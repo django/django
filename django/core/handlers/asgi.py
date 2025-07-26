@@ -50,21 +50,13 @@ class ASGIRequest(HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
+        self.path = scope["path"]
         self.script_name = get_script_prefix(scope)
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
-        # The Django path is different from ASGI scope path args, it should
-        # combine with script name.
-        if self.script_name:
-            self.path = "%s/%s" % (
-                self.script_name.rstrip("/"),
-                self.path_info.replace("/", "", 1),
-            )
-        else:
-            self.path = scope["path"]
         # HTTP basics.
         self.method = self.scope["method"].upper()
         # Ensure query string is encoded correctly.
@@ -271,7 +263,16 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                body_file.write(message["body"])
+                on_disk = getattr(body_file, "_rolled", False)
+                if on_disk:
+                    async_write = sync_to_async(
+                        body_file.write,
+                        thread_sensitive=False,
+                    )
+                    await async_write(message["body"])
+                else:
+                    body_file.write(message["body"])
+
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break
@@ -319,9 +320,7 @@ class ASGIHandler(base.BaseHandler):
                 value = value.encode("latin1")
             response_headers.append((bytes(header), bytes(value)))
         for c in response.cookies.values():
-            response_headers.append(
-                (b"Set-Cookie", c.output(header="").encode("ascii").strip())
-            )
+            response_headers.append((b"Set-Cookie", c.OutputString().encode("ascii")))
         # Initial response message.
         await send(
             {
@@ -332,10 +331,10 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly, to
-            #   allow mapping of a sync iterator.
-            # - Use aclosing() when consuming aiter.
-            #   See https://github.com/python/cpython/commit/6e8dcda
+            # - Consume via `__aiter__` and not `streaming_content` directly,
+            #   to allow mapping of a sync iterator.
+            # - Use aclosing() when consuming aiter. See
+            #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
             async with aclosing(aiter(response)) as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
@@ -343,8 +342,9 @@ class ASGIHandler(base.BaseHandler):
                             {
                                 "type": "http.response.body",
                                 "body": chunk,
-                                # Ignore "more" as there may be more parts; instead,
-                                # use an empty final closing message with False.
+                                # Ignore "more" as there may be more parts;
+                                # instead, use an empty final closing message
+                                # with False.
                                 "more_body": True,
                             }
                         )

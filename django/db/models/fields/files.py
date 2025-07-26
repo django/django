@@ -3,11 +3,13 @@ import posixpath
 
 from django import forms
 from django.core import checks
-from django.core.files.base import File
+from django.core.exceptions import FieldError
+from django.core.files.base import ContentFile, File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
 from django.core.files.utils import validate_file_name
 from django.db.models import signals
+from django.db.models.expressions import DatabaseDefault
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
@@ -88,10 +90,13 @@ class FieldFile(File, AltersData):
     # to further manipulate the underlying file, as well as update the
     # associated model instance.
 
+    def _set_instance_attribute(self, name, content):
+        setattr(self.instance, self.field.attname, name)
+
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
         self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        setattr(self.instance, self.field.attname, self.name)
+        self._set_instance_attribute(self.name, content)
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -171,11 +176,11 @@ class FileDescriptor(DeferredAttribute):
         # instance.file needs to ultimately return some instance of `File`,
         # probably a subclass. Additionally, this returned object needs to have
         # the FieldFile API so that users can easily do things like
-        # instance.file.path and have that delegated to the file storage engine.
-        # Easy enough if we're strict about assignment in __set__, but if you
-        # peek below you can see that we're not. So depending on the current
-        # value of the field we have to dynamically construct some sort of
-        # "thing" to return.
+        # instance.file.path and have that delegated to the file storage
+        # engine. Easy enough if we're strict about assignment in __set__, but
+        # if you peek below you can see that we're not. So depending on the
+        # current value of the field we have to dynamically construct some sort
+        # of "thing" to return.
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
@@ -192,9 +197,15 @@ class FileDescriptor(DeferredAttribute):
             attr = self.field.attr_class(instance, self.field, file)
             instance.__dict__[self.field.attname] = attr
 
+        # If this value is a DatabaseDefault, initialize the attribute class
+        # for this field with its db_default value.
+        elif isinstance(file, DatabaseDefault):
+            attr = self.field.attr_class(instance, self.field, self.field.db_default)
+            instance.__dict__[self.field.attname] = attr
+
         # Other types of files may be assigned as well, but they need to have
-        # the FieldFile interface added to them. Thus, we wrap any other type of
-        # File inside a FieldFile (well, the field's attr_class, which is
+        # the FieldFile interface added to them. Thus, we wrap any other type
+        # of File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
             file_copy = self.field.attr_class(instance, self.field, file.name)
@@ -204,7 +215,8 @@ class FileDescriptor(DeferredAttribute):
 
         # Finally, because of the (some would say boneheaded) way pickle works,
         # the underlying FieldFile might not actually itself have an associated
-        # file. So we need to reset the details of the FieldFile in those cases.
+        # file. So we need to reset the details of the FieldFile in those
+        # cases.
         elif isinstance(file, FieldFile) and not hasattr(file, "field"):
             file.instance = instance
             file.field = self.field
@@ -312,6 +324,15 @@ class FileField(Field):
 
     def pre_save(self, model_instance, add):
         file = super().pre_save(model_instance, add)
+        if file.name is None and file._file is not None:
+            exc = FieldError(
+                f"File for {self.name} must have "
+                "the name attribute specified to be saved."
+            )
+            if isinstance(file._file, ContentFile):
+                exc.add_note("Pass a 'name' argument to ContentFile.")
+            raise exc
+
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
             file.save(file.name, file.file, save=False)
@@ -368,10 +389,10 @@ class ImageFileDescriptor(FileDescriptor):
 
         # To prevent recalculating image dimensions when we are instantiating
         # an object from the database (bug #11084), only update dimensions if
-        # the field had a value before this assignment.  Since the default
+        # the field had a value before this assignment. Since the default
         # value for FileField subclasses is an instance of field.attr_class,
         # previous_file will only be None when we are called from
-        # Model.__init__().  The ImageField.update_dimension_fields method
+        # Model.__init__(). The ImageField.update_dimension_fields method
         # hooked up to the post_init signal handles the Model.__init__() cases.
         # Assignment happening outside of Model.__init__() will trigger the
         # update right here.
@@ -380,6 +401,12 @@ class ImageFileDescriptor(FileDescriptor):
 
 
 class ImageFieldFile(ImageFile, FieldFile):
+    def _set_instance_attribute(self, name, content):
+        setattr(self.instance, self.field.attname, content)
+        # Update the name in case generate_filename() or storage.save() changed
+        # it, but bypass the descriptor to avoid re-reading the file.
+        self.instance.__dict__[self.field.attname] = self.name
+
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, "_dimensions_cache"):
@@ -450,8 +477,8 @@ class ImageField(FileField):
         Update field's width and height fields, if defined.
 
         This method is hooked up to model's post_init signal to update
-        dimensions after instantiating a model instance.  However, dimensions
-        won't be updated if the dimensions fields are already populated.  This
+        dimensions after instantiating a model instance. However, dimensions
+        won't be updated if the dimensions fields are already populated. This
         avoids unnecessary recalculation when loading an object from the
         database.
 
@@ -479,9 +506,9 @@ class ImageField(FileField):
         )
         # When both dimension fields have values, we are most likely loading
         # data from the database or updating an image field that already had
-        # an image stored.  In the first case, we don't want to update the
+        # an image stored. In the first case, we don't want to update the
         # dimension fields because we are already getting their values from the
-        # database.  In the second case, we do want to update the dimensions
+        # database. In the second case, we do want to update the dimensions
         # fields and will skip this return because force will be True since we
         # were called from ImageFileDescriptor.__set__.
         if dimension_fields_filled and not force:

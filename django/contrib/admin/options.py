@@ -2,11 +2,10 @@ import copy
 import enum
 import json
 import re
-import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django import forms
 from django.conf import settings
@@ -41,6 +40,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.functions import Cast
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -55,7 +55,6 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -171,10 +170,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         # ForeignKey or ManyToManyFields
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            # Combine the field kwargs with any options for formfield_overrides.
-            # Make sure the passed in **kwargs override anything in
-            # formfield_overrides because **kwargs is more specific, and should
-            # always win.
+            # Combine the field kwargs with any options for
+            # formfield_overrides. Make sure the passed in **kwargs override
+            # anything in formfield_overrides because **kwargs is more
+            # specific, and should always win.
             if db_field.__class__ in self.formfield_overrides:
                 kwargs = {**self.formfield_overrides[db_field.__class__], **kwargs}
 
@@ -251,7 +250,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def get_field_queryset(self, db, db_field, request):
         """
         If the ModelAdmin specifies ordering, the queryset should respect that
-        ordering.  Otherwise don't specify the queryset, let the field decide
+        ordering. Otherwise don't specify the queryset, let the field decide
         (return None in that case).
         """
         try:
@@ -447,9 +446,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             else self.get_list_display(request)
         )
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         from django.contrib.admin.filters import SimpleListFilter
 
         model = self.model
@@ -497,12 +494,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # for filter_item in self.get_list_filter(request):
-        list_filter = (
-            self.get_list_filter(request) if request is not None else self.list_filter
-        )
-        for filter_item in list_filter:
+        for filter_item in self.get_list_filter(request):
             if isinstance(filter_item, type) and issubclass(
                 filter_item, SimpleListFilter
             ):
@@ -515,7 +507,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         # Is it a valid relational lookup?
         return not {
             LOOKUP_SEP.join(relation_parts),
-            LOOKUP_SEP.join(relation_parts + [part]),
+            LOOKUP_SEP.join([*relation_parts, part]),
         }.isdisjoint(valid_lookups)
 
     def to_field_allowed(self, request, to_field):
@@ -745,8 +737,7 @@ class ModelAdmin(BaseModelAdmin):
                 "<path:object_id>/",
                 wrap(
                     RedirectView.as_view(
-                        pattern_name="%s:%s_%s_change"
-                        % ((self.admin_site.name,) + info)
+                        pattern_name="%s:%s_%s_change" % (self.admin_site.name, *info)
                     )
                 ),
             ),
@@ -973,28 +964,6 @@ class ModelAdmin(BaseModelAdmin):
             single_object=True,
         )
 
-    def log_deletion(self, request, obj, object_repr):
-        """
-        Log that an object will be deleted. Note that this method must be
-        called before the deletion.
-
-        The default implementation creates an admin LogEntry object.
-        """
-        warnings.warn(
-            "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        from django.contrib.admin.models import DELETION, LogEntry
-
-        return LogEntry.objects.log_action(
-            user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(obj).pk,
-            object_id=obj.pk,
-            object_repr=object_repr,
-            action_flag=DELETION,
-        )
-
     def log_deletions(self, request, queryset):
         """
         Log that objects will be deleted. Note that this method must be called
@@ -1003,16 +972,6 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates admin LogEntry objects.
         """
         from django.contrib.admin.models import DELETION, LogEntry
-
-        # RemovedInDjango60Warning.
-        if type(self).log_deletion != ModelAdmin.log_deletion:
-            warnings.warn(
-                "The usage of log_deletion() is deprecated. Implement log_deletions() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            return [self.log_deletion(request, obj, str(obj)) for obj in queryset]
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
@@ -1026,7 +985,9 @@ class ModelAdmin(BaseModelAdmin):
         """
         attrs = {
             "class": "action-select",
-            "aria-label": format_html(_("Select this object for an action - {}"), obj),
+            "aria-label": format_html(
+                _("Select this object for an action - {}"), str(obj)
+            ),
         }
         checkbox = forms.CheckboxInput(attrs, lambda value: False)
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
@@ -1086,10 +1047,10 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
-        Return a list of choices for use in a form object.  Each choice is a
+        Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
-        choices = [] + default_choices
+        choices = [*default_choices]
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
@@ -1098,7 +1059,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_action(self, action):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin.  Return is a tuple of
+        or the name of a method on the ModelAdmin. Return is a tuple of
         (callable, name, description).
         """
         # If the action is a callable, just use it.
@@ -1175,17 +1136,17 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name.removeprefix("^")
+                return "%s__istartswith" % field_name.removeprefix("^"), None
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name.removeprefix("=")
+                return "%s__iexact" % field_name.removeprefix("="), None
             elif field_name.startswith("@"):
-                return "%s__search" % field_name.removeprefix("@")
+                return "%s__search" % field_name.removeprefix("@"), None
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
             # Go through the fields, following all relations.
             prev_field = None
-            for path_part in lookup_fields:
+            for i, path_part in enumerate(lookup_fields):
                 if path_part == "pk":
                     path_part = opts.pk.name
                 try:
@@ -1193,21 +1154,40 @@ class ModelAdmin(BaseModelAdmin):
                 except FieldDoesNotExist:
                     # Use valid query lookups.
                     if prev_field and prev_field.get_lookup(path_part):
-                        return field_name
+                        if path_part == "exact" and not isinstance(
+                            prev_field, (models.CharField, models.TextField)
+                        ):
+                            field_name_without_exact = "__".join(lookup_fields[:i])
+                            alias = Cast(
+                                field_name_without_exact,
+                                output_field=models.CharField(),
+                            )
+                            alias_name = "_".join(lookup_fields[:i])
+                            return f"{alias_name}_str", alias
+                        else:
+                            return field_name, None
                 else:
                     prev_field = field
                     if hasattr(field, "path_infos"):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name
+            return "%s__icontains" % field_name, None
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
-            orm_lookups = [
-                construct_search(str(search_field)) for search_field in search_fields
-            ]
+            str_aliases = {}
+            orm_lookups = []
+            for field in search_fields:
+                lookup, str_alias = construct_search(str(field))
+                orm_lookups.append(lookup)
+                if str_alias:
+                    str_aliases[lookup] = str_alias
+
+            if str_aliases:
+                queryset = queryset.alias(**str_aliases)
+
             term_queries = []
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
@@ -1384,7 +1364,7 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def _get_preserved_qsl(self, request, preserved_filters):
-        query_string = urlparse(request.build_absolute_uri()).query
+        query_string = urlsplit(request.build_absolute_uri()).query
         return parse_qsl(query_string.replace(preserved_filters, ""))
 
     def response_add(self, request, obj, post_url_continue=None):
@@ -1649,7 +1629,7 @@ class ModelAdmin(BaseModelAdmin):
             # the action explicitly on all objects.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
-                # Reminder that something needs to be selected or nothing will happen
+                # Something needs to be selected or nothing will happen.
                 msg = _(
                     "Items must be selected in order to perform "
                     "actions on them. No items have been changed."
@@ -1814,6 +1794,9 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return self._changeform_view(request, object_id, form_url, extra_context)
+
         with transaction.atomic(using=router.db_for_write(self.model)):
             return self._changeform_view(request, object_id, form_url, extra_context)
 
@@ -2175,6 +2158,9 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return self._delete_view(request, object_id, extra_context)
+
         with transaction.atomic(using=router.db_for_write(self.model)):
             return self._delete_view(request, object_id, extra_context)
 
@@ -2196,8 +2182,8 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
 
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
+        # Populate deleted_objects, a data structure of all related objects
+        # that will also be deleted.
         (
             deleted_objects,
             model_count,
@@ -2221,7 +2207,7 @@ class ModelAdmin(BaseModelAdmin):
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
         else:
-            title = _("Are you sure?")
+            title = _("Delete")
 
         context = {
             **self.admin_site.each_context(request),
@@ -2398,8 +2384,6 @@ class InlineModelAdmin(BaseModelAdmin):
         js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
-        if self.classes and "collapse" in self.classes:
-            js.append("collapse.js")
         return forms.Media(js=["admin/js/%s" % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
@@ -2415,7 +2399,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Return a BaseInlineFormSet class for use in admin add/change views."""
+        """Return a BaseInlineFormSet class for use in add/change views."""
         if "fields" in kwargs:
             fields = kwargs.pop("fields")
         else:

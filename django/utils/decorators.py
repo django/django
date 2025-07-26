@@ -2,7 +2,7 @@
 
 from functools import partial, update_wrapper, wraps
 
-from asgiref.sync import iscoroutinefunction
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 
 class classonlymethod(classmethod):
@@ -52,6 +52,10 @@ def _multi_decorate(decorators, method):
         _update_method_wrapper(_wrapper, dec)
     # Preserve any existing attributes of 'method', including the name.
     update_wrapper(_wrapper, method)
+
+    if iscoroutinefunction(method):
+        markcoroutinefunction(_wrapper)
+
     return _wrapper
 
 
@@ -146,8 +150,8 @@ def make_middleware_decorator(middleware_class):
                         response = middleware.process_template_response(
                             request, response
                         )
-                    # Defer running of process_response until after the template
-                    # has been rendered:
+                    # Defer running of process_response until after the
+                    # template has been rendered:
                     if hasattr(middleware, "process_response"):
 
                         def callback(response):

@@ -15,7 +15,7 @@ class GeneratedField(Field):
     _query = None
     output_field = None
 
-    def __init__(self, *, expression, output_field, db_persist=None, **kwargs):
+    def __init__(self, *, expression, output_field, db_persist, **kwargs):
         if kwargs.setdefault("editable", False):
             raise ValueError("GeneratedField cannot be editable.")
         if not kwargs.setdefault("blank", True):
@@ -39,7 +39,7 @@ class GeneratedField(Field):
         return Col(self.model._meta.db_table, self, self.output_field)
 
     def get_col(self, alias, output_field=None):
-        if alias != self.model._meta.db_table and output_field is None:
+        if alias != self.model._meta.db_table and output_field in (None, self):
             output_field = self.output_field
         return super().get_col(alias, output_field)
 

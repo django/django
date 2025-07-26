@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.db import connection, transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -74,7 +73,8 @@ class ManyToManyTests(TestCase):
             with transaction.atomic():
                 a6.publications.add(a5)
 
-        # Add a Publication directly via publications.add by using keyword arguments.
+        # Add a Publication directly via publications.add by using keyword
+        # arguments.
         p5 = a6.publications.create(title="Highlights for Adults")
         self.assertSequenceEqual(
             a6.publications.all(),
@@ -257,8 +257,8 @@ class ManyToManyTests(TestCase):
             [self.a1, self.a3, self.a2, self.a4],
         )
 
-        # Excluding a related item works as you would expect, too (although the SQL
-        # involved is a little complex).
+        # Excluding a related item works as you would expect, too (although the
+        # SQL involved is a little complex).
         self.assertSequenceEqual(
             Article.objects.exclude(publications=self.p2),
             [self.a1],
@@ -325,7 +325,8 @@ class ManyToManyTests(TestCase):
         )
 
     def test_bulk_delete(self):
-        # Bulk delete some Publications - references to deleted publications should go
+        # Bulk delete some Publications - references to deleted publications
+        # should go
         Publication.objects.filter(title__startswith="Science").delete()
         self.assertSequenceEqual(
             Publication.objects.all(),
@@ -576,15 +577,6 @@ class ManyToManyTests(TestCase):
                 self.p3.article_set.exists(), self.p3.article_set.all().exists()
             )
         self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
-
-    def test_get_prefetch_queryset_warning(self):
-        articles = Article.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            self.a1.publications.get_prefetch_queryset(articles)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         articles = Article.objects.all()

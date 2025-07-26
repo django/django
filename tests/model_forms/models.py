@@ -135,7 +135,7 @@ class WriterProfile(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to="unused", blank=True)
+    myfile = models.FileField(storage=temp_storage, upload_to="unused", blank=True)
 
 
 class TextFile(models.Model):
@@ -374,7 +374,7 @@ class FlexibleDatePost(models.Model):
     posted = models.DateField(blank=True, null=True)
 
 
-class Colour(models.Model):
+class Color(models.Model):
     name = models.CharField(max_length=50)
 
     def __iter__(self):
@@ -384,9 +384,9 @@ class Colour(models.Model):
         return self.name
 
 
-class ColourfulItem(models.Model):
+class ColorfulItem(models.Model):
     name = models.CharField(max_length=50)
-    colours = models.ManyToManyField(Colour)
+    colors = models.ManyToManyField(Color)
 
 
 class CustomErrorMessage(models.Model):
@@ -521,3 +521,25 @@ class Dice(models.Model):
         through=NumbersToDice,
         limit_choices_to=models.Q(value__gte=1),
     )
+
+
+class ConstraintsModel(models.Model):
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=50, default="uncategorized")
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        required_db_features = {"supports_table_check_constraints"}
+        constraints = [
+            models.UniqueConstraint(
+                "name",
+                "category",
+                name="unique_name_category",
+                violation_error_message="This product already exists.",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(price__gt=0),
+                name="price_gte_zero",
+                violation_error_message="Price must be greater than zero.",
+            ),
+        ]

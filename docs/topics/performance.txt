@@ -55,11 +55,10 @@ code.
 Django tools
 ~~~~~~~~~~~~
 
-`django-debug-toolbar
-<https://github.com/jazzband/django-debug-toolbar/>`_ is a very handy tool that
-provides insights into what your code is doing and how much time it spends
-doing it. In particular it can show you all the SQL queries your page is
-generating, and how long each one has taken.
+:pypi:`django-debug-toolbar` is a very handy tool that provides insights into
+what your code is doing and how much time it spends doing it. In particular it
+can show you all the SQL queries your page is generating, and how long each one
+has taken.
 
 Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.
@@ -73,10 +72,7 @@ in effect simulating the experience of an actual user.
 
 These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
-adequately measured from within Django environment. Examples include:
-
-* `Yahoo's Yslow <https://yslow.org/>`_
-* `Google PageSpeed <https://developers.google.com/speed/>`_
+adequately measured from within Django environment.
 
 There are also several paid-for services that perform a similar analysis,
 including some that are Django-aware and can integrate with your codebase to
@@ -138,7 +134,7 @@ one that it is comfortable to code for.
 
     Firstly, in a real-life case you need to consider what is happening before
     and after your count to work out what's an optimal way of doing it *in that
-    particular context*. The database optimization documents describes :ref:`a
+    particular context*. The database optimization document describes :ref:`a
     case where counting in the template would be better
     <overuse_of_count_and_exists>`.
 
@@ -216,11 +212,12 @@ Laziness in Django
 ------------------
 
 Django is itself quite lazy. A good example of this can be found in the
-evaluation of ``QuerySets``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
+evaluation of a ``QuerySet``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
 Thus a ``QuerySet`` can be created, passed around and combined with other
-``QuerySets``, without actually incurring any trips to the database to fetch
-the items it describes. What gets passed around is the ``QuerySet`` object, not
-the collection of items that - eventually - will be required from the database.
+``QuerySet`` instances, without actually incurring any trips to the database
+to fetch the items it describes. What gets passed around is the ``QuerySet``
+object, not the collection of items that - eventually - will be required from
+the database.
 
 On the other hand, :ref:`certain operations will force the evaluation of a
 QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
@@ -423,7 +420,8 @@ performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
 <https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.
-Django is compatible, but you will need to check the compatibility of other
+Django is compatible with versions of PyPy corresponding to the supported
+Python versions, but you will need to check the compatibility of other
 libraries you rely on.
 
 C implementations of Python libraries

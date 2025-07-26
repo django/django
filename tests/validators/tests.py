@@ -1,3 +1,4 @@
+import ipaddress
 import re
 import types
 from datetime import datetime, timedelta
@@ -9,6 +10,7 @@ from django.core.files.base import ContentFile
 from django.core.validators import (
     BaseValidator,
     DecimalValidator,
+    DomainNameValidator,
     EmailValidator,
     FileExtensionValidator,
     MaxLengthValidator,
@@ -21,6 +23,7 @@ from django.core.validators import (
     URLValidator,
     int_list_validator,
     validate_comma_separated_integer_list,
+    validate_domain_name,
     validate_email,
     validate_image_file_extension,
     validate_integer,
@@ -124,6 +127,7 @@ VALID_URLS = [
     "http://مثال.إختبار",
     "http://例子.测试",
     "http://उदाहरण.परीक्षा",
+    "https://މިހާރު.com",  # (valid in IDNA 2008 but not IDNA 2003)
     "http://-.~_!$&'()*+,;=%40:80%2f@example.com",
     "http://xn--7sbb4ac0ad0be6cf.xn--p1ai",
     "http://1337.net",
@@ -316,6 +320,20 @@ TEST_DATA = [
     (validate_email, "example@inv-.alid-.com", ValidationError),
     (validate_email, "example@inv-.-alid.com", ValidationError),
     (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
+    (validate_email, "email@xn--4ca9at.com", None),
+    (validate_email, "email@öäü.com", None),
+    (validate_email, "email@עִתוֹן.example.il", None),
+    (validate_email, "email@މިހާރު.example.mv", None),
+    (validate_email, "email@漢字.example.com", None),
+    (validate_email, "editor@މިހާރު.example.mv", None),
+    (validate_email, "@domain.com", ValidationError),
+    (validate_email, "email.domain.com", ValidationError),
+    (validate_email, "email@domain@domain.com", ValidationError),
+    (validate_email, "email@domain..com", ValidationError),
+    (validate_email, "email@.domain.com", ValidationError),
+    (validate_email, "email@-domain.com", ValidationError),
+    (validate_email, "email@domain-.com", ValidationError),
+    (validate_email, "email@domain.com-", ValidationError),
     # Quoted-string format (CR not allowed)
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
@@ -381,15 +399,25 @@ TEST_DATA = [
     (validate_ipv6_address, "fe80::1", None),
     (validate_ipv6_address, "::1", None),
     (validate_ipv6_address, "1:2:3:4:5:6:7:8", None),
+    (validate_ipv6_address, ipaddress.IPv6Address("::ffff:2.125.160.216"), None),
+    (validate_ipv6_address, ipaddress.IPv6Address("fe80::1"), None),
+    (validate_ipv6_address, Decimal("33.1"), ValidationError),
+    (validate_ipv6_address, 9.22, ValidationError),
     (validate_ipv6_address, "1:2", ValidationError),
     (validate_ipv6_address, "::zzz", ValidationError),
     (validate_ipv6_address, "12345::", ValidationError),
     (validate_ipv46_address, "1.1.1.1", None),
     (validate_ipv46_address, "255.0.0.0", None),
     (validate_ipv46_address, "0.0.0.0", None),
+    (validate_ipv46_address, ipaddress.IPv4Address("1.1.1.1"), None),
+    (validate_ipv46_address, ipaddress.IPv4Address("255.0.0.0"), None),
     (validate_ipv46_address, "fe80::1", None),
     (validate_ipv46_address, "::1", None),
     (validate_ipv46_address, "1:2:3:4:5:6:7:8", None),
+    (validate_ipv46_address, ipaddress.IPv6Address("::ffff:2.125.160.216"), None),
+    (validate_ipv46_address, ipaddress.IPv6Address("fe80::1"), None),
+    (validate_ipv46_address, Decimal("33.1"), ValidationError),
+    (validate_ipv46_address, 9.22, ValidationError),
     (validate_ipv46_address, "256.1.1.1", ValidationError),
     (validate_ipv46_address, "25.1.1.", ValidationError),
     (validate_ipv46_address, "25,1,1,1", ValidationError),
@@ -618,6 +646,48 @@ TEST_DATA = [
     (ProhibitNullCharactersValidator(), "\x00something", ValidationError),
     (ProhibitNullCharactersValidator(), "something", None),
     (ProhibitNullCharactersValidator(), None, None),
+    (validate_domain_name, "000000.org", None),
+    (validate_domain_name, "python.org", None),
+    (validate_domain_name, "python.co.uk", None),
+    (validate_domain_name, "python.tk", None),
+    (validate_domain_name, "domain.with.idn.tld.उदाहरण.परीक्ष", None),
+    (validate_domain_name, "ıçğü.com", None),
+    (validate_domain_name, "xn--7ca6byfyc.com", None),
+    (validate_domain_name, "hg.python.org", None),
+    (validate_domain_name, "python.xyz", None),
+    (validate_domain_name, "djangoproject.com", None),
+    (validate_domain_name, "DJANGOPROJECT.COM", None),
+    (validate_domain_name, "spam.eggs", None),
+    (validate_domain_name, "python-python.com", None),
+    (validate_domain_name, "python.name.uk", None),
+    (validate_domain_name, "python.tips", None),
+    (validate_domain_name, "例子.测试", None),
+    (validate_domain_name, "dashinpunytld.xn---c", None),
+    (validate_domain_name, "python..org", ValidationError),
+    (validate_domain_name, "python-.org", ValidationError),
+    (validate_domain_name, "too-long-name." * 20 + "com", ValidationError),
+    (validate_domain_name, "stupid-name试", ValidationError),
+    (validate_domain_name, "255.0.0.0", ValidationError),
+    (validate_domain_name, "fe80::1", ValidationError),
+    (validate_domain_name, "1:2:3:4:5:6:7:8", ValidationError),
+    (DomainNameValidator(accept_idna=False), "non-idna-domain-name-passes.com", None),
+    (
+        DomainNameValidator(accept_idna=False),
+        "domain.with.idn.tld.उदाहरण.परीक्ष",
+        ValidationError,
+    ),
+    (DomainNameValidator(accept_idna=False), "ıçğü.com", ValidationError),
+    (DomainNameValidator(accept_idna=False), "not-domain-name", ValidationError),
+    (
+        DomainNameValidator(accept_idna=False),
+        "not-domain-name, but-has-domain-name-suffix.com",
+        ValidationError,
+    ),
+    (
+        DomainNameValidator(accept_idna=False),
+        "not-domain-name.com, but has domain prefix",
+        ValidationError,
+    ),
 ]
 
 # Add valid and invalid URL tests.
@@ -846,4 +916,26 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             ProhibitNullCharactersValidator(message="message", code="code1"),
             ProhibitNullCharactersValidator(message="message", code="code2"),
+        )
+
+    def test_domain_name_equality(self):
+        self.assertEqual(
+            DomainNameValidator(),
+            DomainNameValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            EmailValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            DomainNameValidator(code="custom_code"),
+        )
+        self.assertEqual(
+            DomainNameValidator(message="custom error message"),
+            DomainNameValidator(message="custom error message"),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(message="custom error message"),
+            DomainNameValidator(message="custom error message", code="custom_code"),
         )

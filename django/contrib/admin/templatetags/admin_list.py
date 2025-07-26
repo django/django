@@ -42,12 +42,14 @@ def paginator_number(cl, i):
     if i == cl.paginator.ELLIPSIS:
         return format_html("{} ", cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{}</span> ', i)
+        return format_html(
+            '<a role="button" href="" aria-current="page">{}</a> ',
+            i,
+        )
     else:
         return format_html(
-            '<a href="{}"{}>{}</a> ',
+            '<a role="button" href="{}">{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
-            mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
         )
 
@@ -214,6 +216,7 @@ def items_for_result(cl, result, form):
     for field_index, field_name in enumerate(cl.list_display):
         empty_value_display = cl.model_admin.get_empty_value_display()
         row_classes = ["field-%s" % _coerce_field_name(field_name, field_index)]
+        link_to_changelist = link_in_col(first, field_name, cl)
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -222,6 +225,8 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
+            if isinstance(value, str) and value.strip() == "":
+                value = ""
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
@@ -240,14 +245,20 @@ def items_for_result(cl, result, form):
                     else:
                         result_repr = field_val
                 else:
-                    result_repr = display_for_field(value, f, empty_value_display)
+                    result_repr = display_for_field(
+                        value,
+                        f,
+                        empty_value_display,
+                        avoid_link=link_to_changelist,
+                    )
                 if isinstance(
                     f, (models.DateField, models.TimeField, models.ForeignKey)
                 ):
                     row_classes.append("nowrap")
         row_class = mark_safe(' class="%s"' % " ".join(row_classes))
-        # If list_display_links not defined, add the link tag to the first field
-        if link_in_col(first, field_name, cl):
+        # If list_display_links not defined, add the link tag to the first
+        # field
+        if link_to_changelist:
             table_tag = "th" if first else "td"
             first = False
 
@@ -283,9 +294,9 @@ def items_for_result(cl, result, form):
                 "<{}{}>{}</{}>", table_tag, row_class, link_or_text, table_tag
             )
         else:
-            # By default the fields come from ModelAdmin.list_editable, but if we pull
-            # the fields out of the form instead of list_editable custom admins
-            # can provide fields on a per request basis
+            # By default the fields come from ModelAdmin.list_editable, but if
+            # we pull the fields out of the form instead of list_editable
+            # custom admins can provide fields on a per request basis
             if (
                 form
                 and field_name in form.fields

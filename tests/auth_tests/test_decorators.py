@@ -1,10 +1,9 @@
-from asyncio import iscoroutinefunction
-
-from asgiref.sync import sync_to_async
+from asgiref.sync import iscoroutinefunction
 
 from django.conf import settings
 from django.contrib.auth import models
 from django.contrib.auth.decorators import (
+    login_not_required,
     login_required,
     permission_required,
     user_passes_test,
@@ -111,6 +110,40 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     async def test_login_required_next_url_async_view(self):
         await self.test_login_required_async_view(login_url="/somewhere/")
+
+
+class LoginNotRequiredTestCase(TestCase):
+    """
+    Tests the login_not_required decorators
+    """
+
+    def test_callable(self):
+        """
+        login_not_required is assignable to callable objects.
+        """
+
+        class CallableView:
+            def __call__(self, *args, **kwargs):
+                pass
+
+        login_not_required(CallableView())
+
+    def test_view(self):
+        """
+        login_not_required is assignable to normal views.
+        """
+
+        def normal_view(request):
+            pass
+
+        login_not_required(normal_view)
+
+    def test_decorator_marks_view_as_login_not_required(self):
+        @login_not_required
+        def view(request):
+            return HttpResponse()
+
+        self.assertFalse(view.login_required)
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
@@ -339,7 +372,7 @@ class UserPassesTestDecoratorTest(TestCase):
 
     def test_decorator_async_test_func(self):
         async def async_test_func(user):
-            return await sync_to_async(user.has_perms)(["auth_tests.add_customuser"])
+            return await user.ahas_perms(["auth_tests.add_customuser"])
 
         @user_passes_test(async_test_func)
         def sync_view(request):
@@ -375,7 +408,7 @@ class UserPassesTestDecoratorTest(TestCase):
 
     async def test_decorator_async_view_async_test_func(self):
         async def async_test_func(user):
-            return await sync_to_async(user.has_perms)(["auth_tests.add_customuser"])
+            return await user.ahas_perms(["auth_tests.add_customuser"])
 
         @user_passes_test(async_test_func)
         async def async_view(request):

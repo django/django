@@ -2,6 +2,7 @@ import uuid
 from decimal import Decimal
 
 from django.apps import apps
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection
 from django.db.models import (
     CharField,
@@ -18,13 +19,18 @@ from django.test.utils import isolate_apps
 from .models import (
     Foo,
     GeneratedModel,
+    GeneratedModelCheckConstraint,
+    GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
+    GeneratedModelNonAutoPk,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
     GeneratedModelOutputFieldDbCollation,
     GeneratedModelOutputFieldDbCollationVirtual,
     GeneratedModelParams,
     GeneratedModelParamsVirtual,
+    GeneratedModelUniqueConstraint,
+    GeneratedModelUniqueConstraintVirtual,
     GeneratedModelVirtual,
 )
 
@@ -88,11 +94,11 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             )
 
     def test_db_persist_required(self):
-        msg = "GeneratedField.db_persist must be True or False."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaises(TypeError):
             GeneratedField(
                 expression=Lower("name"), output_field=CharField(max_length=255)
             )
+        msg = "GeneratedField.db_persist must be True or False."
         with self.assertRaisesMessage(ValueError, msg):
             GeneratedField(
                 expression=Lower("name"),
@@ -123,7 +129,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 db_persist=True,
             )
 
-        col = Square._meta.get_field("area").get_col("alias")
+        field = Square._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, IntegerField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, IntegerField)
 
         class FloatSquare(Model):
@@ -134,7 +145,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 output_field=FloatField(),
             )
 
-        col = FloatSquare._meta.get_field("area").get_col("alias")
+        field = FloatSquare._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, FloatField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, FloatField)
 
     @isolate_apps("model_fields")
@@ -164,7 +180,7 @@ class GeneratedFieldTestMixin:
 
     def test_unsaved_error(self):
         m = self.base_model(a=1, b=2)
-        msg = "Cannot read a generated field from an unsaved model."
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
         with self.assertRaisesMessage(AttributeError, msg):
             m.field
 
@@ -175,6 +191,42 @@ class GeneratedFieldTestMixin:
         m.save()
         m = self._refresh_if_needed(m)
         self.assertEqual(m.field, 3)
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_full_clean_with_check_constraint(self):
+        model_name = self.check_constraint_model._meta.verbose_name.capitalize()
+
+        m = self.check_constraint_model(a=2)
+        m.full_clean()
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.a_squared, 4)
+
+        m = self.check_constraint_model(a=-1)
+        with self.assertRaises(ValidationError) as cm:
+            m.full_clean()
+        self.assertEqual(
+            cm.exception.message_dict,
+            {"__all__": [f"Constraint “{model_name} a > 0” is violated."]},
+        )
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_full_clean_with_unique_constraint_expression(self):
+        model_name = self.unique_constraint_model._meta.verbose_name.capitalize()
+
+        m = self.unique_constraint_model(a=2)
+        m.full_clean()
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.a_squared, 4)
+
+        m = self.unique_constraint_model(a=2)
+        with self.assertRaises(ValidationError) as cm:
+            m.full_clean()
+        self.assertEqual(
+            cm.exception.message_dict,
+            {"__all__": [f"Constraint “{model_name} a” is violated."]},
+        )
 
     def test_create(self):
         m = self.base_model.objects.create(a=1, b=2)
@@ -196,6 +248,12 @@ class GeneratedFieldTestMixin:
         m.save()
         m.refresh_from_db()
         self.assertEqual(m.field, 8)
+
+    def test_save_model_with_pk(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
 
     def test_save_model_with_foreign_key(self):
         fk_object = Foo.objects.create(a="abc", d=Decimal("12.34"))
@@ -289,6 +347,8 @@ class GeneratedFieldTestMixin:
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModel
     nullable_model = GeneratedModelNull
+    check_constraint_model = GeneratedModelCheckConstraint
+    unique_constraint_model = GeneratedModelUniqueConstraint
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollation
     params_model = GeneratedModelParams
 
@@ -297,10 +357,18 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         obj = self._refresh_if_needed(obj)
         self.assertEqual(obj.field, obj.field_copy)
 
+    def test_create_with_non_auto_pk(self):
+        obj = GeneratedModelNonAutoPk.objects.create(id=1, a=2)
+        self.assertEqual(obj.id, 1)
+        self.assertEqual(obj.a, 2)
+        self.assertEqual(obj.b, 2)
+
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
 class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModelVirtual
     nullable_model = GeneratedModelNullVirtual
+    check_constraint_model = GeneratedModelCheckConstraintVirtual
+    unique_constraint_model = GeneratedModelUniqueConstraintVirtual
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollationVirtual
     params_model = GeneratedModelParamsVirtual

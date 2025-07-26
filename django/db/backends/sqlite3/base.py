@@ -40,6 +40,12 @@ def adapt_datetime(val):
     return val.isoformat(" ")
 
 
+def _get_varchar_column(data):
+    if data["max_length"] is None:
+        return "varchar"
+    return "varchar(%(max_length)s)" % data
+
+
 Database.register_converter("bool", b"1".__eq__)
 Database.register_converter("date", decoder(parse_date))
 Database.register_converter("time", decoder(parse_time))
@@ -54,15 +60,15 @@ Database.register_adapter(datetime.datetime, adapt_datetime)
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "sqlite"
     display_name = "SQLite"
-    # SQLite doesn't actually support most of these types, but it "does the right
-    # thing" given more verbose field definitions, so leave them as is so that
-    # schema inspection is more useful.
+    # SQLite doesn't actually support most of these types, but it "does the
+    # right thing" given more verbose field definitions, so leave them as is so
+    # that schema inspection is more useful.
     data_types = {
         "AutoField": "integer",
         "BigAutoField": "integer",
         "BinaryField": "BLOB",
         "BooleanField": "bool",
-        "CharField": "varchar(%(max_length)s)",
+        "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "datetime",
         "DecimalField": "decimal",
@@ -118,13 +124,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
-    # the right-hand side of the lookup isn't a raw string (it might be an expression
-    # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # the right-hand side of the lookup isn't a raw string (it might be an
+    # expression or the result of a bilateral transformation). In those cases,
+    # special characters for LIKE operators (e.g. \, *, _) should be escaped on
+    # database side.
     #
-    # Note: we use str.format() here for readability as '%' is used as a wildcard for
-    # the LIKE operator.
+    # Note: we use str.format() here for readability as '%' is used as a
+    # wildcard for the LIKE operator.
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
         "contains": r"LIKE '%%' || {} || '%%' ESCAPE '\'",

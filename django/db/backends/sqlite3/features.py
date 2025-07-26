@@ -1,4 +1,5 @@
 import operator
+import sqlite3
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -9,11 +10,10 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (3, 27)
+    minimum_database_version = (3, 31)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
-    max_query_params = 999
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
@@ -31,18 +31,18 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_parentheses_in_compound = False
     can_defer_constraint_checks = True
     supports_over_clause = True
-    supports_frame_range_fixed_distance = Database.sqlite_version_info >= (3, 28, 0)
-    supports_frame_exclusion = Database.sqlite_version_info >= (3, 28, 0)
-    supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
-    supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
-    # NULLS LAST/FIRST emulation on < 3.30 requires subquery wrapping.
-    requires_compound_order_by_subquery = Database.sqlite_version_info < (3, 30)
+    supports_frame_range_fixed_distance = True
+    supports_frame_exclusion = True
+    supports_aggregate_filter_clause = True
+    supports_aggregate_order_by_clause = Database.sqlite_version_info >= (3, 44, 0)
+    supports_aggregate_distinct_multiple_argument = False
+    supports_any_value = True
     order_by_nulls_first = True
     supports_json_field_contains = False
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
-    supports_stored_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
-    supports_virtual_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
+    supports_stored_generated_columns = True
+    supports_virtual_generated_columns = True
     test_collations = {
         "ci": "nocase",
         "cs": "binary",
@@ -54,15 +54,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
     }
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
+    supports_unlimited_charfield = True
 
     @cached_property
     def django_test_skips(self):
@@ -103,7 +97,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "servers.tests.LiveServerTestCloseConnectionTest."
                         "test_closes_connections",
                     },
-                    "For SQLite in-memory tests, closing the connection destroys"
+                    "For SQLite in-memory tests, closing the connection destroys "
                     "the database.": {
                         "test_utils.tests.AssertNumQueriesUponConnectionTests."
                         "test_ignores_connection_configuration_queries",
@@ -125,6 +119,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if Database.sqlite_version_info < (3, 47):
+            skips.update(
+                {
+                    "SQLite does not parse escaped double quotes in the JSON path "
+                    "notation": {
+                        "model_fields.test_jsonfield.TestQuerying."
+                        "test_lookups_special_chars_double_quotes",
+                    },
+                }
+            )
         return skips
 
     @cached_property
@@ -136,6 +140,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "GenericIPAddressField": "CharField",
             "SmallAutoField": "AutoField",
         }
+
+    @property
+    def max_query_params(self):
+        """
+        SQLite has a variable limit per query. The limit can be changed using
+        the SQLITE_MAX_VARIABLE_NUMBER compile-time option (which defaults to
+        999 in versions < 3.32.0 or 32766 in newer versions) or lowered per
+        connection at run-time with setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
+        """
+        return self.connection.connection.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
 
     @cached_property
     def supports_json_field(self):

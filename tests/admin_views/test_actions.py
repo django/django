@@ -72,6 +72,7 @@ class AdminActionsTest(TestCase):
         self.assertContains(
             confirmation, "Are you sure you want to delete the selected subscribers?"
         )
+        self.assertContains(confirmation, "<h1>Delete multiple objects</h1>")
         self.assertContains(confirmation, "<h2>Summary</h2>")
         self.assertContains(confirmation, "<li>Subscribers: 2</li>")
         self.assertContains(confirmation, "<li>External subscribers: 1</li>")

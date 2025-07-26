@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             model_name="integerarraydefaultmodel",
             name="field_2",
             field=django.contrib.postgres.fields.ArrayField(
-                models.IntegerField(), default=[], size=None
+                models.IntegerField(), default=[]
             ),
             preserve_default=False,
         ),

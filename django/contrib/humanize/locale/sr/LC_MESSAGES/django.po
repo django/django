@@ -2,14 +2,14 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2021,2023
+# Igor Jerosimić, 2021,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:40+0000\n"
-"Last-Translator: Igor Jerosimić, 2021,2023\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2021,2023,2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -122,30 +122,30 @@ msgstr[2] "%(value)s трилијарди"
 #, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
-msgstr[0] "%(value)sквадрилион "
-msgstr[1] "%(value)sквадрилиона "
-msgstr[2] "%(value)sквадрилиона "
+msgstr[0] "%(value)s квадрилион"
+msgstr[1] "%(value)s квадрилиона"
+msgstr[2] "%(value)s квадрилиона"
 
 #, python-format
 msgid "%(value)s octillion"
 msgid_plural "%(value)s octillion"
-msgstr[0] "%(value)sквадрилијарда "
-msgstr[1] "%(value)sквадрилијарде "
-msgstr[2] "%(value)sквадрилијарди "
+msgstr[0] "%(value)s квадрилијарда"
+msgstr[1] "%(value)s квадрилијарде"
+msgstr[2] "%(value)s квадрилијарди"
 
 #, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
-msgstr[0] "%(value)sквантилион "
-msgstr[1] "%(value)sквантилиона "
-msgstr[2] "%(value)sквантилиона "
+msgstr[0] "%(value)s квантилион"
+msgstr[1] "%(value)s квантилиона"
+msgstr[2] "%(value)s квантилиона"
 
 #, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
-msgstr[0] "%(value)sквантилијарда "
-msgstr[1] "%(value)sквантилијарде "
-msgstr[2] "%(value)sквантилијарди "
+msgstr[0] "%(value)s квантилијарда"
+msgstr[1] "%(value)s квантилијарде"
+msgstr[2] "%(value)s квантилијарди"
 
 #, python-format
 msgid "%(value)s googol"

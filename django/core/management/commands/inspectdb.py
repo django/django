@@ -25,6 +25,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help=(
                 'Nominates a database to introspect. Defaults to using the "default" '
                 "database."
@@ -105,9 +106,12 @@ class Command(BaseCommand):
                         connection.introspection.get_primary_key_columns(
                             cursor, table_name
                         )
+                        or []
                     )
                     primary_key_column = (
-                        primary_key_columns[0] if primary_key_columns else None
+                        primary_key_columns[0]
+                        if len(primary_key_columns) == 1
+                        else None
                     )
                     unique_columns = [
                         c["columns"][0]
@@ -127,6 +131,11 @@ class Command(BaseCommand):
                 yield ""
                 yield "class %s(models.Model):" % model_name
                 known_models.append(model_name)
+
+                if len(primary_key_columns) > 1:
+                    fields = ", ".join([f"'{col}'" for col in primary_key_columns])
+                    yield f"    pk = models.CompositePrimaryKey({fields})"
+
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
                 used_relations = set()  # Holds foreign relations used in the table.
@@ -150,12 +159,6 @@ class Command(BaseCommand):
                     # Add primary_key and unique, if necessary.
                     if column_name == primary_key_column:
                         extra_params["primary_key"] = True
-                        if len(primary_key_columns) > 1:
-                            comment_notes.append(
-                                "The composite primary key (%s) found, that is not "
-                                "supported. The first column is selected."
-                                % ", ".join(primary_key_columns)
-                            )
                     elif column_name in unique_columns:
                         extra_params["unique"] = True
 
@@ -190,8 +193,8 @@ class Command(BaseCommand):
                             )
                         used_relations.add(rel_to)
                     else:
-                        # Calling `get_field_type` to get the field type string and any
-                        # additional parameters and notes.
+                        # Calling `get_field_type` to get the field type string
+                        # and any additional parameters and notes.
                         field_type, field_params, field_notes = self.get_field_type(
                             connection, table_name, row
                         )
@@ -200,8 +203,8 @@ class Command(BaseCommand):
 
                         field_type += "("
 
-                    # Don't output 'id = meta.AutoField(primary_key=True)', because
-                    # that's assumed if it doesn't exist.
+                    # Don't output 'id = meta.AutoField(primary_key=True)',
+                    # because that's assumed if it doesn't exist.
                     if att_name == "id" and extra_params == {"primary_key": True}:
                         if field_type == "AutoField(":
                             continue
@@ -212,8 +215,8 @@ class Command(BaseCommand):
                         ):
                             comment_notes.append("AutoField?")
 
-                    # Add 'null' and 'blank', if the 'null_ok' flag was present in the
-                    # table description.
+                    # Add 'null' and 'blank', if the 'null_ok' flag was present
+                    # in the table description.
                     if row.null_ok:  # If it's NULL...
                         extra_params["blank"] = True
                         extra_params["null"] = True
@@ -284,7 +287,8 @@ class Command(BaseCommand):
             while new_name.find(LOOKUP_SEP) >= 0:
                 new_name = new_name.replace(LOOKUP_SEP, "_")
             if col_name.lower().find(LOOKUP_SEP) >= 0:
-                # Only add the comment if the double underscore was in the original name
+                # Only add the comment if the double underscore was in the
+                # original name
                 field_notes.append(
                     "Field renamed because it contained more than one '_' in a row."
                 )
@@ -388,7 +392,7 @@ class Command(BaseCommand):
                 columns = [
                     x for x in columns if x is not None and x in column_to_field_name
                 ]
-                if len(columns) > 1:
+                if len(columns) > 1 and not params["primary_key"]:
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
                     )

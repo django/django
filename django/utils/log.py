@@ -92,6 +92,13 @@ class AdminEmailHandler(logging.Handler):
         )
 
     def emit(self, record):
+        # Early return when no email will be sent.
+        if (
+            not settings.ADMINS
+            # Method not overridden.
+            and self.send_mail.__func__ is AdminEmailHandler.send_mail
+        ):
+            return
         try:
             request = record.request
             subject = "%s (%s IP): %s" % (
@@ -238,9 +245,14 @@ def log_response(
         else:
             level = "info"
 
+    escaped_args = tuple(
+        a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
+        for a in args
+    )
+
     getattr(logger, level)(
         message,
-        *args,
+        *escaped_args,
         extra={
             "status_code": response.status_code,
             "request": request,

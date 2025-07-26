@@ -11,6 +11,7 @@ from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_applicati
 from django.db import connections
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.version import get_docs_version
 
 naiveip_re = _lazy_re_compile(
     r"""^(?:
@@ -26,8 +27,6 @@ naiveip_re = _lazy_re_compile(
 class Command(BaseCommand):
     help = "Starts a lightweight web server for development."
 
-    # Validation is called explicitly each time the server is reloaded.
-    requires_system_checks = []
     stealth_options = ("shutdown_message",)
     suppressed_base_arguments = {"--verbosity", "--traceback"}
 
@@ -60,11 +59,6 @@ class Command(BaseCommand):
             dest="use_reloader",
             help="Tells Django to NOT use the auto-reloader.",
         )
-        parser.add_argument(
-            "--skip-checks",
-            action="store_true",
-            help="Skip system checks.",
-        )
 
     def execute(self, *args, **options):
         if options["no_color"]:
@@ -77,6 +71,10 @@ class Command(BaseCommand):
     def get_handler(self, *args, **options):
         """Return the default WSGI handler for the runner."""
         return get_internal_wsgi_application()
+
+    def get_check_kwargs(self, options):
+        """Validation is called explicitly each time the server reloads."""
+        return {"tags": set()}
 
     def handle(self, *args, **options):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
@@ -131,7 +129,9 @@ class Command(BaseCommand):
 
         if not options["skip_checks"]:
             self.stdout.write("Performing system checks...\n\n")
-            self.check(display_num_errors=True)
+            check_kwargs = super().get_check_kwargs(options)
+            check_kwargs["display_num_errors"] = True
+            self.check(**check_kwargs)
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
@@ -188,3 +188,14 @@ class Command(BaseCommand):
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )
+        docs_version = get_docs_version()
+        if os.environ.get("DJANGO_RUNSERVER_HIDE_WARNING") != "true":
+            self.stdout.write(
+                self.style.WARNING(
+                    "WARNING: This is a development server. Do not use it in a "
+                    "production setting. Use a production WSGI or ASGI server "
+                    "instead.\nFor more information on production servers see: "
+                    f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+                    "deployment/"
+                )
+            )

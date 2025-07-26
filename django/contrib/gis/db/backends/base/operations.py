@@ -28,8 +28,8 @@ class BaseSpatialOperations:
 
     geom_func_prefix = ""
 
-    # Mapping between Django function names and backend names, when names do not
-    # match; used in spatial_function_name().
+    # Mapping between Django function names and backend names, when names do
+    # not match; used in spatial_function_name().
     function_names = {}
 
     # Set of known unsupported functions of the backend
@@ -39,17 +39,22 @@ class BaseSpatialOperations:
         "AsGML",
         "AsKML",
         "AsSVG",
+        "AsWKB",
+        "AsWKT",
         "Azimuth",
         "BoundingCircle",
         "Centroid",
         "ClosestPoint",
         "Difference",
         "Distance",
+        "DistanceSpheroid",
         "Envelope",
+        "ForcePolygonCW",
         "FromWKB",
         "FromWKT",
         "GeoHash",
         "GeometryDistance",
+        "GeometryType",
         "Intersection",
         "IsEmpty",
         "IsValid",
@@ -62,6 +67,7 @@ class BaseSpatialOperations:
         "Perimeter",
         "PointOnSurface",
         "Reverse",
+        "Rotate",
         "Scale",
         "SnapToGrid",
         "SymDifference",
@@ -73,8 +79,8 @@ class BaseSpatialOperations:
     # Constructors
     from_text = False
 
-    # Default conversion functions for aggregates; will be overridden if implemented
-    # for the spatial backend.
+    # Default conversion functions for aggregates; will be overridden if
+    # implemented for the spatial backend.
     def convert_extent(self, box, srid):
         raise NotImplementedError(
             "Aggregate extent not implemented for this spatial backend."
@@ -111,7 +117,7 @@ class BaseSpatialOperations:
     def get_geom_placeholder(self, f, value, compiler):
         """
         Return the placeholder for the given geometry field with the given
-        value.  Depending on the spatial backend, the placeholder may contain a
+        value. Depending on the spatial backend, the placeholder may contain a
         stored procedure call to the transformation function of the spatial
         backend.
         """

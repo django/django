@@ -3,7 +3,7 @@
 # Translators:
 # 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019-2020,2023
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019-2020,2023,2025
 # Menachem G., 2021
 # Menachem G., 2021
 # אורי רודברג <uri@speedy.net>, 2021
@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
-"2011-2015,2017,2019-2020,2023\n"
+"2011-2015,2017,2019-2020,2023,2025\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -351,6 +351,9 @@ msgstr "עמוד זה אינו מכיל תוצאות"
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
 
+msgid "Enter a valid domain name."
+msgstr "יש להזין שם מתחם חוקי."
+
 msgid "Enter a valid URL."
 msgstr "יש להזין URL חוקי."
 
@@ -372,14 +375,18 @@ msgid ""
 msgstr ""
 "יש להזין 'slug' חוקי המכיל אותיות יוניקוד, ספרות, קווים תחתונים או מקפים."
 
-msgid "Enter a valid IPv4 address."
-msgstr "יש להזין כתובת IPv4 חוקית."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "יש להזין כתובת %(protocol)s חוקית."
 
-msgid "Enter a valid IPv6 address."
-msgstr "יש להזין כתובת IPv6 חוקית."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "יש להזין כתובת IPv4 או IPv6 חוקית."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 או IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "יש להזין רק ספרות מופרדות בפסיקים."
@@ -421,8 +428,6 @@ msgstr[1] ""
 "נא לוודא שערך זה מכיל %(limit_value)d תווים לכל הפחות (מכיל %(show_value)d)."
 msgstr[2] ""
 "נא לוודא שערך זה מכיל %(limit_value)d תווים לכל הפחות (מכיל %(show_value)d)."
-msgstr[3] ""
-"נא לוודא שערך זה מכיל %(limit_value)d תווים לכל הפחות (מכיל %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -437,8 +442,6 @@ msgstr[1] ""
 "נא לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
 msgstr[2] ""
 "נא לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
-msgstr[3] ""
-"נא לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
 
 msgid "Enter a number."
 msgstr "נא להזין מספר."
@@ -449,7 +452,6 @@ msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "נא לוודא שאין יותר מספרה %(max)s בסה\"כ."
 msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות בסה\"כ."
 msgstr[2] "נא לוודא שאין יותר מ־%(max)s ספרות בסה\"כ."
-msgstr[3] "נא לוודא שאין יותר מ־%(max)s ספרות בסה\"כ."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -457,7 +459,6 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "נא לוודא שאין יותר מספרה %(max)s אחרי הנקודה."
 msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות אחרי הנקודה."
 msgstr[2] "נא לוודא שאין יותר מ־%(max)s ספרות אחרי הנקודה."
-msgstr[3] "נא לוודא שאין יותר מ־%(max)s ספרות אחרי הנקודה."
 
 #, python-format
 msgid ""
@@ -467,7 +468,6 @@ msgid_plural ""
 msgstr[0] "נא לוודא שאין יותר מספרה %(max)s לפני הנקודה העשרונית"
 msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
 msgstr[2] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
-msgstr[3] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
 
 #, python-format
 msgid ""
@@ -690,8 +690,8 @@ msgid "Value must be valid JSON."
 msgstr "הערך חייב להיות JSON חוקי."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "פריט %(model)s עם %(field)s %(value)r אינו קיים."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (הסוג נקבע לפי השדה המקושר)"
@@ -756,8 +756,6 @@ msgstr[1] ""
 "נא לוודא ששם קובץ זה מכיל %(max)d תווים לכל היותר (מכיל %(length)d)."
 msgstr[2] ""
 "נא לוודא ששם קובץ זה מכיל %(max)d תווים לכל היותר (מכיל %(length)d)."
-msgstr[3] ""
-"נא לוודא ששם קובץ זה מכיל %(max)d תווים לכל היותר (מכיל %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "נא לשים קובץ או סימן את התיבה לניקוי, לא שניהם."
@@ -805,7 +803,6 @@ msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] "נא לשלוח טופס %(num)d לכל היותר."
 msgstr[1] "נא לשלוח %(num)d טפסים לכל היותר."
 msgstr[2] "נא לשלוח %(num)d טפסים לכל היותר."
-msgstr[3] "נא לשלוח %(num)d טפסים לכל היותר."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
@@ -813,7 +810,6 @@ msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] "נא לשלוח טופס %(num)dאו יותר."
 msgstr[1] "נא לשלוח %(num)d טפסים או יותר."
 msgstr[2] "נא לשלוח %(num)d טפסים או יותר."
-msgstr[3] "נא לשלוח %(num)d טפסים או יותר."
 
 msgid "Order"
 msgstr "מיון"
@@ -886,7 +882,6 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "בית %(size)d "
 msgstr[1] "%(size)d בתים"
 msgstr[2] "%(size)d בתים"
-msgstr[3] "%(size)d בתים"
 
 #, python-format
 msgid "%s KB"
@@ -1157,7 +1152,6 @@ msgid_plural "%(num)d years"
 msgstr[0] "שנה"
 msgstr[1] "שנתיים"
 msgstr[2] "%(num)d שנים"
-msgstr[3] "%(num)d שנים"
 
 #, python-format
 msgid "%(num)d month"
@@ -1165,7 +1159,6 @@ msgid_plural "%(num)d months"
 msgstr[0] "חודש"
 msgstr[1] "חודשיים"
 msgstr[2] "%(num)d חודשים"
-msgstr[3] "%(num)d חודשים"
 
 #, python-format
 msgid "%(num)d week"
@@ -1173,7 +1166,6 @@ msgid_plural "%(num)d weeks"
 msgstr[0] "שבוע"
 msgstr[1] "שבועיים"
 msgstr[2] "%(num)d שבועות"
-msgstr[3] "%(num)d שבועות"
 
 #, python-format
 msgid "%(num)d day"
@@ -1181,7 +1173,6 @@ msgid_plural "%(num)d days"
 msgstr[0] "יום"
 msgstr[1] "יומיים"
 msgstr[2] "%(num)d ימים"
-msgstr[3] "%(num)d ימים"
 
 #, python-format
 msgid "%(num)d hour"
@@ -1189,7 +1180,6 @@ msgid_plural "%(num)d hours"
 msgstr[0] "שעה"
 msgstr[1] "שעתיים"
 msgstr[2] "%(num)d שעות"
-msgstr[3] "%(num)d שעות"
 
 #, python-format
 msgid "%(num)d minute"
@@ -1197,7 +1187,6 @@ msgid_plural "%(num)d minutes"
 msgstr[0] "דקה"
 msgstr[1] "%(num)d דקות"
 msgstr[2] "%(num)d דקות"
-msgstr[3] "%(num)d דקות"
 
 msgid "Forbidden"
 msgstr "אסור"

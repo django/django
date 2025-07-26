@@ -2,11 +2,11 @@
 #
 # Translators:
 # eallik <eallik@gmail.com>, 2011
-# Erlend <debcf78e@opayq.com>, 2020
+# Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2014-2015,2021-2023
+# Martin <martinpajuste@gmail.com>, 2014-2015,2021-2025
 # Martin <martinpajuste@gmail.com>, 2016-2017,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>, 2014-2015,2021-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2014-2015,2021-2025\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -351,6 +351,9 @@ msgstr "See leht ei sisalda tulemusi"
 msgid "Enter a valid value."
 msgstr "Sisestage korrektne väärtus."
 
+msgid "Enter a valid domain name."
+msgstr "Sisestage korrektne domeeninimi."
+
 msgid "Enter a valid URL."
 msgstr "Sisestage korrektne URL."
 
@@ -374,14 +377,18 @@ msgstr ""
 "Sisestage korrektne “nälk”, mis koosneb Unicode tähtedest, numbritest, ala- "
 "või sidekriipsudest."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Sisestage korrektne IPv4 aadress."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Sisestage korrektne %(protocol)s aadress."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Sisestage korrektne IPv6 aadress."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Sisestage korrektne IPv4 või IPv6 aadress."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 või IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Sisestage ainult komaga eraldatud numbreid."
@@ -686,8 +693,8 @@ msgid "Value must be valid JSON."
 msgstr "Väärtus peab olema korrektne JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s isendit %(field)s %(value)r ei leidu."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s isendit %(field)s %(value)r ei ole kehtiv valik."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Välisvõti (tüübi määrab seotud väli) "

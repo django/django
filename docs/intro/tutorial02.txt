@@ -17,48 +17,15 @@ Database setup
 Now, open up :file:`mysite/settings.py`. It's a normal Python module with
 module-level variables representing Django settings.
 
-By default, the configuration uses SQLite. If you're new to databases, or
-you're just interested in trying Django, this is the easiest choice. SQLite is
-included in Python, so you won't need to install anything else to support your
-database. When starting your first real project, however, you may want to use a
-more scalable database like PostgreSQL, to avoid database-switching headaches
-down the road.
+By default, the :setting:`DATABASES` configuration uses SQLite. If you're new
+to databases, or you're just interested in trying Django, this is the easiest
+choice. SQLite is included in Python, so you won't need to install anything
+else to support your database. When starting your first real project, however,
+you may want to use a more scalable database like PostgreSQL, to avoid
+database-switching headaches down the road.
 
-If you wish to use another database, install the appropriate :ref:`database
-bindings <database-installation>` and change the following keys in the
-:setting:`DATABASES` ``'default'`` item to match your database connection
-settings:
-
-* :setting:`ENGINE <DATABASE-ENGINE>` -- Either
-  ``'django.db.backends.sqlite3'``,
-  ``'django.db.backends.postgresql'``,
-  ``'django.db.backends.mysql'``, or
-  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
-  <third-party-notes>`.
-
-* :setting:`NAME` -- The name of your database. If you're using SQLite, the
-  database will be a file on your computer; in that case, :setting:`NAME`
-  should be the full absolute path, including filename, of that file. The
-  default value, ``BASE_DIR / 'db.sqlite3'``, will store the file in your
-  project directory.
-
-If you are not using SQLite as your database, additional settings such as
-:setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
-For more details, see the reference documentation for :setting:`DATABASES`.
-
-.. admonition:: For databases other than SQLite
-
-    If you're using a database besides SQLite, make sure you've created a
-    database by this point. Do that with "``CREATE DATABASE database_name;``"
-    within your database's interactive prompt.
-
-    Also make sure that the database user provided in :file:`mysite/settings.py`
-    has "create database" privileges. This allows automatic creation of a
-    :ref:`test database <the-test-database>` which will be needed in a later
-    tutorial.
-
-    If you're using SQLite, you don't need to create anything beforehand - the
-    database file will be created automatically when it is needed.
+If you wish to use another database, see :ref:`details to customize and get
+your database running <database-installation>`.
 
 While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
 your time zone.
@@ -380,12 +347,12 @@ API Django gives you. To invoke the Python shell, use this command:
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
+By default, the :djadmin:`shell` command automatically imports the models from
+your :setting:`INSTALLED_APPS`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 
 .. code-block:: pycon
-
-    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -409,7 +376,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
-    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.UTC)
 
     # Change values by changing the attributes, then calling save().
     >>> q.question_text = "What's up?"
@@ -476,8 +443,6 @@ Save these changes and start a new Python interactive shell by running
 
 .. code-block:: pycon
 
-    >>> from polls.models import Choice, Question
-
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()
     <QuerySet [<Question: What's up?>]>
@@ -515,8 +480,8 @@ Save these changes and start a new Python interactive shell by running
     # Give the Question a couple of Choices. The create call constructs a new
     # Choice object, does the INSERT statement, adds the choice to the set
     # of available choices and returns the new Choice object. Django creates
-    # a set to hold the "other side" of a ForeignKey relation
-    # (e.g. a question's choice) which can be accessed via the API.
+    # a set (defined as "choice_set") to hold the "other side" of a ForeignKey
+    # relation (e.g. a question's choice) which can be accessed via the API.
     >>> q = Question.objects.get(pk=1)
 
     # Display any choices from the related object set -- none so far.

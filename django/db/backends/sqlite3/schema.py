@@ -6,7 +6,7 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import NOT_PROVIDED, UniqueConstraint
+from django.db.models import CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -16,7 +16,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
     sql_alter_table_comment = None
@@ -104,6 +103,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             f.name: f.clone() if is_self_referential(f) else f
             for f in model._meta.local_concrete_fields
         }
+
+        # Since CompositePrimaryKey is not a concrete field (column is None),
+        # it's not copied by default.
+        pk = model._meta.pk
+        if isinstance(pk, CompositePrimaryKey):
+            body[pk.name] = pk.clone()
+
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = {
@@ -137,7 +143,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
             if (
-                create_field.db_default is NOT_PROVIDED
+                not create_field.has_db_default()
                 and not (create_field.many_to_many or create_field.generated)
                 and create_field.concrete
             ):
@@ -150,8 +156,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body.pop(old_field.name, None)
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
+            rename_mapping[old_field.name] = new_field.name
+            if new_field.generated:
+                continue
             if old_field.null and not new_field.null:
-                if new_field.db_default is NOT_PROVIDED:
+                if not new_field.has_db_default():
                     default = self.prepare_default(self.effective_default(new_field))
                 else:
                     default, _ = self.db_default_sql(new_field)
@@ -162,7 +171,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 mapping[new_field.column] = case_sql
             else:
                 mapping[new_field.column] = self.quote_name(old_field.column)
-            rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         if delete_field:
             del body[delete_field.name]
@@ -198,9 +206,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Construct a new model with the new fields to allow self referential
         # primary key to resolve to. This model won't ever be materialized as a
-        # table and solely exists for foreign key reference resolution purposes.
-        # This wouldn't be required if the schema editor was operating on model
-        # states instead of rendered models.
+        # table and solely exists for foreign key reference resolution
+        # purposes. This wouldn't be required if the schema editor was
+        # operating on model states instead of rendered models.
         meta_contents = {
             "app_label": model._meta.app_label,
             "db_table": model._meta.db_table,
@@ -294,6 +302,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables.
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             self.create_model(field.remote_field.through)
+        elif isinstance(field, CompositePrimaryKey):
+            # If a CompositePrimaryKey field was added, the existing primary
+            # key field had to be altered too, resulting in an AddField,
+            # AlterField migration. The table cannot be re-created on AddField,
+            # it would result in a duplicate primary key error.
+            return
         elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.
@@ -306,10 +320,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or self.effective_default(field) is not None
             # Fields with non-constant defaults cannot by handled by ALTER
             # TABLE ADD COLUMN statement.
-            or (
-                field.db_default is not NOT_PROVIDED
-                and not isinstance(field.db_default, Value)
-            )
+            or (field.has_db_default() and not isinstance(field.db_default, Value))
         ):
             self._remake_table(model, create_field=field)
         else:
@@ -393,7 +404,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     related_models.add(remote_field.through)
             if new_field.primary_key:
                 for many_to_many in opts.many_to_many:
-                    # Ignore self-relationship since the table was already rebuilt.
+                    # Ignore self-relationship since the table was already
+                    # rebuilt.
                     if many_to_many.related_model == model:
                         continue
                     if many_to_many.remote_field.through._meta.auto_created:

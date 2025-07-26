@@ -1,12 +1,19 @@
 import datetime
 import uuid
 from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
-from django.db import DatabaseError, NotSupportedError
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
+from django.db.models import (
+    AutoField,
+    CompositePrimaryKey,
+    Exists,
+    ExpressionWrapper,
+    Lookup,
+)
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
@@ -295,13 +302,6 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            if value == []:
-                raise DatabaseError(
-                    "The database did not return a new row id. Probably "
-                    '"ORA-1403: no data found" was raised internally but was '
-                    "hidden by the Oracle OCI library (see "
-                    "https://code.djangoproject.com/ticket/28859)."
-                )
             columns.append(value[0])
         return tuple(columns)
 
@@ -326,7 +326,7 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, oracledb's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if params:
+        if statement and params:
             if isinstance(params, (tuple, list)):
                 params = {
                     f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))
@@ -372,15 +372,15 @@ END;
         return value.read()
 
     def quote_name(self, name):
-        # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+        # SQL92 requires delimited (quoted) names to be case-sensitive. When
         # not quoted, Oracle has case-insensitive behavior for identifiers, but
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % truncate_name(name, self.max_name_length())
-        # Oracle puts the query text into a (query % args) construct, so % signs
-        # in names need to be escaped. The '%%' will be collapsed back to '%' at
-        # that stage so we aren't really making the name longer here.
+        # Oracle puts the query text into a (query % args) construct, so %
+        # signs in names need to be escaped. The '%%' will be collapsed back to
+        # '%' at that stage so we aren't really making the name longer here.
         name = name.replace("%", "%%")
         return name.upper()
 
@@ -589,8 +589,8 @@ END;
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
 
         If naive datetime is passed assumes that is in UTC. Normally Django
         models.DateTimeField makes sure that if USE_TZ is True passed datetime
@@ -626,9 +626,6 @@ END;
         return Oracle_datetime(
             1900, 1, 1, value.hour, value.minute, value.second, value.microsecond
         )
-
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
 
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
@@ -676,24 +673,6 @@ END;
             for field in fields
             if field
         ]
-        if (
-            self.connection.features.supports_bulk_insert_with_multiple_rows
-            # A workaround with UNION of SELECTs is required for models without
-            # any fields.
-            and field_placeholders
-        ):
-            placeholder_rows_sql = []
-            for row in placeholder_rows:
-                placeholders_row = (
-                    field_placeholder % placeholder
-                    for field_placeholder, placeholder in zip(
-                        field_placeholders, row, strict=True
-                    )
-                )
-                placeholder_rows_sql.append(placeholders_row)
-            return super().bulk_insert_sql(fields, placeholder_rows_sql)
-        # Oracle < 23c doesn't support inserting multiple rows in a single
-        # statement, use UNION of SELECTs as a workaround.
         query = []
         for row in placeholder_rows:
             select = []
@@ -727,6 +706,12 @@ END;
 
     def bulk_batch_size(self, fields, objs):
         """Oracle restricts the number of parameters in a query."""
+        fields = list(
+            chain.from_iterable(
+                field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                for field in fields
+            )
+        )
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)

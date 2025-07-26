@@ -1,24 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019,2021,2023
+# Igor Jerosimić, 2019,2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr@latin\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -26,11 +25,10 @@ msgstr "Dostupni %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Ovo je lista dostupnih „%s“. Možete izabrati elemente tako što ćete ih "
-"izabrati u listi i kliknuti na „Izaberi“."
+"Izaberite %s tako što ćete ih označiti, a zatim kliknite dugme sa strelicom "
+"\"Izaberi\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +37,17 @@ msgstr "Filtrirajte listu dostupnih elemenata „%s“."
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Choose all"
-msgstr "Izaberi sve"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Izaberi sve %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Izaberite sve „%s“ odjednom."
+msgid "Choose selected %s"
+msgstr "Izaberi označene %s"
 
-msgid "Choose"
-msgstr "Izaberi"
-
-msgid "Remove"
-msgstr "Ukloni"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Ukloni izabrane %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,22 +55,21 @@ msgstr "Izabrano „%s“"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Ovo je lista izabranih „%s“. Možete ukloniti elemente tako što ćete ih "
-"izabrati u listi i kliknuti na „Ukloni“."
+"Uklonite %s tako što ćete ih označiti, a zatim kliknite dugme sa strelicom "
+"\"Ukloni\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Unesite u ovo polje da biste filtrirali listu izabranih %s."
 
-msgid "Remove all"
-msgstr "Ukloni sve"
+msgid "(click to clear)"
+msgstr "(klikni da obrišeš)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Uklonite sve izabrane „%s“ odjednom."
+msgid "Remove all %s"
+msgstr "Ukloni sve %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -245,6 +241,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "dec"
 
+msgid "Sunday"
+msgstr "nedelja"
+
+msgid "Monday"
+msgstr "ponedeljak"
+
+msgid "Tuesday"
+msgstr "utorak"
+
+msgid "Wednesday"
+msgstr "sreda"
+
+msgid "Thursday"
+msgstr "četvrtak"
+
+msgid "Friday"
+msgstr "petak"
+
+msgid "Saturday"
+msgstr "subota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "ned"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "pon"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "uto"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "sre"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "čet"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "pet"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "sub"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "N"
@@ -272,9 +317,3 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Pokaži"
-
-msgid "Hide"
-msgstr "Sakrij"

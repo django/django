@@ -1,7 +1,7 @@
 # Unittests for fixtures.
 import json
 import os
-import re
+import unittest
 from io import StringIO
 from pathlib import Path
 
@@ -55,6 +55,13 @@ from .models import (
     Widget,
 )
 
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 _cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -96,12 +103,22 @@ class TestFixtures(TestCase):
         the serialized data for fields that have been removed
         from the database when not ignored.
         """
-        with self.assertRaises(DeserializationError):
-            management.call_command(
-                "loaddata",
-                "sequence_extra",
-                verbosity=0,
-            )
+        test_fixtures = [
+            "sequence_extra",
+            "sequence_extra_jsonl",
+        ]
+        if HAS_YAML:
+            test_fixtures.append("sequence_extra_yaml")
+        for fixture_file in test_fixtures:
+            with (
+                self.subTest(fixture_file=fixture_file),
+                self.assertRaises(DeserializationError),
+            ):
+                management.call_command(
+                    "loaddata",
+                    fixture_file,
+                    verbosity=0,
+                )
 
     def test_loaddata_not_found_fields_ignore(self):
         """
@@ -129,6 +146,33 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Animal.specimens.all()[0].name, "Wolf")
+
+    def test_loaddata_not_found_fields_ignore_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_jsonl",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
+
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
+    def test_loaddata_not_found_fields_ignore_yaml(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_yaml",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Cat")
+
+    def test_loaddata_empty_lines_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_empty_lines_jsonl.jsonl",
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
 
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_pretty_print_xml(self):
@@ -263,8 +307,9 @@ class TestFixtures(TestCase):
 
     def test_empty(self):
         """
-        Test for ticket #18213 -- Loading a fixture file with no data output a warning.
-        Previously empty fixture raises an error exception, see ticket #4371.
+        Test for ticket #18213 -- Loading a fixture file with no data output a
+        warning. Previously empty fixture raises an error exception, see ticket
+        #4371.
         """
         msg = "No fixture data found for 'empty'. (File format may be invalid.)"
         with self.assertWarnsMessage(RuntimeWarning, msg):
@@ -380,11 +425,6 @@ class TestFixtures(TestCase):
 
         # Output order isn't guaranteed, so check for parts
         data = out.getvalue()
-
-        # Get rid of artifacts like '000000002' to eliminate the differences
-        # between different Python versions.
-        data = re.sub("0{6,}[0-9]", "", data)
-
         animals_data = sorted(
             [
                 {
@@ -559,7 +599,8 @@ class TestFixtures(TestCase):
     def test_fixture_dirs_with_default_fixture_path(self):
         """
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
-        for application (app/fixtures) in order to avoid repeated fixture loading.
+        for application (app/fixtures) in order to avoid repeated fixture
+        loading.
         """
         msg = (
             "'%s' is a default fixture directory for the '%s' app "
@@ -573,7 +614,8 @@ class TestFixtures(TestCase):
     def test_fixture_dirs_with_default_fixture_path_as_pathlib(self):
         """
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
-        for application (app/fixtures) in order to avoid repeated fixture loading.
+        for application (app/fixtures) in order to avoid repeated fixture
+        loading.
         """
         msg = (
             "'%s' is a default fixture directory for the '%s' app "
@@ -647,7 +689,8 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_on_serialize(self):
         """
-        Natural key requirements are taken into account when serializing models.
+        Natural key requirements are taken into account when serializing
+        models.
         """
         management.call_command(
             "loaddata",
@@ -683,7 +726,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting(self):
         """
-        It doesn't matter what order you mention the models,  Store *must* be
+        It doesn't matter what order you mention the models, Store *must* be
         serialized before then Person, and both must be serialized before Book.
         """
         sorted_deps = serializers.sort_dependencies(
@@ -830,7 +873,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_simple(self):
         """
-        M2M relations without explicit through models SHOULD count as dependencies
+        M2M relations without explicit through models SHOULD count as
+        dependencies
 
         Regression test for bugs that could be caused by flawed fixes to
         #14226, namely if M2M checks are removed from sort_dependencies
@@ -858,7 +902,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_m2m_complex(self):
         """
         M2M relations with explicit through models should NOT count as
-        dependencies.  The through model itself will have dependencies, though.
+        dependencies. The through model itself will have dependencies, though.
         """
         sorted_deps = serializers.sort_dependencies(
             [("fixtures_regress", [M2MComplexA, M2MComplexB, M2MThroughAB])]
@@ -869,7 +913,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_complex_circular_1(self):
         """
-        Circular M2M relations with explicit through models should be serializable
+        Circular M2M relations with explicit through models should be
+        serializable
         """
         A, B, C, AtoB, BtoC, CtoA = (
             M2MComplexCircular1A,
@@ -890,8 +935,9 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_complex_circular_2(self):
         """
-        Circular M2M relations with explicit through models should be serializable
-        This test tests the circularity with explicit natural_key.dependencies
+        Circular M2M relations with explicit through models should be
+        serializable This test tests the circularity with explicit
+        natural_key.dependencies
         """
         sorted_deps = serializers.sort_dependencies(
             [
@@ -906,7 +952,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dump_and_load_m2m_simple(self):
         """
-        Test serializing and deserializing back models with simple M2M relations
+        Test serializing and deserializing back models with simple M2M
+        relations
         """
         a = M2MSimpleA.objects.create(data="a")
         b1 = M2MSimpleB.objects.create(data="b1")

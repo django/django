@@ -1,7 +1,7 @@
 """
 PostgreSQL database backend for Django.
 
-Requires psycopg2 >= 2.8.4 or psycopg >= 3.1.8
+Requires psycopg2 >= 2.9.9 or psycopg >= 3.1.12
 """
 
 import asyncio
@@ -34,13 +34,13 @@ def psycopg_version():
     return get_version_tuple(version)
 
 
-if psycopg_version() < (2, 8, 4):
+if psycopg_version() < (2, 9, 9):
     raise ImproperlyConfigured(
-        f"psycopg2 version 2.8.4 or newer is required; you have {Database.__version__}"
+        f"psycopg2 version 2.9.9 or newer is required; you have {Database.__version__}"
     )
-if (3,) <= psycopg_version() < (3, 1, 8):
+if (3,) <= psycopg_version() < (3, 1, 12):
     raise ImproperlyConfigured(
-        f"psycopg version 3.1.8 or newer is required; you have {Database.__version__}"
+        f"psycopg version 3.1.12 or newer is required; you have {Database.__version__}"
     )
 
 
@@ -61,8 +61,8 @@ else:
     psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
     psycopg2.extras.register_uuid()
 
-    # Register support for inet[] manually so we don't have to handle the Inet()
-    # object on load all the time.
+    # Register support for inet[] manually so we don't have to handle the
+    # Inet() object on load all the time.
     INETARRAY_OID = 1041
     INETARRAY = psycopg2.extensions.new_array_type(
         (INETARRAY_OID,),
@@ -71,7 +71,8 @@ else:
     )
     psycopg2.extensions.register_type(INETARRAY)
 
-# Some of these import psycopg, so import them after checking if it's installed.
+# Some of these import psycopg, so import them after checking if it's
+# installed.
 from .client import DatabaseClient  # NOQA isort:skip
 from .creation import DatabaseCreation  # NOQA isort:skip
 from .features import DatabaseFeatures  # NOQA isort:skip
@@ -86,31 +87,14 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
-def ensure_timezone(connection, ops, timezone_name):
-    conn_timezone_name = connection.info.parameter_status("TimeZone")
-    if timezone_name and conn_timezone_name != timezone_name:
-        with connection.cursor() as cursor:
-            cursor.execute(ops.set_time_zone_sql(), [timezone_name])
-        return True
-    return False
-
-
-def ensure_role(connection, ops, role_name):
-    if role_name:
-        with connection.cursor() as cursor:
-            sql = ops.compose_sql("SET ROLE %s", [role_name])
-            cursor.execute(sql)
-        return True
-    return False
-
-
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
     # This dictionary maps Field objects to their associated PostgreSQL column
-    # types, as strings. Column-type strings can contain format strings; they'll
-    # be interpolated against the values of Field.__dict__ before being output.
-    # If a column type is set to None, it won't be included in the output.
+    # types, as strings. Column-type strings can contain format strings;
+    # they'll be interpolated against the values of Field.__dict__ before being
+    # output. If a column type is set to None, it won't be included in the
+    # output.
     data_types = {
         "AutoField": "integer",
         "BigAutoField": "bigint",
@@ -168,13 +152,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
-    # the right-hand side of the lookup isn't a raw string (it might be an expression
-    # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # the right-hand side of the lookup isn't a raw string (it might be an
+    # expression or the result of a bilateral transformation). In those cases,
+    # special characters for LIKE operators (e.g. \, *, _) should be escaped on
+    # database side.
     #
-    # Note: we use str.format() here for readability as '%' is used as a wildcard for
-    # the LIKE operator.
+    # Note: we use str.format() here for readability as '%' is used as a
+    # wildcard for the LIKE operator.
     pattern_esc = (
         r"REPLACE(REPLACE(REPLACE({}, E'\\', E'\\\\'), E'%%', E'\\%%'), E'_', E'\\_')"
     )
@@ -364,21 +348,35 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.close_pool()
         if self.connection is None:
             return False
-        return ensure_timezone(self.connection, self.ops, self.timezone_name)
+        return self._configure_timezone(self.connection)
+
+    def _configure_timezone(self, connection):
+        conn_timezone_name = connection.info.parameter_status("TimeZone")
+        timezone_name = self.timezone_name
+        if timezone_name and conn_timezone_name != timezone_name:
+            with connection.cursor() as cursor:
+                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            return True
+        return False
+
+    def _configure_role(self, connection):
+        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
+            with connection.cursor() as cursor:
+                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
+                cursor.execute(sql)
+            return True
+        return False
 
     def _configure_connection(self, connection):
         # This function is called from init_connection_state and from the
-        # psycopg pool itself after a connection is opened. Make sure that
-        # whatever is done here does not access anything on self aside from
-        # variables.
+        # psycopg pool itself after a connection is opened.
 
         # Commit after setting the time zone.
-        commit_tz = ensure_timezone(connection, self.ops, self.timezone_name)
+        commit_tz = self._configure_timezone(connection)
         # Set the role on the connection. This is useful if the credential used
         # to login is not the same as the role that owns database resources. As
         # can be the case when using temporary or ephemeral credentials.
-        role_name = self.settings_dict["OPTIONS"].get("assume_role")
-        commit_role = ensure_role(connection, self.ops, role_name)
+        commit_role = self._configure_role(connection)
 
         return commit_role or commit_tz
 

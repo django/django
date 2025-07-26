@@ -1,10 +1,12 @@
-==================
-Submitting patches
-==================
+========================
+Submitting contributions
+========================
 
-We're always grateful for patches to Django's code. Indeed, bug reports
-with associated patches will get fixed *far* more quickly than those
-without patches.
+We're always grateful for contributions to Django's code. Indeed, bug reports
+with associated contributions will get fixed *far* more quickly than those
+without a solution.
+
+.. _trivial-change:
 
 Typo fixes and trivial documentation changes
 ============================================
@@ -34,7 +36,8 @@ and time availability), claim it by following these steps:
   reset it using the `password reset page`_.
 
 * If a ticket for this issue doesn't exist yet, create one in our
-  `ticket tracker`_.
+  `ticket tracker`_. Remember that proposals for new features should follow
+  the :ref:`process for suggesting new features <requesting-features>`.
 
 * If a ticket for this issue already exists, make sure nobody else has
   claimed it. To do this, look at the "Owned by" section of the ticket.
@@ -45,16 +48,21 @@ and time availability), claim it by following these steps:
   any activity, it's probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
-  or "DjangoProject Login" in the upper left of the ticket page.
+  or "DjangoProject Login" in the upper left of the ticket page. Once logged
+  in, you can then click the "Modify Ticket" button near the bottom of the
+  page.
 
-* Claim the ticket by clicking the "assign to myself" radio button under
-  "Action" near the bottom of the page, then click "Submit changes."
+* Claim the ticket by clicking the "assign to" radio button in the "Action"
+  section. Your username will be filled in the text box by default.
+
+* Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
     The Django software foundation requests that anyone contributing more than
-    a trivial patch to Django sign and submit a `Contributor License
-    Agreement`_, this ensures that the Django Software Foundation has clear
-    license to all contributions allowing for a clear license for all users.
+    a :ref:`trivial change <trivial-change>`, to Django sign and submit a
+    `Contributor License Agreement`_, this ensures that the Django Software
+    Foundation has clear license to all contributions allowing for a clear
+    license for all users.
 
 .. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
@@ -86,35 +94,32 @@ Going through the steps of claiming tickets is overkill in some cases.
 
 In the case of small changes, such as typos in the documentation or small bugs
 that will only take a few minutes to fix, you don't need to jump through the
-hoops of claiming tickets. Submit your patch directly and you're done!
+hoops of claiming tickets. Submit your changes directly and you're done!
 
 It is *always* acceptable, regardless whether someone has claimed it or not, to
-submit patches to a ticket if you happen to have a patch ready.
+link proposals to a ticket if you happen to have the changes ready.
 
 .. _patch-style:
 
-Patch style
-===========
+Contribution style
+==================
 
 Make sure that any contribution you do fulfills at least the following
 requirements:
 
 * The code required to fix a problem or add a feature is an essential part
-  of a patch, but it is not the only part. A good patch should also include a
+  of a solution, but it is not the only part. A good fix should also include a
   :doc:`regression test <unit-tests>` to validate the behavior that has been
   fixed and to prevent the problem from arising again. Also, if some tickets
   are relevant to the code that you've written, mention the ticket numbers in
   some comments in the test so that one can easily trace back the relevant
   discussions after your patch gets committed, and the tickets get closed.
 
-* If the code associated with a patch adds a new feature, or modifies
-  behavior of an existing feature, the patch should also contain
-  documentation.
+* If the code adds a new feature, or modifies the behavior of an existing
+  feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`. Please review the patch yourself using our
-:ref:`patch review checklist <patch-review-checklist>` first.
-
+request <working-with-git>`.
 If you can't send a pull request for some reason, you can also use patches in
 Trac. When using this style, follow these guidelines.
 
@@ -129,7 +134,7 @@ Trac. When using this style, follow these guidelines.
 
 Regardless of the way you submit your work, follow these steps.
 
-* Make sure your code fulfills the requirements in our :ref:`patch review
+* Make sure your code fulfills the requirements in our :ref:`contribution
   checklist <patch-review-checklist>`.
 
 * Check the "Has patch" box on the ticket and make sure the "Needs
@@ -140,19 +145,71 @@ Regardless of the way you submit your work, follow these steps.
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
-Non-trivial patches
-===================
+Contributions which require community feedback
+==============================================
 
-A "non-trivial" patch is one that is more than a small bug fix. It's a patch
-that introduces Django functionality and makes some sort of design decision.
+A wider community discussion is required when a patch introduces new Django
+functionality and makes some sort of design decision. This is especially
+important if the approach involves a :ref:`deprecation <deprecating-a-feature>`
+or introduces breaking changes.
 
-If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on the `Django Forum`_ or |django-developers| list.
+The following are different approaches for gaining feedback from the community.
 
-If you're not sure whether your patch should be considered non-trivial, ask on
-the ticket for opinions.
+The new feature ideas tracker
+-----------------------------
+
+If you have an idea for a new feature, please create a new proposal (or join an
+existing discussion) following the :ref:`process for suggesting new features
+<requesting-features>`. You should explain the need for the change, go into
+details of the approach and discuss alternatives.
+
+The Django Forum
+----------------
+
+You can propose a change (that is not a new feature idea) on the
+`Django Forum`_. You should explain the need for the change, go into details of
+the approach and discuss alternatives.
+
+Please include a link to such discussions in your contributions.
+
+Third party package
+-------------------
+
+Django does not accept experimental features. All features must follow our
+:ref:`deprecation policy <internal-release-deprecation-policy>`. Hence, it can
+take months or years for Django to iterate on an API design.
+
+If you need user feedback on a public interface, it is better to create a
+third-party package first. You can iterate on the public API much faster, while
+also validating the need for the feature.
+
+Once this package becomes stable and there are clear benefits of incorporating
+aspects into Django core, the next step is to propose its inclusion by
+following the :ref:`process for suggesting new features <requesting-features>`.
+
+Django Enhancement Proposal (DEP)
+---------------------------------
+
+Similar to Python’s PEPs, Django has `Django Enhancement Proposals`_ or DEPs. A
+DEP is a design document which provides information to the Django community, or
+describes a new feature or process for Django. They provide concise technical
+specifications of features, along with rationales. DEPs are also the primary
+mechanism for proposing and collecting community input on major new features.
+
+Before considering writing a DEP, it is recommended to first open a discussion
+following the :ref:`process for suggesting new features <requesting-features>`.
+This allows the community to provide feedback and helps refine the proposal.
+Once the DEP is ready the :ref:`Steering Council <steering-council>` votes on
+whether to accept it.
+
+Some examples of DEPs that have been approved and fully implemented:
+
+* `DEP 181: ORM Expressions <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
+* `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+* `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
 .. _Django Forum: https://forum.djangoproject.com/
+.. _Django Enhancement Proposals: https://github.com/django/deps
 
 .. _deprecating-a-feature:
 
@@ -208,9 +265,10 @@ You should also add a test for the deprecation warning::
 
     def test_foo_deprecation_warning(self):
         msg = "Expected deprecation message"
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
+        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg) as ctx:
             # invoke deprecated behavior
             ...
+        self.assertEqual(ctx.filename, __file__)
 
 It's important to include a ``RemovedInDjangoXXWarning`` comment above code
 which has no warning reference, but will need to be changed or removed when the
@@ -232,6 +290,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
+            stacklevel=2,
         )
         old_private_helper()
         ...
@@ -253,32 +312,62 @@ Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
 ``RemovedInDjangoXXWarning``\s matching the new version are removed.
 
-JavaScript patches
-==================
+The ``django.utils.deprecation`` module provides some helpful deprecation
+utilities, such as a ``@deprecate_posargs`` decorator to assist with converting
+positional-or-keyword arguments to keyword-only. See the inline documentation
+in the module source.
 
-For information on JavaScript patches, see the :ref:`javascript-patches`
+JavaScript contributions
+========================
+
+For information on JavaScript contributions, see the :ref:`javascript-patches`
 documentation.
+
+Optimization patches
+====================
+
+Patches aiming to deliver a performance improvement should provide benchmarks
+showing the before and after impact of the patch and sharing the commands for
+reviewers to reproduce.
+
+.. _django-asv-benchmarks:
+
+``django-asv`` benchmarks
+-------------------------
+
+`django-asv`_ monitors the performance of Django code over time. These
+benchmarks can be run on a pull request by labeling the pull request with
+``benchmark``. Adding to these benchmarks is highly encouraged.
+
+.. _django-asv: https://github.com/django/django-asv/
 
 .. _patch-review-checklist:
 
-Patch review checklist
+Contribution checklist
 ======================
 
-Use this checklist to review a pull request. If you are reviewing a pull
-request that is not your own and it passes all the criteria below, please set
-the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
+Use this checklist to review a pull request. If this contribution would not be
+:ref:`considered trivial <trivial-change>`, first ensure it has an accepted
+ticket before proceeding with the review.
+
+If the pull request passes all the criteria below and is not your own, please
+set the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
 and interest permits, mergers do final reviews of "Ready for checkin" tickets
-and will either commit the patch or bump it back to "Accepted" if further works
-need to be done. If you're looking to become a merger, doing thorough reviews
-of patches is a great way to earn trust.
+and will either commit the changes or bump it back to "Accepted" if further
+work needs to be done.
+
+If you're looking to become a member of the `triage & review team
+<https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
+thorough reviews of contributions is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
 of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
-Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
-set so that the ticket appears in that queue.
+
+Looking to get your pull request reviewed? Ensure the Trac flags on the ticket
+are set so that the ticket appears in that queue.
 
 Documentation
 -------------
@@ -324,6 +413,8 @@ All code changes
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?
+* If the change affects the Django admin or rendered HTML output, has
+  :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 
 All tickets
 -----------
@@ -332,5 +423,7 @@ All tickets
   :ref:`commit message format <committing-guidelines>`?
 * Are you the patch author and a new contributor? Please add yourself to the
   :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
+* Does this have an accepted ticket on Trac? All contributions require a ticket
+  unless the :ref:`change is considered trivial <trivial-change>`.
 
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

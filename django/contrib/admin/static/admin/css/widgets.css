@@ -2,7 +2,7 @@
 
 .selector {
     display: flex;
-    flex-grow: 1;
+    flex: 1;
     gap: 0 10px;
 }
 
@@ -14,15 +14,18 @@
 }
 
 .selector-available, .selector-chosen {
-    text-align: center;
     display: flex;
     flex-direction: column;
     flex: 1 1;
 }
 
-.selector-available h2, .selector-chosen h2 {
+.selector-available-title, .selector-chosen-title {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
+}
+
+.selector .helptext {
+    font-size: 0.6875rem;
 }
 
 .selector-chosen .list-footer-display {
@@ -40,14 +43,25 @@
     color: var(--breadcrumbs-fg);
 }
 
-.selector-chosen h2 {
+.selector-chosen-title {
     background: var(--secondary);
     color: var(--header-link-color);
+    padding: 8px;
 }
 
-.selector .selector-available h2 {
+.aligned .selector-chosen-title label {
+    color: var(--header-link-color);
+    width: 100%;
+}
+
+.selector-available-title {
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
+    padding: 8px;
+}
+
+.aligned .selector-available-title label {
+    width: 100%;
 }
 
 .selector .selector-filter {
@@ -59,6 +73,7 @@
     margin: 0;
     text-align: left;
     display: flex;
+    gap: 8px;
 }
 
 .selector .selector-filter label,
@@ -77,14 +92,9 @@
     flex-grow: 1;
 }
 
-.selector .selector-available input,
-.selector .selector-chosen input {
-    margin-left: 8px;
-}
-
 .selector ul.selector-chooser {
     align-self: center;
-    width: 22px;
+    width: 30px;
     background-color: var(--selected-bg);
     border-radius: 10px;
     margin: 0;
@@ -114,40 +124,43 @@
 }
 
 .selector-add, .selector-remove {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     display: block;
     text-indent: -3000px;
     overflow: hidden;
     cursor: default;
     opacity: 0.55;
+    border: none;
 }
 
-.active.selector-add, .active.selector-remove {
+:enabled.selector-add, :enabled.selector-remove {
     opacity: 1;
 }
 
-.active.selector-add:hover, .active.selector-remove:hover {
+:enabled.selector-add:hover, :enabled.selector-remove:hover {
     cursor: pointer;
 }
 
 .selector-add {
-    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
-    background-position: 0 -112px;
+:enabled.selector-add:focus, :enabled.selector-add:hover {
+    background-position: 0 -168px;
 }
 
 .selector-remove {
-    background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
-    background-position: 0 -80px;
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    background-position: 0 -120px;
 }
 
-a.selector-chooseall, a.selector-clearall {
+.selector-chooseall, .selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
@@ -158,38 +171,39 @@ a.selector-chooseall, a.selector-clearall {
     color: var(--body-quiet-color);
     text-decoration: none;
     opacity: 0.55;
+    border: none;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
     color: var(--link-fg);
 }
 
-a.active.selector-chooseall, a.active.selector-clearall {
+:enabled.selector-chooseall, :enabled.selector-clearall {
     opacity: 1;
 }
 
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
     cursor: pointer;
 }
 
-a.selector-chooseall {
+.selector-chooseall {
     padding: 0 18px 0 0;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
-a.selector-clearall {
+.selector-clearall {
     padding: 0 0 0 18px;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
@@ -219,8 +233,9 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked ul.selector-chooser {
-    height: 22px;
-    width: 50px;
+    display: flex;
+    height: 30px;
+    width: 64px;
     margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
@@ -237,32 +252,34 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .selector-add {
-    background: url(../img/selector-icons.svg) 0 -32px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -48px no-repeat;
+    background-size: 24px auto;
     cursor: default;
 }
 
-.stacked .active.selector-add {
-    background-position: 0 -32px;
+.stacked :enabled.selector-add {
+    background-position: 0 -48px;
     cursor: pointer;
 }
 
-.stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
-    background-position: 0 -48px;
+.stacked :enabled.selector-add:focus, .stacked :enabled.selector-add:hover {
+    background-position: 0 -72px;
     cursor: pointer;
 }
 
 .stacked .selector-remove {
     background: url(../img/selector-icons.svg) 0 0 no-repeat;
+    background-size: 24px auto;
     cursor: default;
 }
 
-.stacked .active.selector-remove {
+.stacked :enabled.selector-remove {
     background-position: 0 0px;
     cursor: pointer;
 }
 
-.stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
-    background-position: 0 -16px;
+.stacked :enabled.selector-remove:focus, .stacked :enabled.selector-remove:hover {
+    background-position: 0 -24px;
     cursor: pointer;
 }
 
@@ -318,28 +335,30 @@ table p.datetime {
     position: relative;
     display: inline-block;
     vertical-align: middle;
-    height: 16px;
-    width: 16px;
+    height: 24px;
+    width: 24px;
     overflow: hidden;
 }
 
 .datetimeshortcuts .clock-icon {
     background: url(../img/icon-clock.svg) 0 0 no-repeat;
+    background-size: 24px auto;
 }
 
 .datetimeshortcuts a:focus .clock-icon,
 .datetimeshortcuts a:hover .clock-icon {
-    background-position: 0 -16px;
+    background-position: 0 -24px;
 }
 
 .datetimeshortcuts .date-icon {
     background: url(../img/icon-calendar.svg) 0 0 no-repeat;
+    background-size: 24px auto;
     top: -1px;
 }
 
 .datetimeshortcuts a:focus .date-icon,
 .datetimeshortcuts a:hover .date-icon {
-    background-position: 0 -16px;
+    background-position: 0 -24px;
 }
 
 .timezonewarning {
@@ -558,9 +577,10 @@ ul.timelist, .timelist li {
     float: right;
     text-indent: -9999px;
     background: url(../img/inline-delete.svg) 0 0 no-repeat;
-    width: 16px;
-    height: 16px;
+    width: 1.5rem;
+    height: 1.5rem;
     border: 0px none;
+    margin-bottom: .25rem;
 }
 
 .inline-deletelink:focus, .inline-deletelink:hover {

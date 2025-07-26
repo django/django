@@ -2,10 +2,11 @@
 #
 # Translators:
 # Anders Hovmöller <boxed@killingar.net>, 2023
-# Andreas Pelme <andreas@pelme.se>, 2012
+# Andreas Pelme <andreas@pelme.se>, 2012,2024
 # Danijel Grujicic, 2023
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Benjaminsson <mattias@colourandcode.se>, 2011
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Danijel Grujicic, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:59+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -85,8 +86,8 @@ msgstr "Klicka för att ta bort alla valda %s på en gång."
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s valt alternativ inte synligt"
+msgstr[1] "%s valda alternativ inte synliga"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -250,53 +251,53 @@ msgid "Dec"
 msgstr "dec"
 
 msgid "Sunday"
-msgstr ""
+msgstr "Söndag"
 
 msgid "Monday"
-msgstr ""
+msgstr "Måndag"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "Tisdag"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 msgid "Saturday"
-msgstr ""
+msgstr "Lördag"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr ""
+msgstr "sön"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
-msgstr ""
+msgstr "mån"
 
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
-msgstr ""
+msgstr "tis"
 
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
-msgstr ""
+msgstr "ons"
 
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
-msgstr ""
+msgstr "tors"
 
 msgctxt "abbrev. day Friday"
 msgid "Fri"
-msgstr ""
+msgstr "fre"
 
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
-msgstr ""
+msgstr "lör"
 
 msgctxt "one letter Sunday"
 msgid "S"
@@ -325,9 +326,3 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "L"
-
-msgid "Show"
-msgstr "Visa"
-
-msgid "Hide"
-msgstr "Göm"

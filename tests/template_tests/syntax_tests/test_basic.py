@@ -1,7 +1,8 @@
-from django.template.base import TemplateSyntaxError
+from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase
+from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
 
@@ -346,6 +347,52 @@ class BasicSyntaxTests(SimpleTestCase):
         output = self.engine.render_to_string("tpl-weird-percent")
         self.assertEqual(output, "% %s")
 
+    @setup(
+        {"template": "{{ class_var.class_property }} | {{ class_var.class_method }}"}
+    )
+    def test_subscriptable_class(self):
+        class MyClass(list):
+            # As of Python 3.9 list defines __class_getitem__ which makes it
+            # subscriptable.
+            class_property = "Example property"
+            do_not_call_in_templates = True
+
+            @classmethod
+            def class_method(cls):
+                return "Example method"
+
+        for case in (MyClass, lambda: MyClass):
+            with self.subTest(case=case):
+                output = self.engine.render_to_string("template", {"class_var": case})
+                self.assertEqual(output, "Example property | Example method")
+
+    @setup({"template": "{{ meals.lunch }}"})
+    def test_access_class_property_if_getitem_is_defined_in_metaclass(self):
+        """
+        If the metaclass defines __getitem__, the template system should use
+        it to resolve the dot notation.
+        """
+
+        class MealMeta(type):
+            def __getitem__(cls, name):
+                return getattr(cls, name) + " is yummy."
+
+        class Meals(metaclass=MealMeta):
+            lunch = "soup"
+            do_not_call_in_templates = True
+
+            # Make class type subscriptable.
+            def __class_getitem__(cls, key):
+                from types import GenericAlias
+
+                return GenericAlias(cls, key)
+
+        self.assertEqual(Meals.lunch, "soup")
+        self.assertEqual(Meals["lunch"], "soup is yummy.")
+
+        output = self.engine.render_to_string("template", {"meals": Meals})
+        self.assertEqual(output, "soup is yummy.")
+
 
 class BlockContextTests(SimpleTestCase):
     def test_repr(self):
@@ -356,3 +403,29 @@ class BlockContextTests(SimpleTestCase):
             "<BlockContext: blocks=defaultdict(<class 'list'>, "
             "{'content': [<Block Node: content. Contents: []>]})>",
         )
+
+
+class TemplateNameInExceptionTests(SimpleTestCase):
+    template_error_msg = (
+        "Invalid block tag on line 1: 'endfor'. Did you forget to register or "
+        "load this tag?"
+    )
+
+    def test_template_name_in_error_message(self):
+        msg = f"Template: test.html, {self.template_error_msg}"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template("{% endfor %}", origin=Origin("test.html"))
+
+    def test_template_name_not_in_debug_view(self):
+        try:
+            Template("{% endfor %}", origin=Origin("test.html"))
+        except TemplateSyntaxError as e:
+            reporter = ExceptionReporter(None, e.__class__, e, None)
+            traceback_data = reporter.get_traceback_data()
+            self.assertEqual(traceback_data["exception_value"], self.template_error_msg)
+
+    def test_unknown_source_template(self):
+        try:
+            Template("{% endfor %}")
+        except TemplateSyntaxError as e:
+            self.assertEqual(str(e), self.template_error_msg)

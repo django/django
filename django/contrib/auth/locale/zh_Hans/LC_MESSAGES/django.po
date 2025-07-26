@@ -11,6 +11,7 @@
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
+# L., 2024
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Lemon Li <leeway1985@gmail.com>, 2012-2013
 # Wentao Han <wentao.han@gmail.com>, 2020
@@ -22,9 +23,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
-"Last-Translator: Kaiqi Zhu, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"Last-Translator: L., 2024\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -46,12 +47,22 @@ msgstr "重要日期"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "提交的表单数据存在冲突。请再试一次。"
+
 msgid "Password changed successfully."
 msgstr "密码修改成功。"
+
+msgid "Password-based authentication was disabled."
+msgstr "基于密码的验证已禁用。"
 
 #, python-format
 msgid "Change password: %s"
 msgstr "修改密码：%s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "设置密码: %s"
 
 msgid "Authentication and Authorization"
 msgstr "认证和授权"
@@ -68,8 +79,22 @@ msgstr "密码未设置。"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "不可用的密码格式或未知的哈希算法。"
 
+msgid "Reset password"
+msgstr "重置密码"
+
+msgid "Set password"
+msgstr "设置密码"
+
 msgid "The two password fields didn’t match."
 msgstr "输入的两个密码不一致。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"用户是否能够使用密码进行认证。如果禁用，他们仍可能能够使用其他后端进行认证，"
+"例如单一登入或LDAP。"
 
 msgid "Password"
 msgstr "密码"
@@ -80,12 +105,22 @@ msgstr "密码确认"
 msgid "Enter the same password as before, for verification."
 msgstr "为了校验，请输入与上面相同的密码。"
 
+msgid "Password-based authentication"
+msgstr "基于密码的验证"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Disabled"
+msgstr "禁用"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
-msgstr ""
-"密码原文未存储在系统中，因此无法看到该用户的密码。然而你可以通过<a "
-"href=\"{}\">这个表单</a>来修改密码。"
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr "原始密码不会被储存，因此无法查看用户的密码。"
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "通过设定密码为此用户启用基于密码的认证。"
 
 #, python-format
 msgid ""
@@ -110,9 +145,6 @@ msgstr "你的旧密码不正确。请重新输入。"
 
 msgid "Old password"
 msgstr "旧密码"
-
-msgid "Password (again)"
-msgstr "密码（重复）"
 
 msgid "algorithm"
 msgstr "算法"

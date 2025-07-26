@@ -12,12 +12,10 @@ import random
 import sys
 import textwrap
 import unittest
+import unittest.suite
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
-from io import StringIO
-
-import sqlparse
 
 import django
 from django.core.management import call_command
@@ -29,7 +27,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY312
+from django.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -42,16 +40,47 @@ except ImportError:
     tblib = None
 
 
+class QueryFormatter(logging.Formatter):
+    def format(self, record):
+        if (alias := getattr(record, "alias", None)) in connections:
+            format_sql = connections[alias].ops.format_debug_sql
+
+            sql = None
+            formatted_sql = None
+            if args := record.args:
+                if isinstance(args, tuple) and len(args) > 1 and (sql := args[1]):
+                    record.args = (args[0], formatted_sql := format_sql(sql), *args[2:])
+                elif isinstance(record.args, dict) and (sql := record.args.get("sql")):
+                    record.args["sql"] = formatted_sql = format_sql(sql)
+
+            if extra_sql := getattr(record, "sql", None):
+                if extra_sql == sql:
+                    record.sql = formatted_sql
+                else:
+                    record.sql = format_sql(extra_sql)
+
+        return super().format(record)
+
+
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger("django.db.backends")
         self.logger.setLevel(logging.DEBUG)
-        self.debug_sql_stream = None
+        self.handler = None
         super().__init__(stream, descriptions, verbosity)
 
+    def _read_logger_stream(self):
+        if self.handler is None:
+            # Error before tests e.g. in setUpTestData().
+            sql = ""
+        else:
+            self.handler.stream.seek(0)
+            sql = self.handler.stream.read()
+        return sql
+
     def startTest(self, test):
-        self.debug_sql_stream = StringIO()
-        self.handler = logging.StreamHandler(self.debug_sql_stream)
+        self.handler = logging.StreamHandler(io.StringIO())
+        self.handler.setFormatter(QueryFormatter())
         self.logger.addHandler(self.handler)
         super().startTest(test)
 
@@ -59,35 +88,26 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         super().stopTest(test)
         self.logger.removeHandler(self.handler)
         if self.showAll:
-            self.debug_sql_stream.seek(0)
-            self.stream.write(self.debug_sql_stream.read())
+            self.stream.write(self._read_logger_stream())
             self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
         super().addError(test, err)
-        if self.debug_sql_stream is None:
-            # Error before tests e.g. in setUpTestData().
-            sql = ""
-        else:
-            self.debug_sql_stream.seek(0)
-            sql = self.debug_sql_stream.read()
-        self.errors[-1] = self.errors[-1] + (sql,)
+        self.errors[-1] = self.errors[-1] + (self._read_logger_stream(),)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.debug_sql_stream.seek(0)
-        self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
+        self.failures[-1] = self.failures[-1] + (self._read_logger_stream(),)
 
     def addSubTest(self, test, subtest, err):
         super().addSubTest(test, subtest, err)
         if err is not None:
-            self.debug_sql_stream.seek(0)
             errors = (
                 self.failures
                 if issubclass(err[0], test.failureException)
                 else self.errors
             )
-            errors[-1] = errors[-1] + (self.debug_sql_stream.read(),)
+            errors[-1] = errors[-1] + (self._read_logger_stream(),)
 
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
@@ -96,9 +116,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(
-                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
-            )
+            self.stream.writeln(sql_debug)
 
 
 class PDBDebugResult(unittest.TextTestResult):
@@ -125,7 +143,10 @@ class PDBDebugResult(unittest.TextTestResult):
         self.buffer = False
         exc_type, exc_value, traceback = error
         print("\nOpening PDB: %r" % exc_value)
-        pdb.post_mortem(traceback)
+        if PY313:
+            pdb.post_mortem(exc_value)
+        else:
+            pdb.post_mortem(traceback)
 
 
 class DummyList:
@@ -292,7 +313,15 @@ failure and get a correct traceback.
 
     def addError(self, test, err):
         self.check_picklable(test, err)
-        self.events.append(("addError", self.test_index, err))
+
+        event_occurred_before_first_test = self.test_index == -1
+        if event_occurred_before_first_test and isinstance(
+            test, unittest.suite._ErrorHolder
+        ):
+            self.events.append(("addError", self.test_index, test.id(), err))
+        else:
+            self.events.append(("addError", self.test_index, err))
+
         super().addError(test, err)
 
     def addFailure(self, test, err):
@@ -547,17 +576,31 @@ class ParallelTestSuite(unittest.TestSuite):
 
             tests = list(self.subsuites[subsuite_index])
             for event in events:
-                event_name = event[0]
-                handler = getattr(result, event_name, None)
-                if handler is None:
-                    continue
-                test = tests[event[1]]
-                args = event[2:]
-                handler(test, *args)
+                self.handle_event(result, tests, event)
 
         pool.join()
 
         return result
+
+    def handle_event(self, result, tests, event):
+        event_name = event[0]
+        handler = getattr(result, event_name, None)
+        if handler is None:
+            return
+        test_index = event[1]
+        event_occurred_before_first_test = test_index == -1
+        if (
+            event_name == "addError"
+            and event_occurred_before_first_test
+            and len(event) >= 4
+        ):
+            test_id = event[2]
+            test = unittest.suite._ErrorHolder(test_id)
+            args = event[3:]
+        else:
+            test = tests[test_index]
+            args = event[2:]
+        handler(test, *args)
 
     def __iter__(self):
         return iter(self.subsuites)
@@ -807,15 +850,14 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
-        if PY312:
-            parser.add_argument(
-                "--durations",
-                dest="durations",
-                type=int,
-                default=None,
-                metavar="N",
-                help="Show the N slowest test cases (N=0 for all).",
-            )
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     @property
     def shuffle_seed(self):
@@ -983,9 +1025,8 @@ class DiscoverRunner:
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
+            "durations": self.durations,
         }
-        if PY312:
-            kwargs["durations"] = self.durations
         return kwargs
 
     def run_checks(self, databases):

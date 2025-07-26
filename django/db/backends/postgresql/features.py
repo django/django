@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (13,)
+    minimum_database_version = (14,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
@@ -52,18 +52,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     requires_casted_case_in_updates = True
     supports_over_clause = True
     supports_frame_exclusion = True
     only_supports_unbounded_with_preceding_and_following = True
     supports_aggregate_filter_clause = True
+    supports_aggregate_order_by_clause = True
     supported_explain_formats = {"JSON", "TEXT", "XML", "YAML"}
     supports_deferrable_unique_constraints = True
     has_json_operators = True
@@ -153,10 +147,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_14(self):
-        return self.connection.pg_version >= 140000
-
-    @cached_property
     def is_postgresql_15(self):
         return self.connection.pg_version >= 150000
 
@@ -164,9 +154,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_16(self):
         return self.connection.pg_version >= 160000
 
-    has_bit_xor = property(operator.attrgetter("is_postgresql_14"))
-    supports_covering_spgist_indexes = property(operator.attrgetter("is_postgresql_14"))
+    @cached_property
+    def is_postgresql_17(self):
+        return self.connection.pg_version >= 170000
+
     supports_unlimited_charfield = True
     supports_nulls_distinct_unique_constraints = property(
         operator.attrgetter("is_postgresql_15")
     )
+
+    supports_any_value = property(operator.attrgetter("is_postgresql_16"))

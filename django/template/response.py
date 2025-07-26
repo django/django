@@ -145,7 +145,7 @@ class SimpleTemplateResponse(HttpResponse):
 
 
 class TemplateResponse(SimpleTemplateResponse):
-    rendering_attrs = SimpleTemplateResponse.rendering_attrs + ["_request"]
+    rendering_attrs = [*SimpleTemplateResponse.rendering_attrs, "_request"]
 
     def __init__(
         self,

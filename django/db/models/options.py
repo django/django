@@ -5,8 +5,16 @@ from collections import defaultdict
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.core.signals import setting_changed
 from django.db import connections
-from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
+from django.db.models import (
+    AutoField,
+    CompositePrimaryKey,
+    Manager,
+    OrderWrt,
+    UniqueConstraint,
+)
+from django.db.models.fields import composite
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -230,6 +238,9 @@ class Options:
                 self.db_table, connection.ops.max_name_length()
             )
 
+        if self.swappable:
+            setting_changed.connect(self.setting_changed)
+
     def _format_names(self, objs):
         """App label/class name interpolation for object names."""
         names = {"app_label": self.app_label.lower(), "class": self.model_name}
@@ -337,9 +348,10 @@ class Options:
         # being referenced, because there will be new relationships in the
         # cache. Otherwise, expire the cache of references *to* this field.
         # The mechanism for getting at the related model is slightly odd -
-        # ideally, we'd just ask for field.related_model. However, related_model
-        # is a cached property, and all the models haven't been loaded yet, so
-        # we need to make sure we don't cache a string reference.
+        # ideally, we'd just ask for field.related_model. However,
+        # related_model is a cached property, and all the models haven't been
+        # loaded yet, so we need to make sure we don't cache a string
+        # reference.
         if (
             field.is_relation
             and hasattr(field.remote_field, "model")
@@ -399,7 +411,7 @@ class Options:
         with override(None):
             return str(self.verbose_name)
 
-    @property
+    @cached_property
     def swapped(self):
         """
         Has this model been swapped out for another? If so, return the model
@@ -416,8 +428,8 @@ class Options:
                 except ValueError:
                     # setting not in the format app_label.model_name
                     # raising ImproperlyConfigured here causes problems with
-                    # test cleanup code - instead it is raised in get_user_model
-                    # or as part of validation.
+                    # test cleanup code - instead it is raised in
+                    # get_user_model or as part of validation.
                     return swapped_for
 
                 if (
@@ -426,6 +438,10 @@ class Options:
                 ):
                     return swapped_for
         return None
+
+    def setting_changed(self, *, setting, **kwargs):
+        if setting == self.swappable and "swapped" in self.__dict__:
+            del self.swapped
 
     @cached_property
     def managers(self):
@@ -519,10 +535,10 @@ class Options:
         # For legacy reasons, the fields property should only contain forward
         # fields that are not private or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
-        # The third lambda is a longwinded way of checking f.related_model - we don't
-        # use that property directly because related_model is a cached property,
-        # and all the models may not have been loaded yet; we don't want to cache
-        # the string reference to the related_model.
+        # The third filter is a longwinded way of checking f.related_model - we
+        # don't use that property directly because related_model is a cached
+        # property, and all the models may not have been loaded yet; we don't
+        # want to cache the string reference to the related_model.
         def is_not_an_m2m_field(f):
             return not (f.is_relation and f.many_to_many)
 
@@ -692,7 +708,8 @@ class Options:
     def all_parents(self):
         """
         Return all the ancestors of this model as a tuple ordered by MRO.
-        Useful for determining if something is an ancestor, regardless of lineage.
+        Useful for determining if something is an ancestor, regardless of
+        lineage.
         """
         result = OrderedSet(self.parents)
         for parent in self.parents:
@@ -785,8 +802,8 @@ class Options:
         """
         This method is used by each model to find its reverse objects. As this
         method is very expensive and is accessed frequently (it looks up every
-        field in a model, in every app), it is computed on first access and then
-        is set as a property on every model.
+        field in a model, in every app), it is computed on first access and
+        then is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
 
@@ -966,6 +983,14 @@ class Options:
         ]
 
     @cached_property
+    def pk_fields(self):
+        return composite.unnest([self.pk])
+
+    @property
+    def is_composite_pk(self):
+        return isinstance(self.pk, CompositePrimaryKey)
+
+    @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
         names = set()
@@ -985,8 +1010,11 @@ class Options:
         Return a set of the non-pk concrete field names defined on the model.
         """
         names = []
+        all_pk_fields = set(self.pk_fields)
+        for parent in self.all_parents:
+            all_pk_fields.update(parent._meta.pk_fields)
         for field in self.concrete_fields:
-            if not field.primary_key:
+            if field not in all_pk_fields:
                 names.append(field.name)
                 if field.name != field.attname:
                     names.append(field.attname)

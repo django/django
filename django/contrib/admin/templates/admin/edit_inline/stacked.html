@@ -3,12 +3,16 @@
      id="{{ inline_admin_formset.formset.prefix }}-group"
      data-inline-type="stacked"
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
-<fieldset class="module {{ inline_admin_formset.classes }}">
+<fieldset class="module {{ inline_admin_formset.classes }}" aria-labelledby="{{ inline_admin_formset.formset.prefix }}-heading">
+  {% if inline_admin_formset.is_collapsible %}<details><summary>{% endif %}
+  <h2 id="{{ inline_admin_formset.formset.prefix }}-heading" class="inline-heading">
   {% if inline_admin_formset.formset.max_num == 1 %}
-    <h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2>
+    {{ inline_admin_formset.opts.verbose_name|capfirst }}
   {% else %}
-    <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+    {{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
   {% endif %}
+  </h2>
+  {% if inline_admin_formset.is_collapsible %}</summary>{% endif %}
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
 
@@ -19,11 +23,16 @@
     {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
   </h3>
   {% if inline_admin_form.form.non_field_errors %}{{ inline_admin_form.form.non_field_errors }}{% endif %}
-  {% for fieldset in inline_admin_form %}
-    {% include "admin/includes/fieldset.html" %}
-  {% endfor %}
+
+  {% with parent_counter=forloop.counter0 %}
+    {% for fieldset in inline_admin_form %}
+      {% include "admin/includes/fieldset.html" with heading_level=4 prefix=fieldset.formset.prefix id_prefix=parent_counter id_suffix=forloop.counter0 %}
+    {% endfor %}
+  {% endwith %}
+
   {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
   {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
 </div>{% endfor %}
+  {% if inline_admin_formset.is_collapsible %}</details>{% endif %}
 </fieldset>
 </div>

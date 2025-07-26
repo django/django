@@ -19,7 +19,6 @@ from django.core.management.utils import (
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
-from django.utils.jslex import prepare_js_for_gettext
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
@@ -35,13 +34,13 @@ def check_programs(*programs):
     for program in programs:
         if find_command(program) is None:
             raise CommandError(
-                "Can't find %s. Make sure you have GNU gettext tools 0.15 or "
-                "newer installed." % program
+                f"Can't find {program}. Make sure you have GNU gettext tools "
+                "0.19 or newer installed."
             )
 
 
 def is_valid_locale(locale):
-    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z].*$", locale)
+    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z0-9].*$", locale)
 
 
 @total_ordering
@@ -80,9 +79,7 @@ class BuildFile:
 
     @cached_property
     def is_templatized(self):
-        if self.domain == "djangojs":
-            return self.command.gettext_version < (0, 18, 3)
-        elif self.domain == "django":
+        if self.domain == "django":
             file_ext = os.path.splitext(self.translatable.file)[1]
             return file_ext != ".py"
         return False
@@ -99,11 +96,7 @@ class BuildFile:
         """
         if not self.is_templatized:
             return self.path
-        extension = {
-            "djangojs": "c",
-            "django": "py",
-        }.get(self.domain)
-        filename = "%s.%s" % (self.translatable.file, extension)
+        filename = f"{self.translatable.file}.py"
         return os.path.join(self.translatable.dirpath, filename)
 
     def preprocess(self):
@@ -117,9 +110,7 @@ class BuildFile:
         with open(self.path, encoding="utf-8") as fp:
             src_data = fp.read()
 
-        if self.domain == "djangojs":
-            content = prepare_js_for_gettext(src_data)
-        elif self.domain == "django":
+        if self.domain == "django":
             content = templatize(src_data, origin=self.path[2:])
 
         with open(self.work_path, "w", encoding="utf-8") as fp:
@@ -306,7 +297,7 @@ class Command(BaseCommand):
             nargs="?",
             help=(
                 "Controls '#: filename:line' lines. If the option is 'full' "
-                "(the default if not given), the lines  include both file name "
+                "(the default if not given), the lines include both file name "
                 "and line number. If it's 'file', the line number is omitted. If "
                 "it's 'never', the lines are suppressed (same as --no-location). "
                 "--add-location requires gettext 0.19 or newer."
@@ -349,11 +340,6 @@ class Command(BaseCommand):
             self.msgattrib_options = self.msgattrib_options[:] + ["--no-location"]
             self.xgettext_options = self.xgettext_options[:] + ["--no-location"]
         if options["add_location"]:
-            if self.gettext_version < (0, 19):
-                raise CommandError(
-                    "The --add-location option requires gettext 0.19 or later. "
-                    "You have %s." % ".".join(str(x) for x in self.gettext_version)
-                )
             arg_add_location = "--add-location=%s" % options["add_location"]
             self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
@@ -434,9 +420,11 @@ class Command(BaseCommand):
             for locale in locales:
                 if not is_valid_locale(locale):
                     # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
+                    # Valid examples are: en_GB, shi_Latn_MA and
+                    # nl_NL-x-informal
 
-                    # Search for characters followed by a non character (i.e. separator)
+                    # Search for characters followed by a non character (i.e.
+                    # separator)
                     match = re.match(
                         r"^(?P<language>[a-zA-Z]+)"
                         r"(?P<separator>[^a-zA-Z])"
@@ -478,8 +466,9 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
-        # when looking up the version. It's especially a problem on Windows.
+        # Gettext tools will output system-encoded bytestrings instead of
+        # UTF-8, when looking up the version. It's especially a problem on
+        # Windows.
         out, err, status = popen_wrapper(
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
@@ -512,7 +501,7 @@ class Command(BaseCommand):
             potfile = os.path.join(path, "%s.pot" % self.domain)
             if not os.path.exists(potfile):
                 continue
-            args = ["msguniq"] + self.msguniq_options + [potfile]
+            args = ["msguniq", *self.msguniq_options, potfile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -636,12 +625,11 @@ class Command(BaseCommand):
             build_files.append(build_file)
 
         if self.domain == "djangojs":
-            is_templatized = build_file.is_templatized
             args = [
                 "xgettext",
                 "-d",
                 self.domain,
-                "--language=%s" % ("C" if is_templatized else "JavaScript",),
+                "--language=JavaScript",
                 "--keyword=gettext_noop",
                 "--keyword=gettext_lazy",
                 "--keyword=ngettext_lazy:1,2",
@@ -717,7 +705,7 @@ class Command(BaseCommand):
         pofile = os.path.join(basedir, "%s.po" % self.domain)
 
         if os.path.exists(pofile):
-            args = ["msgmerge"] + self.msgmerge_options + [pofile, potfile]
+            args = ["msgmerge", *self.msgmerge_options, pofile, potfile]
             _, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -740,7 +728,7 @@ class Command(BaseCommand):
             fp.write(msgs)
 
         if self.no_obsolete:
-            args = ["msgattrib"] + self.msgattrib_options + ["-o", pofile, pofile]
+            args = ["msgattrib", *self.msgattrib_options, "-o", pofile, pofile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:

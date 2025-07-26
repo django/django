@@ -29,6 +29,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     Min,
     Model,
@@ -47,19 +48,23 @@ from django.db.models import (
 )
 from django.db.models.expressions import (
     Col,
+    ColPairs,
     Combinable,
     CombinedExpression,
     NegatedExpression,
+    OutputFieldIsNoneError,
     RawSQL,
     Ref,
 )
 from django.db.models.functions import (
     Coalesce,
     Concat,
+    ExtractDay,
     Left,
     Length,
     Lower,
     Substr,
+    TruncDate,
     Upper,
 )
 from django.db.models.sql import constants
@@ -79,6 +84,7 @@ from .models import (
     Company,
     Employee,
     Experiment,
+    JSONFieldModel,
     Manager,
     Number,
     RemoteEmployee,
@@ -208,24 +214,28 @@ class BasicExpressionsTests(TestCase):
 
     def _test_slicing_of_f_expressions(self, model):
         tests = [
-            (F("name")[:], "Example Inc.", "Example Inc."),
-            (F("name")[:7], "Example Inc.", "Example"),
-            (F("name")[:6][:5], "Example", "Examp"),  # Nested slicing.
-            (F("name")[0], "Examp", "E"),
-            (F("name")[5], "E", ""),
-            (F("name")[7:], "Foobar Ltd.", "Ltd."),
-            (F("name")[0:10], "Ltd.", "Ltd."),
-            (F("name")[2:7], "Test GmbH", "st Gm"),
-            (F("name")[1:][:3], "st Gm", "t G"),
-            (F("name")[2:2], "t G", ""),
+            (F("name")[:], "Example Inc."),
+            (F("name")[:7], "Example"),
+            (F("name")[:6][:5], "Examp"),  # Nested slicing.
+            (F("name")[0], "E"),
+            (F("name")[13], ""),
+            (F("name")[8:], "Inc."),
+            (F("name")[0:15], "Example Inc."),
+            (F("name")[2:7], "ample"),
+            (F("name")[1:][:3], "xam"),
+            (F("name")[2:2], ""),
         ]
-        for expression, name, expected in tests:
-            with self.subTest(expression=expression, name=name, expected=expected):
-                obj = model.objects.get(name=name)
-                obj.name = expression
-                obj.save()
-                obj.refresh_from_db()
-                self.assertEqual(obj.name, expected)
+        for expression, expected in tests:
+            with self.subTest(expression=expression, expected=expected):
+                obj = model.objects.get(name="Example Inc.")
+                try:
+                    obj.name = expression
+                    obj.save(update_fields=["name"])
+                    obj.refresh_from_db()
+                    self.assertEqual(obj.name, expected)
+                finally:
+                    obj.name = "Example Inc."
+                    obj.save(update_fields=["name"])
 
     def test_slicing_of_f_expressions_charfield(self):
         self._test_slicing_of_f_expressions(Company)
@@ -358,6 +368,21 @@ class BasicExpressionsTests(TestCase):
         self.assertQuerySetEqual(
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_update_jsonfield_case_when_key_is_null(self):
+        obj = JSONFieldModel.objects.create(data={"key": None})
+        updated = JSONFieldModel.objects.update(
+            data=Case(
+                When(
+                    data__key=Value(None, JSONField()),
+                    then=Value({"key": "something"}, JSONField()),
+                ),
+            )
+        )
+        self.assertEqual(updated, 1)
+        obj.refresh_from_db()
+        self.assertEqual(obj.data, {"key": "something"})
 
     def test_filter_with_join(self):
         # F Expressions can also span joins
@@ -1270,6 +1295,23 @@ class IterableLookupInnerExpressionsTests(TestCase):
                 queryset = Result.objects.filter(**{lookup: within_experiment_time})
                 self.assertSequenceEqual(queryset, [r1])
 
+    def test_relabeled_clone_rhs(self):
+        Number.objects.bulk_create([Number(integer=1), Number(integer=2)])
+        self.assertIs(
+            Number.objects.filter(
+                # Ensure iterable of expressions are properly re-labelled on
+                # subquery pushdown. If the inner query __range right-hand-side
+                # members are not relabelled they will point at the outer query
+                # alias and this test will fail.
+                Exists(
+                    Number.objects.exclude(pk=OuterRef("pk")).filter(
+                        integer__range=(F("integer"), F("integer"))
+                    )
+                )
+            ).exists(),
+            True,
+        )
+
 
 class FTests(SimpleTestCase):
     def test_deepcopy(self):
@@ -1301,6 +1343,43 @@ class FTests(SimpleTestCase):
         value = Value("name")
         self.assertNotEqual(f, value)
         self.assertNotEqual(value, f)
+
+    def test_contains(self):
+        msg = "argument of type 'F' is not iterable"
+        with self.assertRaisesMessage(TypeError, msg):
+            "" in F("name")
+
+    def test_replace_expressions_transform(self):
+        replacements = {F("timestamp"): Value(None)}
+        transform_ref = F("timestamp__date")
+        self.assertIs(transform_ref.replace_expressions(replacements), transform_ref)
+        invalid_transform_ref = F("timestamp__invalid")
+        self.assertIs(
+            invalid_transform_ref.replace_expressions(replacements),
+            invalid_transform_ref,
+        )
+        replacements = {F("timestamp"): Value(datetime.datetime(2025, 3, 1, 14, 10))}
+        self.assertEqual(
+            F("timestamp__date").replace_expressions(replacements),
+            TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10))),
+        )
+        self.assertEqual(
+            F("timestamp__date__day").replace_expressions(replacements),
+            ExtractDay(TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10)))),
+        )
+        invalid_nested_transform_ref = F("timestamp__date__invalid")
+        self.assertIs(
+            invalid_nested_transform_ref.replace_expressions(replacements),
+            invalid_nested_transform_ref,
+        )
+        # `replacements` is not unnecessarily looked up a second time for
+        # transform-less field references as it's the case the vast majority of
+        # the time.
+        mock_replacements = mock.Mock()
+        mock_replacements.get.return_value = None
+        field_ref = F("name")
+        self.assertIs(field_ref.replace_expressions(mock_replacements), field_ref)
+        mock_replacements.get.assert_called_once_with(field_ref)
 
 
 class ExpressionsTests(TestCase):
@@ -1405,6 +1484,29 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(TestModel._meta.get_field("other_field")),
         )
 
+        class InitCaptureExpression(Expression):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        # The identity of expressions that obscure their __init__() signature
+        # with *args and **kwargs cannot be determined when bound with
+        # different combinations or *args and **kwargs.
+        self.assertNotEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
+        )
+
+        # However, they should be considered equal when their bindings are
+        # equal.
+        self.assertEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(IntegerField()),
+        )
+        self.assertEqual(
+            InitCaptureExpression(output_field=IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
+        )
+
     def test_hash(self):
         self.assertEqual(hash(Expression()), hash(Expression()))
         self.assertEqual(
@@ -1424,6 +1526,16 @@ class SimpleExpressionTests(SimpleTestCase):
             hash(Expression(TestModel._meta.get_field("field"))),
             hash(Expression(TestModel._meta.get_field("other_field"))),
         )
+
+    def test_get_expression_for_validation_only_one_source_expression(self):
+        expression = Expression()
+        expression.constraint_validation_compatible = False
+        msg = (
+            "Expressions with constraint_validation_compatible set to False must have "
+            "only one source expression."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            expression.get_expression_for_validation()
 
 
 class ExpressionsNumericTests(TestCase):
@@ -2296,11 +2408,6 @@ class ValueTests(TestCase):
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
 
-    def test_raise_empty_expressionlist(self):
-        msg = "ExpressionList requires at least one expression"
-        with self.assertRaisesMessage(ValueError, msg):
-            ExpressionList()
-
     def test_compile_unresolved(self):
         # This test might need to be revisited later on if #25425 is enforced.
         compiler = Time.objects.all().query.get_compiler(connection=connection)
@@ -2313,6 +2420,16 @@ class ValueTests(TestCase):
         Time.objects.create()
         time = Time.objects.annotate(one=Value(1, output_field=DecimalField())).first()
         self.assertEqual(time.one, 1)
+
+    def test_output_field_is_none_error(self):
+        with self.assertRaises(OutputFieldIsNoneError):
+            Employee.objects.annotate(custom_expression=Value(None)).first()
+
+    def test_output_field_or_none_property_not_cached(self):
+        expression = Value(None, output_field=None)
+        self.assertIsNone(expression._output_field_or_none)
+        expression.output_field = BooleanField()
+        self.assertIsInstance(expression._output_field_or_none, BooleanField)
 
     def test_resolve_output_field(self):
         value_types = [
@@ -2452,6 +2569,10 @@ class ReprTests(SimpleTestCase):
             "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value('legal')>",
         )
         self.assertEqual(repr(Col("alias", "field")), "Col(alias, field)")
+        self.assertEqual(
+            repr(ColPairs("alias", ["t1", "t2"], ["s1", "s2"], "f")),
+            "ColPairs('alias', ['t1', 't2'], ['s1', 's2'], 'f')",
+        )
         self.assertEqual(repr(F("published")), "F(published)")
         self.assertEqual(
             repr(F("cost") + F("tax")), "<CombinedExpression: F(cost) + F(tax)>"

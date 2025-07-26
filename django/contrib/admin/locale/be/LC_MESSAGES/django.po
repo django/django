@@ -2,14 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016-2017,2019-2021,2023-2024\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -202,10 +203,6 @@ msgid ""
 msgstr "Пасьпяхова зьмянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Пасьпяхова дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -374,6 +371,9 @@ msgstr "Пазначце імя карыстальніка ды пароль."
 msgid "Change password"
 msgstr "Зьмяніць пароль"
 
+msgid "Set password"
+msgstr "Усталяваць пароль"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Калі ласка, выпраўце памылкy, адзначаную ніжэй."
@@ -384,6 +384,19 @@ msgstr[3] "Калі ласка, выпраўце памылкі, адзнача�
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Пазначце пароль для карыстальніка «<strong>%(username)s</strong>»."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Гэта дзеянне <strong>ўключыць</strong> аўтэнтыфікацыю на аснове пароля для "
+"гэтага карыстальніка."
+
+msgid "Disable password-based authentication"
+msgstr "Адключыць аўтэнтыфікацыю на аснове пароля"
+
+msgid "Enable password-based authentication"
+msgstr "Уключыць аўтэнтыфікацыю на аснове пароля"
 
 msgid "Skip to main content"
 msgstr "Перайсці да асноўнага зместу"

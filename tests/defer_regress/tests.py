@@ -96,7 +96,8 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Regression for #16409 - make sure defer() and only() work with
+        # annotate()
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).defer("name")), list
         )
@@ -105,7 +106,8 @@ class DeferRegressionTest(TestCase):
         )
 
     def test_ticket_16409(self):
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Regression for #16409 - make sure defer() and only() work with
+        # annotate()
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).defer("name")), list
         )
@@ -161,8 +163,8 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(
             len(Item.objects.select_related("one_to_one_item").defer("value")), 1
         )
-        # Make sure that `only()` doesn't break when we pass in a unique relation,
-        # rather than a field on the relation.
+        # Make sure that `only()` doesn't break when we pass in a unique
+        # relation, rather than a field on the relation.
         self.assertEqual(len(Item.objects.only("one_to_one_item")), 1)
         with self.assertNumQueries(1):
             i = Item.objects.select_related("one_to_one_item")[0]
@@ -309,6 +311,27 @@ class DeferRegressionTest(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(Item.objects.only("request").get(), item)
 
+    def test_self_referential_one_to_one(self):
+        first = Item.objects.create(name="first", value=1)
+        second = Item.objects.create(name="second", value=2, source=first)
+        with self.assertNumQueries(1):
+            deferred_first, deferred_second = (
+                Item.objects.select_related("source", "destination")
+                .only("name", "source__name", "destination__value")
+                .order_by("pk")
+            )
+        with self.assertNumQueries(0):
+            self.assertEqual(deferred_first.name, first.name)
+            self.assertEqual(deferred_second.name, second.name)
+            self.assertEqual(deferred_second.source.name, first.name)
+            self.assertEqual(deferred_first.destination.value, second.value)
+        with self.assertNumQueries(1):
+            self.assertEqual(deferred_first.value, first.value)
+        with self.assertNumQueries(1):
+            self.assertEqual(deferred_second.source.value, first.value)
+        with self.assertNumQueries(1):
+            self.assertEqual(deferred_first.destination.name, second.name)
+
 
 class DeferDeletionSignalsTests(TestCase):
     senders = [Item, Proxy]
@@ -345,3 +368,25 @@ class DeferDeletionSignalsTests(TestCase):
         Proxy.objects.only("value").get(pk=self.item_pk).delete()
         self.assertEqual(self.pre_delete_senders, [Proxy])
         self.assertEqual(self.post_delete_senders, [Proxy])
+
+
+class DeferCopyInstanceTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        SimpleItem.objects.create(name="test", value=42)
+        cls.deferred_item = SimpleItem.objects.defer("value").first()
+        cls.deferred_item.pk = None
+        cls.deferred_item._state.adding = True
+        cls.expected_msg = (
+            "Cannot retrieve deferred field 'value' from an unsaved model."
+        )
+
+    def test_save(self):
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            self.deferred_item.save(force_insert=True)
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            self.deferred_item.save()
+
+    def test_bulk_create(self):
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            SimpleItem.objects.bulk_create([self.deferred_item])

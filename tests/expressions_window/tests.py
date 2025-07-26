@@ -928,6 +928,20 @@ class WindowFunctionTests(TestCase):
             ),
         )
 
+    def test_empty_ordering(self):
+        """
+        Explicit empty ordering makes little sense but it is something that
+        was historically allowed.
+        """
+        qs = Employee.objects.annotate(
+            sum=Window(
+                expression=Sum("salary"),
+                partition_by="department",
+                order_by=[],
+            )
+        ).order_by("department", "sum")
+        self.assertEqual(len(qs), 12)
+
     def test_related_ordering_with_count(self):
         qs = Employee.objects.annotate(
             department_sum=Window(
@@ -1279,7 +1293,9 @@ class WindowFunctionTests(TestCase):
         )
 
     def test_range_unbound(self):
-        """A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING."""
+        """
+        A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING.
+        """
         qs = Employee.objects.annotate(
             sum=Window(
                 expression=Sum("salary"),
@@ -1706,14 +1722,14 @@ class WindowFunctionTests(TestCase):
         """Window expressions can't be used in an INSERT statement."""
         msg = (
             "Window expressions are not allowed in this query (salary=<Window: "
-            "Sum(Value(10000), order_by=OrderBy(F(pk), descending=False)) OVER ()"
+            "Sum(Value(10000)) OVER ()"
         )
         with self.assertRaisesMessage(FieldError, msg):
             Employee.objects.create(
                 name="Jameson",
                 department="Management",
                 hire_date=datetime.date(2007, 7, 1),
-                salary=Window(expression=Sum(Value(10000), order_by=F("pk").asc())),
+                salary=Window(expression=Sum(Value(10000))),
             )
 
     def test_window_expression_within_subquery(self):
@@ -2011,7 +2027,7 @@ class NonQueryWindowTests(SimpleTestCase):
     def test_invalid_order_by(self):
         msg = (
             "Window.order_by must be either a string reference to a field, an "
-            "expression, or a list or tuple of them."
+            "expression, or a list or tuple of them not {'-horse'}."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Window(expression=Sum("power"), order_by={"-horse"})

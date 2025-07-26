@@ -2,7 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -24,6 +24,7 @@ from django.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
+    In,
     IsNull,
     LessThan,
     LessThanOrEqual,
@@ -173,7 +174,8 @@ class LookupTests(TestCase):
         )
 
     def test_in_bulk(self):
-        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to objects.
+        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to
+        # objects.
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
@@ -260,20 +262,15 @@ class LookupTests(TestCase):
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        old_max_query_params = connection.features.max_query_params
-        connection.features.max_query_params = 1
-        try:
-            articles = (
-                Article.objects.order_by("author_id", "-pub_date")
-                .distinct("author_id")
-                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-            )
+        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        with (
+            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            self.assertNumQueries(2),
+        ):
             self.assertEqual(
-                articles,
+                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
                 {self.au1.id: self.a4, self.au2.id: self.a5},
             )
-        finally:
-            connection.features.max_query_params = old_max_query_params
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):
@@ -327,8 +324,15 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
 
+    def test_in_bulk_not_model_iterable(self):
+        msg = "in_bulk() cannot be used with values() or values_list()."
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values().in_bulk()
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values_list().in_bulk()
+
     def test_values(self):
-        # values() returns a list of dictionaries instead of object instances --
+        # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
         self.assertSequenceEqual(
             Article.objects.values("headline"),
@@ -372,7 +376,8 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
-        # The values() method works with "extra" fields specified in extra(select).
+        # The values() method works with "extra" fields specified in
+        # extra(select).
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
                 "id", "id_plus_one"
@@ -412,7 +417,8 @@ class LookupTests(TestCase):
                 }
             ],
         )
-        # You can specify fields from forward and reverse relations, just like filter().
+        # You can specify fields from forward and reverse relations, just like
+        # filter().
         self.assertSequenceEqual(
             Article.objects.values("headline", "author__name"),
             [
@@ -657,8 +663,9 @@ class LookupTests(TestCase):
         )
 
     def test_escaping(self):
-        # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # Underscores, percent signs and backslashes have special meaning in
+        # the underlying SQL code, but Django handles the quoting of them
+        # automatically.
         a8 = Article.objects.create(
             headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )
@@ -781,6 +788,14 @@ class LookupTests(TestCase):
         sql = ctx.captured_queries[0]["sql"]
         self.assertIn("IN (%s)" % self.a1.pk, sql)
 
+    def test_in_select_mismatch(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.filter(id__in=Article.objects.values("id", "headline"))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
@@ -812,6 +827,34 @@ class LookupTests(TestCase):
         ):
             Article.objects.filter(pub_date__gobbledygook="blahblah")
 
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'gt__foo' for DateTimeField or join on the field "
+            "not permitted, perhaps you meant gt or gte?",
+        ):
+            Article.objects.filter(pub_date__gt__foo="blahblah")
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'gt__' for DateTimeField or join on the field "
+            "not permitted, perhaps you meant gt or gte?",
+        ):
+            Article.objects.filter(pub_date__gt__="blahblah")
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'gt__lt' for DateTimeField or join on the field "
+            "not permitted, perhaps you meant gt or gte?",
+        ):
+            Article.objects.filter(pub_date__gt__lt="blahblah")
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'gt__lt__foo' for DateTimeField or join"
+            " on the field not permitted, perhaps you meant gt or gte?",
+        ):
+            Article.objects.filter(pub_date__gt__lt__foo="blahblah")
+
     def test_unsupported_lookups_custom_lookups(self):
         slug_field = Article._meta.get_field("slug")
         msg = (
@@ -825,7 +868,7 @@ class LookupTests(TestCase):
     def test_relation_nested_lookup_error(self):
         # An invalid nested lookup on a related field raises a useful error.
         msg = (
-            "Unsupported lookup 'editor' for ForeignKey or join on the field not "
+            "Unsupported lookup 'editor__name' for ForeignKey or join on the field not "
             "permitted."
         )
         with self.assertRaisesMessage(FieldError, msg):
@@ -1059,6 +1102,10 @@ class LookupTests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
+        msg = (
+            "Unsupported lookup 'blahblah__exact' for CharField or join "
+            "on the field not permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah__exact=99)
         msg = (
@@ -1324,6 +1371,14 @@ class LookupTests(TestCase):
         authors = Author.objects.filter(id=authors_max_ids[:1])
         self.assertEqual(authors.get(), newest_author)
 
+    def test_exact_query_rhs_with_selected_columns_mismatch(self):
+        msg = (
+            "The QuerySet value for the exact lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.filter(id=Author.objects.values("id", "name")[:1])
+
     def test_isnull_non_boolean_value(self):
         msg = "The QuerySet value for an isnull lookup must be True or False."
         tests = [
@@ -1471,6 +1526,25 @@ class LookupQueryingTests(TestCase):
             Season.objects.filter(IsNull(F("nulled_text_field"), True)),
             [self.s1, self.s3],
         )
+
+    def test_in_lookup_in_filter(self):
+        test_cases = [
+            ((), ()),
+            ((1942,), (self.s1,)),
+            ((1842,), (self.s2,)),
+            ((2042,), (self.s3,)),
+            ((1942, 1842), (self.s1, self.s2)),
+            ((1942, 2042), (self.s1, self.s3)),
+            ((1842, 2042), (self.s2, self.s3)),
+            ((1942, 1942, 1942), (self.s1,)),
+            ((1942, 2042, 1842), (self.s1, self.s2, self.s3)),
+        ]
+
+        for years, seasons in test_cases:
+            with self.subTest(years=years, seasons=seasons):
+                self.assertSequenceEqual(
+                    Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
+                )
 
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(

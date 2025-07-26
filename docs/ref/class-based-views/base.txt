@@ -87,6 +87,11 @@ MRO is an acronym for Method Resolution Order.
 
         Performs key view initialization prior to :meth:`dispatch`.
 
+        Assigns the :class:`~django.http.HttpRequest` to the view's ``request``
+        attribute, and any positional and/or keyword arguments
+        :ref:`captured from the URL pattern <how-django-processes-a-request>`
+        to the ``args`` and ``kwargs`` attributes, respectively.
+
         If overriding this method, you must call ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)

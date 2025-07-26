@@ -158,22 +158,34 @@ and use the ``-so`` option to get only the important summary information:
           using driver `ESRI Shapefile' successful.
 
     Layer name: TM_WORLD_BORDERS-0.3
+    Metadata:
+      DBF_DATE_LAST_UPDATE=2008-07-30
     Geometry: Polygon
     Feature Count: 246
     Extent: (-180.000000, -90.000000) - (180.000000, 83.623596)
     Layer SRS WKT:
-    GEOGCS["GCS_WGS_1984",
-        DATUM["WGS_1984",
-            SPHEROID["WGS_1984",6378137.0,298.257223563]],
-        PRIMEM["Greenwich",0.0],
-        UNIT["Degree",0.0174532925199433]]
+    GEOGCRS["WGS 84",
+        DATUM["World Geodetic System 1984",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        CS[ellipsoidal,2],
+            AXIS["latitude",north,
+                ORDER[1],
+                ANGLEUNIT["degree",0.0174532925199433]],
+            AXIS["longitude",east,
+                ORDER[2],
+                ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4326]]
+    Data axis to CRS axis mapping: 2,1
     FIPS: String (2.0)
     ISO2: String (2.0)
     ISO3: String (3.0)
     UN: Integer (3.0)
     NAME: String (50.0)
     AREA: Integer (7.0)
-    POP2005: Integer (10.0)
+    POP2005: Integer64 (10.0)
     REGION: Integer (3.0)
     SUBREGION: Integer (3.0)
     LON: Real (8.3)

@@ -109,9 +109,9 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(3, 26))
+    @mock.patch.object(connection, "get_database_version", return_value=(3, 30))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "SQLite 3.27 or later is required (found 3.26)."
+        msg = "SQLite 3.31 or later is required (found 3.30)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)

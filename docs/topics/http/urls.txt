@@ -183,11 +183,6 @@ Register custom converter classes in your URLconf using
         ...,
     ]
 
-.. deprecated:: 5.1
-
-    Overriding existing converters with ``django.urls.register_converter()`` is
-    deprecated.
-
 Using regular expressions
 =========================
 
@@ -561,7 +556,7 @@ in their final forms either for embedding in generated content (views and assets
 URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
 the server side (redirections, etc.)
 
-It is strongly desirable to avoid hard-coding these URLs (a laborious,
+It is strongly desirable to avoid hardcoding these URLs (a laborious,
 non-scalable and error-prone strategy). Equally dangerous is devising ad-hoc
 mechanisms to generate URLs that are parallel to the design described by the
 URLconf, which can result in the production of URLs that become stale over time.

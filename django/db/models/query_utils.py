@@ -10,9 +10,10 @@ import functools
 import inspect
 import logging
 from collections import namedtuple
+from contextlib import nullcontext
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 from django.utils.functional import cached_property
@@ -130,14 +131,21 @@ class Q(tree.Node):
                 value = Value(value)
             query.add_annotation(value, name, select=False)
         query.add_annotation(Value(1), "_check")
+        connection = connections[using]
         # This will raise a FieldError if a field is missing in "against".
-        if connections[using].features.supports_comparing_boolean_expr:
+        if connection.features.supports_comparing_boolean_expr:
             query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
         else:
             query.add_q(self)
         compiler = query.get_compiler(using=using)
+        context_manager = (
+            transaction.atomic(using=using)
+            if connection.in_atomic_block
+            else nullcontext()
+        )
         try:
-            return compiler.execute_sql(SINGLE) is not None
+            with context_manager:
+                return compiler.execute_sql(SINGLE) is not None
         except DatabaseError as e:
             logger.warning("Got a database error calling check() on %r: %s", self, e)
             return True
@@ -175,6 +183,19 @@ class Q(tree.Node):
     def __hash__(self):
         return hash(self.identity)
 
+    @cached_property
+    def referenced_base_fields(self):
+        """
+        Retrieve all base fields referenced directly or through F expressions
+        excluding any fields referenced through joins.
+        """
+        # Avoid circular imports.
+        from django.db.models.sql import query
+
+        return {
+            child.split(LOOKUP_SEP, 1)[0] for child in query.get_children_from_q(self)
+        }
+
 
 class DeferredAttribute:
     """
@@ -199,9 +220,10 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
-                if instance.pk is None and self.field.generated:
+                if not instance._is_pk_set():
                     raise AttributeError(
-                        "Cannot read a generated field from an unsaved model."
+                        f"Cannot retrieve deferred field {field_name!r} "
+                        "from an unsaved model."
                     )
                 instance.refresh_from_db(fields=[field_name])
             else:
@@ -280,8 +302,9 @@ class RegisterLookupMixin:
     @staticmethod
     def merge_dicts(dicts):
         """
-        Merge dicts in reverse to preference the order of the original list. e.g.,
-        merge_dicts([a, b]) will preference the keys in 'a' over those in 'b'.
+        Merge dicts in reverse to preference the order of the original list.
+        e.g., merge_dicts([a, b]) will preference the keys in 'a' over those in
+        'b'.
         """
         merged = {}
         for d in reversed(dicts):
@@ -340,38 +363,37 @@ class RegisterLookupMixin:
     _unregister_class_lookup = classmethod(_unregister_class_lookup)
 
 
-def select_related_descend(field, restricted, requested, select_mask, reverse=False):
+def select_related_descend(field, restricted, requested, select_mask):
     """
-    Return True if this field should be used to descend deeper for
-    select_related() purposes. Used by both the query construction code
-    (compiler.get_related_selections()) and the model instance creation code
-    (compiler.klass_info).
+    Return whether `field` should be used to descend deeper for
+    `select_related()` purposes.
 
     Arguments:
-     * field - the field to be checked
-     * restricted - a boolean field, indicating if the field list has been
-       manually restricted using a requested clause)
-     * requested - The select_related() dictionary.
-     * select_mask - the dictionary of selected fields.
-     * reverse - boolean, True if we are checking a reverse select related
+     * `field` - the field to be checked. Can be either a `Field` or
+       `ForeignObjectRel` instance.
+     * `restricted` - a boolean field, indicating if the field list has been
+       manually restricted using a select_related() clause.
+     * `requested` - the select_related() dictionary.
+     * `select_mask` - the dictionary of selected fields.
     """
+    # Only relationships can be descended.
     if not field.remote_field:
         return False
-    if field.remote_field.parent_link and not reverse:
+    # Forward MTI parent links should not be explicitly descended as they are
+    # always JOIN'ed against (unless excluded by `select_mask`).
+    if getattr(field.remote_field, "parent_link", False):
         return False
-    if restricted:
-        if reverse and field.related_query_name() not in requested:
-            return False
-        if not reverse and field.name not in requested:
-            return False
-    if not restricted and field.null:
+    # When `select_related()` is used without a `*requested` mask all
+    # relationships are descended unless they are nullable.
+    if not restricted:
+        return not field.null
+    # When `select_related(*requested)` is used only fields that are part of
+    # `requested` should be descended.
+    if field.name not in requested:
         return False
-    if (
-        restricted
-        and select_mask
-        and field.name in requested
-        and field not in select_mask
-    ):
+    # Prevent invalid usages of `select_related()` and `only()`/`defer()` such
+    # as `select_related("a").only("b")` and `select_related("a").defer("a")`.
+    if select_mask and field not in select_mask:
         raise FieldError(
             f"Field {field.model._meta.object_name}.{field.name} cannot be both "
             "deferred and traversed using select_related at the same time."
@@ -414,8 +436,8 @@ def check_rel_lookup_compatibility(model, target_opts, field):
     # Restaurant.objects.filter(pk__in=Restaurant.objects.all()).
     # If we didn't have the primary key check, then pk__in (== place__in) would
     # give Place's opts as the target opts, but Restaurant isn't compatible
-    # with that. This logic applies only to primary keys, as when doing __in=qs,
-    # we are going to turn this into __in=qs.values('pk') later on.
+    # with that. This logic applies only to primary keys, as when doing
+    # __in=qs, we are going to turn this into __in=qs.values('pk') later on.
     return check(target_opts) or (
         getattr(field, "primary_key", False) and check(field.model._meta)
     )

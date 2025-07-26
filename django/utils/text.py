@@ -1,6 +1,7 @@
 import gzip
 import re
 import secrets
+import textwrap
 import unicodedata
 from collections import deque
 from gzip import GzipFile
@@ -49,24 +50,24 @@ def wrap(text, width):
     ``width``.
     """
 
-    def _generator():
-        for line in text.splitlines(True):  # True keeps trailing linebreaks
-            max_width = min((line.endswith("\n") and width + 1 or width), width)
-            while len(line) > max_width:
-                space = line[: max_width + 1].rfind(" ") + 1
-                if space == 0:
-                    space = line.find(" ") + 1
-                    if space == 0:
-                        yield line
-                        line = ""
-                        break
-                yield "%s\n" % line[: space - 1]
-                line = line[space:]
-                max_width = min((line.endswith("\n") and width + 1 or width), width)
-            if line:
-                yield line
-
-    return "".join(_generator())
+    wrapper = textwrap.TextWrapper(
+        width=width,
+        break_long_words=False,
+        break_on_hyphens=False,
+        replace_whitespace=False,
+    )
+    result = []
+    for line in text.splitlines():
+        wrapped = wrapper.wrap(line)
+        if not wrapped:
+            # If `line` contains only whitespaces that are dropped, restore it.
+            result.append(line)
+        else:
+            result.extend(wrapped)
+    if text.endswith("\n"):
+        # If `text` ends with a newline, preserve it.
+        result.append("")
+    return "\n".join(result)
 
 
 def add_truncation_text(text, truncate=None):

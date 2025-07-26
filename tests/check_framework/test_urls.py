@@ -24,7 +24,8 @@ class CheckUrlConfigTests(SimpleTestCase):
 
     @override_settings(ROOT_URLCONF="check_framework.urls.warning_in_include")
     def test_check_resolver_recursive(self):
-        # The resolver is checked recursively (examining URL patterns in include()).
+        # The resolver is checked recursively (examining URL patterns in
+        # include()).
         result = check_url_config(None)
         self.assertEqual(len(result), 1)
         warning = result[0]

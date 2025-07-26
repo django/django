@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -350,6 +350,9 @@ msgstr "Den side indeholder ingen resultater"
 msgid "Enter a valid value."
 msgstr "Indtast en gyldig værdi."
 
+msgid "Enter a valid domain name."
+msgstr "Indtast et gyldigt domænenavn."
+
 msgid "Enter a valid URL."
 msgstr "Indtast en gyldig URL."
 
@@ -373,14 +376,18 @@ msgstr ""
 "Indtast en gyldig “slug” bestående af Unicode-bogstaver, cifre, understreger "
 "eller bindestreger."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Indtast en gyldig IPv4-adresse."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Indtast en gyldig %(protocol)s-adresse."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Indtast en gyldig IPv6-adresse."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Indtast en gyldig IPv4- eller IPv6-adresse."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 eller IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Indtast kun cifre adskilt af kommaer."
@@ -682,8 +689,8 @@ msgid "Value must be valid JSON."
 msgstr "Værdien skal være gyldig JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s instans med %(field)s %(value)r findes ikke."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s-instans med %(field)s %(value)r er ikke et gyldigt valg."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Fremmednøgle (type bestemt af relateret felt)"

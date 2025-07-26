@@ -53,3 +53,6 @@ class FunctionTests(SimpleTestCase):
     def test_fail_silently(self):
         obj = object()
         self.assertEqual(slice_filter(obj, "0::2"), obj)
+
+    def test_empty_dict(self):
+        self.assertEqual(slice_filter({}, "1"), {})

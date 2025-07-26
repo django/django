@@ -35,8 +35,8 @@ with them.
 Python style
 ============
 
-* All files should be formatted using the `black`_ auto-formatter. This will be
-  run by ``pre-commit`` if that is configured.
+* All files should be formatted using the :pypi:`black` auto-formatter. This
+  will be run by ``pre-commit`` if that is configured.
 
 * The project repository includes an ``.editorconfig`` file. We recommend using
   a text editor with `EditorConfig`_ support to avoid indentation and
@@ -46,18 +46,16 @@ Python style
 * Unless otherwise specified, follow :pep:`8`.
 
   Use :pypi:`flake8` to check for problems in this area. Note that our
-  ``setup.cfg`` file contains some excluded files (deprecated modules we don't
+  ``.flake8`` file contains some excluded files (deprecated modules we don't
   care about cleaning up and some third-party code that Django vendors) as well
   as some excluded errors that we don't consider as gross violations. Remember
   that :pep:`8` is only a guide, so respect the style of the surrounding code
   as a primary goal.
 
-  An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
-  code to 79 characters if it means the code looks significantly uglier or is
-  harder to read. We allow up to 88 characters as this is the line length used
-  by ``black``. This check is included when you run ``flake8``. Documentation,
-  comments, and docstrings should be wrapped at 79 characters, even though
-  :pep:`8` suggests 72.
+  An exception to :pep:`8` is our rules on line lengths. We allow up to 88
+  characters in code, as this is the line length used by ``black``.
+  Documentation, comments, and docstrings should be wrapped at 79 characters.
+  These limits are checked when ``flake8`` is run.
 
 * String variable interpolation may use
   :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
@@ -126,6 +124,10 @@ Python style
         A test docstring looks like this (#123456).
         """
         ...
+
+* Where applicable, use unpacking generalizations compliant with :pep:`448`,
+  such as merging mappings (``{**x, **y}``) or sequences (``[*a, *b]``). This
+  improves performance, readability, and maintainability while reducing errors.
 
 .. _coding-style-imports:
 
@@ -417,7 +419,7 @@ Model style
   * All database fields
   * Custom manager attributes
   * ``class Meta``
-  * ``def __str__()``
+  * ``def __str__()`` and other Python magic methods
   * ``def save()``
   * ``def get_absolute_url()``
   * Any custom methods
@@ -506,5 +508,4 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
-.. _black: https://black.readthedocs.io/en/stable/
 .. _editorconfig: https://editorconfig.org/

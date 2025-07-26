@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2023
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -344,6 +344,9 @@ msgstr "Tuta strona wuslědki njewobsahuje"
 msgid "Enter a valid value."
 msgstr "Zapodajće płaćiwu hódnotu."
 
+msgid "Enter a valid domain name."
+msgstr "Zapodajće płaćiwe domenowe mjeno."
+
 msgid "Enter a valid URL."
 msgstr "Zapodajće płaćiwy URL."
 
@@ -367,14 +370,18 @@ msgstr ""
 "Zapodajće płaćiwe „adresowe mjeno“, kotrež jenož pismiki, ličby, podsmužki "
 "abo wjazawki wobsahuje."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Zapodajće płaćiwu IPv4-adresu."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Zapodajće płaćiwu %(protocol)s-adresu."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Zapodajće płaćiwu IPv6-adresu."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Zapodajće płaćiwu IPv4- abo IPv6-adresu."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 abo IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Zapodajće jenož přez komy dźělene cyfry,"
@@ -698,8 +705,8 @@ msgid "Value must be valid JSON."
 msgstr "Hódnota dyrbi płaćiwy JSON być."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Instanca %(model)s z %(field)s %(value)r njeeksistuje."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "Instanca %(model)s z %(field)s %(value)r płaćiwa wólba njeje."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Cuzy kluč (typ so přez wotpowědne polo postaja)"

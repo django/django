@@ -580,7 +580,7 @@ which takes two arguments - the first is an :doc:`app registry
 loaded into it to match where in your history the migration sits, and the
 second is a :doc:`SchemaEditor </ref/schema-editor>`, which you can use to
 manually effect database schema changes (but beware, doing this can confuse
-the migration autodetector!)
+the migration autodetector).
 
 Let's write a migration that populates our new ``name`` field with the combined
 values of ``first_name`` and ``last_name`` (we've come to our senses and
@@ -680,7 +680,7 @@ write it back out into a new set of migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
 so they can coexist with the old migration files, and Django will intelligently
-switch between them depending where you are in the history. If you're still
+switch between them depending on where you are in the history. If you're still
 part-way through the set of migrations that you squashed, it will keep using
 them until it hits the end and then switch to the squashed history, while new
 installs will use the new squashed migration and skip all the old ones.
@@ -703,7 +703,7 @@ app label and migration name you want to squash up to, and it'll get to work:
    - 0002_some_change
    - 0003_another_change
    - 0004_undo_something
-  Do you wish to proceed? [yN] y
+  Do you wish to proceed? [y/N] y
   Optimizing...
     Optimized from 12 operations to 7 operations.
   Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_something.py
@@ -733,7 +733,7 @@ migrations it replaces and distribute this change to all running instances
 of your application, making sure that they run ``migrate`` to store the change
 in their database.
 
-You must then transition the squashed migration to a normal migration by:
+You can then transition the squashed migration to a normal migration by:
 
 - Deleting all the migration files it replaces.
 - Updating all migrations that depend on the deleted migrations to depend on
@@ -742,14 +742,21 @@ You must then transition the squashed migration to a normal migration by:
   squashed migration (this is how Django tells that it is a squashed migration).
 
 .. note::
-    Once you've squashed a migration, you should not then re-squash that squashed
-    migration until you have fully transitioned it to a normal migration.
+    You can squash squashed migrations themselves without transitioning to
+    normal migrations, which might be useful for situations where every
+    environment has not yet run the original squashed migration set. But in
+    general it is better to transition squashed migrations to normal migrations
+    to be able to clean up older migration files.
 
 .. admonition:: Pruning references to deleted migrations
 
     If it is likely that you may reuse the name of a deleted migration in the
     future, you should remove references to it from Django’s migrations table
     with the :option:`migrate --prune` option.
+
+.. versionchanged:: 6.0
+
+    Support for squashing squashed migrations was added.
 
 .. _migration-serializing:
 
@@ -768,21 +775,22 @@ for basic values, and doesn't specify import paths).
 Django can serialize the following:
 
 - ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``, ``NoneType``
-- ``list``, ``set``, ``tuple``, ``dict``, ``range``.
+- ``list``, ``set``, ``tuple``, ``dict``, ``range``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
+- :class:`zoneinfo.ZoneInfo` instances
 - ``decimal.Decimal`` instances
 - ``enum.Enum``  and ``enum.Flag`` instances
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
-  which have serializable ``func``, ``args``, and ``keywords`` values.
+  which have serializable ``func``, ``args``, and ``keywords`` values
 - Pure and concrete path objects from :mod:`pathlib`. Concrete paths are
   converted to their pure path equivalent, e.g. :class:`pathlib.PosixPath` to
-  :class:`pathlib.PurePosixPath`.
+  :class:`pathlib.PurePosixPath`
 - :class:`os.PathLike` instances, e.g. :class:`os.DirEntry`, which are
-  converted to ``str`` or ``bytes`` using :func:`os.fspath`.
-- ``LazyObject`` instances which wrap a serializable value.
-- Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
+  converted to ``str`` or ``bytes`` using :func:`os.fspath`
+- ``LazyObject`` instances which wrap a serializable value
+- Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be
   in module's top-level scope)
@@ -796,10 +804,9 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 5.0
+.. versionchanged:: 6.0
 
-    Serialization support for functions decorated with :func:`functools.cache`
-    or :func:`functools.lru_cache` was added.
+    Serialization support for :class:`zoneinfo.ZoneInfo` instances was added.
 
 Django cannot serialize:
 

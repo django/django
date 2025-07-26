@@ -137,7 +137,7 @@ For example::
             # Do something else.
             pass
 
-It's fragile to hard-code the site IDs like that, in case they change. The
+It's fragile to hardcode the site IDs like that, in case they change. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 

@@ -1,8 +1,10 @@
+from collections import defaultdict
 from importlib import import_module
 from pkgutil import walk_packages
 
 from django.apps import apps
 from django.conf import settings
+from django.core.checks import Error, Warning
 from django.template import TemplateDoesNotExist
 from django.template.context import make_context
 from django.template.engine import Engine
@@ -24,6 +26,50 @@ class DjangoTemplates(BaseEngine):
         options["libraries"] = self.get_templatetag_libraries(libraries)
         super().__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)
+
+    def check(self, **kwargs):
+        return [
+            *self._check_string_if_invalid_is_string(),
+            *self._check_for_template_tags_with_the_same_name(),
+        ]
+
+    def _check_string_if_invalid_is_string(self):
+        value = self.engine.string_if_invalid
+        if not isinstance(value, str):
+            return [
+                Error(
+                    "'string_if_invalid' in TEMPLATES OPTIONS must be a string but "
+                    "got: %r (%s)." % (value, type(value)),
+                    obj=self,
+                    id="templates.E002",
+                )
+            ]
+        return []
+
+    def _check_for_template_tags_with_the_same_name(self):
+        libraries = defaultdict(set)
+
+        for module_name, module_path in get_template_tag_modules():
+            libraries[module_name].add(module_path)
+
+        for module_name, module_path in self.engine.libraries.items():
+            libraries[module_name].add(module_path)
+
+        errors = []
+
+        for library_name, items in libraries.items():
+            if len(items) > 1:
+                items = ", ".join(repr(item) for item in sorted(items))
+                errors.append(
+                    Warning(
+                        f"{library_name!r} is used for multiple template tag modules: "
+                        f"{items}",
+                        obj=self,
+                        id="templates.W003",
+                    )
+                )
+
+        return errors
 
     def from_string(self, template_code):
         return Template(self.engine.from_string(template_code), self)

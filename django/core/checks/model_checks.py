@@ -9,7 +9,7 @@ from django.core.checks import Error, Tags, Warning, register
 
 
 @register(Tags.models)
-def check_all_models(app_configs=None, **kwargs):
+def check_all_models(app_configs, **kwargs):
     db_table_models = defaultdict(list)
     indexes = defaultdict(list)
     constraints = defaultdict(list)
@@ -223,5 +223,5 @@ def _check_lazy_references(apps, ignore=None):
 
 
 @register(Tags.models)
-def check_lazy_references(app_configs=None, **kwargs):
+def check_lazy_references(app_configs, **kwargs):
     return _check_lazy_references(apps)

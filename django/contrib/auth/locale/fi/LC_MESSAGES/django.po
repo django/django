@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017-2018,2020-2021
+# Aarni Koskela, 2015,2017-2018,2020-2021,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
+# Klaus Dahlén, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-22 15:17+0000\n"
-"Last-Translator: Aarni Koskela\n"
-"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Aarni Koskela, 2015,2017-2018,2020-2021,2025\n"
+"Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,12 +33,22 @@ msgstr "Tärkeät päivämäärät"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s perusavaimella %(key)r ei ole olemassa."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Ristiriitaisia lomaketietoja lähetetty. Ole hyvä ja yritä uudelleen."
+
 msgid "Password changed successfully."
 msgstr "Salasana muutettu onnistuneesti."
+
+msgid "Password-based authentication was disabled."
+msgstr "Salasanapohjainen kirjautuminen otettu pois päältä."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Vaihda salasana: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Aseta salasana: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Kirjautuminen ja oikeudet"
@@ -49,11 +59,17 @@ msgstr "salasana"
 msgid "last login"
 msgstr "viimeisin kirjautuminen"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Tuntematon salasanamuoto tai tuntematon hajakoodausalgoritmi."
+
 msgid "No password set."
 msgstr "Salasanaa ei ole asetettu."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Tuntematon salasanamuoto tai tuntematon hajakoodausalgoritmi."
+msgid "Reset password"
+msgstr "Nollaa salasana"
+
+msgid "Set password"
+msgstr "Aseta salasana"
 
 msgid "The two password fields didn’t match."
 msgstr "Salasanakentät eivät täsmänneet."
@@ -68,12 +84,32 @@ msgid "Enter the same password as before, for verification."
 msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Salasanoja ei tallenneta selkokielisinä, joten tämän käyttäjän salasanaa on "
-"mahdoton nähdä, mutta voit vaihtaa salasanan käyttämällä <a href=\"{}\">tätä "
-"lomaketta</a>."
+"Voiko käyttäjä kirjautua salasanalla. Jos otettu pois päältä, käyttäjä voi "
+"mahdollisesti yhä kirjautua esim. Single Sign-Onilla tai LDAPilla."
+
+msgid "Password-based authentication"
+msgstr "Salasanapohjainen kirjautuminen"
+
+msgid "Enabled"
+msgstr "Päällä"
+
+msgid "Disabled"
+msgstr "Pois päältä"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Selkokielisiä salasanoja ei tallenneta, joten käyttäjän salasanaa ei ole "
+"mahdollista nähdä."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Salli salasanapohjainen kirjautuminen tälle käyttäjälle asettamalla salasana."
 
 #, python-format
 msgid ""
@@ -100,9 +136,6 @@ msgstr "Vanha salasana on virheellinen. Yritä uudelleen."
 
 msgid "Old password"
 msgstr "Vanha salasana"
-
-msgid "Password (again)"
-msgstr "Salasana toistamiseen"
 
 msgid "algorithm"
 msgstr "algoritmi"
@@ -229,18 +262,11 @@ msgid "users"
 msgstr "käyttäjät"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Tämä salasana on liian lyhyt. Sen tulee sisältää ainakin %(min_length)d "
-"merkki."
 msgstr[1] ""
-"Tämä salasana on liian lyhyt. Sen tulee sisältää ainakin %(min_length)d "
-"merkkiä."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -272,11 +298,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Salasanan nollaus sivustolla %(site_name)s "
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Syötä kelvollinen käyttäjänimi (vain englannin kirjaimet, numerot ja merkit "
-"@/./+/-/_)."
+"Syötä kelvollinen käyttäjänimi (vain aksentittomat isot ja pienet kirjaimet, "
+"numerot ja merkit @/./+/-/_)."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

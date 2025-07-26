@@ -156,7 +156,7 @@ class Atomic(ContextDecorator):
     It's possible to disable the creation of savepoints if the goal is to
     ensure that some code runs within a transaction without creating overhead.
 
-    A stack of savepoints identifiers is maintained as an attribute of the
+    A stack of savepoint identifiers is maintained as an attribute of the
     connection. None denotes the absence of a savepoint.
 
     This allows reentrancy even if the same AtomicWrapper is reused. For
@@ -165,10 +165,10 @@ class Atomic(ContextDecorator):
 
     Since database connections are thread-local, this is thread-safe.
 
-    An atomic block can be tagged as durable. In this case, raise a
-    RuntimeError if it's nested within another atomic block. This guarantees
+    An atomic block can be tagged as durable. In this case, a RuntimeError is
+    raised if it's nested within another atomic block. This guarantees
     that database changes in a durable block are committed to the database when
-    the block exists without error.
+    the block exits without error.
 
     This is a private API.
     """
@@ -252,9 +252,9 @@ class Atomic(ContextDecorator):
                                 # minimize overhead for the database server.
                                 connection.savepoint_commit(sid)
                             except Error:
-                                # If rolling back to a savepoint fails, mark for
-                                # rollback at a higher level and avoid shadowing
-                                # the original exception.
+                                # If rolling back to a savepoint fails, mark
+                                # for rollback at a higher level and avoid
+                                # shadowing the original exception.
                                 connection.needs_rollback = True
                             raise
                 else:
@@ -270,8 +270,8 @@ class Atomic(ContextDecorator):
                             connection.close()
                         raise
             else:
-                # This flag will be set to True again if there isn't a savepoint
-                # allowing to perform the rollback at this level.
+                # This flag will be set to True again if there isn't a
+                # savepoint allowing to perform the rollback at this level.
                 connection.needs_rollback = False
                 if connection.in_atomic_block:
                     # Roll back to savepoint if there is one, mark for rollback

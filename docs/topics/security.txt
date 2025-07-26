@@ -5,6 +5,16 @@ Security in Django
 This document is an overview of Django's security features. It includes advice
 on securing a Django-powered site.
 
+.. _sanitize-user-input:
+
+Always sanitize user input
+==========================
+
+The golden rule of web application security is to never trust user-controlled
+data. Hence, all user input should be sanitized before being used in your
+application. See the :doc:`forms documentation </topics/forms/index>` for
+details on validating user inputs in Django.
+
 .. _cross-site-scripting:
 
 Cross site scripting (XSS) protection
@@ -275,6 +285,61 @@ User-uploaded content
      to only serve such files.
 
 .. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
+
+.. _security-csp:
+
+Content Security Policy
+=======================
+
+.. versionadded:: 6.0
+
+Content Security Policy (CSP) is a browser security mechanism that helps
+protect web applications against attacks such as cross-site scripting (XSS) and
+other content injection attacks.
+
+CSP allows web applications to define which sources of content are trusted,
+instructing the browser to load, execute, or render resources only from those
+sources. This effectively creates an allowlist of content origins, reducing the
+risk of malicious code execution.
+
+Key benefits of enabling CSP include:
+
+1. Mitigating XSS attacks by blocking inline scripts and restricting external
+   script loading.
+2. Controlling which external resources (e.g., images, fonts, stylesheets) can
+   be loaded.
+3. Preventing unwanted framing of your site to protect against clickjacking.
+4. Reporting violations to a specified endpoint, enabling monitoring and
+   debugging.
+
+For configuration instructions, see the :ref:`Using CSP <csp-config>`
+documentation, and refer to the :ref:`CSP overview <csp-overview>` for details
+on directives and settings.
+
+Limitations and considerations
+------------------------------
+
+While CSP is a powerful security mechanism, it's important to understand its
+limitations and implications, particularly when used in Django:
+
+* Policy exclusion risks: Avoid excluding specific paths or responses from
+  CSP protection. Due to the browser’s same-origin policy, a vulnerability on
+  an unprotected page (e.g., one allowing arbitrary script injection) may be
+  leveraged to attack protected pages. Excluding *any* route can significantly
+  weaken the site's overall CSP protection.
+
+* Performance overhead: Although typically negligible, CSP adds some processing
+  overhead. Nonce generation involves secure randomness for each applicable
+  request. For high-traffic applications or resource-constrained environments,
+  measure the performance impact accordingly.
+
+* Browser support: While CSP Levels 1 and 2 are widely supported, newer
+  directives (CSP Level 3+) or complex policy behaviors may vary across
+  browsers. Test your policy across the environments you intend to support.
+
+Despite these limitations, CSP remains an important and recommended security
+layer for web applications. Understanding its constraints will help you design
+a more effective and reliable deployment.
 
 .. _additional-security-topics:
 

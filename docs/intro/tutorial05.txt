@@ -111,7 +111,7 @@ There are many ways to approach writing tests.
 
 Some programmers follow a discipline called "`test-driven development`_"; they
 actually write their tests before they write their code. This might seem
-counter-intuitive, but in fact it's similar to what most people will often do
+counterintuitive, but in fact it's similar to what most people will often do
 anyway: they describe a problem, then create some code to solve it. Test-driven
 development formalizes the problem in a Python test case.
 
@@ -150,7 +150,6 @@ whose date lies in the future:
 
     >>> import datetime
     >>> from django.utils import timezone
-    >>> from polls.models import Question
     >>> # create a Question instance with pub_date 30 days in the future
     >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
@@ -216,7 +215,7 @@ and you'll see something like:
     FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionModelTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_question
+      File "/path/to/djangotutorial/polls/tests.py", line 16, in test_was_published_recently_with_future_question
         self.assertIs(future_question.was_published_recently(), False)
     AssertionError: True is not False
 
@@ -456,17 +455,17 @@ and then we must amend the ``get_queryset`` method like so:
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
-is, earlier than or equal to - ``timezone.now``.
+is, earlier than or equal to - ``timezone.now()``.
 
 Testing our new view
 --------------------
 
 Now you can satisfy yourself that this behaves as expected by firing up
-``runserver``, loading the site in your browser, creating ``Questions`` with
-dates in the past and future, and checking that only those that have been
-published are listed. You don't want to have to do that *every single time you
-make any change that might affect this* - so let's also create a test, based on
-our :djadmin:`shell` session above.
+``runserver``, loading the site in your browser, creating a few ``Question``
+entries with dates in the past and future, and checking that only those that
+have been published are listed. You don't want to have to do that *every single
+time you make any change that might affect this* - so let's also create a test,
+based on our :djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 
@@ -627,14 +626,14 @@ create a new test class for that view. It'll be very similar to what we have
 just created; in fact there will be a lot of repetition.
 
 We could also improve our application in other ways, adding tests along the
-way. For example, it's silly that ``Questions`` can be published on the site
-that have no ``Choices``. So, our views could check for this, and exclude such
-``Questions``. Our tests would create a ``Question`` without ``Choices`` and
-then test that it's not published, as well as create a similar ``Question``
-*with* ``Choices``, and test that it *is* published.
+way. For example, it's pointless that a ``Question`` with no related ``Choice``
+can be published on the site. So, our views could check for this, and exclude
+such ``Question`` objects. Our tests would create a ``Question`` without a
+``Choice``, and then test that it's not published, as well as create a similar
+``Question`` *with* at least one ``Choice``, and test that it *is* published.
 
-Perhaps logged-in admin users should be allowed to see unpublished
-``Questions``, but not ordinary visitors. Again: whatever needs to be added to
+Perhaps logged-in admin users should be allowed to see unpublished ``Question``
+entries, but not ordinary visitors. Again: whatever needs to be added to
 the software to accomplish this should be accompanied by a test, whether you
 write the test first and then make the code pass the test, or work out the
 logic in your code first and then write a test to prove it.
@@ -654,9 +653,10 @@ once and then forget about it. It will continue performing its useful function
 as you continue to develop your program.
 
 Sometimes tests will need to be updated. Suppose that we amend our views so that
-only ``Questions`` with ``Choices`` are published. In that case, many of our
-existing tests will fail - *telling us exactly which tests need to be amended to
-bring them up to date*, so to that extent tests help look after themselves.
+only ``Question`` entries with associated ``Choice`` instances are published.
+In that case, many of our existing tests will fail - *telling us exactly which
+tests need to be amended to bring them up to date*, so to that extent tests
+help look after themselves.
 
 At worst, as you continue developing, you might find that you have some tests
 that are now redundant. Even that's not a problem; in testing redundancy is

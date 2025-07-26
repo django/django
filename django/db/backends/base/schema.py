@@ -3,6 +3,7 @@ import operator
 from datetime import datetime
 
 from django.conf import settings
+from django.core.exceptions import FieldError
 from django.db.backends.ddl_references import (
     Columns,
     Expressions,
@@ -12,7 +13,8 @@ from django.db.backends.ddl_references import (
     Table,
 )
 from django.db.backends.utils import names_digest, split_identifier, truncate_name
-from django.db.models import NOT_PROVIDED, Deferrable, Index
+from django.db.models import Deferrable, Index
+from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -93,7 +95,7 @@ class BaseDatabaseSchemaEditor:
     sql_alter_column_default = "ALTER COLUMN %(column)s SET DEFAULT %(default)s"
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
+    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_rename_column = (
         "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     )
@@ -105,6 +107,7 @@ class BaseDatabaseSchemaEditor:
     sql_check_constraint = "CHECK (%(check)s)"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
+    sql_pk_constraint = "PRIMARY KEY (%(columns)s)"
 
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
@@ -129,7 +132,7 @@ class BaseDatabaseSchemaEditor:
     )
     sql_create_unique_index = (
         "CREATE UNIQUE INDEX %(name)s ON %(table)s "
-        "(%(columns)s)%(include)s%(condition)s%(nulls_distinct)s"
+        "(%(columns)s)%(include)s%(nulls_distinct)s%(condition)s"
     )
     sql_rename_index = "ALTER INDEX %(old_name)s RENAME TO %(new_name)s"
     sql_delete_index = "DROP INDEX %(name)s"
@@ -163,7 +166,7 @@ class BaseDatabaseSchemaEditor:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
-                self.execute(sql)
+                self.execute(sql, None)
         if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
 
@@ -264,16 +267,34 @@ class BaseDatabaseSchemaEditor:
                 )
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
-        constraints = [
-            constraint.constraint_sql(model, self)
-            for constraint in model._meta.constraints
-        ]
+        # The BaseConstraint DDL creation methods such as constraint_sql(),
+        # create_sql(), and delete_sql(), were not designed in a way that
+        # separate SQL from parameters which make their generated SQL unfit to
+        # be used in a context where parametrization is delegated to the
+        # backend.
+        constraint_sqls = []
+        if params:
+            # If parameters are present (e.g. a DEFAULT clause on backends that
+            # allow parametrization) defer constraint creation so they are not
+            # mixed with SQL meant to be parametrized.
+            for constraint in model._meta.constraints:
+                self.deferred_sql.append(constraint.create_sql(model, self))
+        else:
+            constraint_sqls.extend(
+                constraint.constraint_sql(model, self)
+                for constraint in model._meta.constraints
+            )
+
+        pk = model._meta.pk
+        if isinstance(pk, CompositePrimaryKey):
+            constraint_sqls.append(self._pk_constraint_sql(pk.columns))
+
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
-                str(constraint)
-                for constraint in (*column_sqls, *constraints)
-                if constraint
+                str(statement)
+                for statement in (*column_sqls, *constraint_sqls)
+                if statement
             ),
         }
         if model._meta.db_tablespace:
@@ -292,12 +313,10 @@ class BaseDatabaseSchemaEditor:
         yield column_db_type
         if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
-        if self.connection.features.supports_comments_inline and field.db_comment:
-            yield self._comment_sql(field.db_comment)
         # Work out nullability.
         null = field.null
         # Add database default.
-        if field.db_default is not NOT_PROVIDED:
+        if field.has_db_default():
             default_sql, default_params = self.db_default_sql(field)
             yield f"DEFAULT {default_sql}"
             params.extend(default_params)
@@ -317,9 +336,9 @@ class BaseDatabaseSchemaEditor:
             if default_value is not None:
                 column_default = "DEFAULT " + self._column_default_sql(field)
                 if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (Oracle).
-                    # If this is the case, the individual schema backend should
-                    # implement prepare_default().
+                    # Some databases can't take defaults as a parameter
+                    # (Oracle, SQLite). If this is the case, the individual
+                    # schema backend should implement prepare_default().
                     yield column_default % self.prepare_default(default_value)
                 else:
                     yield column_default
@@ -333,7 +352,9 @@ class BaseDatabaseSchemaEditor:
         ):
             null = True
         if field.generated:
-            yield self._column_generated_sql(field)
+            generated_sql, generated_params = self._column_generated_sql(field)
+            params.extend(generated_params)
+            yield generated_sql
         elif not null:
             yield "NOT NULL"
         elif not self.connection.features.implied_column_null:
@@ -350,6 +371,8 @@ class BaseDatabaseSchemaEditor:
             and field.unique
         ):
             yield self.connection.ops.tablespace_sql(tablespace, inline=True)
+        if self.connection.features.supports_comments_inline and field.db_comment:
+            yield self._comment_sql(field.db_comment)
 
     def column_sql(self, model, field, include_default=False):
         """
@@ -420,7 +443,7 @@ class BaseDatabaseSchemaEditor:
         compiler = query.get_compiler(connection=self.connection)
         default_sql, params = compiler.compile(db_default)
         if self.connection.features.requires_literal_defaults:
-            # Some databases doesn't support parameterized defaults (Oracle,
+            # Some databases don't support parameterized defaults (Oracle,
             # SQLite). If this is the case, the individual schema backend
             # should implement prepare_default().
             default_sql %= tuple(self.prepare_default(p) for p in params)
@@ -431,9 +454,10 @@ class BaseDatabaseSchemaEditor:
         """Return the SQL to use in a GENERATED ALWAYS clause."""
         expression_sql, params = field.generated_sql(self.connection)
         persistency_sql = "STORED" if field.db_persist else "VIRTUAL"
-        if params:
+        if self.connection.features.requires_literal_defaults:
             expression_sql = expression_sql % tuple(self.quote_value(p) for p in params)
-        return f"GENERATED ALWAYS AS ({expression_sql}) {persistency_sql}"
+            params = ()
+        return f"GENERATED ALWAYS AS ({expression_sql}) {persistency_sql}", params
 
     @staticmethod
     def _effective_default(field):
@@ -470,8 +494,8 @@ class BaseDatabaseSchemaEditor:
         Return a quoted version of the value so it's safe to use in an SQL
         string. This is not safe against injection from user code; it is
         intended only for use in making SQL scripts or preparing default values
-        for particularly tricky backends (defaults are not user-defined, though,
-        so this is safe).
+        for particularly tricky backends (defaults are not user-defined,
+        though, so this is safe).
         """
         raise NotImplementedError()
 
@@ -484,7 +508,7 @@ class BaseDatabaseSchemaEditor:
         """
         sql, params = self.table_sql(model)
         # Prevent using [] as params, in the case a literal '%' is used in the
-        # definition.
+        # definition on backends that don't support parametrized DDL.
         self.execute(sql, params or None)
 
         if self.connection.features.supports_comments:
@@ -746,10 +770,12 @@ class BaseDatabaseSchemaEditor:
             "column": self.quote_name(field.column),
             "definition": definition,
         }
-        self.execute(sql, params)
+        # Prevent using [] as params, in the case a literal '%' is used in the
+        # definition on backends that don't support parametrized DDL.
+        self.execute(sql, params or None)
         # Drop the default if we need to
         if (
-            field.db_default is NOT_PROVIDED
+            not field.has_db_default()
             and not self.skip_default_on_alter(field)
             and self.effective_default(field) is not None
         ):
@@ -826,6 +852,7 @@ class BaseDatabaseSchemaEditor:
         old_type = old_db_params["type"]
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params["type"]
+        modifying_generated_field = False
         if (old_type is None and old_field.remote_field is None) or (
             new_type is None and new_field.remote_field is None
         ):
@@ -864,13 +891,19 @@ class BaseDatabaseSchemaEditor:
                 "through= on M2M fields)" % (old_field, new_field)
             )
         elif old_field.generated != new_field.generated or (
-            new_field.generated
-            and (
-                old_field.db_persist != new_field.db_persist
-                or old_field.generated_sql(self.connection)
-                != new_field.generated_sql(self.connection)
-            )
+            new_field.generated and old_field.db_persist != new_field.db_persist
         ):
+            modifying_generated_field = True
+        elif new_field.generated:
+            try:
+                old_field_sql = old_field.generated_sql(self.connection)
+            except FieldError:
+                # Field used in a generated field was renamed.
+                modifying_generated_field = True
+            else:
+                new_field_sql = new_field.generated_sql(self.connection)
+                modifying_generated_field = old_field_sql != new_field_sql
+        if modifying_generated_field:
             raise ValueError(
                 f"Modifying GeneratedFields is not supported - the field {new_field} "
                 "must be removed and re-added with the new definition."
@@ -989,11 +1022,12 @@ class BaseDatabaseSchemaEditor:
         # will now be used in lieu of an index. The following lines from the
         # truth table show all True cases; the rest are False:
         #
-        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
-        # ------------------------------------------------------------------------------
-        # True               | False            | False              | False
-        # True               | False            | False              | True
-        # True               | False            | True               | True
+        #      old_field    |     new_field
+        # db_index | unique | db_index | unique
+        # -------------------------------------
+        # True     | False  | False    | False
+        # True     | False  | False    | True
+        # True     | False  | True     | True
         if (
             old_field.db_index
             and not old_field.unique
@@ -1075,15 +1109,15 @@ class BaseDatabaseSchemaEditor:
             actions.append(fragment)
             post_actions.extend(other_actions)
 
-        if new_field.db_default is not NOT_PROVIDED:
+        if new_field.has_db_default():
             if (
-                old_field.db_default is NOT_PROVIDED
+                not old_field.has_db_default()
                 or new_field.db_default != old_field.db_default
             ):
                 actions.append(
                     self._alter_column_database_default_sql(model, old_field, new_field)
                 )
-        elif old_field.db_default is not NOT_PROVIDED:
+        elif old_field.has_db_default():
             actions.append(
                 self._alter_column_database_default_sql(
                     model, old_field, new_field, drop=True
@@ -1097,11 +1131,7 @@ class BaseDatabaseSchemaEditor:
         #  4. Drop the default again.
         # Default change?
         needs_database_default = False
-        if (
-            old_field.null
-            and not new_field.null
-            and new_field.db_default is NOT_PROVIDED
-        ):
+        if old_field.null and not new_field.null and not new_field.has_db_default():
             old_default = self.effective_default(old_field)
             new_default = self.effective_default(new_field)
             if (
@@ -1120,7 +1150,7 @@ class BaseDatabaseSchemaEditor:
                 null_actions.append(fragment)
         # Only if we have a default and there is a change from NULL to NOT NULL
         four_way_default_alteration = (
-            new_field.has_default() or new_field.db_default is not NOT_PROVIDED
+            new_field.has_default() or new_field.has_db_default()
         ) and (old_field.null and not new_field.null)
         if actions or null_actions:
             if not four_way_default_alteration:
@@ -1142,7 +1172,7 @@ class BaseDatabaseSchemaEditor:
                     params,
                 )
             if four_way_default_alteration:
-                if new_field.db_default is NOT_PROVIDED:
+                if not new_field.has_db_default():
                     default_sql = "%s"
                     params = [new_default]
                 else:
@@ -1181,11 +1211,12 @@ class BaseDatabaseSchemaEditor:
         # constraint will no longer be used in lieu of an index. The following
         # lines from the truth table show all True cases; the rest are False:
         #
-        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
-        # ------------------------------------------------------------------------------
-        # False              | False            | True               | False
-        # False              | True             | True               | False
-        # True               | True             | True               | False
+        #      old_field    |     new_field
+        # db_index | unique | db_index | unique
+        # -------------------------------------
+        # False    | False  | True     | False
+        # False    | True   | True     | False
+        # True     | True   | True     | False
         if (
             (not old_field.db_index or old_field.unique)
             and new_field.db_index
@@ -1203,7 +1234,8 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_primary_key_sql(model, new_field))
             # Update all referencing columns
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
-        # Handle our type alters on the other end of rels from the PK stuff above
+        # Handle our type alters on the other end of rels from the PK stuff
+        # above
         for old_rel, new_rel in rels_to_update:
             rel_db_params = new_rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params["type"]
@@ -1452,7 +1484,8 @@ class BaseDatabaseSchemaEditor:
         )
         self.alter_field(
             new_field.remote_field.through,
-            # for self-referential models we need to alter field from the other end too
+            # for self-referential models we need to alter field from the other
+            # end too
             old_field.remote_field.through._meta.get_field(old_field.m2m_field_name()),
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
@@ -1569,11 +1602,22 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _delete_index_sql(self, model, name, sql=None):
-        return Statement(
+        statement = Statement(
             sql or self.sql_delete_index,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(name),
         )
+
+        # Remove all deferred statements referencing the deleted index.
+        table_name = statement.parts["table"].table
+        index_name = statement.parts["name"]
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_index(
+                table_name, index_name
+            ):
+                self.deferred_sql.remove(sql)
+
+        return statement
 
     def _rename_index_sql(self, model, old_name, new_name):
         return Statement(
@@ -1961,6 +2005,11 @@ class BaseDatabaseSchemaEditor:
                 if not exclude or name not in exclude:
                     result.append(name)
         return result
+
+    def _pk_constraint_sql(self, columns):
+        return self.sql_pk_constraint % {
+            "columns": ", ".join(self.quote_name(column) for column in columns)
+        }
 
     def _delete_primary_key(self, model, strict=False):
         constraint_names = self._constraint_names(model, primary_key=True)

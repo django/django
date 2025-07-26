@@ -10,7 +10,9 @@ all about the internals of models in order to get the information it needs.
 import copy
 import difflib
 import functools
+import inspect
 import sys
+import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -23,15 +25,16 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
     BaseExpression,
     Col,
+    ColPairs,
     Exists,
     F,
     OuterRef,
+    RawSQL,
     Ref,
     ResolvedOuterRef,
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -41,12 +44,17 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
 
+# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs
+# or inline SQL comments are forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|--|/\*|\*/")
 # Quotation marks ('"`[]), whitespace characters, semicolons, or inline
 # SQL comments are forbidden in column aliases.
 FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
@@ -259,12 +267,12 @@ class Query(BaseExpression):
     select_for_update_of = ()
     select_for_no_key_update = False
     select_related = False
-    has_select_fields = False
     # Arbitrary limit for select_related to prevents infinite recursion.
     max_depth = 5
     # Holds the selects defined by a call to values() or values_list()
     # excluding annotation_select and extra_select.
     values_select = ()
+    selected = None
 
     # SQL annotation-related attributes.
     annotation_select_mask = None
@@ -300,10 +308,9 @@ class Query(BaseExpression):
         self.alias_map = {}
         # Whether to provide alias to columns during reference resolving.
         self.alias_cols = alias_cols
-        # Sometimes the query contains references to aliases in outer queries (as
-        # a result of split_exclude). Correct alias quoting needs to know these
-        # aliases too.
-        # Map external tables to whether they are aliased.
+        # Sometimes the query contains references to aliases in outer queries
+        # (as a result of split_exclude). Correct alias quoting needs to know
+        # these aliases too. Map external tables to whether they are aliased.
         self.external_aliases = {}
         self.table_map = {}  # Maps table names to list of aliases.
         self.used_aliases = set()
@@ -490,6 +497,11 @@ class Query(BaseExpression):
             )
             or having
         )
+        set_returning_annotations = {
+            alias
+            for alias, annotation in self.annotation_select.items()
+            if getattr(annotation, "set_returning", False)
+        }
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -509,6 +521,7 @@ class Query(BaseExpression):
             or qualify
             or self.distinct
             or self.combinator
+            or set_returning_annotations
         ):
             from django.db.models.sql.subqueries import AggregateQuery
 
@@ -550,6 +563,9 @@ class Query(BaseExpression):
                         if annotation.get_group_by_cols():
                             annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
+                    # Annotations that possibly return multiple rows cannot
+                    # be masked as they might have an incidence on the query.
+                    annotation_mask |= set_returning_annotations
 
             # Add aggregates to the outer AggregateQuery. This requires making
             # sure all columns referenced by the aggregates are selected in the
@@ -565,8 +581,7 @@ class Query(BaseExpression):
                         col_alias = f"__col{index}"
                         col_ref = Ref(col_alias, col)
                         col_refs[col] = col_ref
-                        inner_query.annotations[col_alias] = col
-                        inner_query.append_annotation_mask([col_alias])
+                        inner_query.add_annotation(col, col_alias)
                     replacements[col] = col_ref
                 outer_query.annotations[alias] = aggregate.replace_expressions(
                     replacements
@@ -577,14 +592,15 @@ class Query(BaseExpression):
                 and not inner_query.annotation_select_mask
             ):
                 # In case of Model.objects[0:3].count(), there would be no
-                # field selected in the inner query, yet we must use a subquery.
-                # So, make sure at least one field is selected.
+                # field selected in the inner query, yet we must use a
+                # subquery. So, make sure at least one field is selected.
                 inner_query.select = (
                     self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                 )
         else:
             outer_query = self
             self.select = ()
+            self.selected = None
             self.default_cols = False
             self.extra = {}
             if self.annotations:
@@ -617,8 +633,12 @@ class Query(BaseExpression):
         if result is None:
             result = empty_set_result
         else:
-            converters = compiler.get_converters(outer_query.annotation_select.values())
-            result = next(compiler.apply_converters((result,), converters))
+            cols = outer_query.annotation_select.values()
+            converters = compiler.get_converters(cols)
+            rows = compiler.apply_converters((result,), converters)
+            if compiler.has_composite_fields(cols):
+                rows = compiler.composite_fields_to_tuples(rows, cols)
+            result = next(rows)
 
         return dict(zip(outer_query.annotation_select, result))
 
@@ -649,13 +669,13 @@ class Query(BaseExpression):
                 for combined_query in q.combined_queries
             )
         q.clear_ordering(force=True)
-        if limit:
+        if limit is True:
             q.set_limits(high=1)
         q.add_annotation(Value(1), "a")
         return q
 
     def has_results(self, using):
-        q = self.exists(using)
+        q = self.exists()
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
@@ -791,46 +811,44 @@ class Query(BaseExpression):
         if select_mask is None:
             select_mask = {}
         select_mask[opts.pk] = {}
-        # All concrete fields that are not part of the defer mask must be
-        # loaded. If a relational field is encountered it gets added to the
-        # mask for it be considered if `select_related` and the cycle continues
-        # by recursively calling this function.
-        for field in opts.concrete_fields:
+        # All concrete fields and related objects that are not part of the
+        # defer mask must be included. If a relational field is encountered it
+        # gets added to the mask for it be considered if `select_related` and
+        # the cycle continues by recursively calling this function.
+        for field in opts.concrete_fields + opts.related_objects:
             field_mask = mask.pop(field.name, None)
-            field_att_mask = mask.pop(field.attname, None)
+            field_att_mask = None
+            if field_attname := getattr(field, "attname", None):
+                field_att_mask = mask.pop(field_attname, None)
             if field_mask is None and field_att_mask is None:
                 select_mask.setdefault(field, {})
             elif field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
+                # Virtual fields such as many-to-many and generic foreign keys
+                # cannot be effectively deferred. Historically, they were
+                # allowed to be passed to QuerySet.defer(). Ignore such field
+                # references until a layer of validation at mask alteration
+                # time is eventually implemented.
+                if field.many_to_many:
+                    continue
                 field_select_mask = select_mask.setdefault(field, {})
-                related_model = field.remote_field.model._meta.concrete_model
+                related_model = field.related_model._meta.concrete_model
                 self._get_defer_select_mask(
                     related_model._meta, field_mask, field_select_mask
                 )
-        # Remaining defer entries must be references to reverse relationships.
-        # The following code is expected to raise FieldError if it encounters
-        # a malformed defer entry.
+        # Remaining defer entries must be references to filtered relations
+        # otherwise they are surfaced as missing field errors.
         for field_name, field_mask in mask.items():
             if filtered_relation := self._filtered_relations.get(field_name):
                 relation = opts.get_field(filtered_relation.relation_name)
                 field_select_mask = select_mask.setdefault((field_name, relation), {})
-                field = relation.field
+                related_model = relation.related_model._meta.concrete_model
+                self._get_defer_select_mask(
+                    related_model._meta, field_mask, field_select_mask
+                )
             else:
-                reverse_rel = opts.get_field(field_name)
-                # While virtual fields such as many-to-many and generic foreign
-                # keys cannot be effectively deferred we've historically
-                # allowed them to be passed to QuerySet.defer(). Ignore such
-                # field references until a layer of validation at mask
-                # alteration time will be implemented eventually.
-                if not hasattr(reverse_rel, "field"):
-                    continue
-                field = reverse_rel.field
-                field_select_mask = select_mask.setdefault(field, {})
-            related_model = field.model._meta.concrete_model
-            self._get_defer_select_mask(
-                related_model._meta, field_mask, field_select_mask
-            )
+                opts.get_field(field_name)
         return select_mask
 
     def _get_only_select_mask(self, opts, mask, select_mask=None):
@@ -840,13 +858,7 @@ class Query(BaseExpression):
         # Only include fields mentioned in the mask.
         for field_name, field_mask in mask.items():
             field = opts.get_field(field_name)
-            # Retrieve the actual field associated with reverse relationships
-            # as that's what is expected in the select mask.
-            if field in opts.related_objects:
-                field_key = field.field
-            else:
-                field_key = field
-            field_select_mask = select_mask.setdefault(field_key, {})
+            field_select_mask = select_mask.setdefault(field, {})
             if field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
@@ -919,10 +931,11 @@ class Query(BaseExpression):
         an outer join. If 'unconditional' is False, only promote the join if
         it is nullable or the parent join is an outer join.
 
-        The children promotion is done to avoid join chains that contain a LOUTER
-        b INNER c. So, if we have currently a INNER b INNER c and a->b is promoted,
-        then we must also promote b->c automatically, or otherwise the promotion
-        of a->b doesn't actually change anything in the query results.
+        The children promotion is done to avoid join chains that contain a
+        LOUTER b INNER c. So, if we have currently a INNER b INNER c and a->b
+        is promoted, then we must also promote b->c automatically, or otherwise
+        the promotion of a->b doesn't actually change anything in the query
+        results.
         """
         aliases = list(aliases)
         while aliases:
@@ -1019,11 +1032,21 @@ class Query(BaseExpression):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
+
+        # 3. Rename the direct external aliases and the ones of combined
+        # queries (union, intersection, difference).
         self.external_aliases = {
             # Table is aliased or it's being changed and thus is aliased.
             change_map.get(alias, alias): (aliased or alias in change_map)
             for alias, aliased in self.external_aliases.items()
         }
+        for combined_query in self.combined_queries:
+            external_change_map = {
+                alias: aliased
+                for alias, aliased in change_map.items()
+                if alias in combined_query.external_aliases
+            }
+            combined_query.change_aliases(external_change_map)
 
     def bump_prefix(self, other_query, exclude=None):
         """
@@ -1190,9 +1213,24 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
+        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        if "%" in alias:
+            if "aggregate" in {frame.function for frame in inspect.stack()}:
+                stacklevel = 5
+            else:
+                # annotate() and alias().
+                stacklevel = 6
+            warnings.warn(
+                "Using percent signs in a column alias is deprecated.",
+                stacklevel=stacklevel,
+                category=RemovedInDjango70Warning,
+            )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
                 "Column aliases cannot contain whitespace characters, quotation marks, "
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
+                # "semicolons, percent signs, or SQL comments."
                 "semicolons, or SQL comments."
             )
 
@@ -1203,17 +1241,24 @@ class Query(BaseExpression):
         if select:
             self.append_annotation_mask([alias])
         else:
-            annotation_mask = (
-                value
-                for value in dict.fromkeys(self.annotation_select)
-                if value != alias
-            )
-            self.set_annotation_mask(annotation_mask)
+            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
+        if select and self.selected:
+            self.selected[alias] = alias
+
+    @property
+    def _subquery_fields_len(self):
+        if self.has_select_fields:
+            return sum(
+                len(self.model._meta.pk_fields) if field == "pk" else 1
+                for field in self.selected
+            )
+        return len(self.model._meta.pk_fields)
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
-        # Subqueries need to use a different set of aliases than the outer query.
+        # Subqueries need to use a different set of aliases than the outer
+        # query.
         clone.bump_prefix(query)
         clone.subquery = True
         clone.where.resolve_expression(query, *args, **kwargs)
@@ -1377,7 +1422,7 @@ class Query(BaseExpression):
         # __exact is the default lookup if one isn't given.
         *transforms, lookup_name = lookups or ["exact"]
         for name in transforms:
-            lhs = self.try_transform(lhs, name)
+            lhs = self.try_transform(lhs, name, lookups)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
         lookup_class = lhs.get_lookup(lookup_name)
@@ -1411,7 +1456,7 @@ class Query(BaseExpression):
 
         return lookup
 
-    def try_transform(self, lhs, name):
+    def try_transform(self, lhs, name, lookups=None):
         """
         Helper method for build_lookup(). Try to fetch and initialize
         a transform for name parameter from lhs.
@@ -1428,9 +1473,14 @@ class Query(BaseExpression):
                 suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
             else:
                 suggestion = "."
+            if lookups is not None:
+                name_index = lookups.index(name)
+                unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
+            else:
+                unsupported_lookup = name
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (name, output_field.__name__, suggestion)
+                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
     def build_filter(
@@ -1554,9 +1604,7 @@ class Query(BaseExpression):
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
-                col = MultiColSource(
-                    alias, targets, join_info.targets, join_info.final_field
-                )
+                col = ColPairs(alias, targets, join_info.targets, join_info.final_field)
         else:
             col = self._get_col(targets[0], join_info.final_field, alias)
 
@@ -1600,7 +1648,7 @@ class Query(BaseExpression):
     def add_filter(self, filter_lhs, filter_rhs):
         self.add_q(Q((filter_lhs, filter_rhs)))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, reuse_all=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1614,7 +1662,11 @@ class Query(BaseExpression):
         existing_inner = {
             a for a in self.alias_map if self.alias_map[a].join_type == INNER
         }
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        if reuse_all:
+            can_reuse = set(self.alias_map)
+        else:
+            can_reuse = self.used_aliases
+        clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
@@ -1688,12 +1740,13 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-                else:
-                    raise ValueError(
-                        "FilteredRelation's condition doesn't support nested "
-                        "relations deeper than the relation_name (got %r for "
-                        "%r)." % (lookup, filtered_relation.relation_name)
-                    )
+            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+                raise ValueError(
+                    "FilteredRelation's condition doesn't support nested "
+                    "relations deeper than the relation_name (got %r for "
+                    "%r)." % (lookup, filtered_relation.relation_name)
+                )
+        filtered_relation = filtered_relation.clone()
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,
@@ -1842,9 +1895,9 @@ class Query(BaseExpression):
         Return the final field involved in the joins, the target field (used
         for any 'where' constraint), the final 'opts' value, the joins, the
         field path traveled to generate the joins, and a transform function
-        that takes a field and alias and is equivalent to `field.get_col(alias)`
-        in the simple case but wraps field transforms if they were included in
-        names.
+        that takes a field and alias and is equivalent to
+        `field.get_col(alias)` in the simple case but wraps field transforms if
+        they were included in names.
 
         The target field is the field containing the concrete value. Final
         field can be something different, for example foreign key pointing to
@@ -1930,6 +1983,8 @@ class Query(BaseExpression):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+            if join.filtered_relation and can_reuse is not None:
+                can_reuse.add(alias)
         return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
@@ -1999,7 +2054,8 @@ class Query(BaseExpression):
                 # Summarize currently means we are doing an aggregate() query
                 # which is executed as a wrapped subquery if any of the
                 # aggregate() elements reference an existing annotation. In
-                # that case we need to return a Ref to the subquery's annotation.
+                # that case we need to return a Ref to the subquery's
+                # annotation.
                 if name not in self.annotation_select:
                     raise FieldError(
                         "Cannot aggregate over the '%s' alias. Use annotate() "
@@ -2074,8 +2130,8 @@ class Query(BaseExpression):
         alias = col.alias
         if alias in can_reuse:
             pk = select_field.model._meta.pk
-            # Need to add a restriction so that outer query's filters are in effect for
-            # the subquery, too.
+            # Need to add a restriction so that outer query's filters are in
+            # effect for the subquery, too.
             query.bump_prefix(self)
             lookup_class = select_field.get_lookup("exact")
             # Note that the query.select[0].alias is different from alias
@@ -2151,7 +2207,8 @@ class Query(BaseExpression):
         """
         Return True if adding filters to this instance is still possible.
 
-        Typically, this means no limits or offsets have been put on the results.
+        Typically, this means no limits or offsets have been put on the
+        results.
         """
         return not self.is_sliced
 
@@ -2162,6 +2219,7 @@ class Query(BaseExpression):
         self.select_related = False
         self.set_extra_mask(())
         self.set_annotation_mask(())
+        self.selected = None
 
     def clear_select_fields(self):
         """
@@ -2171,10 +2229,12 @@ class Query(BaseExpression):
         """
         self.select = ()
         self.values_select = ()
+        self.selected = None
 
     def add_select_col(self, col, name):
         self.select += (col,)
         self.values_select += (name,)
+        self.selected[name] = len(self.select) - 1
 
     def set_select(self, cols):
         self.default_cols = False
@@ -2308,6 +2368,9 @@ class Query(BaseExpression):
             self.append_annotation_mask(group_by_annotations)
             self.select = tuple(values_select.values())
             self.values_select = tuple(values_select)
+            if self.selected is not None:
+                for index, value_select in enumerate(values_select):
+                    self.selected[value_select] = index
         group_by = list(self.select)
         for alias, annotation in self.annotation_select.items():
             if not (group_by_cols := annotation.get_group_by_cols()):
@@ -2381,8 +2444,8 @@ class Query(BaseExpression):
         """
         # Fields on related models are stored in the literal double-underscore
         # format, so that we can use a set datastructure. We do the foo__bar
-        # splitting and handling when computing the SQL column names (as part of
-        # get_columns()).
+        # splitting and handling when computing the SQL column names (as part
+        # of get_columns()).
         existing, defer = self.deferred_loading
         if defer:
             # Add to existing deferred names.
@@ -2425,12 +2488,23 @@ class Query(BaseExpression):
         if names is None:
             self.annotation_select_mask = None
         else:
-            self.annotation_select_mask = list(dict.fromkeys(names))
+            self.annotation_select_mask = set(names)
+            if self.selected:
+                # Prune the masked annotations.
+                self.selected = {
+                    key: value
+                    for key, value in self.selected.items()
+                    if not isinstance(value, str)
+                    or value in self.annotation_select_mask
+                }
+                # Append the unmasked annotations.
+                for name in names:
+                    self.selected[name] = name
         self._annotation_select_cache = None
 
     def append_annotation_mask(self, names):
         if self.annotation_select_mask is not None:
-            self.set_annotation_mask((*self.annotation_select_mask, *names))
+            self.set_annotation_mask(self.annotation_select_mask.union(names))
 
     def set_extra_mask(self, names):
         """
@@ -2443,13 +2517,19 @@ class Query(BaseExpression):
             self.extra_select_mask = set(names)
         self._extra_select_cache = None
 
+    @property
+    def has_select_fields(self):
+        return self.selected is not None
+
     def set_values(self, fields):
         self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()
-        self.has_select_fields = True
 
+        selected = {}
         if fields:
+            for field in fields:
+                self.check_alias(field)
             field_names = []
             extra_names = []
             annotation_names = []
@@ -2457,13 +2537,16 @@ class Query(BaseExpression):
                 # Shortcut - if there are no extra or annotations, then
                 # the values() clause must be just field names.
                 field_names = list(fields)
+                selected = dict(zip(fields, range(len(fields))))
             else:
                 self.default_cols = False
                 for f in fields:
-                    if f in self.extra_select:
+                    if extra := self.extra_select.get(f):
                         extra_names.append(f)
+                        selected[f] = RawSQL(*extra)
                     elif f in self.annotation_select:
                         annotation_names.append(f)
+                        selected[f] = f
                     elif f in self.annotations:
                         raise FieldError(
                             f"Cannot select the '{f}' alias. Use annotate() to "
@@ -2475,13 +2558,13 @@ class Query(BaseExpression):
                         # `f` is not resolvable.
                         if self.annotation_select:
                             self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
+                        selected[f] = len(field_names)
                         field_names.append(f)
             self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
-            selected = frozenset(field_names + extra_names + annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
-            selected = frozenset(field_names)
+            selected = dict.fromkeys(field_names, None)
         # Selected annotations must be known before setting the GROUP BY
         # clause.
         if self.group_by is True:
@@ -2504,6 +2587,7 @@ class Query(BaseExpression):
 
         self.values_select = tuple(field_names)
         self.add_fields(field_names, True)
+        self.selected = selected if fields else None
 
     @property
     def annotation_select(self):
@@ -2517,9 +2601,9 @@ class Query(BaseExpression):
             return {}
         elif self.annotation_select_mask is not None:
             self._annotation_select_cache = {
-                k: self.annotations[k]
-                for k in self.annotation_select_mask
-                if k in self.annotations
+                k: v
+                for k, v in self.annotations.items()
+                if k in self.annotation_select_mask
             }
             return self._annotation_select_cache
         else:
@@ -2550,8 +2634,9 @@ class Query(BaseExpression):
         cols in split_exclude().
 
         Return a lookup usable for doing outerq.filter(lookup=self) and a
-        boolean indicating if the joins in the prefix contain a LEFT OUTER join.
-        _"""
+        boolean indicating if the joins in the prefix contain a LEFT OUTER
+        join.
+        """
         all_paths = []
         for _, paths in names_with_path:
             all_paths.extend(paths)
@@ -2598,9 +2683,10 @@ class Query(BaseExpression):
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
         else:
-            # TODO: It might be possible to trim more joins from the start of the
-            # inner query if it happens to have a longer join chain containing the
-            # values in select_fields. Lets punt this one for now.
+            # TODO: It might be possible to trim more joins from the start of
+            # the inner query if it happens to have a longer join chain
+            # containing the values in select_fields. Lets punt this one for
+            # now.
             select_fields = [r[1] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths]
         # The found starting point is likely a join_class instead of a

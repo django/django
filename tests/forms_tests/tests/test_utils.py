@@ -2,6 +2,7 @@ import copy
 import json
 
 from django.core.exceptions import ValidationError
+from django.forms.renderers import DjangoTemplates
 from django.forms.utils import (
     ErrorDict,
     ErrorList,
@@ -72,7 +73,7 @@ class FormsUtilsTestCase(SimpleTestCase):
         )
         # Can take a Unicode string.
         self.assertHTMLEqual(
-            str(ErrorList(ValidationError("Not \u03C0.").messages)),
+            str(ErrorList(ValidationError("Not \u03c0.").messages)),
             '<ul class="errorlist"><li>Not π.</li></ul>',
         )
         # Can take a lazy string.
@@ -106,7 +107,7 @@ class FormsUtilsTestCase(SimpleTestCase):
                         ValidationError(
                             [
                                 "1. First error.",
-                                "2. Not \u03C0.",
+                                "2. Not \u03c0.",
                                 gettext_lazy("3. Error."),
                                 {
                                     "error_1": "4. First dict error.",
@@ -161,6 +162,35 @@ class FormsUtilsTestCase(SimpleTestCase):
             '<a href="http://www.example.com/">example</a></li></ul>',
         )
 
+    def test_error_list_copy(self):
+        e = ErrorList(
+            [
+                ValidationError(
+                    message="message %(i)s",
+                    params={"i": 1},
+                ),
+                ValidationError(
+                    message="message %(i)s",
+                    params={"i": 2},
+                ),
+            ]
+        )
+
+        e_copy = copy.copy(e)
+        self.assertEqual(e, e_copy)
+        self.assertEqual(e.as_data(), e_copy.as_data())
+
+    def test_error_list_copy_attributes(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        renderer = CustomRenderer()
+        e = ErrorList(error_class="woopsies", renderer=renderer)
+
+        e_copy = e.copy()
+        self.assertEqual(e.error_class, e_copy.error_class)
+        self.assertEqual(e.renderer, e_copy.renderer)
+
     def test_error_dict_copy(self):
         e = ErrorDict()
         e["__all__"] = ErrorList(
@@ -182,6 +212,16 @@ class FormsUtilsTestCase(SimpleTestCase):
 
         e_deepcopy = copy.deepcopy(e)
         self.assertEqual(e, e_deepcopy)
+
+    def test_error_dict_copy_attributes(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        renderer = CustomRenderer()
+        e = ErrorDict(renderer=renderer)
+
+        e_copy = copy.copy(e)
+        self.assertEqual(e.renderer, e_copy.renderer)
 
     def test_error_dict_html_safe(self):
         e = ErrorDict()

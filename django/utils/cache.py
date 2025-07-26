@@ -207,7 +207,8 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return _not_modified(request, response)
 
     # Step 5: Test the If-Range precondition (not supported).
-    # Step 6: Return original response since there isn't a conditional response.
+    # Step 6: Return original response since there isn't a conditional
+    # response.
     return response
 
 

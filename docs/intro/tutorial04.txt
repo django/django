@@ -272,6 +272,7 @@ views and use Django's generic views instead. To do so, open the
 .. code-block:: python
     :caption: ``polls/views.py``
 
+    from django.db.models import F
     from django.http import HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
     from django.urls import reverse

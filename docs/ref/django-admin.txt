@@ -584,7 +584,7 @@ Updates the message files for all available languages.
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies a list of file extensions to examine (default: ``html``, ``txt``,
-``py`` or ``js`` if :option:`--domain` is ``js``).
+``py`` or ``js`` if :option:`--domain` is ``djangojs``).
 
 Example usage:
 
@@ -870,11 +870,11 @@ are reserved for the superuser (root).
 This server uses the WSGI application object specified by the
 :setting:`WSGI_APPLICATION` setting.
 
-DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
-security audits or performance tests. (And that's how it's gonna stay. We're in
-the business of making web frameworks, not web servers, so improving this
-server to be able to handle a production environment is outside the scope of
-Django.)
+.. warning:: DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
+
+    This lightweight development server has not gone through security audits or
+    performance tests, hence is unsuitable for production. Making this server
+    able to handle a production environment is outside the scope of Django.
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
@@ -946,6 +946,20 @@ multithreaded by default.
 
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
+
+.. envvar:: DJANGO_RUNSERVER_HIDE_WARNING
+
+.. versionadded:: 5.2
+
+By default, a warning is printed to the console that ``runserver`` is not
+suitable for production:
+
+.. code-block:: text
+
+    WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+    For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
+
+Set this environment variable to ``"true"`` to hide this warning.
 
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1051,6 +1065,30 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
+All models from installed apps are automatically imported into the shell
+environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
+precedence. The following common utilities are also imported::
+
+    from django.db import connection, reset_queries, models
+    from django.conf import settings
+    from django.utils import timezone
+
+For a ``--verbosity`` of 2 or higher, the automatically imported objects will
+be listed. To disable automatic importing entirely, use the ``--no-imports``
+flag.
+
+See the guide on :ref:`customizing this behavior
+<customizing-shell-auto-imports>` to add or remove automatic imports.
+
+.. versionchanged:: 5.2
+
+    Automatic models import was added.
+
+.. versionchanged:: 6.0
+
+    Automatic imports of common utilities, such as ``django.conf.settings``,
+    were added.
+
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
@@ -1078,11 +1116,17 @@ Python interpreter, use ``python`` as the interface name, like so:
 .. _IPython: https://ipython.org/
 .. _bpython: https://bpython-interpreter.org/
 
-.. django-admin-option:: --nostartup
+.. django-admin-option:: --no-startup
 
 Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
+
+.. django-admin-option:: --no-imports
+
+.. versionadded:: 5.2
+
+Disables the automatic import of models from :setting:`INSTALLED_APPS`.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
 
@@ -1233,9 +1277,13 @@ By default, :source:`the new directory <django/conf/app_template>` contains a
 ``models.py`` file and other app template files. If only the app name is given,
 the app directory will be created in the current working directory.
 
-If the optional destination is provided, Django will use that existing
-directory rather than creating a new one. You can use '.' to denote the current
-working directory.
+If the optional destination is provided, Django will use that name instead. If
+the directory with the given name doesn't exist, it will be created. You can
+use '.' to denote the current working directory.
+
+.. versionchanged:: 6.0
+
+    Automatic creation of the destination directory was added.
 
 For example:
 
@@ -1345,9 +1393,14 @@ If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
 will be created in the current working directory.
 
-If the optional destination is provided, Django will use that existing
-directory as the project directory, and create ``manage.py`` and the project
-package within it. Use '.' to denote the current working directory.
+If the optional destination is provided, Django will use that name as the
+project directory, and create ``manage.py`` and the project package within it.
+If the directory with the given name doesn't exist, it will be created. Use '.'
+to denote the current working directory.
+
+.. versionchanged:: 6.0
+
+    Automatic creation of the destination directory was added.
 
 For example:
 
@@ -1554,13 +1607,7 @@ Outputs timings, including database setup and total run time.
 
 .. django-admin-option:: --durations N
 
-.. versionadded:: 5.0
-
 Shows the N slowest test cases (N=0 for all).
-
-.. admonition:: Python 3.12 and later
-
-    This feature is only available for Python 3.12 and later.
 
 ``testserver``
 --------------

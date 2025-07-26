@@ -18,6 +18,7 @@ if Image:
     from .models import (
         Person,
         PersonDimensionsFirst,
+        PersonNoReadImage,
         PersonTwoImages,
         PersonWithHeight,
         PersonWithHeightAndWidth,
@@ -30,7 +31,7 @@ else:
         pass
 
     PersonWithHeight = PersonWithHeightAndWidth = PersonDimensionsFirst = Person
-    PersonTwoImages = Person
+    PersonTwoImages = PersonNoReadImage = Person
 
 
 class ImageFieldTestMixin(SerializeMixin):
@@ -70,7 +71,7 @@ class ImageFieldTestMixin(SerializeMixin):
         (if defined) the image field is caching to.
 
         Note, this method will check for dimension fields named by adding
-        "_width" or "_height" to the name of the ImageField.  So, the
+        "_width" or "_height" to the name of the ImageField. So, the
         models used in these tests must have their fields named
         accordingly.
 
@@ -293,7 +294,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         # Test dimensions after fetching from database.
         p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.check_dimensions(p, 4, 8)
@@ -441,7 +442,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # Test dimensions after fetching from database.
         p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.assertIs(p.headshot.was_opened, False)
@@ -469,3 +470,28 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # Dimensions were recalculated, and hence file should have opened.
         self.assertIs(p.mugshot.was_opened, True)
         self.assertIs(p.headshot.was_opened, True)
+
+
+@skipIf(Image is None, "Pillow is required to test ImageField")
+class NoReadTests(ImageFieldTestMixin, TestCase):
+    def test_width_height_correct_name_mangling_correct(self):
+        instance1 = PersonNoReadImage()
+
+        instance1.mugshot.save("mug", self.file1)
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance1.save()
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance2 = PersonNoReadImage()
+        instance2.mugshot.save("mug", self.file1)
+        instance2.save()
+
+        self.assertNotEqual(instance1.mugshot.name, instance2.mugshot.name)
+
+        self.assertEqual(instance1.mugshot_width, instance2.mugshot_width)
+        self.assertEqual(instance1.mugshot_height, instance2.mugshot_height)

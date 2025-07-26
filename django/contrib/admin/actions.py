@@ -24,7 +24,8 @@ def delete_selected(modeladmin, request, queryset):
     deletable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 
-    Next, it deletes all selected objects and redirects back to the change list.
+    Next, it deletes all selected objects and redirects back to the change
+    list.
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label
@@ -61,7 +62,7 @@ def delete_selected(modeladmin, request, queryset):
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}
     else:
-        title = _("Are you sure?")
+        title = _("Delete multiple objects")
 
     context = {
         **modeladmin.admin_site.each_context(request),

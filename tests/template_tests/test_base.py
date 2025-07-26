@@ -8,7 +8,7 @@ class LexerTestMixin:
     template_string = (
         "text\n"
         "{% if test %}{{ varvalue }}{% endif %}"
-        "{#comment {{not a var}} %{not a block}% #}"
+        "{#comment {{not a var}} {%not a block%} #}"
         "end text"
     )
     expected_token_tuples = [
@@ -17,7 +17,7 @@ class LexerTestMixin:
         (TokenType.BLOCK, "if test", 2, (5, 18)),
         (TokenType.VAR, "varvalue", 2, (18, 32)),
         (TokenType.BLOCK, "endif", 2, (32, 43)),
-        (TokenType.COMMENT, "comment {{not a var}} %{not a block}%", 2, (43, 85)),
+        (TokenType.COMMENT, "comment {{not a var}} {%not a block%}", 2, (43, 85)),
         (TokenType.TEXT, "end text", 2, (85, 93)),
     ]
 
@@ -78,9 +78,6 @@ class VariableTests(SimpleTestCase):
 
     def test_nonliterals(self):
         """Variable names that aren't resolved as literals."""
-        var_names = []
-        for var in ("inf", "infinity", "iNFiniTy", "nan"):
-            var_names.extend((var, "-" + var, "+" + var))
-        for var in var_names:
+        for var in ["inf", "infinity", "iNFiniTy", "nan"]:
             with self.subTest(var=var):
                 self.assertIsNone(Variable(var).literal)

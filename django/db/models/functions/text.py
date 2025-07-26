@@ -78,7 +78,7 @@ class ConcatPair(Func):
         return super(ConcatPair, coalesced).as_sql(
             compiler,
             connection,
-            template="%(expressions)s",
+            template="(%(expressions)s)",
             arg_joiner=" || ",
             **extra_context,
         )
@@ -110,7 +110,8 @@ class ConcatPair(Func):
         )
 
     def coalesce(self):
-        # null on either side results in null for expression, wrap with coalesce
+        # null on either side results in null for expression, wrap with
+        # coalesce
         c = self.copy()
         c.set_source_expressions(
             [

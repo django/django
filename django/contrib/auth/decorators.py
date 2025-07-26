@@ -1,8 +1,7 @@
-import asyncio
 from functools import wraps
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -25,8 +24,8 @@ def user_passes_test(
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url.
-            login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
-            current_scheme, current_netloc = urlparse(path)[:2]
+            login_scheme, login_netloc = urlsplit(resolved_login_url)[:2]
+            current_scheme, current_netloc = urlsplit(path)[:2]
             if (not login_scheme or login_scheme == current_scheme) and (
                 not login_netloc or login_netloc == current_netloc
             ):
@@ -35,11 +34,11 @@ def user_passes_test(
 
             return redirect_to_login(path, resolved_login_url, redirect_field_name)
 
-        if asyncio.iscoroutinefunction(view_func):
+        if iscoroutinefunction(view_func):
 
             async def _view_wrapper(request, *args, **kwargs):
                 auser = await request.auser()
-                if asyncio.iscoroutinefunction(test_func):
+                if iscoroutinefunction(test_func):
                     test_pass = await test_func(auser)
                 else:
                     test_pass = await sync_to_async(test_func)(auser)
@@ -51,7 +50,7 @@ def user_passes_test(
         else:
 
             def _view_wrapper(request, *args, **kwargs):
-                if asyncio.iscoroutinefunction(test_func):
+                if iscoroutinefunction(test_func):
                     test_pass = async_to_sync(test_func)(request.user)
                 else:
                     test_pass = test_func(request.user)
@@ -59,6 +58,10 @@ def user_passes_test(
                 if test_pass:
                     return view_func(request, *args, **kwargs)
                 return _redirect_to_login(request)
+
+        # Attributes used by LoginRequiredMiddleware.
+        _view_wrapper.login_url = login_url
+        _view_wrapper.redirect_field_name = redirect_field_name
 
         return wraps(view_func)(_view_wrapper)
 
@@ -82,6 +85,14 @@ def login_required(
     return actual_decorator
 
 
+def login_not_required(view_func):
+    """
+    Decorator for views that allows access to unauthenticated requests.
+    """
+    view_func.login_required = False
+    return view_func
+
+
 def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission
@@ -95,11 +106,11 @@ def permission_required(perm, login_url=None, raise_exception=False):
         perms = perm
 
     def decorator(view_func):
-        if asyncio.iscoroutinefunction(view_func):
+        if iscoroutinefunction(view_func):
 
             async def check_perms(user):
                 # First check if the user has the permission (even anon users).
-                if await sync_to_async(user.has_perms)(perms):
+                if await user.ahas_perms(perms):
                     return True
                 # In case the 403 handler should be called raise the exception.
                 if raise_exception:

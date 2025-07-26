@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 import sys
@@ -5,8 +6,6 @@ import tempfile
 import threading
 import time
 import unittest
-from datetime import datetime, timedelta
-from datetime import timezone as datetime_timezone
 from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
@@ -114,7 +113,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -131,15 +130,15 @@ class FileStorageTests(SimpleTestCase):
             self.assertEqual(now.tzname(), dt.tzname())
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and now should be the same effective time.
-            self.assertLess(abs(dt - now), timedelta(seconds=2))
+            self.assertLess(abs(dt - now), datetime.timedelta(seconds=2))
 
     @override_settings(USE_TZ=False, TIME_ZONE="Africa/Algiers")
     def _test_file_time_getter_tz_handling_off(self, getter):
@@ -147,7 +146,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -162,20 +161,20 @@ class FileStorageTests(SimpleTestCase):
             self.assertTrue(timezone.is_naive(dt))
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and naive_now should be the same effective time.
-            self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
+            self.assertLess(abs(dt - naive_now), datetime.timedelta(seconds=2))
             # If we convert dt to an aware object using the Algiers
             # timezone then it should be the same effective time to
             # now_in_algiers.
             _dt = timezone.make_aware(dt, now_in_algiers.tzinfo)
-            self.assertLess(abs(_dt - now_in_algiers), timedelta(seconds=2))
+            self.assertLess(abs(_dt - now_in_algiers), datetime.timedelta(seconds=2))
 
     def test_file_get_accessed_time(self):
         """
@@ -187,14 +186,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
-            atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            atime,
+            datetime.datetime.fromtimestamp(os.path.getatime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_accessed_time(f_name),
-            timedelta(seconds=2),
+        self.assertAlmostEqual(
+            atime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -210,13 +214,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         ctime = self.storage.get_created_time(f_name)
 
-        self.assertEqual(
-            ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            ctime,
+            datetime.datetime.fromtimestamp(os.path.getctime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name), timedelta(seconds=2)
+        self.assertAlmostEqual(
+            ctime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -232,14 +242,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         mtime = self.storage.get_modified_time(f_name)
 
-        self.assertEqual(
-            mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            mtime,
+            datetime.datetime.fromtimestamp(os.path.getmtime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_modified_time(f_name),
-            timedelta(seconds=2),
+        self.assertAlmostEqual(
+            mtime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -281,22 +296,17 @@ class FileStorageTests(SimpleTestCase):
 
         self.storage.delete("path/to/test.file")
 
-    def test_file_save_abs_path(self):
-        test_name = "path/to/test.file"
-        f = ContentFile("file saved with path")
-        f_name = self.storage.save(os.path.join(self.temp_dir, test_name), f)
-        self.assertEqual(f_name, test_name)
-
     @unittest.skipUnless(
         symlinks_supported(), "Must be able to symlink to run this test."
     )
     def test_file_save_broken_symlink(self):
         """A new path is created on save when a broken symlink is supplied."""
         nonexistent_file_path = os.path.join(self.temp_dir, "nonexistent.txt")
-        broken_symlink_path = os.path.join(self.temp_dir, "symlink.txt")
+        broken_symlink_file_name = "symlink.txt"
+        broken_symlink_path = os.path.join(self.temp_dir, broken_symlink_file_name)
         os.symlink(nonexistent_file_path, broken_symlink_path)
         f = ContentFile("some content")
-        f_name = self.storage.save(broken_symlink_path, f)
+        f_name = self.storage.save(broken_symlink_file_name, f)
         self.assertIs(os.path.exists(os.path.join(self.temp_dir, f_name)), True)
 
     def test_save_doesnt_close(self):
@@ -349,7 +359,8 @@ class FileStorageTests(SimpleTestCase):
             self.storage.url("""a/b\\c.file"""), "/test_media_url/a/b/c.file"
         )
 
-        # #25905: remove leading slashes from file names to prevent unsafe url output
+        # #25905: remove leading slashes from file names to prevent unsafe url
+        # output
         self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
@@ -396,8 +407,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_file_storage_prevents_directory_traversal(self):
         """
-        File storage prevents directory traversal (files can only be accessed if
-        they're below the storage location).
+        File storage prevents directory traversal (files can only be accessed
+        if they're below the storage location).
         """
         with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists("..")
@@ -424,7 +435,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_makedirs_race_handling(self):
         """
-        File storage should be robust against directory creation race conditions.
+        File storage should be robust against directory creation race
+        conditions.
         """
         real_makedirs = os.makedirs
 
@@ -607,22 +619,15 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
-class OverwritingStorage(FileSystemStorage):
-    """
-    Overwrite existing files instead of appending a suffix to generate an
-    unused name.
-    """
-
-    # Mask out O_EXCL so os.open() doesn't raise OSError if the file exists.
-    OS_OPEN_FLAGS = FileSystemStorage.OS_OPEN_FLAGS & ~os.O_EXCL
-
-    def get_available_name(self, name, max_length=None):
-        """Override the effort to find an used name."""
-        return name
-
-
 class OverwritingStorageTests(FileStorageTests):
-    storage_class = OverwritingStorage
+    storage_class = FileSystemStorage
+
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+        self.storage = self.storage_class(
+            location=self.temp_dir, base_url="/test_media_url/", allow_overwrite=True
+        )
 
     def test_save_overwrite_behavior(self):
         """Saving to same file name twice overwrites the first file."""
@@ -636,17 +641,69 @@ class OverwritingStorageTests(FileStorageTests):
         try:
             self.assertEqual(stored_name_1, name)
             self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
             with self.storage.open(name) as fp:
                 self.assertEqual(fp.read(), content_1)
             stored_name_2 = self.storage.save(name, f_2)
             self.assertEqual(stored_name_2, name)
             self.assertTrue(self.storage.exists(name))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
+        finally:
+            self.storage.delete(name)
+
+    def test_save_overwrite_behavior_truncate(self):
+        name = "test.file"
+        original_content = b"content extra extra extra"
+        new_smaller_content = b"content"
+        self.storage.save(name, ContentFile(original_content))
+        try:
+            self.storage.save(name, ContentFile(new_smaller_content))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), new_smaller_content)
+        finally:
+            self.storage.delete(name)
+
+    def test_save_overwrite_behavior_temp_file(self):
+        """Saving to same file name twice overwrites the first file."""
+        name = "test.file"
+        self.assertFalse(self.storage.exists(name))
+        content_1 = b"content one"
+        content_2 = b"second content"
+        f_1 = TemporaryUploadedFile("tmp1", "text/plain", 11, "utf8")
+        f_1.write(content_1)
+        f_1.seek(0)
+        f_2 = TemporaryUploadedFile("tmp2", "text/plain", 14, "utf8")
+        f_2.write(content_2)
+        f_2.seek(0)
+        stored_name_1 = self.storage.save(name, f_1)
+        try:
+            self.assertEqual(stored_name_1, name)
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
+            stored_name_2 = self.storage.save(name, f_2)
+            self.assertEqual(stored_name_2, name)
             self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
             with self.storage.open(name) as fp:
                 self.assertEqual(fp.read(), content_2)
         finally:
             self.storage.delete(name)
+
+    def test_file_name_truncation(self):
+        name = "test_long_file_name.txt"
+        file = ContentFile(b"content")
+        stored_name = self.storage.save(name, file, max_length=10)
+        self.addCleanup(self.storage.delete, stored_name)
+        self.assertEqual(stored_name, "test_l.txt")
+        self.assertEqual(len(stored_name), 10)
+
+    def test_file_name_truncation_extension_too_long(self):
+        name = "file_name.longext"
+        file = ContentFile(b"content")
+        with self.assertRaisesMessage(
+            SuspiciousFileOperation, "Storage can not find an available filename"
+        ):
+            self.storage.save(name, file, max_length=5)
 
 
 class DiscardingFalseContentStorage(FileSystemStorage):
@@ -674,7 +731,8 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
 
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
-        shutil.rmtree(temp_storage_location)
+        if os.path.exists(temp_storage_location):
+            shutil.rmtree(temp_storage_location)
 
     def _storage_max_filename_length(self, storage):
         """
@@ -768,7 +826,8 @@ class FileFieldStorageTests(TestCase):
         obj.normal.close()
 
     def test_duplicate_filename(self):
-        # Multiple files with the same name get _(7 random chars) appended to them.
+        # Multiple files with the same name get _(7 random chars) appended to
+        # them.
         tests = [
             ("multiple_files", "txt"),
             ("multiple_files_many_extensions", "tar.gz"),
@@ -805,7 +864,8 @@ class FileFieldStorageTests(TestCase):
             self.assertEqual(names[0], "tests/%s" % filename)
             self.assertRegex(names[1], "tests/fi_%s.ext" % FILE_SUFFIX_REGEX)
 
-            # Testing exception is raised when filename is too short to truncate.
+            # Testing exception is raised when filename is too short to
+            # truncate.
             filename = "short.longext"
             objs[0].limited_length.save(filename, ContentFile("Same Content"))
             with self.assertRaisesMessage(
@@ -846,6 +906,20 @@ class FileFieldStorageTests(TestCase):
         obj = Storage()
         self.assertEqual(obj.default.read(), b"default content")
         obj.default.close()
+
+    def test_filefield_db_default(self):
+        temp_storage.save("tests/db_default.txt", ContentFile("default content"))
+        obj = Storage.objects.create()
+        self.assertEqual(obj.db_default.name, "tests/db_default.txt")
+        self.assertEqual(obj.db_default.read(), b"default content")
+        obj.db_default.close()
+
+        # File is not deleted, even if there are no more objects using it.
+        obj.delete()
+        s = Storage()
+        self.assertEqual(s.db_default.name, "tests/db_default.txt")
+        self.assertEqual(s.db_default.read(), b"default content")
+        s.db_default.close()
 
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
@@ -911,6 +985,23 @@ class FileFieldStorageTests(TestCase):
         temp_storage.save("tests/stringio", output)
         self.assertTrue(temp_storage.exists("tests/stringio"))
         with temp_storage.open("tests/stringio") as f:
+            self.assertEqual(f.read(), b"content")
+
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.InMemoryStorage"
+            }
+        }
+    )
+    def test_create_file_field_from_another_file_field_in_memory_storage(self):
+        f = ContentFile("content", "file.txt")
+        obj = Storage.objects.create(storage_callable_default=f)
+        new_obj = Storage.objects.create(
+            storage_callable_default=obj.storage_callable_default.file
+        )
+        storage = callable_default_storage()
+        with storage.open(new_obj.storage_callable_default.name) as f:
             self.assertEqual(f.read(), b"content")
 
 

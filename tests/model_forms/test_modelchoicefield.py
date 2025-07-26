@@ -7,7 +7,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
 from django.test import TestCase
 
-from .models import Article, Author, Book, Category, Writer
+from .models import Article, Author, Book, Category, ExplicitPK, Writer
 
 
 class ModelChoiceFieldTests(TestCase):
@@ -52,9 +52,9 @@ class ModelChoiceFieldTests(TestCase):
         c4 = Category.objects.create(name="Fourth", url="4th")
         self.assertEqual(f.clean(c4.id).name, "Fourth")
 
-        # Delete a Category object *after* the ModelChoiceField has already been
-        # instantiated. This proves clean() checks the database during clean()
-        # rather than caching it at instantiation time.
+        # Delete a Category object *after* the ModelChoiceField has already
+        # been instantiated. This proves clean() checks the database during
+        # clean() rather than caching it at instantiation time.
         Category.objects.get(url="4th").delete()
         msg = (
             "['Select a valid choice. That choice is not one of the available "
@@ -78,6 +78,12 @@ class ModelChoiceFieldTests(TestCase):
         f = forms.ModelChoiceField(Category.objects.all(), to_field_name="slug")
         self.assertEqual(f.clean(self.c1.slug), self.c1)
         self.assertEqual(f.clean(self.c1), self.c1)
+
+    def test_model_choice_null_characters(self):
+        f = forms.ModelChoiceField(queryset=ExplicitPK.objects.all())
+        msg = "Null characters are not allowed."
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("\x00something")
 
     def test_choices(self):
         f = forms.ModelChoiceField(

@@ -10,13 +10,14 @@ import pathlib
 import re
 import types
 import uuid
+import zoneinfo
 
 from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
-from django.utils.version import PY311, get_docs_version
+from django.utils.version import get_docs_version
 
 FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
 
@@ -81,8 +82,8 @@ class DatetimeDatetimeSerializer(BaseSerializer):
     """For datetime.datetime."""
 
     def serialize(self):
-        if self.value.tzinfo is not None and self.value.tzinfo != datetime.timezone.utc:
-            self.value = self.value.astimezone(datetime.timezone.utc)
+        if self.value.tzinfo is not None and self.value.tzinfo != datetime.UTC:
+            self.value = self.value.astimezone(datetime.UTC)
         imports = ["import datetime"]
         return repr(self.value), set(imports)
 
@@ -92,19 +93,29 @@ class DecimalSerializer(BaseSerializer):
         return repr(self.value), {"from decimal import Decimal"}
 
 
-class DeconstructableSerializer(BaseSerializer):
+class DeconstructibleSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(path, args, kwargs):
-        name, imports = DeconstructableSerializer._serialize_path(path)
+        name, imports = DeconstructibleSerializer._serialize_path(path)
         strings = []
         for arg in args:
             arg_string, arg_imports = serializer_factory(arg).serialize()
             strings.append(arg_string)
             imports.update(arg_imports)
+        non_ident_kwargs = {}
         for kw, arg in sorted(kwargs.items()):
-            arg_string, arg_imports = serializer_factory(arg).serialize()
-            imports.update(arg_imports)
-            strings.append("%s=%s" % (kw, arg_string))
+            if kw.isidentifier():
+                arg_string, arg_imports = serializer_factory(arg).serialize()
+                imports.update(arg_imports)
+                strings.append("%s=%s" % (kw, arg_string))
+            else:
+                non_ident_kwargs[kw] = arg
+        if non_ident_kwargs:
+            # Serialize non-identifier keyword arguments as a dict.
+            kw_string, kw_imports = serializer_factory(non_ident_kwargs).serialize()
+            strings.append(f"**{kw_string}")
+            imports.update(kw_imports)
+
         return "%s(%s)" % (name, ", ".join(strings)), imports
 
     @staticmethod
@@ -140,11 +151,7 @@ class EnumSerializer(BaseSerializer):
         enum_class = self.value.__class__
         module = enum_class.__module__
         if issubclass(enum_class, enum.Flag):
-            if PY311:
-                members = list(self.value)
-            else:
-                members, _ = enum._decompose(enum_class, self.value)
-                members = reversed(members)
+            members = list(self.value)
         else:
             members = (self.value,)
         return (
@@ -200,23 +207,11 @@ class FunctionTypeSerializer(BaseSerializer):
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        # Serialize functools.partial() arguments
-        func_string, func_imports = serializer_factory(self.value.func).serialize()
-        args_string, args_imports = serializer_factory(self.value.args).serialize()
-        keywords_string, keywords_imports = serializer_factory(
-            self.value.keywords
-        ).serialize()
-        # Add any imports needed by arguments
-        imports = {"import functools", *func_imports, *args_imports, *keywords_imports}
-        return (
-            "functools.%s(%s, *%s, **%s)"
-            % (
-                self.value.__class__.__name__,
-                func_string,
-                args_string,
-                keywords_string,
-            ),
-            imports,
+        partial_name = self.value.__class__.__name__
+        return DeconstructibleSerializer.serialize_deconstructed(
+            f"functools.{partial_name}",
+            (self.value.func, *self.value.args),
+            self.value.keywords,
         )
 
 
@@ -234,13 +229,13 @@ class IterableSerializer(BaseSerializer):
         return value % (", ".join(strings)), imports
 
 
-class ModelFieldSerializer(DeconstructableSerializer):
+class ModelFieldSerializer(DeconstructibleSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
         return self.serialize_deconstructed(path, args, kwargs)
 
 
-class ModelManagerSerializer(DeconstructableSerializer):
+class ModelManagerSerializer(DeconstructibleSerializer):
     def serialize(self):
         as_manager, manager_path, qs_path, args, kwargs = self.value.deconstruct()
         if as_manager:
@@ -255,7 +250,8 @@ class OperationSerializer(BaseSerializer):
         from django.db.migrations.writer import OperationWriter
 
         string, imports = OperationWriter(self.value, indentation=0).serialize()
-        # Nested operation, trailing comma is handled in upper OperationWriter._write()
+        # Nested operation, trailing comma is handled in upper
+        # OperationWriter._write()
         return string.rstrip(","), imports
 
 
@@ -338,6 +334,11 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
+class ZoneInfoSerializer(BaseSerializer):
+    def serialize(self):
+        return repr(self.value), {"import zoneinfo"}
+
+
 class Serializer:
     _registry = {
         # Some of these are order-dependent.
@@ -361,6 +362,7 @@ class Serializer:
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
+        zoneinfo.ZoneInfo: ZoneInfoSerializer,
     }
 
     @classmethod
@@ -394,7 +396,7 @@ def serializer_factory(value):
         return TypeSerializer(value)
     # Anything that knows how to deconstruct itself.
     if hasattr(value, "deconstruct"):
-        return DeconstructableSerializer(value)
+        return DeconstructibleSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
             return serializer_cls(value)

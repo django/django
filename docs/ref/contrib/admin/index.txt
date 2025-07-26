@@ -41,7 +41,8 @@ If you're not using the default project template, here are the requirements:
    <TEMPLATES-OPTIONS>`.
 
 #. If you've customized the :setting:`MIDDLEWARE` setting,
-   :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
+   :class:`django.contrib.sessions.middleware.SessionMiddleware`,
+   :class:`django.contrib.auth.middleware.AuthenticationMiddleware`, and
    :class:`django.contrib.messages.middleware.MessageMiddleware` must be
    included.
 
@@ -336,7 +337,8 @@ subclass::
     If neither ``fields`` nor :attr:`~ModelAdmin.fieldsets` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
     has ``editable=True``, in a single fieldset, in the same order as the fields
-    are defined in the model.
+    are defined in the model, followed by any fields defined in
+    :attr:`~ModelAdmin.readonly_fields`.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -413,30 +415,43 @@ subclass::
 
     * ``classes``
         A list or tuple containing extra CSS classes to apply to the fieldset.
+        This can include any custom CSS class defined in the project, as well
+        as any of the CSS classes provided by Django. Within the default admin
+        site CSS stylesheet, two particularly useful classes are defined:
+        ``collapse`` and ``wide``.
 
         Example::
 
             {
-                "classes": ["wide", "extrapretty"],
+                "classes": ["wide", "collapse"],
             }
 
-        Two useful classes defined by the default admin site stylesheet are
-        ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style
-        will be initially collapsed in the admin and replaced with a small
-        "click to expand" link. Fieldsets with the ``wide`` style will be
-        given extra horizontal space.
+        Fieldsets with the ``wide`` style will be given extra horizontal
+        space in the admin interface.
+        Fieldsets with a name and the ``collapse`` style will be initially
+        collapsed, using an expandable widget with a toggle for switching
+        their visibility.
 
     * ``description``
         A string of optional extra text to be displayed at the top of each
-        fieldset, under the heading of the fieldset. This string is not
-        rendered for :class:`~django.contrib.admin.TabularInline` due to its
-        layout.
+        fieldset, under the heading of the fieldset.
 
         Note that this value is *not* HTML-escaped when it's displayed in
         the admin interface. This lets you include HTML if you so desire.
         Alternatively you can use plain text and
         :func:`django.utils.html.escape` to escape any HTML special
         characters.
+
+    .. admonition:: :class:`~django.contrib.admin.TabularInline` has limited
+        support for ``fieldsets``
+
+        Using ``fieldsets`` with :class:`~django.contrib.admin.TabularInline`
+        has limited functionality. You can specify which fields will be
+        displayed and their order within the ``TabularInline`` layout by
+        defining ``fields`` in the ``field_options`` dictionary.
+
+        All other features are not supported. This includes the use of ``name``
+        to define a title for a group of fields.
 
 .. attribute:: ModelAdmin.filter_horizontal
 
@@ -618,11 +633,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["name", "decade_born_in"]
-
-    .. versionchanged:: 5.1
-
-        Support for using ``__`` lookups was added, when targeting related
-        fields.
 
     A few special cases to note about ``list_display``:
 
@@ -830,10 +840,6 @@ subclass::
 
           full_name = property(my_property)
 
-      .. versionchanged:: 5.0
-
-        Support for ``boolean`` attribute on properties was added.
-
     * The field names in ``list_display`` will also appear as CSS classes in
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
       element. This can be used to set column widths in a CSS file for example.
@@ -1019,16 +1025,12 @@ subclass::
 
 .. attribute:: ModelAdmin.show_facets
 
-    .. versionadded:: 5.0
-
     Controls whether facet counts are displayed for filters in the admin
     changelist. Defaults to :attr:`.ShowFacets.ALLOW`.
 
     When displayed, facet counts update in line with currently applied filters.
 
     .. class:: ShowFacets
-
-        .. versionadded:: 5.0
 
         Enum of allowed values for :attr:`.ModelAdmin.show_facets`.
 
@@ -1453,6 +1455,27 @@ templates used by the :class:`ModelAdmin` views:
                 formset.save_m2m()
 
     See also :ref:`saving-objects-in-the-formset`.
+
+.. warning::
+
+    All hooks that return a ``ModelAdmin`` property return the property itself
+    rather than a copy of its value. Dynamically modifying the value can lead
+    to surprising results.
+
+    Let's take :meth:`ModelAdmin.get_readonly_fields` as an example::
+
+        class PersonAdmin(admin.ModelAdmin):
+            readonly_fields = ["name"]
+
+            def get_readonly_fields(self, request, obj=None):
+                readonly = super().get_readonly_fields(request, obj)
+                if not request.user.is_superuser:
+                    readonly.append("age")  # Edits the class attribute.
+                return readonly
+
+    This results in ``readonly_fields`` becoming
+    ``["name", "age", "age", ...]``, even for a superuser, as ``"age"`` is added
+    each time non-superuser visits the page.
 
 .. method:: ModelAdmin.get_ordering(request)
 
@@ -1886,10 +1909,6 @@ templates used by the :class:`ModelAdmin` views:
     Override this method to customize the lookups permitted for your
     :class:`~django.contrib.admin.ModelAdmin` subclass.
 
-    .. versionchanged:: 5.0
-
-        The ``request`` argument was added.
-
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 
     Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
@@ -2151,10 +2170,6 @@ forms or widgets depending on ``django.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', …]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
 
-.. versionchanged:: 5.0
-
-    jQuery was upgraded from 3.6.4 to 3.7.1.
-
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
@@ -2226,6 +2241,7 @@ information.
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
         from django.contrib import admin
+        from myapp.models import Author, Book
 
 
         class BookInline(admin.TabularInline):
@@ -2236,6 +2252,9 @@ information.
             inlines = [
                 BookInline,
             ]
+
+
+        admin.site.register(Author, AuthorAdmin)
 
     Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
@@ -2306,8 +2325,7 @@ The ``InlineModelAdmin`` class adds or customizes:
     A list or tuple containing extra CSS classes to apply to the fieldset that
     is rendered for the inlines. Defaults to ``None``. As with classes
     configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
-    class will be initially collapsed and their header will have a small "show"
-    link.
+    class will be initially collapsed using an expandable widget.
 
 .. attribute:: InlineModelAdmin.extra
 
@@ -2465,6 +2483,10 @@ Take this model for instance::
     from django.db import models
 
 
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+
     class Friendship(models.Model):
         to_person = models.ForeignKey(
             Person, on_delete=models.CASCADE, related_name="friends"
@@ -2478,7 +2500,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship
+    from myapp.models import Friendship, Person
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2490,6 +2512,9 @@ automatically::
         inlines = [
             FriendshipInline,
         ]
+
+
+    admin.site.register(Person, PersonAdmin)
 
 Working with many-to-many models
 --------------------------------
@@ -2519,16 +2544,11 @@ If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
 
     from django.contrib import admin
+    from myapp.models import Group
 
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
-
-
-    class PersonAdmin(admin.ModelAdmin):
-        inlines = [
-            MembershipInline,
-        ]
 
 
     class GroupAdmin(admin.ModelAdmin):
@@ -2536,6 +2556,9 @@ so by defining an ``InlineModelAdmin`` object for the relationship::
             MembershipInline,
         ]
         exclude = ["members"]
+
+
+    admin.site.register(Group, GroupAdmin)
 
 There are two features worth noting in this example.
 
@@ -2591,6 +2614,13 @@ we can do this with inline admin models. Suppose we have the following models::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
+
 The first step in displaying this intermediate model in the admin is to
 define an inline class for the ``Membership`` model::
 
@@ -2628,6 +2658,7 @@ It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.contrib.contenttypes.models import ContentType
     from django.db import models
 
 
@@ -2830,6 +2861,32 @@ linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
+.. _extrabody:
+
+``extrabody`` block
+===================
+
+.. versionadded:: 5.2
+
+You can add custom HTML, JavaScript, or other content to appear just before the
+closing ``</body>`` tag of templates that extend ``admin/base.html`` by
+extending the ``extrabody`` block. For example, if you want an alert to appear
+on page load you could add a ``admin/base.html`` template override to your
+project:
+
+.. code-block:: html+django
+
+    {% extends 'admin/base.html' %}
+
+    {% block extrabody %}
+        {{ block.super }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.alert('Welcome!');
+            });
+        </script>
+    {% endblock extrabody %}
+
 ``AdminSite`` objects
 =====================
 
@@ -2865,10 +2922,6 @@ Templates can override or extend base admin templates as described in
 
     The text to put at the top of each admin page, as a ``<div>`` (a string).
     By default, this is "Django administration".
-
-    .. versionchanged:: 5.0
-
-        In older versions, ``site_header`` was using an ``<h1>`` tag.
 
 .. attribute:: AdminSite.site_title
 
@@ -2934,6 +2987,13 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.logout_template
 
     Path to a custom template that will be used by the admin site logout view.
+
+.. attribute:: AdminSite.password_change_form
+
+    .. versionadded:: 6.0
+
+    Subclass of :class:`~django.contrib.auth.forms.PasswordChangeForm` that
+    will be used by the admin site password change view.
 
 .. attribute:: AdminSite.password_change_template
 
@@ -3041,14 +3101,10 @@ Templates can override or extend base admin templates as described in
 
 .. method:: AdminSite.get_model_admin(model)
 
-    .. versionadded:: 5.0
-
     Returns an admin class for the given model class. Raises
     ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't registered.
 
 .. method:: AdminSite.get_log_entries(request)
-
-    .. versionadded:: 5.0
 
     Returns a queryset for the related
     :class:`~django.contrib.admin.models.LogEntry` instances, shown on the site

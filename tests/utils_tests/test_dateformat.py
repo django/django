@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timezone, tzinfo
+from datetime import UTC, date, datetime, time, tzinfo
 
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
@@ -48,7 +48,8 @@ class DateFormatTests(SimpleTestCase):
         dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, "U")), tz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, "U")), ltz), dt)
-        # astimezone() is safe here because the target timezone doesn't have DST
+        # astimezone() is safe here because the target timezone doesn't have
+        # DST
         self.assertEqual(
             datetime.fromtimestamp(int(format(dt, "U"))),
             dt.astimezone(ltz).replace(tzinfo=None),
@@ -63,7 +64,7 @@ class DateFormatTests(SimpleTestCase):
         )
 
     def test_epoch(self):
-        udt = datetime(1970, 1, 1, tzinfo=timezone.utc)
+        udt = datetime(1970, 1, 1, tzinfo=UTC)
         self.assertEqual(format(udt, "U"), "0")
 
     def test_empty_format(self):
@@ -208,7 +209,7 @@ class DateFormatTests(SimpleTestCase):
 
     @requires_tz_support
     def test_e_format_with_named_time_zone(self):
-        dt = datetime(1970, 1, 1, tzinfo=timezone.utc)
+        dt = datetime(1970, 1, 1, tzinfo=UTC)
         self.assertEqual(dateformat.format(dt, "e"), "UTC")
 
     @requires_tz_support

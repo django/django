@@ -1,5 +1,5 @@
 """
-Global Django exception and warning classes.
+Global Django exception classes.
 """
 
 import operator
@@ -23,6 +23,10 @@ class ObjectDoesNotExist(Exception):
     """The requested object does not exist"""
 
     silent_variable_failure = True
+
+
+class ObjectNotUpdated(Exception):
+    """The updated object no longer exists."""
 
 
 class MultipleObjectsReturned(Exception):

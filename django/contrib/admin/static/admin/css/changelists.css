@@ -25,8 +25,8 @@
     min-height: 400px;
 }
 
-.change-list .filtered .results, .change-list .filtered .paginator,
-.filtered #toolbar, .filtered div.xfull {
+.change-list .filtered .results, .filtered #toolbar,
+.filtered div.xfull {
     width: auto;
 }
 
@@ -43,11 +43,31 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
+#changelist .changelist-footer {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+#changelist .changelist-footer .paginator {
+    color: var(--body-quiet-color);
+    background: var(--body-bg);
+    border: none;
+    padding: 0;
+    overflow: hidden;
+}
+
 #changelist .paginator {
     color: var(--body-quiet-color);
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
+}
+
+#changelist .paginator ul {
+    padding: 0;
 }
 
 /* CHANGELIST TABLES */
@@ -159,7 +179,6 @@
     font-weight: 400;
     padding: 0 15px;
     margin-bottom: 10px;
-    cursor: pointer;
 }
 
 #changelist-filter details summary > * {

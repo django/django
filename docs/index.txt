@@ -27,7 +27,7 @@ Are you new to Django or to programming? This is the place to start!
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
-  :doc:`Writing your first patch for Django <intro/contributing>`
+  :doc:`Writing your first contribution to Django <intro/contributing>`
 
 Getting help
 ============
@@ -251,6 +251,7 @@ applications and Django provides multiple protection tools and mechanisms:
 * :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
 * :ref:`Security Middleware <security-middleware>`
+* :doc:`Content Security Policy <ref/csp>`
 
 Internationalization and localization
 =====================================

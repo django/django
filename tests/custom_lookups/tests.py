@@ -518,7 +518,8 @@ class YearLteTests(TestCase):
 
     def test_custom_implementation_year_exact(self):
         try:
-            # Two ways to add a customized implementation for different backends:
+            # Two ways to add a customized implementation for different
+            # backends:
             # First is MonkeyPatch of the class.
             def as_custom_sql(self, compiler, connection):
                 lhs_sql, lhs_params = self.process_lhs(
@@ -614,6 +615,10 @@ class LookupTransformCallOrderTests(SimpleTestCase):
             )
             TrackCallsYearTransform.call_order = []
             # junk transform - tries transform only, then fails
+            msg = (
+                "Unsupported lookup 'junk__more_junk' for IntegerField or join"
+                " on the field not permitted."
+            )
             with self.assertRaisesMessage(FieldError, msg):
                 Author.objects.filter(birthdate__testyear__junk__more_junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order, ["transform"])
@@ -627,7 +632,7 @@ class LookupTransformCallOrderTests(SimpleTestCase):
             self.assertEqual(TrackCallsYearTransform.call_order, ["lookup"])
 
 
-class CustomisedMethodsTests(SimpleTestCase):
+class CustomizedMethodsTests(SimpleTestCase):
     def test_overridden_get_lookup(self):
         q = CustomModel.objects.filter(field__lookupfunc_monkeys=3)
         self.assertIn("monkeys()", str(q.query))

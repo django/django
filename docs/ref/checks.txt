@@ -62,7 +62,7 @@ class name.
 
 .. class:: Debug(msg, hint=None, obj=None, id=None)
 .. class:: Info(msg, hint=None, obj=None, id=None)
-.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Warning(msg, hint=None, obj=None, id=None)
 .. class:: Error(msg, hint=None, obj=None, id=None)
 .. class:: Critical(msg, hint=None, obj=None, id=None)
 
@@ -77,6 +77,7 @@ Django's system checks are organized using the following tags:
 * ``async_support``: Checks asynchronous-related configuration.
 * ``caches``: Checks cache related configuration.
 * ``compatibility``: Flags potential problems with version upgrades.
+* ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than static code analysis as
   regular checks do. They are only run by the :djadmin:`migrate` command or if
@@ -180,6 +181,7 @@ Model fields
 * **fields.E011**: ``<database>`` does not support default database values with
   expressions (``db_default``).
 * **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
+* **fields.E013**: ``CompositePrimaryKey`` must be named ``pk``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -336,6 +338,10 @@ Related fields
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
 * **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
+* **fields.E347**: Field defines a relation to the ``CompositePrimaryKey`` of
+  model ``<model>`` which is not supported.
+* **fields.E348**: Related name ``<related_name>`` for ``<model>.<field name>``
+  clashes with the name of a model manager.
 
 Models
 ------
@@ -416,6 +422,8 @@ Models
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
 * **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
+* **models.E042**: ``<field name>`` cannot be included in the composite
+  primary key.
 * **models.W042**: Auto-created primary key used when not defining a primary
   key type, by default ``django.db.models.AutoField``.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
@@ -427,6 +435,17 @@ Models
   (``db_table_comment``).
 * **models.W047**: ``<database>`` does not support unique constraints with
   nulls distinct.
+* **models.E048**: ``constraints/indexes/unique_together`` refers to a
+  ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
+  not supported for that option.
+
+Management Commands
+-------------------
+
+The following checks verify custom management commands are correctly configured:
+
+* **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
+  the same ``autodetector``.
 
 Security
 --------
@@ -549,6 +568,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   ``'django-insecure-'`` indicating that it was generated automatically by
   Django. Please generate a long and random value, otherwise many of Django's
   security-critical features will be vulnerable to attack.
+* **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
+  (got ``<value>`` instead).
 
 The following checks verify that your security-related settings are correctly
 configured:
@@ -575,7 +596,9 @@ configured:
 
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
-  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option. *This check is
+  removed in Django 5.1 as system checks may now raise*
+  ``ImproperlyConfigured`` *instead.*
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
@@ -866,6 +889,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------
@@ -887,7 +914,7 @@ The following checks are performed when a model contains a
 ------------
 
 The following checks are performed on :mod:`django.contrib.postgres` model
-fields:
+fields, indexes, and constraints:
 
 * **postgres.E001**: Base field for array has errors: ...
 * **postgres.E002**: Base field for array cannot be a related field.
@@ -895,6 +922,8 @@ fields:
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
 * **postgres.W004**: Base field for array has warnings: ...
+* **postgres.E005**: ``'django.contrib.postgres'`` must be in
+  ``INSTALLED_APPS`` in order to use ``<django.contrib.postgres feature>``.
 
 .. _sites-system-checks:
 

@@ -166,9 +166,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return [(None, ("NULL", [], False))]
 
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
-
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
@@ -362,7 +359,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):
-        # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+        # Alias MySQL's TRADITIONAL to TEXT for consistency with other
+        # backends.
         if format and format.upper() == "TEXT":
             format = "TRADITIONAL"
         elif (

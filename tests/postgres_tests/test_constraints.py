@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib.postgres.indexes import OpClass
 from django.core.checks import Error
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, NotSupportedError, connection, transaction
+from django.db import IntegrityError, connection, transaction
 from django.db.models import (
     CASCADE,
     CharField,
@@ -14,6 +14,7 @@ from django.db.models import (
     F,
     ForeignKey,
     Func,
+    GeneratedField,
     IntegerField,
     Model,
     Q,
@@ -32,6 +33,7 @@ try:
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
         DateTimeRangeField,
+        IntegerRangeField,
         RangeBoundary,
         RangeOperators,
     )
@@ -266,6 +268,19 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertNotIn(constraint.name, self.get_constraints(Scene._meta.db_table))
         Scene.objects.create(scene="ScEnE 10", setting="Sir Bedemir's Castle")
 
+    def test_opclass_func_validate_constraints(self):
+        constraint_name = "test_opclass_func_validate_constraints"
+        constraint = UniqueConstraint(
+            OpClass(Lower("scene"), name="text_pattern_ops"),
+            name="test_opclass_func_validate_constraints",
+        )
+        Scene.objects.create(scene="First scene")
+        # Non-unique scene.
+        msg = f"Constraint “{constraint_name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Scene, Scene(scene="first Scene"))
+        constraint.validate(Scene, Scene(scene="second Scene"))
+
 
 class ExclusionConstraintTests(PostgreSQLTestCase):
     def get_constraints(self, table):
@@ -294,7 +309,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
 
     def test_invalid_expressions(self):
         msg = "The expressions must be a list of 2-tuples."
-        for expressions in (["foo"], [("foo")], [("foo_1", "foo_2", "foo_3")]):
+        for expressions in (["foo"], [("foo",)], [("foo_1", "foo_2", "foo_3")]):
             with self.subTest(expressions), self.assertRaisesMessage(ValueError, msg):
                 ExclusionConstraint(
                     index_type="GIST",
@@ -782,6 +797,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ),
             exclude={"datespan", "start", "end", "room"},
         )
+        # Constraints with excluded fields in condition are ignored.
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"cancelled"},
+        )
 
     def test_range_overlaps_custom(self):
         class TsTzRange(Func):
@@ -852,6 +878,38 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         constraint.validate(RangesModel, RangesModel(ints=(10, 19)))
         constraint.validate(RangesModel, RangesModel(ints=(51, 60)))
         constraint.validate(RangesModel, RangesModel(ints=(10, 20)), exclude={"ints"})
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    @isolate_apps("postgres_tests")
+    def test_validate_generated_field_range_adjacent(self):
+        class RangesModelGeneratedField(Model):
+            ints = IntegerRangeField(blank=True, null=True)
+            ints_generated = GeneratedField(
+                expression=F("ints"),
+                output_field=IntegerRangeField(null=True),
+                db_persist=True,
+            )
+
+        with connection.schema_editor() as editor:
+            editor.create_model(RangesModelGeneratedField)
+
+        constraint = ExclusionConstraint(
+            name="ints_adjacent",
+            expressions=[("ints_generated", RangeOperators.ADJACENT_TO)],
+            violation_error_code="custom_code",
+            violation_error_message="Custom error message.",
+        )
+        RangesModelGeneratedField.objects.create(ints=(20, 50))
+
+        range_obj = RangesModelGeneratedField(ints=(3, 20))
+        with self.assertRaisesMessage(ValidationError, "Custom error message."):
+            constraint.validate(RangesModelGeneratedField, range_obj)
+
+        # Excluding referenced or generated field should skip validation.
+        constraint.validate(RangesModelGeneratedField, range_obj, exclude={"ints"})
+        constraint.validate(
+            RangesModelGeneratedField, range_obj, exclude={"ints_generated"}
+        )
 
     def test_validate_with_custom_code_and_condition(self):
         constraint = ExclusionConstraint(
@@ -984,7 +1042,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include(self):
         constraint_name = "ints_adjacent_spgist_include"
         self.assertNotIn(
@@ -1021,7 +1078,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include_condition(self):
         constraint_name = "ints_adjacent_spgist_include_condition"
         self.assertNotIn(
@@ -1054,7 +1110,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include_deferrable(self):
         constraint_name = "ints_adjacent_spgist_include_deferrable"
         self.assertNotIn(
@@ -1070,27 +1125,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
-
-    def test_spgist_include_not_supported(self):
-        constraint_name = "ints_adjacent_spgist_include_not_supported"
-        constraint = ExclusionConstraint(
-            name=constraint_name,
-            expressions=[("ints", RangeOperators.ADJACENT_TO)],
-            index_type="spgist",
-            include=["id"],
-        )
-        msg = (
-            "Covering exclusion constraints using an SP-GiST index require "
-            "PostgreSQL 14+."
-        )
-        with connection.schema_editor() as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_spgist_indexes",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    editor.add_constraint(RangesModel, constraint)
 
     def test_range_adjacent_opclass(self):
         constraint_name = "ints_adjacent_opclass"
@@ -1174,7 +1208,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_opclass_include(self):
         constraint_name = "ints_adjacent_spgist_opclass_include"
         self.assertNotIn(
@@ -1225,3 +1258,12 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             constraint_name,
             self.get_constraints(ModelWithExclusionConstraint._meta.db_table),
         )
+
+    def test_database_default(self):
+        constraint = ExclusionConstraint(
+            name="ints_equal", expressions=[("ints", RangeOperators.EQUAL)]
+        )
+        RangesModel.objects.create()
+        msg = "Constraint “ints_equal” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel())

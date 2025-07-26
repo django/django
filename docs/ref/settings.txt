@@ -52,9 +52,13 @@ A list of all the people who get code error notifications. When
 is configured in :setting:`LOGGING` (done by default), Django emails these
 people the details of exceptions raised in the request/response cycle.
 
-Each item in the list should be a tuple of (Full name, email address). Example::
+Each item in the list should be an email address string. Example::
 
-    [("John", "john@example.com"), ("Mary", "mary@example.com")]
+    ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -1502,9 +1506,24 @@ exclusive, so only set one of those settings to ``True``.
 
 Default: ``None``
 
-If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
-optionally specify the path to a PEM-formatted certificate chain file to use
-for the SSL connection.
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True`` and the
+secure connection to the SMTP server requires client authentication, use this
+setting to specify the path to a PEM-formatted certificate chain file, which
+must be used in conjunction with :setting:`EMAIL_SSL_KEYFILE`.
+
+``EMAIL_SSL_CERTFILE`` should not be used with a self-signed server certificate
+or a certificate from a private certificate authority (CA). In such cases, the
+server's certificate (or the root certificate of the private CA) should be
+installed into the system's CA bundle. This can be done by following
+platform-specific instructions for installing a root CA certificate,
+or by using OpenSSL's ``SSL_CERT_FILE`` or ``SSL_CERT_DIR`` environment
+variables to specify a custom certificate bundle (if modifying the system
+bundle is not possible or desired).
+
+For more complex scenarios, the SMTP
+:class:`~django.core.mail.backends.smtp.EmailBackend` can be subclassed to add
+root certificates to its ``ssl_context`` using
+:meth:`python:ssl.SSLContext.load_verify_locations`.
 
 .. setting:: EMAIL_SSL_KEYFILE
 
@@ -1514,8 +1533,8 @@ for the SSL connection.
 Default: ``None``
 
 If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
-optionally specify the path to a PEM-formatted private key file to use for the
-SSL connection.
+optionally specify the path to a PEM-formatted private key file for client
+authentication of the SSL connection along with :setting:`EMAIL_SSL_CERTFILE`.
 
 Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
 doesn't result in any certificate checking. They're passed to the underlying SSL
@@ -1667,7 +1686,7 @@ the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
 :func:`django.setup()` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
-generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
+generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 .. setting:: FORM_RENDERER
 
@@ -1683,20 +1702,6 @@ renderers are:
 * ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
-
-.. setting:: FORMS_URLFIELD_ASSUME_HTTPS
-
-``FORMS_URLFIELD_ASSUME_HTTPS``
--------------------------------
-
-.. versionadded:: 5.0
-.. deprecated:: 5.0
-
-Default: ``False``
-
-Set this transitional setting to ``True`` to opt into using ``"https"`` as the
-new default value of :attr:`URLField.assume_scheme
-<django.forms.URLField.assume_scheme>` during the Django 5.x release cycle.
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -1843,9 +1848,7 @@ standard :term:`language ID format <language code>`. For example, U.S. English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
 
-:setting:`USE_I18N` must be active for this setting to have any effect.
-
-It serves two purposes:
+It serves three purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
@@ -1853,6 +1856,11 @@ It serves two purposes:
   user's preferred language can't be determined or is not supported by the
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
+* If localization is explicitly disabled via the :tfilter:`unlocalize` filter
+  or the :ttag:`{% localize off %}<localize>` tag, it provides fallback
+  localization formats which will be applied instead. See
+  :ref:`controlling localization in templates <topic-l10n-templates>` for
+  details.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 
@@ -2069,6 +2077,10 @@ Default: ``[]`` (Empty list)
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: MEDIA_ROOT
 
@@ -2350,6 +2362,94 @@ Unless set to ``None``, the
 :class:`~django.middleware.security.SecurityMiddleware` sets the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
+
+.. setting:: SECURE_CSP
+
+``SECURE_CSP``
+--------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting defines the directives used by the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`, which
+generates and adds a :ref:`Content-Security-Policy <csp-overview>` (CSP) header
+to all responses that do not already include one.
+
+The ``Content-Security-Policy`` header instructs browsers to restrict which
+resources a page is allowed to load. A properly configured CSP can block
+content that violates defined rules, helping prevent cross-site scripting (XSS)
+and other content injection attacks by explicitly declaring trusted sources for
+content such as scripts, styles, images, fonts, and more.
+
+The setting must be a mapping (typically a dictionary) of directive names to
+their values. Each key should be a valid CSP directive such as ``default-src``
+or ``script-src``. The corresponding value can be a list, tuple, or set of
+source expressions or URLs to allow for that directive. If a set is used, it
+will be automatically sorted to ensure consistent output in the generated
+headers.
+
+This example illustrates the expected structure, using the constants defined in
+:ref:`csp-constants`::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+    }
+
+.. admonition:: Directives validation
+
+   Django's CSP middleware helps construct and send the appropriate header
+   based on your settings, but it does **not validate** that the directives and
+   values conform to the CSP specification. It is your responsibility to ensure
+   that the configuration is syntactically and semantically correct. Use
+   browser developer tools or external CSP validators during development.
+
+   For a list of available directives and their values, refer to the `MDN
+   documentation on CSP directives
+   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_.
+
+
+.. setting:: SECURE_CSP_REPORT_ONLY
+
+``SECURE_CSP_REPORT_ONLY``
+--------------------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting is just like :setting:`SECURE_CSP`, but instead of enforcing the
+policy, it instructs the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to apply a
+``Content-Security-Policy-Report-Only`` header to responses, which allows
+browsers to monitor and report policy violations without blocking content. This
+is useful for testing and refining a policy before enforcement.
+
+Most browsers log CSP violations to the developer console and can optionally
+send them to a reporting endpoint. To collect these reports, the ``report-uri``
+directive must be defined (see :ref:`csp-reports` for more details).
+
+As noted in the `MDN documentation on Content-Security-Policy-Report-Only
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>`_,
+the ``report-uri`` directive must be specified for reports to be sent;
+otherwise, the header has no reporting effect (other than logging to the
+browser's developer tools console).
+
+Following the example from the :setting:`SECURE_CSP` setting::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP_REPORT_ONLY = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+        "report-uri": "/my-site/csp/reports/",
+    }
 
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
@@ -2923,10 +3023,6 @@ be retained if present.
 
 See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
 
-.. versionchanged:: 5.0
-
-    In older versions, the default value is ``False``.
-
 .. setting:: USE_X_FORWARDED_HOST
 
 ``USE_X_FORWARDED_HOST``
@@ -2954,6 +3050,21 @@ preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
 
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
+
+.. setting:: URLIZE_ASSUME_HTTPS
+
+``URLIZE_ASSUME_HTTPS``
+-----------------------
+
+.. versionadded:: 6.0
+.. deprecated:: 6.0
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to opt into using HTTPS as the
+default protocol when none is provided in URLs processed by the
+:tfilter:`urlize` and :tfilter:`urlizetrunc` template filters during the Django
+6.x release cycle.
 
 .. setting:: WSGI_APPLICATION
 
@@ -3060,8 +3171,9 @@ Default: ``'/accounts/login/'``
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected for login when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator,
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
-:class:`~django.contrib.auth.mixins.AccessMixin`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.AccessMixin`, or when
+:class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -3637,6 +3749,7 @@ Email
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_LOCALTIME`
+* :setting:`EMAIL_USE_SSL`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
@@ -3664,18 +3777,17 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
-* :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------
-* :setting:`DATE_FORMAT`
-* :setting:`DATE_INPUT_FORMATS`
-* :setting:`DATETIME_FORMAT`
-* :setting:`DATETIME_INPUT_FORMATS`
-* :setting:`DECIMAL_SEPARATOR`
+
+.. _settings-i18n:
+
+Internationalization (``i18n``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * :setting:`FIRST_DAY_OF_WEEK`
 * :setting:`FORMAT_MODULE_PATH`
-* :setting:`LANGUAGE_CODE`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_HTTPONLY`
@@ -3686,6 +3798,21 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
+* :setting:`TIME_ZONE`
+* :setting:`USE_I18N`
+* :setting:`USE_TZ`
+
+.. _settings-l10n:
+
+Localization (``l10n``)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`LANGUAGE_CODE`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
 * :setting:`SHORT_DATE_FORMAT`
@@ -3693,10 +3820,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`THOUSAND_SEPARATOR`
 * :setting:`TIME_FORMAT`
 * :setting:`TIME_INPUT_FORMATS`
-* :setting:`TIME_ZONE`
-* :setting:`USE_I18N`
 * :setting:`USE_THOUSAND_SEPARATOR`
-* :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`
 
 HTTP
@@ -3713,6 +3837,8 @@ HTTP
 
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  * :setting:`SECURE_CSP`
+  * :setting:`SECURE_CSP_REPORT_ONLY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
@@ -3753,6 +3879,7 @@ Security
 
 * :setting:`SECRET_KEY`
 * :setting:`SECRET_KEY_FALLBACKS`
+* :setting:`URLIZE_ASSUME_HTTPS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

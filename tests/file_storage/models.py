@@ -72,10 +72,13 @@ class Storage(models.Model):
     default = models.FileField(
         storage=temp_storage, upload_to="tests", default="tests/default.txt"
     )
+    db_default = models.FileField(
+        storage=temp_storage, upload_to="tests", db_default="tests/db_default.txt"
+    )
     empty = models.FileField(storage=temp_storage)
     limited_length = models.FileField(
         storage=temp_storage, upload_to="tests", max_length=20
     )
     extended_length = models.FileField(
-        storage=temp_storage, upload_to="tests", max_length=300
+        storage=temp_storage, upload_to="tests", max_length=1024
     )

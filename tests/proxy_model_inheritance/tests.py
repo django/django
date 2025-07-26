@@ -14,9 +14,10 @@ from .models import (
 
 class ProxyModelInheritanceTests(TransactionTestCase):
     """
-    Proxy model inheritance across apps can result in migrate not creating the table
-    for the proxied model (as described in #12286).  This test creates two dummy
-    apps and calls migrate, then verifies that the table has been created.
+    Proxy model inheritance across apps can result in migrate not creating the
+    table for the proxied model (as described in #12286). This test creates two
+    dummy apps and calls migrate, then verifies that the table has been
+    created.
     """
 
     available_apps = []

@@ -1,15 +1,16 @@
 from collections import namedtuple
 
+import oracledb
+
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.backends.oracle.oracledb_any import oracledb
 
 FieldInfo = namedtuple(
-    "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
+    "FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "is_json", "comment"]
 )
-TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
+TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -253,8 +254,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all foreign keys in the given table.
+        Return a dictionary of {field_name: (field_name_other_table,
+        other_table)} representing all foreign keys in the given table.
         """
         table_name = table_name.upper()
         cursor.execute(

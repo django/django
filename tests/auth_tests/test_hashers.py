@@ -1,9 +1,11 @@
+from contextlib import contextmanager
 from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX,
     UNUSABLE_PASSWORD_SUFFIX_LENGTH,
+    Argon2PasswordHasher,
     BasePasswordHasher,
     BCryptPasswordHasher,
     BCryptSHA256PasswordHasher,
@@ -83,7 +85,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = make_password("lètmein", "seasalt", "pbkdf2_sha256")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$870000$seasalt$wJSpLMQRQz0Dhj/pFpbyjMj71B2gUYp6HJS5AU+32Ac=",
+            "pbkdf2_sha256$1200000$"
+            "seasalt$6sTlFi4QohxXLuZigqDIUNX8xG9NxrTmV8+flFQdBqE=",
         )
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password("lètmein", encoded))
@@ -276,8 +279,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$870000$"
-            "seasalt2$nxgnNHRsZWSmi4hRSKq2MRigfaRmjDhH1NH4g2sQRbU=",
+            "pbkdf2_sha256$1200000$"
+            "seasalt2$hPlIUc6GqWsws6cZV1K8OuOARm1UrbZ3vLGFoHkH0ZI=",
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -285,7 +288,7 @@ class TestUtilsHashPass(SimpleTestCase):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
-            encoded, "pbkdf2_sha1$870000$seasalt2$iFPKnrkYfxxyxaeIqxq+c3nJ/j4="
+            encoded, "pbkdf2_sha1$1200000$seasalt2$RGU4BAy93u+JDPtuMamdllndh+c="
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -376,7 +379,8 @@ class TestUtilsHashPass(SimpleTestCase):
             # Revert to the old iteration count and ...
             hasher.iterations = old_iterations
 
-            # ... check if the password would get updated to the new iteration count.
+            # ... check if the password would get updated to the new iteration
+            # count.
             self.assertTrue(check_password("letmein", encoded, setter))
             self.assertTrue(state["upgraded"])
         finally:
@@ -451,6 +455,58 @@ class TestUtilsHashPass(SimpleTestCase):
             check_password("wrong_password", encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
+    @contextmanager
+    def assertMakePasswordCalled(self, password, encoded, hasher_side_effect):
+        hasher = get_hasher("default")
+        with (
+            mock.patch(
+                "django.contrib.auth.hashers.identify_hasher",
+                side_effect=hasher_side_effect,
+            ) as mock_identify_hasher,
+            mock.patch(
+                "django.contrib.auth.hashers.make_password"
+            ) as mock_make_password,
+            mock.patch(
+                "django.contrib.auth.hashers.get_random_string",
+                side_effect=lambda size: "x" * size,
+            ),
+            mock.patch.object(hasher, "verify"),
+        ):
+            # Ensure make_password is called to standardize timing.
+            yield
+            self.assertEqual(hasher.verify.call_count, 0)
+            self.assertEqual(mock_identify_hasher.mock_calls, [mock.call(encoded)])
+            self.assertEqual(
+                mock_make_password.mock_calls,
+                [mock.call("x" * UNUSABLE_PASSWORD_SUFFIX_LENGTH)],
+            )
+
+    def test_check_password_calls_make_password_to_fake_runtime(self):
+        cases = [
+            (None, None, None),  # no plain text password provided
+            ("foo", make_password(password=None), None),  # unusable encoded
+            ("letmein", make_password(password="letmein"), ValueError),  # valid encoded
+        ]
+        for password, encoded, hasher_side_effect in cases:
+            with (
+                self.subTest(encoded=encoded),
+                self.assertMakePasswordCalled(password, encoded, hasher_side_effect),
+            ):
+                check_password(password, encoded)
+
+    async def test_acheck_password_calls_make_password_to_fake_runtime(self):
+        cases = [
+            (None, None, None),  # no plain text password provided
+            ("foo", make_password(password=None), None),  # unusable encoded
+            ("letmein", make_password(password="letmein"), ValueError),  # valid encoded
+        ]
+        for password, encoded, hasher_side_effect in cases:
+            with (
+                self.subTest(encoded=encoded),
+                self.assertMakePasswordCalled(password, encoded, hasher_side_effect),
+            ):
+                await acheck_password(password, encoded)
+
     def test_encode_invalid_salt(self):
         hasher_classes = [
             MD5PasswordHasher,
@@ -465,6 +521,54 @@ class TestUtilsHashPass(SimpleTestCase):
                 with self.subTest(hasher_class.__name__, salt=salt):
                     with self.assertRaisesMessage(ValueError, msg):
                         hasher.encode("password", salt)
+
+    def test_password_and_salt_in_str_and_bytes(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                passwords = ["password", b"password"]
+                for password in passwords:
+                    for salt in [hasher.salt(), hasher.salt().encode()]:
+                        encoded = hasher.encode(password, salt)
+                        for password_to_verify in passwords:
+                            self.assertIs(
+                                hasher.verify(password_to_verify, encoded), True
+                            )
+
+    @skipUnless(argon2, "argon2-cffi not installed")
+    def test_password_and_salt_in_str_and_bytes_argon2(self):
+        hasher = Argon2PasswordHasher()
+        passwords = ["password", b"password"]
+        for password in passwords:
+            for salt in [hasher.salt(), hasher.salt().encode()]:
+                encoded = hasher.encode(password, salt)
+                for password_to_verify in passwords:
+                    self.assertIs(hasher.verify(password_to_verify, encoded), True)
+
+    @skipUnless(bcrypt, "bcrypt not installed")
+    def test_password_and_salt_in_str_and_bytes_bcrypt(self):
+        hasher_classes = [
+            BCryptPasswordHasher,
+            BCryptSHA256PasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                passwords = ["password", b"password"]
+                for password in passwords:
+                    salts = [hasher.salt().decode(), hasher.salt()]
+                    for salt in salts:
+                        encoded = hasher.encode(password, salt)
+                        for password_to_verify in passwords:
+                            self.assertIs(
+                                hasher.verify(password_to_verify, encoded), True
+                            )
 
     def test_encode_password_required(self):
         hasher_classes = [
@@ -650,8 +754,8 @@ class TestUtilsHashPassScrypt(SimpleTestCase):
         encoded = make_password("lètmein", "seasalt", "scrypt")
         self.assertEqual(
             encoded,
-            "scrypt$16384$seasalt$8$1$Qj3+9PPyRjSJIebHnG81TMjsqtaIGxNQG/aEB/NY"
-            "afTJ7tibgfYz71m0ldQESkXFRkdVCBhhY8mx7rQwite/Pw==",
+            "scrypt$16384$seasalt$8$5$ECMIUp+LMxMSK8xB/IVyba+KYGTI7FTnet025q/1f"
+            "/vBAVnnP3hdYqJuRi+mJn6ji6ze3Fbb7JEFPKGpuEf5vw==",
         )
         self.assertIs(is_password_usable(encoded), True)
         self.assertIs(check_password("lètmein", encoded), True)

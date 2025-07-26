@@ -331,7 +331,9 @@ class ClientTest(TestCase):
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
 
     def test_follow_relative_redirect_no_trailing_slash(self):
-        "A URL with a relative redirect with no trailing slash can be followed."
+        """
+        A URL with a relative redirect with no trailing slash can be followed.
+        """
         response = self.client.get("/accounts/no_trailing_slash", follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
@@ -681,7 +683,9 @@ class ClientTest(TestCase):
         ]
     )
     def test_view_with_inactive_force_login(self):
-        "Request a page that is protected with @login, but use an inactive login"
+        """
+        Request a page that is protected with @login, but use an inactive login
+        """
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get("/login_protected_view/")
@@ -1322,6 +1326,19 @@ class AsyncRequestFactoryTest(SimpleTestCase):
                 "X-Another-Header": "some other value",
             },
         )
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+    def test_async_request_factory_default_headers(self):
+        request_factory_with_headers = AsyncRequestFactory(
+            **{
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            }
+        )
+        request = request_factory_with_headers.get("/somewhere/")
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
         self.assertIn("HTTP_AUTHORIZATION", request.META)
         self.assertEqual(request.headers["x-another-header"], "some other value")

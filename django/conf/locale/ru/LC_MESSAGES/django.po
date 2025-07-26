@@ -19,16 +19,16 @@
 # Panasoft, 2021
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022-2023
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022-2024
 # Bobsans <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2013-2017,2019-2020,2022-2023\n"
+"2013-2017,2019-2020,2022-2024\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -365,6 +365,9 @@ msgstr "Страница не содержит результатов"
 msgid "Enter a valid value."
 msgstr "Введите правильное значение."
 
+msgid "Enter a valid domain name."
+msgstr "Введите правильное имя домена."
+
 msgid "Enter a valid URL."
 msgstr "Введите правильный URL."
 
@@ -388,14 +391,18 @@ msgstr ""
 "Значение должно состоять только из символов входящих в стандарт Юникод, "
 "цифр, символов подчёркивания или дефисов."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Введите правильный IPv4 адрес."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Введите правильный адрес %(protocol)s."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Введите действительный IPv6 адрес."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Введите действительный IPv4 или IPv6 адрес."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 или IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Введите цифры, разделенные запятыми."

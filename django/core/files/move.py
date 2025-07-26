@@ -19,8 +19,9 @@ def file_move_safe(
     """
     Move a file from one location to another in the safest way possible.
 
-    First, try ``os.rename``, which is simple but will break across filesystems.
-    If that fails, stream manually from one file to another in pure Python.
+    First, try ``os.rename``, which is simple but will break across
+    filesystems. If that fails, stream manually from one file to another in
+    pure Python.
 
     If the destination file exists and ``allow_overwrite`` is ``False``, raise
     ``FileExistsError``.
@@ -32,13 +33,12 @@ def file_move_safe(
     except OSError:
         pass
 
-    try:
-        if not allow_overwrite and os.access(new_file_name, os.F_OK):
-            raise FileExistsError(
-                "Destination file %s exists and allow_overwrite is False."
-                % new_file_name
-            )
+    if not allow_overwrite and os.access(new_file_name, os.F_OK):
+        raise FileExistsError(
+            f"Destination file {new_file_name} exists and allow_overwrite is False."
+        )
 
+    try:
         os.rename(old_file_name, new_file_name)
         return
     except OSError:
@@ -56,6 +56,7 @@ def file_move_safe(
                 | os.O_CREAT
                 | getattr(os, "O_BINARY", 0)
                 | (os.O_EXCL if not allow_overwrite else 0)
+                | os.O_TRUNC
             ),
         )
         try:
@@ -84,7 +85,7 @@ def file_move_safe(
         os.remove(old_file_name)
     except PermissionError as e:
         # Certain operating systems (Cygwin and Windows)
-        # fail when deleting opened files, ignore it.  (For the
+        # fail when deleting opened files, ignore it. (For the
         # systems where this happens, temporary files will be auto-deleted
         # on close anyway.)
         if getattr(e, "winerror", 0) != 32:

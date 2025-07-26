@@ -1,10 +1,11 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kaspars Gūtmanis, 2024
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2019,2021
 # peterisb <pb@sungis.lv>, 2016
 # Pēteris Caune, 2023
@@ -12,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Pēteris Caune, 2023\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,12 +38,22 @@ msgstr "Svarīgi datumi"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekts ar primāro atslēgu %(key)r neeksistē."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Iesniegti pretrunīgi veidlapas dati. Lūdzu mēģiniet vēlreiz."
+
 msgid "Password changed successfully."
 msgstr "Parole nomainīta sekmīgi."
+
+msgid "Password-based authentication was disabled."
+msgstr "Paroles bāzēta autentifikācija tika atspējota."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Paroles maiņa: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Iestatīt paroli: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentifikācija un autorizācija"
@@ -53,11 +64,17 @@ msgstr "parole"
 msgid "last login"
 msgstr "pēdējoreiz pieslēdzies"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
+
 msgid "No password set."
 msgstr "Nav norādīta parole"
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
+msgid "Reset password"
+msgstr "Atiestatīt paroli"
+
+msgid "Set password"
+msgstr "Iestatīt paroli"
 
 msgid "The two password fields didn’t match."
 msgstr "Paroles lauki nesakrita."
@@ -72,11 +89,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Paroles netiek glabātas brīvā tekstā, tāpēc nav iespējams apskatīt lietotāja "
-"paroli, bet jūs varat to nomainīt, izmantojot <a href=\"{}\">šo formu</a>."
+"Vai lietotājs varēs autentificēties, izmantojot paroli, vai nē. Ja "
+"atspējots, lietotāji joprojām varēs autentificēties, izmantojot citas "
+"autentifikācijas sistēmas, piemēram, vienreizējo pierakstīšanos (Single Sign-"
+"On) vai LDAP."
+
+msgid "Password-based authentication"
+msgstr "Paroles bāzēta autentifikācija"
+
+msgid "Enabled"
+msgstr "Iespējots"
+
+msgid "Disabled"
+msgstr "Atspējots"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Nešifrētas paroles netiek saglabātas, tāpēc nav iespējams apskatīt lietotāja "
+"paroli."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Iespējojiet šim lietotājam paroles balstītu autentifikāciju, iestatot paroli."
 
 #, python-format
 msgid ""
@@ -96,7 +136,7 @@ msgid "New password"
 msgstr "Jaunā parole"
 
 msgid "New password confirmation"
-msgstr "Jaunās parole vēlreiz"
+msgstr "Jaunā parole vēlreiz"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
@@ -104,9 +144,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Vecā parole"
-
-msgid "Password (again)"
-msgstr "Parole (vēlreiz)"
 
 msgid "algorithm"
 msgstr "algoritms"
@@ -231,18 +268,12 @@ msgid "users"
 msgstr "lietotāji"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmes garai."
-msgstr[1] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai.."
-msgstr[2] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmēm garai."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmes garai."
+msgstr[1] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmi garai."
+msgstr[2] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmēm garai."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

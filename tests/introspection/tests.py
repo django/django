@@ -319,10 +319,10 @@ class IntrospectionTests(TransactionTestCase):
             foreign_key=None,
         ):
             # Different backends have different values for same constraints:
-            #               PRIMARY KEY     UNIQUE CONSTRAINT    UNIQUE INDEX
-            # MySQL      pk=1 uniq=1 idx=1  pk=0 uniq=1 idx=1  pk=0 uniq=1 idx=1
-            # PostgreSQL pk=1 uniq=1 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
-            # SQLite     pk=1 uniq=0 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
+            #              PRIMARY KEY     UNIQUE CONSTRAINT    UNIQUE INDEX
+            # MySQL     pk=1 uniq=1 idx=1  pk=0 uniq=1 idx=1  pk=0 uniq=1 idx=1
+            # Postgres  pk=1 uniq=1 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
+            # SQLite    pk=1 uniq=0 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
             if details["primary_key"]:
                 details["unique"] = True
             if details["unique"]:

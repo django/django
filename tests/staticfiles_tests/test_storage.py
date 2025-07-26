@@ -101,7 +101,7 @@ class TestHashedFiles:
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.a60c0e74834f.css")
+        self.assertEqual(relpath, "cached/css/fragments.7fe344dee895.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"fonts/font.b9b105392eb8.eot?#iefix", content)
@@ -131,7 +131,8 @@ class TestHashedFiles:
 
     def test_template_tag_absolute_root(self):
         """
-        Like test_template_tag_absolute, but for a file in STATIC_ROOT (#26249).
+        Like test_template_tag_absolute, but for a file in STATIC_ROOT
+        (#26249).
         """
         relpath = self.hashed_file_path("absolute_root.css")
         self.assertEqual(relpath, "absolute_root.f821df1b64f7.css")
@@ -186,7 +187,9 @@ class TestHashedFiles:
         err = StringIO()
         with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertEqual("Post-processing 'All' failed!\n\n", err.getvalue())
+        self.assertEqual(
+            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
+        )
         self.assertPostCondition()
 
     def test_post_processing(self):
@@ -196,8 +199,8 @@ class TestHashedFiles:
         Files that are alterable should always be post-processed; files that
         aren't should be skipped.
 
-        collectstatic has already been called once in setUp() for this testcase,
-        therefore we check by verifying behavior on a second run.
+        collectstatic has already been called once in setUp() for this
+        testcase, therefore we check by verifying behavior on a second run.
         """
         collectstatic_args = {
             "interactive": False,
@@ -231,6 +234,13 @@ class TestHashedFiles:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.assertPostCondition()
+
+    def test_css_data_uri_with_nested_url(self):
+        relpath = self.hashed_file_path("cached/data_uri_with_nested_url.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'url("data:image/svg+xml,url(%23b) url(%23c)")', content)
         self.assertPostCondition()
 
     def test_css_source_map(self):
@@ -559,6 +569,20 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(manifest_hash, "")
         self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
 
+    def test_manifest_file_consistent_content(self):
+        original_manifest_content = storage.staticfiles_storage.read_manifest()
+        hashed_files = storage.staticfiles_storage.hashed_files
+        # Force a change in the order of the hashed files.
+        with mock.patch.object(
+            storage.staticfiles_storage,
+            "hashed_files",
+            dict(reversed(hashed_files.items())),
+        ):
+            storage.staticfiles_storage.save_manifest()
+        manifest_file_content = storage.staticfiles_storage.read_manifest()
+        # The manifest file content should not change.
+        self.assertEqual(original_manifest_content, manifest_file_content)
+
 
 @override_settings(
     STATIC_URL="/",
@@ -674,7 +698,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -686,6 +710,11 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
             # Creating a module object.
             b'import * as NewModule from "./module_test.477bbebe77f0.js";',
+            # Creating a minified module object.
+            b'import*as m from "./module_test.477bbebe77f0.js";',
+            b'import* as m from "./module_test.477bbebe77f0.js";',
+            b'import *as m from "./module_test.477bbebe77f0.js";',
+            b'import*  as  m from "./module_test.477bbebe77f0.js";',
             # Aliases.
             b'import { testConst as alias } from "./module_test.477bbebe77f0.js";',
             b"import {\n"
@@ -701,7 +730,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',

@@ -88,7 +88,7 @@ Argument    Value
             arguments passed to ``__init__()``)
 
 ``kwargs``  ``{'question_text': "What's new?",``
-            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)}``
+            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.UTC)}``
 ==========  ===============================================================
 
 ``post_init``
@@ -204,9 +204,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-
-    The origin of the deletion being the instance of a ``Model`` or
-    ``QuerySet`` class.
+    The ``Model`` or ``QuerySet`` instance from which the deletion originated,
+    that is, the instance whose ``delete()`` method was invoked.
 
 ``post_delete``
 ---------------
@@ -233,9 +232,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-
-    The origin of the deletion being the instance of a ``Model`` or
-    ``QuerySet`` class.
+    The ``Model`` or ``QuerySet`` instance from which the deletion originated,
+    that is, the instance whose ``delete()`` method was invoked.
 
 ``m2m_changed``
 ---------------

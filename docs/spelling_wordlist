@@ -3,14 +3,12 @@ accessor
 accessors
 Aceh
 admindocs
-affine
 affordances
 Ai
 Alchin
 allowlist
 alphanumerics
 amet
-analytics
 arccosine
 architected
 arcsine
@@ -60,7 +58,6 @@ Bokmål
 Bonham
 bookmarklet
 bookmarklets
-boolean
 booleans
 bpython
 Bronn
@@ -96,6 +93,7 @@ contenttypes
 contrib
 coroutine
 coroutines
+counterintuitive
 criticals
 cron
 crontab
@@ -113,11 +111,9 @@ Danga
 Darussalam
 databrowse
 datafile
-dataset
-datasets
 datetimes
 declaratively
-decrementing
+deconstructible
 deduplicates
 deduplication
 deepcopy
@@ -128,7 +124,6 @@ deserialize
 deserialized
 deserializer
 deserializing
-deterministically
 Deutsch
 dev
 dictConfig
@@ -162,9 +157,7 @@ esque
 Ess
 ETag
 ETags
-exe
 exfiltration
-extensibility
 fallbacks
 favicon
 fieldset
@@ -174,7 +167,6 @@ filesystems
 flatpage
 flatpages
 focusable
-fooapp
 formatter
 formatters
 formfield
@@ -207,7 +199,6 @@ hashable
 hasher
 hashers
 headerlist
-hoc
 Hoerner
 Holovaty
 Homebrew
@@ -220,7 +211,6 @@ Hypercorn
 ies
 iframe
 Igbo
-incrementing
 indexable
 ing
 ini
@@ -237,7 +227,6 @@ iterable
 iterables
 iteratively
 ize
-Jazzband
 Jinja
 jQuery
 Jupyter
@@ -280,7 +269,6 @@ manouche
 Marino
 memcache
 memcached
-mentorship
 metaclass
 metaclasses
 metre
@@ -322,6 +310,7 @@ needsinfo
 německy
 nginx
 noding
+nonces
 nonnegative
 nullable
 OAuth
@@ -335,8 +324,6 @@ orm
 Outdim
 outfile
 paginator
-parallelization
-parallelized
 parameterization
 params
 parens
@@ -358,9 +345,7 @@ pluggable
 pluralizations
 pooler
 postfix
-postgis
 postgres
-postgresql
 pragma
 pre
 precisions
@@ -373,7 +358,6 @@ prefetches
 prefetching
 preload
 preloaded
-prepend
 prepended
 prepending
 prepends
@@ -426,7 +410,6 @@ reflow
 registrable
 reimplement
 reindent
-reindex
 releaser
 releasers
 reloader
@@ -436,7 +419,6 @@ repo
 reportable
 reprojection
 reraising
-resampling
 reST
 reStructuredText
 reusability
@@ -444,7 +426,6 @@ reverter
 roadmap
 Roald
 rss
-runtime
 Sandvik
 savepoint
 savepoints
@@ -455,7 +436,6 @@ screencasts
 semimajor
 semiminor
 serializability
-serializable
 serializer
 serializers
 shapefile
@@ -464,7 +444,6 @@ sharding
 sitewide
 sliceable
 SMTP
-solaris
 Sorani
 sortable
 Spectre
@@ -530,9 +509,9 @@ titlecase
 tokenized
 toolkits
 toolset
+tooltip
 trac
 tracebacks
-transactional
 Transifex
 Tredinnick
 triager

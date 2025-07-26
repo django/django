@@ -1,0 +1,82 @@
+==========================
+Django 5.2.1 release notes
+==========================
+
+*May 7, 2025*
+
+Django 5.2.1 fixes a security issue with severity "moderate" and several bugs
+in 5.2.
+
+This release was built using an upgraded :pypi:`setuptools`, producing
+filenames compliant with :pep:`491` and :pep:`625` and thus addressing a PyPI
+warning about non-compliant distribution filenames. This change only affects
+the Django packaging process and does not impact Django's behavior.
+
+CVE-2025-32873: Denial-of-service possibility in ``strip_tags()``
+=================================================================
+
+:func:`~django.utils.html.strip_tags` would be slow to evaluate certain inputs
+containing large sequences of incomplete HTML tags. This function is used to
+implement the :tfilter:`striptags` template filter, which was thus also
+vulnerable.
+
+:func:`~django.utils.html.strip_tags` now raises a :exc:`.SuspiciousOperation`
+exception if it encounters an unusually large number of unclosed opening tags.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2 that caused a crash when annotating
+  aggregate expressions over query that uses explicit grouping by transforms
+  followed by field references (:ticket:`36292`).
+
+* Fixed a regression in Django 5.2 that caused unnecessary queries when
+  prefetching nullable foreign key relationships (:ticket:`36290`).
+
+* Fixed a regression in Django 5.2 that caused a crash of
+  ``QuerySet.bulk_create()`` with nullable geometry fields on PostGIS
+  (:ticket:`36289`).
+
+* Fixed a regression in Django 5.2 that caused fields to be incorrectly
+  selected when using ``QuerySet.alias()`` after ``values()``
+  (:ticket:`36299`).
+
+* Fixed a data corruption possibility in ``file_move_safe()`` when
+  ``allow_overwrite=True``, where leftover content from a previously larger
+  file could remain after overwriting with a smaller one due to lack of
+  truncation (:ticket:`36298`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using
+  ``QuerySet.select_for_update(of=(…))`` with ``values()/values_list()``
+  including expressions (:ticket:`36301`).
+
+* Fixed a regression in Django 5.2 that caused improper values to be returned
+  from ``QuerySet.values_list()`` when duplicate field names were specified
+  (:ticket:`36288`).
+
+* Fixed a regression in Django 5.2 where the password validation error message
+  from ``MinimumLengthValidator`` was not translated when using non-English
+  locales (:ticket:`36314`).
+
+* Fixed a regression in Django 5.2 that caused the ``object-tools`` block to be
+  rendered twice when using custom admin templates with overridden blocks due
+  to changes in the base admin page block structure (:ticket:`36331`).
+
+* Fixed a regression in Django 5.2, introduced when fixing :cve:`2025-26699`,
+  where the :tfilter:`wordwrap` template filter did not preserve empty lines
+  between paragraphs after wrapping text (:ticket:`36341`).
+
+* Fixed a regression in Django 5.2 that caused a crash when serializing email
+  alternatives or attachments due to named tuple mismatches (:ticket:`36309`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using ``update()``
+  on a ``QuerySet`` filtered against a related model and including references
+  to annotations through ``values()`` (:ticket:`36360`).
+
+* Fixed a bug in Django 5.2 that caused composite primary key introspection to
+  wrongly identify ``IntegerField`` as ``AutoField`` on SQLite
+  (:ticket:`36358`).
+
+* Fixed a bug in Django 5.2 that caused a redundant ``unique_together``
+  constraint to be generated for composite primary keys when using
+  :djadmin:`inspectdb` (:ticket:`36357`).

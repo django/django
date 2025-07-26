@@ -23,9 +23,17 @@ class GrandChild(models.Model):
     parent = models.ForeignKey(Child, models.SET_NULL, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
 
+    def __str__(self):
+        return self.name
+
+    def __html__(self):
+        return f'<h2 class="main">{self.name}</h2>'
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=20)
+    file = models.FileField(upload_to="documents/", blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
 
 
 class Band(models.Model):

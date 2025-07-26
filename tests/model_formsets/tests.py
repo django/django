@@ -104,8 +104,8 @@ class DeletionTests(TestCase):
 
     def test_change_form_deletion_when_invalid(self):
         """
-        Make sure that a change form that is filled out, but marked for deletion
-        doesn't cause validation errors.
+        Make sure that a change form that is filled out, but marked for
+        deletion doesn't cause validation errors.
         """
         PoetFormSet = modelformset_factory(Poet, fields="__all__", can_delete=True)
         poet = Poet.objects.create(name="test")
@@ -763,7 +763,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inline_formsets_save_as_new(self):
         # The save_as_new parameter lets you re-associate the data to a new
-        # instance.  This is used in the admin for save_as functionality.
+        # instance. This is used in the admin for save_as functionality.
         AuthorBooksFormSet = inlineformset_factory(
             Author, Book, can_delete=False, extra=2, fields="__all__"
         )
@@ -1160,7 +1160,7 @@ class ModelFormsetTest(TestCase):
             'maxlength="100"></p>',
         )
 
-        # Custom primary keys with ForeignKey, OneToOneField and AutoField ############
+        # Custom primary keys with ForeignKey, OneToOneField and AutoField.
 
         place = Place.objects.create(pk=1, name="Giordanos", city="Chicago")
 
@@ -1538,8 +1538,8 @@ class ModelFormsetTest(TestCase):
             ],
         )
 
-        # unique_together with inlineformset_factory with overridden form fields
-        # Also see #9494
+        # unique_together with inlineformset_factory with overridden form
+        # fields Also see #9494
 
         FormSet = inlineformset_factory(
             Repository, Revision, fields=("revision",), extra=1
@@ -1564,9 +1564,10 @@ class ModelFormsetTest(TestCase):
         )
         formset = FormSet(instance=person)
 
-        # Django will render a hidden field for model fields that have a callable
-        # default. This is required to ensure the value is tested for change correctly
-        # when determine what extra forms have changed to save.
+        # Django will render a hidden field for model fields that have a
+        # callable default. This is required to ensure the value is tested for
+        # change correctly when determine what extra forms have changed to
+        # save.
 
         self.assertEqual(len(formset.forms), 1)  # this formset only has one form
         form = formset.forms[0]
@@ -1594,7 +1595,8 @@ class ModelFormsetTest(TestCase):
             'id="id_membership_set-0-id"></p>' % person.id,
         )
 
-        # test for validation with callable defaults. Validations rely on hidden fields
+        # test for validation with callable defaults. Validations rely on
+        # hidden fields
 
         data = {
             "membership_set-TOTAL_FORMS": "1",
@@ -1703,9 +1705,33 @@ class ModelFormsetTest(TestCase):
             [{}, {"__all__": ["Please correct the duplicate values below."]}, {}],
         )
 
+    def test_inlineformset_with_jsonfield(self):
+        class BookForm(forms.ModelForm):
+            title = forms.JSONField()
+
+            class Meta:
+                model = Book
+                fields = ("title",)
+
+        BookFormSet = inlineformset_factory(Author, Book, form=BookForm)
+        data = {
+            "book_set-TOTAL_FORMS": "3",
+            "book_set-INITIAL_FORMS": "0",
+            "book_set-MAX_NUM_FORMS": "",
+            "book_set-0-title": {"test1": "test2"},
+            "book_set-1-title": {"test1": "test2"},
+            "book_set-2-title": {"test3": "test4"},
+        }
+        author = Author.objects.create(name="test")
+        formset = BookFormSet(data, instance=author)
+        self.assertEqual(
+            formset.errors,
+            [{}, {"__all__": ["Please correct the duplicate values below."]}, {}],
+        )
+
     def test_model_formset_with_custom_pk(self):
-        # a formset for a Model that has a custom primary key that still needs to be
-        # added to the formset automatically
+        # a formset for a Model that has a custom primary key that still needs
+        # to be added to the formset automatically
         FormSet = modelformset_factory(
             ClassyMexicanRestaurant, fields=["tacos_are_yummy"]
         )

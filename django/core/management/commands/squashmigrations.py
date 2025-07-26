@@ -5,12 +5,11 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import run_formatters
-from django.db import DEFAULT_DB_ALIAS, connections, migrations
+from django.db import migrations
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
-from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
@@ -75,7 +74,7 @@ class Command(BaseCommand):
             raise CommandError(str(err))
         # Load the current graph state, check the app and migration they asked
         # for exists.
-        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
+        loader = MigrationLoader(None)
         if app_label not in loader.migrated_apps:
             raise CommandError(
                 "App '%s' does not have migrations (so squashmigrations on "
@@ -123,7 +122,7 @@ class Command(BaseCommand):
             if self.interactive:
                 answer = None
                 while not answer or answer not in "yn":
-                    answer = input("Do you wish to proceed? [yN] ")
+                    answer = input("Do you wish to proceed? [y/N] ")
                     if not answer:
                         answer = "n"
                         break
@@ -141,12 +140,6 @@ class Command(BaseCommand):
         # as it may be 0002 depending on 0001
         first_migration = True
         for smigration in migrations_to_squash:
-            if smigration.replaces:
-                raise CommandError(
-                    "You cannot squash squashed migrations! Please transition it to a "
-                    "normal migration first: https://docs.djangoproject.com/en/%s/"
-                    "topics/migrations/#squashing-migrations" % get_docs_version()
-                )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
                 if isinstance(dependency, SwappableTuple):
@@ -180,14 +173,7 @@ class Command(BaseCommand):
                         % (len(operations), len(new_operations))
                     )
 
-        # Work out the value of replaces (any squashed ones we're re-squashing)
-        # need to feed their replaces into ours
-        replaces = []
-        for migration in migrations_to_squash:
-            if migration.replaces:
-                replaces.extend(migration.replaces)
-            else:
-                replaces.append((migration.app_label, migration.name))
+        replaces = [(m.app_label, m.name) for m in migrations_to_squash]
 
         # Make a new migration with those operations
         subclass = type(
@@ -221,7 +207,7 @@ class Command(BaseCommand):
             )
         with open(writer.path, "w", encoding="utf-8") as fh:
             fh.write(writer.as_string())
-        run_formatters([writer.path])
+        run_formatters([writer.path], stderr=self.stderr)
 
         if self.verbosity > 0:
             self.stdout.write(

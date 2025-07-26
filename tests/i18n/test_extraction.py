@@ -6,7 +6,7 @@ import time
 import warnings
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf, skipUnless
+from unittest import mock, skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -25,10 +25,6 @@ from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
 
 LOCALE = "de"
 has_xgettext = find_command("xgettext")
-gettext_version = MakeMessagesCommand().gettext_version if has_xgettext else None
-requires_gettext_019 = skipIf(
-    has_xgettext and gettext_version < (0, 19), "gettext 0.19 required"
-)
 
 
 @skipUnless(has_xgettext, "xgettext is mandatory for extraction tests")
@@ -105,7 +101,8 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         r"""
-        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
+        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB',
+        'foo.py')
 
         verifies that the django.po file has a gettext-style location comment
         of the form
@@ -182,6 +179,15 @@ class BasicExtractorTests(ExtractorTests):
         self.assertNotIn("invalid locale en_GB", out.getvalue())
         self.assertIn("processing locale en_GB", out.getvalue())
         self.assertIs(Path("locale/en_GB/LC_MESSAGES/django.po").exists(), True)
+
+    def test_valid_locale_with_numeric_region_code(self):
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["ar_002"], stdout=out, verbosity=1
+        )
+        self.assertNotIn("invalid locale ar_002", out.getvalue())
+        self.assertIn("processing locale ar_002", out.getvalue())
+        self.assertIs(Path("locale/ar_002/LC_MESSAGES/django.po").exists(), True)
 
     def test_valid_locale_tachelhit_latin_morocco(self):
         out = StringIO()
@@ -363,7 +369,9 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command("makemessages", locale=[LOCALE], verbosity=0)
 
     def test_extraction_warning(self):
-        """test xgettext warning about multiple bare interpolation placeholders"""
+        """
+        test xgettext warning about multiple bare interpolation placeholders
+        """
         shutil.copyfile("./code.sample", "./code_sample.py")
         out = StringIO()
         management.call_command("makemessages", locale=[LOCALE], stdout=out)
@@ -433,7 +441,9 @@ class BasicExtractorTests(ExtractorTests):
             )
 
     def test_template_comments(self):
-        """Template comment tags on the same line of other constructs (#19552)"""
+        """
+        Template comment tags on the same line of other constructs (#19552)
+        """
         # Test detection/end user reporting of old, incorrect templates
         # translator comments syntax
         with warnings.catch_warnings(record=True) as ws:
@@ -651,7 +661,8 @@ class JavaScriptExtractorTests(ExtractorTests):
 
     def test_i18n_catalog_not_ignored_when_not_invoked_for_django(self):
         # Create target file so it exists in the filesystem but is NOT ignored.
-        # "invoked_for_django" is False when "conf/locale" folder does not exist.
+        # "invoked_for_django" is False when "conf/locale" folder does not
+        # exist.
         self.assertIs(os.path.exists(os.path.join("conf", "locale")), False)
         i18n_catalog_js = os.path.join("views", "templates", "i18n_catalog.js")
         os.makedirs(os.path.dirname(i18n_catalog_js))
@@ -752,9 +763,9 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
 
     def test_translate_and_plural_blocktranslate_collision(self):
         """
-        Ensures a correct workaround for the gettext bug when handling a literal
-        found inside a {% translate %} tag and also in another file inside a
-        {% blocktranslate %} with a plural (#17375).
+        Ensures a correct workaround for the gettext bug when handling a
+        literal found inside a {% translate %} tag and also in another file
+        inside a {% blocktranslate %} with a plural (#17375).
         """
         management.call_command(
             "makemessages", locale=[LOCALE], extensions=["html", "djtpl"], verbosity=0
@@ -805,7 +816,9 @@ class NoWrapExtractorTests(ExtractorTests):
 
 class LocationCommentsTests(ExtractorTests):
     def test_no_location_enabled(self):
-        """Behavior is correct if --no-location switch is specified. See #16903."""
+        """
+        Behavior is correct if --no-location switch is specified. See #16903.
+        """
         management.call_command(
             "makemessages", locale=[LOCALE], verbosity=0, no_location=True
         )
@@ -818,7 +831,8 @@ class LocationCommentsTests(ExtractorTests):
             "makemessages", locale=[LOCALE], verbosity=0, no_location=False
         )
         self.assertTrue(os.path.exists(self.PO_FILE))
-        # #16903 -- Standard comment with source file relative path should be present
+        # #16903 -- Standard comment with source file relative path should be
+        # present
         self.assertLocationCommentPresent(
             self.PO_FILE, "Translatable literal #6b", "templates", "test.html"
         )
@@ -836,7 +850,6 @@ class LocationCommentsTests(ExtractorTests):
         self.assertLocationCommentNotPresent(self.PO_FILE, None, ".html.py")
         self.assertLocationCommentPresent(self.PO_FILE, 5, "templates", "test.html")
 
-    @requires_gettext_019
     def test_add_location_full(self):
         """makemessages --add-location=full"""
         management.call_command(
@@ -848,7 +861,6 @@ class LocationCommentsTests(ExtractorTests):
             self.PO_FILE, "Translatable literal #6b", "templates", "test.html"
         )
 
-    @requires_gettext_019
     def test_add_location_file(self):
         """makemessages --add-location=file"""
         management.call_command(
@@ -862,7 +874,6 @@ class LocationCommentsTests(ExtractorTests):
             self.PO_FILE, "Translatable literal #6b", "templates", "test.html"
         )
 
-    @requires_gettext_019
     def test_add_location_never(self):
         """makemessages --add-location=never"""
         management.call_command(
@@ -870,24 +881,6 @@ class LocationCommentsTests(ExtractorTests):
         )
         self.assertTrue(os.path.exists(self.PO_FILE))
         self.assertLocationCommentNotPresent(self.PO_FILE, None, "test.html")
-
-    @mock.patch(
-        "django.core.management.commands.makemessages.Command.gettext_version",
-        new=(0, 18, 99),
-    )
-    def test_add_location_gettext_version_check(self):
-        """
-        CommandError is raised when using makemessages --add-location with
-        gettext < 0.19.
-        """
-        msg = (
-            "The --add-location option requires gettext 0.19 or later. You have "
-            "0.18.99."
-        )
-        with self.assertRaisesMessage(CommandError, msg):
-            management.call_command(
-                "makemessages", locale=[LOCALE], verbosity=0, add_location="full"
-            )
 
 
 class NoObsoleteExtractorTests(ExtractorTests):
@@ -958,7 +951,8 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
 
     def _set_times_for_all_po_files(self):
         """
-        Set access and modification times to the Unix epoch time for all the .po files.
+        Set access and modification times to the Unix epoch time for all the
+        .po files.
         """
         for locale in self.LOCALES:
             os.utime(self.PO_FILE % locale, (0, 0))
@@ -1026,7 +1020,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def _test_project_locale_paths(self, locale_path):
         """
-        * translations for an app containing a locale folder are stored in that folder
+        * translations for an app containing a locale folder are stored in that
+          folder
         * translations outside of that app are in LOCALE_PATHS[0]
         """
         with override_settings(LOCALE_PATHS=[locale_path]):

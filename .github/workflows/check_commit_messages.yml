@@ -1,0 +1,61 @@
+name: Check commit prefix
+
+on:
+  pull_request:
+    types: [edited, opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-commit-prefix:
+    if: startsWith(github.event.pull_request.base.ref, 'stable/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Calculate commit prefix
+        id: vars
+        run: |
+          BASE="${{ github.event.pull_request.base.ref }}"
+          echo "BASE=$BASE" >> $GITHUB_ENV
+          VERSION="${BASE#stable/}"
+          echo "prefix=[$VERSION]" >> $GITHUB_OUTPUT
+
+      - name: Check PR title prefix
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          PREFIX="${{ steps.vars.outputs.prefix }}"
+          if [[ "$TITLE" != "$PREFIX"* ]]; then
+            echo "❌ PR title must start with the required prefix: $PREFIX"
+            exit 1
+          fi
+          echo "✅ PR title has the required prefix."
+
+      - name: Fetch relevant branches
+        run: |
+          git fetch origin $BASE:base
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
+
+      - name: Check commit messages prefix
+        run: |
+          PREFIX="${{ steps.vars.outputs.prefix }}"
+          COMMITS=$(git rev-list base..pr)
+          echo "Checking commit messages for required prefix: $PREFIX"
+          FAIL=0
+          for SHA in $COMMITS; do
+            MSG=$(git log -1 --pretty=%s $SHA)
+            echo "Checking commit $SHA: $MSG"
+            if [[ "$MSG" != "$PREFIX"* ]]; then
+              echo "❌ Commit $SHA must start with the required prefix: $PREFIX"
+              FAIL=1
+            fi
+          done
+
+          if [[ $FAIL -eq 1 ]]; then
+            echo "One or more commit messages are missing the required prefix."
+            exit 1
+          fi
+
+          echo "✅ All commits have the required prefix."

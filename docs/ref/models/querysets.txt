@@ -135,8 +135,8 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of ``QuerySets`` are only valid for the version of Django that
-    was used to generate them. If you generate a pickle using Django
+    Pickles of ``QuerySet`` objects are only valid for the version of Django
+    that was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
@@ -258,10 +258,14 @@ you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
-expressions </ref/models/expressions>`. An expression may be a simple value, a
-reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc.) that has been computed over the objects that
-are related to the objects in the ``QuerySet``.
+expressions </ref/models/expressions>` or :class:`~django.db.models.Q` objects.
+Each object can be annotated with:
+
+* a simple value,  via ``Value()``;
+* a reference to a field on the model (or any related models), via ``F()``;
+* a boolean, via ``Q()``; or
+* a result from an aggregate expression (averages, sums, etc.) computed over
+  the objects that are related to the objects in the ``QuerySet``.
 
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
@@ -745,6 +749,11 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values()`` was updated to
+    respect the order of the specified ``*fields`` and ``**expressions``.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -834,6 +843,11 @@ not having any author:
     ``values_list()`` will return ``True``, ``False``, and ``None`` instead of
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
+
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values_list()`` was updated to
+    respect the order of the specified ``*fields``.
 
 ``dates()``
 ~~~~~~~~~~~
@@ -1160,12 +1174,6 @@ supports prefetching of
 queryset for each ``ContentType`` must be provided in the ``querysets``
 parameter of :class:`~django.contrib.contenttypes.prefetch.GenericPrefetch`.
 
-.. versionchanged:: 5.0
-
-    Support for prefetching
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
-    non-homogeneous set of results was added.
-
 For example, suppose you have these models::
 
     from django.db import models
@@ -1209,8 +1217,8 @@ the items, it will find them in a prefetched ``QuerySet`` cache that was
 populated in a single query.
 
 That is, all the relevant toppings will have been fetched in a single query,
-and used to make ``QuerySets`` that have a pre-filled cache of the relevant
-results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+and used to make ``QuerySet`` instances that have a pre-filled cache of the
+relevant results; these are then used in the ``self.toppings.all()`` calls.
 
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
@@ -1234,16 +1242,16 @@ function.
 
 Note that the result cache of the primary ``QuerySet`` and all specified related
 objects will then be fully loaded into memory. This changes the typical
-behavior of ``QuerySets``, which normally try to avoid loading all objects into
-memory before they are needed, even after a query has been executed in the
+behavior of a ``QuerySet``, which normally tries to avoid loading all objects
+into memory before they are needed, even after a query has been executed in the
 database.
 
 .. note::
 
-    Remember that, as always with ``QuerySets``, any subsequent chained methods
-    which imply a different database query will ignore previously cached
-    results, and retrieve data using a fresh database query. So, if you write
-    the following:
+    Remember that, as always with ``QuerySet`` objects, any subsequent chained
+    methods which imply a different database query will ignore previously
+    cached results, and retrieve data using a fresh database query. So, if you
+    write the following:
 
     .. code-block:: pycon
 
@@ -1595,9 +1603,7 @@ of the arguments is required, but you should use at least one of them.
       FROM blog_blog;
 
   Note that the parentheses required by most database engines around
-  subqueries are not required in Django's ``select`` clauses. Also note
-  that some database backends, such as some MySQL versions, don't support
-  subqueries.
+  subqueries are not required in Django's ``select`` clauses.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
@@ -2114,13 +2120,6 @@ SQL equivalent:
             2
         )
 
-   .. versionchanged:: 5.0
-
-        In older versions, on databases without native support for the SQL
-        ``XOR`` operator, ``XOR`` returned rows that were matched by exactly
-        one operand. The previous behavior was not consistent with MySQL,
-        MariaDB, and Python behavior.
-
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
 
@@ -2338,9 +2337,9 @@ whenever a request to a page has a side effect on your data. For more, see
       # Raises IntegrityError
 
   This is happening because it's trying to get or create "Chapter 1" through the
-  book "Ulysses", but it can't do any of them: the relation can't fetch that
-  chapter because it isn't related to that book, but it can't create it either
-  because ``title`` field should be unique.
+  book "Ulysses", but it can't do either: the relation can't fetch that chapter
+  because it isn't related to that book, but it can't create it either because
+  ``title`` field should be unique.
 
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -2402,10 +2401,6 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
-.. versionchanged:: 5.0
-
-    The ``create_defaults`` argument was added.
-
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
@@ -2432,10 +2427,11 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField` and
-  ``ignore_conflicts`` is False, the primary key attribute can only be
-  retrieved on certain databases (currently PostgreSQL, MariaDB, and SQLite
-  3.35+). On other databases, it will not be set.
+* If the model's primary key is an :class:`~django.db.models.AutoField` or has
+  a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
+  is ``False``, the primary key attribute can only be retrieved on certain
+  databases (currently PostgreSQL, MariaDB, and SQLite 3.35+). On other
+  databases, it will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -2469,11 +2465,6 @@ be in conflict must be provided.
 
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
-
-.. versionchanged:: 5.0
-
-    In older versions, enabling the ``update_conflicts`` parameter prevented
-    setting the primary key on each model instance.
 
 .. warning::
 
@@ -2628,11 +2619,6 @@ evaluated will force it to evaluate again, repeating the query.
 ``iterator()`` is compatible with previous calls to ``prefetch_related()`` as
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
-
-.. versionchanged:: 5.0
-
-    Support for ``aiterator()`` with previous calls to ``prefetch_related()``
-    was added.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -2819,16 +2805,16 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> Blog.objects.aggregate(Count("entry"))
-    {'entry__count': 16}
+    >>> Blog.objects.aggregate(Count("entry__authors"))
+    {'entry__authors__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
 control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> Blog.objects.aggregate(number_of_entries=Count("entry"))
-    {'number_of_entries': 16}
+    >>> Blog.objects.aggregate(number_of_authors=Count("entry__authors"))
+    {'number_of_authors': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
@@ -2974,6 +2960,14 @@ loading the model object into memory. For example, instead of doing this::
 Using ``update()`` also prevents a race condition wherein something might
 change in your database in the short period of time between loading the object
 and calling ``save()``.
+
+.. admonition:: MySQL does not support self-select updates
+
+    On MySQL, ``QuerySet.update()`` may execute a ``SELECT`` followed by an
+    ``UPDATE`` instead of a single ``UPDATE`` when filtering on related tables,
+    which can introduce a race condition if concurrent changes occur between
+    the queries. To ensure atomicity, consider using transactions or avoiding
+    such filter conditions on MySQL.
 
 Finally, realize that ``update()`` does an update at the SQL level and, thus,
 does not call any ``save()`` methods on your models, nor does it emit the
@@ -3125,9 +3119,10 @@ adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
 
-.. versionchanged:: 5.1
+.. versionchanged:: 5.2
 
-    Support for the ``generic_plan`` option on PostgreSQL 16+ was added.
+    Support for the ``memory`` and ``serialize`` options on PostgreSQL 17+ was
+    added.
 
 .. _field-lookups:
 
@@ -3948,6 +3943,60 @@ when the queryset (or grouping) contains no entries.
 Keyword arguments that can provide extra context for the SQL generated
 by the aggregate.
 
+``AnyValue``
+~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. class:: AnyValue(expression, output_field=None, filter=None, default=None, **extra)
+
+    Returns an arbitrary value from the non-null input values.
+
+    * Default alias: ``<field>__anyvalue``
+    * Return type: same as input field, or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
+
+    Usage example:
+
+    .. code-block:: pycon
+
+        >>> # Get average rating for each year along with a sample headline
+        >>> # from that year.
+        >>> from django.db.models import AnyValue, Avg, F, Q
+        >>> sample_headline = AnyValue("headline")
+        >>> Entry.objects.values(
+        ...     pub_year=F("pub_date__year"),
+        ... ).annotate(
+        ...     avg_rating=Avg("rating"),
+        ...     sample_headline=sample_headline,
+        ... )
+
+        >>> # Get a sample headline from each year with rating greater than 4.5.
+        >>> sample_headline = AnyValue(
+        ...     "headline",
+        ...     filter=Q(rating__gt=4.5),
+        ... )
+        >>> Entry.objects.values(
+        ...     pub_year=F("pub_date__year"),
+        ... ).annotate(
+        ...     avg_rating=Avg("rating"),
+        ...     sample_headline=sample_headline,
+        ... )
+
+    Supported on SQLite, MySQL, Oracle, and PostgreSQL 16+.
+
+    .. admonition:: MySQL with ``ONLY_FULL_GROUP_BY`` enabled
+
+        When the ``ONLY_FULL_GROUP_BY`` SQL mode is enabled on MySQL it may be
+        necessary to use ``AnyValue`` if an aggregation includes a mix of
+        aggregate and non-aggregate functions. Using ``AnyValue`` allows the
+        non-aggregate function to be referenced in the select list when
+        database cannot determine that it is functionally dependent on the
+        columns in the `group by`_ clause. See the :ref:`aggregation
+        documentation <aggregation-mysql-only-full-group-by>` for more details.
+
+        .. _group by: https://dev.mysql.com/doc/refman/8.4/en/group-by-handling.html
+
 ``Avg``
 ~~~~~~~
 
@@ -4064,6 +4113,25 @@ by the aggregate.
         However, if ``sample=True``, the return value will be the sample
         variance.
 
+``StringAgg``
+~~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
+
+    Returns the input values concatenated into a string, separated by the
+    ``delimiter`` string, or ``default`` if there are no values.
+
+    * Default alias: ``<field>__stringagg``
+    * Return type: ``string`` or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
+
+    .. attribute:: delimiter
+
+        A ``Value`` or expression representing the string that should separate
+        each of the values. For example, ``Value(",")``.
+
 Query-related tools
 ===================
 
@@ -4078,9 +4146,10 @@ elsewhere.
 A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
 :class:`F() <django.db.models.F>` object represents the value of a model field
-or annotation. They make it possible to define and reuse conditions, and
-combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
-(``XOR``). See :ref:`complex-lookups-with-q`.
+or annotation. They make it possible to define and reuse conditions. These can
+be negated using the ``~`` (``NOT``) operator, and combined using operators
+such as ``|`` (``OR``), ``&`` (``AND``), and ``^`` (``XOR``). See
+:ref:`complex-lookups-with-q`.
 
 ``Prefetch()`` objects
 ----------------------
@@ -4160,10 +4229,6 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.
-
-.. versionchanged:: 5.0
-
-    ``aprefetch_related_objects()`` function was added.
 
 ``FilteredRelation()`` objects
 ------------------------------

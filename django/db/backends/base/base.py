@@ -150,7 +150,7 @@ class BaseDatabaseWrapper:
         if not settings.USE_TZ:
             return None
         elif self.settings_dict["TIME_ZONE"] is None:
-            return datetime.timezone.utc
+            return datetime.UTC
         else:
             return zoneinfo.ZoneInfo(self.settings_dict["TIME_ZONE"])
 
@@ -175,7 +175,8 @@ class BaseDatabaseWrapper:
         if len(self.queries_log) == self.queries_log.maxlen:
             warnings.warn(
                 "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen)
+                "will be returned.".format(self.queries_log.maxlen),
+                stacklevel=2,
             )
         return list(self.queries_log)
 
@@ -220,7 +221,6 @@ class BaseDatabaseWrapper:
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
-        global RAN_DB_VERSION_CHECK
         if self.alias not in RAN_DB_VERSION_CHECK:
             self.check_database_version_supported()
             RAN_DB_VERSION_CHECK.add(self.alias)
@@ -595,8 +595,8 @@ class BaseDatabaseWrapper:
         """
         if self.connection is not None:
             self.health_check_done = False
-            # If the application didn't restore the original autocommit setting,
-            # don't take chances, drop the connection.
+            # If the application didn't restore the original autocommit
+            # setting, don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
                 self.close()
                 return

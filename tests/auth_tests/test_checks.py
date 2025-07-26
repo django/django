@@ -1,5 +1,14 @@
-from django.contrib.auth.checks import check_models_permissions, check_user_model
+from django.contrib.auth.checks import (
+    check_middleware,
+    check_models_permissions,
+    check_user_model,
+)
+from django.contrib.auth.middleware import (
+    AuthenticationMiddleware,
+    LoginRequiredMiddleware,
+)
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import checks
 from django.db import models
 from django.db.models import Q, UniqueConstraint
@@ -345,3 +354,102 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
                 default_permissions = ()
 
         self.assertEqual(checks.run_checks(self.apps.get_app_configs()), [])
+
+
+class LoginRequiredMiddlewareSubclass(LoginRequiredMiddleware):
+    redirect_field_name = "redirect_to"
+
+
+class AuthenticationMiddlewareSubclass(AuthenticationMiddleware):
+    pass
+
+
+class SessionMiddlewareSubclass(SessionMiddleware):
+    pass
+
+
+@override_system_checks([check_middleware])
+class MiddlewareChecksTests(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=[
+            "auth_tests.test_checks.SessionMiddlewareSubclass",
+            "auth_tests.test_checks.AuthenticationMiddlewareSubclass",
+            "auth_tests.test_checks.LoginRequiredMiddlewareSubclass",
+        ]
+    )
+    def test_middleware_subclasses(self):
+        errors = checks.run_checks()
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        MIDDLEWARE=[
+            "auth_tests.test_checks",
+            "auth_tests.test_checks.NotExist",
+        ]
+    )
+    def test_invalid_middleware_skipped(self):
+        errors = checks.run_checks()
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.does.not.Exist",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        ]
+    )
+    def test_check_ignores_import_error_in_middleware(self):
+        errors = checks.run_checks()
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        ]
+    )
+    def test_correct_order_with_login_required_middleware(self):
+        errors = checks.run_checks()
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.auth.middleware.LoginRequiredMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+        ]
+    )
+    def test_incorrect_order_with_login_required_middleware(self):
+        errors = checks.run_checks()
+        self.assertEqual(
+            errors,
+            [
+                checks.Error(
+                    "In order to use django.contrib.auth.middleware."
+                    "LoginRequiredMiddleware, django.contrib.auth.middleware."
+                    "AuthenticationMiddleware must be defined before it in MIDDLEWARE.",
+                    id="auth.E013",
+                )
+            ],
+        )
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        ]
+    )
+    def test_missing_authentication_with_login_required_middleware(self):
+        errors = checks.run_checks()
+        self.assertEqual(
+            errors,
+            [
+                checks.Error(
+                    "In order to use django.contrib.auth.middleware."
+                    "LoginRequiredMiddleware, django.contrib.auth.middleware."
+                    "AuthenticationMiddleware must be defined before it in MIDDLEWARE.",
+                    id="auth.E013",
+                )
+            ],
+        )

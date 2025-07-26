@@ -456,8 +456,6 @@ the session cookie settings:
 Testing
 =======
 
-.. versionadded:: 5.0
-
 This module offers a tailored test assertion method, for testing messages
 attached to an :class:`~.HttpResponse`.
 

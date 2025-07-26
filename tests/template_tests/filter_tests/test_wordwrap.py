@@ -78,3 +78,55 @@ class FunctionTests(SimpleTestCase):
             "this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\n"
             "I'm afraid",
         )
+
+    def test_wrap_long_text(self):
+        long_text = (
+            "this is a long paragraph of text that really needs"
+            " to be wrapped I'm afraid " * 20_000
+        )
+        self.assertIn(
+            "this is a\nlong\nparagraph\nof text\nthat\nreally\nneeds to\nbe wrapped\n"
+            "I'm afraid",
+            wordwrap(long_text, 10),
+        )
+
+    def test_wrap_preserve_newlines(self):
+        cases = [
+            (
+                "this is a long paragraph of text that really needs to be wrapped\n\n"
+                "that is followed by another paragraph separated by an empty line\n",
+                "this is a long paragraph of\ntext that really needs to be\nwrapped\n\n"
+                "that is followed by another\nparagraph separated by an\nempty line\n",
+                30,
+            ),
+            ("\n\n\n", "\n\n\n", 5),
+            ("\n\n\n\n\n\n", "\n\n\n\n\n\n", 5),
+        ]
+        for text, expected, width in cases:
+            with self.subTest(text=text):
+                self.assertEqual(wordwrap(text, width), expected)
+
+    def test_wrap_preserve_whitespace(self):
+        width = 5
+        width_spaces = " " * width
+        cases = [
+            (
+                f"first line\n{width_spaces}\nsecond line",
+                f"first\nline\n{width_spaces}\nsecond\nline",
+            ),
+            (
+                "first line\n \t\t\t \nsecond line",
+                "first\nline\n \t\t\t \nsecond\nline",
+            ),
+            (
+                f"first line\n{width_spaces}\nsecond line\n\nthird{width_spaces}\n",
+                f"first\nline\n{width_spaces}\nsecond\nline\n\nthird\n",
+            ),
+            (
+                f"first line\n{width_spaces}{width_spaces}\nsecond line",
+                f"first\nline\n{width_spaces}{width_spaces}\nsecond\nline",
+            ),
+        ]
+        for text, expected in cases:
+            with self.subTest(text=text):
+                self.assertEqual(wordwrap(text, width), expected)

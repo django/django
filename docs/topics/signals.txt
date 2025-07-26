@@ -107,10 +107,6 @@ Signals can be sent either synchronously or asynchronously, and receivers will
 automatically be adapted to the correct call-style. See :ref:`sending signals
 <sending-signals>` for more information.
 
-.. versionchanged:: 5.0
-
-    Support for asynchronous receivers was added.
-
 .. _connecting-receiver-functions:
 
 Connecting receiver functions
@@ -307,7 +303,7 @@ error instance is returned in the tuple pair for the receiver that raised the er
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
 
-``asend()`` is similar as ``send()``, but it is coroutine that must be
+``asend()`` is similar to ``send()``, but it is a coroutine that must be
 awaited::
 
     async def asend_pizza(self, toppings, size):
@@ -318,7 +314,7 @@ Whether synchronous or asynchronous, receivers will be correctly adapted to
 whether ``send()`` or ``asend()`` is used. Synchronous receivers will be
 called using :func:`~.sync_to_async` when invoked via ``asend()``. Asynchronous
 receivers will be called using :func:`~.async_to_sync` when invoked via
-``sync()``. Similar to the :ref:`case for middleware <async_performance>`,
+``send()``. Similar to the :ref:`case for middleware <async_performance>`,
 there is a small performance cost to adapting receivers in this way. Note that
 in order to reduce the number of sync/async calling-style switches within a
 ``send()`` or ``asend()`` call, the receivers are grouped by whether or not
@@ -329,10 +325,6 @@ receiver. In addition, async receivers are executed concurrently using
 
 All built-in signals, except those in the async request-response cycle, are
 dispatched using :meth:`Signal.send`.
-
-.. versionchanged:: 5.0
-
-    Support for asynchronous signals was added.
 
 Disconnecting signals
 =====================

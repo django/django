@@ -57,7 +57,7 @@ from enum import Enum
 
 from django.template.context import BaseContext
 from django.utils.formats import localize
-from django.utils.html import conditional_escape, escape
+from django.utils.html import conditional_escape
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
@@ -199,6 +199,14 @@ class Template:
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
+            if (
+                isinstance(e, TemplateSyntaxError)
+                and self.origin.name != UNKNOWN_SOURCE
+                and e.args
+            ):
+                raw_message = e.args[0]
+                e.raw_error_message = raw_message
+                e.args = (f"Template: {self.origin.name}, {raw_message}", *e.args[1:])
             raise
 
     def get_exception_info(self, exception, token):
@@ -247,10 +255,10 @@ class Template:
         for num, next in enumerate(linebreak_iter(self.source)):
             if start >= upto and end <= next:
                 line = num
-                before = escape(self.source[upto:start])
-                during = escape(self.source[start:end])
-                after = escape(self.source[end:next])
-            source_lines.append((num, escape(self.source[upto:next])))
+                before = self.source[upto:start]
+                during = self.source[start:end]
+                after = self.source[end:next]
+            source_lines.append((num, self.source[upto:next]))
             upto = next
         total = len(source_lines)
 
@@ -474,7 +482,8 @@ class Parser:
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TokenType.* for a tiny performance boost.
+            # Use the raw values here for TokenType.* for a tiny performance
+            # boost.
             token_type = token.token_type.value
             if token_type == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
@@ -533,9 +542,13 @@ class Parser:
     def extend_nodelist(self, nodelist, node, token):
         # Check that non-text nodes don't appear before an extends tag.
         if node.must_be_first and nodelist.contains_nontext:
+            if self.origin.template_name:
+                origin = repr(self.origin.template_name)
+            else:
+                origin = "the template"
             raise self.error(
                 token,
-                "%r must be the first tag in the template." % node,
+                "{%% %s %%} must be the first tag in %s." % (token.contents, origin),
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
@@ -629,19 +642,18 @@ constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
 ^(?P<constant>%(constant)s)|
-^(?P<var>[%(var_chars)s]+|%(num)s)|
+^(?P<var>[%(var_chars)s]+)|
  (?:\s*%(filter_sep)s\s*
      (?P<filter_name>\w+)
          (?:%(arg_sep)s
              (?:
               (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>[%(var_chars)s]+|%(num)s)
+              (?P<var_arg>[%(var_chars)s]+)
              )
          )?
  )""" % {
     "constant": constant_string,
-    "num": r"[-+.]?\d[\d.e]*",
-    "var_chars": r"\w\.",
+    "var_chars": r"\w\.\+-",
     "filter_sep": re.escape(FILTER_SEPARATOR),
     "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
@@ -834,13 +846,20 @@ class Variable:
             try:
                 self.literal = mark_safe(unescape_string_literal(var))
             except ValueError:
-                # Otherwise we'll set self.lookups so that resolve() knows we're
-                # dealing with a bonafide variable
+                # Otherwise we'll set self.lookups so that resolve() knows
+                # we're dealing with a bonafide variable
                 if VARIABLE_ATTRIBUTE_SEPARATOR + "_" in var or var[0] == "_":
                     raise TemplateSyntaxError(
                         "Variables and attributes may "
                         "not begin with underscores: '%s'" % var
                     )
+                # Disallow characters that are allowed in numbers but not in a
+                # variable name.
+                for c in ["+", "-"]:
+                    if c in var:
+                        raise TemplateSyntaxError(
+                            "Invalid character ('%s') in variable name: '%s'" % (c, var)
+                        )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
 
     def resolve(self, context):
@@ -880,12 +899,17 @@ class Variable:
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
                 try:  # dictionary lookup
+                    # Only allow if the metaclass implements __getitem__. See
+                    # https://docs.python.org/3/reference/datamodel.html#classgetitem-versus-getitem
+                    if not hasattr(type(current), "__getitem__"):
+                        raise TypeError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
                 except (TypeError, AttributeError, KeyError, ValueError, IndexError):
                     try:  # attribute lookup
-                        # Don't return class attributes if the class is the context:
+                        # Don't return class attributes if the class is the
+                        # context:
                         if isinstance(current, BaseContext) and getattr(
                             type(current), bit
                         ):

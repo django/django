@@ -127,15 +127,19 @@ wasn't provided to :func:`~django.contrib.auth.authenticate` (which passes it
 on to the backend).
 
 The Django admin is tightly coupled to the Django :ref:`User object
-<user-objects>`. The best way to deal with this is to create a Django ``User``
-object for each user that exists for your backend (e.g., in your LDAP
-directory, your external SQL database, etc.) You can either write a script to
-do this in advance, or your ``authenticate`` method can do it the first time a
-user logs in.
+<user-objects>`. For example, for a user to access the admin,
+:attr:`.User.is_staff` and :attr:`.User.is_active` must be ``True`` (see
+:meth:`.AdminSite.has_permission` for details).
+
+The best way to deal with this is to create a Django ``User`` object for each
+user that exists for your backend (e.g., in your LDAP directory, your external
+SQL database, etc.). You can either write a script to do this in advance, or
+your ``authenticate`` method can do it the first time a user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
-object the first time a user authenticates::
+object the first time a user authenticates. In this example, the created Django
+``User`` object is a superuser who will have full access to the admin::
 
     from django.conf import settings
     from django.contrib.auth.backends import BaseBackend
@@ -162,7 +166,7 @@ object the first time a user authenticates::
                 except User.DoesNotExist:
                     # Create a new user. There's no need to set a password
                     # because only the password from settings.py is checked.
-                    user = User(username=username)
+                    user = User(username=username)  # is_active defaults to True.
                     user.is_staff = True
                     user.is_superuser = True
                     user.save()
@@ -400,10 +404,9 @@ the Django model that you wish to use as your user model.
 Using a custom user model when starting a project
 -------------------------------------------------
 
-If you're starting a new project, it's highly recommended to set up a custom
-user model, even if the default :class:`~django.contrib.auth.models.User` model
-is sufficient for you. This model behaves identically to the default user
-model, but you'll be able to customize it in the future if the need arises::
+If you're starting a new project, you can set up a custom user model that
+behaves identically to the default user model by subclassing
+:class:`~django.contrib.auth.models.AbstractUser`::
 
     from django.contrib.auth.models import AbstractUser
 
@@ -426,7 +429,7 @@ Changing to a custom user model mid-project
 -------------------------------------------
 
 Changing :setting:`AUTH_USER_MODEL` after you've created database tables is
-significantly more difficult since it affects foreign keys and many-to-many
+possible, but can be complex, since it affects foreign keys and many-to-many
 relationships, for example.
 
 This change can't be done automatically and requires manually fixing your
@@ -703,10 +706,6 @@ The following attributes and methods are available on any subclass of
         the user. (This takes care of the password hashing in making the
         comparison.)
 
-        .. versionchanged:: 5.0
-
-            ``acheck_password()`` method was added.
-
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
         Marks the user as having no password set.  This isn't the same as
@@ -795,9 +794,16 @@ utility methods:
         email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
+    .. method:: models.BaseUserManager.aget_by_natural_key(username)
+
+        *Asynchronous version*: ``aget_by_natural_key()``
 
         Retrieves a user instance using the contents of the field
         nominated by ``USERNAME_FIELD``.
+
+        .. versionchanged:: 5.2
+
+            ``aget_by_natural_key()`` method was added.
 
 Extending Django's default ``User``
 -----------------------------------
@@ -1191,3 +1197,25 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = "customauth.MyUser"
+
+.. _writing-authentication-backends-async-interface:
+
+Adding an async interface
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+To optimize performance when called from an async context authentication,
+backends can implement async versions of each function - ``aget_user(user_id)``
+and ``aauthenticate(request, **credentials)``. When an authentication backend
+extends ``BaseBackend`` and async versions of these functions are not provided,
+they will be automatically synthesized with ``sync_to_async``. This has
+:ref:`performance penalties <async_performance>`.
+
+While an async interface is optional, a synchronous interface is always
+required. There is no automatic synthesis for a synchronous interface if an
+async interface is implemented.
+
+Django's out-of-the-box authentication backends have native async support. If
+these native backends are extended take special care to make sure the async
+versions of modified functions are modified as well.

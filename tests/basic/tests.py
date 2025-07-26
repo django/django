@@ -20,9 +20,8 @@ from django.test import (
     TransactionTestCase,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.test.utils import CaptureQueriesContext
 from django.utils.connection import ConnectionDoesNotExist
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -32,6 +31,8 @@ from .models import (
     FeaturedArticle,
     PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
+    PrimaryKeyWithFalseyDbDefault,
+    PrimaryKeyWithFalseyDefault,
     SelfRef,
 )
 
@@ -178,13 +179,20 @@ class ModelInstanceCreationTests(TestCase):
 
         # You can use 'in' to test for membership...
         self.assertIn(a, Article.objects.all())
-        # ... but there will often be more efficient ways if that is all you need:
+        # ... but there will often be more efficient ways if that is all you
+        # need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 
     def test_save_primary_with_default(self):
         # An UPDATE attempt is skipped when a primary key has default.
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
+
+    def test_save_primary_with_default_force_update(self):
+        # An UPDATE attempt is made if explicitly requested.
+        obj = PrimaryKeyWithDefault.objects.create()
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDefault(uuid=obj.pk).save(force_update=True)
 
     def test_save_primary_with_db_default(self):
         # An UPDATE attempt is skipped when a primary key has db_default.
@@ -197,49 +205,13 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(2):
             ChildPrimaryKeyWithDefault().save()
 
-    def test_save_deprecation(self):
-        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
-        msg = "Passing positional arguments to save() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            a.save(False, False, None, None)
-            self.assertEqual(Article.objects.count(), 1)
+    def test_save_primary_with_falsey_default(self):
+        with self.assertNumQueries(1):
+            PrimaryKeyWithFalseyDefault().save()
 
-    async def test_asave_deprecation(self):
-        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
-        msg = "Passing positional arguments to asave() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            await a.asave(False, False, None, None)
-            self.assertEqual(await Article.objects.acount(), 1)
-
-    @ignore_warnings(category=RemovedInDjango60Warning)
-    def test_save_positional_arguments(self):
-        a = Article.objects.create(headline="original", pub_date=datetime(2014, 5, 16))
-        a.headline = "changed"
-
-        a.save(False, False, None, ["pub_date"])
-        a.refresh_from_db()
-        self.assertEqual(a.headline, "original")
-
-        a.headline = "changed"
-        a.save(False, False, None, ["pub_date", "headline"])
-        a.refresh_from_db()
-        self.assertEqual(a.headline, "changed")
-
-    @ignore_warnings(category=RemovedInDjango60Warning)
-    async def test_asave_positional_arguments(self):
-        a = await Article.objects.acreate(
-            headline="original", pub_date=datetime(2014, 5, 16)
-        )
-        a.headline = "changed"
-
-        await a.asave(False, False, None, ["pub_date"])
-        await a.arefresh_from_db()
-        self.assertEqual(a.headline, "original")
-
-        a.headline = "changed"
-        await a.asave(False, False, None, ["pub_date", "headline"])
-        await a.arefresh_from_db()
-        self.assertEqual(a.headline, "changed")
+    def test_save_primary_with_falsey_db_default(self):
+        with self.assertNumQueries(1):
+            PrimaryKeyWithFalseyDbDefault().save()
 
 
 class ModelTest(TestCase):
@@ -561,6 +533,31 @@ class ModelTest(TestCase):
             headline__startswith="Area",
         )
 
+    def test_is_pk_unset(self):
+        cases = [
+            Article(),
+            Article(id=None),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), False)
+
+    def test_is_pk_set(self):
+        def new_instance():
+            a = Article(pub_date=datetime.today())
+            a.save()
+            return a
+
+        cases = [
+            Article(id=1),
+            Article(id=0),
+            Article.objects.create(pub_date=datetime.today()),
+            new_instance(),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), True)
+
 
 class ModelLookupTest(TestCase):
     @classmethod
@@ -789,7 +786,8 @@ class ManagerTest(SimpleTestCase):
 
         It's particularly useful to prevent accidentally leaking new methods
         into `Manager`. New `QuerySet` methods that should also be copied onto
-        `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
+        `Manager` will need to be added to
+        `ManagerTest.QUERYSET_PROXY_METHODS`.
         """
         self.assertEqual(
             sorted(BaseManager._get_queryset_methods(models.QuerySet)),

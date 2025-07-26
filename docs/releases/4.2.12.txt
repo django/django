@@ -1,0 +1,14 @@
+===========================
+Django 4.2.12 release notes
+===========================
+
+*May 6, 2024*
+
+Django 4.2.12 fixes a compatibility issue with Python 3.11.9+ and 3.12.3+.
+
+Bugfixes
+========
+
+* Fixed a crash in Django 4.2 when validating email max line lengths with
+  content decoded using the ``surrogateescape`` error handling scheme
+  (:ticket:`35361`).

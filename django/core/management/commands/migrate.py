@@ -15,17 +15,12 @@ from django.utils.text import Truncator
 
 
 class Command(BaseCommand):
+    autodetector = MigrationAutodetector
     help = (
         "Updates database schema. Manages both apps with migrations and those without."
     )
-    requires_system_checks = []
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--skip-checks",
-            action="store_true",
-            help="Skip system checks.",
-        )
         parser.add_argument(
             "app_label",
             nargs="?",
@@ -47,6 +42,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help=(
                 'Nominates a database to synchronize. Defaults to the "default" '
                 "database."
@@ -93,12 +89,13 @@ class Command(BaseCommand):
             help="Delete nonexistent migrations from the django_migrations table.",
         )
 
+    def get_check_kwargs(self, options):
+        kwargs = super().get_check_kwargs(options)
+        return {**kwargs, "databases": [options["database"]]}
+
     @no_translations
     def handle(self, *args, **options):
         database = options["database"]
-        if not options["skip_checks"]:
-            self.check(databases=[database])
-
         self.verbosity = options["verbosity"]
         self.interactive = options["interactive"]
 
@@ -116,7 +113,8 @@ class Command(BaseCommand):
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
-        # Raise an error if any migrations are applied before their dependencies.
+        # Raise an error if any migrations are applied before their
+        # dependencies.
         executor.loader.check_consistent_history(connection)
 
         # Before anything else, see if there's conflicting apps and drop out
@@ -328,7 +326,7 @@ class Command(BaseCommand):
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them
                 # how to fix it.
-                autodetector = MigrationAutodetector(
+                autodetector = self.autodetector(
                     executor.loader.project_state(),
                     ProjectState.from_apps(apps),
                 )
@@ -360,8 +358,8 @@ class Command(BaseCommand):
             fake=fake,
             fake_initial=fake_initial,
         )
-        # post_migrate signals have access to all models. Ensure that all models
-        # are reloaded in case any are delayed.
+        # post_migrate signals have access to all models. Ensure that all
+        # models are reloaded in case any are delayed.
         post_migrate_state.clear_delayed_apps_cache()
         post_migrate_apps = post_migrate_state.apps
 
@@ -378,8 +376,8 @@ class Command(BaseCommand):
             [ModelState.from_model(apps.get_model(*model)) for model in model_keys]
         )
 
-        # Send the post_migrate signal, so individual apps can do whatever they need
-        # to do at this point.
+        # Send the post_migrate signal, so individual apps can do whatever they
+        # need to do at this point.
         emit_post_migrate_signal(
             self.verbosity,
             self.interactive,

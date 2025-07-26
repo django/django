@@ -55,6 +55,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help=(
                 "Nominates a specific database to load fixtures into. Defaults to the "
                 '"default" database.'

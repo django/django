@@ -7,6 +7,76 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.0:
+
+7.0
+---
+
+See the :ref:`Django 6.0 release notes <deprecated-features-6.0>` for more
+details on these changes.
+
+* The ``serialize`` keyword argument of
+  ``BaseDatabaseCreation.create_test_db()`` will be removed.
+
+* The ``django.contrib.postgres.aggregates.StringAgg`` class will be removed.
+
+* The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class
+  will be removed.
+
+* The default protocol in ``urlize`` and ``urlizetrunc`` template filters will
+  change from HTTP to HTTPS.
+
+* The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
+
+* Using a percent sign in a column alias or annotation will raise
+  ``ValueError``.
+
+* Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
+  (name, address) tuples will be removed.
+
+* The ``orphans`` argument being larger than or equal to the ``per_page``
+  argument of ``django.core.paginator.Paginator`` and
+  ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
+
+* The :mod:`django.core.mail` APIs will no longer accept certain parameters as
+  positional arguments. These must be passed as keyword arguments instead.
+
+* Support for passing Python's legacy email ``email.mime.base.MIMEBase``
+  object to ``EmailMessage.attach()`` (or including one in the message's
+  ``attachments`` list) will be removed.
+
+* The ``django.core.mail.BadHeaderError`` exception will be removed.
+
+* The ``django.core.mail.SafeMIMEText`` and ``SafeMIMEMultipart`` classes will
+  be removed.
+
+* The ``django.core.mail.forbid_multi_line_headers()`` and
+  ``django.core.mail.message.sanitize_address()`` functions will be removed.
+
+.. _deprecation-removed-in-6.1:
+
+6.1
+---
+
+See the :ref:`Django 5.2 release notes <deprecated-features-5.2>` for more
+details on these changes.
+
+* The ``all`` keyword argument of ``django.contrib.staticfiles.finders.find()``
+  will be removed.
+
+* The fallback to ``request.user`` when ``user`` is ``None`` in
+  ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
+  removed.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` will be removed.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` will be
+  removed.
+
 .. _deprecation-removed-in-6.0:
 
 6.0
@@ -78,6 +148,11 @@ details on these changes.
   converters.
 
 * The ``check`` keyword argument of ``CheckConstraint`` will be removed.
+
+* The ``OS_OPEN_FLAGS`` attribute of
+  :class:`~django.core.files.storage.FileSystemStorage` will be removed.
+
+* The ``get_cache_name()`` method of ``FieldCacheMixin`` will be removed.
 
 .. _deprecation-removed-in-5.1:
 
@@ -1020,7 +1095,7 @@ details on these changes.
 
 * The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
 
-* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+* Usage of the hardcoded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
   forms for ManyToMany model fields will not be performed by Django anymore
   either at the model or forms layer.

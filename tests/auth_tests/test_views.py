@@ -32,13 +32,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase, modify_settings, override_settings
 from django.test.client import RedirectCycleError
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
-from .models import CustomUser, UUIDUser
+from .models import CustomUser, CustomUserCompositePrimaryKey, UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -153,8 +153,8 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("http://", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
-        # optional multipart text/html email has been added.  Make sure original,
-        # default functionality is 100% the same
+        # optional multipart text/html email has been added. Make sure
+        # original, default functionality is 100% the same
         self.assertFalse(mail.outbox[0].message().is_multipart())
 
     def test_extra_email_context(self):
@@ -209,8 +209,8 @@ class PasswordResetTest(AuthViewsTestCase):
         # the colon is interpreted as part of a username for login purposes,
         # making 'evil.com' the request domain. Since HTTP_HOST is used to
         # produce a meaningful reset URL, we need to be certain that the
-        # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
-        # is invoked, but we check here as a practical consequence.
+        # HTTP_HOST header isn't poisoned. This is done as a check when
+        # get_host() is invoked, but we check here as a practical consequence.
         with self.assertLogs("django.security.DisallowedHost", "ERROR"):
             response = self.client.post(
                 "/password_reset/",
@@ -223,7 +223,10 @@ class PasswordResetTest(AuthViewsTestCase):
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
-        "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
+        """
+        Poisoned HTTP_HOST headers can't be used for reset emails on admin
+        views
+        """
         with self.assertLogs("django.security.DisallowedHost", "ERROR"):
             response = self.client.post(
                 "/admin_password_reset/",
@@ -472,6 +475,29 @@ class PasswordResetTest(AuthViewsTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get("/reset/missing_parameters/")
 
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        reset_urls = [
+            reverse("password_reset"),
+            reverse("password_reset_done"),
+            reverse("password_reset_confirm", kwargs={"uidb64": "abc", "token": "def"}),
+            reverse("password_reset_complete"),
+        ]
+
+        for url in reset_urls:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            "/password_reset/", {"email": "staffmember@example.com"}
+        )
+        self.assertRedirects(
+            response, "/password_reset/done/", fetch_redirect_response=False
+        )
+
 
 @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")
 class CustomUserPasswordResetTest(AuthViewsTestCase):
@@ -515,6 +541,18 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
             },
         )
         self.assertRedirects(response, "/reset/done/")
+
+
+@override_settings(AUTH_USER_MODEL="auth_tests.CustomUserCompositePrimaryKey")
+class CustomUserCompositePrimaryKeyPasswordResetTest(CustomUserPasswordResetTest):
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = CustomUserCompositePrimaryKey.custom_objects.create(
+            email="staffmember@example.com",
+            date_of_birth=datetime.date(1976, 11, 8),
+        )
+        cls.u1.set_password("password")
+        cls.u1.save()
 
 
 @override_settings(AUTH_USER_MODEL="auth_tests.UUIDUser")
@@ -661,12 +699,45 @@ class ChangePasswordTest(AuthViewsTestCase):
             response, "/password_reset/", fetch_redirect_response=False
         )
 
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.post(
+            "/password_change/",
+            {
+                "old_password": "password",
+                "new_password1": "password1",
+                "new_password2": "password1",
+            },
+        )
+        self.assertRedirects(
+            response,
+            settings.LOGIN_URL + "?next=/password_change/",
+            fetch_redirect_response=False,
+        )
+
+        self.login()
+
+        response = self.client.post(
+            "/password_change/",
+            {
+                "old_password": "password",
+                "new_password1": "password1",
+                "new_password2": "password1",
+            },
+        )
+        self.assertRedirects(
+            response, "/password_change/done/", fetch_redirect_response=False
+        )
+
 
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
         #21649 - Ensure contrib.auth.views.password_change updates the user's
-        session auth hash after a password change so the session isn't logged out.
+        session auth hash after a password change so the session isn't logged
+        out.
         """
         self.login()
         original_session_key = self.client.session.session_key
@@ -834,8 +905,8 @@ class LoginTest(AuthViewsTestCase):
     def test_session_key_flushed_on_login(self):
         """
         To avoid reusing another user's session, ensure a new, empty session is
-        created if the existing session corresponds to a different authenticated
-        user.
+        created if the existing session corresponds to a different
+        authenticated user.
         """
         self.login()
         original_session_key = self.client.session.session_key
@@ -903,6 +974,13 @@ class LoginTest(AuthViewsTestCase):
     def test_login_redirect_url_overrides_get_default_redirect_url(self):
         response = self.login(url="/login/get_default_redirect_url/?next=/test/")
         self.assertRedirects(response, "/test/", fetch_redirect_response=False)
+
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.get(reverse("login"))
+        self.assertEqual(response.status_code, 200)
 
 
 class LoginURLSettings(AuthViewsTestCase):
@@ -1355,6 +1433,22 @@ class LogoutTest(AuthViewsTestCase):
         self.assertContains(response, "Logged out")
         self.confirm_logged_out()
 
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.post("/logout/")
+        self.assertRedirects(
+            response,
+            settings.LOGIN_URL + "?next=/logout/",
+            fetch_redirect_response=False,
+        )
+
+        self.login()
+
+        response = self.client.post("/logout/")
+        self.assertEqual(response.status_code, 200)
+
 
 def get_perm(Model, perm):
     ct = ContentType.objects.get_for_model(Model)
@@ -1442,8 +1536,8 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'change or unset the password using <a href="([^"]*)">this form</a>',
-            response.content.decode(),
+            r'<a role="button" class="button" href="([^"]*)">Reset password</a>',
+            response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
@@ -1538,8 +1632,8 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'by setting a password using <a href="([^"]*)">this form</a>',
-            response.content.decode(),
+            r'<a role="button" class="button" href="([^"]*)">Set password</a>',
+            response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
@@ -1613,7 +1707,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         algo, salt, hash_string = u.password.split("$")
         self.assertContains(response, '<div class="readonly">testclient</div>')
-        # ReadOnlyPasswordHashWidget is used to render the field.
+        # The password value is hashed.
         self.assertContains(
             response,
             "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
@@ -1625,6 +1719,10 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
                 hash_string[:6],
             ),
             html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<a role="button" class="button" href="../password/">Reset password</a>',
         )
         # Value in POST data is ignored.
         data = self.get_user_data(u)

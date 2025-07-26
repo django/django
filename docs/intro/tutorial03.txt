@@ -166,7 +166,7 @@ commas, according to publication date:
 
     # Leave the rest of the views (detail, results, vote) unchanged
 
-There's a problem here, though: the page's design is hard-coded in the view. If
+There's a problem here, though: the page's design is hardcoded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python by
 creating a template that the view can use.
@@ -234,9 +234,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
     def index(request):
         latest_question_list = Question.objects.order_by("-pub_date")[:5]
         template = loader.get_template("polls/index.html")
-        context = {
-            "latest_question_list": latest_question_list,
-        }
+        context = {"latest_question_list": latest_question_list}
         return HttpResponse(template.render(context, request))
 
 That code loads the template called  ``polls/index.html`` and passes it a

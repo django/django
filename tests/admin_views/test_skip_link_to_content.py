@@ -36,12 +36,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertTrue(skip_link.is_displayed())
 
         # Press RETURN to skip the navbar links (view site / documentation /
-        # change password / log out) and focus first model in the admin_views list.
+        # change password / log out) and focus first model in the admin_views
+        # list.
         skip_link.send_keys(Keys.RETURN)
         self.assertFalse(skip_link.is_displayed())  # `skip link` disappear.
         keys = [Keys.TAB, Keys.TAB]  # The 1st TAB is the section title.
         if self.browser == "firefox":
-            # For some reason Firefox doesn't focus the section title ('ADMIN_VIEWS').
+            # For some reason Firefox doesn't focus the section title
+            # ('ADMIN_VIEWS').
             keys.remove(Keys.TAB)
         body.send_keys(keys)
         actors_a_tag = self.selenium.find_element(By.LINK_TEXT, "Actors")
@@ -61,7 +63,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertEqual(self.selenium.switch_to.active_element, actors_a_tag)
 
-        # Go to the Actor form and the first input will be focused automatically.
+        # Go to the Actor form and the first input will be focused
+        # automatically.
         with self.wait_page_loaded():
             actors_a_tag.send_keys(Keys.RETURN)
         first_input = self.selenium.find_element(By.ID, "id_name")

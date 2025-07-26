@@ -1,0 +1,55 @@
+name: Labels
+
+on:
+  pull_request_target:
+    types: [ edited, opened, reopened, ready_for_review ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  no_ticket:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
+    name: "Flag if no Trac ticket is found in the title"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Check title and manage labels"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const regex = /#[0-9]+[ ,:]?/gm;
+            const label = "no ticket";
+            const hasMatch = regex.test(title);
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr_number = context.payload.pull_request.number;
+            console.log(`=> Pull Request Title: ${title}`);
+            console.log(`=> Labels on PR: [${labels}]`);
+            if (hasMatch && labels.includes(label)) {
+              console.log(`==> Removing label "${label}" from PR #${pr_number}`);
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: pr_number,
+                name: label
+              });
+            } else if (!hasMatch && !labels.includes(label)) {
+              console.log(`==> Adding label "${label}" to PR #${pr_number}`);
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: pr_number,
+                labels: [label]
+              });
+            } else {
+              console.log(`No action needed for PR #${pr_number}`);
+            }
