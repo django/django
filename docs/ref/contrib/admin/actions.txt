@@ -153,7 +153,7 @@ Actions are also available in the admin object detail page. We can adjust the
 description to show we are only talking about a single object::
 
     @admin.action(
-        description="Mark selected story as published",
+        description="Mark story as published",
         description_plural="Mark selected stories as published",
     )
     def make_published(modeladmin, request, queryset):
