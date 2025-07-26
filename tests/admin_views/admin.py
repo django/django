@@ -397,7 +397,9 @@ class SubscriberAdmin(admin.ModelAdmin):
         ).send()
 
 
-@admin.action(description="External mail (Another awesome action)")
+@admin.action(
+    description="External mail (Another awesome action)", changelist_only=False
+)
 def external_mail(modeladmin, request, selected):
     EmailMessage(
         "Greetings from a function action",
@@ -417,6 +419,7 @@ def redirect_to(modeladmin, request, selected):
 @admin.action(
     description="Download subscription",
     description_plural="Download selected subscriptions",
+    changelist_only=False,
 )
 def download(modeladmin, request, selected):
     if selected.count() > 1:
