@@ -213,6 +213,10 @@ point to the latest or stable version of the documentation, e.g. ``/en/stable/``
 Writing style
 =============
 
+Prefer plain language. Avoid jargon and technical terms unless
+they are necessary. Keep sentences short and to the point. Use the active voice
+where possible.
+
 When using pronouns in reference to a hypothetical person, such as "a user with
 a session cookie", gender-neutral pronouns (they/their/them) should be used.
 Instead of:
@@ -621,6 +625,24 @@ See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
 
 .. _django-admin-manpage:
+
+Accessibility in documentation
+==============================
+
+See :doc:`/internals/contributing/accessibility` for our project guidelines. For documentation
+specifically, guide readers to use accessible patterns. This means documentation should:
+
+* Include enough code so examples are accessible by default.
+* Start with the accessible way when showcasing multiple options.
+* Prefer semantic HTML elements over ARIA attributes.
+
+Here are practical examples of those guidelines:
+
+* Forms should use :meth:`.Form.as_div` over less accessible alternatives.
+* Images should have alternative text with the ``alt`` attribute.
+* ``<html>`` elements must have a ``lang`` attribute.
+* Use semantic headings instead of bold or styled text.
+* Demonstrate ``dialog`` or ``details`` elements over their ARIA equivalents.
 
 ``django-admin`` man page
 =========================
