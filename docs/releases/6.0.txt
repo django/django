@@ -170,6 +170,10 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
+* The :djadmin:`collectstatic` command now reports only a summary of skipped
+  files due to conflicts at verbosity level 1. To see warnings for each
+  conflicting destination path, use verbosity level 2 or higher. 
+
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
