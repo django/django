@@ -15,6 +15,7 @@ from django.template.base import (
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 
 
 class ParserTests(SimpleTestCase):
@@ -44,6 +45,16 @@ class ParserTests(SimpleTestCase):
         self.assertEqual(
             repr(lexer),
             '<Lexer template_string="{% for i in 1 %}{{ a...", verbatim=False>',
+        )
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this settings
+    # override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
+    def test_repr_multiline(self):
+        lexer = Lexer("{% \nfor i in 1\n %}{{ a }}\n{% \nendfor \n%}")
+        self.assertEqual(
+            repr(lexer),
+            '<Lexer template_string="{% for i in 1 %}{{...", verbatim=False>',
         )
 
     def test_filter_parsing(self):
