@@ -470,6 +470,10 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.8.1 to
   3.9.1.
 
+* The :djadmin:`collectstatic` command now reports only a summary of skipped
+  files due to conflicts when ``--verbosity`` is 1. To see warnings for each
+  conflicting destination path, set the ``--verbosity`` flag to 2 or higher.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
