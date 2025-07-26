@@ -1,5 +1,10 @@
 def action(
-    function=None, *, permissions=None, description=None, description_plural=None
+    function=None,
+    *,
+    permissions=None,
+    description=None,
+    description_plural=None,
+    changelist_only=True,
 ):
     """
     Conveniently add attributes to an action function::
@@ -33,6 +38,8 @@ def action(
             func.plural_description = description_plural
         elif description is not None:
             func.plural_description = description
+
+        func.changelist_only = changelist_only
 
         return func
 

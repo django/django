@@ -575,7 +575,7 @@ class AdminDetailActionsTest(TestCase):
 
     def test_available_detail_actions(self):
         """
-        'Delete' action present in dropdown.
+        'Delete' action IS NOT present in dropdown by default.
         'Download' action with SINGULAR description.
         'Custom action' is not present because user doesn't have permission.
         """
@@ -588,7 +588,6 @@ class AdminDetailActionsTest(TestCase):
             response,
             """<label>Action: <select name="action" required>
             <option value="" selected>---------</option>
-            <option value="delete_selected">Delete</option>
             <option value="redirect_to">Redirect to (Awesome action)</option>
             <option value="external_mail">External mail (Another awesome action)
             </option>
@@ -692,36 +691,6 @@ class AdminDetailActionsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_delete_action_in_detail_view(self):
-        content_type = ContentType.objects.get_for_model(Subscriber)
-        permission = Permission.objects.get(
-            codename="delete_subscriber", content_type=content_type
-        )
-        self.user.user_permissions.add(permission)
-        response = self.client.post(
-            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {"action": "delete_selected", ACTION_CHECKBOX_NAME: [self.s1.pk]},
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            "Are you sure you want to delete the selected external subscriber?",
-        )
-
-        response = self.client.post(
-            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {
-                "action": "delete_selected",
-                ACTION_CHECKBOX_NAME: [self.s1.pk],
-                "post": "yes",
-            },
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.url, reverse("admin:admin_views_externalsubscriber_changelist")
-        )
-        self.assertEqual(ExternalSubscriber.objects.count(), 0)
-
     def test_action_with_permissions(self):
         # User doesn't have the permission to run the custom action.
         response = self.client.post(
@@ -758,5 +727,13 @@ class AdminDetailActionsTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
-            response.url, reverse("admin:admin_views_externalsubscriber_changelist")
+            response.url,
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+        )
+
+        response = self.client.get(response.url)
+        self.assertContains(
+            response,
+            "Action executed successfully",
+            html=True,
         )

@@ -1014,6 +1014,10 @@ class ModelAdmin(BaseModelAdmin):
         for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
+
+            if is_change_view and func.changelist_only:
+                continue
+
             description = self._get_action_description(func, name, is_change_view)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
@@ -1691,23 +1695,16 @@ class ModelAdmin(BaseModelAdmin):
 
             response = func(self, request, queryset)
 
+            self.message_user(request, "Action executed successfully", messages.SUCCESS)
+
             # Actions may return an HttpResponse-like object, which will be
             # used as the response from the POST. If not, we'll be a good
             # little HTTP citizen and redirect back to the changelist page.
+
             if isinstance(response, HttpResponseBase):
                 return response
             else:
-                # If action was executed from change view, redirect to
-                # list view once finished.
-                is_change_view = request.resolver_match.url_name.endswith("change")
-                return HttpResponseRedirect(
-                    reverse(
-                        "admin:%s_%s_changelist"
-                        % (self.opts.app_label, self.opts.model_name)
-                    )
-                    if is_change_view
-                    else request.get_full_path()
-                )
+                return HttpResponseRedirect(request.get_full_path())
         else:
             msg = _("No action selected.")
             self.message_user(request, msg, messages.WARNING)
