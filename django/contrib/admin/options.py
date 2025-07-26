@@ -418,7 +418,12 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying custom readonly fields.
         """
-        return self.readonly_fields
+        readonly = super().get_readonly_fields(request, obj)
+        pk_field = self.model._meta.pk
+
+        if obj is not None and not pk_field.auto_created and pk_field.name not in readonly:
+                readonly = readonly + (pk_field.name,)
+        return readonly
 
     def get_prepopulated_fields(self, request, obj=None):
         """
