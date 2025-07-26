@@ -649,6 +649,7 @@ class ModelAdmin(BaseModelAdmin):
     save_as_continue = True
     save_on_top = False
     paginator = Paginator
+    estimated_count = False
     preserve_filters = True
     show_facets = ShowFacets.ALLOW
     inlines = ()
@@ -2556,3 +2557,4 @@ class StackedInline(InlineModelAdmin):
 
 class TabularInline(InlineModelAdmin):
     template = "admin/edit_inline/tabular.html"
+    
