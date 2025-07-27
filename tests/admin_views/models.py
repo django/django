@@ -623,6 +623,26 @@ class CyclicTwo(models.Model):
         return self.name
 
 
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
+
+
+class Course(models.Model):
+    DIFFICULTY_CHOICES = [
+        ("beginner", "Beginner Class"),
+        ("intermediate", "Intermediate Class"),
+        ("advanced", "Advanced Class"),
+    ]
+
+    title = models.CharField(max_length=100)
+    difficulty = models.CharField(
+        max_length=20, choices=DIFFICULTY_CHOICES, null=True, blank=True
+    )
+    students = models.ManyToManyField(Student, blank=True)
+    start_datetime = models.DateTimeField(null=True, blank=True)
+
+
 class Topping(models.Model):
     name = models.CharField(max_length=20)
 

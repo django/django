@@ -91,6 +91,20 @@ fieldset .inline-heading,
 
 /* ALIGNED FIELDSETS */
 
+.aligned fieldset {
+    width: 100%;
+    border-top: none;
+}
+
+.aligned fieldset > div {
+    width: 100%;
+}
+
+.aligned legend {
+    float: left;
+}
+
+.aligned legend,
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
@@ -136,6 +150,10 @@ form .aligned div.radiolist {
     display: inline-block;
     margin: 0;
     padding: 0;
+}
+
+form .aligned fieldset div.help {
+    margin-left: 0;
 }
 
 form .aligned p.help,

@@ -15,7 +15,8 @@ Requires core.js and SelectBox.js.
             const from_box = document.getElementById(field_id);
             from_box.id += '_from'; // change its ID
             from_box.className = 'filtered';
-            from_box.setAttribute('aria-labelledby', field_id + '_from_title');
+            from_box.setAttribute('aria-labelledby', field_id + '_from_label');
+            from_box.setAttribute('aria-describedby', `${field_id}_helptext ${field_id}_choose_helptext`);
 
             for (const p of from_box.parentNode.getElementsByTagName('p')) {
                 if (p.classList.contains("info")) {
@@ -42,12 +43,20 @@ Requires core.js and SelectBox.js.
             const selector_available_title = quickElement('div', selector_available);
             selector_available_title.id = field_id + '_from_title';
             selector_available_title.className = 'selector-available-title';
-            quickElement('label', selector_available_title, interpolate(gettext('Available %s') + ' ', [field_name]), 'for', field_id + '_from');
+            quickElement(
+                'label',
+                selector_available_title,
+                interpolate(gettext('Available %s') + ' ', [field_name]),
+                'id',
+                field_id + '_from_label',
+                'for',
+                field_id + '_from'
+            );
             quickElement(
                 'p',
                 selector_available_title,
                 interpolate(gettext('Choose %s by selecting them and then select the "Choose" arrow button.'), [field_name]),
-                'class', 'helptext'
+                'id', `${field_id}_choose_helptext`, 'class', 'helptext'
             );
 
             const filter_p = quickElement('p', selector_available, '', 'id', field_id + '_filter');
@@ -102,12 +111,20 @@ Requires core.js and SelectBox.js.
             const selector_chosen_title = quickElement('div', selector_chosen);
             selector_chosen_title.className = 'selector-chosen-title';
             selector_chosen_title.id = field_id + '_to_title';
-            quickElement('label', selector_chosen_title, interpolate(gettext('Chosen %s') + ' ', [field_name]), 'for', field_id + '_to');
+            quickElement(
+                'label',
+                selector_chosen_title,
+                interpolate(gettext('Chosen %s') + ' ', [field_name]),
+                'id',
+                field_id + '_to_label',
+                'for',
+                field_id + '_to'
+            );
             quickElement(
                 'p',
                 selector_chosen_title,
                 interpolate(gettext('Remove %s by selecting them and then select the "Remove" arrow button.'), [field_name]),
-                'class', 'helptext'
+                'id', `${field_id}_remove_helptext`, 'class', 'helptext'
             );
             
             const filter_selected_p = quickElement('p', selector_chosen, '', 'id', field_id + '_filter_selected');
@@ -134,7 +151,8 @@ Requires core.js and SelectBox.js.
                 'multiple', '',
                 'size', from_box.size,
                 'name', from_box.name,
-                'aria-labelledby', field_id + '_to_title',
+                'aria-labelledby', field_id + '_to_label',
+                'aria-describedby', `${field_id}_helptext ${field_id}_remove_helptext`,
                 'class', 'filtered'
             );
             const warning_footer = quickElement('div', selector_chosen, '', 'class', 'list-footer-display');

@@ -6908,6 +6908,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
 
+    def test_use_fieldset_fields_render(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+
+        expected_legend_tags_text = ["Difficulty:", "Students:", "Start datetime:"]
+        url = reverse("admin:admin_views_course_add")
+        self.selenium.get(self.live_server_url + url)
+        fieldsets = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.aligned fieldset"
+        )
+        for fieldset in fieldsets:
+            legend = fieldset.find_element(By.TAG_NAME, "legend")
+            self.assertIn(legend.text, expected_legend_tags_text)
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     @override_settings(MESSAGE_LEVEL=10)
     def test_messages(self):

@@ -39,4 +39,5 @@ QUnit.test('time zone offset warning', function(assert) {
     DateTimeShortcuts.init();
     $('body').attr('data-admin-utc-offset', savedOffset);
     assert.equal($('.timezonewarning').text(), 'Note: You are 1 hour behind server time.');
+    assert.equal($('.timezonewarning').attr("id"), "_timezone_warning_helptext");
 });

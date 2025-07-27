@@ -399,7 +399,8 @@ class AdminDateWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="text" class="vDateField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="vDateField" name="test" '
             'size="10"></p>',
         )
         # pass attrs to widget
@@ -407,7 +408,8 @@ class AdminDateWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="text" class="myDateField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="myDateField" name="test" '
             'size="20"></p>',
         )
 
@@ -418,7 +420,8 @@ class AdminTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="text" class="vTimeField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="vTimeField" name="test" '
             'size="8"></p>',
         )
         # pass attrs to widget
@@ -426,7 +429,8 @@ class AdminTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="text" class="myTimeField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="myTimeField" name="test" '
             'size="20"></p>',
         )
 
@@ -437,9 +441,13 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="text" class="vDateField" '
+            "<label>Date:</label> "
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="vDateField" '
             'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="text" class="vTimeField" '
+            "<label>Time:</label> "
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="vTimeField" '
             'name="test_1" size="8"></p>',
         )
 
@@ -451,9 +459,13 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             self.assertHTMLEqual(
                 w.render("test", datetime(2007, 12, 1, 9, 30)),
                 '<p class="datetime">'
-                'Datum: <input value="01.12.2007" type="text" '
+                "<label>Datum:</label> "
+                '<input aria-describedby="id_test_timezone_warning_helptext" '
+                'value="01.12.2007" type="text" '
                 'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
+                "<label>Zeit:</label> "
+                '<input aria-describedby="id_test_timezone_warning_helptext" '
+                'value="09:30:00" type="text" class="vTimeField" '
                 'name="test_1" size="8"></p>',
             )
 
