@@ -967,6 +967,13 @@ class QuerySet(AltersData):
     abulk_update.alters_data = True
 
     def get_or_create(self, defaults=None, **kwargs):
+        """
+        Look up an object with the given kwargs, creating one if necessary.
+        Return a tuple of (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        # The get() needs to be targeted at the write database in order
+        # to avoid potential transaction consistency problems.
         self._for_write = True
         try:
             return self.get(**kwargs), False
