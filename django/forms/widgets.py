@@ -530,6 +530,7 @@ class ClearableFileInput(FileInput):
     input_text = _("Change")
     template_name = "django/forms/widgets/clearable_file_input.html"
     checked = False
+    use_fieldset = True
 
     def clear_checkbox_name(self, name):
         """

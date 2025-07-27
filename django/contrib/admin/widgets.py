@@ -49,7 +49,16 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         return context
 
 
-class BaseAdminDateWidget(forms.DateInput):
+class DateTimeWidgetContextMixin:
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["widget"]["attrs"][
+            "aria-describedby"
+        ] = f"id_{name}_timezone_warning_helptext"
+        return context
+
+
+class BaseAdminDateWidget(DateTimeWidgetContextMixin, forms.DateInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -65,7 +74,7 @@ class AdminDateWidget(BaseAdminDateWidget):
     template_name = "admin/widgets/date.html"
 
 
-class BaseAdminTimeWidget(forms.TimeInput):
+class BaseAdminTimeWidget(DateTimeWidgetContextMixin, forms.TimeInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -98,7 +107,12 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         context = super().get_context(name, value, attrs)
         context["date_label"] = _("Date:")
         context["time_label"] = _("Time:")
+        for widget in context["widget"]["subwidgets"]:
+            widget["attrs"]["aria-describedby"] = f"id_{name}_timezone_warning_helptext"
         return context
+
+    def id_for_label(self, id_):
+        return id_
 
 
 class AdminRadioSelect(forms.RadioSelect):
@@ -282,6 +296,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.can_view_related = not multiple and can_view_related
         # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
+        self.use_fieldset = True
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
