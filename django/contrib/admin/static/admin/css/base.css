@@ -109,10 +109,6 @@ body {
     background: var(--body-bg);
 }
 
-label {
-    font-size: 1rem;
-}
-
 /* LINKS */
 
 a:link, a:visited {

@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.core.checks import Error
 from django.db import models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
@@ -104,4 +105,30 @@ class ManyToManyFieldDBTests(TestCase):
         obj.m2m.add(related_obj)
         self.assertEqual(
             obj._meta.get_field("m2m").value_from_object(obj), [related_obj]
+        )
+
+
+@isolate_apps("model_fields")
+class M2MCompositePKCheckTests(SimpleTestCase):
+    def test_many_to_many_from_model_with_composite_primary_key(self):
+        class Parent(models.Model):
+            name = models.CharField(max_length=20)
+
+        class Child(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+            parents = models.ManyToManyField(Parent)
+
+        field = Child._meta.get_field("parents")
+        self.assertEqual(
+            field.check(from_model=Child),
+            [
+                Error(
+                    "Field has a CompositePrimaryKey and defines a relation with model "
+                    "'Parent', which is not supported.",
+                    obj=field,
+                    id="fields.E348",
+                ),
+            ],
         )

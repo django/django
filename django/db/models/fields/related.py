@@ -1531,6 +1531,20 @@ class ManyToManyField(RelatedField):
                 "tables cannot be checked if you don't pass the model "
                 "where the field is attached to."
             )
+            if isinstance(from_model._meta.pk, CompositePrimaryKey):
+                model_name = self.remote_field.model._meta.object_name
+                msg = (
+                    "Field has a CompositePrimaryKey and defines a relation with model "
+                    f"'{model_name}', which is not supported."
+                )
+                errors.append(
+                    checks.Error(
+                        msg,
+                        obj=self,
+                        id="fields.E348",
+                    )
+                )
+                return errors
             # Set some useful local variables
             to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
