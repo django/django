@@ -627,9 +627,10 @@ class ForeignObject(RelatedField):
                 if isinstance(field, CompositePrimaryKey):
                     errors.append(
                         checks.Error(
-                            "Field defines a relation to the CompositePrimaryKey of "
-                            f"model {self.remote_field.model._meta.object_name!r} "
-                            "which is not supported.",
+                            "Field defines a relation involving model "
+                            f"{self.remote_field.model._meta.object_name!r} which has "
+                            "a CompositePrimaryKey and such relations are not "
+                            "supported.",
                             obj=self,
                             id="fields.E347",
                         )
@@ -1539,20 +1540,24 @@ class ManyToManyField(RelatedField):
                 to_model_name = to_model
             else:
                 to_model_name = to_model._meta.object_name
-            if (
-                self.remote_field.through_fields is None
-                and not isinstance(to_model, str)
-                and isinstance(to_model._meta.pk, CompositePrimaryKey)
+            if self.remote_field.through_fields is None and not isinstance(
+                to_model, str
             ):
-                errors.append(
-                    checks.Error(
-                        "Field defines a relation to the CompositePrimaryKey of model "
-                        f"{self.remote_field.model._meta.object_name!r} which is not "
-                        "supported.",
-                        obj=self,
-                        id="fields.E347",
+                model_name = None
+                if isinstance(to_model._meta.pk, CompositePrimaryKey):
+                    model_name = self.remote_field.model._meta.object_name
+                elif isinstance(from_model._meta.pk, CompositePrimaryKey):
+                    model_name = from_model_name
+                if model_name:
+                    errors.append(
+                        checks.Error(
+                            f"Field defines a relation involving model {model_name!r} "
+                            "which has a CompositePrimaryKey and such relations are "
+                            "not supported.",
+                            obj=self,
+                            id="fields.E347",
+                        )
                     )
-                )
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
             # Count foreign keys in intermediate model
