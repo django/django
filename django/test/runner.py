@@ -404,8 +404,9 @@ def get_max_test_processes():
     The maximum number of test processes when using the --parallel option.
     """
     # The current implementation of the parallel test runner requires
-    # multiprocessing to start subprocesses with fork() or spawn().
-    if multiprocessing.get_start_method() not in {"fork", "spawn"}:
+    # multiprocessing to start subprocesses with fork(), forkserver(), or
+    # spawn().
+    if multiprocessing.get_start_method() not in {"fork", "spawn", "forkserver"}:
         return 1
     try:
         return int(os.environ["DJANGO_TEST_PROCESSES"])
@@ -450,9 +451,12 @@ def _init_worker(
         counter.value += 1
         _worker_id = counter.value
 
-    start_method = multiprocessing.get_start_method()
+    is_spawn_or_forkserver = multiprocessing.get_start_method() in {
+        "forkserver",
+        "spawn",
+    }
 
-    if start_method == "spawn":
+    if is_spawn_or_forkserver:
         if process_setup and callable(process_setup):
             if process_setup_args is None:
                 process_setup_args = ()
@@ -463,7 +467,7 @@ def _init_worker(
     db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:
         connection = connections[alias]
-        if start_method == "spawn":
+        if is_spawn_or_forkserver:
             # Restore initial settings in spawned processes.
             connection.settings_dict.update(initial_settings[alias])
             if value := serialized_contents.get(alias):
@@ -606,7 +610,7 @@ class ParallelTestSuite(unittest.TestSuite):
         return iter(self.subsuites)
 
     def initialize_suite(self):
-        if multiprocessing.get_start_method() == "spawn":
+        if multiprocessing.get_start_method() in {"forkserver", "spawn"}:
             self.initial_settings = {
                 alias: connections[alias].settings_dict for alias in connections
             }
