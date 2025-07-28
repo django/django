@@ -170,7 +170,7 @@ form .aligned select + div.help {
 }
 
 form .aligned select option:checked {
-    background-color: var(--selected-row);
+    background-color: var(--body-fg);
 }
 
 form .aligned ul li {
