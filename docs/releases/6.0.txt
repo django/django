@@ -348,7 +348,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The :class:`.DiscoverRunner` now supports parallel test execution on systems
+  using the ``forkserver`` :mod:`multiprocessing` start method.
 
 URLs
 ~~~~
