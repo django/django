@@ -111,6 +111,7 @@ CONTRIB_TESTS_TO_APPS = {
     "deprecation": ["django.contrib.flatpages", "django.contrib.redirects"],
     "flatpages_tests": ["django.contrib.flatpages"],
     "redirects_tests": ["django.contrib.redirects"],
+    "news": ["django.contrib.flatpages", "django.contrib.auth"],
 }
 
 
