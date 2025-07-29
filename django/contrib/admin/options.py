@@ -414,26 +414,35 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         return self.ordering or ()  # otherwise we might try to *None, which is bad ;)
 
+    def _get_readonly_manual_pk_fields(self, obj):
+        """
+        Returns a list of primary key field names that should be readonly if:
+        - we're editing an existing object,
+        - the PK was manually defined (not auto-created),
+        - and it's not already in self.readonly_fields.
+        Supports both single and composite PKs.
+        """
+        if not obj or hasattr(self, "parent_model"):
+            return []
+
+        readonly = []
+        pk_fields = self.model._meta.pk_fields
+
+        for pk in pk_fields:
+            if (
+                pk.editable
+                and not pk.auto_created
+                and pk.name not in self.readonly_fields
+            ):
+                readonly.append(pk.name)
+
+        return readonly
+
     def get_readonly_fields(self, request, obj=None):
         """
         Hook for specifying custom readonly fields.
         """
-        readonly = self.readonly_fields
-        pk_field = self.model._meta.pk
-
-        # Only add PK to readonly if:
-        # - editing an existing object
-        # - PK is not auto-created
-        # - it's not already in the readonly list
-        # - and this is NOT an inline admin (which has `parent_model`)
-        if (
-            obj is not None
-            and not pk_field.auto_created
-            and pk_field.name not in readonly
-            and not hasattr(self, "parent_model")
-        ):
-            readonly = readonly + (pk_field.name,)
-        return readonly
+        return list(self.readonly_fields) + self._get_readonly_manual_pk_fields(obj)
 
     def get_prepopulated_fields(self, request, obj=None):
         """
