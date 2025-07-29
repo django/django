@@ -1534,14 +1534,15 @@ class ManyToManyField(RelatedField):
             if isinstance(from_model._meta.pk, CompositePrimaryKey):
                 model_name = self.remote_field.model._meta.object_name
                 msg = (
-                    "Field has a CompositePrimaryKey and defines a relation with model "
-                    f"'{model_name}', which is not supported."
+                    "Field defines a many-to-many relation on model "
+                    f"{model_name!r} which has a "
+                    "CompositePrimaryKey, but this is not supported."
                 )
                 errors.append(
                     checks.Error(
                         msg,
                         obj=self,
-                        id="fields.E348",
+                        id="fields.E349",
                     )
                 )
                 return errors
