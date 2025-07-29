@@ -4086,7 +4086,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         )
         self.assertContains(
             response,
-            '<a role="button" href="%s" class="historylink"' % escape(expected_link),
+            '<a href="%s" class="historylink"' % escape(expected_link),
         )
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6957,6 +6957,34 @@ class SeleniumTests(AdminSeleniumTestCase):
             save_button.click()
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_object_tools(self):
+        from selenium.webdriver.common.by import By
+
+        state = State.objects.create(name="Korea")
+        city = City.objects.create(state=state, name="Gwangju")
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_city_changelist")
+        )
+        object_tools = self.selenium.find_elements(
+            By.CSS_SELECTOR, "ul.object-tools li a"
+        )
+        self.assertEqual(len(object_tools), 1)
+        self.take_screenshot("changelist")
+
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_views_city_change", args=(city.pk,))
+        )
+        object_tools = self.selenium.find_elements(
+            By.CSS_SELECTOR, "ul.object-tools li a"
+        )
+        self.assertEqual(len(object_tools), 2)
+        self.take_screenshot("changeform")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_long_header_with_object_tools_layout(self):
         from selenium.webdriver.common.by import By
 
@@ -8415,7 +8443,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a role="button" href="(.*?)" class="historylink">History</a>',
+            '<a href="(.*?)" class="historylink">History</a>',
             response.text,
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
