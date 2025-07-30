@@ -165,7 +165,7 @@ This will give us an admin object detail page that looks like this:
 
 .. versionchanged:: 6.0
 
-    Actions where added to the admin object detail page.
+    Actions were added to the admin object detail page by setting ``changelist_only`` to False.
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document covers more
@@ -452,7 +452,7 @@ For example::
 The ``action`` decorator
 ========================
 
-.. function:: action(*, permissions=None, description=None)
+.. function:: action(*, permissions=None, description=None, description_plural=None, changelist_only=True)
 
     This decorator can be used for setting specific attributes on custom action
     functions that can be used with
