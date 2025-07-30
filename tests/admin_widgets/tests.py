@@ -441,11 +441,12 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">'
-            "<label>Date:</label> "
+            '<label for="">Date:</label> '
             '<input aria-describedby="id_test_timezone_warning_helptext" '
             'value="2007-12-01" type="text" class="vDateField" '
             'name="test_0" size="10"><br>'
-            "<label>Time:</label> "
+            "<label for="
+            ">Time:</label> "
             '<input aria-describedby="id_test_timezone_warning_helptext" '
             'value="09:30:00" type="text" class="vTimeField" '
             'name="test_1" size="8"></p>',
@@ -459,11 +460,12 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             self.assertHTMLEqual(
                 w.render("test", datetime(2007, 12, 1, 9, 30)),
                 '<p class="datetime">'
-                "<label>Datum:</label> "
+                '<label for="">Datum:</label> '
                 '<input aria-describedby="id_test_timezone_warning_helptext" '
                 'value="01.12.2007" type="text" '
                 'class="vDateField" name="test_0"size="10"><br>'
-                "<label>Zeit:</label> "
+                "<label for="
+                ">Zeit:</label> "
                 '<input aria-describedby="id_test_timezone_warning_helptext" '
                 'value="09:30:00" type="text" class="vTimeField" '
                 'name="test_1" size="8"></p>',

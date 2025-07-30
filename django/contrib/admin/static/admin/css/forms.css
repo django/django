@@ -42,6 +42,7 @@ label {
     font-size: 0.8125rem;
 }
 
+.required legend, legend.required,
 .required label, label.required {
     font-weight: bold;
 }

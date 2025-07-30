@@ -70,6 +70,7 @@ from .models import (
     Color,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -6914,9 +6915,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.admin_login(
             username="super", password="secret", login_url=reverse("admin:index")
         )
-
-        expected_legend_tags_text = ["Difficulty:", "Students:", "Start datetime:"]
-        url = reverse("admin:admin_views_course_add")
+        course = Course.objects.create(
+            title="Django Class", materials="django_documents"
+        )
+        expected_legend_tags_text = [
+            "Materials:",
+            "Difficulty:",
+            "Students:",
+            "Start datetime:",
+        ]
+        url = reverse("admin:admin_views_course_change", args=(course.pk,))
         self.selenium.get(self.live_server_url + url)
         fieldsets = self.selenium.find_elements(
             By.CSS_SELECTOR, "fieldset.aligned fieldset"

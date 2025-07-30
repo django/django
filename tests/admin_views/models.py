@@ -636,6 +636,7 @@ class Course(models.Model):
     ]
 
     title = models.CharField(max_length=100)
+    materials = models.FileField(upload_to="test_upload")
     difficulty = models.CharField(
         max_length=20, choices=DIFFICULTY_CHOICES, null=True, blank=True
     )
