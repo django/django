@@ -4223,8 +4223,9 @@ Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;
 for example, when fetching models from a cache or instantiating them manually.
 
-Pass an iterable of model instances (must all be of the same class) and the
-lookups or :class:`Prefetch` objects you want to prefetch for. For example:
+Pass an iterable of model instances (must all be of the same class and able to
+be iterated multiple times) and the lookups or :class:`Prefetch` objects you
+want to prefetch for. For example:
 
 .. code-block:: pycon
 
