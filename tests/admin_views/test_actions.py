@@ -674,7 +674,7 @@ class AdminDetailActionsTest(TestCase):
         self.assertEqual(external_subscriber.name, "John Doe")
         self.assertEqual(external_subscriber.email, "john@example.org")
 
-    def test_custom_function_action_streaming_response(self):
+    def test_custom_function_action_streaming_response_change_view(self):
         """
         A custom action may return a StreamingHttpResponse with the
         name of the External Subscriber.
