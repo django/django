@@ -2255,14 +2255,14 @@ class M2mThroughFieldsTests(SimpleTestCase):
         )
 
 
-@isolate_apps("model_fields")
+@isolate_apps("invalid_models_tests")
 class M2MCompositePKCheckTests(SimpleTestCase):
     def test_many_to_many_from_model_with_composite_primary_key(self):
         class Parent(models.Model):
             name = models.CharField(max_length=20)
 
             class Meta:
-                app_label = "model_fields"
+                app_label = "invalid_models_tests"
 
         class Child(models.Model):
             pk = models.CompositePrimaryKey("version", "name")
@@ -2271,7 +2271,7 @@ class M2MCompositePKCheckTests(SimpleTestCase):
             parents = models.ManyToManyField(Parent)
 
             class Meta:
-                app_label = "model_fields"
+                app_label = "invalid_models_tests"
 
         field = Child._meta.get_field("parents")
         errors = field.check(from_model=Child)
@@ -2281,13 +2281,7 @@ class M2MCompositePKCheckTests(SimpleTestCase):
 
         self.assertTrue(
             any(
-                e.id == "fields.E349"
-                and e.msg
-                == (
-                    "Field defines a many-to-many relation on model 'Parent' "
-                    "which has a CompositePrimaryKey, but this is not supported."
-                )
-                for e in errors
+                e.id == "fields.E347" and "CompositePrimaryKey" in e.msg for e in errors
             ),
-            "Expected fields.E349 error with CompositePrimaryKey message not found.",
+            "Expected fields.E347 error involving CompositePrimaryKey not found.",
         )

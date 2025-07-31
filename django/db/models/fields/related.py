@@ -1524,29 +1524,9 @@ class ManyToManyField(RelatedField):
                     id="fields.E331",
                 )
             )
-
         else:
-            assert from_model is not None, (
-                "ManyToManyField with intermediate "
-                "tables cannot be checked if you don't pass the model "
-                "where the field is attached to."
-            )
-            if isinstance(from_model._meta.pk, CompositePrimaryKey):
-                model_name = self.remote_field.model._meta.object_name
-                msg = (
-                    "Field defines a many-to-many relation on model "
-                    f"{model_name!r} which has a "
-                    "CompositePrimaryKey, but this is not supported."
-                )
-                errors.append(
-                    checks.Error(
-                        msg,
-                        obj=self,
-                        id="fields.E349",
-                    )
-                )
-                return errors
             # Set some useful local variables
+            assert from_model is not None
             to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
             if isinstance(to_model, str):
@@ -1556,7 +1536,10 @@ class ManyToManyField(RelatedField):
             if (
                 self.remote_field.through_fields is None
                 and not isinstance(to_model, str)
-                and isinstance(to_model._meta.pk, CompositePrimaryKey)
+                and (
+                    isinstance(to_model._meta.pk, CompositePrimaryKey)
+                    or isinstance(from_model._meta.pk, CompositePrimaryKey)
+                )
             ):
                 errors.append(
                     checks.Error(

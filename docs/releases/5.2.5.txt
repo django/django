@@ -19,10 +19,3 @@ Bugfixes
 
 * Fixed a crash in Django 5.2 when filtering against a composite primary key
   using a tuple containing expressions (:ticket:`36522`).
-
-System checks
-=============
-
-* Added a system check to raise an error when a ``ManyToManyField`` is declared on
-  a model using a ``CompositePrimaryKey``, which is not supported
-  (:ticket:`36530`).
