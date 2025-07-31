@@ -432,7 +432,10 @@ def rjust(value, arg):
 @stringfilter
 def center(value, arg):
     """Center the value in a field of a given width."""
-    return value.center(int(arg))
+    width = int(arg)
+    if width <= 0:
+        return value
+    return f"{value:^{width}}"
 
 
 @register.filter

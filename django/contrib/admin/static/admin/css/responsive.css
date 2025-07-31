@@ -409,9 +409,13 @@ input[type="submit"], button {
 
     /* Changelist */
 
-    #changelist {
-        align-items: stretch;
+    #changelist .changelist-form-container {
         flex-direction: column;
+    }
+
+    #changelist .changelist-form-container:has(#changelist-filter) > div {
+        max-width: 100%;
+        width: 100%;
     }
 
     #toolbar {
@@ -436,25 +440,12 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        position: static;
-        width: auto;
+        width: 100%;
         margin-top: 30px;
     }
 
     .object-tools {
-        float: none;
-        margin: 0 0 15px;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .object-tools li {
-        height: auto;
-        margin-left: 0;
-    }
-
-    .object-tools li + li {
-        margin-left: 15px;
+        text-align: left;
     }
 
     /* Forms */
