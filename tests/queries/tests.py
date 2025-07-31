@@ -4615,3 +4615,15 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list("pk", flat=True)),
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class ExcludedNoneInTest(TestCase):
+    def setUp(self):
+        Tag.objects.create(name="null", parent_id=None)
+        Tag.objects.create(name="one", parent_id=1)
+        Tag.objects.create(name="two", parent_id=2)
+
+    def test_exclude_in_with_none(self):
+        qs = Tag.objects.exclude(parent_id__in=[None, 1])
+        values = list(qs.values_list("parent_id", flat=True))
+        self.assertEqual(values, [2])
