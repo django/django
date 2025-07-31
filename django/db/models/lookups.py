@@ -553,6 +553,32 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             and len(self.rhs) > max_in_list_size
         ):
             return self.split_parameter_list_as_sql(compiler, connection)
+
+        if self.rhs_is_direct_value() and isinstance(self.rhs, (list, tuple)):
+            values = list(self.rhs)
+            has_none = None in values
+            filtered_values = [v for v in values if v is not None]
+            if not filtered_values and not has_none:
+                # Avoid circular import when importing NothingNode
+                from django.db.models.sql.where import NothingNode
+
+                where = NothingNode()
+                return compiler.compile(where)
+
+            lhs, lhs_params = self.process_lhs(compiler, connection)
+            sql_parts = []
+            params = []
+
+            if filtered_values:
+                placeholders = ", ".join(["%s"] * len(filtered_values))
+                sql_parts.append(f"{lhs} IN ({placeholders})")
+                params.extend(lhs_params + filtered_values)
+
+            if has_none:
+                sql_parts.append(f"{lhs} IS NULL")
+
+            return " OR ".join(sql_parts), params
+
         return super().as_sql(compiler, connection)
 
     def split_parameter_list_as_sql(self, compiler, connection):
