@@ -1,5 +1,7 @@
+{% load i18n %}
 {% if show %}
-<nav class="toplinks">
+<nav class="toplinks" aria-labelledby="date-hierarchy-label">
+<span id="date-hierarchy-label">{% blocktranslate %}Filter by {{ field_name }}{% endblocktranslate %}</span>
 {% block date-hierarchy-toplinks %}
 {% block date-hierarchy-back %}
 {% if back %}<a href="{{ back.link }}" class="date-back">&lsaquo; {{ back.title }}</a>{% endif %}
