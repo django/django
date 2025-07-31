@@ -498,7 +498,7 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(from_model=Child),
             [
                 Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "Field defines a relation with the CompositePrimaryKey of model "
                     "'Parent' which is not supported.",
                     obj=field,
                     id="fields.E347",
@@ -510,7 +510,7 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(from_model=Child),
             [
                 Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "Field defines a relation with the CompositePrimaryKey of model "
                     "'Parent' which is not supported.",
                     obj=field,
                     id="fields.E347",

@@ -1543,9 +1543,9 @@ class ManyToManyField(RelatedField):
             ):
                 errors.append(
                     checks.Error(
-                        "Field defines a relation to the CompositePrimaryKey of model "
-                        f"{self.remote_field.model._meta.object_name!r} which is not "
-                        "supported.",
+                        "Field defines a relation with the CompositePrimaryKey of "
+                        f"model {self.remote_field.model._meta.object_name!r} which is "
+                        "not supported.",
                         obj=self,
                         id="fields.E347",
                     )
