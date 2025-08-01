@@ -1950,7 +1950,7 @@ your test suite.
     If a ``"using"`` key is present in ``kwargs`` it is used as the database
     alias for which to check the number of queries::
 
-        self.assertNumQueries(7, using="non_default_db")
+        self.assertNumQueries(7, my_function, using="non_default_db")
 
     If you wish to call a function with a ``using`` parameter you can do it by
     wrapping the call with a ``lambda`` to add an extra parameter::
