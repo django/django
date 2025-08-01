@@ -1525,8 +1525,12 @@ class ManyToManyField(RelatedField):
                 )
             )
         else:
+            assert from_model is not None, (
+                "ManyToManyField with intermediate "
+                "tables cannot be checked if you don't pass the model "
+                "where the field is attached to."
+            )
             # Set some useful local variables
-            assert from_model is not None
             to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
             if isinstance(to_model, str):
