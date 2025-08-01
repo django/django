@@ -47,6 +47,7 @@ from .models import (
     Color2,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -652,6 +653,11 @@ class CustomChangeList(ChangeList):
 class GadgetAdmin(admin.ModelAdmin):
     def get_changelist(self, request, **kwargs):
         return CustomChangeList
+
+
+class CourseAdmin(admin.ModelAdmin):
+    radio_fields = {"difficulty": admin.VERTICAL}
+    filter_horizontal = ("students",)
 
 
 class ToppingAdmin(admin.ModelAdmin):
@@ -1280,6 +1286,7 @@ site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
 site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
+site.register(Course, CourseAdmin)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)

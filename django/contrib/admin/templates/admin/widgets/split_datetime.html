@@ -1,4 +1,4 @@
 <p class="datetime">
-  {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
-  {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
+  <label for="{{ widget.subwidgets.0.attrs.id }}">{{ date_label }}</label> {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
+  <label for="{{ widget.subwidgets.1.attrs.id }}">{{ time_label }}</label> {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
 </p>
