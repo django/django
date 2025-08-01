@@ -4,7 +4,7 @@ argon2-cffi >= 19.2.0
 backports.zoneinfo; python_version < '3.9'
 bcrypt
 black == 23.12.1
-docutils
+docutils < 0.22
 geoip2; python_version < '3.12'
 jinja2 >= 2.11.0
 numpy; python_version < '3.12'
