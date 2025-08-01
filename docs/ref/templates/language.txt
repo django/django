@@ -475,6 +475,143 @@ it also defines the content that fills the hole in the *parent*. If there were
 two similarly-named :ttag:`block` tags in a template, that template's parent
 wouldn't know which one of the blocks' content to use.
 
+.. _template-partials:
+
+Template partials
+=================
+
+.. versionadded:: 6.0
+
+Template partials define reusable template fragments within a template file.
+Partials are self-contained components that you can use multiple times within
+the same template.
+
+Basic syntax
+------------
+
+Define a partial using the :ttag:`partialdef` tag:
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef %}
+
+For extra readability, you can optionally add the name to your 
+``{% endpartialdef %}`` tag:
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef card %}
+
+Render the partial using the :ttag:`partial` tag:
+
+.. code-block:: html+django
+
+    {% partial card %}
+
+Fragment reuse
+--------------
+
+Once defined, you can reuse a partial multiple times:
+
+.. code-block:: html+django
+
+    {% partialdef user-info %}
+        <div class="user">
+            <span>{{ user.username }}</span>
+            <span>{{ user.email }}</span>
+        </div>
+    {% endpartialdef %}
+
+    {% block content %}
+        <h2>Authors</h2>
+        {% for user in authors %}
+            {% partial user-info %}
+        {% endfor %}
+
+        <h2>Editors</h2>
+        {% for user in editors %}
+            {% partial user-info %}
+        {% endfor %}
+    {% endblock %}
+
+The partial content will be rendered each time the named partial is used,
+with the current template context.
+
+Inline partials
+---------------
+
+Define and render a partial inline using the ``inline`` argument:
+
+.. code-block:: html+django
+
+    {% partialdef header inline %}
+        <header class="site-header">
+            <h1>{{ site_name }}</h1>
+        </header>
+    {% endpartialdef %}
+
+This defines the partial and renders it immediately in place.
+
+Direct partial access
+---------------------
+
+Access partials directly using the ``#`` syntax. In views, use the
+:func:`~django.shortcuts.render` shortcut:
+
+.. code-block:: python
+
+    # In views.py
+    from django.shortcuts import render
+
+
+    def product_card_partial(request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        return render(request, "products/list.html#product-card", {"product": product})
+
+This approach is useful for AJAX responses, HTMX requests, or when you need
+only a specific part of a template. Use partials with the :ttag:`include` tag:
+
+.. code-block:: html+django
+
+    {% include "products/list.html#product-card" %}
+
+Context handling
+----------------
+
+Template partials render with the current template context. They work as
+expected in loops and with context variables:
+
+.. code-block:: html+django
+
+    {% partialdef product-card %}
+        <div class="product" data-id="{{ product.id }}">
+            <h3>{{ product.name }}</h3>
+            <p>${{ product.price }}</p>
+        </div>
+    {% endpartialdef %}
+
+    {% for product in products %}
+        {% partial product-card %}
+    {% endfor %}
+
+If you need to adjust the context, use the :ttag:`with` tag:
+
+.. code-block:: html+django
+
+    {% with title="Special Offer" price=product.sale_price %}
+        {% partial product-card %}
+    {% endwith %}
+
 .. _next section: #automatic-html-escaping
 .. _automatic-html-escaping:
 

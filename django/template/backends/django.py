@@ -75,10 +75,31 @@ class DjangoTemplates(BaseEngine):
         return Template(self.engine.from_string(template_code), self)
 
     def get_template(self, template_name):
+        original_name = template_name
         try:
-            return Template(self.engine.get_template(template_name), self)
+            template_name, _, partial_name = template_name.partition("#")
+        except AttributeError:
+            raise TemplateDoesNotExist(original_name)
+
+        if not template_name:
+            raise TemplateDoesNotExist(original_name)
+
+        try:
+            template = self.engine.get_template(template_name)
         except TemplateDoesNotExist as exc:
             reraise(exc, self)
+
+        if not partial_name:
+            return Template(template, self)
+
+        extra_data = getattr(template, "extra_data", {})
+        try:
+            partial = extra_data["template-partials"][partial_name]
+        except (KeyError, TypeError):
+            raise TemplateDoesNotExist(partial_name, tried=[template_name])
+        partial.engine = self.engine
+
+        return Template(partial, self)
 
     def get_templatetag_libraries(self, custom_libraries):
         """

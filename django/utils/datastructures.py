@@ -345,3 +345,17 @@ class CaseInsensitiveMapping(Mapping):
                     "Element key %r invalid, only strings are allowed" % elem[0]
                 )
             yield elem
+
+
+class SubDictionaryWrapper:
+    """
+    Wrap a parent dictionary, allowing deferred
+    access to a sub-dict by key.
+    """
+
+    def __init__(self, parent_dict, deferred_key):
+        self.parent_dict = parent_dict
+        self.deferred_key = deferred_key
+
+    def __getitem__(self, key):
+        return self.parent_dict[self.deferred_key][key]
