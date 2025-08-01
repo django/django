@@ -15,3 +15,5 @@ Bugfixes
 
 * Fixed a crash in Django 5.2 when filtering against a composite primary key
   using a tuple containing expressions (:ticket:`36522`).
+
+* Added compatibility for ``docutils`` 0.22 (:ticket:`36535`).
