@@ -268,3 +268,18 @@ class CompositePKChecksTests(TestCase):
                 ),
             ],
         )
+
+    def test_autofield_in_composite_pk_does_not_require_primary_key(self):
+        class AutoId(models.Model):
+            pk = models.CompositePrimaryKey("id", "name")
+            id = models.BigAutoField()
+            name = models.CharField(max_length=255)
+
+        if connection.features.supports_autofields_in_composite_pk:
+            self.assertEqual(AutoId.check(databases=self.databases), [])
+        else:
+            self.assertEqual(
+                AutoId.check(databases=self.databases)[0].msg,
+                "AutoFields must either set primary_key=True or be part of a "
+                "CompositePrimaryKey.",
+            )
