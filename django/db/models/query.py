@@ -18,6 +18,7 @@ from django.db import (
     IntegrityError,
     NotSupportedError,
     connections,
+    models,
     router,
     transaction,
 )
@@ -984,12 +985,27 @@ class QuerySet(AltersData):
                 with transaction.atomic(using=self.db):
                     params = dict(resolve_callables(params))
                     return self.create(**params), True
-            except IntegrityError:
+            except IntegrityError as e:
                 try:
-                    return self.get(**kwargs), False
+                    obj = self.get(**kwargs)
                 except self.model.DoesNotExist:
-                    pass
-                raise
+                    # Re-raise if the object still doesn't exist.
+                    # This wasn't a race condition but an integrity error.
+                    raise e
+                else:
+                    # Clear stale reverse OneToOne cache on related object
+                    for field in self.model._meta.fields:
+                        if isinstance(field, models.OneToOneField):
+                            related_obj = kwargs.get(field.name)
+                            if related_obj is not None:
+                                related_cache_attr = field.remote_field.cache_name
+                                cached = getattr(related_obj, related_cache_attr, None)
+                                if cached is None or cached.pk is None:
+                                    related_obj._state.fields_cache.pop(
+                                        related_cache_attr, None
+                                    )
+
+                    return obj, False
 
     get_or_create.alters_data = True
 
