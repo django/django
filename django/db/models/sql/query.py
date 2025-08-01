@@ -1622,7 +1622,11 @@ class Query(BaseExpression):
             and condition.rhs is not None
         ):
             require_outer = True
-            if lookup_type != "isnull":
+            if lookup_type != "isnull" and not (
+                lookup_type == "in"
+                and isinstance(value, (list, tuple))
+                and None in value
+            ):
                 # The condition added here will be SQL like this:
                 # NOT (col IS NOT NULL), where the first NOT is added in
                 # upper layers of code. The reason for addition is that if col
