@@ -1524,7 +1524,6 @@ class ManyToManyField(RelatedField):
                     id="fields.E331",
                 )
             )
-
         else:
             assert from_model is not None, (
                 "ManyToManyField with intermediate "
@@ -1541,13 +1540,16 @@ class ManyToManyField(RelatedField):
             if (
                 self.remote_field.through_fields is None
                 and not isinstance(to_model, str)
-                and isinstance(to_model._meta.pk, CompositePrimaryKey)
+                and (
+                    isinstance(to_model._meta.pk, CompositePrimaryKey)
+                    or isinstance(from_model._meta.pk, CompositePrimaryKey)
+                )
             ):
                 errors.append(
                     checks.Error(
-                        "Field defines a relation to the CompositePrimaryKey of model "
-                        f"{self.remote_field.model._meta.object_name!r} which is not "
-                        "supported.",
+                        "Field defines a relation with the CompositePrimaryKey of "
+                        f"model {self.remote_field.model._meta.object_name!r} which is "
+                        "not supported.",
                         obj=self,
                         id="fields.E347",
                     )
