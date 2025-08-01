@@ -157,6 +157,51 @@
     word-break: break-word;
 }
 
+.changelist-tools {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* SIDEBAR TRIGGER */
+
+.sidebar-trigger {
+    display: none;
+    margin-top: 0;
+    padding: 0;
+}
+
+.sidebar-trigger li {
+    list-style-type: none;
+}
+
+.sidebar-trigger button {
+    display: flex;
+    gap: 8px;
+    outline: none;
+    box-sizing: content-box;
+    border: none;
+    line-height: 20px;
+    cursor: pointer;
+    background-color: var(--sidebar-toggle-bg);
+    border-radius: 15px;
+}
+
+.sidebar-trigger button::after {
+    content: '';
+    display: inline-block;
+    background: url("../img/icon-sidebar-toggle-open.svg") 0 1px no-repeat;
+    height: 16px;
+    width: 16px;
+}
+
+.sidebar-trigger button[aria-pressed="true"] {
+    background-color: var(--sidebar-toggle-pressed-bg);
+}
+
+.sidebar-trigger button[aria-pressed="true"]::after {
+    background: url("../img/icon-sidebar-toggle-close.svg") 0 1px no-repeat;
+}
+
 /* FILTER COLUMN */
 
 #changelist-filter {
