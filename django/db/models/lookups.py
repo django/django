@@ -546,34 +546,25 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return "IN %s" % rhs
 
     def as_sql(self, compiler, connection):
-        max_size = connection.ops.max_in_list_size()
-        has_none = (
-            self.rhs_is_direct_value()
-            and isinstance(self.rhs, (list, tuple, set))
+        try:
+            sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            sql, params = "", ()
+
+        if (
+            compiler.query.is_nullable(self.lhs.output_field)
+            and self.rhs_is_direct_value()
             and None in self.rhs
-        )
-        if has_none:
-            self.rhs = [v for v in self.rhs if v is not None]
-            if not self.rhs:
-                # Short-circuit PK lookups like id__in=[None] to none().
-                # This avoids unnecessary "IS NULL" queries when the QuerySet
-                # will return no results (e.g. assertNumQueries(0) tests).
-                if getattr(self.lhs.output_field, "primary_key", False):
-                    return super().as_sql(compiler, connection)
-
-                lhs, params = self.process_lhs(compiler, connection)
-                op = "IS NOT NULL" if compiler.query.where.negated else "IS NULL"
-                return f"{lhs} {op}", params
-
-        if self.rhs_is_direct_value() and max_size and len(self.rhs) > max_size:
-            return self.split_parameter_list_as_sql(compiler, connection)
-
-        sql, params = super().as_sql(compiler, connection)
-
-        if has_none:
-            lhs, lhs_params = self.process_lhs(compiler, connection)
-            sql = f"({sql} OR {lhs} IS NULL)"
-            params = (*params, *lhs_params)
+        ):
+            lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+            if sql:
+                sql = f"({sql} OR {lhs_sql} IS NULL)"
+                params = (*params, *lhs_params)
+            else:
+                sql = f"{lhs_sql} IS NULL"
+                params = (*lhs_params,)
+        elif not sql:
+            raise EmptyResultSet
 
         return sql, params
 
