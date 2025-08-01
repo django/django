@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.conf import settings
 from django.utils.csp import CSP, LazyNonce, build_policy
 from django.utils.deprecation import MiddlewareMixin
@@ -14,23 +12,24 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         request._csp_nonce = LazyNonce()
 
     def process_response(self, request, response):
-        # In DEBUG mode, exclude CSP headers for specific status codes that
-        # trigger the debug view.
-        exempted_status_codes = {
-            HTTPStatus.NOT_FOUND,
-            HTTPStatus.INTERNAL_SERVER_ERROR,
-        }
-        if settings.DEBUG and response.status_code in exempted_status_codes:
-            return response
-
         nonce = get_nonce(request)
-        for header, config in [
-            (CSP.HEADER_ENFORCE, settings.SECURE_CSP),
-            (CSP.HEADER_REPORT_ONLY, settings.SECURE_CSP_REPORT_ONLY),
+        for config, header, disabled in [
+            (
+                getattr(response, "_csp_config", None) or settings.SECURE_CSP,
+                CSP.HEADER_ENFORCE,
+                getattr(response, "_csp_disabled", False),
+            ),
+            (
+                getattr(response, "_csp_config_ro", None)
+                or settings.SECURE_CSP_REPORT_ONLY,
+                CSP.HEADER_REPORT_ONLY,
+                getattr(response, "_csp_disabled_ro", False),
+            ),
         ]:
-            # If headers are already set on the response, don't overwrite them.
-            # This allows for views to set their own CSP headers as needed.
-            if config and header not in response:
+            # Only set CSP headers if they are not present on the response,
+            # and if CSP is not disabled via the `@csp_disabled` decorator.
+            # This allows views to customize or disable CSP headers as needed.
+            if config and header not in response and not disabled:
                 response.headers[str(header)] = build_policy(config, nonce)
 
         return response
