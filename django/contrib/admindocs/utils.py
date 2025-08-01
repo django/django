@@ -13,6 +13,7 @@ try:
     import docutils.core
     import docutils.nodes
     import docutils.parsers.rst.roles
+    import docutils.writers
 except ImportError:
     docutils_is_available = False
 else:
@@ -78,11 +79,14 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 
 .. default-role::
 """
+    # In docutils < 0.22, the `writer` param must be an instance. Passing a
+    # string writer name like "html" is only supported in 0.22+.
+    writer_instance = docutils.writers.get_writer_class("html")()
     parts = docutils.core.publish_parts(
         source % text,
         source_path=thing_being_parsed,
         destination_path=None,
-        writer="html",
+        writer=writer_instance,
         settings_overrides=overrides,
     )
     return mark_safe(parts["fragment"])
