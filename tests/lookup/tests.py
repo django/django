@@ -776,6 +776,20 @@ class LookupTests(TestCase):
         with self.assertNumQueries(0):
             self.assertSequenceEqual(Article.objects.filter(id__in=[None]), [])
 
+    def test_exclude_in_with_none(self):
+        Article.objects.all().delete()
+        Author.objects.all().delete()
+
+        a1 = Author.objects.create(name="one")
+        a2 = Author.objects.create(name="two")
+        Article.objects.create(headline="null", pub_date=datetime.now(), author=None)
+        Article.objects.create(headline="one", pub_date=datetime.now(), author=a1)
+        Article.objects.create(headline="two", pub_date=datetime.now(), author=a2)
+
+        qs = Article.objects.exclude(author__in=[None, a1])
+        authors = list(qs.values_list("author_id", flat=True))
+        self.assertEqual(authors, [a2.pk])
+
     def test_in_ignore_none_with_unhashable_items(self):
         class UnhashableInt(int):
             __hash__ = None

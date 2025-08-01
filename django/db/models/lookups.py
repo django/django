@@ -546,40 +546,36 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return "IN %s" % rhs
 
     def as_sql(self, compiler, connection):
-        max_in_list_size = connection.ops.max_in_list_size()
-        if (
+        max_size = connection.ops.max_in_list_size()
+        has_none = (
             self.rhs_is_direct_value()
-            and max_in_list_size
-            and len(self.rhs) > max_in_list_size
-        ):
+            and isinstance(self.rhs, (list, tuple, set))
+            and None in self.rhs
+        )
+        if has_none:
+            self.rhs = [v for v in self.rhs if v is not None]
+            if not self.rhs:
+                # Short-circuit PK lookups like id__in=[None] to none().
+                # This avoids unnecessary "IS NULL" queries when the QuerySet
+                # will return no results (e.g. assertNumQueries(0) tests).
+                if getattr(self.lhs.output_field, "primary_key", False):
+                    return super().as_sql(compiler, connection)
+
+                lhs, params = self.process_lhs(compiler, connection)
+                op = "IS NOT NULL" if compiler.query.where.negated else "IS NULL"
+                return f"{lhs} {op}", params
+
+        if self.rhs_is_direct_value() and max_size and len(self.rhs) > max_size:
             return self.split_parameter_list_as_sql(compiler, connection)
 
-        if self.rhs_is_direct_value() and isinstance(self.rhs, (list, tuple)):
-            values = list(self.rhs)
-            has_none = None in values
-            filtered_values = [v for v in values if v is not None]
-            if not filtered_values and not has_none:
-                # Avoid circular import when importing NothingNode
-                from django.db.models.sql.where import NothingNode
+        sql, params = super().as_sql(compiler, connection)
 
-                where = NothingNode()
-                return compiler.compile(where)
-
+        if has_none:
             lhs, lhs_params = self.process_lhs(compiler, connection)
-            sql_parts = []
-            params = []
+            sql = f"({sql} OR {lhs} IS NULL)"
+            params = (*params, *lhs_params)
 
-            if filtered_values:
-                placeholders = ", ".join(["%s"] * len(filtered_values))
-                sql_parts.append(f"{lhs} IN ({placeholders})")
-                params.extend(lhs_params + filtered_values)
-
-            if has_none:
-                sql_parts.append(f"{lhs} IS NULL")
-
-            return " OR ".join(sql_parts), params
-
-        return super().as_sql(compiler, connection)
+        return sql, params
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
