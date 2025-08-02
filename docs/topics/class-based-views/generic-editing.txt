@@ -303,7 +303,7 @@ preference, use :func:`django.http.HttpRequest.get_preferred_type`::
 
         def form_invalid(self, form):
             response = super().form_invalid(form)
-            accepted_type = request.get_preferred_type(self.accepted_media_types)
+            accepted_type = self.request.get_preferred_type(self.accepted_media_types)
             if accepted_type == "text/html":
                 return response
             elif accepted_type == "application/json":
@@ -314,7 +314,7 @@ preference, use :func:`django.http.HttpRequest.get_preferred_type`::
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
             response = super().form_valid(form)
-            accepted_type = request.get_preferred_type(self.accepted_media_types)
+            accepted_type = self.request.get_preferred_type(self.accepted_media_types)
             if accepted_type == "text/html":
                 return response
             elif accepted_type == "application/json":
