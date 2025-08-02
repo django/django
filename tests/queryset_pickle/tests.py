@@ -318,8 +318,7 @@ class PickleabilityTestCase(TestCase):
 
     def test_filter_deferred(self):
         qs = Happening.objects.all()
-        qs._defer_next_filter = True
-        qs = qs.filter(id=0)
+        qs = qs._filter_q(models.Q(id=0), defer=True)
         self.assert_pickles(qs)
 
     def test_missing_django_version_unpickling(self):
