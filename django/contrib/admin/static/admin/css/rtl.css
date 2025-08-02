@@ -26,7 +26,12 @@ th {
 }
 
 .object-tools {
-    float: left;
+    text-align: left;
+}
+
+.object-tools li + li {
+    margin-right: 15px;
+    margin-left: 0;
 }
 
 thead th:first-child,

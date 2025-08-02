@@ -1221,9 +1221,9 @@ class MigrationAutodetector:
                 model_name=model_name,
                 name=field_name,
             ),
-            # We might need to depend on the removal of an
-            # order_with_respect_to or index/constraint/unique_together
-            # operation; this is safely ignored if there isn't one
+            # Include dependencies such as order_with_respect_to, constraints,
+            # and any generated fields that may depend on this field. These
+            # are safely ignored if not present.
             dependencies=[
                 OperationDependency(
                     app_label,
@@ -1242,6 +1242,9 @@ class MigrationAutodetector:
                     model_name,
                     field_name,
                     OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
+                ),
+                *self._get_generated_field_dependencies_for_removed_field(
+                    app_label, model_name, field_name
                 ),
             ],
         )
@@ -1694,6 +1697,27 @@ class MigrationAutodetector:
                         model_name,
                         added_field.name,
                         OperationDependency.Type.CREATE,
+                    )
+                )
+        return dependencies
+
+    def _get_generated_field_dependencies_for_removed_field(
+        self, app_label, model_name, field_name
+    ):
+        dependencies = []
+        model_state = self.from_state.models[app_label, model_name]
+        generated_fields = (f for f in model_state.fields.values() if f.generated)
+        for field in generated_fields:
+            if any(
+                field_name == name
+                for name, *_ in models.Model._get_expr_references(field.expression)
+            ):
+                dependencies.append(
+                    OperationDependency(
+                        app_label,
+                        model_name,
+                        field.name,
+                        OperationDependency.Type.REMOVE,
                     )
                 )
         return dependencies

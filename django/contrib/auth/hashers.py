@@ -6,6 +6,8 @@ import importlib
 import math
 import warnings
 
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
@@ -86,7 +88,10 @@ def check_password(password, encoded, setter=None, preferred="default"):
 
 async def acheck_password(password, encoded, setter=None, preferred="default"):
     """See check_password()."""
-    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
+    is_correct, must_update = await sync_to_async(
+        verify_password,
+        thread_sensitive=False,
+    )(password, encoded, preferred=preferred)
     if setter and is_correct and must_update:
         await setter(password)
     return is_correct
