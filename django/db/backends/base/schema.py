@@ -204,6 +204,8 @@ class BaseDatabaseSchemaEditor:
                 cursor.execute(sql, params)
 
     def quote_name(self, name):
+        if name is None:
+            return name
         return self.connection.ops.quote_name(name)
 
     def table_sql(self, model):
@@ -1659,7 +1661,11 @@ class BaseDatabaseSchemaEditor:
         return output
 
     def _field_should_be_altered(self, old_field, new_field, ignore=None):
-        if not old_field.concrete and not new_field.concrete:
+        if not (
+            old_field.concrete or old_field.is_relation and old_field.many_to_many
+        ) and not (
+            new_field.concrete or new_field.is_relation and new_field.many_to_many
+        ):
             return False
         ignore = ignore or set()
         _, old_path, old_args, old_kwargs = old_field.deconstruct()
