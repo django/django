@@ -133,8 +133,8 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
-    An :class:`EmailValidator` ensures that a value looks like an email, and
-    raises a :exc:`~django.core.exceptions.ValidationError` with
+    An :class:`EmailValidator` ensures that a value looks like an email
+    address, and raises a :exc:`~django.core.exceptions.ValidationError` with
     :attr:`message` and :attr:`code` if it doesn't. Values longer than 320
     characters are always considered invalid.
 
