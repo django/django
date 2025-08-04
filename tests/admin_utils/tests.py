@@ -329,12 +329,27 @@ class UtilsTests(SimpleTestCase):
 
         self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
         self.assertEqual(label_for_field("site_id", Article), "Site id")
-        # The verbose_name and attr are returned when `__` is in the field
-        # name.
-        self.assertEqual(label_for_field("site__domain", Article), "domain")
+
+        # Related lookup, field doesn't have a explicit verbose_name defined
+        domain_field_attr_name = "domain"
+        domain_field = Site._meta.get_field(domain_field_attr_name)
+        self.assertIsNone(domain_field._verbose_name)
+        self.assertEqual(
+            label_for_field("site__domain", Article), domain_field_attr_name
+        )
         self.assertEqual(
             label_for_field("site__domain", Article, return_attr=True),
-            ("domain", Site._meta.get_field("domain")),
+            ("domain", domain_field),
+        )
+
+        # Related lookup, field does have a explicit verbose_name defined
+        owner_verbose_name = "Site owner"
+        owner_field = Site._meta.get_field("owner")
+        self.assertEqual(owner_field.verbose_name, owner_verbose_name)
+        self.assertEqual(label_for_field("site__owner", Article), owner_verbose_name)
+        self.assertEqual(
+            label_for_field("site__domain", Article, return_attr=True),
+            (owner_verbose_name, domain_field),
         )
 
     def test_label_for_field_failed_lookup(self):
