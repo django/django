@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import TooManyFieldsSent, TooManyFilesSent
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
@@ -309,6 +310,27 @@ class SafeExceptionReporterFilter:
         return cleansed.items()
 
 
+class SafeExceptionRequest:
+    def __init__(self, request):
+        self._request = request
+
+    def __getattr__(self, name):
+        if name in ("GET", "FILES"):
+            try:
+                return getattr(self._request, name)
+            except (TooManyFieldsSent, TooManyFilesSent):
+                from django.http import QueryDict
+
+                return QueryDict()
+        return getattr(self._request, name)
+
+    def __str__(self):
+        return str(self._request)
+
+    def __repr__(self):
+        return repr(self._request)
+
+
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
 
@@ -389,7 +411,7 @@ class ExceptionReporter:
             "is_email": self.is_email,
             "unicode_hint": unicode_hint,
             "frames": frames,
-            "request": self.request,
+            "request": SafeExceptionRequest(self.request) if self.request else None,
             "request_meta": self.filter.get_safe_request_meta(self.request),
             "request_COOKIES_items": self.filter.get_safe_cookies(self.request).items(),
             "user_str": user_str,
@@ -407,8 +429,26 @@ class ExceptionReporter:
             "postmortem": self.postmortem,
         }
         if self.request is not None:
-            c["request_GET_items"] = self.request.GET.items()
-            c["request_FILES_items"] = self.request.FILES.items()
+            try:
+                c["request_GET_items"] = self.request.GET.items()
+            except TooManyFieldsSent:
+                c["request_GET_items"] = [
+                    (
+                        "<could not parse>",
+                        "Number of GET paramters exceeded "
+                        "DATA_UPLOAD_MAX_NUMBER_FIELDS.",
+                    )
+                ]
+            try:
+                c["request_FILES_items"] = self.request.FILES.items()
+            except TooManyFilesSent:
+                c["request_FILES_items"] = [
+                    (
+                        "<could not parse>",
+                        "Number of FILES parameters exceeded "
+                        "DATA_UPLOAD_MAX_NUMBER_FILES",
+                    )
+                ]
             c["request_insecure_uri"] = self._get_raw_insecure_uri()
             c["raising_view_name"] = get_caller(self.request)
 

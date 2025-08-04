@@ -486,6 +486,14 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
+    @override_settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1)
+    def test_max_number_of_fields_exceeded(self):
+        response = self.client.get("/raises500/", {"a": "1", "b": "2"})
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, '<div class="context" id="', status_code=500)
+        self.assertContains(response, "Exception", status_code=500)
+
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
