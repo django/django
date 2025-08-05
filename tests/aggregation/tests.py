@@ -2739,8 +2739,10 @@ class JSONArrayAggTests(TestCase):
     def setUpTestData(cls):
         cls.a1 = Author.objects.create(name="Adrian Holovaty", age=34)
         cls.a2 = Author.objects.create(name="Jacob Kaplan-Moss", age=45)
+        cls.a3 = Author.objects.create(name="Brad Dayley", age=40)
         cls.p1 = Publisher.objects.create(num_awards=3)
         cls.p2 = Publisher.objects.create(num_awards=1)
+        cls.p3 = Publisher.objects.create(num_awards=7)
         cls.b1 = Book.objects.create(
             isbn="159059725",
             name="b1",
@@ -2763,40 +2765,46 @@ class JSONArrayAggTests(TestCase):
             pubdate=datetime.date(2008, 3, 3),
         )
         cls.b2.authors.add(cls.a2)
+        cls.b3 = Book.objects.create(
+            isbn="159059996",
+            name="Practical Django Projects",
+            pages=300,
+            rating=4.0,
+            price=Decimal("29.69"),
+            contact=cls.a3,
+            publisher=cls.p3,
+            pubdate=datetime.date(2008, 6, 23),
+        )
+        cls.b3.authors.add(cls.a3)
 
     def test_text(self):
         vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
         self.assertEqual(
             vals,
-            {"jsonarrayagg": ["Adrian Holovaty", "Jacob Kaplan-Moss"]},
+            {"jsonarrayagg": ["Adrian Holovaty", "Jacob Kaplan-Moss", "Brad Dayley"]},
         )
 
     def test_datefield(self):
         vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pubdate"))
         self.assertEqual(
             vals,
-            {
-                "jsonarrayagg": [
-                    "2007-12-06",
-                    "2008-03-03",
-                ]
-            },
+            {"jsonarrayagg": ["2007-12-06", "2008-03-03", "2008-06-23"]},
         )
 
     def test_decimalfield(self):
         vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__price"))
-        self.assertEqual(vals, {"jsonarrayagg": [30.0, 23.09]})
+        self.assertEqual(vals, {"jsonarrayagg": [30.0, 23.09, 29.69]})
 
     def test_integerfield(self):
         vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pages"))
-        self.assertEqual(vals, {"jsonarrayagg": [447, 528]})
+        self.assertEqual(vals, {"jsonarrayagg": [447, 528, 300]})
 
     @skipUnlessDBFeature("supports_aggregate_filter_clause")
     def test_filter(self):
         vals = Book.objects.aggregate(
             jsonarrayagg=JSONArrayAgg("contact__age", filter=Q(contact__age__gt=35))
         )
-        self.assertEqual(vals, {"jsonarrayagg": [45]})
+        self.assertEqual(vals, {"jsonarrayagg": [45, 40]})
 
     def test_empty_result_set(self):
         Author.objects.all().delete()
@@ -2816,8 +2824,21 @@ class JSONArrayAggTests(TestCase):
     )
     @skipUnlessDBFeature("supports_aggregate_order_by_clause")
     def test_order_by(self):
-        val = Author.objects.aggregate(authors=JSONArrayAgg("name", order_by="-age"))
-        self.assertEqual(val, {"authors": ["Jacob Kaplan-Moss", "Adrian Holovaty"]})
+        for order_by, expected_result in (
+            (
+                "book__publisher__num_awards",
+                {"authors": ["Jacob Kaplan-Moss", "Adrian Holovaty", "Brad Dayley"]},
+            ),
+            (
+                "-book__publisher__num_awards",
+                {"authors": ["Brad Dayley", "Adrian Holovaty", "Jacob Kaplan-Moss"]},
+            ),
+        ):
+            with self.subTest(order_by=order_by):
+                val = Author.objects.aggregate(
+                    authors=JSONArrayAgg("name", order_by=order_by)
+                )
+                self.assertEqual(val, expected_result)
 
     @skipUnless(connection.vendor == "mysql", "JSONArrayAgg not supported.")
     def test_order_by_not_supported(self):
