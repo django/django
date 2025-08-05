@@ -12,7 +12,7 @@ from django.db.backends.postgresql.psycopg_any import (
 from django.db.models.functions import Cast
 from django.db.models.lookups import PostgresOperatorLookup
 
-from ..utils import CheckPostgresInstalledMixin
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from .utils import AttributeSetter
 
 __all__ = [

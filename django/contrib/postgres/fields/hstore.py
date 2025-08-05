@@ -7,7 +7,7 @@ from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import CheckPostgresInstalledMixin
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 
 __all__ = ["HStoreField"]
 

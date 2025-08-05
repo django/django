@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .. import Tags, Warning, register
+from django.core.checks import Tags, Warning, register
 
 
 def add_session_cookie_message(message):

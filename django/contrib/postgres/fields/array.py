@@ -9,7 +9,7 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import CheckPostgresInstalledMixin, prefix_validation_error
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin, prefix_validation_error
 from .utils import AttributeSetter
 
 __all__ = ["ArrayField"]

@@ -9,7 +9,7 @@ from django.contrib.postgres.validators import (
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import prefix_validation_error
+from django.contrib.postgres.utils import prefix_validation_error
 
 
 class SimpleArrayField(forms.CharField):
