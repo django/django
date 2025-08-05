@@ -2176,20 +2176,20 @@ class PrefetchRelatedMTICacheTests(TestCase):
             .prefetch_related("favorite_authors")
             .get(pk=self.m2m_child.pk)
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             {self.related1, self.related2, self.related3},
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             {self.related1, self.related2, self.related3},
         )
         gp.authorwithage.favorite_authors.add(self.related4)
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             {self.related1, self.related2, self.related3, self.related4},
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             {self.related1, self.related2, self.related3, self.related4},
         )
@@ -2202,28 +2202,28 @@ class PrefetchRelatedMTICacheTests(TestCase):
             .prefetch_related("favorite_authors")
             .get(pk=self.m2m_child.pk)
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.authorwithagechild.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
         gp.authorwithage.authorwithagechild.favorite_authors.add(self.related4)
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             [self.related1, self.related2, self.related3, self.related4],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             [self.related1, self.related2, self.related3, self.related4],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.authorwithagechild.favorite_authors.all(),
             [self.related1, self.related2, self.related3, self.related4],
         )
@@ -2234,17 +2234,17 @@ class PrefetchRelatedMTICacheTests(TestCase):
             .prefetch_related("favorite_authors")
             .get(pk=self.m2m_child.pk)
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
         gp.authorwithage.favorite_authors.clear()
-        self.assertQuerySetEqual(gp.favorite_authors.all(), [])
-        self.assertQuerySetEqual(gp.authorwithage.favorite_authors.all(), [])
+        self.assertSequenceEqual(gp.favorite_authors.all(), [])
+        self.assertSequenceEqual(gp.authorwithage.favorite_authors.all(), [])
 
     def test_remove_clears_prefetched_objects_in_grandparent(self):
         gp = (
@@ -2254,21 +2254,21 @@ class PrefetchRelatedMTICacheTests(TestCase):
             .prefetch_related("favorite_authors")
             .get(pk=self.m2m_child.pk)
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
-        self.assertQuerySetEqual(
+        self.assertCountEqual(
             gp.authorwithage.authorwithagechild.favorite_authors.all(),
             [self.related1, self.related2, self.related3],
         )
         gp.authorwithage.favorite_authors.clear()
-        self.assertQuerySetEqual(gp.favorite_authors.all(), [])
-        self.assertQuerySetEqual(gp.authorwithage.favorite_authors.all(), [])
-        self.assertQuerySetEqual(
+        self.assertSequenceEqual(gp.favorite_authors.all(), [])
+        self.assertSequenceEqual(gp.authorwithage.favorite_authors.all(), [])
+        self.assertSequenceEqual(
             gp.authorwithage.authorwithagechild.favorite_authors.all(), []
         )
