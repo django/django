@@ -474,6 +474,10 @@ Miscellaneous
   files due to conflicts when ``--verbosity`` is 1. To see warnings for each
   conflicting destination path, set the ``--verbosity`` flag to 2 or higher.
 
+* The :option:`collectstatic --clear` command now reports only a summary of
+  deleted files when ``--verbosity`` is 1. To see the details for each file
+  deleted, set the ``--verbosity`` flag to 2 or higher.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
