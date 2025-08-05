@@ -2573,6 +2573,18 @@ class InlineModelAdmin(BaseModelAdmin):
             return self._has_any_perms_for_target_model(request, ["view", "change"])
         return super().has_view_permission(request)
 
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Make manually specified (non-auto-created) primary key fields readonly
+        when editing an existing inline object.
+        """
+        readonly = list(self.readonly_fields)
+        if obj:
+            for pk in self.model._meta.pk_fields:
+                if pk.editable and not pk.auto_created and pk.name not in readonly:
+                    readonly.append(pk.name)
+        return readonly
+
 
 class StackedInline(InlineModelAdmin):
     template = "admin/edit_inline/stacked.html"
