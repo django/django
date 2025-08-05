@@ -26,6 +26,7 @@ class Command(BaseCommand):
         self.unmodified_files = []
         self.post_processed_files = []
         self.skipped_files = []
+        self.deleted_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
 
@@ -168,6 +169,7 @@ class Command(BaseCommand):
             "unmodified": self.unmodified_files,
             "post_processed": self.post_processed_files,
             "skipped": self.skipped_files,
+            "deleted": self.deleted_files,
         }
 
     def handle(self, **options):
@@ -212,14 +214,21 @@ class Command(BaseCommand):
         collected = self.collect()
 
         if self.verbosity >= 1:
+            deleted_count = len(collected["deleted"])
             modified_count = len(collected["modified"])
             unmodified_count = len(collected["unmodified"])
             post_processed_count = len(collected["post_processed"])
             skipped_count = len(collected["skipped"])
             return (
-                "\n%(modified_count)s %(identifier)s %(action)s"
+                "\n%(deleted)s%(modified_count)s %(identifier)s %(action)s"
                 "%(destination)s%(unmodified)s%(post_processed)s%(skipped)s."
             ) % {
+                "deleted": (
+                    "%s static file%s deleted, "
+                    % (deleted_count, "" if deleted_count == 1 else "s")
+                    if deleted_count > 0
+                    else ""
+                ),
                 "modified_count": modified_count,
                 "identifier": "static file" + ("" if modified_count == 1 else "s"),
                 "action": "symlinked" if self.symlink else "copied",
@@ -264,9 +273,11 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" % fpath, level=1)
+                self.log("Pretending to delete '%s'" % fpath, level=2)
+                self.deleted_files.append(fpath)
             else:
-                self.log("Deleting '%s'" % fpath, level=1)
+                self.log("Deleting '%s'" % fpath, level=2)
+                self.deleted_files.append(fpath)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:

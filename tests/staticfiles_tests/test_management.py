@@ -291,11 +291,13 @@ class TestCollectionClear(CollectionTestCase):
     Test the ``--clear`` option of the ``collectstatic`` management command.
     """
 
+    run_collectstatic_in_setUp = False
+
     def run_collectstatic(self, **kwargs):
         clear_filepath = os.path.join(settings.STATIC_ROOT, "cleared.txt")
         with open(clear_filepath, "w") as f:
             f.write("should be cleared")
-        super().run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True, **kwargs)
 
     def test_cleared_not_found(self):
         self.assertFileNotFound("cleared.txt")
@@ -315,6 +317,39 @@ class TestCollectionClear(CollectionTestCase):
     def test_handle_path_notimplemented(self):
         self.run_collectstatic()
         self.assertFileNotFound("cleared.txt")
+
+    def test_verbosity_0(self):
+        for kwargs in [{}, {"dry_run": True}]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=0, stdout=stdout, **kwargs)
+                self.assertEqual(stdout.getvalue(), "")
+
+    def test_verbosity_1(self):
+        for deletion_message, kwargs in [
+            ("Deleting", {}),
+            ("Pretending to delete", {"dry_run": True}),
+        ]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=1, stdout=stdout, **kwargs)
+                output = stdout.getvalue()
+                self.assertIn("static file", output)
+                self.assertIn("deleted", output)
+                self.assertNotIn(deletion_message, output)
+
+    def test_verbosity_2(self):
+        for deletion_message, kwargs in [
+            ("Deleting", {}),
+            ("Pretending to delete", {"dry_run": True}),
+        ]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=2, stdout=stdout, **kwargs)
+                output = stdout.getvalue()
+                self.assertIn("static file", output)
+                self.assertIn("deleted", output)
+                self.assertIn(deletion_message, output)
 
 
 class TestInteractiveMessages(CollectionTestCase):
