@@ -2,12 +2,11 @@ import json
 
 from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
-
-from ..utils import CheckPostgresInstalledMixin
 
 __all__ = ["HStoreField"]
 
