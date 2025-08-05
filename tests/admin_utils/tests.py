@@ -348,8 +348,8 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(owner_field.verbose_name, owner_verbose_name)
         self.assertEqual(label_for_field("site__owner", Article), owner_verbose_name)
         self.assertEqual(
-            label_for_field("site__domain", Article, return_attr=True),
-            (owner_verbose_name, domain_field),
+            label_for_field("site__owner", Article, return_attr=True),
+            (owner_verbose_name, owner_field),
         )
 
     def test_label_for_field_failed_lookup(self):
