@@ -3197,6 +3197,36 @@ class StartApp(AdminScriptTestCase):
         )
         self.assertFalse(os.path.exists(testapp_dir))
 
+    def test_existing_empty_directory_allows_create(self):
+        """
+        Ensure that an existing empty directory
+        does not trigger a false importable module check.
+        """
+        custom_dir = os.path.join(self.test_dir, "destination")
+        os.makedirs(custom_dir, exist_ok=True)
+
+        args = ["startapp", "my_app", custom_dir]
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(os.path.join(custom_dir, "apps.py")))
+
+    def test_existing_non_empty_directory_overlay_error(self):
+        """
+        Ensure that an existing non empty directory
+        triggers an overlaying app warning.
+        """
+        custom_dir = os.path.join(self.test_dir, "non_empty_dir")
+        os.makedirs(custom_dir, exist_ok=True)
+
+        with open(os.path.join(custom_dir, "dummy.txt"), "w") as f:
+            f.write("test")
+
+        args = ["startapp", "my_app", custom_dir]
+        _, err = self.run_django_admin(args)
+        self.assertIn(
+            "already exists. Overlaying an app into an existing directory", err
+        )
+
 
 class DiffSettings(AdminScriptTestCase):
     """Tests for diffsettings management command."""
