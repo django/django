@@ -508,15 +508,17 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
     # looking for was emitted.
     warning_string = "Found another file"
 
-    def _collectstatic_output(self, **kwargs):
+    def _collectstatic_output(self, verbosity=3, **kwargs):
         """
-        Run collectstatic, and capture and return the output. We want to run
-        the command at highest verbosity, which is why we can't
-        just call e.g. BaseCollectionTestCase.run_collectstatic()
+        Run collectstatic, and capture and return the output.
         """
         out = StringIO()
         call_command(
-            "collectstatic", interactive=False, verbosity=3, stdout=out, **kwargs
+            "collectstatic",
+            interactive=False,
+            verbosity=verbosity,
+            stdout=out,
+            **kwargs,
         )
         return out.getvalue()
 
@@ -527,9 +529,10 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         output = self._collectstatic_output(clear=True)
         self.assertNotIn(self.warning_string, output)
 
-    def test_warning(self):
+    def test_warning_at_verbosity_2(self):
         """
-        There is a warning when there are duplicate destinations.
+        There is a warning when there are duplicate destinations at verbosity
+        2+.
         """
         with tempfile.TemporaryDirectory() as static_dir:
             duplicate = os.path.join(static_dir, "test", "file.txt")
@@ -538,15 +541,42 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
                 f.write("duplicate of file.txt")
 
             with self.settings(STATICFILES_DIRS=[static_dir]):
-                output = self._collectstatic_output(clear=True)
+                output = self._collectstatic_output(clear=True, verbosity=2)
             self.assertIn(self.warning_string, output)
 
-            os.remove(duplicate)
+    def test_no_warning_at_verbosity_1(self):
+        """
+        There is no individual warning at verbosity 1, but summary is shown.
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate = os.path.join(static_dir, "test", "file.txt")
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, "w+") as f:
+                f.write("duplicate of file.txt")
 
-            # Make sure the warning went away again.
             with self.settings(STATICFILES_DIRS=[static_dir]):
-                output = self._collectstatic_output(clear=True)
+                output = self._collectstatic_output(clear=True, verbosity=1)
             self.assertNotIn(self.warning_string, output)
+            self.assertIn("1 skipped due to conflict", output)
+
+    def test_summary_multiple_conflicts(self):
+        """
+        Summary shows correct count for multiple conflicts.
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate1 = os.path.join(static_dir, "test", "file.txt")
+            os.makedirs(os.path.dirname(duplicate1))
+            with open(duplicate1, "w+") as f:
+                f.write("duplicate of file.txt")
+            duplicate2 = os.path.join(static_dir, "test", "file1.txt")
+            with open(duplicate2, "w+") as f:
+                f.write("duplicate of file1.txt")
+            duplicate3 = os.path.join(static_dir, "test", "nonascii.css")
+            shutil.copy2(duplicate1, duplicate3)
+
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True, verbosity=1)
+            self.assertIn("3 skipped due to conflict", output)
 
 
 @override_settings(

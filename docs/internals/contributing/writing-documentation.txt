@@ -152,10 +152,29 @@ To edit this page, for example, we would edit the file
 :source:`docs/internals/contributing/writing-documentation.txt` and rebuild the
 HTML with ``make html``.
 
+.. _documentation-checks:
+
+Documentation quality checks
+----------------------------
+
+Several checks help maintain Django's documentation quality, including
+:ref:`spelling <documentation-spelling-check>` and
+:ref:`code block formatting <documentation-code-block-format-check>`.
+
+These checks are run automatically in CI and must pass before documentation
+changes can be merged. They can also be run locally with a single command:
+
+.. console::
+
+     $ make check
+
+This command runs all current checks and will include any new checks added in
+the future.
+
 .. _documentation-spelling-check:
 
 Spelling check
---------------
+~~~~~~~~~~~~~~
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
@@ -176,6 +195,25 @@ one of the following:
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+.. _documentation-code-block-format-check:
+
+Code block format check
+~~~~~~~~~~~~~~~~~~~~~~~
+
+All Python code blocks should be formatted using the :pypi:`blacken-docs`
+auto-formatter. This is automatically run by the :ref:`pre-commit hook
+<coding-style-pre-commit>` if configured.
+
+The check can also be run manually: provided that ``blacken-docs`` is installed,
+run the following command from the ``docs`` directory:
+
+.. console::
+
+     $ make black
+
+The formatter will report any issues by printing them to the terminal and will
+reformat code blocks where possible.
 
 .. _documentation-link-check:
 
@@ -304,10 +342,6 @@ documentation:
   You can prefix the target with a ``~`` (that's a tilde) to get only the
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
-
-* All Python code blocks should be formatted using the :pypi:`blacken-docs`
-  auto-formatter. This will be run by :ref:`pre-commit
-  <coding-style-pre-commit>` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
