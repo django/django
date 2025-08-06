@@ -23,7 +23,7 @@ class OperationWriter:
 
     def serialize(self):
         def _write(_arg_name, _arg_value):
-            if _arg_name in self.operation.serialization_expand_args and isinstance(
+            if (_arg_name in self.operation.serialization_expand_args or _arg_name == "sql") and isinstance(
                 _arg_value, (list, tuple, dict)
             ):
                 if isinstance(_arg_value, dict):

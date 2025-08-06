@@ -65,6 +65,12 @@ class BaseSimpleSerializer(BaseSerializer):
     def serialize(self):
         return repr(self.value), set()
 
+class StringSerializer(BaseSimpleSerializer):
+    def serialize(self):
+        import textwrap
+        if "\n" in self.value:
+            return f'"""{textwrap.indent(textwrap.dedent(self.value), '    ')}"""', set()
+        return super().serialize()
 
 class ChoicesSerializer(BaseSerializer):
     def serialize(self):
@@ -353,7 +359,8 @@ class Serializer:
         (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
         SettingsReference: SettingsReferenceSerializer,
         float: FloatSerializer,
-        (bool, int, types.NoneType, bytes, str, range): BaseSimpleSerializer,
+        (bool, int, types.NoneType, bytes, range): BaseSimpleSerializer,
+        str: StringSerializer,
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         FUNCTION_TYPES: FunctionTypeSerializer,
