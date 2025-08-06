@@ -76,7 +76,7 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> car.save()
     >>> car.photo.path
     '/media/cars/chevy_ii.jpg'
-    >>> car.photo.path == str(new_path)
+    >>> car.photo.path == new_path
     True
 
 To save an existing file on disk to a :class:`~django.db.models.FileField`:
