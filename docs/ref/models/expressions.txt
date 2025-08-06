@@ -1202,6 +1202,8 @@ calling the appropriate methods on the wrapped expression.
         :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
         queryset.
 
+.. _writing-your-own-query-expressions:
+
 Writing your own Query Expressions
 ----------------------------------
 
@@ -1262,7 +1264,7 @@ Next, we write the method responsible for generating the SQL::
             sql_params.extend(params)
         template = template or self.template
         data = {"expressions": ",".join(sql_expressions)}
-        return template % data, sql_params
+        return template % data, tuple(sql_params)
 
 
     def as_oracle(self, compiler, connection):

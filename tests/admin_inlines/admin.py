@@ -358,6 +358,7 @@ class BinaryTreeAdmin(admin.TabularInline):
 # admin for #19524
 class SightingInline(admin.TabularInline):
     model = Sighting
+    show_change_link = True
 
 
 # admin and form for #18263
@@ -517,7 +518,7 @@ site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2In
 site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
-site.register([Question, Inner4Stacked, Inner4Tabular])
+site.register([Question, Inner4Stacked, Inner4Tabular, Sighting])
 site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
