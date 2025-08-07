@@ -385,6 +385,16 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
+* In order to improve accessibility of the admin change forms:
+
+  * Form fields are now shown below their respective labels instead of next to
+    them.
+
+  * Help text is now shown after the field label and before the field input.
+
+  * Validation errors are now shown after the help text and before the field
+    input.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1
