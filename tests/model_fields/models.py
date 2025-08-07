@@ -403,6 +403,13 @@ class CustomJSONDecoder(json.JSONDecoder):
         return dct
 
 
+class JSONNullCustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, models.JSONNull):
+            return None
+        return super().default(o)
+
+
 class JSONModel(models.Model):
     value = models.JSONField()
 
@@ -416,6 +423,15 @@ class NullableJSONModel(models.Model):
         encoder=DjangoJSONEncoder,
         decoder=CustomJSONDecoder,
         null=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_json_field"}
+
+
+class JSONNullDefaultModel(models.Model):
+    value = models.JSONField(
+        db_default=models.JSONNull(), encoder=JSONNullCustomEncoder
     )
 
     class Meta:

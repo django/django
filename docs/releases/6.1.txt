@@ -86,6 +86,16 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+``JSONNull()`` expression
+-------------------------
+
+The new :class:`~django.db.models.JSONNull` expression provides an explicit
+way to represent the JSON scalar ``null``. It can be used when saving a
+top-level :class:`~django.db.models.JSONField` value, or querying for
+top-level or nested JSON ``null`` values.
+
+See :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
 Minor features
 --------------
 
