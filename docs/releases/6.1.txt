@@ -238,6 +238,12 @@ Models
 * :meth:`.QuerySet.in_bulk` now supports chaining after
   :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
+* The new :class:`~django.db.models.JSONNull` expression provides an explicit
+  way to represent the JSON scalar ``null``. It can be used when saving a
+  top-level :class:`~django.db.models.JSONField` value, or querying for
+  top-level or nested JSON ``null`` values. See
+  :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
 Pagination
 ~~~~~~~~~~
 

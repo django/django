@@ -148,6 +148,27 @@ class JSONField(CheckFieldDefaultMixin, Field):
         )
 
 
+class JSONNull(expressions.Value):
+    """Represent JSON `null` primitive."""
+
+    def __init__(self):
+        super().__init__(None, output_field=JSONField())
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+    def as_sql(self, compiler, connection):
+        value = self.output_field.get_db_prep_value(self.value, connection)
+        if value is None:
+            value = "null"
+        return "%s", (value,)
+
+    def as_mysql(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
+        sql = "JSON_EXTRACT(%s, '$')"
+        return sql, params
+
+
 class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contains"
     postgres_operator = "@>"
@@ -318,7 +339,7 @@ class JSONExact(lookups.Exact):
         # Treat None lookup values as null.
         if rhs == "%s" and (*rhs_params,) == (None,):
             rhs_params = ("null",)
-        if connection.vendor == "mysql":
+        if connection.vendor == "mysql" and not isinstance(self.rhs, JSONNull):
             func = ["JSON_EXTRACT(%s, '$')"] * len(rhs_params)
             rhs %= tuple(func)
         return rhs, rhs_params
