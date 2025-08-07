@@ -124,29 +124,8 @@ thead th.sorted .text {
 
 /* FORMS */
 
-.aligned label,
-.aligned legend {
-    padding: 0 0 3px 1em;
-}
-
-.submit-row a.deletelink {
-    margin-left: 0;
-    margin-right: auto;
-}
-
-.vDateField, .vTimeField {
-    margin-left: 2px;
-}
-
-.aligned .form-row input {
-    margin-left: 5px;
-}
-
 form .aligned ul {
-    margin-right: 163px;
-    padding-right: 10px;
-    margin-left: 0;
-    padding-left: 0;
+    margin: 0;
 }
 
 form ul.inline li {
@@ -155,46 +134,8 @@ form ul.inline li {
     padding-left: 7px;
 }
 
-form .aligned p.help,
-form .aligned div.help {
-    margin-left: 0;
-    margin-right: 160px;
-    padding-right: 10px;
-}
-
-form div.help ul,
-form .aligned .checkbox-row + .help,
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
-    margin-right: 0;
-    padding-right: 0;
-}
-
-form .wide p.help,
-form .wide ul.errorlist,
-form .wide div.help {
-    padding-left: 0;
-    padding-right: 50px;
-}
-
 .submit-row {
     text-align: right;
-}
-
-fieldset .fieldBox {
-    margin-left: 20px;
-    margin-right: 0;
-}
-
-.errorlist li {
-    background-position: 100% 12px;
-    padding: 0;
-}
-
-.errornote {
-    background-position: 100% 12px;
-    padding: 10px 12px;
 }
 
 /* WIDGETS */

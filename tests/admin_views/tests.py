@@ -7311,12 +7311,10 @@ class SeleniumTests(AdminSeleniumTestCase):
             By.CSS_SELECTOR, "#content-main .field-difficulty, .form-multiline"
         )
         # Two field boxes.
-        field_boxes = multiline.find_elements(By.CSS_SELECTOR, "div > div.fieldBox")
+        field_boxes = multiline.find_elements(By.XPATH, "./*")
         self.assertEqual(len(field_boxes), 2)
         # One of them is under a <fieldset>.
-        under_fieldset = multiline.find_elements(
-            By.CSS_SELECTOR, "fieldset > div > div.fieldBox"
-        )
+        under_fieldset = multiline.find_elements(By.TAG_NAME, "fieldset")
         self.assertEqual(len(under_fieldset), 1)
         self.take_screenshot("horizontal_fieldset")
 
@@ -7460,6 +7458,26 @@ class SeleniumTests(AdminSeleniumTestCase):
         changelist_filter = self.selenium.find_element(By.ID, "changelist-filter")
         self.assertTrue(changelist_filter.is_displayed())
         self.take_screenshot("filter_sidebar")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_form_errors_render_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_language_add")
+        )
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.NAME, "_save").click()
+
+        form_rows = self.selenium.find_elements(By.CSS_SELECTOR, "div.form-row")
+        for row in form_rows:
+            error_list = row.find_element(By.CSS_SELECTOR, "ul.errorlist")
+            self.assertTrue(error_list.is_displayed())
+        self.take_screenshot("error_list")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -9063,10 +9081,18 @@ class TestLabelVisibility(TestCase):
         )
 
     def assert_fieldline_visible(self, response):
-        self.assertContains(response, '<div class="form-row field-first field-second">')
+        self.assertContains(
+            response,
+            "<div class="
+            '"form-row flex-container form-multiline field-first field-second">',
+        )
 
     def assert_fieldline_hidden(self, response):
-        self.assertContains(response, '<div class="form-row hidden')
+        self.assertContains(
+            response,
+            "<div class="
+            '"form-row flex-container form-multiline hidden field-first field-second">',
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
