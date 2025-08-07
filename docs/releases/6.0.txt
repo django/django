@@ -600,6 +600,20 @@ Miscellaneous
   deleted files when ``--verbosity`` is 1. To see the details for each file
   deleted, set the ``--verbosity`` flag to 2 or higher.
 
+* In order to improve accessibility of the admin change forms:
+
+  * Form fields are now shown below their respective labels instead of next to
+    them.
+
+  * Help text is now shown after the field label and before the field input.
+
+  * Validation errors are now shown after the help text and before the field
+    input.
+
+* The Django-provided ``"wide"`` class for the ``classes`` option in
+  :attr:`.ModelAdmin.fieldsets` is removed, as it is obsolete with the new
+  admin layout.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
