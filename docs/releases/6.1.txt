@@ -99,6 +99,19 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
+* In order to improve accessibility of the admin change forms:
+
+  * Form fields are now shown below their respective labels instead of next to
+    them.
+
+  * Help text is now shown after the field label and before the field input.
+
+  * Validation errors are now shown after the help text and before the field
+    input.
+
+  * Checkboxes are an exception to the above changes and continue to be
+    displayed in their original layout.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -379,6 +392,11 @@ backends.
 
 * Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
   if the management command isn't supported.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``wide`` class is removed, as it was made obsolete by the new layout.
 
 :mod:`django.contrib.gis`
 -------------------------

@@ -498,6 +498,7 @@ class PictureAdmin(admin.ModelAdmin):
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ["iso", "shortlist", "english_name", "name"]
     list_editable = ["shortlist"]
+    fields = [("iso", "english_name"), "name"]
 
 
 class RecommendationAdmin(admin.ModelAdmin):

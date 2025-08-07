@@ -48,17 +48,6 @@
 /* MOBILE */
 
 @media (max-width: 767px) {
-    [dir="rtl"] .aligned .related-lookup,
-    [dir="rtl"] .aligned .datetimeshortcuts {
-        margin-left: 0;
-        margin-right: 15px;
-    }
-
-    [dir="rtl"] .aligned ul,
-    [dir="rtl"] form .aligned ul.errorlist {
-        margin-right: 0;
-    }
-
     [dir="rtl"] #changelist-filter {
         margin-left: 0;
         margin-right: 0;
