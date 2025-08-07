@@ -148,6 +148,22 @@ class JSONField(CheckFieldDefaultMixin, Field):
         )
 
 
+class JSONNull(expressions.Expression):
+    """Represent JSON `null` primitive."""
+
+    allowed_default = True
+
+    def __init__(self):
+        super().__init__(output_field=JSONField())
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+    def as_sql(self, compiler, connection):
+        value = self.output_field.get_db_prep_value(None, connection)
+        return "%s", [value]
+
+
 class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contains"
     postgres_operator = "@>"

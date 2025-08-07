@@ -16,16 +16,20 @@ from django.db import (
     transaction,
 )
 from django.db.models import (
+    Case,
+    CheckConstraint,
     Count,
     ExpressionWrapper,
     F,
     IntegerField,
     JSONField,
+    JSONNull,
     OuterRef,
     Q,
     Subquery,
     Transform,
     Value,
+    When,
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
@@ -44,6 +48,7 @@ from .models import (
     CustomJSONDecoder,
     CustomSerializationJSONModel,
     JSONModel,
+    JSONNullDefaultModel,
     NullableJSONModel,
     RelatedJSONModel,
 )
@@ -1235,3 +1240,98 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+
+class JSONNullTests(TestCase):
+    def test_repr(self):
+        self.assertEqual(repr(JSONNull()), "JSONNull()")
+
+    def test_save_load(self):
+        obj = NullableJSONModel(value=JSONNull())
+        obj.save()
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+
+    def test_create(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+
+    def test_update(self):
+        obj = NullableJSONModel.objects.create(value={"key": "value"})
+        NullableJSONModel.objects.update(value=JSONNull())
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+
+    def test_filter(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        found = NullableJSONModel.objects.get(value=JSONNull())
+        self.assertEqual(obj, found)
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(value=JSONNull()), []
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__isnull=True), []
+        )
+
+    def test_case_expression(self):
+        with self.subTest("JSONNull() in When.then"):
+            obj = NullableJSONModel.objects.create(value={"key": "value"})
+            NullableJSONModel.objects.filter(pk=obj.pk).update(
+                value=Case(
+                    When(value={"key": "value"}, then=JSONNull()),
+                )
+            )
+            obj.refresh_from_db()
+            self.assertIsNone(obj.value)
+        with self.subTest("JSONNull() in When.condition"):
+            obj = NullableJSONModel.objects.create(value=JSONNull())
+            NullableJSONModel.objects.filter(pk=obj.pk).update(
+                value=Case(
+                    When(
+                        value=JSONNull(),
+                        then=Value({"key": "replaced"}, output_field=JSONField()),
+                    )
+                ),
+            )
+            obj.refresh_from_db()
+            self.assertEqual(obj.value, {"key": "replaced"})
+
+    def test_key_transform_exact_filter(self):
+        obj = NullableJSONModel.objects.create(value={"key": None})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key=JSONNull()),
+            [obj],
+        )
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_constraint_validation(self):
+        constraint = CheckConstraint(
+            condition=~Q(value=JSONNull()), name="check_not_json_null"
+        )
+        constraint.validate(NullableJSONModel, NullableJSONModel(value={"key": None}))
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(NullableJSONModel, NullableJSONModel(value=JSONNull()))
+
+    def test_constraint_validation_key_transform(self):
+        constraint = CheckConstraint(
+            condition=Q(value__has_key="name") & ~Q(value__name=JSONNull()),
+            name="check_value_name_not_json_null",
+        )
+        constraint.validate(
+            NullableJSONModel, NullableJSONModel(value={"name": "Django"})
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                NullableJSONModel, NullableJSONModel(value={"name": None})
+            )
+
+    def test_default(self):
+        obj = JSONNullDefaultModel.objects.create()
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+        self.assertSequenceEqual(
+            JSONNullDefaultModel.objects.filter(value__isnull=True), []
+        )
