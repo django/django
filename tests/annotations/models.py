@@ -66,3 +66,18 @@ class JsonModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class Application(models.Model):
+    pass
+
+
+class Score(models.Model):
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="score",
+    )
+    reviewed = models.BooleanField(null=True)

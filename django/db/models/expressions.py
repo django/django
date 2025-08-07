@@ -1643,7 +1643,14 @@ class When(Expression):
         connection.ops.check_expression_support(self)
         template_params = extra_context
         sql_params = []
-        condition_sql, condition_params = compiler.compile(self.condition)
+
+        if isinstance(self.condition, Q):
+            query = self.queryset.query.clone()
+            where_node, _ = query.build_filter(self.condition, can_reuse=set())
+            condition_sql, condition_params = where_node.as_sql(compiler, connection)
+        else:
+            condition_sql, condition_params = compiler.compile(self.condition)
+
         template_params["condition"] = condition_sql
         result_sql, result_params = compiler.compile(self.result)
         template_params["result"] = result_sql

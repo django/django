@@ -42,6 +42,7 @@ from django.test.utils import register_lookup
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
+    Application,
     Author,
     Book,
     Company,
@@ -49,6 +50,7 @@ from .models import (
     Employee,
     JsonModel,
     Publisher,
+    Score,
     Store,
     Ticket,
 )
@@ -1505,3 +1507,78 @@ class AliasTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: Value(1)})
+
+
+class NegatedQInWhenTests(TestCase):
+    """
+    Regression tests for #29291 — ensure negated Q expressions inside When()
+    behave consistently and compile properly.
+    """
+
+    def setUp(self):
+        """
+        Sets up:
+        - Application with both reviewed=True and reviewed=False scores
+        - Application with no related scores
+        - Application with a reviewed=None score
+        """
+        a1 = Application.objects.create()
+        Score.objects.create(application=a1, reviewed=False)
+        Score.objects.create(application=a1, reviewed=True)
+
+        Application.objects.create()
+
+        a3 = Application.objects.create()
+        Score.objects.create(application=a3, reviewed=None)
+
+    def test_negated_q_in_when_executes_without_error(self):
+        """
+        Negated Q in When() compiles and executes without error.
+        """
+        qs = Application.objects.annotate(
+            needs_review=Case(
+                When(~Q(score__reviewed=True), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        )
+        self.assertTrue(qs.exists())
+
+    def test_negated_q_in_when_generates_valid_sql(self):
+        """
+        SQL generated from negated Q in When() contains expected NOT and JOIN.
+        """
+        qs = Application.objects.annotate(
+            needs_review=Case(
+                When(~Q(score__reviewed=True), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        )
+        sql = str(qs.query).lower()
+        self.assertIn("not", sql)
+        self.assertIn("join", sql)
+
+    def test_annotation_vs_filter_semantics_difference(self):
+        """
+        Annotation with ~Q and filtering with ~Q across a nullable relation can
+        produce different results. This asserts that the difference is
+        expected.
+        """
+        qs_annotated = (
+            Application.objects.annotate(
+                needs_review=Case(
+                    When(~Q(score__reviewed=True), then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField(),
+                )
+            )
+            .filter(needs_review=True)
+            .order_by("id")
+        )
+
+        qs_filtered = Application.objects.filter(~Q(score__reviewed=True)).order_by(
+            "id"
+        )
+
+        self.assertNotEqual(set(qs_annotated), set(qs_filtered))
