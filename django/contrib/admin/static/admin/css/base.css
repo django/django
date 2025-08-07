@@ -498,9 +498,6 @@ input, textarea, select, .form-row p, form .button {
     font-weight: normal;
     font-size: 0.8125rem;
 }
-.form-row div.help {
-    padding: 2px 3px;
-}
 
 textarea {
     vertical-align: top;
@@ -700,7 +697,7 @@ ul.messagelist li.error {
 }
 
 ul.errorlist {
-    margin: 0 0 4px;
+    margin: 0;
     padding: 0;
     color: var(--error-fg);
     background: var(--body-bg);
@@ -709,7 +706,6 @@ ul.errorlist {
 ul.errorlist li {
     font-size: 0.8125rem;
     display: block;
-    margin-bottom: 4px;
     overflow-wrap: break-word;
 }
 
