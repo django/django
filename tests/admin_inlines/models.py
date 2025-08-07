@@ -324,6 +324,9 @@ class Sighting(models.Model):
     et = models.ForeignKey(ExtraTerrestrial, models.CASCADE)
     place = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.place
+
 
 # Models for #18263
 class SomeParentModel(models.Model):

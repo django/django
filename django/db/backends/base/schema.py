@@ -1,6 +1,7 @@
 import logging
 import operator
 from datetime import datetime
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -1160,7 +1161,7 @@ class BaseDatabaseSchemaEditor:
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters and actions:
                 sql, params = tuple(zip(*actions))
-                actions = [(", ".join(sql), sum(params, []))]
+                actions = [(", ".join(sql), tuple(chain(*params)))]
             # Apply those actions
             for sql, params in actions:
                 self.execute(

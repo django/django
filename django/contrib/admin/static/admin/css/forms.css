@@ -429,7 +429,6 @@ body.popup .submit-row {
 .inline-group .tabular tr td.original {
     padding: 2px 0 0 0;
     width: 0;
-    _position: relative;
 }
 
 .inline-group .tabular th.original {
@@ -437,16 +436,19 @@ body.popup .submit-row {
     padding: 0;
 }
 
+.inline-group .tabular td {
+    font-size: 1rem;
+}
+
 .inline-group .tabular td.original p {
     position: absolute;
     left: 0;
-    height: 1.1em;
+    height: 1.2em;
     padding: 2px 9px;
     overflow: hidden;
-    font-size: 0.5625rem;
+    font-size: 0.875rem;
     font-weight: bold;
     color: var(--body-quiet-color);
-    _width: 700px;
 }
 
 .inline-group div.add-row,

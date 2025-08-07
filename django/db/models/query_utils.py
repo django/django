@@ -13,7 +13,7 @@ from collections import namedtuple
 from contextlib import nullcontext
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, transaction
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 from django.utils.functional import cached_property
@@ -98,6 +98,45 @@ class Q(tree.Node):
         )
         query.promote_joins(joins)
         return clause
+
+    def replace_expressions(self, replacements):
+        if not replacements:
+            return self
+        clone = self.create(connector=self.connector, negated=self.negated)
+        for child in self.children:
+            child_replacement = child
+            if isinstance(child, tuple):
+                lhs, rhs = child
+                if LOOKUP_SEP in lhs:
+                    path, lookup = lhs.rsplit(LOOKUP_SEP, 1)
+                else:
+                    path = lhs
+                    lookup = None
+                field = models.F(path)
+                if (
+                    field_replacement := field.replace_expressions(replacements)
+                ) is not field:
+                    # Handle the implicit __exact case by falling back to an
+                    # extra transform when get_lookup returns no match for the
+                    # last component of the path.
+                    if lookup is None:
+                        lookup = "exact"
+                    if (lookup_class := field_replacement.get_lookup(lookup)) is None:
+                        if (
+                            transform_class := field_replacement.get_transform(lookup)
+                        ) is not None:
+                            field_replacement = transform_class(field_replacement)
+                            lookup = "exact"
+                            lookup_class = field_replacement.get_lookup(lookup)
+                    if rhs is None and lookup == "exact":
+                        lookup_class = field_replacement.get_lookup("isnull")
+                        rhs = True
+                    if lookup_class is not None:
+                        child_replacement = lookup_class(field_replacement, rhs)
+            else:
+                child_replacement = child.replace_expressions(replacements)
+            clone.children.append(child_replacement)
+        return clone
 
     def flatten(self):
         """
