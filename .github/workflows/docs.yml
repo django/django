@@ -22,7 +22,7 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-24.04
-    name: docs
+    name: spelling
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
       - name: Build docs
         run: |
           cd docs
-          sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
+          sphinx-build -b spelling -n -q -W -d _build/doctrees -D language=en_US -j auto . _build/spelling
 
   blacken-docs:
     runs-on: ubuntu-latest
