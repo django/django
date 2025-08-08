@@ -47,6 +47,7 @@ from .models import (
     Color2,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -1280,6 +1281,7 @@ site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
 site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
+site.register(Course)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)
