@@ -207,6 +207,12 @@ LANG_INFO = {
         "name": "French",
         "name_local": "français",
     },
+    "fr-ca": {
+        "bidi": False,
+        "code": "fr-ca",
+        "name": "Canadian French",
+        "name_local": "français canadien",
+    },
     "fy": {
         "bidi": False,
         "code": "fy",
