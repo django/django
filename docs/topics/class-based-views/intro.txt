@@ -296,7 +296,8 @@ of the method to be decorated as the keyword argument ``name``::
 If you have a set of common decorators used in several places, you can define
 a list or tuple of decorators and use this instead of invoking
 ``method_decorator()`` multiple times. These two classes are equivalent::
-
+    
+    from django.views.decorators.cache import never_cache
     decorators = [never_cache, login_required]
 
 
