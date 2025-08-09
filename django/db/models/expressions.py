@@ -1804,7 +1804,9 @@ class Subquery(BaseExpression, Combinable):
                 self.output_field
             except AttributeError:
                 return resolved.query
-            if self.output_field and self.output_field != resolved.query.output_field:
+            if self.output_field and type(self.output_field) is not type(
+                resolved.query.output_field
+            ):
                 return ExpressionWrapper(resolved.query, output_field=self.output_field)
             return resolved.query
         return resolved
