@@ -477,6 +477,7 @@ Miscellaneous
 * The :option:`collectstatic --clear` command now reports only a summary of
   deleted files when ``--verbosity`` is 1. To see the details for each file
   deleted, set the ``--verbosity`` flag to 2 or higher.
+
 * In order to improve accessibility of the admin change forms:
 
   * Form fields are now shown below their respective labels instead of next to

@@ -7025,8 +7025,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_views_language_add")
         )
-        save = self.selenium.find_element(By.CSS_SELECTOR, "div.submit-row input")
-        save.click()
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.NAME, "_save").click()
+
         form_rows = self.selenium.find_elements(By.CSS_SELECTOR, "div.form-row")
         for row in form_rows:
             error_list = row.find_element(By.CSS_SELECTOR, "ul.errorlist")
