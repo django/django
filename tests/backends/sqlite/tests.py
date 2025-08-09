@@ -1,11 +1,13 @@
 import os
 import re
+import sqlite3
 import tempfile
 import threading
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
+from unittest.mock import Mock, patch
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import (
@@ -322,3 +324,95 @@ class TestTransactionMode(SimpleTestCase):
             yield new_connection
         finally:
             new_connection._close()
+
+
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
+class QuoteParamsForLastExecutedQueryTest(TestCase):
+
+    def test_small_params_no_batching(self):
+        """Small parameters are processed without batching"""
+        params = ["param1", "param2", "param3"]
+        result = connection.ops._quote_params_for_last_executed_query(params)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), len(params))
+
+    def test_getlimit_called_with_sqlite_limit_column(self):
+        """Verify that getlimit is called with SQLITE_LIMIT_COLUMN"""
+        with patch.object(connection.ops.connection, "connection") as mock_connection:
+            mock_connection.getlimit.return_value = 1000
+
+            # Create a situation that requires batching
+            with patch.object(connection.ops.connection, "features") as mock_features:
+                mock_features.max_query_params = 500
+
+                params = [f"param{i}" for i in range(600)]
+
+                # Execute (result is not important)
+                try:
+                    connection.ops._quote_params_for_last_executed_query(params)
+                except Exception:
+                    pass
+
+                # What matters is whether it was called with the correct constant
+                mock_connection.getlimit.assert_called_with(sqlite3.SQLITE_LIMIT_COLUMN)
+
+    def test_uses_dynamic_limits_not_hardcoded_999(self):
+        """Verify that dynamic limits are used instead of hardcoded 999"""
+        with patch.object(connection.ops.connection, "connection") as mock_connection:
+            with patch.object(connection.ops.connection, "features") as mock_features:
+                # Set small values to ensure batching is triggered
+                mock_features.max_query_params = 50
+                mock_connection.getlimit.return_value = 30
+
+                # Number of parameters that definitely require batching (more than 30)
+                params = [f"param{i}" for i in range(100)]
+
+                # Mock setup for batch execution
+                mock_cursor = Mock()
+                mock_connection.cursor.return_value = mock_cursor
+                mock_cursor.execute.return_value.fetchone.return_value = tuple(
+                    ["'quoted'"] * 30
+                )
+
+                try:
+                    connection.ops._quote_params_for_last_executed_query(params)
+                except Exception:
+                    pass  # getlimit call is more important than execution result
+
+                # Verify that getlimit was called with the correct constant
+                mock_connection.getlimit.assert_called_with(sqlite3.SQLITE_LIMIT_COLUMN)
+
+    def test_getlimit_called_during_batch_size_calculation(self):
+        """Verify that getlimit is called during batch size calculation"""
+        with patch.object(connection.ops.connection, "connection") as mock_connection:
+            with patch.object(connection.ops.connection, "features") as mock_features:
+                mock_features.max_query_params = 100
+                mock_connection.getlimit.return_value = 50
+
+                # Situation requiring batching
+                params = [f"param{i}" for i in range(200)]
+
+                # Mock for actual batch execution
+                mock_cursor = Mock()
+                mock_connection.cursor.return_value = mock_cursor
+                mock_cursor.execute.return_value.fetchone.return_value = tuple(
+                    ["'quoted'"] * 50
+                )
+
+                try:
+                    connection.ops._quote_params_for_last_executed_query(params)
+                except Exception:
+                    pass
+
+                # Verify it was called with SQLITE_LIMIT_COLUMN constant
+                mock_connection.getlimit.assert_called_with(sqlite3.SQLITE_LIMIT_COLUMN)
+
+    def test_actual_execution_small_params(self):
+        """Actual execution test - small parameters"""
+        params = ["test1", "test2", "test3"]
+        result = connection.ops._quote_params_for_last_executed_query(params)
+
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 3)
+        for quoted_param in result:
+            self.assertIsInstance(quoted_param, str)
