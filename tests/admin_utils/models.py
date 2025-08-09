@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Site(models.Model):
     domain = models.CharField(max_length=100)
+    owner = models.CharField(verbose_name=_("Site owner"))
 
     def __str__(self):
         return self.domain
