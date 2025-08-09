@@ -435,12 +435,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
             '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8"></p>',
+            '<label for="id_test_0">Date:</label> '
+            '<input value="2007-12-01" type="text" class="vDateField" '
+            'name="test_0" size="10" id="id_test_0"><br>'
+            '<label for="id_test_1">Time:</label> '
+            '<input value="09:30:00" type="text" class="vTimeField" '
+            'name="test_1" size="8" id="id_test_1"></p>',
         )
 
     def test_localization(self):
@@ -449,12 +451,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         with translation.override("de-at"):
             w.is_localized = True
             self.assertHTMLEqual(
-                w.render("test", datetime(2007, 12, 1, 9, 30)),
+                w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
                 '<p class="datetime">'
-                'Datum: <input value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8"></p>',
+                '<label for="id_test_0">Datum:</label> '
+                '<input value="01.12.2007" type="text" class="vDateField" '
+                'name="test_0" size="10" id="id_test_0"><br>'
+                '<label for="id_test_1">Zeit:</label> '
+                '<input value="09:30:00" type="text" class="vTimeField" '
+                'name="test_1" size="8" id="id_test_1"></p>',
             )
 
 
