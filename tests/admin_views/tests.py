@@ -7015,6 +7015,26 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertGreater(len(object_tools), 0)
         self.take_screenshot("change_list")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_form_errors_render_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_language_add")
+        )
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.NAME, "_save").click()
+
+        form_rows = self.selenium.find_elements(By.CSS_SELECTOR, "div.form-row")
+        for row in form_rows:
+            error_list = row.find_element(By.CSS_SELECTOR, "ul.errorlist")
+            self.assertTrue(error_list.is_displayed())
+        self.take_screenshot("error_list")
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
@@ -7267,7 +7287,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<label for="id_public">Overridden public label:</label>',
+            '<label for="id_public">Overridden public label</label>',
             html=True,
         )
         self.assertNotContains(
@@ -8608,19 +8628,27 @@ class TestLabelVisibility(TestCase):
 
     def assert_field_visible(self, response, field_name):
         self.assertContains(
-            response, f'<div class="flex-container fieldBox field-{field_name}">'
+            response, f'<div class="flex-container field-{field_name}">'
         )
 
     def assert_field_hidden(self, response, field_name):
         self.assertContains(
-            response, f'<div class="flex-container fieldBox field-{field_name} hidden">'
+            response, f'<div class="flex-container field-{field_name} hidden">'
         )
 
     def assert_fieldline_visible(self, response):
-        self.assertContains(response, '<div class="form-row field-first field-second">')
+        self.assertContains(
+            response,
+            "<div class="
+            '"form-row flex-container form-multiline field-first field-second">',
+        )
 
     def assert_fieldline_hidden(self, response):
-        self.assertContains(response, '<div class="form-row hidden')
+        self.assertContains(
+            response,
+            "<div class="
+            '"form-row flex-container form-multiline hidden field-first field-second">',
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
