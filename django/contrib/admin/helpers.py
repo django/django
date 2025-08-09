@@ -190,7 +190,7 @@ class AdminField:
         return self.field.label_tag(
             contents=mark_safe(contents),
             attrs=attrs,
-            label_suffix="" if self.is_checkbox else None,
+            label_suffix="",
         )
 
     def errors(self):
