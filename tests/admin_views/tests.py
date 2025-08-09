@@ -4868,6 +4868,7 @@ class AdminInheritedInlinesTest(TestCase):
         response = self.client.get(reverse("admin:admin_views_persona_add"))
         names = name_re.findall(response.content)
         names.remove(b"csrfmiddlewaretoken")
+        names.remove(b"csrfmiddlewaretoken")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
 
@@ -4904,6 +4905,7 @@ class AdminInheritedInlinesTest(TestCase):
             reverse("admin:admin_views_persona_change", args=(persona_id,))
         )
         names = name_re.findall(response.content)
+        names.remove(b"csrfmiddlewaretoken")
         names.remove(b"csrfmiddlewaretoken")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
