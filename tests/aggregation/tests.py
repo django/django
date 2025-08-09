@@ -53,6 +53,7 @@ from django.test import TestCase
 from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Author, Book, Employee, Publisher, Store
 
@@ -1620,6 +1621,30 @@ class AggregateTestCase(TestCase):
                     .values_list("pk", flat=True)
                 )
                 self.assertEqual(list(books_qs), expected_result)
+
+    @skipIfDBFeature("supports_order_by_grouped_table")
+    def test_order_by_grouped_table_deprecated(self):
+        books_qs = (
+            Book.objects.values("rating").annotate(Count("authors")).order_by("pubdate")
+        )
+        message = (
+            "Having columns in the ORDER BY clause that are not in the GROUP "
+            "BY clause is not supported on this database backend and will be "
+            "deprecated on Django 7.0."
+        )
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # with self.assertRaisesMessage(NotSupportedError, message):
+        with self.assertWarnsMessage(RemovedInDjango70Warning, message):
+            # There are two GROUP BY clause (zero commas means at most one clause).
+            books_qs_str = str(books_qs.query)
+            group_by_idx = books_qs_str.index("GROUP BY")
+            order_by_idx = books_qs_str.index("ORDER BY")
+            self.assertGreater(group_by_idx, 0)
+            self.assertGreater(order_by_idx, 0)
+            self.assertEqual(
+                books_qs_str[group_by_idx : order_by_idx + 1].count(", "), 1
+            )
+            self.assertTrue("pubdate" in books_qs_str[group_by_idx : order_by_idx + 1])
 
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_group_by_subquery_annotation(self):
