@@ -1513,11 +1513,10 @@ class TestCase(TransactionTestCase):
                             try:
                                 callback()
                             except Exception as e:
-                                logger.error(
-                                    f"Error calling {callback.__qualname__} in "
-                                    f"on_commit() (%s).",
+                                name = getattr(callback, "__qualname__", callback)
+                                logger.exception(
+                                    f"Error calling {name} in on_commit() (%s).",
                                     e,
-                                    exc_info=True,
                                 )
                         else:
                             callback()
