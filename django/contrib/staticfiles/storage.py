@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.jslex import extract_css_urls
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -80,12 +81,6 @@ class HashedFilesMixin:
         (
             "*.css",
             (
-                r"""(?P<matched>url\((?P<quote>['"]{0,1})"""
-                r"""\s*(?P<url>.*?)(?P=quote)\))""",
-                (
-                    r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
-                    """@import url("%(url)s")""",
-                ),
                 (
                     (
                         r"(?m)^(?P<matched>/\*#[ \t]"
@@ -371,6 +366,47 @@ class HashedFilesMixin:
                         content = original_file.read().decode("utf-8")
                     except UnicodeDecodeError as exc:
                         yield name, None, exc, False
+
+                    complex_adjustments = False
+                    if name.endswith(".css"):
+                        search_content = content.lower()
+                        complex_adjustments = (
+                            "url" in search_content or "import" in search_content
+                        )
+
+                    if complex_adjustments:
+                        result_parts = []
+                        last_position = 0
+
+                        url_matches = extract_css_urls(content)
+
+                        for url_name, position in url_matches:
+                            converter_function = self.url_converter(
+                                name, hashed_files, "%(url)s"
+                            )
+                            # converter_function has good logic about what should and
+                            # shouldn't be replaced so worth reusing, but as it is used
+                            # as part of the re.sub function it expects a matched_group
+                            matched_group = re.match(
+                                "(?P<matched>(?P<url>" + re.escape(url_name) + "))",
+                                url_name,
+                            )
+
+                            try:
+                                replacement = converter_function(matched_group)
+                            except ValueError as exc:
+                                yield name, None, exc, False
+
+                            result_parts.append(content[last_position:position])
+                            # Add the replacement
+                            result_parts.append(replacement)
+                            # Update position tracker
+                            last_position = position + len(url_name)
+
+                        # Add the remaining part of the original string
+                        result_parts.append(content[last_position:])
+                        content = "".join(result_parts)
+
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
