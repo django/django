@@ -12,6 +12,3 @@ Bugfixes
 * Fixed a regression in Django 5.2.1 that prevented the usage of ``UNNEST``
   PostgreSQL strategy of ``QuerySet.bulk_create()`` with foreign keys
   (:ticket:`36502`).
-
-* Fixed Background color for admin's m2m multi-select "selected" rows in Edge
-(:ticket: `36513`)

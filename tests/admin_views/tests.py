@@ -6222,6 +6222,38 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("selectbox-non-collapsible")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_selectbox_selected_option_contrast(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
+
+        self.admin_login(
+            username="super",
+            password="secret",
+            login_url=reverse("admin:index"),
+        )
+        select_elem = self.selenium.find_element(By.ID, "id_toppings_from")
+        select = Select(select_elem)
+        select.select_by_index(0)  # Select the first option
+
+        # Get the selected option
+        option_elem = select_elem.find_element(By.CSS_SELECTOR, "option:checked")
+        color = option_elem.value_of_css_property("color")
+        background = option_elem.value_of_css_property("background-color")
+
+        def rgb_to_luminance(rgb):
+            import re
+            r, g, b = map(int, re.findall(r'\d+', rgb))
+            def channel(c):
+                c = c / 255.0
+                return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+            return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+
+        lum1 = rgb_to_luminance(color)
+        lum2 = rgb_to_luminance(background)
+        contrast = (max(lum1, lum2) + 0.05) / (min(lum1, lum2) + 0.05)
+        self.assertGreaterEqual(contrast, 4.5, "Contrast ratio too low")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_selected_rows(self):
         from selenium.webdriver import ActionChains
         from selenium.webdriver.common.by import By
