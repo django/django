@@ -36,3 +36,20 @@ class DynOrderingBandAdmin(admin.ModelAdmin):
             return ["rank"]
         else:
             return ["name"]
+
+
+class UserPermission(models.Model):
+    permission = models.CharField(max_length=50)
+
+
+class SystemUser(models.Model):
+    name = models.CharField(max_length=50)
+    permissions = models.ManyToManyField(
+        UserPermission,
+        help_text="Specific permissions for this user.",
+    )
+
+
+class ReportData(models.Model):
+    title = models.CharField(max_length=255)
+    owner = models.ForeignKey(SystemUser, on_delete=models.CASCADE)
