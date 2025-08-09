@@ -11,7 +11,8 @@ from django.utils.functional import lazy
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_docs_version
-
+from django.db.backends.mysql.validation import DatabaseValidation as MySQLDatabaseValidation
+from django.db.backends.oracle.validation import DatabaseValidation as OracleDatabaseValidation
 
 @isolate_apps("invalid_models_tests")
 class AutoFieldTests(SimpleTestCase):
@@ -685,6 +686,171 @@ class DecimalFieldTests(SimpleTestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(field.check(), [])
+
+    @unittest.skipUnless(connection.vendor == "mysql", "Test valid only for MySQL")
+    def test_mysql_decimal_max_digits_limit(self):
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=66, decimal_places=10)
+
+        field = Model._meta.get_field("field")
+        validator = MySQLDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s does not support DecimalField with max_digits > 65." % connection.display_name,
+                    obj=field,
+                    id="mysql.W004",
+                )
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "sqlite", "Test valid only for SQLite")
+    def test_sqlite_decimal_max_digits_limit(self):
+        from django.db.backends.sqlite3.validation import DatabaseValidation as SQLiteDatabaseValidation
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=16, decimal_places=10)
+
+        field = Model._meta.get_field("field")
+        validator = SQLiteDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s stores only 15 significant digits for decimal values. "
+                    "Values with max_digits > 15 may lose precision "
+                    "and be stored as floating-point numbers." % connection.display_name,
+                    obj=field,
+                    id="sqlite3.W001",
+                )
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "sqlite", "Test valid only for SQLite")
+    def test_sqlite_decimal_places_limit(self):
+        from django.db.backends.sqlite3.validation import DatabaseValidation
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=20, decimal_places=16)
+
+        field = Model._meta.get_field("field")
+        validator = DatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s stores only 15 significant digits for decimal values. "
+                    "Values with decimal_places > 15 may lose precision "
+                    "and be stored as floating-point numbers." % connection.display_name,
+                    obj=field,
+                    id="sqlite3.W002",
+                )
+            ],
+        )
+
+    
+    
+    @unittest.skipUnless(connection.vendor == "postgresql", "Test valid only for PostgreSQL")
+    def test_postgresql_decimal_max_digits_limit(self):
+
+        from django.db.backends.postgresql.validation import DatabaseValidation as PostgreSQLDatabaseValidation
+
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=131073, decimal_places=10)
+
+        field = Model._meta.get_field("field")
+        validator = PostgreSQLDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s does not support DecimalField with max_digits > 131072." % connection.display_name,
+                    obj=field,
+                    id="postgresql.W001",
+                )
+            ],
+        )
+    @unittest.skipUnless(connection.vendor == "postgresql", "Test valid only for PostgreSQL")
+    def test_postgresql_decimal_places_limit(self):
+        
+        from django.db.backends.postgresql.validation import DatabaseValidation as PostgreSQLDatabaseValidation
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=20000, decimal_places=16384)
+
+        field = Model._meta.get_field("field")
+        validator = PostgreSQLDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s does not support DecimalField with decimal_places > 16383." % connection.display_name,
+                    obj=field,
+                    id="postgresql.W002",
+                )
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "Test valid only for PostgreSQL")
+    def test_postgresql_decimal_places_greater_than_max_digits(self):
+
+        from django.db.backends.postgresql.validation import DatabaseValidation as PostgreSQLDatabaseValidation
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=10, decimal_places=15)
+
+        field = Model._meta.get_field("field")
+        validator = PostgreSQLDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "numeric"),
+            [
+                DjangoWarning(
+                    "%s requires decimal_places <= max_digits for NUMERIC fields." % connection.display_name,
+                    obj=field,
+                    id="postgresql.W002",
+                )
+            ],
+        )
+    
+
+    @unittest.skipUnless(connection.vendor == "oracle", "Test valid only for Oracle")
+    def test_oracle_decimal_max_digits_limit(self):      
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=39, decimal_places=10)
+
+        field = Model._meta.get_field("field")
+        validator = OracleDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "number"),
+            [
+                DjangoWarning(
+                    "%s does not support DecimalField with max_digits > 38." % connection.display_name,
+                    obj=field,
+                    id="oracle.W001",
+                )
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "oracle", "Test valid only for Oracle")
+    def test_oracle_decimal_places_limit(self):
+
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=50, decimal_places=128)
+
+        field = Model._meta.get_field("field")
+        validator = OracleDatabaseValidation(connection=connection)
+        self.assertEqual(
+            validator.check_field_type(field, "number"),
+            [
+                DjangoWarning(
+                    "%s does not support DecimalField with decimal_places > 127." % connection.display_name,    
+                    obj=field,
+                    id="oracle.W002",
+                )
+            ],
+        )
 
 
 @isolate_apps("invalid_models_tests")
