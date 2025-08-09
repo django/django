@@ -168,6 +168,7 @@ LANGUAGE_COOKIE_PATH = "/"
 LANGUAGE_COOKIE_SECURE = False
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = None
+LANGUAGE_COOKIE_PARTITIONED = False
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
@@ -490,6 +491,8 @@ SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
 # This can be 'Lax', 'Strict', 'None', or False to disable the flag.
 SESSION_COOKIE_SAMESITE = "Lax"
+# Whether to use partitioned cookies (CHIPS) for cross-site contexts.
+SESSION_COOKIE_PARTITIONED = False
 # Whether to save the session data on every request.
 SESSION_SAVE_EVERY_REQUEST = False
 # Whether a user's session cookie expires when the web browser is closed.
@@ -567,6 +570,7 @@ CSRF_COOKIE_PATH = "/"
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_PARTITIONED = False
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_TRUSTED_ORIGINS = []
 CSRF_USE_SESSIONS = False
