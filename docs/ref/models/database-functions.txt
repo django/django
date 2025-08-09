@@ -871,18 +871,20 @@ Usage example:
 ``JSONObject``
 --------------
 
-.. class:: JSONObject(**fields)
+.. class:: JSONObject(*expressions, **kwargs)
 
-Takes a list of key-value pairs and returns a JSON object containing those
-pairs.
+Accepts a list of field names or expressions and returns a JSON object with
+with those key-value pairs, or keyword arguments as shorthand. Providing both
+positional and keyword arguments will result in an error.
 
 Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import F
-    >>> from django.db.models.functions import JSONObject, Lower
+    >>> from django.db.models import F, TextField, Value
+    >>> from django.db.models.functions import Cast, JSONObject, Lower
     >>> Author.objects.create(name="Margaret Smith", alias="msmith", age=25)
+    >>> # Shorthand keyword arguments
     >>> author = Author.objects.annotate(
     ...     json_object=JSONObject(
     ...         name=Lower("name"),
@@ -892,6 +894,37 @@ Usage example:
     ... ).get()
     >>> author.json_object
     {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
+    >>> # Or the more verbose equivalent
+    >>> author = Author.objects.annotate(
+    ...     json_object=JSONObject(
+    ...         Value("name"),
+    ...         Lower("name"),
+    ...         Value("alias"),
+    ...         "alias",
+    ...         Value("age"),
+    ...         F("age") * 2,
+    ...     )
+    ... ).get()
+    >>> author.json_object
+    {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
+    >>> # Positional expressions allow for dynamic keys
+    >>> author = Author.objects.annotate(
+    ...     json_object=JSONObject(
+    ...         Lower("name"),
+    ...         "alias",
+    ...     )
+    ... ).get()
+    >>> author.json_object
+    {'margaret smith': 'msmith'}
+    >>> # Building objects with non-string keys requires the use of Cast
+    >>> author = Author.objects.annotate(
+    ...     json_object=JSONObject(
+    ...         Cast("age", TextField()),
+    ...         "alias",
+    ...     )
+    ... ).get()
+    >>> author.json_object
+    {'30': 'msmith'}
 
 .. _math-functions:
 
