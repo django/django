@@ -488,7 +488,8 @@ class DebugViewTests(SimpleTestCase):
 
     @override_settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1)
     def test_max_number_of_fields_exceeded(self):
-        response = self.client.get("/raises500/", {"a": "1", "b": "2"})
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/", {"a": "1", "b": "2"})
 
         self.assertEqual(response.status_code, 500)
         self.assertContains(response, '<div class="context" id="', status_code=500)
