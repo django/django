@@ -135,7 +135,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "BigIntegerField": "NUMBER(19)",
         "IPAddressField": "VARCHAR2(15)",
         "GenericIPAddressField": "VARCHAR2(39)",
-        "OneToOneField": "NUMBER(11)",
         "PositiveBigIntegerField": "NUMBER(19)",
         "PositiveIntegerField": "NUMBER(11)",
         "PositiveSmallIntegerField": "NUMBER(11)",
