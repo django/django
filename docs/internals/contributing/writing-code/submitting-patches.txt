@@ -167,7 +167,7 @@ The Django Forum
 ----------------
 
 You can propose a change (that is not a new feature idea) on the
-`Django Forum`_. You should explain the need for the change, go into details of
+|django-forum|. You should explain the need for the change, go into details of
 the approach and discuss alternatives.
 
 Please include a link to such discussions in your contributions.
@@ -208,7 +208,6 @@ Some examples of DEPs that have been approved and fully implemented:
 * `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
 * `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
-.. _Django Forum: https://forum.djangoproject.com/
 .. _Django Enhancement Proposals: https://github.com/django/deps
 
 .. _deprecating-a-feature:
