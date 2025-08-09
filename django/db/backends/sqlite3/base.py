@@ -81,7 +81,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "IPAddressField": "char(15)",
         "GenericIPAddressField": "char(39)",
         "JSONField": "text",
-        "OneToOneField": "integer",
         "PositiveBigIntegerField": "bigint unsigned",
         "PositiveIntegerField": "integer unsigned",
         "PositiveSmallIntegerField": "smallint unsigned",
