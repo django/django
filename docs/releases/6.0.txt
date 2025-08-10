@@ -297,6 +297,9 @@ Models
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
 
+* Subqueries returning a :class:`~django.db.models.CompositePrimaryKey` can now
+  be used as the target of lookups other than ``__in``, such as ``__exact``.
+
 * :class:`~django.db.models.JSONField` now supports
   :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
 
