@@ -292,8 +292,23 @@ need to override the :setting:`STORAGES` setting in tests, you should use a
     class MyModel(models.Model):
         upload = models.FileField(storage=my_storage)
 
-The ``LazyObject`` delays the evaluation of the storage until it's actually
-needed, allowing :func:`~django.test.override_settings` to take effect::
+The ``LazyObject`` delays evaluation of the storage until it's actually
+needed, allowing :func:`~django.test.override_settings` to take effect. To
+make this work, connect to the
+:data:`~django.test.signals.setting_changed` signal and reset storages when
+``STORAGES`` is overridden::
+
+    from django.core.files.storage import storages
+    from django.core.signals import setting_changed
+    from django.dispatch import receiver
+
+
+    @receiver(setting_changed)
+    def update_filefield_storage(setting, **kwargs):
+        if setting == "STORAGES":
+            storages._storages.clear()
+
+And in your tests::
 
     @override_settings(
         STORAGES={
