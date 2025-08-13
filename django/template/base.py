@@ -86,7 +86,7 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%(?=.*%}).*?%}|{{(?=.*}}).*?}}|{#(?=.*#}).*?#})")
 
 logger = logging.getLogger("django.template")
 
