@@ -12,6 +12,7 @@ from django.db.models import (
     Exists,
     ExpressionWrapper,
     F,
+    FilteredRelation,
     FloatField,
     Func,
     IntegerField,
@@ -1121,6 +1122,15 @@ class NonAggregateAnnotationTestCase(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.annotate(**{crafted_alias: Value(1)})
 
+    def test_alias_filtered_relation_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(**{crafted_alias: FilteredRelation("author")})
+
     def test_alias_forbidden_chars(self):
         tests = [
             'al"ias',
@@ -1145,6 +1155,11 @@ class NonAggregateAnnotationTestCase(TestCase):
             with self.subTest(crafted_alias):
                 with self.assertRaisesMessage(ValueError, msg):
                     Book.objects.annotate(**{crafted_alias: Value(1)})
+
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.annotate(
+                        **{crafted_alias: FilteredRelation("authors")}
+                    )
 
 
 class AliasTests(TestCase):
@@ -1418,3 +1433,12 @@ class AliasTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: Value(1)})
+
+    def test_alias_filtered_relation_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})

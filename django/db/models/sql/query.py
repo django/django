@@ -1620,6 +1620,7 @@ class Query(BaseExpression):
         return target_clause
 
     def add_filtered_relation(self, filtered_relation, alias):
+        self.check_alias(alias)
         filtered_relation.alias = alias
         lookups = dict(get_children_from_q(filtered_relation.condition))
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
