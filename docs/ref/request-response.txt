@@ -993,7 +993,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None, partitioned=False)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -1026,9 +1026,20 @@ Methods
 
       Use ``samesite='None'`` (string) to explicitly state that this cookie is
       sent with all same-site and cross-site requests.
+    * Use ``partitioned=True`` to enable CHIPS (Cookies Having Independent
+      Partitioned State). This allows cookies to be partitioned by top-level
+      site, which improves privacy by preventing cross-site tracking while
+      still allowing the cookie to work in embedded contexts like iframe.
+      The `Partitioned`_ attribute is particularly useful for third-party
+      services that need to maintain state in embedded contexts.
+
+      .. versionchanged:: 6.0
+
+        The ``partitioned`` argument was added.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
+    .. _Partitioned: https://developer.mozilla.org/en-US/docs/Web/Privacy/Privacy_sandbox/Partitioned_cookies
 
     .. warning::
 
@@ -1038,7 +1049,7 @@ Methods
         attempt to store a cookie of more than 4096 bytes, but many browsers
         will not set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None, partitioned=False)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
@@ -1047,14 +1058,14 @@ Methods
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
-.. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
+.. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None, partitioned=False)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
 
-    Due to the way cookies work, ``path`` and ``domain`` should be the same
-    values you used in ``set_cookie()`` -- otherwise the cookie may not be
-    deleted.
+    Due to the way cookies work, ``path``, ``domain``, and ``partitioned``
+    should be the same values you used in ``set_cookie()`` -- otherwise the
+    cookie may not be deleted.
 
 .. method:: HttpResponse.close()
 

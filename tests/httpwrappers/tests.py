@@ -950,6 +950,11 @@ class CookieTests(unittest.TestCase):
         self.assertEqual(c["name"]["samesite"], "lax")
         self.assertIn("SameSite=lax", c.output())
 
+    def test_partitioned(self):
+        c = SimpleCookie("name=value; partitioned; httponly")
+        self.assertEqual(c["name"]["partitioned"], True)
+        self.assertIn("Partitioned", c.output())
+
     def test_httponly_after_load(self):
         c = SimpleCookie()
         c.load("name=val")
