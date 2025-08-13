@@ -2,7 +2,7 @@ import json
 import os
 import re
 from pathlib import Path
-
+from urllib.parse import quote
 from django.apps import apps
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -63,7 +63,7 @@ def set_language(request):
                     response = HttpResponseRedirect(next_trans)
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
-                lang_code,
+                quote(lang_code),
                 max_age=settings.LANGUAGE_COOKIE_AGE,
                 path=settings.LANGUAGE_COOKIE_PATH,
                 domain=settings.LANGUAGE_COOKIE_DOMAIN,
