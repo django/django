@@ -23,7 +23,8 @@ from django.middleware.csrf import (
     get_token,
     rotate_token,
 )
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -1479,6 +1480,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
 
 @override_settings(ROOT_URLCONF="csrf_tests.csrf_token_error_handler_urls", DEBUG=False)
 class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_csrf_token_on_404_stays_constant(self):
         response = self.client.get("/does not exist/")
         # The error handler returns status code 599.
