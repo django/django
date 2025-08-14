@@ -491,7 +491,10 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get(self.url)
 
     def test_assert_num_queries_less_failure(self):
-        msg = "2 not less than 2 : 2 queries executed, 2 expected\nCaptured queries were:\n1."
+        msg = (
+            "2 not less than 2 : 2 queries executed, 2 expected\n"
+            "Captured queries were:\n1."
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueriesLess(2):
                 Person.objects.count()
@@ -515,7 +518,10 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get(self.url)
 
     def test_assert_num_queries_less_equal_failure(self):
-        msg = "3 not less than or equal to 2 : 3 queries executed, 2 expected\nCaptured queries were:\n1"
+        msg = (
+            "3 not less than or equal to 2 : 3 queries executed, 2 expected\n"
+            "Captured queries were:\n1"
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueriesLessEqual(2):
                 Person.objects.count()

@@ -1299,7 +1299,9 @@ class TransactionTestCase(SimpleTestCase):
         with context:
             func(*args, **kwargs)
 
-    def assertNumQueriesLess(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
+    def assertNumQueriesLess(
+        self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
+    ):
         conn = connections[using]
 
         context = _AssertNumQueriesContext(self, num, conn, 'assertLess')
@@ -1309,7 +1311,9 @@ class TransactionTestCase(SimpleTestCase):
         with context:
             func(*args, **kwargs)
 
-    def assertNumQueriesLessEqual(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
+    def assertNumQueriesLessEqual(
+        self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
+    ):
         conn = connections[using]
 
         context = _AssertNumQueriesContext(self, num, conn, 'assertLessEqual')
