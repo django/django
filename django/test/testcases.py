@@ -1273,6 +1273,19 @@ class TransactionTestCase(SimpleTestCase):
                 inhibit_post_migrate=inhibit_post_migrate,
             )
 
+    def _baseAssertNumQueries(
+        self, num, func=None, *args,
+        using=DEFAULT_DB_ALIAS, assert_method="assertEqual", **kwargs
+    ):
+        conn = connections[using]
+
+        context = _AssertNumQueriesContext(self, num, conn, assert_method)
+        if func is None:
+            return context
+
+        with context:
+            func(*args, **kwargs)
+
     def assertQuerySetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
         items = qs
@@ -1290,38 +1303,26 @@ class TransactionTestCase(SimpleTestCase):
         return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
-        conn = connections[using]
-
-        context = _AssertNumQueriesContext(self, num, conn, "assertEqual")
-        if func is None:
-            return context
-
-        with context:
-            func(*args, **kwargs)
+        return self._baseAssertNumQueries(
+            num, func, *args,
+            using=using, assert_method="assertEqual", **kwargs
+        )
 
     def assertNumQueriesLess(
         self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
     ):
-        conn = connections[using]
-
-        context = _AssertNumQueriesContext(self, num, conn, "assertLess")
-        if func is None:
-            return context
-
-        with context:
-            func(*args, **kwargs)
+        return self._baseAssertNumQueries(
+            num, func, *args,
+            using=using, assert_method="assertLess", **kwargs
+        )
 
     def assertNumQueriesLessEqual(
         self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
     ):
-        conn = connections[using]
-
-        context = _AssertNumQueriesContext(self, num, conn, "assertLessEqual")
-        if func is None:
-            return context
-
-        with context:
-            func(*args, **kwargs)
+        return self._baseAssertNumQueries(
+            num, func, *args,
+            using=using, assert_method="assertLessEqual", **kwargs
+        )
 
 
 def connections_support_transactions(aliases=None):
