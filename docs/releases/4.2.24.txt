@@ -1,0 +1,7 @@
+===========================
+Django 4.2.24 release notes
+===========================
+
+*September 3, 2025*
+
+Django 4.2.24 fixes a security issue with severity "high" in 4.2.23.
