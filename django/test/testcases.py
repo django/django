@@ -99,9 +99,10 @@ def assert_and_parse_html(self, html, user_msg, msg):
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
-    def __init__(self, test_case, num, connection):
+    def __init__(self, test_case, num, connection, assert_method='assertEqual'):
         self.test_case = test_case
         self.num = num
+        self.assert_method = assert_method
         super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -109,7 +110,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         if exc_type is not None:
             return
         executed = len(self)
-        self.test_case.assertEqual(
+        getattr(self.test_case, self.assert_method)(
             executed,
             self.num,
             "%d queries executed, %d expected\nCaptured queries were:\n%s"
@@ -1291,7 +1292,27 @@ class TransactionTestCase(SimpleTestCase):
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
         conn = connections[using]
 
-        context = _AssertNumQueriesContext(self, num, conn)
+        context = _AssertNumQueriesContext(self, num, conn, 'assertEqual')
+        if func is None:
+            return context
+
+        with context:
+            func(*args, **kwargs)
+
+    def assertNumQueriesLess(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
+        conn = connections[using]
+
+        context = _AssertNumQueriesContext(self, num, conn, 'assertLess')
+        if func is None:
+            return context
+
+        with context:
+            func(*args, **kwargs)
+
+    def assertNumQueriesLessEqual(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
+        conn = connections[using]
+
+        context = _AssertNumQueriesContext(self, num, conn, 'assertLessEqual')
         if func is None:
             return context
 

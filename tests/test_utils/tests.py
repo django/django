@@ -490,6 +490,59 @@ class AssertNumQueriesContextManagerTests(TestCase):
                 pass
             self.client.get(self.url)
 
+    def test_assert_num_queries_less_failure(self):
+        msg = "2 not less than 2 : 2 queries executed, 2 expected\nCaptured queries were:\n1."
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertNumQueriesLess(2):
+                Person.objects.count()
+                Person.objects.count()
+
+        with self.assertRaises(TypeError):
+            with self.assertNumQueriesLess(4000):
+                raise TypeError
+
+    def test_assert_num_queries_less(self):
+        person = Person.objects.create(name="test")
+
+        with self.assertNumQueriesLess(2):
+            self.client.get(self.url)
+
+        with self.assertNumQueriesLess(3):
+            self.client.get(self.url)
+            self.client.get(self.url)
+
+        with self.assertNumQueriesLess(4):
+            self.client.get(self.url)
+            self.client.get(self.url)
+            self.client.get(self.url)
+
+    def test_assert_num_queries_less_equal_failure(self):
+        msg = "3 not less than or equal to 2 : 3 queries executed, 2 expected\nCaptured queries were:\n1"
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertNumQueriesLessEqual(2):
+                Person.objects.count()
+                Person.objects.count()
+                Person.objects.count()
+
+        with self.assertRaises(TypeError):
+            with self.assertNumQueriesLessEqual(4000):
+                raise TypeError
+
+    def test_assert_num_queries_less_equal(self):
+        person = Person.objects.create(name="test")
+
+        with self.assertNumQueriesLessEqual(1):
+            self.client.get(self.url)
+
+        with self.assertNumQueriesLessEqual(2):
+            self.client.get(self.url)
+            self.client.get(self.url)
+
+        with self.assertNumQueriesLessEqual(3):
+            self.client.get(self.url)
+            self.client.get(self.url)
+            self.client.get(self.url)
+
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
 class AssertTemplateUsedContextManagerTests(SimpleTestCase):
