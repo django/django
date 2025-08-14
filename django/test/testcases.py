@@ -99,7 +99,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
-    def __init__(self, test_case, num, connection, assert_method='assertEqual'):
+    def __init__(self, test_case, num, connection, assert_method="assertEqual"):
         self.test_case = test_case
         self.num = num
         self.assert_method = assert_method
