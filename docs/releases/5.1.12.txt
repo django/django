@@ -1,0 +1,7 @@
+===========================
+Django 5.1.12 release notes
+===========================
+
+*September 3, 2025*
+
+Django 5.1.12 fixes a security issue with severity "high" in 5.1.11.
