@@ -502,8 +502,6 @@ class AssertNumQueriesContextManagerTests(TestCase):
                 raise TypeError
 
     def test_assert_num_queries_less(self):
-        person = Person.objects.create(name="test")
-
         with self.assertNumQueriesLess(2):
             self.client.get(self.url)
 
@@ -529,8 +527,6 @@ class AssertNumQueriesContextManagerTests(TestCase):
                 raise TypeError
 
     def test_assert_num_queries_less_equal(self):
-        person = Person.objects.create(name="test")
-
         with self.assertNumQueriesLessEqual(1):
             self.client.get(self.url)
 
