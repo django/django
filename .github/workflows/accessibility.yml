@@ -40,5 +40,9 @@ jobs:
           --config ./pa11y.json
           --runner axe
           --include-warnings)
+          && pa11y http://127.0.0.1:8000/en/admin/demo/artist/7zX2wRWDKLiW2V5QlI4QXU/change/
+          --config ./pa11y.json
+          --runner axe
+          --include-warnings
         # TODO: remove this when the errors are fixed.
         continue-on-error: true
