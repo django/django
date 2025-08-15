@@ -301,6 +301,10 @@ p.datetime {
     font-weight: bold;
 }
 
+p.datetime label {
+    padding: 6px 0;
+}
+
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
@@ -309,7 +313,6 @@ p.datetime {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    margin-left: 5px;
     margin-bottom: 4px;
 }
 

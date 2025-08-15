@@ -435,12 +435,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
             '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8"></p>',
+            '<label for="id_test_0">Date:</label> '
+            '<input value="2007-12-01" type="text" class="vDateField" '
+            'name="test_0" size="10" id="id_test_0"><br>'
+            '<label for="id_test_1">Time:</label> '
+            '<input value="09:30:00" type="text" class="vTimeField" '
+            'name="test_1" size="8" id="id_test_1"></p>',
         )
 
     def test_localization(self):
@@ -449,12 +451,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         with translation.override("de-at"):
             w.is_localized = True
             self.assertHTMLEqual(
-                w.render("test", datetime(2007, 12, 1, 9, 30)),
+                w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
                 '<p class="datetime">'
-                'Datum: <input value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8"></p>',
+                '<label for="id_test_0">Datum:</label> '
+                '<input value="01.12.2007" type="text" class="vDateField" '
+                'name="test_0" size="10" id="id_test_0"><br>'
+                '<label for="id_test_1">Zeit:</label> '
+                '<input value="09:30:00" type="text" class="vTimeField" '
+                'name="test_1" size="8" id="id_test_1"></p>',
             )
 
 
@@ -1175,6 +1179,42 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                     self.selenium.find_element(By.ID, "calendarlink0").click()
                     # The right month and year are displayed.
                     self.wait_for_text("#calendarin0 caption", expected_caption)
+
+    @override_settings(TIME_ZONE="Asia/Seoul")
+    def test_timezone_warning_message(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        datetime = self.selenium.find_element(By.CSS_SELECTOR, "p.datetime")
+        warnings = self.selenium.find_elements(
+            By.CSS_SELECTOR, "div.form-row.field-birthdate div.help.timezonewarning"
+        )
+        # Warning duplicate check
+        self.assertEqual(len(warnings), 1)
+
+        warning = warnings[0]
+        self.assertTrue(warning.is_displayed())
+        next_element = warning.find_element(By.XPATH, "./following-sibling::*[1]")
+        # Warning message are generally located just above the field block.
+        self.assertEqual(next_element, datetime)
+
+        date = datetime.find_element(By.TAG_NAME, "input")
+        date.send_keys("invalid")
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.NAME, "_save").click()
+
+        errors = self.selenium.find_element(By.ID, "id_birthdate_error")
+        warning = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.help.timezonewarning"
+        )
+        next_element = warning.find_element(By.XPATH, "./following-sibling::*[1]")
+        # warning message appears above the error message.
+        self.assertEqual(next_element, errors)
 
 
 @requires_tz_support
