@@ -1274,8 +1274,13 @@ class TransactionTestCase(SimpleTestCase):
             )
 
     def _baseAssertNumQueries(
-        self, num, func=None, *args,
-        using=DEFAULT_DB_ALIAS, assert_method="assertEqual", **kwargs
+        self,
+        num,
+        func=None,
+        *args,
+        using=DEFAULT_DB_ALIAS,
+        assert_method="assertEqual",
+        **kwargs,
     ):
         conn = connections[using]
 
