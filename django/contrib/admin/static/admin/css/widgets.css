@@ -301,6 +301,10 @@ p.datetime {
     font-weight: bold;
 }
 
+p.datetime label {
+    display: inline;
+}
+
 .datetime span {
     white-space: nowrap;
     font-weight: normal;

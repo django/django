@@ -70,6 +70,7 @@ from .models import (
     Color,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -6907,6 +6908,30 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
+
+    def test_use_fieldset_fields_render(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        course = Course.objects.create(
+            title="Django Class", materials="django_documents"
+        )
+        expected_legend_tags_text = [
+            "Materials:",
+            "Difficulty:",
+            "Categories:",
+            "Start datetime:",
+        ]
+        url = reverse("admin:admin_views_course_change", args=(course.pk,))
+        self.selenium.get(self.live_server_url + url)
+        fieldsets = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.aligned fieldset"
+        )
+        for index, fieldset in enumerate(fieldsets):
+            legend = fieldset.find_element(By.TAG_NAME, "legend")
+            self.assertEqual(legend.text, expected_legend_tags_text[index])
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     @override_settings(MESSAGE_LEVEL=10)

@@ -47,6 +47,7 @@ from .models import (
     Color2,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -1190,6 +1191,10 @@ class CamelCaseAdmin(admin.ModelAdmin):
     filter_horizontal = ["m2m"]
 
 
+class CourseAdmin(admin.ModelAdmin):
+    radio_fields = {"difficulty": admin.VERTICAL}
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1280,6 +1285,7 @@ site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
 site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
+site.register(Course, CourseAdmin)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)
