@@ -37,7 +37,8 @@ class AutoFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "AutoFields must set primary_key=True.",
+                    "AutoFields must either set primary_key=True or be part of"
+                    " a CompositePrimaryKey.",
                     obj=field,
                     id="fields.E100",
                 ),
