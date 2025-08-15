@@ -25,8 +25,18 @@ class LogEntryManager(models.Manager):
     use_in_migrations = True
 
     def log_actions(
-        self, user_id, queryset, action_flag, change_message="", *, single_object=False
+        self,
+        user_id,
+        queryset,
+        action_flag,
+        change_message="",
+        action_by_repr="",
+        *,
+        single_object=False,
     ):
+        if not (user_id or action_by_repr):
+            raise ValueError("user_id or action_by_repr must be provided")
+
         if isinstance(change_message, list):
             change_message = json.dumps(change_message)
 
@@ -38,6 +48,7 @@ class LogEntryManager(models.Manager):
                 ).id,
                 object_id=obj.pk,
                 object_repr=str(obj)[:200],
+                action_by_repr=action_by_repr[:200],
                 action_flag=action_flag,
                 change_message=change_message,
             )
@@ -62,8 +73,10 @@ class LogEntry(models.Model):
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        models.CASCADE,
+        models.SET_NULL,
         verbose_name=_("user"),
+        blank=True,
+        null=True,
     )
     content_type = models.ForeignKey(
         ContentType,
@@ -76,6 +89,12 @@ class LogEntry(models.Model):
     # Translators: 'repr' means representation
     # (https://docs.python.org/library/functions.html#repr)
     object_repr = models.CharField(_("object repr"), max_length=200)
+    action_by_repr = models.CharField(
+        _("action by repr"),
+        max_length=200,
+        blank=True,
+        null=True,
+    )
     action_flag = models.PositiveSmallIntegerField(
         _("action flag"), choices=ACTION_FLAG_CHOICES
     )
@@ -105,6 +124,20 @@ class LogEntry(models.Model):
             return gettext("Deleted “%(object)s.”") % {"object": self.object_repr}
 
         return gettext("LogEntry Object")
+
+    def get_action_by_repr(self):
+        if self.action_by_repr:
+            return self.action_by_repr
+
+        if self.user:
+            action_by_repr = self.user.get_username()
+            if hasattr(self.user, 'get_full_name'):
+                full_name = self.user.get_full_name()
+                if full_name:
+                    action_by_repr = f'{action_by_repr} ({full_name})'
+            return action_by_repr
+
+        return gettext("Unknown, or deleted user")
 
     def is_addition(self):
         return self.action_flag == ADDITION
