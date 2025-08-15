@@ -1,15 +1,257 @@
-====================
-Model Form Functions
-====================
-
-Model Form API reference. For introductory material about model forms, see the
-:doc:`/topics/forms/modelforms` topic guide.
+===========
+ModelForms
+===========
 
 .. module:: django.forms.models
-   :synopsis: Django's functions for building model forms and formsets.
+    :synopsis: ModelForm API reference for inner ``Meta`` class and factory
+        functions
+
+.. class:: ModelForm
+
+.. _ref-modelform:
+
+.. currentmodule:: django.forms
+
+:class:`~django.forms.ModelForm` API reference. For introductory material about
+ModelForms, see the :doc:`/topics/forms/modelforms` topic guide.
+
+.. _ref-modelform-meta-options:
+
+ModelForm ``Meta`` Options
+==========================
+
+The :class:`~django.forms.ModelForm` helper class can be used to build forms
+that closely reflect specific Django models. The exact structure of the form
+produced can be controlled by setting metadata options as attributes of an inner
+``Meta`` class.
+
+::
+
+    # Example using some sort of Book model
+
+    from django.forms import ModelForm
+    from myapp.models import Book
+
+
+    class BookForm(ModelForm):
+        class Meta:
+            model = Book
+            fields = ["title", "author"]
+            help_texts = {
+                "title": "The title of the book",
+                "author": "The author of the book",
+            }
+            # ... other attributes
+
+.. admonition:: Invalid Meta class attributes
+
+    While any number of attributes can be included in a ``Meta``
+    class, **only attributes that match those described below will be used**.
+    When troubleshooting or encountering unexpected behavior, be sure to check
+    for typos or misnamed attributes because these will **not**, in and of
+    themselves, raise an error (though they might cause another error to be
+    raised if they affect a required attribute).
+
+:attr:`~ModelFormOptions.model` is required as well as either 
+:attr:`~ModelFormOptions.fields` or :attr:`~ModelFormOptions.exclude`.
+All other ``Meta`` attributes are optional. Included fields need not be 
+included in every option used. If an option isn't set, or if a model's 
+field isn't used with a particular option, Django will fall back on whatever 
+has already been defined for a field in their model or whatever defaults 
+might exist for that field's type.
+
+Optional ``Meta`` attributes, other than
+:attr:`~ModelFormOptions.localized_fields` and
+:attr:`~ModelFormOptions.formfield_callback`, expect a dictionary that maps a
+model field name string to some other object or string. Including invalid or
+excluded field name strings in these dictionaries is possible but should have no
+effect since fields that haven't been included would never be accessed.
+
+``error_messages``
+------------------
+
+.. attribute:: ModelFormOptions.error_messages
+
+    Expects a dictionary that maps a model field name string to a dictionary of
+    error message keys (``null``, ``blank``, ``invalid``, ``unique``, etc.)
+    mapped to custom error messages.  
+    
+    Where a field doesn't have an error message dictionary mapped to it in
+    :attr:`~ModelFormOptions.error_messages`, Django will fall back on error
+    messages defined in that model field's
+    :attr:`django.db.models.Field.error_messages` and then finally on the
+    default error messages for that field type.
+
+``exclude``
+-----------
+
+.. attribute:: ModelFormOptions.exclude
+
+    *One of* :attr:`~ModelFormOptions.fields` *and*
+    :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of strings
+    or list of strings where each string is the name of a field from the model
+    set in :attr:`~ModelFormOptions.model`. Every field named in
+    :attr:`~ModelFormOptions.exclude` will be excluded from the output form,
+    **including fields that are also listed in**
+    :attr:`~ModelFormOptions.fields`.
+
+    * When using :attr:`~ModelFormOptions.exclude`, leaving
+      :attr:`~ModelFormOptions.fields` unset or setting it to ``None`` has the
+      net effect of including all valid model fields (as if
+      :attr:`~ModelFormOptions.fields` were set to ``'__all__'``) except for
+      those provided to :attr:`~ModelFormOptions.exclude`. 
+    * If neither of :attr:`~ModelFormOptions.fields` or
+      :attr:`~ModelFormOptions.exclude` are set, an
+      :class:`~django.core.exceptions.ImproperlyConfigured` exception will be
+      raised.
+
+``field_classes``
+-----------------
+
+.. attribute:: ModelFormOptions.field_classes
+
+    Expects a dictionary that maps a model field name string to a
+    :class:`~django.forms.Field` class (**not** a string). 
+
+    :attr:`~ModelFormOptions.field_classes` can be used to set or
+    override whatever :class:`django.forms.Field` type may have already been set
+    for a field, such as the default :class:`django.forms.Field` type for a
+    given :class:`django.db.models.Field` type.
+
+    The :class:`~django.forms.Field` specified in
+    :attr:`~ModelFormOptions.field_classes` (the 'new field') gets
+    passed all the arguments that would otherwise have been used for that
+    model's field (the 'old field'). If the old field has different attributes
+    (and therefore different arguments) than the new field, a :exc:`TypeError`
+    may be raised. For example:
+    
+    * Replacing a :class:`~django.forms.CharField` with an
+      :class:`~django.forms.EmailField` will work, since the latter is a
+      subclass of the former and can handle all the arguments passed to it.
+    * Replacing a :class:`~django.forms.CharField` with an
+      :class:`~django.forms.IntegerField`, however, will **not** work, since the
+      :class:`~django.forms.CharField` would pass a
+      :attr:`~django.forms.CharField.max_length` argument, and the
+      :class:`~django.forms.IntegerField` cannot accept such an argument (it
+      instead has :attr:`~django.forms.IntegerField.max_value`). In this case, a
+      :exc:`TypeError` will be raised with the message: 
+    
+        .. code-block:: console
+
+            >>> TypeError: Field.__init__() got an unexpected keyword argument 'max_length'
+
+``fields``
+----------
+
+.. attribute:: ModelFormOptions.fields
+
+    *One of* :attr:`~ModelFormOptions.fields` *and*
+    :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of string
+    or list of strings where each string is the name of a field from the model
+    set in :attr:`~ModelFormOptions.model` or, instead, the single, special
+    string ``'__all__'``. Every field named in :attr:`~ModelFormOptions.fields`
+    will be included in the output form. Non-editable fields cannot be included.
+    
+    * If set to the special string ``'__all__'``, all non-editable model fields
+      will be included.
+    * Other than the special case of ``'__all__'``,
+      :attr:`~ModelFormOptions.fields` **cannot** be set to a single string,
+      even if only a single field is desired. The input for
+      :attr:`~ModelFormOptions.fields` must still be structured as a tuple of
+      strings (e.g., ``('myFieldName',)``) or list of strings (e.g., ``[
+      'myFieldName' ]``) or else a :exc:`TypeError` will be raised.
+    * If a string provided is not a valid field name for the model specified by
+      :attr:`ModelFormOptions.model` (e.g., the field doesn't exist on the model
+      or the field name contained a typo), a
+      :exc:`~django.core.exceptions.FieldError` exception will be raised.
+    * If a non-editable field name is provided, a
+      :exc:`~django.core.exceptions.FieldError` exception will be raised.
+    * If neither of :attr:`~ModelFormOptions.fields` or
+      :attr:`~ModelFormOptions.exclude` are set, an
+      :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be
+      raised.
+
+``formfield_callback``
+----------------------
+
+.. attribute:: ModelFormOptions.formfield_callback
+
+    Expects a function or callable that takes a model field (**not** a string,
+    though the name of the field can be accessed in the called function using
+    ``modelField.name``) and returns a :class:`django.forms.Field` object.
+
+    If :attr:`~ModelFormOptions.formfield_callback` is neither a callable nor a
+    function, a :exc:`TypeError` will be raised. 
+
+``help_texts``
+--------------
+
+.. attribute:: ModelFormOptions.help_texts
+
+    Expects a dictionary that maps a model field name string to a help text
+    string. 
+    
+    Where a field doesn't have a label string mapped to it in
+    :attr:`~ModelFormOptions.help_texts`, Django will fall back on that model
+    field's :attr:`~django.db.models.Field.help_text`.
+
+``labels``
+----------
+
+.. attribute:: ModelFormOptions.labels
+
+    Expects a dictionary that maps a model field name string to a label string. 
+    
+    Where a field doesn't have a label string mapped to it in
+    :attr:`~ModelFormOptions.labels`, Django will fall back on that model
+    field's :attr:`~django.db.models.Field.verbose_name` and then the field's
+    attribute name.
+
+``localized_fields``
+--------------------
+
+.. attribute:: ModelFormOptions.localized_fields
+
+    Expects a tuple of strings or a list of strings that are field names.
+    
+    The fields included in this list will have their data localized (by default,
+    the form fields output by a :class:`~django.forms.ModelForm` are **not**
+    localized, see :ref:`Creating forms from models: Enabling localization of
+    fields <modelforms-enabling-localization-of-fields>`).  
+    
+    Like :attr:`~ModelFormOptions.fields`,
+    :attr:`~ModelFormOptions.localized_fields` can be set to the special string
+    ``'__all__'`` to include all fields.
+
+``model``
+---------
+
+.. attribute:: ModelFormOptions.model
+
+    *Required.* A :class:`django.db.models.Model` to be used for this
+    :class:`~django.forms.ModelForm`.
+
+    If no class is specified, a :exc:`ValueError` exception will be raised.
+
+``widgets``
+-----------
+
+.. attribute:: ModelFormOptions.widgets
+
+    Expects a dictionary that maps a model field name string to a
+    :class:`django.forms.Widget`. 
+    
+    Where an included model field doesn't have a widget mapped to it in
+    :attr:`~ModelFormOptions.widgets`, Django will fall back on the default
+    widget for that particular type of :class:`django.db.models.Field`.
+
+ModelForm Factory Functions
+===========================
+
+.. currentmodule:: django.forms.models
 
 ``modelform_factory``
-=====================
+---------------------
 
 .. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None, widgets=None, localized_fields=None, labels=None, help_texts=None, error_messages=None, field_classes=None)
 
@@ -50,7 +292,7 @@ Model Form API reference. For introductory material about model forms, see the
     an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 ``modelformset_factory``
-========================
+------------------------
 
 .. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None, min_num=None, validate_min=False, field_classes=None, absolute_max=None, can_delete_extra=True, renderer=None, edit_only=False)
 
@@ -73,7 +315,7 @@ Model Form API reference. For introductory material about model forms, see the
     See :ref:`model-formsets` for example usage.
 
 ``inlineformset_factory``
-=========================
+-------------------------
 
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None, min_num=None, validate_min=False, field_classes=None, absolute_max=None, can_delete_extra=True, renderer=None, edit_only=False)
 
