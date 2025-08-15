@@ -1302,27 +1302,17 @@ class TransactionTestCase(SimpleTestCase):
             )
         return self.assertEqual(list(items), values, msg=msg)
 
-    def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
-        return self._baseAssertNumQueries(
-            num, func, *args,
-            using=using, assert_method="assertEqual", **kwargs
-        )
+    def assertNumQueries(self, *args, **kwargs):
+        kwargs["assert_method"] = "assertEqual"
+        return self._baseAssertNumQueries(*args, **kwargs)
 
-    def assertNumQueriesLess(
-        self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
-    ):
-        return self._baseAssertNumQueries(
-            num, func, *args,
-            using=using, assert_method="assertLess", **kwargs
-        )
+    def assertNumQueriesLess(self, *args, **kwargs):
+        kwargs["assert_method"] = "assertLess"
+        return self._baseAssertNumQueries(*args, **kwargs)
 
-    def assertNumQueriesLessEqual(
-        self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs
-    ):
-        return self._baseAssertNumQueries(
-            num, func, *args,
-            using=using, assert_method="assertLessEqual", **kwargs
-        )
+    def assertNumQueriesLessEqual(self, *args, **kwargs):
+        kwargs["assert_method"] = "assertLessEqual"
+        return self._baseAssertNumQueries(*args, **kwargs)
 
 
 def connections_support_transactions(aliases=None):
