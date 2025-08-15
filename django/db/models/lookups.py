@@ -546,14 +546,27 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return "IN %s" % rhs
 
     def as_sql(self, compiler, connection):
-        max_in_list_size = connection.ops.max_in_list_size()
+        try:
+            sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            sql, params = "", ()
+
         if (
-            self.rhs_is_direct_value()
-            and max_in_list_size
-            and len(self.rhs) > max_in_list_size
+            compiler.query.is_nullable(self.lhs.output_field)
+            and self.rhs_is_direct_value()
+            and None in self.rhs
         ):
-            return self.split_parameter_list_as_sql(compiler, connection)
-        return super().as_sql(compiler, connection)
+            lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+            if sql:
+                sql = f"({sql} OR {lhs_sql} IS NULL)"
+                params = (*params, *lhs_params)
+            else:
+                sql = f"{lhs_sql} IS NULL"
+                params = (*lhs_params,)
+        elif not sql:
+            raise EmptyResultSet
+
+        return sql, params
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
