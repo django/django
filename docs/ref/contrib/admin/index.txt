@@ -3313,7 +3313,7 @@ password box.
 .. class:: models.LogEntry
 
     The ``LogEntry`` class tracks additions, changes, and deletions of objects
-    done through the admin interface.
+    done through the admin interface and admin actions.
 
 .. currentmodule:: django.contrib.admin.models
 
@@ -3326,8 +3326,8 @@ password box.
 
 .. attribute:: LogEntry.user
 
-    The user (an :setting:`AUTH_USER_MODEL` instance) who performed the
-    action.
+    The user (an :setting:`AUTH_USER_MODEL` instance) who performed
+    the action, or `None` if not applicable or available.
 
 .. attribute:: LogEntry.content_type
 
@@ -3341,6 +3341,12 @@ password box.
 .. attribute:: LogEntry.object_repr
 
     The object`s ``repr()`` after the modification.
+
+.. attribute:: LogEntry.action_by_repr
+
+    .. versionadded:: 6.x
+
+    A string that describes who or what performed the action.
 
 .. attribute:: LogEntry.action_flag
 
@@ -3368,6 +3374,15 @@ password box.
 .. method:: LogEntry.get_edited_object()
 
     A shortcut that returns the referenced object.
+
+.. method:: LogEntry.get_action_by_repr()
+
+    .. versionadded:: 6.x
+
+    Returns text to describe who or what performed the action. If
+    :attr:`action_by_repr` is not empty then that value will be returned.
+    Otherwise, it will return the `username` of :attr:`user`; followed by its
+    full name, if available.
 
 .. method:: LogEntry.get_change_message()
 
