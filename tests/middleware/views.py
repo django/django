@@ -3,9 +3,11 @@ import sys
 
 from django.http import HttpResponse
 from django.middleware.csp import get_nonce
+from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
 from django.views.debug import technical_500_response
 from django.views.decorators.common import no_append_slash
+from django.views.decorators.csp import csp_disabled, csp_override
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
@@ -27,6 +29,42 @@ class SensitiveCBV(View):
 
 def csp_nonce(request):
     return HttpResponse(get_nonce(request))
+
+
+@csp_disabled
+def csp_disabled_both(request):
+    return HttpResponse()
+
+
+@csp_disabled(report_only=False)
+def csp_disabled_enforced(request):
+    return HttpResponse()
+
+
+@csp_disabled(enforced=False)
+def csp_disabled_ro(request):
+    return HttpResponse()
+
+
+csp_policy_override = {
+    "default-src": [CSP.SELF],
+    "img-src": [CSP.SELF, "data:"],
+}
+
+
+@csp_override(csp_policy_override)
+def override_csp_both(request):
+    return HttpResponse()
+
+
+@csp_override(csp_policy_override, report_only=False)
+def override_csp_enforced(request):
+    return HttpResponse()
+
+
+@csp_override(csp_policy_override, enforced=False)
+def override_csp_report_only(request):
+    return HttpResponse()
 
 
 def csp_500(request):
