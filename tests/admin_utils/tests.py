@@ -422,7 +422,7 @@ class UtilsTests(SimpleTestCase):
         form = MyForm()
         self.assertHTMLEqual(
             helpers.AdminField(form, "text", is_first=False).label_tag(),
-            '<label for="id_text" class="required inline"><i>text</i></label>',
+            '<label for="id_text" class="required inline"><i>text</i>:</label>',
         )
         self.assertHTMLEqual(
             helpers.AdminField(form, "cb", is_first=False).label_tag(),
@@ -438,7 +438,7 @@ class UtilsTests(SimpleTestCase):
         form = MyForm()
         self.assertHTMLEqual(
             helpers.AdminField(form, "text", is_first=False).label_tag(),
-            '<label for="id_text" class="required inline">&amp;text</label>',
+            '<label for="id_text" class="required inline">&amp;text:</label>',
         )
         self.assertHTMLEqual(
             helpers.AdminField(form, "cb", is_first=False).label_tag(),

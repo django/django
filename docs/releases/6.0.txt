@@ -445,6 +445,12 @@ or lists. For instance, prefer unpacking like this::
 
   params = (*lhs_params, *rhs_params)
 
+Admin
+-----
+
+* The "wide" class in the classes option of :attr:`.ModelAdmin.fieldsets` no
+  longer affects the form layout.
+
 Miscellaneous
 -------------
 

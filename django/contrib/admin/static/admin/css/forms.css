@@ -141,6 +141,11 @@ form .aligned ul li {
     list-style: none;
 }
 
+form .aligned div.help ul {
+    padding-left: 0;
+    margin-left: 0;
+}
+
 form .aligned table p {
     margin-left: 0;
     padding-left: 0;
@@ -157,17 +162,6 @@ form .aligned table p {
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
     width: 610px;
-}
-
-/* WIDE FIELDSETS */
-
-form div.help ul {
-    padding-left: 0;
-    margin-left: 0;
-}
-
-.colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
-    width: 450px;
 }
 
 /* COLLAPSIBLE FIELDSETS */

@@ -7287,7 +7287,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<label for="id_public">Overridden public label</label>',
+            '<label for="id_public">Overridden public label:</label>',
             html=True,
         )
         self.assertNotContains(
