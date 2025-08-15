@@ -1908,6 +1908,47 @@ your test suite.
             Person.objects.create(name="Aaron")
             Person.objects.create(name="Daniel")
 
+.. method:: TransactionTestCase.assertNumQueriesLess(num, func, *args, **kwargs)
+
+    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
+    performed up to ``num - 1`` database queries.
+
+    If a ``"using"`` key is present in ``kwargs`` it is used as the database
+    alias for which to check the number of queries::
+
+        self.assertNumQueriesLess(7, my_function, using="non_default_db")
+
+    If you wish to call a function with a ``using`` parameter you can do it by
+    wrapping the call with a ``lambda`` to add an extra parameter::
+
+        self.assertNumQueriesLess(7, lambda: my_function(using=7))
+
+    You can also use this as a context manager::
+
+        with self.assertNumQueriesLess(2):
+            Person.objects.create(name="Aaron")
+
+.. method:: TransactionTestCase.assertNumQueriesLessEqual(num, func, *args, **kwargs)
+
+    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
+    performed up to ``num`` database queries.
+
+    If a ``"using"`` key is present in ``kwargs`` it is used as the database
+    alias for which to check the number of queries::
+
+        self.assertNumQueriesLessEqual(7, my_function, using="non_default_db")
+
+    If you wish to call a function with a ``using`` parameter you can do it by
+    wrapping the call with a ``lambda`` to add an extra parameter::
+
+        self.assertNumQueriesLessEqual(7, lambda: my_function(using=7))
+
+    You can also use this as a context manager::
+
+        with self.assertNumQueriesLessEqual(2):
+            Person.objects.create(name="Aaron")
+            Person.objects.create(name="Aaron")
+
 .. _topics-tagging-tests:
 
 Tagging tests
