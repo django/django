@@ -260,16 +260,15 @@ class LookupTests(TestCase):
             {self.au1.id: self.a4, self.au2.id: self.a5},
         )
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        qs = Article.objects.all()
         with (
-            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            mock.patch.object(connection.features.__class__, "max_query_params", 2),
             self.assertNumQueries(2),
         ):
             self.assertEqual(
-                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
-                {self.au1.id: self.a4, self.au2.id: self.a5},
+                list(qs.in_bulk([self.a5.id, self.a4.id, self.a3.id, self.a2.id])),
+                [5, 4, 2, 3],
             )
 
     @skipUnlessDBFeature("can_distinct_on_fields")
