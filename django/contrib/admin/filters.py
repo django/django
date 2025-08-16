@@ -6,6 +6,7 @@ Each filter subclass knows how to display a filter for a field that passes a
 certain test -- e.g. being a DateField or ForeignKey.
 """
 
+import ast
 import datetime
 
 from django.contrib.admin.exceptions import NotRegistered
@@ -181,9 +182,22 @@ class FieldListFilter(FacetsMixin, ListFilter):
         for p in self.expected_parameters():
             if p in params:
                 value = params.pop(p)
-                self.used_parameters[p] = prepare_lookup_value(
-                    p, value, self.list_separator
-                )
+                lookup_value = prepare_lookup_value(p, value, self.list_separator)
+                # `TypeError: memoryview: a bytes-like object is required,
+                # not 'str'`
+                # Admin passes BinaryField filter values as repr(bytes)
+                # strings, so we need ast.literal_eval() to convert them
+                # back to real bytes.
+                if (
+                    isinstance(lookup_value, list)
+                    and isinstance(field, models.BinaryField)
+                    and p == getattr(field, "attname")
+                ):
+                    lookup_value = [
+                        ast.literal_eval(i) if isinstance(i, str) else i
+                        for i in lookup_value
+                    ]
+                self.used_parameters[p] = lookup_value
 
     def has_output(self):
         return True
