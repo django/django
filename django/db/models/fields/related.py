@@ -1126,10 +1126,12 @@ class ForeignKey(ForeignObject):
             return
 
         using = router.db_for_read(self.remote_field.model, instance=model_instance)
+        limit_choices_to = self.get_limit_choices_to()
+        if not isinstance(limit_choices_to, Q):
+            limit_choices_to = Q(**limit_choices_to)
         qs = self.remote_field.model._base_manager.using(using).filter(
-            **{self.remote_field.field_name: value}
+            limit_choices_to, **{self.remote_field.field_name: value}
         )
-        qs = qs.complex_filter(self.get_limit_choices_to())
         if not qs.exists():
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
