@@ -293,34 +293,28 @@
 
 /* DATE AND TIME */
 
-p.datetime {
+div.datetime {
     line-height: 20px;
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-weight: bold;
-}
-
-p.datetime label {
-    display: inline;
-}
-
-.datetime span {
-    white-space: nowrap;
-    font-weight: normal;
     font-size: 0.6875rem;
+}
+
+div.datetime label {
+    display: inline;
+    font-size: 0.6875rem;
+}
+
+div.datetime span {
+    white-space: nowrap;
     color: var(--body-quiet-color);
+    font-size: 0.6875rem;
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
     margin-left: 5px;
     margin-bottom: 4px;
-}
-
-table p.datetime {
-    font-size: 0.6875rem;
-    margin-left: 0;
-    padding-left: 0;
 }
 
 .datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
@@ -360,36 +354,42 @@ table p.datetime {
 
 /* URL */
 
-p.url {
+div.url {
     line-height: 20px;
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
-    font-weight: bold;
 }
 
-.url a {
-    font-weight: normal;
+div.url label, div.url span {
+    display: inline;
+    padding: 0;
+    font-size: 0.6875rem;
 }
 
 /* FILE UPLOADS */
 
-p.file-upload {
+div.file-upload {
     line-height: 20px;
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
-    font-weight: bold;
 }
 
-.file-upload a {
-    font-weight: normal;
+div.file-upload label, div.file-upload span {
+    display: inline;
+    padding: 0;
+    font-size: 0.6875rem;
 }
 
 .file-upload .deletelink {
     margin-left: 5px;
+}
+
+span.clearable-file-input {
+    margin-left: 15px;
 }
 
 span.clearable-file-input label {
