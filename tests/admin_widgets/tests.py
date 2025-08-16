@@ -398,17 +398,17 @@ class AdminDateWidgetTest(SimpleTestCase):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<p class="date">'
+            '<div class="date">'
             '<input value="2007-12-01" type="text" class="vDateField" name="test" '
-            'size="10"></p>',
+            'size="10"></div>',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<p class="date">'
+            '<div class="date">'
             '<input value="2007-12-01" type="text" class="myDateField" name="test" '
-            'size="20"></p>',
+            'size="20"></div>',
         )
 
 
@@ -417,17 +417,17 @@ class AdminTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<p class="time">'
+            '<div class="time">'
             '<input value="09:30:00" type="text" class="vTimeField" name="test" '
-            'size="8"></p>',
+            'size="8"></div>',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={"size": 20, "class": "myTimeField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<p class="time">'
+            '<div class="time">'
             '<input value="09:30:00" type="text" class="myTimeField" name="test" '
-            'size="20"></p>',
+            'size="20"></div>',
         )
 
 
@@ -435,12 +435,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8"></p>',
+            w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
+            '<div class="datetime">'
+            '<div><label for="id_test_0">Date:</label> '
+            '<input value="2007-12-01" type="text" class="vDateField" '
+            'name="test_0" size="10" id="id_test_0"></div>'
+            '<div><label for="id_test_1">Time:</label> '
+            '<input value="09:30:00" type="text" class="vTimeField" '
+            'name="test_1" size="8" id="id_test_1"></div></div>',
         )
 
     def test_localization(self):
@@ -449,12 +451,14 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         with translation.override("de-at"):
             w.is_localized = True
             self.assertHTMLEqual(
-                w.render("test", datetime(2007, 12, 1, 9, 30)),
-                '<p class="datetime">'
-                'Datum: <input value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8"></p>',
+                w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
+                '<div class="datetime">'
+                '<div><label for="id_test_0">Datum:</label> '
+                '<input value="01.12.2007" type="text" class="vDateField" '
+                'name="test_0" size="10" id="id_test_0"></div>'
+                '<div><label for="id_test_1">Zeit:</label> '
+                '<input value="09:30:00" type="text" class="vTimeField" '
+                'name="test_1" size="8" id="id_test_1"></div></div>',
             )
 
 
@@ -478,20 +482,21 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
         self.assertHTMLEqual(
             w.render("test", "http://example.com"),
-            '<p class="url">Currently:<a href="http://example.com">'
-            "http://example.com</a><br>"
-            'Change:<input class="vURLField" name="test" type="url" '
-            'value="http://example.com"></p>',
+            '<div class="url"><div><span>Currently:</span>'
+            '<a href="http://example.com">http://example.com</a></div>'
+            '<div><span>Change:</span><input class="vURLField" name="test" type="url" '
+            'value="http://example.com"></div></div>',
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             w.render("test", "http://example-äüö.com"),
-            '<p class="url">Currently: <a href="http://example-%C3%A4%C3%BC%C3%B6.com">'
-            "http://example-äüö.com</a><br>"
-            'Change:<input class="vURLField" name="test" type="url" '
-            'value="http://example-äüö.com"></p>',
+            '<div class="url"><div><span>Currently:</span>'
+            '<a href="http://example-%C3%A4%C3%BC%C3%B6.com">'
+            "http://example-äüö.com</a></div>"
+            '<div><span>Change:</span><input class="vURLField" name="test" type="url" '
+            'value="http://example-äüö.com"></div></div>',
         )
         # Does not use obsolete IDNA-2003 encoding (#36013).
         self.assertNotIn("fass.example.com", w.render("test", "http://faß.example.com"))
@@ -582,12 +587,13 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             w.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            '<div class="file-upload"><div>'
+            '<span>Currently:</span><a href="%(STORAGE_URL)salbums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
-            '<input type="checkbox" name="test-clear" id="test-clear_id"> '
-            '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test"></p>'
+            '<input type="checkbox" name="test-clear" id="test-clear_id">'
+            '<label for="test-clear_id">Clear</label></span></div>'
+            '<div><span>Change:</span> <input type="file" name="test"></div></div>'
             % {
                 "STORAGE_URL": default_storage.url(""),
             },
@@ -602,12 +608,14 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             w.render("test", self.album.cover_art, attrs={"id": "test_id"}),
-            f'<p class="file-upload">Currently: <a href="{storage_url}albums/'
-            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            '<div class="file-upload">'
+            f'<div><span>Currently:</span><a href="{storage_url}albums/'
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a>'
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id"> '
-            '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test" id="test_id"></p>',
+            '<label for="test-clear_id">Clear</label></span></div>'
+            '<div><span>Change:</span><input type="file" name="test" id="test_id">'
+            "</div></div>",
         )
 
     def test_render_required(self):
@@ -615,9 +623,10 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         widget.is_required = True
         self.assertHTMLEqual(
             widget.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
-            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a><br>'
-            'Change: <input type="file" name="test"></p>'
+            '<div class="file-upload"><div>'
+            '<span>Currently:</span><a href="%(STORAGE_URL)salbums/'
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a></div>'
+            '<div><span>Change:</span><input type="file" name="test"></div></div>'
             % {
                 "STORAGE_URL": default_storage.url(""),
             },
@@ -627,12 +636,14 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         widget = widgets.AdminFileWidget(attrs={"disabled": True})
         self.assertHTMLEqual(
             widget.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
-            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            '<div class="file-upload">'
+            '<div><span>Currently:</span><a href="%(STORAGE_URL)salbums/'
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a>'
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id" disabled>'
-            '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test" disabled></p>'
+            '<label for="test-clear_id">Clear</label></span></div>'
+            '<div><span>Change:</span><input type="file" name="test" disabled>'
+            "</div></div>"
             % {
                 "STORAGE_URL": default_storage.url(""),
             },
@@ -644,12 +655,14 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         widget.checked = True
         self.assertHTMLEqual(
             widget.render("test", self.album.cover_art),
-            f'<p class="file-upload">Currently: <a href="{storage_url}albums/'
+            '<div class="file-upload">'
+            f'<div><span>Currently:</span><a href="{storage_url}albums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id" checked>'
-            '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test" checked></p>',
+            '<label for="test-clear_id">Clear</label></span></div>'
+            '<div><span>Change:</span><input type="file" name="test" checked>'
+            "</div></div>",
         )
 
     def test_readonly_fields(self):
