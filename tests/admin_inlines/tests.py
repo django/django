@@ -2501,6 +2501,16 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+        # The table does not overflow the content section.
+        content = self.selenium.find_element(By.ID, "content-main")
+        tabular_wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.tabular.inline-related div.wrapper"
+        )
+        self.assertGreater(
+            tabular_wrapper.find_element(By.TAG_NAME, "table").size["width"],
+            tabular_wrapper.size["width"],
+        )
+        self.assertLessEqual(tabular_wrapper.size["width"], content.size["width"])
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_tabular_inline_delete_layout(self):

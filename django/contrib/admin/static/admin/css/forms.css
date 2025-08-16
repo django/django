@@ -432,9 +432,12 @@ body.popup .submit-row {
     border: none;
 }
 
+.inline-related.tabular div.wrapper {
+    overflow-x: auto;
+}
+
 .inline-related.tabular fieldset.module table {
     width: 100%;
-    overflow-x: scroll;
 }
 
 .last-related fieldset {
