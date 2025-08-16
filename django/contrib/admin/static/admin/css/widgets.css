@@ -162,21 +162,21 @@
 
 .selector-chooseall, .selector-clearall {
     display: inline-block;
-    height: 16px;
     text-align: left;
+    padding: 4px 5px;
     margin: 0 auto;
     overflow: hidden;
-    font-weight: bold;
-    line-height: 16px;
-    color: var(--body-quiet-color);
+    color: var(--button-fg);
+    background-color: var(--button-bg);
     text-decoration: none;
     opacity: 0.55;
     border: none;
+    border-radius: 4px;
 }
 
 :enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
 :enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
-    color: var(--link-fg);
+    background-color: var(--button-hover-bg);
 }
 
 :enabled.selector-chooseall, :enabled.selector-clearall {
@@ -187,20 +187,8 @@
     cursor: pointer;
 }
 
-.selector-chooseall {
-    padding: 0 18px 0 0;
-    background: url(../img/selector-icons.svg) right -160px no-repeat;
-    cursor: default;
-}
-
 :enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -176px;
-}
-
-.selector-clearall {
-    padding: 0 0 0 18px;
-    background: url(../img/selector-icons.svg) 0 -128px no-repeat;
-    cursor: default;
 }
 
 :enabled.selector-clearall:focus, :enabled.selector-clearall:hover {

@@ -126,7 +126,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "IPAddressField": "char(15)",
         "GenericIPAddressField": "char(39)",
         "JSONField": "json",
-        "OneToOneField": "integer",
         "PositiveBigIntegerField": "bigint UNSIGNED",
         "PositiveIntegerField": "integer UNSIGNED",
         "PositiveSmallIntegerField": "smallint UNSIGNED",

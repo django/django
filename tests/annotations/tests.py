@@ -1019,7 +1019,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .values("publisher")
             .annotate(count=Count("pk"))
             .values("count")
-        )
+        )[:1]
         publisher_books_qs = (
             Publisher.objects.annotate(
                 total_books=Count("book"),

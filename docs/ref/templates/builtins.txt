@@ -957,6 +957,80 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
+.. templatetag:: partial
+
+``partial``
+-----------
+
+.. versionadded:: 6.0
+
+Renders a template fragment that was defined with :ttag:`partialdef`, inserting
+the matching partial at this location.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partial partial_name %}
+
+The ``partial_name`` argument is the name of the template fragment to render.
+
+In the following example, a partial named ``button`` is defined and then
+rendered three times:
+
+.. code-block:: html+django
+
+    {% partialdef button %}
+        <button>Submit</button>
+    {% endpartialdef %}
+
+    {% partial button %}
+    {% partial button %}
+    {% partial button %}
+
+.. templatetag:: partialdef
+
+``partialdef``
+--------------
+
+.. versionadded:: 6.0
+
+Defines a reusable template fragment that can be rendered multiple times within
+the same template or accessed directly via :ref:`template loading or inclusion
+<template-partials-direct-access>`.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partialdef partial_name %}
+        {# Reusable content. #}
+    {% endpartialdef %}
+
+The ``partial_name`` argument is required and must be a valid template
+identifier.
+
+In the following example, a new fragment named ``card`` is defined:
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef %}
+
+This partial can then be rendered using the :ttag:`partial` tag:
+
+.. code-block:: html+django
+
+    {% partial card %}
+    {% partial card %}
+
+To :ref:`render a fragment immediately in place  <template-partials-inline>`,
+use the ``inline`` option. The partial is still stored and can be reused later.
+
 .. templatetag:: querystring
 
 ``querystring``

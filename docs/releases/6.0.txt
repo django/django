@@ -91,6 +91,21 @@ Notably, the return type of the :class:`EmailMessage.message()
 previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
 instance of those now-deprecated classes.
 
+Template Partials
+-----------------
+
+The :ref:`Django Template Language <template-language-intro>` now supports
+:ref:`template partials <template-partials>` , making it easier to encapsulate
+and reuse small named fragments within a template file. The new tags
+:ttag:`{% partialdef %} <partialdef>` and :ttag:`{% partial %} <partial>`
+define a partial and render it, respectively.
+
+Partials can also be referenced using the ``template_name#partial_name`` syntax
+with :func:`~django.template.Engine.get_template`,
+:func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
+template-loading tools, enabling more modular and maintainable templates
+without needing to split components into separate files.
+
 Minor features
 --------------
 
@@ -297,6 +312,9 @@ Models
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
 
+* Subqueries returning a :class:`~django.db.models.CompositePrimaryKey` can now
+  be used as the target of lookups other than ``__in``, such as ``__exact``.
+
 * :class:`~django.db.models.JSONField` now supports
   :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
 
@@ -473,6 +491,10 @@ Miscellaneous
 * The :djadmin:`collectstatic` command now reports only a summary of skipped
   files due to conflicts when ``--verbosity`` is 1. To see warnings for each
   conflicting destination path, set the ``--verbosity`` flag to 2 or higher.
+
+* The :option:`collectstatic --clear` command now reports only a summary of
+  deleted files when ``--verbosity`` is 1. To see the details for each file
+  deleted, set the ``--verbosity`` flag to 2 or higher.
 
 .. _deprecated-features-6.0:
 

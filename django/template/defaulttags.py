@@ -12,6 +12,7 @@ from itertools import groupby
 from django.conf import settings
 from django.http import QueryDict
 from django.utils import timezone
+from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -29,6 +30,7 @@ from .base import (
     VARIABLE_TAG_START,
     Node,
     NodeList,
+    PartialTemplate,
     TemplateSyntaxError,
     VariableDoesNotExist,
     kwarg_re,
@@ -406,6 +408,31 @@ class NowNode(Node):
             return ""
         else:
             return formatted
+
+
+class PartialDefNode(Node):
+    def __init__(self, partial_name, inline, nodelist):
+        self.partial_name = partial_name
+        self.inline = inline
+        self.nodelist = nodelist
+
+    def render(self, context):
+        return self.nodelist.render(context) if self.inline else ""
+
+
+class PartialNode(Node):
+    def __init__(self, partial_name, partial_mapping):
+        # Defer lookup in `partial_mapping` and nodelist to runtime.
+        self.partial_name = partial_name
+        self.partial_mapping = partial_mapping
+
+    def render(self, context):
+        try:
+            return self.partial_mapping[self.partial_name].render(context)
+        except KeyError:
+            raise TemplateSyntaxError(
+                f"Partial '{self.partial_name}' is not defined in the current template."
+            )
 
 
 class ResetCycleNode(Node):
@@ -1172,6 +1199,75 @@ def now(parser, token):
         raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1][1:-1]
     return NowNode(format_string, asvar)
+
+
+@register.tag(name="partialdef")
+def partialdef_func(parser, token):
+    """
+    Declare a partial that can be used in the template.
+
+    Usage::
+
+        {% partialdef partial_name %}
+        Content goes here.
+        {% endpartialdef %}
+
+    Store the nodelist in the context under the key "partials". It can be
+    retrieved using the ``{% partial %}`` tag.
+
+    The optional ``inline`` argument renders the partial's contents
+    immediately, at the point where it is defined.
+    """
+    match token.split_contents():
+        case "partialdef", partial_name, "inline":
+            inline = True
+        case "partialdef", partial_name, _:
+            raise TemplateSyntaxError(
+                "The 'inline' argument does not have any parameters; either use "
+                "'inline' or remove it completely."
+            )
+        case "partialdef", partial_name:
+            inline = False
+        case ["partialdef"]:
+            raise TemplateSyntaxError("'partialdef' tag requires a name")
+        case _:
+            raise TemplateSyntaxError("'partialdef' tag takes at most 2 arguments")
+
+    # Parse the content until the end tag.
+    valid_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
+    nodelist = parser.parse(valid_endpartials)
+    endpartial = parser.next_token()
+    if endpartial.contents not in valid_endpartials:
+        parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
+
+    # Store the partial nodelist in the parser.extra_data attribute.
+    partials = parser.extra_data.setdefault("partials", {})
+    if partial_name in partials:
+        raise TemplateSyntaxError(
+            f"Partial '{partial_name}' is already defined in the "
+            f"'{parser.origin.name}' template."
+        )
+    partials[partial_name] = PartialTemplate(nodelist, parser.origin, partial_name)
+
+    return PartialDefNode(partial_name, inline, nodelist)
+
+
+@register.tag(name="partial")
+def partial_func(parser, token):
+    """
+    Render a partial previously declared with the ``{% partialdef %}`` tag.
+
+    Usage::
+
+        {% partial partial_name %}
+    """
+    match token.split_contents():
+        case "partial", partial_name:
+            extra_data = parser.extra_data
+            partial_mapping = DeferredSubDict(extra_data, "partials")
+            return PartialNode(partial_name, partial_mapping=partial_mapping)
+        case _:
+            raise TemplateSyntaxError("'partial' tag requires a single argument")
 
 
 @register.simple_tag(name="querystring", takes_context=True)

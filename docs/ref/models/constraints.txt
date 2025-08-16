@@ -26,8 +26,9 @@ option.
     (including ``name``) each time. To work around name collisions, part of the
     name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
     replaced, respectively, by the lowercased app label and class name of the
-    concrete model. For example ``CheckConstraint(condition=Q(age__gte=18),
-    name='%(app_label)s_%(class)s_is_adult')``.
+    concrete model. For example::
+
+        CheckConstraint(condition=Q(age__gte=18), name="%(app_label)s_%(class)s_is_adult")
 
 .. admonition:: Validation of Constraints
 
@@ -99,7 +100,10 @@ This method must be implemented by a subclass.
 A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
 specifies the conditional check you want the constraint to enforce.
 
-For example, ``CheckConstraint(condition=Q(age__gte=18), name='age_gte_18')``
+For example::
+
+    CheckConstraint(condition=Q(age__gte=18), name="age_gte_18")
+
 ensures the age field is never less than 18.
 
 .. admonition:: Expression order
@@ -156,9 +160,11 @@ Functional unique constraints have the same database restrictions as
 A list of field names that specifies the unique set of columns you want the
 constraint to enforce.
 
-For example, ``UniqueConstraint(fields=['room', 'date'],
-name='unique_booking')`` ensures each room can only be booked once for each
-date.
+For example::
+
+    UniqueConstraint(fields=["room", "date"], name="unique_booking")
+
+ensures each room can only be booked once for each date.
 
 ``condition``
 -------------
