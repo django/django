@@ -19,6 +19,7 @@ from django.test.utils import isolate_apps
 from .models import (
     Foo,
     GeneratedModel,
+    GeneratedModelAsPrimaryKey,
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
@@ -362,6 +363,39 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         self.assertEqual(obj.id, 1)
         self.assertEqual(obj.a, 2)
         self.assertEqual(obj.b, 2)
+
+
+@skipUnlessDBFeature("supports_generated_columns_as_pk")
+class StoredGeneratedFieldAsPrimaryKeyTests(StoredGeneratedFieldTests):
+    def test_generatedfield_raises_attributeerror(self):
+        obj = GeneratedModelAsPrimaryKey(integer=1)
+        with self.assertRaises(AttributeError) as e:
+            obj.id
+        self.assertEqual(
+            e.exception.args[0],
+            "Cannot retrieve deferred field 'id' from an unsaved model.",
+        )
+
+    def test_as_pk_using_create(self):
+        obj = GeneratedModelAsPrimaryKey.objects.create(integer=1)
+        if connection.features.can_return_columns_from_insert:
+            self.assertEqual(obj.pk, 2)
+        else:
+            with self.assertRaises(AttributeError):
+                obj.pk
+            obj = GeneratedModelAsPrimaryKey.objects.get()
+            self.assertEqual(obj.pk, 2)
+
+    def test_as_pk_using_save(self):
+        obj = GeneratedModelAsPrimaryKey(integer=1)
+        obj.save()
+        if connection.features.can_return_columns_from_insert:
+            self.assertEqual(obj.pk, 2)
+        else:
+            with self.assertRaises(AttributeError):
+                obj.pk
+            obj = GeneratedModelAsPrimaryKey.objects.get()
+            self.assertEqual(obj.pk, 2)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
