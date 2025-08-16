@@ -1,13 +1,12 @@
 import unittest
 from unittest import mock
 
-from django.contrib.gis.gdal import Driver, GDALException
+from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
 
 valid_drivers = (
     # vector
     "ESRI Shapefile",
     "MapInfo File",
-    "TIGER",
     "S57",
     "DGN",
     "Memory",
@@ -25,7 +24,6 @@ invalid_drivers = ("Foo baz", "clucka", "ESRI Shp", "ESRI rast")
 
 aliases = {
     "eSrI": "ESRI Shapefile",
-    "TigER/linE": "TIGER",
     "SHAPE": "ESRI Shapefile",
     "sHp": "ESRI Shapefile",
     "tiFf": "GTiff",
@@ -33,6 +31,14 @@ aliases = {
     "jPEg": "JPEG",
     "jpG": "JPEG",
 }
+
+if GDAL_VERSION[:2] <= (3, 10):
+    aliases.update(
+        {
+            "tiger": "TIGER",
+            "tiger/line": "TIGER",
+        }
+    )
 
 
 class DriverTest(unittest.TestCase):
