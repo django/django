@@ -312,10 +312,6 @@ input[type="submit"], button {
         max-width: 120px;
     }
 
-    .datetime span {
-        font-size: 0.8125rem;
-    }
-
     .datetime .timezonewarning {
         display: block;
         font-size: 0.6875rem;
@@ -516,14 +512,6 @@ input[type="submit"], button {
     .aligned label + div.readonly {
         padding: 0;
         margin-left: 0;
-    }
-
-    .aligned p.file-upload {
-        font-size: 0.8125rem;
-    }
-
-    span.clearable-file-input {
-        margin-left: 15px;
     }
 
     span.clearable-file-input label {
