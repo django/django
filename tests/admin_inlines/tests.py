@@ -2502,6 +2502,21 @@ class SeleniumTests(AdminSeleniumTestCase):
             [],
         )
 
+    def test_tabular_inline_overflow(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_photographer_add")
+        )
+
+        content = self.selenium.find_element(By.ID, "content-main")
+        tabular_table = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.tabular.inline-related table"
+        )
+        self.assertTrue(tabular_table.is_displayed())
+        self.assertLessEqual(tabular_table.size["width"], content.size["width"])
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_tabular_inline_delete_layout(self):
         from selenium.webdriver.common.by import By
