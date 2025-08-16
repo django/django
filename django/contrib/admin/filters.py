@@ -187,8 +187,9 @@ class FieldListFilter(FacetsMixin, ListFilter):
                 # Django Admin passes BinaryField filter values as repr(bytes) strings,
                 # so we need ast.literal_eval() to convert them back to real bytes.
                 if (
-                    isinstance(field, models.BinaryField) and
-                    p == getattr(field, 'attname')
+                    isinstance(lookup_value, list)
+                    and isinstance(field, models.BinaryField)
+                    and p == getattr(field, "attname")
                 ):
                     lookup_value = [
                         ast.literal_eval(i) for i in lookup_value if isinstance(i, str)
