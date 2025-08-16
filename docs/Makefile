@@ -51,6 +51,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  spelling   to check for typos in documentation"
 	@echo "  black      to apply the black formatting to code blocks in documentation"
+	@echo "  lint       to check the documentation for sphinx linting errors"
 
 
 clean:
@@ -175,6 +176,11 @@ black:
 	@echo
 	@echo "Code blocks reformatted"
 
-check: spelling black
+lint:
+	$(PYTHON) lint.py
+	@echo
+	@echo "Documentation lint complete."
+
+check: spelling black lint
 	@echo
 	@echo "Style and spelling checks completed."

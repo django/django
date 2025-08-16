@@ -190,8 +190,8 @@ Now, create a ``polls/results.html`` template:
 
     <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
 
-Now, go to ``/polls/1/`` in your browser and vote in the question. You should see a
-results page that gets updated each time you vote. If you submit the form
+Now, go to ``/polls/1/`` in your browser and vote in the question. You should
+see a results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
 Use generic views: Less code is better

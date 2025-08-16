@@ -50,9 +50,11 @@ Other bugfixes and changes
 
 * Subclass HTMLParser only for appropriate Python versions (#18239).
 * Added batch_size argument to qs.bulk_create() (#17788).
-* Fixed a small regression in the admin filters where wrongly formatted dates passed as url parameters caused an unhandled ValidationError (#18530).
+* Fixed a small regression in the admin filters where wrongly formatted dates
+  passed as url parameters caused an unhandled ValidationError (#18530).
 * Fixed an endless loop bug when accessing permissions in templates (#18979)
 * Fixed some Python 2.5 compatibility issues
 * Fixed an issue with quoted filenames in Content-Disposition header (#19006)
-* Made the context option in ``trans`` and ``blocktrans`` tags accept literals wrapped in single quotes (#18881).
+* Made the context option in ``trans`` and ``blocktrans`` tags accept literals
+  wrapped in single quotes (#18881).
 * Numerous documentation improvements and fixes.

@@ -113,8 +113,9 @@ SpatiaLite  ``MbrOverlaps(poly, geom)``
 ``contained``
 -------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Contained.html>`__,
-MariaDB, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Contained.html>`__, MariaDB, MySQL,
+SpatiaLite, PGRaster (Native)
 
 Tests if the geometry field's bounding box is completely contained by the
 lookup geometry's bounding box.
@@ -464,8 +465,9 @@ On these spatial backends the intersection pattern is a string comprising
 nine characters, which  define intersections between  the interior, boundary,
 and exterior of the geometry field and the lookup geometry.
 The intersection pattern matrix may only use the following characters:
-``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
-a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
+``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to
+"fine tune" a specific geometric relationship consistent with the DE-9IM model.
+[#fnde9im]_
 
 Geometry example::
 
@@ -612,11 +614,11 @@ PostGIS equivalent:
 ``overlaps_left``
 -----------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overleft.html>`__,
-PGRaster (Bilateral)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overleft.html>`__, PGRaster (Bilateral)
 
-Tests if the geometry field's bounding box overlaps or is to the left of the lookup
-geometry's bounding box.
+Tests if the geometry field's bounding box overlaps or is to the left of the
+lookup geometry's bounding box.
 
 Example::
 
@@ -634,11 +636,11 @@ PostGIS equivalent:
 ``overlaps_right``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overright.html>`__,
-PGRaster (Bilateral)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overright.html>`__, PGRaster (Bilateral)
 
-Tests if the geometry field's bounding box overlaps or is to the right of the lookup
-geometry's bounding box.
+Tests if the geometry field's bounding box overlaps or is to the right of the
+lookup geometry's bounding box.
 
 Example::
 
@@ -655,8 +657,8 @@ PostGIS equivalent:
 ``overlaps_above``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overabove.html>`__,
-PGRaster (Conversion)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overabove.html>`__, PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is above the lookup
 geometry's bounding box.
@@ -676,8 +678,8 @@ PostGIS equivalent:
 ``overlaps_below``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overbelow.html>`__,
-PGRaster (Conversion)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overbelow.html>`__, PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is below the lookup
 geometry's bounding box.
@@ -918,8 +920,8 @@ Example:
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
 MariaDB, MySQL, SpatiaLite
 
-Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
-column. This is analogous to a simplified version of the :class:`Union`
+Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the
+geometry column. This is analogous to a simplified version of the :class:`Union`
 aggregate, except it can be several orders of magnitude faster than performing
 a union because it rolls up geometries into a collection or multi object, not
 caring about dissolving boundaries.

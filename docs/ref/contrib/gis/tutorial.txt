@@ -412,11 +412,15 @@ units of degrees.
 In addition, shapefiles also support attribute fields that may contain
 additional data.  Here are the fields on the World Borders layer:
 
+.. code-block:: pycon
+
     >>> print(lyr.fields)
     ['FIPS', 'ISO2', 'ISO3', 'UN', 'NAME', 'AREA', 'POP2005', 'REGION', 'SUBREGION', 'LON', 'LAT']
 
 The following code will let you examine the OGR types (e.g. integer or
 string) associated with each of the fields:
+
+.. code-block:: pycon
 
     >>> [fld.__name__ for fld in lyr.field_types]
     ['OFTString', 'OFTString', 'OFTString', 'OFTInteger', 'OFTString', 'OFTInteger', 'OFTInteger64', 'OFTInteger', 'OFTInteger', 'OFTReal', 'OFTReal']

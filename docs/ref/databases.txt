@@ -691,8 +691,8 @@ storage engine, you have a couple of options.
 Table names
 -----------
 
-There are `known issues`_ in even the latest versions of MySQL that can cause the
-case of a table name to be altered when certain SQL statements are executed
+There are `known issues`_ in even the latest versions of MySQL that can cause
+the case of a table name to be altered when certain SQL statements are executed
 under certain conditions. It is recommended that you use lowercase table
 names, if possible, to avoid any problems that might arise from this behavior.
 Django uses lowercase table names when it auto-generates table names from
@@ -795,9 +795,10 @@ Automatic typecasting can cause unexpected results
 When performing a query on a string type, but with an integer value, MySQL will
 coerce the types of all values in the table to an integer before performing the
 comparison. If your table contains the values ``'abc'``, ``'def'`` and you
-query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolumn=1``
-will match the value ``'abc1'``. Therefore, string type fields included in Django
-will always cast the value to a string before using it in a query.
+query for ``WHERE mycolumn=0``, both rows will match. Similarly,
+``WHERE mycolumn=1`` will match the value ``'abc1'``. Therefore, string type
+fields included in Django will always cast the value to a string before using it
+in a query.
 
 If you implement custom model fields that inherit from
 :class:`~django.db.models.Field` directly, are overriding

@@ -485,7 +485,7 @@ a fallback when the database-backed sites framework is not available.
 
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
-except its :meth:`~django.contrib.sites.requests.RequestSite.__init__()`
+except its :meth:`~django.contrib.sites.requests.RequestSite.__init__`
 method takes an :class:`~django.http.HttpRequest` object. It's able to deduce
 the ``domain`` and ``name`` by looking at the request's domain. It has
 ``save()`` and ``delete()`` methods to match the interface of

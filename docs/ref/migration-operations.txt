@@ -608,7 +608,8 @@ Some things to note:
         ...
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
-  the one that will be the current state once the migration has finished reversing.
+  the one that will be the current state once the migration has finished
+  reversing.
 
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for

@@ -31,7 +31,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
     ``ObjectDoesNotExist`` will catch
     :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~django.db.models.query.QuerySet.get`.
 
 ``ObjectNotUpdated``
 --------------------
@@ -45,7 +45,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
     ``ObjectNotUpdated`` will catch
     :exc:`~django.db.models.Model.NotUpdated` exceptions for all models.
 
-    See :meth:`~django.db.models.Model.save()`.
+    See :meth:`~django.db.models.Model.save`.
 
 ``EmptyResultSet``
 ------------------
@@ -85,7 +85,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
     :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
     models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~django.db.models.query.QuerySet.get`.
 
 ``SuspiciousOperation``
 -----------------------
@@ -239,7 +239,7 @@ URL Resolver exceptions are defined in ``django.urls``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    :func:`~django.urls.resolve` if the path passed to ``resolve()`` doesn't
     map to a view. It's a subclass of :class:`django.http.Http404`.
 
 ``NoReverseMatch``

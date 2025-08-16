@@ -107,8 +107,8 @@ you're responsible for defining the HTML of the resulting error page::
 
     return HttpResponseNotFound("<h1>Page not found</h1>")
 
-For convenience, and because it's a good idea to have a consistent 404 error page
-across your site, Django provides an ``Http404`` exception. If you raise
+For convenience, and because it's a good idea to have a consistent 404 error
+page across your site, Django provides an ``Http404`` exception. If you raise
 ``Http404`` at any point in a view function, Django will catch it and return the
 standard error page for your application, along with an HTTP error code 404.
 
