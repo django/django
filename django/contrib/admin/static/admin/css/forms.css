@@ -414,6 +414,7 @@ body.popup .submit-row {
 }
 
 .inline-related.tabular fieldset.module table {
+    display: block;
     width: 100%;
     overflow-x: scroll;
 }
