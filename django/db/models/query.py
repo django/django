@@ -674,15 +674,26 @@ class QuerySet(AltersData):
     acreate.alters_data = True
 
     def _prepare_for_bulk_create(self, objs):
+        opts = self.model._meta
         objs_with_pk, objs_without_pk = [], []
+        pk = opts.pk
+        pk_fields = list(getattr(pk, "fields", (pk,)))
+
+        def _pk_is_complete(obj):
+            for f in pk_fields:
+                v = getattr(obj, f.attname)
+                if v is None or isinstance(v, DatabaseDefault):
+                    return False
+            return True
+
         for obj in objs:
             if isinstance(obj.pk, DatabaseDefault):
                 objs_without_pk.append(obj)
-            elif obj._is_pk_set():
+            elif _pk_is_complete(obj):
                 objs_with_pk.append(obj)
             else:
-                obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
-                if obj._is_pk_set():
+                obj.pk = opts.pk.get_pk_value_on_save(obj)
+                if _pk_is_complete(obj):
                     objs_with_pk.append(obj)
                 else:
                     objs_without_pk.append(obj)
@@ -839,6 +850,8 @@ class QuerySet(AltersData):
                 if (
                     connection.features.can_return_rows_from_bulk_insert
                     and on_conflict is None
+                    and opts.db_returning_fields
+                    and objs_without_pk
                 ):
                     assert len(returned_columns) == len(objs_without_pk)
                 for obj_without_pk, results in zip(objs_without_pk, returned_columns):
