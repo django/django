@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Post, Tenant, User, TimeStamped
+from .models import Post, Tenant, TimeStamped, User
 
 
 class CompositePKCreateTests(TestCase):
