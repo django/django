@@ -22,12 +22,12 @@ from django.test import RequestFactory, SimpleTestCase, TestCase, override_setti
 
 from .models import (
     Book,
+    BookBinaryInfo,
     Bookmark,
     Department,
     Employee,
     ImprovedBook,
     TaggedItem,
-    BookBinaryInfo
 )
 
 
@@ -2057,7 +2057,8 @@ class ListFiltersTests(TestCase):
         self.assertEqual(list(queryset), [jane])
 
     def test_binaryfield_listfilter(self):
-        from urllib.parse import urlparse, parse_qsl
+        from urllib.parse import parse_qsl, urlparse
+
         class BookBinaryInfoAdmin(ModelAdmin):
             list_filter = ["datas"]
 
@@ -2069,14 +2070,14 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
         choices = list(filterspec.choices(changelist))
-        binary_choice_href = choices[1]['query_string']
+        binary_choice_href = choices[1]["query_string"]
         filter_request_query = urlparse(binary_choice_href).query
         filter_request_params = dict(parse_qsl(filter_request_query))
         filter_modeladmin = BookBinaryInfoAdmin(BookBinaryInfo, site)
         filter_request = self.request_factory.get("/", filter_request_params)
         filter_request.user = self.alfred
         filter_changelist = filter_modeladmin.get_changelist_instance(filter_request)
-        print({filter_request.get_host():filter_request.get_port()})
+        print({filter_request.get_host(): filter_request.get_port()})
         queryset = filter_changelist.get_queryset(filter_request)
         result = list(queryset)
         self.assertEqual(len(result), 1)

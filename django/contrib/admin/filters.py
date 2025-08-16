@@ -183,16 +183,27 @@ class FieldListFilter(FacetsMixin, ListFilter):
             if p in params:
                 value = params.pop(p)
                 lookup_value = prepare_lookup_value(p, value, self.list_separator)
-                # `TypeError: memoryview: a bytes-like object is required, not 'str'`
-                # Django Admin passes BinaryField filter values as repr(bytes) strings,
-                # so we need ast.literal_eval() to convert them back to real bytes.
+                # `TypeError: memoryview: a bytes-like object is required,
+                # not 'str'`
+                # Admin passes BinaryField filter values as repr(bytes)
+                # strings, so we need ast.literal_eval() to convert them
+                # back to real bytes.
                 if (
                     isinstance(lookup_value, list)
                     and isinstance(field, models.BinaryField)
                     and p == getattr(field, "attname")
                 ):
                     lookup_value = [
-                        ast.literal_eval(i) for i in lookup_value if isinstance(i, str)
+                        (
+                            ast.literal_eval(i)
+                            if isinstance(i, str)
+                            and (
+                                (i.startswith("b'") and i.endswith("'"))
+                                or (i.startswith('b"') and i.endswith('"'))
+                            )
+                            else i
+                        )
+                        for i in lookup_value
                     ]
                 self.used_parameters[p] = lookup_value
 
