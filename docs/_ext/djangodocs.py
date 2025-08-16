@@ -13,7 +13,7 @@ from sphinx import addnodes
 from sphinx import version_info as sphinx_version
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives.code import CodeBlock
-from sphinx.domains.std import Cmdoption
+from sphinx.domains.std import Cmdoption, StandardDomain
 from sphinx.errors import ExtensionError
 from sphinx.util import logging
 from sphinx.util.console import bold
@@ -69,6 +69,30 @@ def setup(app):
     app.add_directive("console", ConsoleDirective)
     app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
+
+    # Wrap StandardDomain._resolve_doc_xref to warn about :doc: being used with
+    # relative targets.
+    orig_resolve_doc_xref = StandardDomain._resolve_doc_xref
+
+    def _resolve_doc_xref(
+        self, env, fromdocname, builder, typ, target, node, contnode
+    ) -> nodes.reference | None:
+        if not node["reftarget"].startswith("/") and not node["reftarget"].startswith(
+            "python:"
+        ):
+            logger.warning(
+                ":doc: used with relative target: %r",
+                node["reftarget"],
+                location=node,
+                type="ref",
+                subtype=node["reftype"],
+            )
+        return orig_resolve_doc_xref(
+            self, env, fromdocname, builder, typ, target, node, contnode
+        )
+
+    StandardDomain._resolve_doc_xref = _resolve_doc_xref
+
     return {"parallel_read_safe": True}
 
 
