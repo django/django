@@ -178,7 +178,7 @@ class HashedFilesMixin:
             if urlsplit(clean_name).path.endswith("/"):  # don't hash paths
                 hashed_name = name
             else:
-                args = (clean_name,)
+                args = (self.clean_name(clean_name).lstrip("/"),)
                 if hashed_files is not None:
                     args += (hashed_files,)
                 hashed_name = hashed_name_func(*args)
