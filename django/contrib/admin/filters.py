@@ -182,30 +182,9 @@ class FieldListFilter(FacetsMixin, ListFilter):
         for p in self.expected_parameters():
             if p in params:
                 value = params.pop(p)
-                lookup_value = prepare_lookup_value(p, value, self.list_separator)
-                # `TypeError: memoryview: a bytes-like object is required,
-                # not 'str'`
-                # Admin passes BinaryField filter values as repr(bytes)
-                # strings, so we need ast.literal_eval() to convert them
-                # back to real bytes.
-                if (
-                    isinstance(lookup_value, list)
-                    and isinstance(field, models.BinaryField)
-                    and p == getattr(field, "attname")
-                ):
-                    lookup_value = [
-                        (
-                            ast.literal_eval(i)
-                            if isinstance(i, str)
-                            and (
-                                (i.startswith("b'") and i.endswith("'"))
-                                or (i.startswith('b"') and i.endswith('"'))
-                            )
-                            else i
-                        )
-                        for i in lookup_value
-                    ]
-                self.used_parameters[p] = lookup_value
+                self.used_parameters[p] = prepare_lookup_value(
+                    p, value, self.list_separator
+                )
 
     def has_output(self):
         return True
@@ -656,6 +635,22 @@ class AllValuesFieldListFilter(FieldListFilter):
                 "display": empty_title,
             }
 
+
+class BinaryFieldListFilter(AllValuesFieldListFilter):
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        super().__init__(field, request, params, model, model_admin, field_path)
+        self.lookup_choices = (
+            i.tobytes() if isinstance(i, memoryview) else i for i in self.lookup_choices
+        )
+        if self.used_parameters and self.lookup_kwarg in self.used_parameters:
+            self.used_parameters[self.lookup_kwarg] = (
+                ast.literal_eval(i) for i in self.used_parameters[self.lookup_kwarg]
+            )
+
+
+FieldListFilter.register(
+    lambda f: isinstance(f, models.BinaryField), BinaryFieldListFilter
+)
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 
