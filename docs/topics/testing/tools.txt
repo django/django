@@ -1512,6 +1512,47 @@ LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
 STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
 ================================= ========================
 
+Using ``override_settings(CACHES=...)`` with cached class-based views
+=====================================================================
+
+When using ``@override_settings(CACHES=...)`` in tests together with
+class-based views (CBVs) decorated by ``@cache_page``, the cache backend
+may not update as expected. This is because ``@cache_page`` is applied
+at class definition time, before ``override_settings`` takes effect.
+
+To ensure that the new cache configuration is respected, define or reload
+the CBV inside the ``override_settings`` context. For example::
+
+    from django.test import TestCase, override_settings
+    from django.views.decorators.cache import cache_page
+    from django.http import HttpResponse
+    from django.views import View
+
+
+    class MyView(View):
+        def get(self, request):
+            return HttpResponse("Hello")
+
+
+    class CacheTest(TestCase):
+        @override_settings(
+            CACHES={
+                "default": {
+                    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                }
+            }
+        )
+        def test_cache_with_override(self):
+            # Define the cached view inside the override
+            CachedView = cache_page(60)(MyView.as_view())
+            response = self.client.get("/")
+            self.assertEqual(response.status_code, 200)
+
+See also :doc:`/topics/cache` and
+:doc:`/topics/class-based-views/index` for related details.
+
+
+
 Isolating apps
 --------------
 
