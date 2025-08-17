@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-windows-${{ matrix.python-version }}
-          path: tests/.coverage
+          path: tests/.coverages/
           retention-days: 30
       - name: Analyze coverage for changes (diff-cover)
         if: github.event_name == 'pull_request'
@@ -120,7 +120,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-data-windows-3.13
-          path: tests/
+          path: tests/.coverages/
       - name: Generate coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
@@ -143,5 +143,5 @@ jobs:
       - name: Comment coverage analysis on PR
         uses: ./.github/actions/coverage-commenter
         with:
-          coverage-data: tests/.coverage
+          coverage-data: tests/.coverages/.coverage
           token: ${{ github.token }}
