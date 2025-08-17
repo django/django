@@ -3,6 +3,8 @@ asgiref >= 3.8.1
 argon2-cffi >= 23.1.0; sys.platform != 'win32' or python_version < '3.14'
 bcrypt >= 4.1.1
 black >= 25.1.0
+coverage >= 7.4.0
+diff-cover >= 8.0.0
 docutils >= 0.19
 geoip2 >= 4.8.0; sys.platform != 'win32' or python_version < '3.14'
 jinja2 >= 2.11.0

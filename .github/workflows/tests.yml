@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -37,8 +39,44 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
-      - name: Run tests
+      - name: Run tests with coverage
         run: python -Wall tests/runtests.py -v2
+        env:
+          COVERAGE_PROCESS_START: tests/.coveragerc
+      - name: Combine coverage data
+        run: coverage combine
+        working-directory: tests/
+      - name: Generate coverage report
+        run: coverage report --show-missing
+        working-directory: tests/
+      - name: Generate HTML coverage report
+        run: coverage html
+        working-directory: tests/
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-windows-${{ matrix.python-version }}
+          path: tests/coverage_html/
+          retention-days: 30
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-windows-${{ matrix.python-version }}
+          path: tests/.coverage
+          retention-days: 30
+      - name: Analyze coverage for changes (diff-cover)
+        if: github.event_name == 'pull_request'
+        run: |
+          coverage xml
+          diff-cover coverage.xml --compare-branch=origin/main --html-report diff-cover-report.html
+        working-directory: tests/
+      - name: Upload diff-cover report
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-cover-windows-${{ matrix.python-version }}
+          path: tests/diff-cover-report.html
+          retention-days: 30
 
   javascript-tests:
     runs-on: ubuntu-latest
@@ -54,3 +92,56 @@ jobs:
           cache-dependency-path: '**/package.json'
       - run: npm install
       - run: npm test
+
+  coverage-summary:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [windows, javascript-tests]
+    name: Coverage Analysis Summary
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install dependencies
+        run: python -m pip install -r tests/requirements/py3.txt
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-windows-3.13
+          path: tests/coverage_html/
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-data-windows-3.13
+          path: tests/
+      - name: Generate coverage summary
+        run: |
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This PR has been tested with **SQLite database** coverage analysis." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Coverage Reports Available:" >> $GITHUB_STEP_SUMMARY
+          echo "- **HTML Coverage Report**: Download from artifacts above" >> $GITHUB_STEP_SUMMARY
+          echo "- **Diff Coverage Report**: Shows coverage for changed lines only" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Important Notes:" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage warnings are informational only** - they don't block PRs" >> $GITHUB_STEP_SUMMARY
+          echo "Some code paths may show as uncovered because:" >> $GITHUB_STEP_SUMMARY
+          echo "   - They only execute with specific databases (MySQL, PostgreSQL)" >> $GITHUB_STEP_SUMMARY
+          echo "   - They require specific environment configurations" >> $GITHUB_STEP_SUMMARY
+          echo "   - They are platform-specific code paths" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Recommendation**: Review uncovered lines to ensure critical paths are tested" >> $GITHUB_STEP_SUMMARY
+        working-directory: tests/
+      - name: Comment coverage analysis on PR
+        uses: ./.github/actions/coverage-commenter
+        with:
+          coverage-data: tests/.coverage
+          token: ${{ github.token }}
