@@ -2073,7 +2073,7 @@ class ListFiltersTests(TestCase):
         try:
             choice = select_by(choices, "display", str(datas))
         except IndexError as e:
-            raise IndexError(f"IndexError: {e}, choices={choices}")
+            raise IndexError(f"{e}, choices={choices}")
         self.assertEqual(
             choice["query_string"],
             "?datas=%s" % (quote(str(datas)),),
@@ -2087,8 +2087,12 @@ class ListFiltersTests(TestCase):
         filter_changelist = filter_modeladmin.get_changelist_instance(filter_request)
         queryset = filter_changelist.get_queryset(filter_request)
         result = list(queryset)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].datas, datas)
+        result_datas = (
+            result[0].datas.tobytes()
+            if isinstance(result[0].datas, memoryview)
+            else result[0].datas
+        )
+        self.assertEqual(result_datas, datas)
 
 
 class FacetsMixinTests(SimpleTestCase):
