@@ -52,6 +52,9 @@ jobs:
       - name: Generate HTML coverage report
         run: coverage html
         working-directory: tests/
+      - name: Ensure coverage directory exists
+        run: mkdir -p .coverages
+        working-directory: tests/
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -62,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-windows-${{ matrix.python-version }}
-          path: tests/.coverages/
+          path: tests/.coverage
           retention-days: 30
       - name: Analyze coverage for changes (diff-cover)
         if: github.event_name == 'pull_request'
@@ -120,7 +123,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-data-windows-3.13
-          path: tests/.coverages/
+          path: tests/
+      - name: Check if coverage data exists
+        run: |
+          if [ ! -f .coverage ]; then
+            echo "Coverage data not found. Skipping coverage analysis."
+            echo "This usually means tests failed before coverage could be collected."
+            exit 0
+          fi
+        working-directory: tests/
       - name: Generate coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
@@ -143,5 +154,5 @@ jobs:
       - name: Comment coverage analysis on PR
         uses: ./.github/actions/coverage-commenter
         with:
-          coverage-data: tests/.coverages/.coverage
+          coverage-data: tests/.coverage
           token: ${{ github.token }}
