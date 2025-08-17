@@ -130,7 +130,7 @@ a:not(
     #header a,
     #nav-sidebar a,
     #content-main.app-list a,
-    .object-tools a,
+    .object-tools a
 ) {
     text-decoration: underline;
 }
