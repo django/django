@@ -353,7 +353,8 @@ your :setting:`INSTALLED_APPS`.
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 
 .. code-block:: pycon
-
+    # Import the models so we can interact with the database.
+    >>> from polls.models import Question
     # No questions are in the system yet.
     >>> Question.objects.all()
     <QuerySet []>
