@@ -1045,6 +1045,36 @@ class SessionMiddlewareTests(TestCase):
             response.cookies[settings.SESSION_COOKIE_NAME]["samesite"], "Strict"
         )
 
+    @override_settings(SESSION_COOKIE_PARTITIONED=True)
+    def test_partitioned_session_cookie(self):
+        """
+        The Partitioned attribute is set on the session cookie when
+        SESSION_COOKIE_PARTITIONED is True.
+        """
+        request = self.request_factory.get("/")
+        middleware = SessionMiddleware(self.get_response_touching_session)
+        response = middleware(request)
+        self.assertIs(
+            response.cookies[settings.SESSION_COOKIE_NAME]["partitioned"], True
+        )
+
+    @override_settings(SESSION_COOKIE_PARTITIONED=False)
+    def test_no_partitioned_session_cookie(self):
+        """
+        The Partitioned attribute is not set on the session cookie when
+        SESSION_COOKIE_PARTITIONED is False.
+        """
+        request = self.request_factory.get("/")
+        middleware = SessionMiddleware(self.get_response_touching_session)
+        response = middleware(request)
+        self.assertEqual(
+            response.cookies[settings.SESSION_COOKIE_NAME]["partitioned"], ""
+        )
+        self.assertNotIn(
+            "Partitioned",
+            str(response.cookies[settings.SESSION_COOKIE_NAME]),
+        )
+
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
         request = self.request_factory.get("/")

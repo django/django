@@ -119,12 +119,14 @@ class CookieStorage(BaseStorage):
                 secure=settings.SESSION_COOKIE_SECURE or None,
                 httponly=settings.SESSION_COOKIE_HTTPONLY or None,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
+                partitioned=settings.SESSION_COOKIE_PARTITIONED,
             )
         else:
             response.delete_cookie(
                 self.cookie_name,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
+                partitioned=settings.SESSION_COOKIE_PARTITIONED,
             )
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):

@@ -70,6 +70,7 @@ def set_language(request):
                 secure=settings.LANGUAGE_COOKIE_SECURE,
                 httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
                 samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+                partitioned=settings.LANGUAGE_COOKIE_PARTITIONED,
             )
     return response
 
