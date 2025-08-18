@@ -157,7 +157,7 @@ Widget classes
 
     .. attribute:: base_layer
 
-       .. versionadded:: 6.0
+        .. versionadded:: 6.0
 
         ``nasaWorldview``
 
