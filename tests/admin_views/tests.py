@@ -4,6 +4,7 @@ import re
 import unittest
 import zoneinfo
 from unittest import mock
+from unittest.mock import patch
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from django import forms
@@ -43,7 +44,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 
 from . import customadmin
-from .admin import CityAdmin, site, site2
+from .admin import CityAdmin, PersonAdmin, site, site2
 from .models import (
     Actor,
     AdminOrderedAdminMethod,
@@ -4666,6 +4667,70 @@ class AdminViewListEditable(TestCase):
             '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id),
             1,
         )
+
+    def test_list_editable_per_object_permissions(self):
+        """
+        Test that list_editable fields are stripped for objects where the user
+        lacks change permissions, and retained for objects where the user has
+        permissions.
+        """
+        self.client.logout()
+        self.client.force_login(self.superuser)
+        allowed_pks = [self.per1.pk, self.per3.pk]
+
+        with patch.object(
+            PersonAdmin,
+            "has_change_permission",
+            new=lambda self, request, obj=None: obj is None or obj.pk in allowed_pks,
+        ):
+            response = self.client.get(reverse("admin:admin_views_person_changelist"))
+            # Editable fields present
+            self.assertContains(response, 'name="form-0-gender"')
+            self.assertContains(response, 'name="form-0-alive"')
+            self.assertContains(response, 'name="form-2-gender"')
+            self.assertContains(response, 'name="form-2-alive"')
+            # Non-editable fields should NOT have inputs
+            self.assertNotContains(response, 'name="form-1-gender"')
+            self.assertNotContains(response, 'name="form-1-alive"')
+            # Check that the original values exist somewhere in the HTML
+            self.assertContains(response, str(self.per2.gender))
+            self.assertContains(response, str(self.per2.alive))
+
+    def test_list_editable_per_object_permissions_submission(self):
+        """
+        Test that form submission updates only objects where the user has
+        change permissions, ignoring changes to unauthorized objects.
+        """
+        self.client.logout()
+        self.client.force_login(self.superuser)
+        allowed_pks = [self.per1.pk, self.per3.pk]
+
+        with patch.object(
+            PersonAdmin,
+            "has_change_permission",
+            new=lambda self, request, obj=None: obj is None or obj.pk in allowed_pks,
+        ):
+            data = {
+                "form-TOTAL_FORMS": "3",
+                "form-INITIAL_FORMS": "3",
+                "form-MAX_NUM_FORMS": "0",
+                "form-0-gender": "2",  # Change per1 (allowed)
+                "form-0-id": str(self.per1.pk),
+                "form-1-gender": "2",  # Change per2 (not allowed)
+                "form-1-id": str(self.per2.pk),
+                "form-2-gender": "2",  # Change per3 (allowed)
+                "form-2-id": str(self.per3.pk),
+                "_save": "Save",
+            }
+            response = self.client.post(
+                reverse("admin:admin_views_person_changelist"), data, follow=True
+            )
+            # Verify that per1 and per3 were updated, but per2 was not
+            self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 2)
+            self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 1)  # Unchanged
+            self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 2)
+            # Check for success message
+            self.assertEqual(len(response.context["messages"]), 1)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
