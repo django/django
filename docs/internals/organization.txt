@@ -229,7 +229,7 @@ works as follows:
 #. The steering council directs one of its members to notify the Secretary of the
    Django Software Foundation, in writing, of the triggering of the election,
    and the condition which triggered it. The Secretary post to the appropriate
-   venue -- the `Django Forum`_ to announce the election and its timeline.
+   venue -- the |django-forum| to announce the election and its timeline.
 #. As soon as the election is announced, the `DSF Board`_ begin a period of
    voter registration. All `individual members of the DSF`_ are automatically
    registered and need not explicitly register. All other persons who believe
@@ -249,7 +249,7 @@ works as follows:
    believes are registering in bad faith.
 #. Registration of candidates close one week after it has opened. One week
    after registration of candidates closes, the Secretary of the DSF publishes
-   the roster of candidates to the `Django Forum`_, and the election begins.
+   the roster of candidates to the |django-forum|, and the election begins.
    The DSF Board provides a voting form accessible to registered voters, and is
    the custodian of the votes.
 #. Voting is by secret ballot containing the roster of candidates, and any
@@ -259,7 +259,7 @@ works as follows:
    votes and produce a summary, including the total number of votes cast and
    the number received by each candidate. This summary is ratified by a
    majority vote of the DSF Board, then posted by the Secretary of the DSF to
-   the `Django Forum`_. The five candidates with the highest vote totals
+   the |django-forum|. The five candidates with the highest vote totals
    immediately become the new steering council.
 
 A member of the steering council may be removed by:
@@ -274,7 +274,6 @@ A member of the steering council may be removed by:
   if a DSF Board member, must not vote) vote "yes" on a motion that the person
   in question is ineligible.
 
-.. _`Django Forum`: https://forum.djangoproject.com/
 .. _`Django Git repository`: https://github.com/django/django/
 .. _`DSF Board`: https://www.djangoproject.com/foundation/#board
 .. _`individual members of the DSF`: https://www.djangoproject.com/foundation/individual-members/

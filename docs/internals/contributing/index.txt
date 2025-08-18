@@ -21,7 +21,7 @@ Join the Django community
 There are several ways you can help the Django community and others to maintain
 a great ecosystem to work in:
 
-* Join the `Django Forum`_. This forum is a place for discussing the Django
+* Join the |django-forum|. This forum is a place for discussing the Django
   framework and applications and projects that use it. This is also a good
   place to ask and answer any questions related to installing, using, or
   contributing to Django.
@@ -41,7 +41,6 @@ a great ecosystem to work in:
 
 .. _community page: https://www.djangoproject.com/community/
 .. _Django Discord server: https://chat.djangoproject.com
-.. _Django Forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 
 Getting started

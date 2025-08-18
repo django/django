@@ -286,6 +286,7 @@ rst_epilog = """
 .. |django-developers| replace:: :ref:`django-developers <django-developers-mailing-list>`
 .. |django-announce| replace:: :ref:`django-announce <django-announce-mailing-list>`
 .. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
+.. |django-forum| replace:: :ref:`Django Forum <django-forum>`
 """  # NOQA
 
 # -- Options for LaTeX output --
