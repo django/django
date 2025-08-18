@@ -1289,8 +1289,7 @@ details on these changes.
   instead use ``django.contrib.formtools.utils.form_hmac``
 
 * The function-based generic view modules will be removed in favor of their
-  class-based equivalents, outlined :doc:`here
-  </topics/class-based-views/index>`.
+  class-based equivalents, outlined in :ref:`class-based-views-explanation`.
 
 * The ``django.core.servers.basehttp.AdminMediaHandler`` will be
   removed.  In its place use
