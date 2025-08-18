@@ -1137,8 +1137,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         # Add the inline foreign key field to form._meta.fields if it's defined
         # to make sure validation isn't skipped on that field.
         if self.form._meta.fields and self.fk.name not in self.form._meta.fields:
-            if isinstance(self.form._meta.fields, tuple):
-                self.form._meta.fields = list(self.form._meta.fields)
+            self.form._meta.fields = list(self.form._meta.fields)
             self.form._meta.fields.append(self.fk.name)
 
     def initial_form_count(self):

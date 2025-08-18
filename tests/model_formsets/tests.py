@@ -1687,9 +1687,10 @@ class ModelFormsetTest(TestCase):
 
             class Meta:
                 model = Book
-                fields = ("title",)
+                fields = ["title"]
 
         BookFormSet = inlineformset_factory(Author, Book, form=BookForm)
+        self.assertEqual(BookForm.Meta.fields, ["title"])
         data = {
             "book_set-TOTAL_FORMS": "3",
             "book_set-INITIAL_FORMS": "0",
@@ -1700,6 +1701,7 @@ class ModelFormsetTest(TestCase):
         }
         author = Author.objects.create(name="test")
         formset = BookFormSet(data, instance=author)
+        self.assertEqual(BookForm.Meta.fields, ["title"])
         self.assertEqual(
             formset.errors,
             [{}, {"__all__": ["Please correct the duplicate values below."]}, {}],
