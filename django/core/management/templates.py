@@ -105,7 +105,20 @@ class TemplateCommand(BaseCommand):
         else:
             top_dir = os.path.abspath(os.path.expanduser(target))
             if app_or_project == "app":
-                self.validate_name(os.path.basename(top_dir), "directory")
+                dir_name = os.path.basename(top_dir)
+
+                # Non empty directory already exists
+                if os.path.exists(top_dir):
+                    if os.listdir(top_dir):
+                        raise CommandError(
+                            f"{top_dir} already exists. Overlaying an app into an "
+                            "existing directory won't replace conflicting files."
+                        )
+                # Does not exist so validate new name
+                else:
+                    self.validate_name(dir_name, "directory")
+
+            # Create directory if it doesn't exist
             if not os.path.exists(top_dir):
                 try:
                     os.makedirs(top_dir)
