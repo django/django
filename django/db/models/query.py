@@ -5,9 +5,8 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections.abc import Iterator
 from functools import reduce
-from itertools import chain, islice, tee
+from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
 
@@ -2391,15 +2390,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # We assume that objects retrieved are homogeneous (which is the
             # premise of prefetch_related), so what applies to first object
             # applies to all.
-            if isinstance(obj_list, Iterator):
-                obj_list, obj_list_for_next = tee(obj_list, 2)
-            else:
-                obj_list_for_next = obj_list
-
-            first_obj = next(iter(obj_list_for_next), None)
-
-            if first_obj is None:
-                continue
+            first_obj = next(iter(obj_list))
 
             to_attr = lookup.get_current_to_attr(level)[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
