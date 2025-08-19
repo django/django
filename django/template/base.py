@@ -88,10 +88,6 @@ UNKNOWN_SOURCE = "<unknown source>"
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
-combined_partial_re = re.compile(
-    r"{%\s*partialdef\s+(?P<name>[\w-]+)(?:\s+inline)?\s*%}"
-    r"|{%\s*endpartialdef(?:\s+[\w-]+)?\s*%}"
-)
 
 logger = logging.getLogger("django.template")
 
@@ -300,35 +296,98 @@ class PartialTemplate:
     Wraps nodelist as a partial, in order to be able to bind context.
     """
 
-    def __init__(self, nodelist, origin, name):
+    def __init__(self, nodelist, origin, name, source_start=None, source_end=None):
         self.nodelist = nodelist
         self.origin = origin
         self.name = name
+        # If available (debug mode), the absolute character offsets in the
+        # template.source corresponding to the full partial region.
+        self._source_start = source_start
+        self._source_end = source_end
 
     def get_exception_info(self, exception, token):
         template = self.origin.loader.get_template(self.origin.template_name)
         return template.get_exception_info(exception, token)
 
-    def find_partial_source(self, full_source, partial_name):
-        start_match = None
+    def non_debug_find_partial_source(self, full_source, partial_name):
+
+        # Token-aware scan that ignores verbatim/comment regions and tracks
+        # nested partials.
+        verbatim_end_content = None
+        comment_depth = 0
+        start_index = None
         nesting = 0
 
-        for match in combined_partial_re.finditer(full_source):
-            if name := match["name"]:  # Opening tag.
-                if start_match is None and name == partial_name:
-                    start_match = match
-                if start_match is not None:
-                    nesting += 1
-            elif start_match is not None:
-                nesting -= 1
-                if nesting == 0:
-                    return full_source[start_match.start() : match.end()]
+        for match in tag_re.finditer(full_source):
+            raw = match.group(0)
+
+            if raw.startswith(BLOCK_TAG_START):
+                content = raw[2:-2].strip()
+                if verbatim_end_content is not None:
+                    if content == verbatim_end_content:
+                        verbatim_end_content = None
+                    continue
+                if comment_depth:
+                    if content == "comment":
+                        comment_depth += 1
+                    elif content == "endcomment":
+                        comment_depth -= 1
+                    continue
+                if content.startswith("verbatim"):
+                    verbatim_end_content = f"end{content}"
+                    continue
+                if content == "comment":
+                    comment_depth = 1
+                    continue
+                bits = smart_split(content)
+                try:
+                    command = next(bits)
+                except StopIteration:
+                    continue
+
+                if command == "partialdef":
+                    # Expect: partialdef <name> [inline]
+                    try:
+                        name = next(bits)
+                    except StopIteration:
+                        # Malformed; ignore
+                        continue
+                    if start_index is None:
+                        if name == partial_name:
+                            start_index = match.start()
+                            nesting = 1
+                    else:
+                        nesting += 1
+                elif command == "endpartialdef":
+                    if start_index is not None:
+                        nesting -= 1
+                        if nesting == 0:
+                            return full_source[start_index : match.end()]
+            elif raw.startswith(COMMENT_TAG_START):
+                continue
 
         return ""
+
+    def find_partial_source(self, full_source, partial_name):
+        # Prefer parse-time offsets if available (debug mode) to avoid rescans.
+        if (
+            self._source_start is not None
+            and self._source_end is not None
+            and 0 <= self._source_start <= self._source_end <= len(full_source)
+        ):
+            return full_source[self._source_start : self._source_end]
+
+        return self.non_debug_find_partial_source(full_source, partial_name)
 
     @property
     def source(self):
         template = self.origin.loader.get_template(self.origin.template_name)
+        if (
+            self._source_start is not None
+            and self._source_end is not None
+            and 0 <= self._source_start <= self._source_end <= len(template.source)
+        ):
+            return template.source[self._source_start : self._source_end]
         return self.find_partial_source(template.source, self.name)
 
     def _render(self, context):
