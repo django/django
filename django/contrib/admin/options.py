@@ -834,6 +834,38 @@ class ModelAdmin(BaseModelAdmin):
                 % (e, self.__class__.__name__)
             )
 
+    def get_pagination_class(self, request):
+        """
+        Return the Pagination class for use on pages where pagination is
+        required.
+        """
+        from django.contrib.admin.pagination import Pagination
+
+        return Pagination
+
+    def get_pagination_instance(
+        self,
+        request,
+        model,
+        queryset,
+        list_per_page,
+        list_max_show_all,
+        model_admin,
+    ):
+        """
+        Return an instance of the `Pagination` class to be
+        used for paginating the queryset.
+        """
+        Pagination = self.get_pagination_class(request)
+        return Pagination(
+            request,
+            model,
+            queryset,
+            list_per_page,
+            list_max_show_all,
+            model_admin,
+        )
+
     def get_changelist(self, request, **kwargs):
         """
         Return the ChangeList class for use on the changelist page.
@@ -2125,6 +2157,7 @@ class ModelAdmin(BaseModelAdmin):
             "is_popup": cl.is_popup,
             "to_field": cl.to_field,
             "cl": cl,
+            "pagination": cl.pagination,
             "media": media,
             "has_add_permission": self.has_add_permission(request),
             "opts": cl.opts,
@@ -2232,7 +2265,6 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
-        from django.contrib.admin.views.main import PAGE_VAR
 
         # First check if the user can see this history.
         model = self.model
@@ -2255,20 +2287,22 @@ class ModelAdmin(BaseModelAdmin):
             .select_related()
             .order_by("action_time")
         )
-
-        paginator = self.get_paginator(request, action_list, 100)
-        page_number = request.GET.get(PAGE_VAR, 1)
-        page_obj = paginator.get_page(page_number)
-        page_range = paginator.get_elided_page_range(page_obj.number)
+        pagination = self.get_pagination_instance(
+            request,
+            LogEntry,
+            action_list,
+            self.list_per_page,
+            self.list_max_show_all,
+            self,
+        )
 
         context = {
             **self.admin_site.each_context(request),
             "title": _("Change history: %s") % obj,
             "subtitle": None,
-            "action_list": page_obj,
-            "page_range": page_range,
-            "page_var": PAGE_VAR,
-            "pagination_required": paginator.count > 100,
+            "action_list": pagination.get_objects(),
+            "pagination_required": pagination.paginator.count > 100,
+            "pagination": pagination,
             "module_name": str(capfirst(self.opts.verbose_name_plural)),
             "object": obj,
             "opts": self.opts,

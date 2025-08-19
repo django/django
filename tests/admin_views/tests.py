@@ -12,6 +12,7 @@ from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
+from django.contrib.admin.templatetags.admin_list import pagination as pagination_tag
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
@@ -24,6 +25,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
+from django.core.paginator import Paginator
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
@@ -43,7 +45,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 
 from . import customadmin
-from .admin import CityAdmin, site, site2
+from .admin import CityAdmin, PersonaAdmin, site, site2
 from .models import (
     Actor,
     AdminOrderedAdminMethod,
@@ -1662,6 +1664,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                     f'<a href="/test_admin/admin/{app_label}/{model_name}/add/" '
                     f'class="addlink" aria-describedby="{row_id}">Add</a>',
                 )
+
+    def test_custom_paginator(self):
+        for i in range(1, 101):
+            Persona.objects.create(name=f"persona-{i}")
+        response = self.client.get(
+            reverse("namespaced_admin:admin_views_persona_changelist")
+        )
+        self.assertContains(response, '<a role="button" href="?p=20">20</a>')
 
 
 @override_settings(
@@ -4845,6 +4855,75 @@ class AdminSearchTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminPaginationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        for i in range(1, 101):
+            Persona.objects.create(name=f"{i}-persona")
+        cls.factory = RequestFactory()
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_pagination(self):
+        request = self.factory.get("/persona/")
+        model_admin = PersonaAdmin(Persona, site)
+        queryset = Persona.objects.order_by("id")
+        pagination = model_admin.get_pagination_instance(
+            request, Persona, queryset, 50, 100, model_admin
+        )
+        self.assertEqual(queryset.count(), 100)
+        self.assertEqual(pagination.result_count, 100)
+        self.assertTrue(pagination.multi_page)
+        self.assertTrue(pagination.can_show_all)
+        self.assertEqual(len(pagination.get_objects()), 50)
+        pagination = model_admin.get_pagination_instance(
+            request, Persona, queryset, 200, 50, model_admin
+        )
+        self.assertEqual(pagination.result_count, 100)
+        self.assertFalse(pagination.multi_page)
+        self.assertFalse(pagination.can_show_all)
+        self.assertEqual(len(pagination.get_objects()), 100)
+
+    def test_pagination_page_range(self):
+        model_admin = CityAdmin(City, site)
+        request = self.factory.get("/city/")
+        ELLIPSIS = Paginator.ELLIPSIS
+        state = State.objects.create(name="seoul")
+        for number, pages, expected in [
+            (1, 1, []),
+            (1, 2, [1, 2]),
+            (6, 11, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (6, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, ELLIPSIS, 12, 13]),
+            (7, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (7, 14, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ELLIPSIS, 13, 14]),
+            (8, 13, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (8, 14, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+            (8, 15, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, ELLIPSIS, 14, 15]),
+        ]:
+            with self.subTest(number=number, pages=pages):
+                City.objects.all().delete()
+                for _ in range(pages * 10):
+                    City.objects.create(state=state, name="test city")
+                pagination = model_admin.get_pagination_instance(
+                    request, City, City.objects.order_by("id"), 10, 200, model_admin
+                )
+                pagination.page_num = number
+                self.assertEqual(
+                    list(pagination_tag(pagination)["page_range"]), expected
+                )
+
+    def test_custom_pagination(self):
+        response = self.client.get(reverse("admin7:admin_views_persona_changelist"))
+        self.assertContains(response, '<a role="button" href="?p=5">5</a>')
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminInheritedInlinesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -6907,6 +6986,63 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
+
+    def test_pagination(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        for i in range(1, 201):
+            Persona.objects.create(name=f"persona-{i}")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_persona_changelist")
+        )
+        paginator = self.selenium.find_element(By.CSS_SELECTOR, ".paginator")
+        self.assertEqual(paginator.tag_name, "nav")
+        labelledby = paginator.get_attribute("aria-labelledby")
+        description = self.selenium.find_element(By.CSS_SELECTOR, "#%s" % labelledby)
+        self.assertHTMLEqual(
+            description.get_attribute("outerHTML"),
+            '<h2 id="pagination" class="visually-hidden">Pagination personas</h2>',
+        )
+        self.assertTrue(paginator.is_displayed())
+        aria_current_link = paginator.find_elements(By.CSS_SELECTOR, "[aria-current]")
+        self.assertEqual(len(aria_current_link), 1)
+        # Current page.
+        current_page_link = aria_current_link[0]
+        self.assertEqual(current_page_link.get_attribute("aria-current"), "page")
+        self.assertEqual(current_page_link.get_attribute("href"), "")
+        self.assertIn("%s personas" % Persona.objects.count(), paginator.text)
+        self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
+        self.assertEqual(current_page_link.text, "1")
+        rows = self.selenium.find_elements(
+            By.CSS_SELECTOR, "table#result_list tbody tr th a"
+        )
+        self.assertEqual(rows[0].text, "persona-200")
+        self.assertEqual(rows[-1].text, "persona-191")
+        # Select the second page.
+        pages = paginator.find_elements(By.TAG_NAME, "a")
+        second_page_link = pages[1]
+        self.assertEqual(second_page_link.text, "2")
+        second_page_link.click()
+        self.assertIn("?p=2", self.selenium.current_url)
+        rows = self.selenium.find_elements(
+            By.CSS_SELECTOR, "table#result_list tbody tr th a"
+        )
+        self.assertEqual(rows[0].text, "persona-190")
+        self.assertEqual(rows[-1].text, "persona-181")
+        # Select Show all.
+        show_all = self.selenium.find_element(
+            By.CSS_SELECTOR, "form#changelist-form nav.paginator a.showall"
+        )
+        self.assertEqual(show_all.text, "Show all")
+        show_all.click()
+        rows = self.selenium.find_elements(
+            By.CSS_SELECTOR, "table#result_list tbody tr th a"
+        )
+        self.assertEqual(rows[0].text, "persona-200")
+        self.assertEqual(rows[-1].text, "persona-1")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     @override_settings(MESSAGE_LEVEL=10)

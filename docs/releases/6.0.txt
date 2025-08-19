@@ -114,6 +114,9 @@ Minor features
 
 * The Font Awesome Free icon set (version 6.7.2) is now used for the admin
   interface icons.
+* The :attr:`~django.contrib.admin.ModelAdmin.list_per_page` and
+  :attr:`~django.contrib.admin.ModelAdmin.list_max_show_all` attributes
+  now apply to history page pagination in addition to change list page.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

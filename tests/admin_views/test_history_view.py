@@ -50,6 +50,7 @@ class AdminHistoryViewTests(TestCase):
         )
 
 
+# RemovedInDjango70Warning: Remove this class.
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
@@ -85,19 +86,19 @@ class SeleniumTests(AdminSeleniumTestCase):
         description = self.selenium.find_element(By.CSS_SELECTOR, "#%s" % labelledby)
         self.assertHTMLEqual(
             description.get_attribute("outerHTML"),
-            '<h2 id="pagination" class="visually-hidden">Pagination user entries</h2>',
+            '<h2 id="pagination" class="visually-hidden">Pagination log entries</h2>',
         )
         self.assertTrue(paginator.is_displayed())
         aria_current_link = paginator.find_elements(By.CSS_SELECTOR, "[aria-current]")
         self.assertEqual(len(aria_current_link), 1)
-        # The current page.
+        # Current page.
         current_page_link = aria_current_link[0]
         self.assertEqual(current_page_link.get_attribute("aria-current"), "page")
         self.assertEqual(current_page_link.get_attribute("href"), "")
-        self.assertIn("%s entries" % LogEntry.objects.count(), paginator.text)
+        self.assertIn("%s log entries" % LogEntry.objects.count(), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         self.assertEqual(current_page_link.text, "1")
-        # The last page.
+        # Last page.
         last_page_link = self.selenium.find_element(By.XPATH, "//ul/li[last()]/a")
         self.assertTrue(last_page_link.text, "20")
         # Select the second page.

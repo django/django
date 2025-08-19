@@ -1,20 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 
 from .models import Band, Child, Event, Genre, GrandChild, Parent, ProxyUser, Swallow
 
 site = admin.AdminSite(name="admin")
 
 site.register(User, UserAdmin)
-
-
-class CustomPaginator(Paginator):
-    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super().__init__(
-            queryset, 5, orphans=2, allow_empty_first_page=allow_empty_first_page
-        )
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -60,10 +52,6 @@ class GrandChildAdmin(admin.ModelAdmin):
 
 
 site.register(GrandChild, GrandChildAdmin)
-
-
-class CustomPaginationAdmin(ChildAdmin):
-    paginator = CustomPaginator
 
 
 class FilteredChildAdmin(admin.ModelAdmin):

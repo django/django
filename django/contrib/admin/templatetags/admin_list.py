@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.admin.pagination import ALL_VAR, PAGE_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field,
@@ -9,17 +10,16 @@ from django.contrib.admin.utils import (
     lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
-    PAGE_VAR,
     SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
+from django.template.defaulttags import querystring
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
@@ -35,13 +35,14 @@ register = Library()
 
 
 @register.simple_tag
-def paginator_number(cl, i):
+def paginator_number(pagination, i):
     """
     Generate an individual page index link in a paginated list.
     """
-    if i == cl.paginator.ELLIPSIS:
-        return format_html("{} ", cl.paginator.ELLIPSIS)
-    elif i == cl.page_num:
+    paginator = pagination.paginator
+    if i == paginator.ELLIPSIS:
+        return format_html("{} ", paginator.ELLIPSIS)
+    elif i == pagination.page_num:
         return format_html(
             '<a role="button" href="" aria-current="page">{}</a> ',
             i,
@@ -49,24 +50,30 @@ def paginator_number(cl, i):
     else:
         return format_html(
             '<a role="button" href="{}">{}</a> ',
-            cl.get_query_string({PAGE_VAR: i}),
+            querystring(None, {**pagination.params, PAGE_VAR: i}),
             i,
         )
 
 
-def pagination(cl):
+def pagination(pagination):
     """
     Generate the series of links to the pages in a paginated list.
     """
-    pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
-    page_range = (
-        cl.paginator.get_elided_page_range(cl.page_num) if pagination_required else []
+    pagination_required = pagination.multi_page and not (
+        pagination.show_all and pagination.can_show_all
     )
-    need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
+    page_range = (
+        pagination.paginator.get_elided_page_range(pagination.page_num)
+        if pagination_required
+        else []
+    )
+    need_show_all_link = (
+        pagination.can_show_all and not pagination.show_all and pagination.multi_page
+    )
     return {
-        "cl": cl,
+        "pagination": pagination,
         "pagination_required": pagination_required,
-        "show_all_url": need_show_all_link and cl.get_query_string({ALL_VAR: ""}),
+        "show_all_url": need_show_all_link and {ALL_VAR: ""},
         "page_range": page_range,
         "ALL_VAR": ALL_VAR,
         "1": 1,

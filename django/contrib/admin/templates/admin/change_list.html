@@ -89,7 +89,7 @@
           {% endblock %}
           {% block pagination %}
           <div class="changelist-footer">
-          {% pagination cl %}
+          {% pagination cl.pagination %}
           {% if cl.formset and cl.result_count %}<input type="submit" name="_save" class="default" value="{% translate 'Save' %}">{% endif %}
           {% endblock %}
           </div>

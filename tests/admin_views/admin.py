@@ -5,11 +5,13 @@ from wsgiref.util import FileWrapper
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
+from django.contrib.admin.pagination import Pagination
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
@@ -143,6 +145,11 @@ from .models import (
     Worker,
     WorkHour,
 )
+
+
+class CustomUserAdmin(UserAdmin):
+    list_per_page = 50
+    list_max_show_all = 2000
 
 
 @admin.display(ordering="date")
@@ -375,6 +382,34 @@ class BarAccountAdmin(admin.StackedInline):
 
 class PersonaAdmin(admin.ModelAdmin):
     inlines = (FooAccountAdmin, BarAccountAdmin)
+    list_per_page = 10
+
+
+class CustomPaginator(Paginator):
+    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
+        super().__init__(
+            queryset, 5, orphans=2, allow_empty_first_page=allow_empty_first_page
+        )
+
+
+class CustomPaginatorAdmin(PersonaAdmin):
+    paginator = CustomPaginator
+    list_per_page = 50
+
+
+class CustomPagination(Pagination):
+
+    def setup(self, request):
+        self.list_per_page += 10
+        super().setup(request)
+
+
+class PersonaCustomPaginationAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    list_max_show_all = 300
+
+    def get_pagination_class(self, request):
+        return CustomPagination
 
 
 class SubscriberAdmin(admin.ModelAdmin):
@@ -1335,11 +1370,14 @@ site2.register(
 site2.register(Person, save_as_continue=False)
 site2.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 site2.register(Language)
+site2.register(Persona, CustomPaginatorAdmin)
 
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
+site7.register(Persona, PersonaCustomPaginationAdmin)
+site7.register(User, CustomUserAdmin)
 site7.register(
     Pizza,
     filter_horizontal=["toppings"],
