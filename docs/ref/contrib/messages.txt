@@ -258,6 +258,11 @@ The ``Message`` class
       the lowercase version of the name of the associated constant, but this
       can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
 
+    * ``extra_kwargs``: This variable accepts all further keyword arguments
+      to the Message class. The default behavior is that this does nothing,
+      but allows third-party storage classes to extend the behavior of this
+      class.
+
 Creating custom message levels
 ------------------------------
 
