@@ -1915,7 +1915,8 @@ templates used by the :class:`ModelAdmin` views:
     If obj is ``None``, should return ``True`` or ``False`` to indicate whether
     viewing of objects of this type is permitted in general (e.g., ``False``
     will be interpreted as meaning that the current user is not permitted to
-    view any object of this type).
+    view any object of this type). The object type’s list view is
+    only accessible when ``True`` is returned.
 
     The default implementation returns ``True`` if the user has either the
     "change" or "view" permission.
@@ -1947,7 +1948,7 @@ templates used by the :class:`ModelAdmin` views:
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
     <django.contrib.auth.models.User.has_module_perms>` by default. Overriding
-    it does not restrict access to the view, add, change, or delete views,
+    it does not restrict access to the list, view, add, change, or delete views,
     :meth:`~ModelAdmin.has_view_permission`,
     :meth:`~ModelAdmin.has_add_permission`,
     :meth:`~ModelAdmin.has_change_permission`, and
