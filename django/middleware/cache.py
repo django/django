@@ -100,8 +100,17 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         ):
             return response
 
-        # Don't cache a response with 'Cache-Control: private'
-        if "private" in response.get("Cache-Control", ()):
+        # Don't cache responses when the Cache-Control header is set to
+        # private, no-cache, or no-store.
+        cache_control = response.get("Cache-Control", "").lower()
+        if cache_control and any(
+            directive in cache_control
+            for directive in (
+                "private",
+                "no-cache",
+                "no-store",
+            )
+        ):
             return response
 
         # Don't cache responses when the Vary header contains '*'.
