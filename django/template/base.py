@@ -309,66 +309,7 @@ class PartialTemplate:
         template = self.origin.loader.get_template(self.origin.template_name)
         return template.get_exception_info(exception, token)
 
-    def non_debug_find_partial_source(self, full_source, partial_name):
-
-        # Token-aware scan that ignores verbatim/comment regions and tracks
-        # nested partials.
-        verbatim_end_content = None
-        comment_depth = 0
-        start_index = None
-        nesting = 0
-
-        for match in tag_re.finditer(full_source):
-            raw = match.group(0)
-
-            if raw.startswith(BLOCK_TAG_START):
-                content = raw[2:-2].strip()
-                if verbatim_end_content is not None:
-                    if content == verbatim_end_content:
-                        verbatim_end_content = None
-                    continue
-                if comment_depth:
-                    if content == "comment":
-                        comment_depth += 1
-                    elif content == "endcomment":
-                        comment_depth -= 1
-                    continue
-                if content.startswith("verbatim"):
-                    verbatim_end_content = f"end{content}"
-                    continue
-                if content == "comment":
-                    comment_depth = 1
-                    continue
-                bits = smart_split(content)
-                try:
-                    command = next(bits)
-                except StopIteration:
-                    continue
-
-                if command == "partialdef":
-                    # Expect: partialdef <name> [inline]
-                    try:
-                        name = next(bits)
-                    except StopIteration:
-                        # Malformed; ignore
-                        continue
-                    if start_index is None:
-                        if name == partial_name:
-                            start_index = match.start()
-                            nesting = 1
-                    else:
-                        nesting += 1
-                elif command == "endpartialdef":
-                    if start_index is not None:
-                        nesting -= 1
-                        if nesting == 0:
-                            return full_source[start_index : match.end()]
-            elif raw.startswith(COMMENT_TAG_START):
-                continue
-
-        return ""
-
-    def find_partial_source(self, full_source, partial_name):
+    def find_partial_source(self, full_source):
         # Prefer parse-time offsets if available (debug mode) to avoid rescans.
         if (
             self._source_start is not None
@@ -377,12 +318,12 @@ class PartialTemplate:
         ):
             return full_source[self._source_start : self._source_end]
 
-        return self.non_debug_find_partial_source(full_source, partial_name)
+        return ""
 
     @property
     def source(self):
         template = self.origin.loader.get_template(self.origin.template_name)
-        return self.find_partial_source(template.source, self.name)
+        return self.find_partial_source(template.source)
 
     def _render(self, context):
         return self.nodelist.render(context)

@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(ROOT, "templates")
 
 
-def setup(templates, *args, test_once=False):
+def setup(templates, *args, test_once=False, debug_only=False):
     """
     Runs test method multiple times in the following order:
 
@@ -50,6 +50,18 @@ def setup(templates, *args, test_once=False):
         def inner(self):
             # Set up custom template tag libraries if specified
             libraries = getattr(self, "libraries", {})
+
+            if debug_only:
+                self.engine = Engine(
+                    debug=True,
+                    libraries=libraries,
+                    loaders=loaders,
+                )
+                func(self)
+                if test_once:
+                    return
+                func(self)
+                return
 
             self.engine = Engine(
                 libraries=libraries,
