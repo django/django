@@ -15,7 +15,7 @@ have loaded in a hidden frame or iframe.
 An example of clickjacking
 ==========================
 
-Suppose an online store has a page where a logged in user can click "Buy Now" to
+Suppose an online store has a page where a logged-in user can click "Buy Now" to
 purchase an item. A user has chosen to stay logged into the store all the time
 for convenience. An attacker site might create an "I Like Ponies" button on one
 of their own pages, and load the store's page in a transparent iframe such that

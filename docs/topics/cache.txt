@@ -783,7 +783,7 @@ uniquely identify the cache fragment:
 
     {% load cache %}
     {% cache 500 sidebar request.user.username %}
-        .. sidebar for logged in user ..
+        .. sidebar for logged-in user ..
     {% endcache %}
 
 If :setting:`USE_I18N` is set to ``True`` the per-site middleware cache will
