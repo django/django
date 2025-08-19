@@ -10,6 +10,14 @@ class MyBigAutoField(models.BigAutoField):
 
 @isolate_apps("model_options")
 class TestDefaultPK(SimpleTestCase):
+    def test_default_value_of_default_auto_field_setting(self):
+        """django.conf.global_settings defaults to BigAutoField."""
+
+        class MyModel(models.Model):
+            pass
+
+        self.assertIsInstance(MyModel._meta.pk, models.BigAutoField)
+
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.NonexistentAutoField")
     def test_default_auto_field_setting_nonexistent(self):
         msg = (
