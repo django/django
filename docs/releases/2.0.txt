@@ -280,8 +280,8 @@ Models
   backends, only Oracle supports it.
 
 * The new :meth:`connection.execute_wrapper()
-  <django.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
-  :doc:`installing wrappers around execution of database queries
+  <django.db.backends.base.base.BaseDatabaseWrapper.execute_wrapper>` method
+  allows :doc:`installing wrappers around execution of database queries
   </topics/db/instrumentation>`.
 
 * The new ``filter`` argument for built-in aggregates allows :ref:`adding
