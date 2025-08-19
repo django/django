@@ -1701,44 +1701,11 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_indexes(databases),
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
-                *cls._check_default_pk(),
                 *cls._check_db_table_comment(databases),
                 *cls._check_composite_pk(),
             ]
 
         return errors
-
-    @classmethod
-    def _check_default_pk(cls):
-        if (
-            not cls._meta.abstract
-            and cls._meta.pk.auto_created
-            and
-            # Inherited PKs are checked in parents models.
-            not (
-                isinstance(cls._meta.pk, OneToOneField)
-                and cls._meta.pk.remote_field.parent_link
-            )
-            and not settings.is_overridden("DEFAULT_AUTO_FIELD")
-            and cls._meta.app_config
-            and not cls._meta.app_config._is_default_auto_field_overridden
-        ):
-            return [
-                checks.Warning(
-                    f"Auto-created primary key used when not defining a "
-                    f"primary key type, by default "
-                    f"'{settings.DEFAULT_AUTO_FIELD}'.",
-                    hint=(
-                        f"Configure the DEFAULT_AUTO_FIELD setting or the "
-                        f"{cls._meta.app_config.__class__.__qualname__}."
-                        f"default_auto_field attribute to point to a subclass "
-                        f"of AutoField, e.g. 'django.db.models.BigAutoField'."
-                    ),
-                    obj=cls,
-                    id="models.W042",
-                ),
-            ]
-        return []
 
     @classmethod
     def _check_composite_pk(cls):
