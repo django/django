@@ -1175,23 +1175,15 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 0;
 }
 
-.paginator a:link, .paginator a:visited {
+.paginator a {
     display: inline-block;
     padding: 2px 6px;
+}
+
+.paginator a:not(.showall) {
     background: var(--button-bg);
     text-decoration: none;
     color: var(--button-fg);
-}
-
-.paginator a.showall {
-    border: none;
-    background: none;
-    color: var(--link-fg);
-}
-
-.paginator a.showall:focus, .paginator a.showall:hover {
-    background: none;
-    color: var(--link-hover-color);
 }
 
 .paginator a[aria-current="page"] {
@@ -1201,8 +1193,8 @@ a.deletelink:focus, a.deletelink:hover {
     cursor: default;
 }
 
-.paginator a:not([aria-current="page"]):focus,
-.paginator a:not([aria-current="page"]):hover {
+.paginator a:not([aria-current="page"], .showall):focus,
+.paginator a:not([aria-current="page"], .showall):hover {
     color: white;
     background: var(--link-hover-color);
 }
