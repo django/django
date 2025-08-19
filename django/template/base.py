@@ -382,12 +382,6 @@ class PartialTemplate:
     @property
     def source(self):
         template = self.origin.loader.get_template(self.origin.template_name)
-        if (
-            self._source_start is not None
-            and self._source_end is not None
-            and 0 <= self._source_start <= self._source_end <= len(template.source)
-        ):
-            return template.source[self._source_start : self._source_end]
         return self.find_partial_source(template.source, self.name)
 
     def _render(self, context):
