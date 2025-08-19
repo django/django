@@ -205,7 +205,7 @@ async def alogin(request, user, backend=None):
     # RemovedInDjango61Warning.
     if user is None:
         warnings.warn(
-            "Fallback to request.user when user is None will be removed.",
+            "Fallback to request.auser() when user is None will be removed.",
             RemovedInDjango61Warning,
             stacklevel=2,
         )
