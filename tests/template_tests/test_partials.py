@@ -4,7 +4,9 @@ from unittest import mock
 from django.http import HttpResponse
 from django.template import (
     Context,
+    NodeList,
     Origin,
+    PartialTemplate,
     Template,
     TemplateDoesNotExist,
     TemplateSyntaxError,
@@ -246,26 +248,21 @@ INLINE-CONTENT
 {% endpartialdef %}"""
         self.assertEqual(partial_proxy.source.strip(), expected.strip())
 
-    @setup(
-        {
-            "nonexistent_partial_test_template": (
-                "{% partialdef test-partial %}\n"
-                "TEST-PARTIAL-CONTENT\n"
-                "{% endpartialdef %}\n"
-            ),
-        },
-        test_once=True,
-        debug_only=True,
-    )
-    def test_find_partial_source_nonexistent_partial(self):
-        template = self.engine.get_template("nonexistent_partial_test_template")
-        partial_proxy = template.extra_data["partials"]["test-partial"]
+    def test_find_partial_source_fallback_cases(self):
 
-        result = partial_proxy.find_partial_source(template.source)
-        expected = """{% partialdef test-partial %}
-TEST-PARTIAL-CONTENT
-{% endpartialdef %}"""
-        self.assertEqual(result.strip(), expected.strip())
+        with self.subTest("None offsets"):
+            partial = PartialTemplate(
+                NodeList(), Origin("test"), "test", source_start=None, source_end=None
+            )
+            result = partial.find_partial_source("some source")
+            self.assertEqual(result, "")
+
+        with self.subTest("Out of bounds offsets"):
+            partial = PartialTemplate(
+                NodeList(), Origin("test"), "test", source_start=10, source_end=20
+            )
+            result = partial.find_partial_source("short")
+            self.assertEqual(result, "")
 
     @setup(
         {
