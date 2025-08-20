@@ -269,8 +269,8 @@ async def alogout(request):
     user = getattr(request, "auser", None)
     if user is not None:
         user = await user()
-    if not getattr(user, "is_authenticated", True):
-        user = None
+        if not getattr(user, "is_authenticated", True):
+            user = None
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
     if hasattr(request, "auser"):
@@ -364,8 +364,8 @@ async def aget_user(request):
                     session_hash_verified = False
                 else:
                     session_auth_hash = user.get_session_auth_hash()
-                    session_hash_verified = session_hash and constant_time_compare(
-                        session_hash, user.get_session_auth_hash()
+                    session_hash_verified = constant_time_compare(
+                        session_hash, session_auth_hash
                     )
                 if not session_hash_verified:
                     # If the current secret does not verify the session, try
