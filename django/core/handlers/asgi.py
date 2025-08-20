@@ -94,7 +94,11 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
+            if corrected_name == "HTTP_COOKIE":
+                value = value.rstrip("; ")
+                if "HTTP_COOKIE" in self.META:
+                    value = self.META[corrected_name] + "; " + value
+            elif corrected_name in self.META:
                 value = self.META[corrected_name] + "," + value
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
