@@ -450,6 +450,34 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(RawPostDataException):
             request.body
 
+    def test_malformed_multipart_header(self):
+        for header in [
+            'Content-Disposition : form-data; name="name"',
+            'Content-Disposition:form-data; name="name"',
+            'Content-Disposition :form-data; name="name"',
+        ]:
+            with self.subTest(header):
+                payload = FakePayload(
+                    "\r\n".join(
+                        [
+                            "--boundary",
+                            header,
+                            "",
+                            "value",
+                            "--boundary--",
+                        ]
+                    )
+                )
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                        "CONTENT_LENGTH": len(payload),
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.POST, {"name": ["value"]})
+
     def test_body_after_POST_multipart_related(self):
         """
         Reading body after parsing multipart that isn't form-data is allowed
