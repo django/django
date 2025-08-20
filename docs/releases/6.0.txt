@@ -333,7 +333,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Multiple ``Cookie`` headers are now supported for HTTP/2 requests when
+  running with ASGI.
 
 Security
 ~~~~~~~~
