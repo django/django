@@ -39,8 +39,7 @@ class BaseEngine:
 
         This method is optional.
         """
-        raise NotImplementedError(
-            "subclasses of BaseEngine should provide a from_string() method"
+        raise NotImplementedError("get_template() must be implemented by subclasses")
         )
 
     def get_template(self, template_name):
@@ -49,8 +48,7 @@ class BaseEngine:
 
         Raise TemplateDoesNotExist if no such template exists.
         """
-        raise NotImplementedError(
-            "subclasses of BaseEngine must provide a get_template() method"
+        raise NotImplementedError("get_template() must be implemented by subclasses")
         )
 
     # Utility methods: they are provided to minimize code duplication and
