@@ -202,7 +202,7 @@ class HttpRequest:
                 msg += (
                     " The domain name provided is not valid according to RFC 1034/1035."
                 )
-            raise DisallowedHost(msg)
+            raise BadRequest(msg)
 
     def get_port(self):
         """Return the port number for the request as a string."""
