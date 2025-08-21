@@ -54,6 +54,7 @@
 #changelist .changelist-footer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 10px;
     border-top: 1px solid var(--hairline-color);
     border-bottom: 1px solid var(--hairline-color);
@@ -64,18 +65,17 @@
     background: var(--body-bg);
     border: none;
     padding: 0;
-    overflow: hidden;
 }
 
 #changelist .paginator {
     color: var(--body-quiet-color);
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
-    overflow: hidden;
 }
 
 #changelist .paginator ul {
     padding: 0;
+    white-space: nowrap;
 }
 
 /* CHANGELIST TABLES */

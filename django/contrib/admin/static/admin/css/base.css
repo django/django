@@ -1161,7 +1161,6 @@ a.deletelink:focus, a.deletelink:hover {
     line-height: 22px;
     margin: 0;
     border-top: 1px solid var(--hairline-color);
-    width: 100%;
     box-sizing: border-box;
 }
 
