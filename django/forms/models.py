@@ -1134,8 +1134,8 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.unique_fields = {self.fk.name}
         super().__init__(data, files, prefix=prefix, queryset=qs, **kwargs)
 
-        # Add the generated field to form._meta.fields if it's defined to make
-        # sure validation isn't skipped on that field.
+        # Add the inline foreign key field to form._meta.fields if it's defined
+        # to make sure validation isn't skipped on that field.
         if self.form._meta.fields and self.fk.name not in self.form._meta.fields:
             if isinstance(self.form._meta.fields, tuple):
                 self.form._meta.fields = list(self.form._meta.fields)
