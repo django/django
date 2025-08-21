@@ -175,6 +175,23 @@ Widget classes
     properties of the inner ``Media`` class (see
     :ref:`assets-as-a-static-definition`).
 
+    .. admonition:: Using with Content Security Policy (CSP)
+
+        If you have
+        :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`
+        enabled, you must allow the base layer's tile domain in your policy so
+        that map tiles can be loaded by the browser. Using the default NASA
+        Worldview base layer, an example policy could be:
+
+        .. code-block:: python
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "https://*.earthdata.nasa.gov"],
+            }
+
 ``OSMWidget``
 
 .. class:: OSMWidget
@@ -201,6 +218,20 @@ Widget classes
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
     tiles.
+
+    .. admonition:: Using with Content Security Policy (CSP)
+
+        If CSP is enabled you will need to add an ``img-src`` directive so the
+        tiles can load. For example:
+
+        .. code-block:: python
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "https://tile.openstreetmap.org"],
+            }
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
 
