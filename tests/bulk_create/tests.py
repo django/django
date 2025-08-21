@@ -901,7 +901,7 @@ class BulkCreateTransactionTests(TransactionTestCase):
         with self.assertNumQueries(4):
             Country.objects.bulk_create(
                 [
-                    Country(id=1, name="France", iso_two_letter="FR"),
+                    Country(id=10, name="France", iso_two_letter="FR"),
                     Country(name="Canada", iso_two_letter="CA"),
                 ]
             )
