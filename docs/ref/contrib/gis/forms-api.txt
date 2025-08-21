@@ -169,10 +169,10 @@ Widget classes
 
         ``3857``
 
-    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``ol.js`` file hosted
-    on the ``cdn.jsdelivr.net`` content-delivery network. You can subclass
-    these widgets in order to specify your own version of the ``ol.js`` file in
-    the ``js`` property of the inner ``Media`` class (see
+    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``ol.js`` and
+    ``ol.css`` files vendored with Django. You can subclass these widgets in
+    order to specify your own version of these files in the ``js`` and ``css``
+    properties of the inner ``Media`` class (see
     :ref:`assets-as-a-static-definition`).
 
 ``OSMWidget``
