@@ -5,6 +5,7 @@ This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
 
+import hmac
 import logging
 import string
 from collections import defaultdict
@@ -15,7 +16,7 @@ from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.http import HttpHeaders, UnreadablePostError
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
-from django.utils.crypto import constant_time_compare, get_random_string
+from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
@@ -154,7 +155,7 @@ def _does_token_match(request_csrf_token, csrf_secret):
     if len(request_csrf_token) == CSRF_TOKEN_LENGTH:
         request_csrf_token = _unmask_cipher_token(request_csrf_token)
     assert len(request_csrf_token) == CSRF_SECRET_LENGTH
-    return constant_time_compare(request_csrf_token, csrf_secret)
+    return hmac.compare_digest(request_csrf_token, csrf_secret)
 
 
 class RejectRequest(Exception):

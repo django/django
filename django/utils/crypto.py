@@ -5,8 +5,10 @@ Django's standard crypto functions and utilities.
 import hashlib
 import hmac
 import secrets
+import warnings
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.encoding import force_bytes
 
 
@@ -64,7 +66,12 @@ def get_random_string(length, allowed_chars=RANDOM_STRING_CHARS):
 
 def constant_time_compare(val1, val2):
     """Return True if the two strings are equal, False otherwise."""
-    return secrets.compare_digest(force_bytes(val1), force_bytes(val2))
+    warnings.warn(
+        "constant_time_compare() is deprecated. Use hmac.compare_digest() instead.",
+        RemovedInDjango70Warning,
+        stacklevel=2,
+    )
+    return hmac.compare_digest(val1, val2)
 
 
 def pbkdf2(password, salt, iterations, dklen=0, digest=None):

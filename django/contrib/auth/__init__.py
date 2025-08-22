@@ -1,3 +1,4 @@
+import hmac
 import inspect
 import re
 import warnings
@@ -6,7 +7,6 @@ from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
-from django.utils.crypto import constant_time_compare
 from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_variables
@@ -175,7 +175,7 @@ def login(request, user, backend=None):
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
             session_auth_hash
-            and not constant_time_compare(
+            and not hmac.compare_digest(
                 request.session.get(HASH_SESSION_KEY, ""), session_auth_hash
             )
         ):
@@ -217,7 +217,7 @@ async def alogin(request, user, backend=None):
     if await request.session.ahas_key(SESSION_KEY):
         if await _aget_user_session_key(request) != user.pk or (
             session_auth_hash
-            and not constant_time_compare(
+            and not hmac.compare_digest(
                 await request.session.aget(HASH_SESSION_KEY, ""),
                 session_auth_hash,
             )
@@ -323,7 +323,7 @@ def get_user(request):
                     session_hash_verified = False
                 else:
                     session_auth_hash = user.get_session_auth_hash()
-                    session_hash_verified = constant_time_compare(
+                    session_hash_verified = hmac.compare_digest(
                         session_hash, session_auth_hash
                     )
                 if not session_hash_verified:
@@ -331,7 +331,7 @@ def get_user(request):
                     # with the fallback secrets and stop when a matching one is
                     # found.
                     if session_hash and any(
-                        constant_time_compare(session_hash, fallback_auth_hash)
+                        hmac.compare_digest(session_hash, fallback_auth_hash)
                         for fallback_auth_hash in user.get_session_auth_fallback_hash()
                     ):
                         request.session.cycle_key()
@@ -364,7 +364,7 @@ async def aget_user(request):
                     session_hash_verified = False
                 else:
                     session_auth_hash = user.get_session_auth_hash()
-                    session_hash_verified = constant_time_compare(
+                    session_hash_verified = hmac.compare_digest(
                         session_hash, session_auth_hash
                     )
                 if not session_hash_verified:
@@ -372,7 +372,7 @@ async def aget_user(request):
                     # with the fallback secrets and stop when a matching one is
                     # found.
                     if session_hash and any(
-                        constant_time_compare(session_hash, fallback_auth_hash)
+                        hmac.compare_digest(session_hash, fallback_auth_hash)
                         for fallback_auth_hash in user.get_session_auth_fallback_hash()
                     ):
                         await request.session.acycle_key()
