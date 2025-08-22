@@ -1,0 +1,93 @@
+===============================
+Django Admin Keyboard Shortcuts
+===============================
+
+.. versionadded:: 5.1
+
+The Django admin interface includes keyboard shortcuts for common form actions, 
+allowing you to save time when working with admin forms.
+
+Available Shortcuts
+===================
+
+The following keyboard shortcuts are available on admin change and add forms:
+
+.. list-table:: Admin Form Shortcuts
+   :header-rows: 1
+   :widths: 30 20 50
+
+   * - Action
+     - Mac
+     - Windows/Linux
+   * - Save and continue editing
+     - Command + S
+     - Ctrl + S
+   * - Save and exit
+     - Command + Shift + S
+     - Ctrl + Shift + S
+   * - Save and add another
+     - Command + Alt + S
+     - Ctrl + Alt + S
+
+How It Works
+============
+
+Keyboard shortcuts are automatically enabled on all admin forms that contain
+the corresponding action buttons. The shortcuts will only work when:
+
+* The corresponding button is present and visible on the form
+* The button is not disabled
+* You are not currently focused on an input field (to prevent conflicts)
+
+Visual Hints
+============
+
+When you hover over form action buttons, you'll see tooltip hints showing
+the available keyboard shortcuts for that button.
+
+Browser Compatibility
+=====================
+
+Keyboard shortcuts work in all modern browsers including:
+
+* Chrome 60+
+* Firefox 60+
+* Safari 12+
+* Edge 79+
+
+Accessibility
+=============
+
+The keyboard shortcuts feature is designed with accessibility in mind:
+
+* Shortcuts don't interfere with screen reader navigation
+* Visual hints are provided via standard ``title`` attributes
+* Shortcuts are disabled when focused on editable elements
+* All functionality remains available via mouse/touch interaction
+
+Technical Implementation
+========================
+
+The shortcuts are implemented using vanilla JavaScript without external
+dependencies. The feature uses progressive enhancement, meaning forms will
+work normally even if JavaScript is disabled.
+
+The shortcuts module is only loaded on admin change and add forms, not on
+other admin pages, to minimize performance impact.
+
+Customization
+=============
+
+If you need to disable keyboard shortcuts in your custom admin forms, you can
+override the ``admin_change_form_document_ready`` block in your admin templates
+and exclude the shortcuts.js file.
+
+.. code-block:: html
+
+    {% block admin_change_form_document_ready %}
+        <script src="{% static 'admin/js/change_form.js' %}" async></script>
+        {# shortcuts.js excluded #}
+    {% endblock %}
+
+For advanced customization or additional shortcuts, you can extend the
+``DjangoAdminShortcuts`` object in your own JavaScript files.
