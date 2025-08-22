@@ -396,9 +396,6 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
-  ``serialize_db_to_string()`` instead.
-
 * :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
   PostgreSQL backends no longer use ``CASCADE`` when dropping a column.
 
