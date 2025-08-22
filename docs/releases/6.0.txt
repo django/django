@@ -90,6 +90,50 @@ Notably, the return type of the :class:`EmailMessage.message()
 :py:class:`email.message.EmailMessage`. This supports the same API as the
 previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
 instance of those now-deprecated classes.
+Model field fetch modes
+-----------------------
+
+The on-demand fetching behavior of model fields is now configurable with
+:doc:`fetch modes </topics/db/fetch-modes>`. These allow you to control how
+Django fetches data from the database when an unfetched field is accessed.
+
+Django provides three fetch modes:
+
+1. ``FETCH_ONE``, the default, fetches the missing field for the current
+   instance only. This mode represents Django’s existing behavior.
+
+2. ``FETCH_PEERS`` fetches a missing field for all instances that came from
+   the same :class:`~django.db.models.query.QuerySet`.
+
+   This mode works like an on-demand ``prefetch_related()``. It can reduce most
+   cases of the “N+1 queries problem” to two queries without maintaining a
+   list of fields to prefetch.
+
+3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+   exception.
+
+   This mode can prevent unintentional queries in performance-critical
+   sections of code.
+
+Use the new method :meth:`.QuerySet.fetch_mode` to set the fetch mode for model
+instances fetched by the ``QuerySet``:
+
+.. code-block:: python
+
+    from django.db.models import FETCH_PEERS
+
+    books = Book.objects.fetch_mode(FETCH_PEERS)
+    for book in books:
+        print(book.author.name)
+
+Despite the loop accessing the ``author`` foreign key on each instance, the
+``FETCH_PEERS`` fetch mode will make the above example perform only two
+queries:
+
+1. Fetch all books.
+2. Fetch associated authors.
+
+See :doc:`fetch modes </topics/db/fetch-modes>` for more details.
 
 Template Partials
 -----------------
