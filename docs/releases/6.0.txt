@@ -570,6 +570,9 @@ Miscellaneous
 * The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions are deprecated.
 
+* The ``django.utils.crypto.constant_time_compare()`` function is deprecated
+  because it is merely an alias of :py:func:`hmac.compare_digest`.
+
 Features removed in 6.0
 =======================
 
