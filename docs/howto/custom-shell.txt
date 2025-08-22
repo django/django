@@ -39,8 +39,8 @@ For example:
 
 The customization above adds :func:`~django.urls.resolve` and
 :func:`~django.urls.reverse` to the default namespace, which already includes
-all models from the apps listed in :setting:`INSTALLED_APPS` plus what is 
-imported by default. These objects will be available in the ``shell`` without 
+all models from the apps listed in :setting:`INSTALLED_APPS` plus what is
+imported by default. These objects will be available in the ``shell`` without
 requiring a manual import.
 
 Running this customized ``shell`` command with ``verbosity=2`` would show:
@@ -48,7 +48,7 @@ Running this customized ``shell`` command with ``verbosity=2`` would show:
 .. console::
 
     13 objects imported automatically:
-	
+
       from django.db import connection, reset_queries, models
       from django.conf import settings
       from django.contrib.admin.models import LogEntry
