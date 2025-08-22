@@ -410,7 +410,7 @@ you've manually saved the instance produced by the form, you can invoke
 
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a ``save()`` on a form, all data -- including many-to-many data --
-is saved without the need for any additional method calls.  For example:
+is saved without the need for any additional method calls. For example:
 
 .. code-block:: pycon
 
@@ -490,7 +490,7 @@ include that field.
     Django will prevent any attempt to save an incomplete model, so if
     the model does not allow the missing fields to be empty, and does
     not provide a default value for the missing fields, any attempt to
-    ``save()`` a ``ModelForm`` with missing fields will fail.  To
+    ``save()`` a ``ModelForm`` with missing fields will fail. To
     avoid this failure, you must instantiate your model with initial
     values for the missing, but required fields::
 
@@ -1107,7 +1107,7 @@ Overriding ``clean()`` on a ``ModelFormSet``
 Just like with a ``ModelForm``, by default the ``clean()`` method of a
 ``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
-``unique_for_date|month|year``).  If you want to override the ``clean()`` method
+``unique_for_date|month|year``). If you want to override the ``clean()`` method
 on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 

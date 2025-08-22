@@ -5,7 +5,7 @@ Reporting bugs and requesting features
 .. Important::
 
     Please report security issues **only** to
-    security@djangoproject.com.  This is a private list only open to
+    security@djangoproject.com. This is a private list only open to
     long-time, highly trusted Django developers, and its archives are
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.

@@ -264,7 +264,7 @@ Template filter code falls into one of two situations:
    reviewing your code.
 
    Marking a filter ``is_safe`` will coerce the filter's return value to
-   a string.  If your filter should return a boolean or other non-string
+   a string. If your filter should return a boolean or other non-string
    value, marking it ``is_safe`` will probably have unintended
    consequences (such as converting a boolean False to the string
    'False').
@@ -841,7 +841,7 @@ When Django compiles a template, it splits the raw template text into *nodes*.
 Each node is an instance of ``django.template.Node`` and has a ``render()``
 method. A compiled template is a list of ``Node`` objects. When you call
 ``render()`` on a compiled template object, the template calls ``render()`` on
-each ``Node`` in its node list, with the given context.  The results are all
+each ``Node`` in its node list, with the given context. The results are all
 concatenated together to form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
@@ -1159,7 +1159,7 @@ Now your tag should begin to look like this::
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
 
 You also have to change the renderer to retrieve the actual contents of the
-``date_updated`` property of the ``blog_entry`` object.  This can be
+``date_updated`` property of the ``blog_entry`` object. This can be
 accomplished by using the ``Variable()`` class in ``django.template``.
 
 To use the ``Variable`` class, instantiate it with the name of the variable to

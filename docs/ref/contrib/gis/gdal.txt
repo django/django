@@ -6,7 +6,7 @@ GDAL API
     :synopsis: GeoDjango's high-level interface to the GDAL library.
 
 `GDAL`__ stands for **Geospatial Data Abstraction Library**,
-and is a veritable "Swiss army knife" of GIS data functionality.  A subset
+and is a veritable "Swiss army knife" of GIS data functionality. A subset
 of GDAL is the `OGR`__ Simple Features Library, which specializes
 in reading and writing vector geographic data in a variety of standard
 formats.
@@ -34,7 +34,7 @@ Sample Data
 
 The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
-to have some data to work with.  If you're starting out and don't yet
+to have some data to work with. If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
 data sets that you can use for testing. You can download them here:
 
@@ -51,9 +51,9 @@ Vector Data Source Objects
 
 :class:`DataSource` is a wrapper for the OGR data source object that
 supports reading data from a variety of OGR-supported geospatial file
-formats and data sources using a consistent interface.  Each
+formats and data sources using a consistent interface. Each
 data source is represented by a :class:`DataSource` object which contains
-one or more layers of data.  Each layer, represented by a :class:`Layer`
+one or more layers of data. Each layer, represented by a :class:`Layer`
 object, contains some number of geographic features (:class:`Feature`),
 information about the type of features contained in that layer (e.g.
 points, polygons, etc.), as well as the names and types of any
@@ -285,7 +285,7 @@ __ https://gdal.org/drivers/vector/
     .. method:: test_capability(capability)
 
     Returns a boolean indicating whether this layer supports the given
-    capability (a string).  Examples of valid capability strings include:
+    capability (a string). Examples of valid capability strings include:
     ``'RandomRead'``, ``'SequentialWrite'``, ``'RandomWrite'``,
     ``'FastSpatialFilter'``, ``'FastFeatureCount'``, ``'FastGetExtent'``,
     ``'CreateField'``, ``'Transactions'``, ``'DeleteFeature'``, and
@@ -673,7 +673,7 @@ coordinate transformation:
     This property controls the spatial reference for this geometry, or
     ``None`` if no spatial reference system has been assigned to it.
     If assigned, accessing this property returns a :class:`SpatialReference`
-    object.  It may be set with another :class:`SpatialReference` object,
+    object. It may be set with another :class:`SpatialReference` object,
     or any input that :class:`SpatialReference` accepts. Example:
 
     .. code-block:: pycon
@@ -684,7 +684,7 @@ coordinate transformation:
     .. attribute:: srid
 
     Returns or sets the spatial reference identifier corresponding to
-    :class:`SpatialReference` of this geometry.  Returns ``None`` if
+    :class:`SpatialReference` of this geometry. Returns ``None`` if
     there is no spatial reference information associated with this
     geometry, or if an SRID cannot be determined.
 
@@ -1274,9 +1274,9 @@ Raster Data Objects
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file
-formats and data sources using a consistent interface.  Each
+formats and data sources using a consistent interface. Each
 data source is represented by a :class:`GDALRaster` object which contains
-one or more layers of data named bands.  Each band, represented by a
+one or more layers of data named bands. Each band, represented by a
 :class:`GDALBand` object, contains georeferenced image data. For example, an RGB
 image is represented as three bands: one for red, one for green, and one for
 blue.
@@ -2140,7 +2140,7 @@ Settings
 ``GDAL_LIBRARY_PATH``
 ---------------------
 
-A string specifying the location of the GDAL library.  Typically,
+A string specifying the location of the GDAL library. Typically,
 this setting is only used if the GDAL library is in a non-standard
 location (e.g., ``/home/john/lib/libgdal.so``).
 

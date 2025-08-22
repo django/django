@@ -139,9 +139,9 @@ A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
 
 By default, ``max_num`` only affects how many forms are displayed and does not
-affect validation.  If ``validate_max=True`` is passed to the
+affect validation. If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
-validation.  See :ref:`validate_max`.
+validation. See :ref:`validate_max`.
 
 .. _formsets-absolute-max:
 
@@ -695,7 +695,7 @@ model instances for deleted forms will be deleted when you call
 ``formset.save()``.
 
 If you call ``formset.save(commit=False)``, objects will not be deleted
-automatically.  You'll need to call ``delete()`` on each of the
+automatically. You'll need to call ``delete()`` on each of the
 :attr:`formset.deleted_objects
 <django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
 them:

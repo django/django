@@ -581,7 +581,7 @@ to generate and apply a database migration for your user model.
 
 We considered an increase to 254 characters to more easily allow the use of
 email addresses (which are limited to 254 characters) as usernames but rejected
-it due to a MySQL limitation.  When using the ``utf8mb4`` encoding (recommended
+it due to a MySQL limitation. When using the ``utf8mb4`` encoding (recommended
 for proper Unicode support), MySQL can only create unique indexes with 191
 characters by default. Therefore, if you need a longer length, please use a
 custom user model.
@@ -850,7 +850,7 @@ Miscellaneous
 
 * The ``base_field`` attribute of
   :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
-  not an instance of a field.  If you have created a custom subclass of
+  not an instance of a field. If you have created a custom subclass of
   :class:`~django.contrib.postgres.fields.RangeField`, you should change the
   ``base_field`` attribute.
 

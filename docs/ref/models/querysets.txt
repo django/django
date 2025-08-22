@@ -959,7 +959,7 @@ Examples:
 
 .. method:: all()
 
-Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass).  This
+Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass). This
 can be useful in situations where you might want to pass in either a model
 manager or a ``QuerySet`` and do further filtering on the result. After calling
 ``all()`` on either object, you'll definitely have a ``QuerySet`` to work with.
@@ -1562,7 +1562,7 @@ of the arguments is required, but you should use at least one of them.
 * ``select``
 
   The ``select`` argument lets you put extra fields in the ``SELECT``
-  clause.  It should be a dictionary mapping attribute names to SQL
+  clause. It should be a dictionary mapping attribute names to SQL
   clauses to use to calculate that attribute.
 
   Example::
@@ -1895,7 +1895,7 @@ are in your ``only()`` call.
 .. method:: using(alias)
 
 This method is for controlling which database the ``QuerySet`` will be
-evaluated against if you are using more than one database.  The only argument
+evaluated against if you are using more than one database. The only argument
 this method takes is the alias of a database, as defined in
 :setting:`DATABASES`.
 

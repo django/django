@@ -873,7 +873,7 @@ the login page or shown an HTTP 403 Forbidden response, depending on the
 
     .. attribute:: login_url
 
-        Default return value for :meth:`get_login_url`.  Defaults to ``None``
+        Default return value for :meth:`get_login_url`. Defaults to ``None``
         in which case :meth:`get_login_url` falls back to
         :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
@@ -891,7 +891,7 @@ the login page or shown an HTTP 403 Forbidden response, depending on the
 
         If this attribute is set to ``True``, a
         :class:`~django.core.exceptions.PermissionDenied` exception is raised
-        when the conditions are not met.  When ``False`` (the default),
+        when the conditions are not met. When ``False`` (the default),
         anonymous users are redirected to the login page.
 
     .. method:: get_login_url()

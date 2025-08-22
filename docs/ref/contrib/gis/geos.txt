@@ -12,7 +12,7 @@ What is GEOS?
 -------------
 
 `GEOS`__ stands for **Geometry Engine - Open Source**,
-and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS
+and is a C++ library, ported from the  `Java Topology Suite`__. GEOS
 implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
@@ -30,8 +30,8 @@ features include:
 
 * A BSD-licensed interface to the GEOS geometry routines, implemented purely
   in Python using ``ctypes``.
-* Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
-  may be used outside of a Django project/application.  In other words,
+* Loosely-coupled to GeoDjango. For example, :class:`GEOSGeometry` objects
+  may be used outside of a Django project/application. In other words,
   no need to have :envvar:`DJANGO_SETTINGS_MODULE` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
 * Cross-platform tested.
@@ -47,7 +47,7 @@ This section contains a brief introduction and tutorial to using
 Creating a Geometry
 -------------------
 
-:class:`GEOSGeometry` objects may be created in a few ways.  The first is
+:class:`GEOSGeometry` objects may be created in a few ways. The first is
 to simply instantiate the object on some spatial input -- the following
 are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
 
@@ -66,7 +66,7 @@ are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
     ... )  # GeoJSON
 
 Another option is to use the constructor for the specific geometry type
-that you wish to create.  For example, a :class:`Point` object may be
+that you wish to create. For example, a :class:`Point` object may be
 created by passing in the X and Y coordinates into its constructor:
 
 .. code-block:: pycon
@@ -127,8 +127,8 @@ may be used to get the geometry coordinates as a Python tuple:
     (5.0, 23.0)
 
 You can get/set geometry components using standard Python indexing
-techniques.  However, what is returned depends on the geometry type
-of the object.  For example, indexing on a :class:`LineString`
+techniques. However, what is returned depends on the geometry type
+of the object. For example, indexing on a :class:`LineString`
 returns a coordinate tuple:
 
 .. code-block:: pycon
@@ -212,7 +212,7 @@ Geometry Objects
     :param srid: spatial reference identifier
     :type srid: int
 
-This is the base class for all GEOS geometry objects.  It initializes on the
+This is the base class for all GEOS geometry objects. It initializes on the
 given ``geo_input`` argument, and then assumes the proper geometry subclass
 (e.g., ``GEOSGeometry('POINT(1 1)')`` will create a :class:`Point` object).
 
@@ -275,7 +275,7 @@ Properties
 
 .. attribute:: GEOSGeometry.geom_type
 
-    Returns a string corresponding to the type of geometry.  For example:
+    Returns a string corresponding to the type of geometry. For example:
 
     .. code-block:: pycon
 
@@ -285,7 +285,7 @@ Properties
 
 .. attribute:: GEOSGeometry.geom_typeid
 
-    Returns the GEOS geometry type identification number.  The following table
+    Returns the GEOS geometry type identification number. The following table
     shows the value for each geometry type:
 
     ===========================  ========
@@ -307,7 +307,7 @@ Properties
 
 .. attribute:: GEOSGeometry.num_geom
 
-    Returns the number of geometries in this geometry.  In other words, will
+    Returns the number of geometries in this geometry. In other words, will
     return 1 on anything but geometry collections.
 
 .. attribute:: GEOSGeometry.hasz
@@ -329,7 +329,7 @@ Properties
 
     Returns a boolean indicating whether the geometry is 'simple'. A geometry
     is simple if and only if it does not intersect itself (except at boundary
-    points).  For example, a :class:`LineString` object is not simple if it
+    points). For example, a :class:`LineString` object is not simple if it
     intersects itself. Thus, :class:`LinearRing` and :class:`Polygon` objects
     are always simple because they cannot intersect themselves, by definition.
 
@@ -344,7 +344,7 @@ Properties
 .. attribute:: GEOSGeometry.srid
 
     Property that may be used to retrieve or set the SRID associated with the
-    geometry.  For example:
+    geometry. For example:
 
     .. code-block:: pycon
 
@@ -359,12 +359,12 @@ Output Properties
 ~~~~~~~~~~~~~~~~~
 
 The properties in this section export the :class:`GEOSGeometry` object into
-a different.  This output may be in the form of a string, buffer, or even
+a different. This output may be in the form of a string, buffer, or even
 another object.
 
 .. attribute:: GEOSGeometry.ewkt
 
-    Returns the "extended" Well-Known Text of the geometry.  This representation
+    Returns the "extended" Well-Known Text of the geometry. This representation
     is specific to PostGIS and is a superset of the OGC WKT standard. [#fnogc]_
     Essentially the SRID is prepended to the WKT representation, for example
     ``SRID=4326;POINT(5 23)``.
@@ -376,14 +376,14 @@ another object.
 
 .. attribute:: GEOSGeometry.hex
 
-    Returns the WKB of this Geometry in hexadecimal form.  Please note
+    Returns the WKB of this Geometry in hexadecimal form. Please note
     that the SRID value is not included in this representation
     because it is not a part of the OGC specification (use the
     :attr:`GEOSGeometry.hexewkb` property instead).
 
 .. attribute:: GEOSGeometry.hexewkb
 
-    Returns the EWKB of this Geometry in hexadecimal form.  This is an
+    Returns the EWKB of this Geometry in hexadecimal form. This is an
     extension of the WKB specification that includes the SRID value
     that are a part of this geometry.
 
@@ -400,7 +400,7 @@ another object.
 .. attribute:: GEOSGeometry.kml
 
     Returns a `KML`__ (Keyhole Markup Language) representation of the
-    geometry.  This should only be used for geometries with an SRID of
+    geometry. This should only be used for geometries with an SRID of
     4326 (WGS84), but this restriction is not enforced.
 
 .. attribute:: GEOSGeometry.ogr
@@ -413,7 +413,7 @@ another object.
 .. attribute:: GEOSGeometry.wkb
 
     Returns the WKB (Well-Known Binary) representation of this Geometry
-    as a Python buffer.  SRID value is not included, use the
+    as a Python buffer. SRID value is not included, use the
     :attr:`GEOSGeometry.ewkb` property instead.
 
 .. _ewkb:
@@ -483,7 +483,7 @@ return a boolean.
 .. method:: GEOSGeometry.equals_exact(other, tolerance=0)
 
     Returns true if the two geometries are exactly equal, up to a
-    specified tolerance.  The ``tolerance`` value should be a floating
+    specified tolerance. The ``tolerance`` value should be a floating
     point number representing the error tolerance in the comparison, e.g.,
     ``poly1.equals_exact(poly2, 0.001)`` will compare equality to within
     one thousandth of a unit.
@@ -608,7 +608,7 @@ Topological Properties
 .. attribute:: GEOSGeometry.centroid
 
     Returns a :class:`Point` object representing the geometric center of
-    the geometry.  The point is not guaranteed to be on the interior
+    the geometry. The point is not guaranteed to be on the interior
     of the geometry.
 
 .. attribute:: GEOSGeometry.convex_hull
@@ -809,7 +809,7 @@ Other Properties & Methods
 .. class:: Polygon(*args, **kwargs)
 
     ``Polygon`` objects may be instantiated by passing in parameters that
-    represent the rings of the polygon.  The parameters must either be
+    represent the rings of the polygon. The parameters must either be
     :class:`LinearRing` instances, or a sequence that may be used to construct a
     :class:`LinearRing`:
 
@@ -922,12 +922,13 @@ Prepared Geometries
 ===================
 
 In order to obtain a prepared geometry, access the
-:attr:`GEOSGeometry.prepared` property.  Once you have a
-``PreparedGeometry`` instance its spatial predicate methods, listed below,
-may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
-geometry can be orders of magnitude faster -- the more complex the geometry
-that is prepared, the larger the speedup in the operation.  For more information,
-please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+:attr:`GEOSGeometry.prepared` property. Once you have a ``PreparedGeometry``
+instance its spatial predicate methods, listed below, may be used with other
+``GEOSGeometry`` objects. An operation with a prepared geometry can be orders
+of magnitude faster -- the more complex the geometry that is prepared, the
+larger the speedup in the operation. For more information, please consult the
+`GEOS wiki page on prepared geometries
+<https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
 For example:
 
@@ -1034,14 +1035,14 @@ Writer Objects
 --------------
 
 All writer objects have a ``write(geom)`` method that returns either the
-WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
+WKB or WKT of the given geometry. In addition, :class:`WKBWriter` objects
 also have properties that may be used to change the byte order, and or
 include the SRID value (in other words, EWKB).
 
 .. class:: WKBWriter(dim=2)
 
-    ``WKBWriter`` provides the most control over its output.  By default it
-    returns OGC-compliant WKB when its ``write`` method is called.  However,
+    ``WKBWriter`` provides the most control over its output. By default it
+    returns OGC-compliant WKB when its ``write`` method is called. However,
     it has properties that allow for the creation of EWKB, a superset of the
     WKB standard that includes additional information. See the
     :attr:`WKBWriter.outdim` documentation for more details about the ``dim``
@@ -1062,7 +1063,7 @@ include the SRID value (in other words, EWKB).
 
     .. method:: WKBWriter.write_hex(geom)
 
-    Returns WKB of the geometry in hexadecimal.  Example:
+    Returns WKB of the geometry in hexadecimal. Example:
 
     .. code-block:: pycon
 
@@ -1099,7 +1100,7 @@ include the SRID value (in other words, EWKB).
     .. attribute:: WKBWriter.outdim
 
     This property may be set to change the output dimension of the geometry
-    representation.  In other words, if you have a 3D geometry then set to 3
+    representation. In other words, if you have a 3D geometry then set to 3
     so that the Z value is included in the WKB.
 
     ============ ===========================
@@ -1127,7 +1128,7 @@ include the SRID value (in other words, EWKB).
     .. attribute:: WKBWriter.srid
 
     Set this property with a boolean to indicate whether the SRID of the
-    geometry should be included with the WKB representation.  Example:
+    geometry should be included with the WKB representation. Example:
 
     .. code-block:: pycon
 
@@ -1210,7 +1211,7 @@ Settings
 ``GEOS_LIBRARY_PATH``
 ---------------------
 
-A string specifying the location of the GEOS C library.  Typically,
+A string specifying the location of the GEOS C library. Typically,
 this setting is only used if the GEOS C library is in a non-standard
 location (e.g., ``/home/bob/lib/libgeos_c.so``).
 

@@ -1293,7 +1293,7 @@ details on these changes.
   </topics/class-based-views/index>`.
 
 * The ``django.core.servers.basehttp.AdminMediaHandler`` will be
-  removed.  In its place use
+  removed. In its place use
   ``django.contrib.staticfiles.handlers.StaticFilesHandler``.
 
 * The template tags library ``adminmedia`` and the template tag ``{%
@@ -1356,7 +1356,7 @@ details on these changes.
 See the :ref:`Django 1.2 release notes<deprecated-features-1.2>` for more
 details on these changes.
 
-* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed.  Use
+* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed. Use
   the ``{% csrf_token %}`` template tag inside forms to enable CSRF
   protection. ``CsrfViewMiddleware`` remains and is enabled by default.
 
@@ -1384,7 +1384,7 @@ details on these changes.
 * The ``Message`` model (in ``django.contrib.auth``), its related
   manager in the ``User`` model (``user.message_set``), and the
   associated methods (``user.message_set.create()`` and
-  ``user.get_and_delete_messages()``), will be removed.  The
+  ``user.get_and_delete_messages()``), will be removed. The
   :doc:`messages framework </ref/contrib/messages>` should be used
   instead. The related ``messages`` variable returned by the
   auth context processor will also be removed. Note that this
@@ -1396,7 +1396,7 @@ details on these changes.
   will no longer be checked and can be removed from custom backends.
 
 * Authentication backends will need to support the ``AnonymousUser`` class
-  being passed to all methods dealing with permissions.  The
+  being passed to all methods dealing with permissions. The
   ``supports_anonymous_user`` variable will no longer be checked and can be
   removed from custom backends.
 
@@ -1423,7 +1423,7 @@ details on these changes.
   ``django.contrib.syndication`` will be removed. The class-based view
   ``views.Feed`` should be used instead.
 
-* ``django.core.context_processors.auth``.  This release will
+* ``django.core.context_processors.auth``. This release will
   remove the old method in favor of the new method in
   ``django.contrib.auth.context_processors.auth``.
 
@@ -1454,7 +1454,7 @@ details on these changes.
 See the :ref:`Django 1.1 release notes<deprecated-features-1.1>` for more
 details on these changes.
 
-* ``AdminSite.root()``.  This method of hooking up the admin URLs will be
+* ``AdminSite.root()``. This method of hooking up the admin URLs will be
   removed in favor of including ``admin.site.urls``.
 
 * Authentication backends need to define the boolean attributes

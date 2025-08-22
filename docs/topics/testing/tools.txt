@@ -2057,7 +2057,7 @@ Django, such as your machine's mail server, if you're running one.)
 
 During test running, each outgoing email is saved in
 ``django.core.mail.outbox``. This is a list of all
-:class:`~django.core.mail.EmailMessage` instances that have been sent.  The
+:class:`~django.core.mail.EmailMessage` instances that have been sent. The
 ``outbox`` attribute is a special attribute that is created *only* when the
 ``locmem`` email backend is used. It doesn't normally exist as part of the
 :mod:`django.core.mail` module and you can't import it directly. The code below

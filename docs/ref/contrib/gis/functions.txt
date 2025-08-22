@@ -349,7 +349,7 @@ scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
 SpatiaLite
 
 Accepts a single geographic field or expression and returns a geometry with all
-points snapped to the given grid.  How the geometry is snapped to the grid
+points snapped to the given grid. How the geometry is snapped to the grid
 depends on how many numeric (either float, integer, or long) arguments are
 given.
 
@@ -376,7 +376,7 @@ the transformed geometry to the spatial reference system specified by the
 .. note::
 
     What spatial reference system an integer SRID corresponds to may depend on
-    the spatial database used.  In other words, the SRID numbers used for Oracle
+    the spatial database used. In other words, the SRID numbers used for Oracle
     are not necessarily the same as those used by PostGIS.
 
 ``Translate``

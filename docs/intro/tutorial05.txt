@@ -352,7 +352,7 @@ The Django test client
 ----------------------
 
 Django provides a test :class:`~django.test.Client` to simulate a user
-interacting with the code at the view level.  We can use it in ``tests.py``
+interacting with the code at the view level. We can use it in ``tests.py``
 or even in the :djadmin:`shell`.
 
 We will start again with the :djadmin:`shell`, where we need to do a couple of

@@ -148,7 +148,7 @@ your :setting:`SECRET_KEY`:
     {'message': 'Hello!'}
 
 Using salt in this way puts the different signatures into different
-namespaces.  A signature that comes from one namespace (a particular salt
+namespaces. A signature that comes from one namespace (a particular salt
 value) cannot be used to validate the same plaintext string in a different
 namespace that is using a different salt setting. The result is to prevent an
 attacker from using a signed string generated in one place in the code as input

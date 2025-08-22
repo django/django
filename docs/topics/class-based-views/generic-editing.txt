@@ -65,7 +65,7 @@ Notes:
 Model forms
 ===========
 
-Generic views really shine when working with models.  These generic
+Generic views really shine when working with models. These generic
 views will automatically create a :class:`~django.forms.ModelForm`, so long as
 they can work out which model class to use:
 
@@ -78,7 +78,7 @@ they can work out which model class to use:
 
 Model form views provide a
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid` implementation
-that saves the model automatically.  You can override this if you have any
+that saves the model automatically. You can override this if you have any
 special requirements; see below for examples.
 
 You don't even need to provide a ``success_url`` for

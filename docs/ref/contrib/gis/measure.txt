@@ -14,9 +14,10 @@ Specifically, it implements two objects, :class:`Distance` and
 Example
 =======
 
-:class:`Distance` objects may be instantiated using a keyword argument indicating the
-context of the units.  In the example below, two different distance objects are
-instantiated in units of kilometers (``km``) and miles (``mi``):
+:class:`Distance` objects may be instantiated using a keyword argument
+indicating the context of the units. In the example below, two different
+distance objects are instantiated in units of kilometers (``km``) and miles
+(``mi``):
 
 .. code-block:: pycon
 

@@ -78,7 +78,7 @@ Logging
 -------
 
 Django 1.3 adds framework-level support for Python's ``logging``
-module.  This means you can now easily configure and control logging
+module. This means you can now easily configure and control logging
 as part of your Django project. A number of logging handlers and
 logging calls have been added to Django's own code as well -- most
 notably, the error emails sent on an HTTP 500 server error are now
@@ -236,7 +236,7 @@ Permissions for inactive users
 
 If you provide a custom auth backend with ``supports_inactive_user``
 set to ``True``, an inactive ``User`` instance will check the backend
-for permissions.  This is useful for further centralizing the
+for permissions. This is useful for further centralizing the
 permission handling. See the :doc:`authentication docs </topics/auth/index>`
 for more details.
 
@@ -808,9 +808,9 @@ GeoDjango
 
 * Previously, calling
   :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would
-  silently do nothing when GDAL wasn't available.  Now, a
+  silently do nothing when GDAL wasn't available. Now, a
   :class:`~django.contrib.gis.geos.GEOSException` is properly raised
-  to indicate possible faulty application code.  A warning is now
+  to indicate possible faulty application code. A warning is now
   raised if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is
   called when the SRID of the geometry is less than 0 or ``None``.
 

@@ -900,7 +900,7 @@ reuse it:
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Querysets do not always cache their results.  When evaluating only *part* of
+Querysets do not always cache their results. When evaluating only *part* of
 the queryset, the cache is checked, but if it is not populated then the items
 returned by the subsequent query are not cached. Specifically, this means that
 :ref:`limiting the queryset <limiting-querysets>` using an array slice or an

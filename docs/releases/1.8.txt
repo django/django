@@ -1668,7 +1668,7 @@ Model ``Field.related``
 -----------------------
 
 Private attribute ``django.db.models.Field.related`` is deprecated in favor
-of ``Field.rel``.  The latter is an instance of
+of ``Field.rel``. The latter is an instance of
 ``django.db.models.fields.related.ForeignObjectRel`` which replaces
 ``django.db.models.related.RelatedObject``. The ``django.db.models.related``
 module has been removed and the ``Field.related`` attribute will be removed in

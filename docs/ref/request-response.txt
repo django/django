@@ -1255,7 +1255,7 @@ using non-dict objects in JSON-encoded response.
     <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
     poison the JavaScript ``Array`` constructor. For this reason, Django does
     not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    :class:`~django.http.JsonResponse` constructor by default. However, most
     modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 

@@ -282,7 +282,7 @@ The functions defined in this module share the following properties:
     :class:`~pathlib.Path`.
 
     This method will encode certain characters that would normally be
-    recognized as special characters for URIs.  Note that this method does not
+    recognized as special characters for URIs. Note that this method does not
     encode the ' character, as it is a valid character within URIs. See
     ``encodeURIComponent()`` JavaScript function for more details.
 

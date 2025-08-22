@@ -710,7 +710,7 @@ want::
 You can also override the cache prefix on a per-view basis. ``cache_page``
 takes an optional keyword argument, ``key_prefix``,
 which works in the same way as the :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
-setting for the middleware.  It can be used like this::
+setting for the middleware. It can be used like this::
 
     @cache_page(60 * 15, key_prefix="site1")
     def my_view(request): ...
@@ -860,7 +860,7 @@ cache the entire result (since some of the data changes often), but you'd still
 want to cache the results that rarely change.
 
 For cases like this, Django exposes a low-level cache API. You can use this API
-to store objects in the cache with any level of granularity you like.  You can
+to store objects in the cache with any level of granularity you like. You can
 cache any Python object that can be pickled safely: strings, dictionaries,
 lists of model objects, and so forth. (Most common Python objects can be
 pickled; refer to the Python documentation for more information about
@@ -1052,7 +1052,7 @@ of keys to be cleared:
 .. method:: cache.clear()
 
 Finally, if you want to delete all the keys in the cache, use
-``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
+``cache.clear()``. Be careful with this; ``clear()`` will remove *everything*
 from the cache, not just the keys set by your application:
 
 .. code-block:: pycon
@@ -1312,7 +1312,7 @@ expose incorrect or sensitive data to subsequent visitors to those pages.
 For example, if you operate a web email system, then the contents of the
 "inbox" page depend on which user is logged in. If an ISP blindly cached your
 site, then the first user who logged in through that ISP would have their
-user-specific inbox page cached for subsequent visitors to the site.  That's
+user-specific inbox page cached for subsequent visitors to the site. That's
 not cool.
 
 Fortunately, HTTP provides a solution to this problem. A number of HTTP headers

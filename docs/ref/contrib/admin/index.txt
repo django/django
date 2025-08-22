@@ -1153,7 +1153,7 @@ subclass::
 
     The ``raw_id_fields`` ``Input`` widget should contain a primary key if the
     field is a ``ForeignKey`` or a comma separated list of values if the field
-    is a ``ManyToManyField``.  The ``raw_id_fields`` widget shows a magnifying
+    is a ``ManyToManyField``. The ``raw_id_fields`` widget shows a magnifying
     glass button next to the field which allows users to search for and select
     a value:
 
@@ -1355,9 +1355,9 @@ subclass::
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`admin-overriding-templates` section describes how to override or extend
-the default admin templates.  Use the following options to override the default
-templates used by the :class:`ModelAdmin` views:
+The :ref:`admin-overriding-templates` section describes how to override or
+extend the default admin templates. Use the following options to override the
+default templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.add_form_template
 
@@ -1660,7 +1660,7 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.get_urls()
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
-    that ModelAdmin in the same way as a URLconf.  Therefore you can extend
+    that ModelAdmin in the same way as a URLconf. Therefore you can extend
     them as documented in :doc:`/topics/http/urls`, using the
     ``AdminSite.admin_view()`` wrapper on your views::
 
@@ -1970,7 +1970,7 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
     Sends a message to the user using the :mod:`django.contrib.messages`
-    backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
+    backend. See the :ref:`custom ModelAdmin example <custom-admin-action>`.
 
     Keyword arguments allow you to change the message level, add extra CSS
     tags, or fail silently if the ``contrib.messages`` framework is not

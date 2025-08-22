@@ -306,8 +306,8 @@ We'll deal with this problem in the next section.
 .. note::
 
     If you get a 404 when requesting ``/books/acme/``, check to ensure you
-    actually have a Publisher with the name 'ACME Publishing'.  Generic
-    views have an ``allow_empty`` parameter for this case.  See the
+    actually have a Publisher with the name 'ACME Publishing'. Generic
+    views have an ``allow_empty`` parameter for this case. See the
     :doc:`class-based-views reference</ref/class-based-views/index>` for more
     details.
 

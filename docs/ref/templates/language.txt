@@ -208,7 +208,7 @@ you a taste of what's available, here are some of the more commonly used
 tags:
 
 :ttag:`for`
-    Loop over each item in an array.  For example, to display a list of athletes
+    Loop over each item in an array. For example, to display a list of athletes
     provided in ``athlete_list``:
 
     .. code-block:: html+django

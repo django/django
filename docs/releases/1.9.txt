@@ -357,7 +357,7 @@ Forms
 
 * :class:`~django.forms.CharField` now accepts a
   :attr:`~django.forms.CharField.strip` argument to strip input data of leading
-  and trailing whitespace.  As this defaults to ``True`` this is different
+  and trailing whitespace. As this defaults to ``True`` this is different
   behavior from previous releases.
 
 * Form fields now support the :attr:`~django.forms.Field.disabled` argument,
