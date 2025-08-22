@@ -299,11 +299,11 @@ Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
 
 When specifying ``db_index=True`` on your model fields, Django typically
-outputs a single ``CREATE INDEX`` statement.  However, if the database type
+outputs a single ``CREATE INDEX`` statement. However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perform
+for the column. The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
@@ -827,7 +827,7 @@ Substring matching and case sensitivity
 ---------------------------------------
 
 For all SQLite versions, there is some slightly counterintuitive behavior when
-attempting to match some types of strings.  These are triggered when using the
+attempting to match some types of strings. These are triggered when using the
 :lookup:`iexact` or :lookup:`contains` filters in querysets. The behavior
 splits into two cases:
 
@@ -1143,7 +1143,7 @@ INSERT ... RETURNING INTO
 -------------------------
 
 By default, the Oracle backend uses a ``RETURNING INTO`` clause to efficiently
-retrieve the value of an ``AutoField`` when inserting new rows.  This behavior
+retrieve the value of an ``AutoField`` when inserting new rows. This behavior
 may result in a ``DatabaseError`` in certain unusual setups, such as when
 inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
@@ -1182,9 +1182,9 @@ backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the
-value of a ``db_column`` option.  Django quotes all identifiers used
+value of a ``db_column`` option. Django quotes all identifiers used
 in queries to prevent most such problems, but this error can still
-occur when an Oracle datatype is used as a column name.  In
+occur when an Oracle datatype is used as a column name. In
 particular, take care to avoid using the names ``date``,
 ``timestamp``, ``number`` or ``float`` as a field name.
 

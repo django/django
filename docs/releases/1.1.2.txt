@@ -23,9 +23,9 @@ Test runner exit status code
 
 The exit status code of the test runners (``tests/runtests.py`` and ``python
 manage.py test``) no longer represents the number of failed tests, since a
-failure of 256 or more tests resulted in a wrong exit status code.  The exit
+failure of 256 or more tests resulted in a wrong exit status code. The exit
 status code for the test runner is now 0 for success (no failing tests) and 1
-for any number of test failures.  If needed, the number of test failures can be
+for any number of test failures. If needed, the number of test failures can be
 found at the end of the test runner's output.
 
 Cookie encoding
@@ -34,7 +34,7 @@ Cookie encoding
 To fix bugs with cookies in Internet Explorer, Safari, and possibly other
 browsers, our encoding of cookie values was changed so that the characters
 comma and semi-colon are treated as non-safe characters, and are therefore
-encoded as ``\054`` and ``\073`` respectively.  This could produce backwards
+encoded as ``\054`` and ``\073`` respectively. This could produce backwards
 incompatibilities, especially if you are storing comma or semi-colon in
 cookies and have JavaScript code that parses and manipulates cookie values
 client-side.

@@ -133,7 +133,7 @@ New forms library
 
 ``django.newforms`` is Django's new form-handling library. It's a
 replacement for ``django.forms``, the old form/manipulator/validation
-framework.  Both APIs are available in 0.96, but over the next two
+framework. Both APIs are available in 0.96, but over the next two
 releases we plan to switch completely to the new forms system, and
 deprecate and remove the old system.
 
@@ -142,7 +142,7 @@ There are three elements to this transition:
 * We've copied the current ``django.forms`` to
   ``django.oldforms``. This allows you to upgrade your code *now*
   rather than waiting for the backwards-incompatible change and
-  rushing to fix your code after the fact.  Just change your
+  rushing to fix your code after the fact. Just change your
   import statements like this::
 
       from django import forms  # 0.95-style

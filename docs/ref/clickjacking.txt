@@ -6,7 +6,7 @@ Clickjacking Protection
    :synopsis: Protects against Clickjacking
 
 The clickjacking middleware and decorators provide easy-to-use protection
-against `clickjacking`_.  This type of attack occurs when a malicious site
+against `clickjacking`_. This type of attack occurs when a malicious site
 tricks a user into clicking on a concealed element of another site which they
 have loaded in a hidden frame or iframe.
 

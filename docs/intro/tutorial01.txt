@@ -91,7 +91,7 @@ These files are:
   read :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
-  project.  :doc:`/topics/settings` will tell you all about how settings
+  project. :doc:`/topics/settings` will tell you all about how settings
   work.
 
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a

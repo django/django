@@ -20,7 +20,7 @@ Python compatibility
 ====================
 
 Django 2.1 supports Python 3.5, 3.6, and 3.7. Django 2.0 is the last version to
-support Python 3.4.  We **highly recommend** and only officially support the
+support Python 3.4. We **highly recommend** and only officially support the
 latest release of each series.
 
 .. _whats-new-2.1:

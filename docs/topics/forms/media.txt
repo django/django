@@ -211,7 +211,7 @@ complete control over which files are inherited, and which are not.
 If you need to perform some more sophisticated manipulation of asset
 requirements, you can define the ``media`` property directly. This is
 done by defining a widget property that returns an instance of
-``forms.Media``.  The constructor for ``forms.Media`` accepts ``css``
+``forms.Media``. The constructor for ``forms.Media`` accepts ``css``
 and ``js`` keyword arguments in the same format as that used in a
 static media definition.
 

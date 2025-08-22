@@ -1300,7 +1300,7 @@ the parent, it's possible to move from the parent down to the child,
 as in the above example. However, this uses up the name that is the
 default :attr:`~django.db.models.ForeignKey.related_name` value for
 :class:`~django.db.models.ForeignKey` and
-:class:`~django.db.models.ManyToManyField` relations.  If you
+:class:`~django.db.models.ManyToManyField` relations. If you
 are putting those types of relations on a subclass of the parent model, you
 **must** specify the :attr:`~django.db.models.ForeignKey.related_name`
 attribute on each such field. If you forget, Django will raise a validation

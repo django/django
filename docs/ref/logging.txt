@@ -251,7 +251,7 @@ The security loggers will receive messages on any occurrence of
 :exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
 errors. There is a sub-logger for each subtype of security error, including all
 ``SuspiciousOperation``\s. The level of the log event depends on where the
-exception is handled.  Most occurrences are logged as a warning, while
+exception is handled. Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
 a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400

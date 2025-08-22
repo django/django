@@ -132,7 +132,7 @@ And the view::
 If the view is accessed from a ``GET`` request, an object list is returned in
 the response (using the ``book_list.html`` template). But if the client issues
 a ``HEAD`` request, the response has an empty body and the ``Last-Modified``
-header indicates when the most recent book was published.  Based on this
+header indicates when the most recent book was published. Based on this
 information, the client may or may not download the full object list.
 
 .. _async-class-based-views:

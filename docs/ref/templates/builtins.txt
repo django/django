@@ -137,7 +137,7 @@ this:
         </tr>
     {% endfor %}
 
-Variables included in the cycle will be escaped.  You can disable auto-escaping
+Variables included in the cycle will be escaped. You can disable auto-escaping
 with:
 
 .. code-block:: html+django
@@ -1754,32 +1754,32 @@ Format character  Description                               Example output
                   leading zeros.
 ``j``             Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
-``D``             Day of the week, textual, 3 letters.      ``'Fri'``
-``l``             Day of the week, textual, long.           ``'Friday'``
+``D``             Day of the week, textual, 3 letters. ``'Fri'``
+``l``             Day of the week, textual, long. ``'Friday'``
 ``S``             English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                   month, 2 characters.
 ``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-``z``             Day of the year.                          ``1`` to ``366``
+``z``             Day of the year. ``1`` to ``366``
 **Week**
 ``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
 **Month**
-``m``             Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-``n``             Month without leading zeros.              ``'1'`` to ``'12'``
-``M``             Month, textual, 3 letters.                ``'Jan'``
-``b``             Month, textual, 3 letters, lowercase.     ``'jan'``
+``m``             Month, 2 digits with leading zeros. ``'01'`` to ``'12'``
+``n``             Month without leading zeros. ``'1'`` to ``'12'``
+``M``             Month, textual, 3 letters. ``'Jan'``
+``b``             Month, textual, 3 letters, lowercase. ``'jan'``
 ``E``             Month, locale specific alternative
                   representation usually used for long
-                  date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-``F``             Month, textual, long.                     ``'January'``
+                  date representation. ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
+``F``             Month, textual, long. ``'January'``
 ``N``             Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                   style. Proprietary extension.
-``t``             Number of days in the given month.        ``28`` to ``31``
+``t``             Number of days in the given month. ``28`` to ``31``
 **Year**
-``y``             Year, 2 digits with leading zeros.        ``'00'`` to ``'99'``
-``Y``             Year, 4 digits with leading zeros.        ``'0001'``, ..., ``'1999'``, ..., ``'9999'``
-``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
+``y``             Year, 2 digits with leading zeros. ``'00'`` to ``'99'``
+``Y``             Year, 4 digits with leading zeros. ``'0001'``, ..., ``'1999'``, ..., ``'9999'``
+``L``             Boolean for whether it's a leap year. ``True`` or ``False``
 ``o``             ISO-8601 week-numbering year,             ``'1999'``
                   corresponding to the ISO-8601 week
                   number (W) which uses leap weeks. See Y
@@ -1789,16 +1789,16 @@ Format character  Description                               Example output
                   zeros.
 ``G``             Hour, 24-hour format without leading      ``'0'`` to ``'23'``
                   zeros.
-``h``             Hour, 12-hour format.                     ``'01'`` to ``'12'``
-``H``             Hour, 24-hour format.                     ``'00'`` to ``'23'``
-``i``             Minutes.                                  ``'00'`` to ``'59'``
-``s``             Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-``u``             Microseconds.                             ``000000`` to ``999999``
+``h``             Hour, 12-hour format. ``'01'`` to ``'12'``
+``H``             Hour, 24-hour format. ``'00'`` to ``'23'``
+``i``             Minutes. ``'00'`` to ``'59'``
+``s``             Seconds, 2 digits with leading zeros. ``'00'`` to ``'59'``
+``u``             Microseconds. ``000000`` to ``999999``
 ``a``             ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
                   this is slightly different than PHP's
                   output, because this includes periods
                   to match Associated Press style.)
-``A``             ``'AM'`` or ``'PM'``.                     ``'AM'``
+``A``             ``'AM'`` or ``'PM'``. ``'AM'``
 ``f``             Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                   with minutes left off if they're zero.
                   Proprietary extension.
@@ -1813,8 +1813,8 @@ Format character  Description                               Example output
                   depending on the datetime.
 ``I``             Daylight saving time, whether it's in     ``'1'`` or ``'0'``
                   effect or not.
-``O``             Difference to Greenwich time in hours.    ``'+0200'``
-``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
+``O``             Difference to Greenwich time in hours. ``'+0200'``
+``T``             Time zone of this machine. ``'EST'``, ``'MDT'``
 ``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``
                   offset for timezones west of UTC is
                   always negative, and for those east of

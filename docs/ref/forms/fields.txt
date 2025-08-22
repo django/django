@@ -713,15 +713,15 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: allow_files
 
-        Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
-        whether files in the specified location should be included.  Either this or
-        :attr:`allow_folders` must be ``True``.
+        Optional. Either ``True`` or ``False``. Default is ``True``. Specifies
+        whether files in the specified location should be included. Either this
+        or :attr:`allow_folders` must be ``True``.
 
     .. attribute:: allow_folders
 
-        Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
-        whether folders in the specified location should be included.  Either this or
-        :attr:`allow_files` must be ``True``.
+        Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
+        whether folders in the specified location should be included. Either
+        this or :attr:`allow_files` must be ``True``.
 
 
 ``FloatField``
@@ -1217,7 +1217,7 @@ Slightly complex built-in ``Field`` classes
     .. attribute:: fields
 
         A tuple of fields whose values are cleaned and subsequently combined
-        into a single value.  Each value of the field is cleaned by the
+        into a single value. Each value of the field is cleaned by the
         corresponding field in ``fields`` -- the first value is cleaned by the
         first field, the second value is cleaned by the second field, etc.
         Once all fields are cleaned, the list of clean values is combined into
@@ -1325,9 +1325,9 @@ Fields which handle relationships
 
 Two fields are available for representing relationships between
 models: :class:`ModelChoiceField` and
-:class:`ModelMultipleChoiceField`.  Both of these fields require a
+:class:`ModelMultipleChoiceField`. Both of these fields require a
 single ``queryset`` parameter that is used to create the choices for
-the field.  Upon form validation, these fields will place either one
+the field. Upon form validation, these fields will place either one
 model object (in the case of ``ModelChoiceField``) or multiple model
 objects (in the case of ``ModelMultipleChoiceField``) into the
 ``cleaned_data`` dictionary of the form.

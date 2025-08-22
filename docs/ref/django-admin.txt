@@ -1641,7 +1641,7 @@ This is useful in a number of ways:
   copy of a database that you'd like to interact with. You can dump your
   database to a :ref:`fixture <fixtures-explanation>` (using the
   :djadmin:`dumpdata` command, explained above), then use ``testserver`` to run
-  your web application with that data.  With this arrangement, you have the
+  your web application with that data. With this arrangement, you have the
   flexibility of messing up your data in any way, knowing that whatever data
   changes you're making are only being made to a test database.
 
@@ -1907,7 +1907,7 @@ Example usage:
 
 .. django-admin-option:: --no-color
 
-Disables colorized command output.  Some commands format their output to be
+Disables colorized command output. Some commands format their output to be
 colorized. For example, errors will be printed to the console in red and SQL
 statements will be syntax highlighted.
 

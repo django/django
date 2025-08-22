@@ -248,8 +248,8 @@ Minor features
 
 * The ``validate_max`` parameter was added to ``BaseFormSet`` and
   :func:`~django.forms.formsets.formset_factory`, and ``ModelForm`` and inline
-  versions of the same.  The behavior of validation for formsets with
-  ``max_num`` was clarified.  The previously undocumented behavior that
+  versions of the same. The behavior of validation for formsets with
+  ``max_num`` was clarified. The previously undocumented behavior that
   hardened formsets against memory exhaustion attacks was documented,
   and the undocumented limit of the higher of 1000 or ``max_num`` forms
   was changed so it is always 1000 more than ``max_num``.

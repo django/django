@@ -389,7 +389,7 @@ Context in year archive class-based views
 
 For consistency with the other date-based generic views,
 :class:`~django.views.generic.dates.YearArchiveView` now passes ``year`` in
-the context as a :class:`datetime.date` rather than a string.  If you are
+the context as a :class:`datetime.date` rather than a string. If you are
 using ``{{ year }}`` in your templates, you must replace it with ``{{
 year|date:"Y" }}``.
 

@@ -16,7 +16,7 @@ instructions for :ref:`installing the development version
 If you're using Linux or a Unix installation, such as OpenSolaris,
 check with your distributor to see if they already package Django. If
 you're using a Linux distro and don't know how to find out if a package
-is available, then now is a good time to learn.  The Django Wiki contains
+is available, then now is a good time to learn. The Django Wiki contains
 a list of `Third Party Distributions`_ to help you out.
 
 .. _`Third Party Distributions`: https://code.djangoproject.com/wiki/Distributions

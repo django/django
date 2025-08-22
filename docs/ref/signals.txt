@@ -40,8 +40,9 @@ model system.
     methods for these signals to be sent.
 
     Note also that Django stores signal handlers as weak references by default,
-    so if your handler is a local function, it may be garbage collected.  To
-    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    so if your handler is a local function, it may be garbage collected. To
+    prevent this, pass ``weak=False`` when you call the signal's
+    :meth:`~django.dispatch.Signal.connect`.
 
 .. note::
 
@@ -687,7 +688,7 @@ initiated.
    :module:
 
 Sent when the database wrapper makes the initial connection to the
-database.  This is particularly useful if you'd like to send any post
+database. This is particularly useful if you'd like to send any post
 connection commands to the SQL backend.
 
 Arguments sent with this signal:

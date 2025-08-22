@@ -604,9 +604,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: ModelBackend
 
-    This is the default authentication backend used by Django.  It
+    This is the default authentication backend used by Django. It
     authenticates using credentials consisting of a user identifier and
-    password.  For Django's default user model, the user identifier is the
+    password. For Django's default user model, the user identifier is the
     username, for custom user models it is the field specified by
     USERNAME_FIELD (see :doc:`Customizing Users and authentication
     </topics/auth/customizing>`).
@@ -751,8 +751,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: RemoteUserBackend
 
     Use this backend to take advantage of external-to-Django-handled
-    authentication.  It authenticates using usernames passed in
-    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    authentication. It authenticates using usernames passed in
+    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`. See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
 

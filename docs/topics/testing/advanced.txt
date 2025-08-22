@@ -560,7 +560,7 @@ and tear down the test suite.
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
 
-    ``parallel`` specifies the number of processes.  If ``parallel`` is greater
+    ``parallel`` specifies the number of processes. If ``parallel`` is greater
     than ``1``, the test suite will run in ``parallel`` processes. If there are
     fewer test case classes than configured processes, Django will reduce the
     number of processes accordingly. Each process gets its own database. This

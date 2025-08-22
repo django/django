@@ -1146,7 +1146,7 @@ If you want to manually associate file data with
 method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
-``content`` which is an object containing the file's contents.  The
+``content`` which is an object containing the file's contents. The
 optional ``save`` argument controls whether or not the model instance is
 saved after the file associated with this field has been altered. Defaults to
 ``True``.
@@ -1230,14 +1230,14 @@ directory on the filesystem. Has some special arguments, of which the first is
 
 .. attribute:: FilePathField.allow_files
 
-    Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
-    whether files in the specified location should be included.  Either this or
+    Optional. Either ``True`` or ``False``. Default is ``True``. Specifies
+    whether files in the specified location should be included. Either this or
     :attr:`~FilePathField.allow_folders` must be ``True``.
 
 .. attribute:: FilePathField.allow_folders
 
-    Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
-    whether folders in the specified location should be included.  Either this
+    Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
+    whether folders in the specified location should be included. Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
 
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
@@ -1528,7 +1528,7 @@ default length of 50.
 Implies setting :attr:`Field.db_index` to ``True``.
 
 It is often useful to automatically prepopulate a SlugField based on the value
-of some other value.  You can do this automatically in the admin using
+of some other value. You can do this automatically in the admin using
 :attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
 
 It uses :class:`~django.core.validators.validate_slug` or
@@ -1681,7 +1681,7 @@ See :attr:`ForeignKey.on_delete` for details on the second positional
 argument.
 
 A database index is automatically created on the ``ForeignKey``. You can
-disable this by setting :attr:`~Field.db_index` to ``False``.  You may want to
+disable this by setting :attr:`~Field.db_index` to ``False``. You may want to
 avoid the overhead of an index if you are creating a foreign key for
 consistency rather than joins, or if you will be creating an alternative index
 like a partial or multiple column index.

@@ -310,7 +310,7 @@ The core goals of Django's :doc:`cache framework </topics/cache>` are:
 Less code
 ---------
 
-A cache should be as fast as possible.  Hence, all framework code surrounding
+A cache should be as fast as possible. Hence, all framework code surrounding
 the cache backend should be kept to the absolute minimum, especially for
 ``get()`` operations.
 

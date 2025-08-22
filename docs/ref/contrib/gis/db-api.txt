@@ -141,7 +141,7 @@ Spatial Lookups
 ===============
 
 GeoDjango's lookup types may be used with any manager method like
-``filter()``, ``exclude()``, etc.  However, the lookup types unique to
+``filter()``, ``exclude()``, etc. However, the lookup types unique to
 GeoDjango are only available on spatial fields.
 
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
@@ -233,9 +233,9 @@ Introduction
 ------------
 
 Distance calculations with spatial data is tricky because, unfortunately,
-the Earth is not flat.  Some distance queries with fields in a geographic
+the Earth is not flat. Some distance queries with fields in a geographic
 coordinate system may have to be expressed differently because of
-limitations in PostGIS.  Please see the :ref:`selecting-an-srid` section
+limitations in PostGIS. Please see the :ref:`selecting-an-srid` section
 in the :doc:`model-api` documentation for more details.
 
 .. _distance-lookups-intro:
@@ -273,7 +273,7 @@ to be in the units of the field.
     In PostGIS, ``ST_Distance_Sphere`` does *not* limit the geometry types
     geographic distance queries are performed with. [#fndistsphere15]_  However,
     these queries may take a long time, as great-circle distances must be
-    calculated on the fly for *every* row in the query.  This is because the
+    calculated on the fly for *every* row in the query. This is because the
     spatial index on traditional geometry fields cannot be used.
 
     For much better performance on WGS84 distance queries, consider using

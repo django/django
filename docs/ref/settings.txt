@@ -311,9 +311,9 @@ keep the cookies in-memory instead of on persistent storage.
 
 Default: ``None``
 
-The domain to be used when setting the CSRF cookie.  This can be useful for
+The domain to be used when setting the CSRF cookie. This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
-site request forgery protection.  It should be set to a string such as
+site request forgery protection. It should be set to a string such as
 ``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 

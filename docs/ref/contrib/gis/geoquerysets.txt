@@ -13,7 +13,7 @@ The spatial lookups in this section are available for :class:`GeometryField`
 and :class:`RasterField`.
 
 For an introduction, see the :ref:`spatial lookups introduction
-<spatial-lookups-intro>`.  For an overview of what lookups are
+<spatial-lookups-intro>`. For an overview of what lookups are
 compatible with a particular spatial backend, refer to the
 :ref:`spatial lookup compatibility table <spatial-lookup-compatibility>`.
 
@@ -454,18 +454,18 @@ SpatiaLite  ``Overlaps(poly, geom)``
 MariaDB, Oracle, SpatiaLite, PGRaster (Conversion)
 
 Tests if the geometry field is spatially related to the lookup geometry by
-the values given in the given pattern.  This lookup requires a tuple parameter,
+the values given in the given pattern. This lookup requires a tuple parameter,
 ``(geom, pattern)``; the form of ``pattern`` will depend on the spatial backend:
 
 MariaDB, PostGIS, and SpatiaLite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On these spatial backends the intersection pattern is a string comprising
-nine characters, which  define intersections between  the interior, boundary,
-and exterior of the geometry field and the lookup geometry.
-The intersection pattern matrix may only use the following characters:
-``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
-a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
+On these spatial backends the intersection pattern is a string comprising nine
+characters, which  define intersections between  the interior, boundary, and
+exterior of the geometry field and the lookup geometry. The intersection
+pattern matrix may only use the following characters: ``1``, ``2``, ``T``,
+``F``, or ``*``. This lookup type allows users to "fine tune" a specific
+geometric relationship consistent with the DE-9IM model. [#fnde9im]_
 
 Geometry example::
 
@@ -503,7 +503,7 @@ Oracle
 Here the relation pattern is comprised of at least one of the nine relation
 strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``,
 ``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
-``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean
+``ANYINTERACT``. Multiple strings may be combined with the logical Boolean
 operator OR, for example, ``'inside+touch'``. [#fnsdorelate]_  The relation
 strings are case-insensitive.
 
@@ -894,7 +894,7 @@ use these aggregate functions, see :doc:`the topic guide on aggregation
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``tolerance``          This keyword is for Oracle only.  It is for the
+``tolerance``          This keyword is for Oracle only. It is for the
                        tolerance value used by the ``SDOAGGRTYPE``
                        procedure; the  `Oracle documentation`__ has more
                        details.

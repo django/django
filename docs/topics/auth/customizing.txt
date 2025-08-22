@@ -616,7 +616,7 @@ password resets. You must then provide some key implementation details:
     .. attribute:: is_active
 
         A boolean attribute that indicates whether the user is considered
-        "active".  This attribute is provided as an attribute on
+        "active". This attribute is provided as an attribute on
         ``AbstractBaseUser`` defaulting to ``True``. How you choose to
         implement it will depend on the details of your chosen auth backends.
         See the documentation of the :attr:`is_active attribute on the built-in
@@ -708,7 +708,7 @@ The following attributes and methods are available on any subclass of
 
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
-        Marks the user as having no password set.  This isn't the same as
+        Marks the user as having no password set. This isn't the same as
         having a blank string for a password.
         :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password` for this user
         will never return ``True``. Doesn't save the
