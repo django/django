@@ -11,6 +11,7 @@ from .models import (
     Inventory,
     Member,
     Profile,
+    RadioChild,
     ReleaseEvent,
     School,
     Student,
@@ -53,6 +54,10 @@ class SchoolAdmin(admin.ModelAdmin):
     filter_horizontal = ("alumni",)
 
 
+class RadioChildAdmin(admin.ModelAdmin):
+    radio_fields = {"parent": admin.VERTICAL}
+
+
 site = WidgetAdmin(name="widget-admin")
 
 site.register(User)
@@ -76,3 +81,5 @@ site.register(School, SchoolAdmin)
 site.register(Student)
 
 site.register(Profile)
+
+site.register(RadioChild, RadioChildAdmin)

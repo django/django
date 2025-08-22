@@ -2053,3 +2053,26 @@ class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
             self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
             True,
         )
+
+
+class RadioFieldWidgetWrapperTests(AdminWidgetSeleniumTestCase):
+    def test_radio_select_widget_no_edit_view_icons(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_radiochild_add")
+        )
+
+        # Wait for the radio list to be rendered
+        self.wait_until(
+            lambda d: d.find_element(By.CSS_SELECTOR, "#id_parent.radiolist")
+        )
+
+        # Change/view icons should not be present for radio fields
+        self.assertFalse(self.selenium.find_elements(By.ID, "change_id_parent"))
+        self.assertFalse(self.selenium.find_elements(By.ID, "view_id_parent"))
+
+        # add(+) is present
+        self.assertTrue(self.selenium.find_elements(By.ID, "add_id_parent"))
