@@ -310,7 +310,6 @@ class PartialTemplate:
         return template.get_exception_info(exception, token)
 
     def find_partial_source(self, full_source):
-        # Prefer parse-time offsets if available (debug mode) to avoid rescans.
         if (
             self._source_start is not None
             and self._source_end is not None
