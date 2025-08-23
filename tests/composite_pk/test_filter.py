@@ -615,13 +615,8 @@ class CompositePKExcludeNoneTests(TestCase):
         )
 
     def test_pk_in_with_partial_or_all_none(self):
-        test_cases = [
-            ("filter", [(1, None)], []),
-            ("filter", [(None, None)], []),
-            ("exclude", [(1, None)], [self.user]),
-            ("exclude", [(None, None)], [self.user]),
-        ]
-        for method, value, expected in test_cases:
-            with self.subTest(method=method, value=value):
-                qs = getattr(User.objects, method)(pk__in=value)
-                self.assertEqual(list(qs), expected)
+        qs = User.objects
+        self.assertQuerySetEqual(qs.filter(pk__in=[(1, None)]), [])
+        self.assertQuerySetEqual(qs.filter(pk__in=[(None, None)]), [])
+        self.assertQuerySetEqual(qs.exclude(pk__in=[(1, None)]), [self.user])
+        self.assertQuerySetEqual(qs.exclude(pk__in=[(None, None)]), [self.user])

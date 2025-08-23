@@ -25,6 +25,6 @@ Bugfixes
 * Fixed a crash in Django 5.2 when using a ``ManyToManyField`` on a model with
   a composite primary key, by extending the ``fields.E347`` system check
   (:ticket:`36530`).
-* Fixed a bug where exclude(field__in=[..., None]) didn’t exclude rows with
+
 * Fixed a bug where exclude(field__in=[..., None]) didn't exclude rows with
   NULL values. None is now handled explicitly with IS NULL/IS NOT NULL logic in SQL.
