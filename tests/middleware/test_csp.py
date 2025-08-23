@@ -106,6 +106,80 @@ class CSPMiddlewareTest(SimpleTestCase):
 
 
 @override_settings(
+    MIDDLEWARE=["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+    ROOT_URLCONF="middleware.urls",
+    SECURE_CSP=basic_config,
+    SECURE_CSP_REPORT_ONLY=basic_config,
+)
+class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
+    def test_no_decorators(self):
+        """
+        Test the base state.
+        """
+        response = self.client.get("/csp-base/")
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_disabled_enforced(self):
+        """
+        Test that `csp_disabled` disables the enforced header only.
+        """
+        response = self.client.get("/csp-disabled-enforced/")
+        self.assertNotIn(CSP.HEADER_ENFORCE, response)
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_disabled_report_only(self):
+        """
+        Test that `csp_disabled_report_only` disables the report-only
+        header only.
+        """
+        response = self.client.get("/csp-disabled-report-only/")
+        self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+
+    def test_csp_disabled_both(self):
+        """
+        Test that stacking decorators will clear both headers.
+        """
+        response = self.client.get("/csp-disabled/")
+        self.assertNotIn(CSP.HEADER_ENFORCE, response)
+        self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
+
+    def test_csp_override_enforced(self):
+        """
+        Test the `csp_override` decorator overrides the enforced header only.
+        """
+        response = self.client.get("/override-csp-enforced/")
+        self.assertEqual(
+            response[CSP.HEADER_ENFORCE], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_override_report_only(self):
+        """
+        Test the `csp_override_report_only` decorator overrides the report-only
+        header only.
+        """
+        response = self.client.get("/override-csp-report-only/")
+        self.assertEqual(
+            response[CSP.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+
+    def test_csp_override_both_decorator(self):
+        """
+        Test the stacking decorators overrides both CSP Django settings.
+        """
+        response = self.client.get("/override-csp-both/")
+        self.assertEqual(
+            response[CSP.HEADER_ENFORCE], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(
+            response[CSP.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+        )
+
+
+@override_settings(
     ROOT_URLCONF="middleware.urls",
     SECURE_CSP_REPORT_ONLY={
         "default-src": [CSP.NONE],

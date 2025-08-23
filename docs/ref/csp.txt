@@ -153,6 +153,88 @@ with the CSP specification.
       secure, random nonce that is generated for each request. See detailed
       explanation in :ref:`csp-nonce`.
 
+Decorators
+==========
+
+.. module:: django.views.decorators.csp
+
+The examples below assume you are using function-based views. If you
+are working with class-based views, you can refer to :ref:`Decorating
+class-based views<decorating-class-based-views>`.
+
+.. warning::
+
+    Weakening or excluding a CSP policy on any page can compromise the
+    security of the entire site. Due to the "same origin" policy, an
+    attacker can exploit a vulnerability on one page to access other parts
+    of the site.
+
+.. function:: csp_disabled(view)
+
+    Disables the enforced Content Security Policy header for this view. Example::
+
+        from django.http import HttpResponse
+        from django.views.decorators.csp import csp_disabled
+
+
+        @csp_disabled
+        def my_view(request):
+            return HttpResponse("This view will not have an enforced CSP header")
+
+.. function:: csp_disabled_report_only(view)
+
+    Disables the report-only Content Security Policy header for this view. Example::
+
+        from django.http import HttpResponse
+        from django.views.decorators.csp import csp_disabled_report_only
+
+
+        @csp_disabled_report_only
+        def my_view(request):
+            return HttpResponse("This view will not have a report-only CSP header")
+
+.. function:: csp_override(config)(view)
+
+    This decorator allows you to override the enforced Content Security Policy
+    header for a specific view.  It takes a dictionary as an argument, similar to
+    the ``SECURE_CSP`` setting. Example::
+
+        from django.http import HttpResponse
+        from django.utils.csp import CSP
+        from django.views.decorators.csp import csp_override
+
+
+        @csp_override(
+            {
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "data:"],
+            }
+        )
+        def my_view(request):
+            return HttpResponse("Enforced CSP header will be overridden")
+
+.. function:: csp_override_report_only(config)(view)
+
+    Overrides the report-only Content Security Policy header for this view. Example::
+
+        from django.http import HttpResponse
+        from django.utils.csp import CSP
+        from django.views.decorators.csp import csp_override_report_only
+
+
+        @csp_override_report_only(
+            {
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "data:"],
+            }
+        )
+        def my_view(request):
+            return HttpResponse("Report-only CSP header will be overridden")
+
+These decorators provide fine-grained control over the Content Security Policy
+on a per-view basis, allowing you to customize the policy as needed for specific
+parts of your application.
+
 .. _csp-nonce:
 
 Nonce usage
