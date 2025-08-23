@@ -1,3 +1,5 @@
+from collections import deque
+
 from django.db.models import Prefetch, prefetch_related_objects
 from django.test import TestCase
 
@@ -221,3 +223,73 @@ class PrefetchRelatedObjectsTests(TestCase):
 
         with self.assertNumQueries(0):
             self.assertCountEqual(book1.authors.all(), [self.author1, self.author2])
+
+    def test_prefetch_related_objects_with_various_iterables(self):
+        """
+        Test that prefetch_related_objects works with various iterables:
+        list, set, tuple, dict_values, empty iterable, and duplicate objects.
+        """
+        book = self.book1
+        # set
+        prefetch_related_objects({book}, "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # tuple
+        prefetch_related_objects((book,), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # dict_values
+        d = {"a": book}
+        prefetch_related_objects(d.values(), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # frozenset
+        prefetch_related_objects(frozenset([book]), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # generator
+        prefetch_related_objects((x for x in [book]), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # map
+        prefetch_related_objects(map(lambda x: x, [book]), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # filter
+        prefetch_related_objects(filter(lambda x: True, [book]), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+        # collections.deque
+        prefetch_related_objects(deque([book]), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+
+        # custom iterable
+        class MyIterable:
+            def __iter__(self_inner):
+                yield book
+
+        prefetch_related_objects(MyIterable(), "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
+
+        # empty iterable
+        prefetch_related_objects([], "authors")
+        prefetch_related_objects(set(), "authors")
+        prefetch_related_objects((), "authors")
+        prefetch_related_objects(frozenset(), "authors")
+        prefetch_related_objects({}.values(), "authors")
+        prefetch_related_objects((x for x in []), "authors")
+        prefetch_related_objects(map(lambda x: x, []), "authors")
+        prefetch_related_objects(filter(lambda x: True, []), "authors")
+        prefetch_related_objects(deque([]), "authors")
+        prefetch_related_objects([book, book, book], "authors")
