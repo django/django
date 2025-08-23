@@ -17,5 +17,11 @@ urlpatterns = [
     path("csp-report/", views.csp_report_view),
     path("csp-base/", views.empty_view),
     path("csp-nonce/", views.csp_nonce),
+    path("csp-disabled-both/", views.csp_disabled_both),
+    path("csp-disabled-enforced/", views.csp_disabled_enforced),
+    path("csp-disabled-report-only/", views.csp_disabled_ro),
+    path("csp-override-both/", views.csp_override_both),
+    path("csp-override-enforced/", views.csp_override_enforced),
+    path("csp-override-report-only/", views.csp_override_report_only),
     path("csp-500/", views.csp_500),
 ]
