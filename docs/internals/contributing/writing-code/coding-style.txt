@@ -46,11 +46,9 @@ Python style
 * Unless otherwise specified, follow :pep:`8`.
 
   Use :pypi:`flake8` to check for problems in this area. Note that our
-  ``.flake8`` file contains some excluded files (deprecated modules we don't
-  care about cleaning up and some third-party code that Django vendors) as well
-  as some excluded errors that we don't consider as gross violations. Remember
-  that :pep:`8` is only a guide, so respect the style of the surrounding code
-  as a primary goal.
+  ``.flake8`` file excludes some errors that we don't consider as gross
+  violations. Remember that :pep:`8` is only a guide, so respect the style of
+  the surrounding code as a primary goal.
 
   An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
   code to 79 characters if it means the code looks significantly uglier or is
