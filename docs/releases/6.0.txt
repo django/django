@@ -72,7 +72,8 @@ The resulting ``Content-Security-Policy`` header would be set to:
 
 To get started, follow the :doc:`CSP how-to guide </howto/csp>`. For in-depth
 guidance, see the :ref:`CSP security overview <security-csp>` and the
-:doc:`reference docs </ref/csp>`.
+:doc:`reference docs </ref/csp>`, which include details about decorators to
+override or disable policies on a per-view basis.
 
 Adoption of Python's modern email API
 -------------------------------------
