@@ -602,3 +602,26 @@ class CompositePKFilterTupleLookupFallbackTests(CompositePKFilterTests):
         )
         self.enterContext(feature_patch_1)
         self.enterContext(feature_patch_2)
+
+
+class CompositePKExcludeNoneTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tenant = Tenant.objects.create()
+        cls.user = User.objects.create(
+            tenant=cls.tenant,
+            id=1,
+            email="exclude@example.com",
+        )
+
+    def test_pk_in_with_partial_or_all_none(self):
+        test_cases = [
+            ("filter", [(1, None)], []),
+            ("filter", [(None, None)], []),
+            ("exclude", [(1, None)], [self.user]),
+            ("exclude", [(None, None)], [self.user]),
+        ]
+        for method, value, expected in test_cases:
+            with self.subTest(method=method, value=value):
+                qs = getattr(User.objects, method)(pk__in=value)
+                self.assertEqual(list(qs), expected)
