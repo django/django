@@ -6,6 +6,7 @@ from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
+from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
@@ -232,7 +233,7 @@ def get_ogr_db_string():
         return None
 
     # SQLite/SpatiaLite in-memory databases
-    if db["NAME"] == ":memory:":
+    if DatabaseCreation.is_in_memory_db(db["NAME"]):
         return None
 
     # Build the params of the OGR database connection string
