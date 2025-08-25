@@ -352,7 +352,7 @@ compatibility
 
         An optional string containing the MIME type of the stylesheet. If not
         specified, Django will attempt to guess it by using Python's
-        :py:func:`mimetypes.guess_type`. Use ``mimetype=None`` if you don't
+        :func:`mimetypes.guess_type`. Use ``mimetype=None`` if you don't
         want your stylesheet to have a MIME type specified.
 
     .. attribute:: media
@@ -532,7 +532,7 @@ compatibility
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
 
-    Because of the way the :py:ref:`descriptor protocol
+    Because of the way the :ref:`descriptor protocol
     <descriptor-invocation>` works, using ``del`` (or ``delattr``) on a
     ``cached_property`` that hasn't been accessed raises ``AttributeError``.
 
@@ -560,7 +560,7 @@ compatibility
 
 .. class:: classproperty(method=None)
 
-    Similar to :py:func:`@classmethod <classmethod>`, the ``@classproperty``
+    Similar to :func:`@classmethod <classmethod>`, the ``@classproperty``
     decorator converts the result of a method with a single ``cls`` argument
     into a property that can be accessed directly from the class.
 

@@ -113,7 +113,7 @@ Django provides a single API to control database transactions.
     durability and can be achieved by setting ``durable=True``. If the
     ``atomic`` block is nested within another it raises a ``RuntimeError``.
 
-    ``atomic`` is usable both as a :py:term:`decorator`::
+    ``atomic`` is usable both as a :term:`decorator`::
 
         from django.db import transaction
 
@@ -123,7 +123,7 @@ Django provides a single API to control database transactions.
             # This code executes inside a transaction.
             do_stuff()
 
-    and as a :py:term:`context manager`::
+    and as a :term:`context manager`::
 
         from django.db import transaction
 

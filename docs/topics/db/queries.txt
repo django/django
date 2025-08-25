@@ -1060,7 +1060,7 @@ representation of the JSON scalar ``null`` is the same as SQL ``NULL``, i.e.
 ``None``. Therefore, it can be hard to distinguish between them.
 
 This only applies to ``None`` as the top-level value of the field. If ``None``
-is inside a :py:class:`list` or :py:class:`dict`, it will always be interpreted
+is inside a :class:`list` or :class:`dict`, it will always be interpreted
 as JSON ``null``.
 
 When querying, ``None`` value will always be interpreted as JSON ``null``. To

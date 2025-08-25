@@ -312,7 +312,7 @@ Threadlocals and contextvars values are preserved across the boundary in both
 directions.
 
 :func:`async_to_sync` is essentially a more powerful version of the
-:py:func:`asyncio.run` function in Python's standard library. As well
+:func:`asyncio.run` function in Python's standard library. As well
 as ensuring threadlocals work, it also enables the ``thread_sensitive`` mode of
 :func:`sync_to_async` when that wrapper is used below it.
 

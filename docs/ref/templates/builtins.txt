@@ -1225,14 +1225,14 @@ attribute and calling the result ``country_list``.
 
 ``{% regroup %}`` produces a list (in this case, ``country_list``) of
 **group objects**. Group objects are instances of
-:py:func:`~collections.namedtuple` with two fields:
+:func:`~collections.namedtuple` with two fields:
 
 * ``grouper`` -- the item that was grouped by (e.g., the string "India" or
   "Japan").
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
 
-Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
+Because ``{% regroup %}`` produces :func:`~collections.namedtuple` objects,
 you can also write the previous example as:
 
 .. code-block:: html+django
@@ -1839,7 +1839,7 @@ For example:
 
     {{ value|date:"D d M Y" }}
 
-If ``value`` is a :py:class:`~datetime.datetime` object (e.g., the result of
+If ``value`` is a :class:`~datetime.datetime` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
@@ -2736,7 +2736,7 @@ specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date. If you need to format a ``date``
 value, use the :tfilter:`date` filter instead (or along with :tfilter:`time` if
-you need to render a full :py:class:`~datetime.datetime` value).
+you need to render a full :class:`~datetime.datetime` value).
 
 There is one exception the above rule: When passed a ``datetime`` value with
 attached timezone information (a :ref:`time-zone-aware
