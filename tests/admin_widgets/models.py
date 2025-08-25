@@ -213,3 +213,13 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class RadioParent(models.Model):
+    name = models.CharField("name", max_length=20)
+
+
+class RadioChild(models.Model):
+    parent = models.ForeignKey(
+        RadioParent, on_delete=models.CASCADE, related_name="children"
+    )
