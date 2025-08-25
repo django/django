@@ -1,0 +1,104 @@
+name: Coverage
+
+on:
+  pull_request_target:
+    paths:
+      - 'django/**/*.py'
+      - 'tests/**/*.py'
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  diff-coverage:
+    if: github.repository == 'django/django'
+    name: Diff Coverage (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -e .
+          python -m pip install 'coverage[toml]' diff-cover
+
+      - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}/tests
+          COVERAGE_PROCESS_START: ${{ github.workspace }}/tests/.coveragerc
+          RUNTESTS_DIR: ${{ github.workspace }}/tests
+        run: |
+          python -Wall tests/runtests.py -v2
+
+      - name: Generate coverage report
+        if: success()
+        env:
+          COVERAGE_RCFILE: ${{ github.workspace }}/tests/.coveragerc
+          RUNTESTS_DIR: ${{ github.workspace }}/tests
+        run: |
+          python -m coverage combine
+          python -m coverage report --show-missing
+          python -m coverage xml -o tests/coverage.xml
+
+      - name: Run diff-cover
+        if: success()
+        run: |
+          if (Test-Path 'tests/coverage.xml') {
+            diff-cover tests/coverage.xml --compare-branch=origin/main --fail-under=0 > tests/diff-cover-report.md
+          } else {
+            Set-Content -Path tests/diff-cover-report.md -Value 'No coverage.xml found; skipping diff-cover.'
+          }
+
+      - name: Post/update PR comment
+        if: success()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'tests/diff-cover-report.md';
+            let body = 'No coverage data available.';
+            if (fs.existsSync(reportPath)) {
+              body = fs.readFileSync(reportPath, 'utf8');
+            }
+            const commentBody = '### 📊 Coverage Report for Changed Files\n\n```\n' + body + '\n```\n\n**Note:** Missing lines are warnings only. Some lines may not be covered by SQLite tests as they are database-specific.\n\nFor more information about code coverage on pull requests, see the [contributing documentation](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests).';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            for (const c of comments) {
+              if ((c.body || '').includes('📊 Coverage Report for Changed Files')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody,
+            });
