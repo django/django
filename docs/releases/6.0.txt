@@ -70,6 +70,12 @@ The resulting ``Content-Security-Policy`` header would be set to:
 
     default-src 'self'; script-src 'self' 'nonce-SECRET'; img-src 'self' https:
 
+Per-view policy customization can be achieved via the
+:func:`~django.views.decorators.csp.csp_disabled`,
+:func:`~django.views.decorators.csp.csp_disabled_report_only`,
+:func:`~django.views.decorators.csp.csp_override`, and
+:func:`~django.views.decorators.csp.csp_override_report_only` decorators.
+
 To get started, follow the :doc:`CSP how-to guide </howto/csp>`. For in-depth
 guidance, see the :ref:`CSP security overview <security-csp>` and the
 :doc:`reference docs </ref/csp>`.
