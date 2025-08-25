@@ -244,3 +244,35 @@ attribute should be used instead:
         <django.db.models.fields.ForeignKey: product>,
         <django.db.models.fields.ForeignKey: order>
     ]
+
+Composite primary keys with Class-Based Views
+==============================================
+
+:class:`~django.views.generic.detail.DetailView` and related views
+automatically support composite primary keys::
+
+    # views.py
+    class OrderLineItemDetailView(DetailView):
+        model = OrderLineItem
+
+URL patterns are flexible - all primary key field names must be present as
+parameters, but order doesn't matter::
+
+    # urls.py
+    urlpatterns = [
+        path("item/<int:product_id>,<str:order_id>/", OrderLineItemDetailView.as_view()),
+        path("item/<int:product_id>/<str:order_id>/", OrderLineItemDetailView.as_view()),
+        path(
+            "order/<str:order_id>/item/<int:product_id>/", OrderLineItemDetailView.as_view()
+        ),
+        path(
+            "detail/item/<int:product_id>/from/order/<str:order_id>/",
+            OrderLineItemDetailView.as_view(),
+        ),
+    ]
+
+.. note::
+
+    All field names from :attr:`~django.db.models.options.Options.pk_fields`
+    must be present as URL parameters. No comma separators or specific ordering
+    required.
