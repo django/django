@@ -285,6 +285,10 @@ form .form-row p.datetime {
     right: 0;
 }
 
+.inline-group .tabular tr td.original a + a {
+  margin-right: 8px;
+}
+
 .selector .selector-chooser {
     margin: 0;
 }
