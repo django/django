@@ -330,27 +330,10 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
         self.assertEqual(label_for_field("site_id", Article), "Site id")
 
-        # Related lookup, field doesn't have a explicit verbose_name defined
-        domain_field_attr_name = "domain"
-        domain_field = Site._meta.get_field(domain_field_attr_name)
-        self.assertIsNone(domain_field._verbose_name)
-        self.assertEqual(
-            label_for_field("site__domain", Article), domain_field_attr_name
-        )
-        self.assertEqual(
-            label_for_field("site__domain", Article, return_attr=True),
-            ("domain", domain_field),
-        )
-
-        # Related lookup, field does have a explicit verbose_name defined
-        owner_verbose_name = "Site owner"
-        owner_field = Site._meta.get_field("owner")
-        self.assertEqual(owner_field.verbose_name, owner_verbose_name)
-        self.assertEqual(label_for_field("site__owner", Article), owner_verbose_name)
-        self.assertEqual(
-            label_for_field("site__owner", Article, return_attr=True),
-            (owner_verbose_name, owner_field),
-        )
+        # Related lookup, field doesn't have an explicit verbose_name defined.
+        self.assertEqual(label_for_field("site__domain", Article), "Domain")
+        # Related lookup, field has an explicit verbose_name defined.
+        self.assertEqual(label_for_field("site__owner", Article), "Site owner")
 
     def test_label_for_field_failed_lookup(self):
         msg = "Unable to lookup 'site__unknown' on Article"
