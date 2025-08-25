@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
