@@ -21,7 +21,7 @@ class LogEntryTests(TestCase):
         cls.user = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
-        cls.site = Site.objects.create(domain="example.org", owner="Tom")
+        cls.site = Site.objects.create(domain="example.org")
         cls.a1 = Article.objects.create(
             site=cls.site,
             title="Title",
@@ -148,7 +148,6 @@ class LogEntryTests(TestCase):
         )
         post_data = {
             "domain": "example.com",  # domain changed
-            "owner": "Tom",
             "admin_articles-TOTAL_FORMS": "5",
             "admin_articles-INITIAL_FORMS": "2",
             "admin_articles-MIN_NUM_FORMS": "0",
