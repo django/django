@@ -13,6 +13,8 @@ many projects they are typically the most commonly used views.
     While this view is executing, ``self.object`` will contain the object that
     the view is operating upon.
 
+    ``DetailView`` automatically supports :doc:`composite primary keys </topics/composite-primary-key>`.
+
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
