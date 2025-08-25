@@ -100,7 +100,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         """
         Test that the CSP headers are not added to the debug view.
         """
-        response = self.client.get("/csp-500/")
+        with self.assertLogs("django.request", "WARNING"):
+            response = self.client.get("/csp-500/")
         self.assertNotIn(CSP.HEADER_ENFORCE, response)
         self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
 
