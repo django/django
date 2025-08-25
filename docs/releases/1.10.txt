@@ -448,7 +448,7 @@ Requests and Responses
 * Added :class:`~django.http.HttpResponse` methods
   :meth:`~django.http.HttpResponse.readable` and
   :meth:`~django.http.HttpResponse.seekable` to make an instance a
-  stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
+  stream-like object and allow wrapping it with :class:`io.TextIOWrapper`.
 
 * Added the :attr:`HttpRequest.content_type
   <django.http.HttpRequest.content_type>` and

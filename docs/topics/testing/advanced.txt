@@ -587,7 +587,7 @@ and tear down the test suite.
 
     If ``buffer`` is ``True``, outputs from passing tests will be discarded.
 
-    If ``enable_faulthandler`` is ``True``, :py:mod:`faulthandler` will be
+    If ``enable_faulthandler`` is ``True``, :mod:`faulthandler` will be
     enabled.
 
     If ``timing`` is ``True``, test timings, including database setup and total
@@ -601,7 +601,7 @@ and tear down the test suite.
     :ref:`Grouping by test class <order-of-tests>` is preserved when using this
     option.
 
-    ``logger`` can be used to pass a Python :py:ref:`Logger object <logger>`.
+    ``logger`` can be used to pass a Python :ref:`Logger object <logger>`.
     If provided, the logger will be used to log messages instead of printing to
     the console. The logger object will respect its logging level rather than
     the ``verbosity``.
@@ -661,7 +661,7 @@ Methods
 
     Override this class method to add custom arguments accepted by the
     :djadmin:`test` management command. See
-    :py:meth:`argparse.ArgumentParser.add_argument` for details about adding
+    :meth:`argparse.ArgumentParser.add_argument` for details about adding
     arguments to a parser.
 
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)

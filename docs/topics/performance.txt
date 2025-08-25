@@ -204,7 +204,7 @@ therefore have performance implications, and the more expensive the work
 concerned, the more there is to gain through laziness.
 
 Python provides a number of tools for lazy evaluation, particularly through the
-:py:term:`generator` and :py:term:`generator expression` constructs. It's worth
+:term:`generator` and :term:`generator expression` constructs. It's worth
 reading up on laziness in Python to discover opportunities for making use of
 lazy patterns in your code.
 

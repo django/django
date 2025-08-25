@@ -951,7 +951,7 @@ Enabling JSON1 extension on SQLite
 ----------------------------------
 
 To use :class:`~django.db.models.JSONField` on SQLite, you need to enable the
-`JSON1 extension`_ on Python's :py:mod:`sqlite3` library. If the extension is
+`JSON1 extension`_ on Python's :mod:`sqlite3` library. If the extension is
 not enabled on your installation, a system error (``fields.E180``) will be
 raised.
 

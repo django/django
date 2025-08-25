@@ -536,7 +536,7 @@ Miscellaneous
 
 * :class:`~django.test.runner.DiscoverRunner` now returns a non-zero error code
   for unexpected successes from tests marked with
-  :py:func:`unittest.expectedFailure`.
+  :func:`unittest.expectedFailure`.
 
 * :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
   cookie like it does the CSRF token in the DOM.
@@ -608,7 +608,7 @@ Features deprecated in 4.1
 Log out via GET
 ---------------
 
-Logging out via ``GET`` requests to the :py:class:`built-in logout view
+Logging out via ``GET`` requests to the :class:`built-in logout view
 <django.contrib.auth.views.LogoutView>` is deprecated. Use ``POST`` requests
 instead.
 

@@ -965,7 +965,7 @@ It also provides an additional method:
     called before each test, negating the speed benefits.
 
     Objects assigned to class attributes in ``setUpTestData()`` must support
-    creating deep copies with :py:func:`copy.deepcopy` in order to isolate them
+    creating deep copies with :func:`copy.deepcopy` in order to isolate them
     from alterations performed by each test methods.
 
 .. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
