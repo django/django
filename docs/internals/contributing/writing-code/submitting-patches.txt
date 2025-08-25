@@ -438,6 +438,9 @@ All code changes
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?
+* If there is a :ref:`code coverage report <code-coverage-on-pull-requests>`
+  comment on the pull request, have you reviewed the missing coverage in
+  context (considering database/platform-specific limitations)?
 * If the change affects the Django admin or rendered HTML output, has
   :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 
