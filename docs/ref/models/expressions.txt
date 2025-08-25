@@ -563,7 +563,7 @@ values into their corresponding database type.
 
 If no :ref:`output_field<output-field>` is specified, it will be inferred from
 the type of the provided ``value`` for many common types. For example, passing
-an instance of :py:class:`datetime.datetime` as ``value`` defaults
+an instance of :class:`datetime.datetime` as ``value`` defaults
 ``output_field`` to :class:`~django.db.models.DateTimeField`.
 
 ``ExpressionWrapper()`` expressions
@@ -1094,7 +1094,7 @@ calling the appropriate methods on the wrapped expression.
 
         Tells Django which value should be returned when the expression is used
         to apply a function over an empty result set. Defaults to
-        :py:data:`NotImplemented` which forces the expression to be computed on
+        :data:`NotImplemented` which forces the expression to be computed on
         the database.
 
     .. attribute:: set_returning

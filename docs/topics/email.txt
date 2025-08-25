@@ -418,11 +418,11 @@ The class has the following methods:
 
   The keyword argument ``policy`` allows specifying the set of rules for
   updating and serializing the representation of the message. It must be an
-  :py:mod:`email.policy.Policy <email.policy>` object. Defaults to
-  :py:data:`email.policy.default`. In certain cases you may want to use
-  :py:data:`~email.policy.SMTP`, :py:data:`~email.policy.SMTPUTF8` or a custom
+  :mod:`email.policy.Policy <email.policy>` object. Defaults to
+  :data:`email.policy.default`. In certain cases you may want to use
+  :data:`~email.policy.SMTP`, :data:`~email.policy.SMTPUTF8` or a custom
   policy. For example, :class:`django.core.mail.backends.smtp.EmailBackend`
-  uses the :py:data:`~email.policy.SMTP` policy to ensure ``\r\n`` line endings
+  uses the :data:`~email.policy.SMTP` policy to ensure ``\r\n`` line endings
   as required by the SMTP protocol.
 
   If you ever need to extend Django's :class:`~django.core.mail.EmailMessage`
@@ -432,7 +432,7 @@ The class has the following methods:
   .. versionchanged:: 6.0
 
       The ``policy`` keyword argument was added and the return type was updated
-      to an instance of :py:class:`~email.message.EmailMessage`.
+      to an instance of :class:`~email.message.EmailMessage`.
 
 * ``recipients()`` returns a list of all the recipients of the message,
   whether they're recorded in the ``to``, ``cc`` or ``bcc`` attributes. This

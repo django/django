@@ -492,7 +492,7 @@ This view function serves static files in development.
 .. note::
 
     To guess the served files' content types, this view relies on the
-    :py:mod:`mimetypes` module from the Python standard library, which itself
+    :mod:`mimetypes` module from the Python standard library, which itself
     relies on the underlying platform's map files. If you find that this view
     doesn't return proper content types for certain files, it is most likely
     that the platform's map files are incorrect or need to be updated. This can

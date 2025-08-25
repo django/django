@@ -129,7 +129,7 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. Python :py:ref:`f-strings
+supported by ``gettext`` are supported by Django. Python :ref:`f-strings
 <f-strings>` cannot be used directly with ``gettext`` functions because
 f-string expressions are evaluated before they reach ``gettext``. This means
 ``_(f"Welcome {name}")`` will not work as expected, as the variable is

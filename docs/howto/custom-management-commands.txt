@@ -120,7 +120,7 @@ this::
             # ...
 
 The option (``delete`` in our example) is available in the options dict
-parameter of the handle method. See the :py:mod:`argparse` Python documentation
+parameter of the handle method. See the :mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
@@ -208,7 +208,7 @@ All attributes can be set in your derived class and can be used in
 
     If your command defines mandatory positional arguments, you can customize
     the message error returned in the case of missing arguments. The default is
-    output by :py:mod:`argparse` ("too few arguments").
+    output by :mod:`argparse` ("too few arguments").
 
 .. attribute:: BaseCommand.output_transaction
 

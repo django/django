@@ -79,15 +79,15 @@ Adoption of Python's modern email API
 
 Email handling in Django now uses Python's modern email API, introduced in
 Python 3.6. This API, centered around the
-:py:class:`email.message.EmailMessage` class, offers a cleaner and
+:class:`email.message.EmailMessage` class, offers a cleaner and
 Unicode-friendly interface for composing and sending emails. It replaces use of
 Python's older legacy (``Compat32``) API, which relied on lower-level MIME
-classes (from :py:mod:`email.mime`) and required more manual handling of
+classes (from :mod:`email.mime`) and required more manual handling of
 message structure and encoding.
 
 Notably, the return type of the :class:`EmailMessage.message()
 <django.core.mail.EmailMessage>` method is now an instance of Python's
-:py:class:`email.message.EmailMessage`. This supports the same API as the
+:class:`email.message.EmailMessage`. This supports the same API as the
 previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
 instance of those now-deprecated classes.
 
@@ -228,7 +228,7 @@ Email
 * The new ``policy`` argument for :class:`EmailMessage.message()
   <django.core.mail.EmailMessage>` allows specifying the email policy, the set
   of rules for updating and serializing the representation of the message.
-  Defaults to :py:data:`email.policy.default`.
+  Defaults to :data:`email.policy.default`.
 
 * :class:`EmailMessage.attach() <django.core.mail.EmailMessage>` now accepts a
   :class:`~email.message.MIMEPart` object from Python's modern email API.
@@ -439,7 +439,7 @@ Email
 
 * The undocumented ``encoding`` property of
   :class:`~django.core.mail.EmailMessage` no longer supports Python legacy
-  :py:class:`email.charset.Charset` objects.
+  :class:`email.charset.Charset` objects.
 
 * As the internal implementations of :class:`~django.core.mail.EmailMessage`
   and :class:`~django.core.mail.EmailMultiAlternatives` have changed
@@ -471,7 +471,7 @@ Miscellaneous
   at the end of the output, even without the ``indent`` option set.
 
 * The undocumented ``django.utils.http.parse_header_parameters()`` function is
-  refactored to use Python's :py:class:`email.message.Message` for parsing.
+  refactored to use Python's :class:`email.message.Message` for parsing.
   Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
 
 * Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
@@ -569,6 +569,9 @@ Miscellaneous
 
 * The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions are deprecated.
+
+* The ``django.utils.crypto.constant_time_compare()`` function is deprecated
+  because it is merely an alias of :func:`hmac.compare_digest`.
 
 Features removed in 6.0
 =======================

@@ -285,7 +285,7 @@ Models
 
 * The new :attr:`.Field.descriptor_class` attribute allows model fields to
   customize the get and set behavior by overriding their
-  :py:ref:`descriptors <descriptors>`.
+  :ref:`descriptors <descriptors>`.
 
 * :class:`~django.db.models.Avg` and :class:`~django.db.models.Sum` now support
   the ``distinct`` argument.

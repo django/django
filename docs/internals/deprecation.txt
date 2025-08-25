@@ -742,8 +742,8 @@ details on these changes.
 * The ability to use a dotted Python path for the ``LOGIN_URL`` and
   ``LOGIN_REDIRECT_URL`` settings will be removed.
 
-* Support for :py:mod:`optparse` will be dropped for custom management commands
-  (replaced by :py:mod:`argparse`).
+* Support for :mod:`optparse` will be dropped for custom management commands
+  (replaced by :mod:`argparse`).
 
 * The class ``django.core.management.NoArgsCommand`` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no

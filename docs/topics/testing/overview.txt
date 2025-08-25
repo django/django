@@ -83,7 +83,7 @@ your project's ``manage.py`` utility:
 
     $ ./manage.py test
 
-Test discovery is based on the unittest module's :py:ref:`built-in test
+Test discovery is based on the unittest module's :ref:`built-in test
 discovery <unittest-test-discovery>`. By default, this will discover tests in
 any file named ``test*.py`` under the current working directory.
 
