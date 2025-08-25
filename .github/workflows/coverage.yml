@@ -1,7 +1,7 @@
 name: Coverage (Trial)
 
 on:
-  pull_request:
+  pull_request_target:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
@@ -66,7 +66,7 @@ jobs:
           }
 
       - name: Post/update PR comment
-        if: success() && github.event_name == 'pull_request'
+        if: success() && github.event_name == 'pull_request_target'
         uses: actions/github-script@v7
         with:
           script: |
@@ -99,3 +99,4 @@ jobs:
               issue_number: context.issue.number,
               body: commentBody,
             });
+
