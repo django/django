@@ -234,8 +234,12 @@ majority of tickets have a severity of "Normal".
 Version
 -------
 
-It is possible to use the *version* attribute to indicate in which
-version the reported bug was identified.
+The *version* attribute indicates the version in which the bug was reproduced.
+During triage, it is helpful to update this field to the earliest supported
+version that reproduces the issue, but there is no need to make further updates
+when that version goes out of support. Avoid resetting the version to "dev"
+merely to indicate the issue still exists. Instead, reference the commit hash
+you tested in a comment.
 
 UI/UX
 -----
