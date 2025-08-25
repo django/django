@@ -384,6 +384,10 @@ input[type="submit"], button {
         padding: 15px;
     }
 
+    #content:has(.sidebar-trigger button.filter[aria-pressed="true"]) {
+        margin-bottom: 40vh;
+    }
+
     div.breadcrumbs {
         padding: 10px 15px;
     }
@@ -441,12 +445,27 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        height: 40vh;
         width: 100%;
-        margin-top: 30px;
+        overflow: scroll;
+    }
+
+    #changelist-filter.shifted {
+        display: block;
     }
 
     .object-tools {
         text-align: left;
+    }
+
+    /* SIDEBAR TRIGGER */
+
+    .sidebar-trigger {
+        display: block;
     }
 
     /* Forms */

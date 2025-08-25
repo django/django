@@ -23,6 +23,46 @@
         });
     }
 
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    let filterSidebarToggleRegistered = false;
+    function handleViewportChange(e) {
+        const toggleFilterSidebar = document.getElementById('toggle-filter-sidebar');
+        const filterSidebar = document.getElementById('changelist-filter');
+        if (e.matches) {
+            // Mobile
+            if (toggleFilterSidebar !== null) {
+                let filterSidebarIsOpen = localStorage.getItem('django.admin.filterSidebarIsOpen');
+                if (filterSidebarIsOpen === null) {
+                    filterSidebarIsOpen = 'true';
+                }
+                localStorage.setItem('django.admin.filterSidebarIsOpen', filterSidebarIsOpen);
+                filterSidebar.classList.toggle('shifted', filterSidebarIsOpen === 'true');
+                filterSidebar.setAttribute('aria-expanded', filterSidebarIsOpen);
+                toggleFilterSidebar.setAttribute('aria-pressed', filterSidebarIsOpen);
+
+                if (!filterSidebarToggleRegistered) {
+                    toggleFilterSidebar.addEventListener('click', function() {
+                        if (filterSidebarIsOpen === 'true') {
+                            filterSidebarIsOpen = 'false';
+                        } else {
+                            filterSidebarIsOpen = 'true';
+                        }
+                        localStorage.setItem('django.admin.filterSidebarIsOpen', filterSidebarIsOpen);
+                        filterSidebar.classList.toggle('shifted');
+                        filterSidebar.setAttribute('aria-expanded', filterSidebarIsOpen);
+                        toggleFilterSidebar.setAttribute('aria-pressed', filterSidebarIsOpen);
+                    });
+                    filterSidebarToggleRegistered = true;
+                }
+            }
+        } else {
+            // Tablet, Desktop
+            filterSidebar.removeAttribute('aria-expanded');
+        }
+    }
+    handleViewportChange(mediaQuery);
+    mediaQuery.addEventListener('change', handleViewportChange);
+
     function initSidebarQuickFilter() {
         const options = [];
         const navSidebar = document.getElementById('nav-sidebar');

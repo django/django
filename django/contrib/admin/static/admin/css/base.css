@@ -63,6 +63,9 @@ html[data-theme="light"],
     --object-tools-bg: var(--close-button-bg);
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
+    --sidebar-toggle-bg: #417690;
+    --sidebar-toggle-pressed-bg: #264b5d;
+
     --font-family-primary:
         "Segoe UI",
         system-ui,
@@ -828,7 +831,7 @@ a.deletelink:focus, a.deletelink:hover {
     border-radius: 15px;
 }
 
-.object-tools a:link, .object-tools a:visited {
+.object-tools a:link, .object-tools a:visited, .sidebar-trigger button {
     display: block;
     float: left;
     padding: 3px 12px;
