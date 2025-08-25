@@ -1434,7 +1434,7 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
 
 .. attribute:: JSONField.encoder
 
-    An optional :py:class:`json.JSONEncoder` subclass to serialize data types
+    An optional :class:`json.JSONEncoder` subclass to serialize data types
     not supported by the standard JSON serializer (e.g. ``datetime.datetime``
     or :class:`~python:uuid.UUID`). For example, you can use the
     :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
@@ -1443,7 +1443,7 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
 
 .. attribute:: JSONField.decoder
 
-    An optional :py:class:`json.JSONDecoder` subclass to deserialize the value
+    An optional :class:`json.JSONDecoder` subclass to deserialize the value
     retrieved from the database. The value will be in the format chosen by the
     custom encoder (most often a string). Your deserialization may need to
     account for the fact that you can't be certain of the input type. For
@@ -1458,7 +1458,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 .. admonition:: Default value
 
     If you give the field a :attr:`~django.db.models.Field.default`, ensure
-    it's a callable such as the :py:class:`dict` class or a function that
+    it's a callable such as the :class:`dict` class or a function that
     returns a fresh object each time. Incorrectly using a mutable object like
     ``default={}`` or ``default=[]`` creates a mutable default that is shared
     between all instances.
@@ -1483,8 +1483,8 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 .. admonition:: Oracle users
 
     Oracle Database does not support storing JSON scalar values. Only JSON
-    objects and arrays (represented in Python using :py:class:`dict` and
-    :py:class:`list`) are supported.
+    objects and arrays (represented in Python using :class:`dict` and
+    :class:`list`) are supported.
 
 ``PositiveBigIntegerField``
 ---------------------------
@@ -2440,7 +2440,7 @@ Field API reference
 
     .. attribute:: descriptor_class
 
-        A class implementing the :py:ref:`descriptor protocol <descriptors>`
+        A class implementing the :ref:`descriptor protocol <descriptors>`
         that is instantiated and assigned to the model instance attribute. The
         constructor must accept a single argument, the ``Field`` instance.
         Overriding this class attribute allows for customizing the get and set

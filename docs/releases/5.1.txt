@@ -382,7 +382,7 @@ Miscellaneous
 
 * ``django.utils.text.Truncator`` used by :tfilter:`truncatechars_html` and
   :tfilter:`truncatewords_html` template filters now uses
-  :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
+  :class:`html.parser.HTMLParser` subclasses. This results in a more robust
   and faster operation, but there may be small differences in the output.
 
 * The undocumented ``django.urls.converters.get_converter()`` function is

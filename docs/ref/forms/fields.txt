@@ -919,7 +919,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: encoder
 
-        A :py:class:`json.JSONEncoder` subclass to serialize data types not
+        A :class:`json.JSONEncoder` subclass to serialize data types not
         supported by the standard JSON serializer (e.g. ``datetime.datetime``
         or :class:`~python:uuid.UUID`). For example, you can use the
         :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
@@ -928,14 +928,14 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: decoder
 
-        A :py:class:`json.JSONDecoder` subclass to deserialize the input. Your
+        A :class:`json.JSONDecoder` subclass to deserialize the input. Your
         deserialization may need to account for the fact that you can't be
         certain of the input type. For example, you run the risk of returning a
         ``datetime`` that was actually a string that just happened to be in the
         same format chosen for ``datetime``\s.
 
         The ``decoder`` can be used to validate the input. If
-        :py:class:`json.JSONDecodeError` is raised during the deserialization,
+        :class:`json.JSONDecodeError` is raised during the deserialization,
         a ``ValidationError`` will be raised.
 
         Defaults to ``json.JSONDecoder``.

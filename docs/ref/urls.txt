@@ -95,7 +95,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
 The ``route`` argument should be a string or
 :func:`~django.utils.translation.gettext_lazy` (see
 :ref:`translating-urlpatterns`) that contains a regular expression compatible
-with Python's :py:mod:`re` module. Strings typically use raw string syntax
+with Python's :mod:`re` module. Strings typically use raw string syntax
 (``r''``) so that they can contain sequences like ``\d`` without the need to
 escape the backslash with another backslash. When a match is made, captured
 groups from the regular expression are passed to the view -- as named arguments
@@ -104,7 +104,7 @@ passed as strings, without any type conversion.
 
 When a ``route`` ends with ``$`` the whole requested URL, matching against
 :attr:`~django.http.HttpRequest.path_info`, must match the regular expression
-pattern (:py:func:`re.fullmatch` is used).
+pattern (:func:`re.fullmatch` is used).
 
 The ``view``, ``kwargs`` and ``name`` arguments are the same as for
 :func:`~django.urls.path`.

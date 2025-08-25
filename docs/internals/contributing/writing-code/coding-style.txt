@@ -56,8 +56,8 @@ Python style
   These limits are checked when ``flake8`` is run.
 
 * String variable interpolation may use
-  :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
-  <f-strings>`, or :py:meth:`str.format` as appropriate, with the goal of
+  :ref:`%-formatting <old-string-formatting>`, :ref:`f-strings
+  <f-strings>`, or :meth:`str.format` as appropriate, with the goal of
   maximizing code readability.
 
   Final judgments of readability are left to the Merger's discretion. As a
