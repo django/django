@@ -36,13 +36,12 @@ These functions make use of all of them.
 
 import base64
 import datetime
-import hmac
 import json
 import time
 import zlib
 
 from django.conf import settings
-from django.utils.crypto import salted_hmac
+from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
@@ -210,7 +209,7 @@ class Signer:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         for key in [self.key, *self.fallback_keys]:
-            if hmac.compare_digest(sig, self.signature(value, key)):
+            if constant_time_compare(sig, self.signature(value, key)):
                 return value
         raise BadSignature('Signature "%s" does not match' % sig)
 
