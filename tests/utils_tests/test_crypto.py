@@ -2,34 +2,25 @@ import hashlib
 import unittest
 
 from django.test import SimpleTestCase
-from django.test.utils import ignore_warnings
 from django.utils.crypto import (
     InvalidAlgorithm,
     constant_time_compare,
     pbkdf2,
     salted_hmac,
 )
-from django.utils.deprecation import RemovedInDjango70Warning
 
 
 class TestUtilsCryptoMisc(SimpleTestCase):
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_constant_time_compare(self):
         # It's hard to test for constant time, just test the result.
         self.assertTrue(constant_time_compare(b"spam", b"spam"))
         self.assertFalse(constant_time_compare(b"spam", b"eggs"))
         self.assertTrue(constant_time_compare("spam", "spam"))
         self.assertFalse(constant_time_compare("spam", "eggs"))
-
-    def test_constant_time_compare_deprecated(self):
-        msg = (
-            "constant_time_compare() is deprecated. "
-            "Use hmac.compare_digest() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
-            constant_time_compare(b"spam", b"spam")
-        self.assertEqual(ctx.filename, __file__)
+        self.assertTrue(constant_time_compare(b"spam", "spam"))
+        self.assertFalse(constant_time_compare("spam", b"eggs"))
+        self.assertTrue(constant_time_compare("ありがとう", "ありがとう"))
+        self.assertFalse(constant_time_compare("ありがとう", "おはよう"))
 
     def test_salted_hmac(self):
         tests = [

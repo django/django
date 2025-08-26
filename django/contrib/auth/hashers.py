@@ -2,7 +2,6 @@ import base64
 import binascii
 import functools
 import hashlib
-import hmac
 import importlib
 import math
 import warnings
@@ -13,7 +12,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils.crypto import RANDOM_STRING_CHARS, get_random_string, pbkdf2
+from django.utils.crypto import (
+    RANDOM_STRING_CHARS,
+    constant_time_compare,
+    get_random_string,
+    pbkdf2,
+)
 from django.utils.encoding import force_bytes, force_str
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
@@ -345,7 +349,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def verify(self, password, encoded):
         decoded = self.decode(encoded)
         encoded_2 = self.encode(password, decoded["salt"], decoded["iterations"])
-        return hmac.compare_digest(encoded, encoded_2)
+        return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
         decoded = self.decode(encoded)
@@ -529,7 +533,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         algorithm, data = encoded.split("$", 1)
         assert algorithm == self.algorithm
         encoded_2 = self.encode(password, data.encode("ascii"))
-        return hmac.compare_digest(encoded, encoded_2)
+        return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
         decoded = self.decode(encoded)
@@ -624,7 +628,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
             decoded["block_size"],
             decoded["parallelism"],
         )
-        return hmac.compare_digest(encoded, encoded_2)
+        return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
         decoded = self.decode(encoded)
@@ -677,7 +681,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def verify(self, password, encoded):
         decoded = self.decode(encoded)
         encoded_2 = self.encode(password, decoded["salt"])
-        return hmac.compare_digest(encoded, encoded_2)
+        return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
         decoded = self.decode(encoded)
