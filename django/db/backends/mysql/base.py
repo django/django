@@ -164,14 +164,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
         "exact": "= %s",
         "iexact": "LIKE %s",
-        "contains": "LIKE BINARY %s",
+        "contains": "LIKE %s COLLATE {bin_collation}",
         "icontains": "LIKE %s",
         "gt": "> %s",
         "gte": ">= %s",
         "lt": "< %s",
         "lte": "<= %s",
-        "startswith": "LIKE BINARY %s",
-        "endswith": "LIKE BINARY %s",
+        "startswith": "LIKE %s COLLATE {bin_collation}",
+        "endswith": "LIKE %s COLLATE {bin_collation}",
         "istartswith": "LIKE %s",
         "iendswith": "LIKE %s",
     }
@@ -184,16 +184,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     #
     # Note: we use str.format() here for readability as '%' is used as a
     # wildcard for the LIKE operator.
-    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
+    pattern_esc = r"REPLACE(REPLACE(REPLACE(%s, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
-        "contains": "LIKE BINARY CONCAT('%%', {}, '%%')",
-        "icontains": "LIKE CONCAT('%%', {}, '%%')",
-        "startswith": "LIKE BINARY CONCAT({}, '%%')",
-        "istartswith": "LIKE CONCAT({}, '%%')",
-        "endswith": "LIKE BINARY CONCAT('%%', {})",
-        "iendswith": "LIKE CONCAT('%%', {})",
+        "contains": "LIKE CONCAT('%%', %s, '%%') COLLATE {bin_collation}",
+        "icontains": "LIKE CONCAT('%%', %s, '%%')",
+        "startswith": "LIKE CONCAT(%s, '%%') COLLATE {bin_collation}",
+        "istartswith": "LIKE CONCAT(%s, '%%')",
+        "endswith": "LIKE CONCAT('%%', %s) COLLATE {bin_collation}",
+        "iendswith": "LIKE CONCAT('%%', %s)",
     }
-
     isolation_levels = {
         "read uncommitted",
         "read committed",

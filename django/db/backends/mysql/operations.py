@@ -384,11 +384,18 @@ class DatabaseOperations(BaseDatabaseOperations):
         # REGEXP_LIKE doesn't exist in MariaDB.
         if self.connection.mysql_is_mariadb:
             if lookup_type == "regex":
-                return "%s REGEXP BINARY %s"
+                return "%s REGEXP %s COLLATE {bin_collation}"
             return "%s REGEXP %s"
 
         match_option = "c" if lookup_type == "regex" else "i"
         return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
+    
+    def binary_collation(self, field=None):
+        collation = getattr(field, "db_collation", None)
+        if collation:
+            base = collation.split("_")[0]
+            return f"{base}_bin"
+        return "utf8mb4_bin"
 
     def insert_statement(self, on_conflict=None):
         if on_conflict == OnConflict.IGNORE:

@@ -593,15 +593,18 @@ class PatternLookup(BuiltinLookup):
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
         if hasattr(self.rhs, "as_sql") or self.bilateral_transforms:
-            pattern = connection.pattern_ops[self.lookup_name].format(
-                connection.pattern_esc
-            )
-            return pattern.format(rhs)
+            bin_collation = connection.ops.binary_collation(self.rhs)
+            pattern_template = connection.pattern_ops[self.lookup_name]
+            # Only replace the collation placeholder; leave %s alone
+            return pattern_template.format(bin_collation=bin_collation)
         else:
             return super().get_rhs_op(connection, rhs)
 
+
+
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
+        print("DEBUG SQL RHS:", rhs, "PARAMS:", params)
         if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
             params = (
                 self.param_pattern % connection.ops.prep_for_like_query(params[0]),
