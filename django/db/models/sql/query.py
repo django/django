@@ -1219,7 +1219,7 @@ class Query(BaseExpression):
             if "aggregate" in {frame.function for frame in inspect.stack()}:
                 stacklevel = 5
             else:
-                # annotate() and alias().
+                # annotate(), alias(), and values().
                 stacklevel = 6
             warnings.warn(
                 "Using percent signs in a column alias is deprecated.",
