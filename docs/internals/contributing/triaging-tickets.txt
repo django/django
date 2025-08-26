@@ -350,8 +350,7 @@ Then, you can help out by:
   "wontfix".
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
-  sparse to be actionable, or when they're feature requests requiring a
-  discussion on the `Django Forum`_.
+  sparse to be actionable.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"
   flags for tickets where they are incorrectly set.
