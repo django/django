@@ -1069,6 +1069,14 @@ class JSONFieldTests(TestCase):
 
         self.assertEqual(Model._meta.get_field("field").check(), [])
 
+    def test_valid_expression_default(self):
+        class Model(models.Model):
+            field = models.JSONField(
+                default=models.Value({"k": "v"}, models.JSONField())
+            )
+
+        self.assertEqual(Model._meta.get_field("field").check(), [])
+
 
 @isolate_apps("invalid_models_tests")
 class DbCommentTests(TestCase):

@@ -42,6 +42,7 @@ class CheckFieldDefaultMixin:
             self.has_default()
             and self.default is not None
             and not callable(self.default)
+            and not hasattr(self.default, "as_sql")
         ):
             return [
                 checks.Warning(
