@@ -1,7 +1,0 @@
-docker run --name mysql-django `
-  -e MYSQL_ROOT_PASSWORD=secret `
-  -e MYSQL_DATABASE=django `
-  -e MYSQL_USER=django `
-  -e MYSQL_PASSWORD=secret `
-  -p 3306:3306 `
-  -d mysql:8

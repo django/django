@@ -184,7 +184,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     #
     # Note: we use str.format() here for readability as '%' is used as a
     # wildcard for the LIKE operator.
-    pattern_esc = r"REPLACE(REPLACE(REPLACE(%s, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
+    pattern_esc = r"REPLACE(REPLACE(REPLACE(%s, '\\', '\\\\'), %s, %s), '_', '\\_')"
+
     pattern_ops = {
         "contains": "LIKE CONCAT('%%', %s, '%%') COLLATE {bin_collation}",
         "icontains": "LIKE CONCAT('%%', %s, '%%')",

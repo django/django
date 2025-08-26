@@ -592,15 +592,27 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
+        bin_collation = connection.ops.binary_collation(self.rhs)
+
         if hasattr(self.rhs, "as_sql") or self.bilateral_transforms:
-            bin_collation = connection.ops.binary_collation(self.rhs)
             pattern_template = connection.pattern_ops[self.lookup_name]
-            # Only replace the collation placeholder; leave %s alone
-            return pattern_template.format(bin_collation=bin_collation)
+            # Wrap the SQL expression with REPLACE(...), so wildcards get escaped
+            escaped_rhs = (
+                "REPLACE(REPLACE(REPLACE({rhs}, '\\\\', '\\\\\\\\'), '%%', '%%%%'), '_', '\\_')"
+            ).format(rhs=rhs)
+
+            sql = pattern_template.replace("%s", escaped_rhs).format(
+                bin_collation=bin_collation
+            )
+            print("DEBUG FINAL SQL TEMPLATE (expr):", sql)
+            return sql
         else:
-            return super().get_rhs_op(connection, rhs)
-
-
+            # Simple value → delegate, but patch in collation if needed
+            base = super().get_rhs_op(connection, rhs)
+            if "{bin_collation}" in base:
+                base = base.format(bin_collation=bin_collation)
+            print("DEBUG FINAL SQL TEMPLATE (fallback):", base)
+            return base
 
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
