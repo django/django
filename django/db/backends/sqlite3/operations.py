@@ -358,14 +358,32 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
-    def combine_expression(self, connector, sub_expressions):
+    def combine_expression(self, connector, sub_expressions, output_field=None):
         # SQLite doesn't have a ^ operator, so use the user-defined POWER
         # function that's registered in connect().
         if connector == "^":
             return "POWER(%s)" % ",".join(sub_expressions)
         elif connector == "#":
             return "BITXOR(%s)" % ",".join(sub_expressions)
-        return super().combine_expression(connector, sub_expressions)
+        elif connector == "/":
+            lhs, rhs = sub_expressions
+            # SQLite performs floating-point division. To ensure results match the
+            # expected output_field type:
+            # - For FloatField/DecimalField, ensure REAL division.
+            # - For other types (e.g. IntegerField), perform REAL division,
+            #   then ROUND and CAST to INTEGER to mimic integer division behavior.
+            if output_field and output_field.get_internal_type() in (
+                "FloatField",
+                "DecimalField",
+            ):
+                return f"CAST({lhs} AS REAL) / CAST({rhs} AS REAL)"
+            else:
+                return (
+                    f"CAST(ROUND(CAST({lhs} AS REAL) / CAST({rhs} AS REAL)) AS INTEGER)"
+                )
+        return super().combine_expression(
+            connector, sub_expressions, output_field=output_field
+        )
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
