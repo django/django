@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.mysql import lookups  # noqa: F401
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
@@ -164,14 +165,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
         "exact": "= %s",
         "iexact": "LIKE %s",
-        "contains": "LIKE %s COLLATE {bin_collation}",
+        "contains": "LIKE %s",
         "icontains": "LIKE %s",
         "gt": "> %s",
         "gte": ">= %s",
         "lt": "< %s",
         "lte": "<= %s",
-        "startswith": "LIKE %s COLLATE {bin_collation}",
-        "endswith": "LIKE %s COLLATE {bin_collation}",
+        "startswith": "LIKE %s",
+        "endswith": "LIKE %s",
         "istartswith": "LIKE %s",
         "iendswith": "LIKE %s",
     }
@@ -184,15 +185,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     #
     # Note: we use str.format() here for readability as '%' is used as a
     # wildcard for the LIKE operator.
-    pattern_esc = r"REPLACE(REPLACE(REPLACE(%s, '\\', '\\\\'), %s, %s), '_', '\\_')"
+    pattern_esc = (
+        "REPLACE("
+        "  REPLACE("
+        "    REPLACE({}, CHAR(92), CONCAT(CHAR(92), CHAR(92))),"
+        "    CHAR(37), CONCAT(CHAR(92), CHAR(37))"
+        "  ),"
+        "  CHAR(95), CONCAT(CHAR(92), CHAR(95))"
+        ")"
+    )
 
     pattern_ops = {
-        "contains": "LIKE CONCAT('%%', %s, '%%') COLLATE {bin_collation}",
-        "icontains": "LIKE CONCAT('%%', %s, '%%')",
-        "startswith": "LIKE CONCAT(%s, '%%') COLLATE {bin_collation}",
-        "istartswith": "LIKE CONCAT(%s, '%%')",
-        "endswith": "LIKE CONCAT('%%', %s) COLLATE {bin_collation}",
-        "iendswith": "LIKE CONCAT('%%', %s)",
+        "contains": "LIKE CONCAT('%%', {}, '%%')",
+        "icontains": "LIKE CONCAT('%%', {}, '%%')",
+        "startswith": "LIKE CONCAT({}, '%%')",
+        "istartswith": "LIKE CONCAT({}, '%%')",
+        "endswith": "LIKE CONCAT('%%', {})",
+        "iendswith": "LIKE CONCAT('%%', {})",
     }
     isolation_levels = {
         "read uncommitted",

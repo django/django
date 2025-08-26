@@ -592,31 +592,16 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        bin_collation = connection.ops.binary_collation(self.rhs)
-
         if hasattr(self.rhs, "as_sql") or self.bilateral_transforms:
-            pattern_template = connection.pattern_ops[self.lookup_name]
-            # Wrap the SQL expression with REPLACE(...), so wildcards get escaped
-            escaped_rhs = (
-                "REPLACE(REPLACE(REPLACE({rhs}, '\\\\', '\\\\\\\\'), '%%', '%%%%'), '_', '\\_')"
-            ).format(rhs=rhs)
-
-            sql = pattern_template.replace("%s", escaped_rhs).format(
-                bin_collation=bin_collation
+            pattern = connection.pattern_ops[self.lookup_name].format(
+                connection.pattern_esc
             )
-            print("DEBUG FINAL SQL TEMPLATE (expr):", sql)
-            return sql
+            return pattern.format(rhs)
         else:
-            # Simple value → delegate, but patch in collation if needed
-            base = super().get_rhs_op(connection, rhs)
-            if "{bin_collation}" in base:
-                base = base.format(bin_collation=bin_collation)
-            print("DEBUG FINAL SQL TEMPLATE (fallback):", base)
-            return base
+            return super().get_rhs_op(connection, rhs)
 
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
-        print("DEBUG SQL RHS:", rhs, "PARAMS:", params)
         if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
             params = (
                 self.param_pattern % connection.ops.prep_for_like_query(params[0]),

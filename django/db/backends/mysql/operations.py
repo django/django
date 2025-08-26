@@ -7,6 +7,7 @@ from django.db.models import Exists, ExpressionWrapper, Lookup
 from django.db.models.constants import OnConflict
 from django.utils import timezone
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 
@@ -40,6 +41,36 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     # EXTRACT format cannot be passed in parameters.
     _extract_format_re = _lazy_re_compile(r"[A-Z_]+")
+
+    @cached_property
+    def _connection_charset(self):
+        # Try OPTIONS['charset'], fall back to utf8mb4.
+        return self.connection.settings_dict.get("OPTIONS", {}).get(
+            "charset", "utf8mb4"
+        )
+
+    @cached_property
+    def _bin_collation_default(self):
+        """
+        Best-effort binary collation for the connection charset.
+
+        MySQL 8 often uses versioned collations (utf8mb4_0900_*),
+        MariaDB uses e.g. utf8mb4_bin. We prefer a conservative,
+        widely-available choice and fall back sensibly.
+        """
+        charset = self._connection_charset
+        if self.connection.mysql_is_mariadb:
+            return f"{charset}_bin"
+        # MySQL 8: prefer versioned utf8mb4_0900_bin if we're on utf8mb4.
+        if charset == "utf8mb4" and self.connection.mysql_version >= (8, 0, 0):
+            return "utf8mb4_0900_bin"
+        return f"{charset}_bin"
+
+    def collate_binary_sql(self, expr_sql):
+        """
+        Append a binary collation to an expression SQL fragment.
+        """
+        return f"{expr_sql} COLLATE {self._bin_collation_default}"
 
     def date_extract_sql(self, lookup_type, sql, params):
         # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
@@ -384,12 +415,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # REGEXP_LIKE doesn't exist in MariaDB.
         if self.connection.mysql_is_mariadb:
             if lookup_type == "regex":
-                return "%s REGEXP %s COLLATE {bin_collation}"
+                return "%s REGEXP BINARY %s"
             return "%s REGEXP %s"
 
         match_option = "c" if lookup_type == "regex" else "i"
         return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
-    
+
     def binary_collation(self, field=None):
         collation = getattr(field, "db_collation", None)
         if collation:
