@@ -14,13 +14,17 @@ permissions:
    contents: read
 
 jobs:
-  postgis-latest:
+  postgis:
     if: contains(github.event.pull_request.labels.*.name, 'geodjango')
     runs-on: ubuntu-latest
-    name: Latest PostGIS
+    strategy:
+      fail-fast: false
+      matrix:
+        postgis-version: [latest, "17-3.5-alpine", "17-master"]
+    name: PostGIS ${{ matrix.postgis-version }}
     services:
       postgres:
-        image: postgis/postgis:latest
+        image: postgis/postgis:${{ matrix.postgis-version }}
         env:
           POSTGRES_DB: geodjango
           POSTGRES_USER: user
