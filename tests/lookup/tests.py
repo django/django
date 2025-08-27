@@ -250,8 +250,8 @@ class LookupTests(TestCase):
 
     def test_in_bulk_preserve_ordering(self):
         self.assertEqual(
-            list(Article.objects.in_bulk([self.au2.id, self.au1.id])),
-            [self.au2.id, self.au1.id],
+            list(Article.objects.in_bulk([self.a2.id, self.a1.id])),
+            [self.a2.id, self.a1.id],
         )
 
     def test_in_bulk_preserve_ordering_with_batch_size(self):
