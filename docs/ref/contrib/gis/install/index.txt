@@ -8,7 +8,7 @@ In general, GeoDjango installation requires:
 
 #. :ref:`Python and Django <django>`
 #. :ref:`spatial_database`
-#. :doc:`geolibs`
+#. :ref:`geolibs-list`
 
 Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific

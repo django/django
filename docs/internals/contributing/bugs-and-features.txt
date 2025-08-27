@@ -55,7 +55,7 @@ particular:
   as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
-:doc:`triaging-tickets`.
+:ref:`triage-workflow`.
 
 Reporting user interface bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
