@@ -359,9 +359,8 @@ class FunctionTests(SimpleTestCase):
             "www.example.com</a>]",
         )
         self.assertEqual(
-            urlize("see test[at[example.com"),
-            'see <a href="https://test[at[example.com" rel="nofollow">'
-            "test[at[example.com</a>",
+            urlize("see test[at[example.com"),  # Invalid hostname.
+            "see test[at[example.com",
         )
         self.assertEqual(
             urlize("[http://168.192.0.1](http://168.192.0.1)"),
