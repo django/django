@@ -5,12 +5,14 @@ from os.path import abspath, dirname, splitext
 from unittest import mock
 
 from sphinxlint.checkers import (
+    _ROLE_BODY,
     _is_long_interpreted_text,
     _is_very_long_string_literal,
     _starts_with_anonymous_hyperlink,
     _starts_with_directive_or_hyperlink,
 )
 from sphinxlint.checkers import checker as sphinxlint_checker
+from sphinxlint.rst import SIMPLENAME
 from sphinxlint.sphinxlint import check_text
 from sphinxlint.utils import PER_FILE_CACHES, hide_non_rst_blocks
 
@@ -114,6 +116,24 @@ def check_line_too_long_django(file, lines, options=None):
                 ):
                     continue
             yield lno + 1, f"Line too long ({len(line) - 1}/{options.max_line_length})"
+
+
+_PYTHON_DOMAIN = re.compile(f":py:{SIMPLENAME}:`{_ROLE_BODY}`")
+
+
+@sphinxlint_checker(".rst", enabled=False, rst_only=True)
+def check_python_domain_in_roles(file, lines, options=None):
+    """
+    :py: indicates the Python language domain. This means code writen in
+    Python, not Python built-ins in particular.
+
+    Bad:    :py:class:`email.message.EmailMessage`
+    Good:   :class:`email.message.EmailMessage`
+    """
+    for lno, line in enumerate(lines, start=1):
+        role = _PYTHON_DOMAIN.search(line)
+        if role:
+            yield lno, f":py domain is the default and can be omitted {role.group(0)!r}"
 
 
 import sphinxlint  # noqa: E402
