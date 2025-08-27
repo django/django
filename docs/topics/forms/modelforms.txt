@@ -38,6 +38,8 @@ For example:
     >>> article = Article.objects.get(pk=1)
     >>> form = ArticleForm(instance=article)
 
+.. _model-form-field-types:
+
 Field types
 -----------
 
@@ -682,6 +684,8 @@ the field declaratively and setting its ``validators`` parameter::
 
     See the :doc:`form field documentation </ref/forms/fields>` for more
     information on fields and their arguments.
+
+.. _modelforms-enabling-localization-of-fields:
 
 Enabling localization of fields
 -------------------------------
