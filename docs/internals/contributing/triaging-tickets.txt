@@ -29,11 +29,13 @@ confusion or disagreement.
 Django is a community project, and every contribution helps. We can't do this
 without **you**!
 
+.. _triage-workflow:
+
 Triage workflow
 ===============
 
 Unfortunately, not all reports in the ticket tracker provide all the
-:doc:`required details<bugs-and-features>`. A number of tickets have proposed
+:ref:`required details <reporting-bugs>`. A number of tickets have proposed
 solutions, but those don't necessarily meet all the requirements :ref:`adhering
 to the guidelines for contributing <patch-style>`.
 
@@ -168,8 +170,8 @@ Has patch
 ---------
 
 This means the ticket has an associated solution. These will be reviewed to
-ensure they adhere to the :doc:`documented guidelines
-<writing-code/submitting-patches>`.
+ensure they adhere to the :ref:`documented guidelines
+<patch-review-checklist>`.
 
 The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.

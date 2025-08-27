@@ -47,7 +47,7 @@ Keep old patches up-to-date
 Oftentimes the codebase will change between a patch being submitted and the
 time it gets reviewed. Make sure it still applies cleanly and functions as
 expected. Updating a patch is both useful and important! See more on
-:doc:`writing-code/submitting-patches`.
+:ref:`patch-review-checklist`.
 
 Write some documentation
 ------------------------

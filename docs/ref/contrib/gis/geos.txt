@@ -5,6 +5,8 @@ GEOS API
 .. module:: django.contrib.gis.geos
     :synopsis: GeoDjango's high-level interface to the GEOS library.
 
+.. _geos-overview:
+
 Background
 ==========
 
