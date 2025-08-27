@@ -224,7 +224,7 @@ input[type="submit"], button {
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
         align-self: center;
-        margin-left: 15px;
+        margin-left: 0.5rem;
     }
 
     form .aligned div.radiolist {

@@ -302,7 +302,8 @@ p.datetime {
 }
 
 p.datetime label {
-    padding: 6px 0;
+    display: block;
+    padding: 0.5rem 0;
 }
 
 .datetime span {

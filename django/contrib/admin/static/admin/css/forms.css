@@ -113,6 +113,7 @@ fieldset .inline-heading,
 .aligned legend,
 .aligned label {
     display: block;
+    padding: 0.5rem 0;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
