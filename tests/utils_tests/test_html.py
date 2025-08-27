@@ -489,6 +489,7 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@localhost.",
             "test@example?;+!.com",
             "email me@example.com,then I'll respond",
+            "[a link](https://www.djangoproject.com/)",
             # trim_punctuation catastrophic tests
             "(" * 100_000 + ":" + ")" * 100_000,
             "(" * 100_000 + "&:" + ")" * 100_000,

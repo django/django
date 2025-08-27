@@ -10,7 +10,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
-from django.core.validators import EmailValidator
+from django.core.validators import DomainNameValidator, EmailValidator
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -296,7 +296,9 @@ class Urlizer:
 
     simple_url_re = _lazy_re_compile(r"^https?://\[?\w", re.IGNORECASE)
     simple_url_2_re = _lazy_re_compile(
-        r"^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$", re.IGNORECASE
+        rf"^www\.|^(?!http)(?:{DomainNameValidator.hostname_re})"
+        r"\.(com|edu|gov|int|mil|net|org)($|/.*)$",
+        re.IGNORECASE,
     )
     word_split_re = _lazy_re_compile(r"""([\s<>"']+)""")
 
