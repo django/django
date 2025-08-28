@@ -41,8 +41,15 @@ from django.db.models.fields.json import (
     KeyTransformTextLookupMixin,
 )
 from django.db.models.functions import Cast
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     CustomJSONDecoder,
@@ -229,6 +236,7 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(obj.value)
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_json_null_different_from_sql_null(self):
         json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
         NullableJSONModel.objects.update(value=Value(None, JSONField()))
@@ -242,6 +250,9 @@ class TestSaveLoad(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value=None),
+            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # with:
+            # [sql_null],
             [json_null],
         )
         self.assertSequenceEqual(
@@ -1335,3 +1346,17 @@ class JSONNullTests(TestCase):
         self.assertSequenceEqual(
             JSONNullDefaultModel.objects.filter(value__isnull=True), []
         )
+
+
+class JSONExactNoneDeprecationTests(TestCase):
+    def test_deprecated_json_exact_none(self):
+        msg = (
+            "Using None as the right-hand side of an exact lookup on JSONField to mean "
+            "JSON scalar 'null' is deprecated. Use JSONNull() instead."
+        )
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.filter(value=None),
+                [obj],
+            )
