@@ -253,6 +253,11 @@ Miscellaneous
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now match JSON ``null``,
+  to match the behavior of :lookup:`exact=None <exact>` on key transforms.
+  Previously, it was interpreted as an :lookup:`isnull` lookup.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1
