@@ -878,7 +878,7 @@ def yesno(value, arg=None):
         arg = gettext("yes,no,maybe")
     bits = arg.split(",")
     if len(bits) < 2:
-        return value  # Invalid arg.
+        bits = "yes,no,maybe".split(",")  # Fallback to default.
     try:
         yes, no, maybe = bits
     except ValueError:
