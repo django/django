@@ -2516,6 +2516,21 @@ them, but it has a few caveats:
 * If updating a large number of columns in a large number of rows, the SQL
   generated can be very large. Avoid this by specifying a suitable
   ``batch_size``.
+* When updating a large number of objects, be aware that ``bulk_update()``
+  prepares all of the ``WHEN`` clauses for every object across all batches
+  before executing any queries. This can require more memory than expected. To
+  reduce memory usage, you can use an approach like this::
+
+    from itertools import islice
+
+    batch_size = 100
+    ids_iter = range(1000)
+    while ids := list(islice(ids_iter, batch_size)):
+        batch = Entry.objects.filter(ids__in=ids)
+        for entry in batch:
+            entry.headline = f"Updated headline {entry.pk}"
+        Entry.objects.bulk_update(batch, ["headline"], batch_size=batch_size)
+
 * Updating fields defined on multi-table inheritance ancestors will incur an
   extra query per ancestor.
 * When an individual batch contains duplicates, only the first instance in that
