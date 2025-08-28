@@ -364,7 +364,24 @@ class BaseDatabaseOperations:
         return the SQL and params to append to the INSERT query. The returned
         fragment should contain a format string to hold the appropriate column.
         """
-        pass
+        if not fields:
+            return "", ()
+        columns = [
+            "%s.%s"
+            % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            for field in fields
+        ]
+        return "RETURNING %s" % ", ".join(columns), ()
+
+    def fetch_returned_insert_rows(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the tuple of returned data.
+        """
+        return cursor.fetchall()
 
     def compiler(self, compiler_name):
         """
