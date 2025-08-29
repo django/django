@@ -100,8 +100,8 @@ html[data-theme="dark"] {
 
 .theme-toggle svg {
     vertical-align: middle;
-    height: 1.5rem;
-    width: 1.5rem;
+    height: max(1.5rem, 24px);
+    width: max(1.5rem, 24px);
     display: none;
 }
 
