@@ -169,13 +169,16 @@ class CompositePKUpdateTests(TestCase):
         token_3 = Token.objects.get(pk=self.token_3.pk)
         self.assertEqual(token_3.secret, "bar")
 
-    def test_cant_update_to_unsaved_object(self):
+    def test_cant_update_relation(self):
         msg = (
-            "Unsaved model instance <User: User object ((None, None))> cannot be used "
-            "in an ORM query."
+            "Cannot update model field <django.db.models.fields.related.ForeignObject: "
+            "user> (only non-relations and foreign keys permitted)"
         )
 
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(FieldError, msg):
+            Comment.objects.update(user=self.user_1)
+
+        with self.assertRaisesMessage(FieldError, msg):
             Comment.objects.update(user=User())
 
     def test_cant_update_pk_field(self):
