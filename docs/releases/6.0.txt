@@ -364,6 +364,10 @@ Templates
   arguments, which must be mappings, such as :class:`~django.http.QueryDict`
   or :class:`dict`.
 
+* The :tfilter:`yesno` template filter now falls back to the default formatting
+  string when the provided formatting string is malformed; previously, it
+  returned the input value unmodified.
+
 Tests
 ~~~~~
 
