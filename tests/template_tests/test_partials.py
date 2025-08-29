@@ -248,10 +248,19 @@ INLINE-CONTENT
 {% endpartialdef %}"""
         self.assertEqual(partial_proxy.source.strip(), expected.strip())
 
-    def test_find_partial_source_nonexistent_partial(self):
-        partial = PartialTemplate(NodeList(), Origin("test"), "test")
-        result = partial.find_partial_source("some source", "nonexistent-partial")
-        self.assertEqual(result, "")
+    def test_find_partial_source_fallback_cases(self):
+        cases = {"None offsets": (None, None), "Out of bounds offsets": (10, 20)}
+        for name, (source_start, source_end) in cases.items():
+            with self.subTest(name):
+                partial = PartialTemplate(
+                    NodeList(),
+                    Origin("test"),
+                    "test",
+                    source_start=source_start,
+                    source_end=source_end,
+                )
+                result = partial.find_partial_source("nonexistent-partial")
+                self.assertEqual(result, "")
 
     @setup(
         {
@@ -264,7 +273,7 @@ INLINE-CONTENT
         template = self.engine.get_template("empty_partial_template")
         partial_proxy = template.extra_data["partials"]["empty"]
 
-        result = partial_proxy.find_partial_source(template.source, "empty")
+        result = partial_proxy.find_partial_source(template.source)
         self.assertEqual(result, "{% partialdef empty %}{% endpartialdef %}")
 
     @setup(
@@ -283,10 +292,10 @@ INLINE-CONTENT
         empty_proxy = template.extra_data["partials"]["empty"]
         other_proxy = template.extra_data["partials"]["other"]
 
-        empty_result = empty_proxy.find_partial_source(template.source, "empty")
+        empty_result = empty_proxy.find_partial_source(template.source)
         self.assertEqual(empty_result, "{% partialdef empty %}{% endpartialdef %}")
 
-        other_result = other_proxy.find_partial_source(template.source, "other")
+        other_result = other_proxy.find_partial_source(template.source)
         self.assertEqual(other_result, "{% partialdef other %}...{% endpartialdef %}")
 
     def test_partials_with_duplicate_names(self):
@@ -337,7 +346,7 @@ INLINE-CONTENT
         template = self.engine.get_template("named_end_tag_template")
         partial_proxy = template.extra_data["partials"]["thing"]
 
-        result = partial_proxy.find_partial_source(template.source, "thing")
+        result = partial_proxy.find_partial_source(template.source)
         self.assertEqual(
             result, "{% partialdef thing %}CONTENT{% endpartialdef thing %}"
         )
@@ -359,7 +368,7 @@ INLINE-CONTENT
         empty_proxy = template.extra_data["partials"]["outer"]
         other_proxy = template.extra_data["partials"]["inner"]
 
-        outer_result = empty_proxy.find_partial_source(template.source, "outer")
+        outer_result = empty_proxy.find_partial_source(template.source)
         self.assertEqual(
             outer_result,
             (
@@ -368,7 +377,7 @@ INLINE-CONTENT
             ),
         )
 
-        inner_result = other_proxy.find_partial_source(template.source, "inner")
+        inner_result = other_proxy.find_partial_source(template.source)
         self.assertEqual(inner_result, "{% partialdef inner %}...{% endpartialdef %}")
 
     @setup(
@@ -388,7 +397,7 @@ INLINE-CONTENT
         empty_proxy = template.extra_data["partials"]["outer"]
         other_proxy = template.extra_data["partials"]["inner"]
 
-        outer_result = empty_proxy.find_partial_source(template.source, "outer")
+        outer_result = empty_proxy.find_partial_source(template.source)
         self.assertEqual(
             outer_result,
             (
@@ -397,7 +406,7 @@ INLINE-CONTENT
             ),
         )
 
-        inner_result = other_proxy.find_partial_source(template.source, "inner")
+        inner_result = other_proxy.find_partial_source(template.source)
         self.assertEqual(
             inner_result, "{% partialdef inner %}...{% endpartialdef inner %}"
         )
@@ -419,7 +428,7 @@ INLINE-CONTENT
         empty_proxy = template.extra_data["partials"]["outer"]
         other_proxy = template.extra_data["partials"]["inner"]
 
-        outer_result = empty_proxy.find_partial_source(template.source, "outer")
+        outer_result = empty_proxy.find_partial_source(template.source)
         self.assertEqual(
             outer_result,
             (
@@ -428,7 +437,7 @@ INLINE-CONTENT
             ),
         )
 
-        inner_result = other_proxy.find_partial_source(template.source, "inner")
+        inner_result = other_proxy.find_partial_source(template.source)
         self.assertEqual(inner_result, "{% partialdef inner %}...{% endpartialdef %}")
 
     @setup(
@@ -448,7 +457,7 @@ INLINE-CONTENT
         empty_proxy = template.extra_data["partials"]["outer"]
         other_proxy = template.extra_data["partials"]["inner"]
 
-        outer_result = empty_proxy.find_partial_source(template.source, "outer")
+        outer_result = empty_proxy.find_partial_source(template.source)
         self.assertEqual(
             outer_result,
             (
@@ -457,7 +466,120 @@ INLINE-CONTENT
             ),
         )
 
-        inner_result = other_proxy.find_partial_source(template.source, "inner")
+        inner_result = other_proxy.find_partial_source(template.source)
         self.assertEqual(
             inner_result, "{% partialdef inner %}...{% endpartialdef inner %}"
         )
+
+    @setup(
+        {
+            "partial_embedded_in_verbatim": (
+                "{% verbatim %}\n"
+                "{% partialdef testing-name %}\n"
+                "{% endverbatim %}\n"
+                "{% partialdef testing-name %}\n"
+                "<p>Content</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_template_embedded_in_verbatim(self):
+        template = self.engine.get_template("partial_embedded_in_verbatim")
+        partial_template = template.extra_data["partials"]["testing-name"]
+        self.assertIn("Content", partial_template.source)
+
+    @setup(
+        {
+            "partial_debug_source": (
+                "{% partialdef testing-name %}\n"
+                "<p>Content</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_source_uses_offsets_in_debug(self):
+        template = self.engine.get_template("partial_debug_source")
+        partial_template = template.extra_data["partials"]["testing-name"]
+
+        self.assertIsInstance(partial_template._source_start, int)
+        self.assertIsInstance(partial_template._source_end, int)
+        expected = template.source[
+            partial_template._source_start : partial_template._source_end
+        ]
+        self.assertEqual(partial_template.source, expected)
+
+    @setup(
+        {
+            "partial_embedded_in_named_verbatim": (
+                "{% verbatim block1 %}\n"
+                "{% partialdef testing-name %}\n"
+                "{% endverbatim block1 %}\n"
+                "{% partialdef testing-name %}\n"
+                "<p>Named Content</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_template_embedded_in_named_verbatim(self):
+        template = self.engine.get_template("partial_embedded_in_named_verbatim")
+        partial_template = template.extra_data["partials"]["testing-name"]
+        self.assertIn("Named Content", partial_template.source)
+
+    @setup(
+        {
+            "partial_embedded_in_comment_block": (
+                "{% comment %}\n"
+                "{% partialdef testing-name %}\n"
+                "{% endcomment %}\n"
+                "{% partialdef testing-name %}\n"
+                "<p>Comment Content</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_template_embedded_in_comment_block(self):
+        template = self.engine.get_template("partial_embedded_in_comment_block")
+        partial_template = template.extra_data["partials"]["testing-name"]
+        self.assertIn("Comment Content", partial_template.source)
+
+    @setup(
+        {
+            "partial_embedded_in_inline_comment": (
+                "{# {% partialdef testing-name %} #}\n"
+                "{% partialdef testing-name %}\n"
+                "<p>Inline Comment Content</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_template_embedded_in_inline_comment(self):
+        template = self.engine.get_template("partial_embedded_in_inline_comment")
+        partial_template = template.extra_data["partials"]["testing-name"]
+        self.assertIn("Inline Comment Content", partial_template.source)
+
+    @setup(
+        {
+            "partial_contains_fake_end_inside_verbatim": (
+                "{% partialdef testing-name %}\n"
+                "{% verbatim %}{% endpartialdef %}{% endverbatim %}\n"
+                "<p>Body</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        test_once=True,
+        debug_only=True,
+    )
+    def test_partial_template_contains_fake_end_inside_verbatim(self):
+        template = self.engine.get_template("partial_contains_fake_end_inside_verbatim")
+        partial_template = template.extra_data["partials"]["testing-name"]
+        self.assertIn("Body", partial_template.source)
