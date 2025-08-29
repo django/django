@@ -2242,8 +2242,21 @@ class Query(BaseExpression):
                     join_info.joins,
                     join_info.path,
                 )
-                for target in targets:
-                    cols.append(join_info.transform_function(target, final_alias))
+                if len(targets) > 1:
+                    transformed_targets = [
+                        join_info.transform_function(target, final_alias)
+                        for target in targets
+                    ]
+                    cols.append(
+                        ColPairs(
+                            final_alias if self.alias_cols else None,
+                            [col.target for col in transformed_targets],
+                            [col.output_field for col in transformed_targets],
+                            join_info.final_field,
+                        )
+                    )
+                else:
+                    cols.append(join_info.transform_function(targets[0], final_alias))
             if cols:
                 self.set_select(cols)
         except MultiJoin:

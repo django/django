@@ -10,4 +10,6 @@ Django 5.2.6 fixes a security issue with severity "high" and several bugs in
 Bugfixes
 ========
 
-* ...
+* Fixed a bug where using ``QuerySet.values()`` or ``values_list()`` with a
+  ``ForeignObject`` composed of multiple fields returned incorrect results
+  instead of tuples of the referenced fields (:ticket:`36431`).
