@@ -72,6 +72,15 @@ class MigrationExecutor:
                         applied[migration] = self.loader.graph.nodes[migration]
         return plan
 
+    def _get_replaced_migration(self):
+        replaced_migration = set()
+        for replacement_key in self.loader.replacements:
+            migration = self.loader.graph.nodes.get(replacement_key)
+            if migration and hasattr(migration, "replaces"):
+                for replace in migration.replaces or []:
+                    replaced_migration.add(replace)
+        return replaced_migration
+
     def _create_project_state(self, with_applied_migrations=False):
         """
         Create a project state including all the applications without
@@ -88,8 +97,13 @@ class MigrationExecutor:
                 for key in self.loader.applied_migrations
                 if key in self.loader.graph.nodes
             }
+            replaced_migration = self._get_replaced_migration()
             for migration, _ in full_plan:
                 if migration in applied_migrations:
+                    if (migration.app_label, migration.name) in replaced_migration:
+                        # Skip replaced migration
+                        # because info is already included in the squashed migration
+                        continue
                     migration.mutate_state(state, preserve=False)
         return state
 
@@ -184,6 +198,7 @@ class MigrationExecutor:
         the plan.
         """
         migrations_to_run = {m[0] for m in plan}
+        unapply_migrations = set([i[0].app_label for i in plan])
         # Holds all migration states prior to the migrations being unapplied
         states = {}
         state = self._create_project_state()
@@ -192,6 +207,7 @@ class MigrationExecutor:
             for key in self.loader.applied_migrations
             if key in self.loader.graph.nodes
         }
+        replaced_migration = self._get_replaced_migration()
         if self.progress_callback:
             self.progress_callback("render_start")
         for migration, _ in full_plan:
@@ -213,6 +229,12 @@ class MigrationExecutor:
                 # Only mutate the state if the migration is actually applied
                 # to make sure the resulting state doesn't include changes
                 # from unrelated migrations.
+                if (
+                    (migration.app_label, migration.name) in replaced_migration
+                    and migration.app_label not in unapply_migrations
+                ):
+                    # Skip if it's a replaced migration and the app is unrelated
+                    continue
                 migration.mutate_state(state, preserve=False)
         if self.progress_callback:
             self.progress_callback("render_success")
