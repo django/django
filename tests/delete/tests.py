@@ -14,7 +14,10 @@ from .models import (
     A,
     Avatar,
     B,
+    Bar,
     Base,
+    Baz,
+    BazItem,
     Child,
     DeleteBottom,
     DeleteTop,
@@ -674,6 +677,15 @@ class DeletionTests(TestCase):
                     ctx.captured_queries[0]["sql"],
                 )
                 signal.disconnect(receiver, sender=Referrer)
+
+    def test_keep_parents_does_not_delete_proxy_related(self):
+        bar = Bar.objects.create()
+        baz = Baz.objects.get(pk=bar.pk)
+        BazItem.objects.create(baz=baz)
+
+        self.assertEqual(BazItem.objects.count(), 1)
+        bar.delete(keep_parents=True)
+        self.assertEqual(BazItem.objects.count(), 1)
 
 
 class FastDeleteTests(TestCase):
