@@ -72,7 +72,11 @@ Single object mixins
 
         Returns the single object that this view will display. If ``queryset``
         is provided, that queryset will be used as the source of objects;
-        otherwise, :meth:`get_queryset` will be used. ``get_object()`` looks
+        otherwise, :meth:`get_queryset` will be used. ``get_object()``
+        automatically supports :doc:`composite primary keys
+        </topics/composite-primary-key>`.
+
+        ``get_object()`` looks
         for a :attr:`pk_url_kwarg` argument in the arguments to the view; if
         this argument is found, this method performs a primary-key based lookup
         using that value. If this argument is not found, it looks for a
