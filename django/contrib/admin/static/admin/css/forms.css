@@ -43,7 +43,7 @@ legend, label {
 }
 
 .required legend, legend.required,
-.required label, label.required {
+.required label, label.required, span.required {
     font-weight: bold;
 }
 
@@ -120,7 +120,7 @@ fieldset .inline-heading,
     vertical-align: middle;
 }
 
-.aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
+.aligned label + div, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -155,6 +155,7 @@ form .aligned div.radiolist {
 
 form .aligned fieldset div.help {
     margin-left: 0;
+    padding-left: 0;
 }
 
 form .aligned p.help,
@@ -164,9 +165,9 @@ form .aligned div.help {
     padding-left: 10px;
 }
 
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
+form .aligned div.date div.help.timezonewarning,
+form .aligned div.datetime div.help.timezonewarning,
+form .aligned div.time div.help.timezonewarning {
     margin-left: 0;
     padding-left: 0;
     font-weight: normal;
@@ -460,6 +461,11 @@ body.popup .submit-row {
 
 .inline-group .tabular td {
     font-size: 1rem;
+}
+
+.inline-group .tabular td div:not(.help),
+.inline-group .tabular td a {
+    font-size: 0.8175rem;
 }
 
 .inline-group .tabular td.original p {
