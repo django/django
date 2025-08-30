@@ -1,3 +1,4 @@
+import datetime
 import string
 import uuid
 
@@ -74,6 +75,15 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.route, "books/<int:year>/<int:month>/<int:day>/")
         self.assertEqual(match.captured_kwargs, {"year": 2015, "month": 4, "day": 12})
         self.assertEqual(match.extra_kwargs, {"extra": True})
+
+    def test_path_lookup_with_iso_date(self):
+        match = resolve("/articles/2015-04-12/")
+        self.assertEqual(match.url_name, "articles-date")
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {"date": datetime.date(2015, 4, 12)})
+        self.assertEqual(match.route, "articles/<date:date>/")
+        self.assertEqual(match.captured_kwargs, {"date": datetime.date(2015, 4, 12)})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_path_lookup_with_extra_kwarg(self):
         match = resolve("/books/2007/")

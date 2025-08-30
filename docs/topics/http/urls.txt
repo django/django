@@ -134,6 +134,9 @@ The following path converters are available by default:
   ``'/'``. This allows you to match against a complete URL path rather than
   a segment of a URL path as with ``str``.
 
+* ``date`` - Matches any ISO8601 date string. For example ``2017-09-25``.
+  Returns a ``datetime.date`` instance.
+
 .. _registering-custom-path-converters:
 
 Registering custom path converters

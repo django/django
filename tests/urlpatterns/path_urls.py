@@ -13,6 +13,11 @@ urlpatterns = [
         views.empty_view,
         name="articles-year-month-day",
     ),
+    path(
+        "articles/<date:date>/",
+        views.empty_view,
+        name="articles-date",
+    ),
     path("books/2007/", views.empty_view, {"extra": True}, name="books-2007"),
     path(
         "books/<int:year>/<int:month>/<int:day>/",

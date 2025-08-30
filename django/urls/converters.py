@@ -1,5 +1,16 @@
+import datetime
 import functools
 import uuid
+
+
+class DateConverter:
+    regex = r"\d{4}-\d{2}-\d{2}"
+
+    def to_python(self, value: str) -> datetime.date:
+        return datetime.date.fromisoformat(value)
+
+    def to_url(self, value: datetime.date) -> str:
+        return value.isoformat()
 
 
 class IntConverter:
@@ -41,6 +52,7 @@ class PathConverter(StringConverter):
 
 
 DEFAULT_CONVERTERS = {
+    "date": DateConverter(),
     "int": IntConverter(),
     "path": PathConverter(),
     "slug": SlugConverter(),
