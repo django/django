@@ -241,3 +241,20 @@ class GenericDeleteBottomParent(models.Model):
     generic_delete_bottom = models.ForeignKey(
         GenericDeleteBottom, on_delete=models.CASCADE
     )
+
+
+class Foo(models.Model):
+    pass
+
+
+class Bar(Foo):
+    pass
+
+
+class Baz(Foo):
+    class Meta:
+        proxy = True
+
+
+class BazItem(models.Model):
+    baz = models.ForeignKey("Baz", on_delete=models.CASCADE)
