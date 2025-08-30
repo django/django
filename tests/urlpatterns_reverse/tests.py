@@ -18,7 +18,13 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import redirect
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.test import (
+    RequestFactory,
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    override_settings,
+)
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch,
@@ -37,6 +43,7 @@ from django.urls import (
     reverse_lazy,
 )
 from django.urls.resolvers import RegexPattern
+from django.utils.deprecation import RemovedInDjango61Warning
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -1557,12 +1564,15 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.resolver = URLResolver(RegexPattern(r"^$"), urlconf)
         self.callable_resolver = URLResolver(RegexPattern(r"^$"), urlconf_callables)
 
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_named_handlers(self):
         for code in [400, 403, 404, 500]:
             with self.subTest(code=code):
                 self.assertEqual(self.resolver.resolve_error_handler(code), empty_view)
 
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_callable_handlers(self):
+        # After Django 6.1 removal, only test with 'error_handler' and one code.
         for code in [400, 403, 404, 500]:
             with self.subTest(code=code):
                 self.assertEqual(
