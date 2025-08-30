@@ -48,6 +48,14 @@ class Comment(models.Model):
     text = models.TextField(default="", blank=True)
     integer = models.IntegerField(default=0)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(user__isnull=False),
+                name="user_not_null",
+            ),
+        ]
+
 
 class Post(models.Model):
     pk = models.CompositePrimaryKey("tenant_id", "id")
