@@ -503,6 +503,17 @@ body.popup .submit-row {
     font-size: 0.75rem;
 }
 
+.inline-group a.viewsitelink {
+    display: inline-block;
+    float: none;
+    line-height: 1rem;
+    white-space: nowrap;
+}
+
+.inline-group:has(a.inlinechangelink) a.viewsitelink{
+    margin: 0 0.75rem;
+}
+
 .empty-form {
     display: none;
 }
