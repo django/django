@@ -13,10 +13,13 @@ from .models import (
     ForConcreteModelModel,
     ForProxyModelModel,
     Gecko,
+    Idea,
     ManualPK,
     Mineral,
+    Note,
     ProxyRelatedModel,
     Rock,
+    Story,
     TaggedItem,
     ValuableRock,
     ValuableTaggedItem,
@@ -860,3 +863,17 @@ class TestInitWithNoneArgument(SimpleTestCase):
         # TaggedItem requires a content_type but initializing with None should
         # be allowed.
         TaggedItem(content_object=None)
+
+
+class GenericRelationQueryTests(TestCase):
+    def test_generic_relation_related_exact_lookup_incompatible_pk_types(self):
+        story = Story.objects.create(name="The Hobbit")
+        note1 = Note.objects.create(title="Fantastic fantasy", owner=story)
+        self.assertSequenceEqual(Note.objects.filter(story=story), [note1])
+        self.assertSequenceEqual(Note.objects.filter(story=story.pk), [note1])
+
+    def test_generic_relation_reverse_related_exact_lookup_incompatible_pk_types(self):
+        idea = Idea.objects.create(description="Eureka")
+        story = Story.objects.create(name="Bathtime Serendipity", inspiration=idea)
+        self.assertSequenceEqual(Idea.objects.filter(stories=story), [idea])
+        self.assertSequenceEqual(Idea.objects.filter(stories=story.pk), [idea])
