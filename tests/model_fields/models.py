@@ -422,6 +422,13 @@ class NullableJSONModel(models.Model):
         required_db_features = {"supports_json_field"}
 
 
+class JSONNullDefaultModel(models.Model):
+    value = models.JSONField(db_default=models.JSONNull())
+
+    class Meta:
+        required_db_features = {"supports_json_field", "supports_expression_defaults"}
+
+
 class RelatedJSONModel(models.Model):
     value = models.JSONField()
     json_model = models.ForeignKey(NullableJSONModel, models.CASCADE)
