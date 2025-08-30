@@ -138,6 +138,15 @@ class PartialTagsTests(TestCase):
         rendered_content = template_with_partial.render({})
         self.assertEqual("TEST-PARTIAL-CONTENT", rendered_content.strip())
 
+    def test_template_source_warning(self):
+        partial = engine.get_template("partial_examples.html#test-partial")
+        with self.assertWarnsMessage(
+            RuntimeWarning,
+            "PartialTemplate.source is only available when template "
+            "debugging is enabled.",
+        ):
+            self.assertEqual(partial.template.source, "")
+
 
 class RobustPartialHandlingTests(TestCase):
 
