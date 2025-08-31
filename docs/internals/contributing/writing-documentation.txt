@@ -483,7 +483,7 @@ define some extra description units:
 
 Django's documentation uses a custom ``console`` directive for documenting
 command-line examples involving ``django-admin``, ``manage.py``, ``python``,
-etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
+etc. In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
 For example, you can replace this fragment:
@@ -547,7 +547,7 @@ blank line and an optional description (indented).
 
 General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
-as the ``versionadded`` mentioned above.
+as the ``versionadded`` mentioned above).
 
 These ``versionadded`` and ``versionchanged`` blocks should be
 "self-contained." In other words, since we only keep these annotations around
