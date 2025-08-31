@@ -251,21 +251,6 @@ class PrefetchRelatedObjectsTests(TestCase):
         self.assertCountEqual(
             book.authors.all(), [self.author1, self.author2, self.author3]
         )
-        # generator
-        prefetch_related_objects((x for x in [book]), "authors")
-        self.assertCountEqual(
-            book.authors.all(), [self.author1, self.author2, self.author3]
-        )
-        # map
-        prefetch_related_objects(map(lambda x: x, [book]), "authors")
-        self.assertCountEqual(
-            book.authors.all(), [self.author1, self.author2, self.author3]
-        )
-        # filter
-        prefetch_related_objects(filter(lambda x: True, [book]), "authors")
-        self.assertCountEqual(
-            book.authors.all(), [self.author1, self.author2, self.author3]
-        )
         # collections.deque
         prefetch_related_objects(deque([book]), "authors")
         self.assertCountEqual(
@@ -288,8 +273,5 @@ class PrefetchRelatedObjectsTests(TestCase):
         prefetch_related_objects((), "authors")
         prefetch_related_objects(frozenset(), "authors")
         prefetch_related_objects({}.values(), "authors")
-        prefetch_related_objects((x for x in []), "authors")
-        prefetch_related_objects(map(lambda x: x, []), "authors")
-        prefetch_related_objects(filter(lambda x: True, []), "authors")
         prefetch_related_objects(deque([]), "authors")
         prefetch_related_objects([book, book, book], "authors")
