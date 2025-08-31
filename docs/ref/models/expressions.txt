@@ -1216,7 +1216,6 @@ values. It will return the first column or value that isn't ``NULL``.
 We'll start by defining the template to be used for SQL generation and
 an ``__init__()`` method to set some attributes::
 
-  import copy
   from django.db.models import Expression
 
 
