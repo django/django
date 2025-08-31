@@ -1052,8 +1052,7 @@ Storing and querying for ``None``
 
 As with other fields, storing ``None`` as the field's value will store it as
 SQL ``NULL``. While not recommended, it is possible to store JSON scalar
-``null`` instead of SQL ``NULL`` by using :class:`Value(None, JSONField())
-<django.db.models.Value>`.
+``null`` instead of SQL ``NULL`` by using ``JSONNull()`` expression.
 
 Whichever of the values is stored, when retrieved from the database, the Python
 representation of the JSON scalar ``null`` is the same as SQL ``NULL``, i.e.
@@ -1063,18 +1062,21 @@ This only applies to ``None`` as the top-level value of the field. If ``None``
 is inside a :class:`list` or :class:`dict`, it will always be interpreted
 as JSON ``null``.
 
-When querying, ``None`` value will always be interpreted as JSON ``null``. To
-query for SQL ``NULL``, use :lookup:`isnull`:
+When querying, :lookup:`isnull=True <isnull>` is used to match SQL ``NULL``,
+while exact-matching ``JSONNull()`` is used to match JSON ``null``.
+
+.. versionadded:: 6.0
+
+    ``JSONNull()`` expression was added.
 
 .. code-block:: pycon
 
+    >>> from django.db.models import JSONNull
     >>> Dog.objects.create(name="Max", data=None)  # SQL NULL.
     <Dog: Max>
-    >>> Dog.objects.create(name="Archie", data=Value(None, JSONField()))  # JSON null.
+    >>> Dog.objects.create(name="Archie", data=JSONNull())  # JSON null.
     <Dog: Archie>
-    >>> Dog.objects.filter(data=None)
-    <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value(None, JSONField()))
+    >>> Dog.objects.filter(data=JSONNull())
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
@@ -1089,6 +1091,16 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
+
+.. admonition:: Specifying a JSON ``null`` field default
+
+    ``JSONNull()`` can be used as a :attr:`~django.db.models.Field.db_default`.
+
+.. admonition:: Storing JSON ``null`` inside JSON data
+
+    While ``JSONNull()`` can be used in :fieldlookup:`~jsonfield.key` exact
+    lookups, it cannot be stored inside :class:`dict` or :class:`list`
+    instances meant to be saved in a ``JSONField``. Instead, use ``None``.
 
 .. fieldlookup:: jsonfield.key
 

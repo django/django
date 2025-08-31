@@ -586,6 +586,12 @@ Miscellaneous
 * The ``django.utils.crypto.constant_time_compare()`` function is deprecated
   because it is merely an alias of :func:`hmac.compare_digest`.
 
+* The use of ``None`` to mean a top-level JSON scalar ``null`` when querying
+  :class:`~django.db.models.JSONField` is deprecated in favor of the new
+  :class:`~django.db.models.JSONNull` expression. At the end of the deprecation
+  period, ``None`` values will match SQL ``IS NULL`` when used as the top-level
+  value. Key transform lookups are unaffected by this deprecation.
+
 Features removed in 6.0
 =======================
 

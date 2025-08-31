@@ -578,6 +578,14 @@ available on other expressions. ``ExpressionWrapper`` is necessary when using
 arithmetic on ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
 
+``JSONNull()`` expression
+-------------------------
+
+.. class:: JSONNull()
+
+Specialized expression to represent JSON scalar ``null`` on
+:class:`~django.db.models.JSONField`.
+
 Conditional expressions
 -----------------------
 
