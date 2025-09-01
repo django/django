@@ -401,6 +401,37 @@ documentation:
     Five
     ^^^^
 
+* Add headers for functions, classes, and methods in reference documentation:
+
+  - Each function, class, method, or attribute in reference documentation should
+    have a header using the appropriate heading level based on document hierarchy.
+  - The header should be rendered as fixed width text by wrapping it with
+    double backticks.
+  - Use the exact name of the item as the header text. Headers for functions
+    or methods should have brackets appended, e.g. ``patch_cache_control()``.
+  - Place the header directly above the documentation concerned.
+
+  For example:
+
+  .. code-block:: rst
+
+    ``patch_cache_control()``
+    -------------------------
+
+    .. function:: patch_cache_control(response, **kwargs)
+
+        This function patches the ``Cache-Control`` header.
+
+    ``get_max_age()``
+    -----------------
+
+    .. function:: get_max_age(response)
+
+        Returns the max-age from the response ``Cache-Control`` header.
+
+  This approach ensures that all individual items are listed in the table of contents
+  and improves accessibility for users of screen readers.
+
 * Use :rst:role:`:rfc:<rfc>` to reference a Request for Comments (RFC) and
   try to link to the relevant section if possible. For example, use
   ``:rfc:`2324#section-2.3.2``` or
