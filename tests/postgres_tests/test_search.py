@@ -7,6 +7,7 @@ transcript.
 """
 
 from django.db.models import F, Value
+from django.utils.safestring import SafeString
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
@@ -730,6 +731,42 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
             "<b>Bravely</b> bold <b>Sir</b> <b>Robin</b>, rode forth from "
             "Camelot. He was not afraid to die, o ",
             searched.headline,
+        )
+
+    def test_headline_sanitize_html(self):
+        dangerous_line = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='Foobar <script>console.log("danger");</script>',
+        )
+        dangerous_line.full_clean()
+
+        searched = Line.objects.annotate(
+            headline=SearchHeadline(
+                "dialogue",
+                SearchQuery("Foobar", config="english"),
+                highlight_all=False,
+            ),
+        ).get(pk=dangerous_line.pk)
+        self.assertNotIsInstance(searched.headline, SafeString)
+        self.assertEqual(
+            searched.headline,
+            '<b>Foobar</b>  console.log("danger"); ',
+            "When hightlight_all is False, PostgreSQL removes existing HTML tags",
+        )
+
+        searched = Line.objects.annotate(
+            headline=SearchHeadline(
+                "dialogue",
+                SearchQuery("Foobar", config="english"),
+                highlight_all=True,
+            ),
+        ).get(pk=dangerous_line.pk)
+        self.assertNotIsInstance(searched.headline, SafeString)
+        self.assertEqual(
+            searched.headline,
+            '<b>Foobar</b> <script>console.log("danger");</script>',
+            "When highlight_all is True, PostgreSQL riskily keeps existing HTML tags",
         )
 
     def test_headline_short_word_option(self):
