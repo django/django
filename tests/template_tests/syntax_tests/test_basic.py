@@ -2,6 +2,7 @@ from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -208,13 +209,28 @@ class BasicSyntaxTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template("basic-syntax23")
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=False)
     @setup({"basic-syntax24": "{{ moo\n }}"})
     def test_basic_syntax24(self):
         """
-        Embedded newlines make it not-a-tag.
+        Embedded newlines make it not-a-tag if not in multiline mode.
         """
         output = self.engine.render_to_string("basic-syntax24")
         self.assertEqual(output, "{{ moo\n }}")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove
+    # settings override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
+    @setup({"basic-syntax24-multiline": "{{ \nfoo\n }}"})
+    def test_basic_syntax24_multiline(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.engine.render_to_string(
+            "basic-syntax24-multiline", {"foo": "bar"}
+        )
+        self.assertEqual(output, "bar")
 
     # Literal strings are permitted inside variables, mostly for i18n
     # purposes.
@@ -325,6 +341,88 @@ class BasicSyntaxTests(SimpleTestCase):
             "basic-syntax38", {"var": {"callable": lambda: "foo bar"}}
         )
         self.assertEqual(output, "foo bar")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove
+    # settings override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
+    @setup(
+        {
+            "basic-syntax39-multiline": """
+                {% if
+                    foo
+                %}
+                    a
+                {%
+                    else
+                %}
+                    b
+                {%
+                    endif
+                %}
+                {#
+                    comment
+                #}
+                """
+        }
+    )
+    def test_basic_syntax39_multiline(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": True}
+        ).strip()
+        self.assertEqual(output, "a")
+        output = self.engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": False}
+        ).strip()
+        self.assertEqual(output, "b")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove
+    # settings override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
+    @setup(
+        {
+            "basic-syntax39-multiline": """
+                {{
+                    foo
+                        | upper
+                }}
+                """
+        }
+    )
+    def test_basic_syntax39_multiline_variable(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": "foo"}
+        ).strip()
+        self.assertEqual(output, "FOO")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove
+    # settings override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
+    @setup(
+        {
+            "basic-syntax39-multiline": """
+                {% with a=3
+                     b='bar'|upper
+                     c=foo|upper
+                %}
+                    {{ a }} {{ b }} {{ c }}
+                {% endwith %}
+                """
+        }
+    )
+    def test_basic_syntax39_multiline_complex_with(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": "foo"}
+        ).strip()
+        self.assertEqual(output, "3 BAR FOO")
 
     @setup({"template": "{% block content %}"})
     def test_unclosed_block(self):
