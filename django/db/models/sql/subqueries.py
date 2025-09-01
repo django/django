@@ -86,7 +86,16 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in values.items():
+            lookups, parts, _ = self.solve_lookup_type(lookup=name, summarize=False)
+            if parts:
+                name = parts[0]
             field = self.get_meta().get_field(name)
+            if lookups and not getattr(field, "allow_lookups_on_update", False):
+                raise FieldError(
+                    "Lookup updates are not allowed on model field %r." % field
+                )
+            if hasattr(field, "copy_with_lookups") and lookups:
+                field = field.copy_with_lookups(lookups)
             direct = (
                 not (field.auto_created and not field.concrete) or not field.concrete
             )

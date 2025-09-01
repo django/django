@@ -37,6 +37,8 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         if hasattr(self.base_field, "from_db_value"):
             self.from_db_value = self._from_db_value
         super().__init__(**kwargs)
+        self.allow_lookups_on_update = True
+        self._lookups = list()
 
     @property
     def model(self):
@@ -55,6 +57,14 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     @classmethod
     def _choices_is_value(cls, value):
         return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
+
+    @property
+    def lookups(self):
+        return self._lookups
+
+    @lookups.setter
+    def lookups(self, values):
+        self._lookups = values
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
@@ -122,7 +132,40 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         return db_params
 
     def get_placeholder(self, value, compiler, connection):
+        # Placeholder on slice or index updates cannot force default
+        # array type. Default placeholder is required.
+        if not isinstance(value, (list, tuple)):
+            return "%s"
         return "%s::{}".format(self.db_type(connection))
+
+    def copy_with_lookups(self, lookups):
+        """
+        Get field copy with prepared lookup values.
+
+        When every update value interacts with same ArrayField instance,
+        self.lookups will be shared in-memory. Copying field allows multiple
+        updates of the same field during single update query.
+        """
+        obj_copy = self.__copy__()
+        obj_copy.lookups = [self._prep_array_slice(lookup) for lookup in lookups]
+        return obj_copy
+
+    def as_sql(self, compiler, connection):
+        lhs = '"%s"' % self.column
+        params = list()
+        for array_slice in self.lookups:
+            if isinstance(array_slice, int):
+                lhs += "[%s]"
+                params.append(array_slice)
+
+            elif isinstance(array_slice, (list, tuple)):
+                if array_slice[1] is None:
+                    lhs += "[%s:]"
+                    params.append(array_slice[0])
+                else:
+                    lhs += "[%s:%s]"
+                    params.extend(array_slice)
+        return lhs, params
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
@@ -169,10 +212,8 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 values.append(base_field.value_to_string(obj))
         return json.dumps(values, ensure_ascii=False)
 
-    def get_transform(self, name):
-        transform = super().get_transform(name)
-        if transform:
-            return transform
+    @classmethod
+    def _prep_array_slice(cls, name):
         if "_" not in name:
             try:
                 index = int(name)
@@ -180,7 +221,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 pass
             else:
                 index += 1  # postgres uses 1-indexing
-                return IndexTransformFactory(index, self.base_field)
+                return index
         try:
             start, end = name.split("_")
             start = int(start) + 1
@@ -188,7 +229,20 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         except ValueError:
             pass
         else:
-            return SliceTransformFactory(start, end)
+            return start, end
+        return None
+
+    def get_transform(self, name):
+        transform = super().get_transform(name)
+        if transform:
+            return transform
+
+        array_slice = self._prep_array_slice(name)
+        if isinstance(array_slice, int):
+            return IndexTransformFactory(array_slice, self.base_field)
+        elif isinstance(array_slice, (list, tuple)):
+            return SliceTransformFactory(*array_slice)
+        return None
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)

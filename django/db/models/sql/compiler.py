@@ -2066,16 +2066,19 @@ class SQLUpdateCompiler(SQLCompiler):
                 placeholder = field.get_placeholder(val, self, self.connection)
             else:
                 placeholder = "%s"
-            name = field.column
+            name = qn(field.column)
+            if hasattr(field, "as_sql"):
+                sql, params = self.compile(field)
+                name = sql % (*params,)
             if hasattr(val, "as_sql"):
                 sql, params = self.compile(val)
-                values.append("%s = %s" % (qn(name), placeholder % sql))
+                values.append("%s = %s" % (name, placeholder % sql))
                 update_params.extend(params)
             elif val is not None:
-                values.append("%s = %s" % (qn(name), placeholder))
+                values.append("%s = %s" % (name, placeholder))
                 update_params.append(val)
             else:
-                values.append("%s = NULL" % qn(name))
+                values.append("%s = NULL" % name)
         table = self.query.base_table
         result = [
             "UPDATE %s SET" % qn(table),

@@ -124,6 +124,8 @@ class Field(RegisterLookupMixin):
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
 
+    allow_lookups_on_update = False
+
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
     # creates, creation_counter is used for all user-specified fields.
