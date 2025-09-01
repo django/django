@@ -267,11 +267,17 @@ class PrefetchRelatedObjectsTests(TestCase):
             book.authors.all(), [self.author1, self.author2, self.author3]
         )
 
-        # empty iterable
+        # empty iterable - should not raise any exceptions
+        # Test that prefetch_related_objects handles empty iterables gracefully
         prefetch_related_objects([], "authors")
         prefetch_related_objects(set(), "authors")
         prefetch_related_objects((), "authors")
         prefetch_related_objects(frozenset(), "authors")
         prefetch_related_objects({}.values(), "authors")
         prefetch_related_objects(deque([]), "authors")
+
+        # duplicate objects - should work correctly and not cause issues
         prefetch_related_objects([book, book, book], "authors")
+        self.assertCountEqual(
+            book.authors.all(), [self.author1, self.author2, self.author3]
+        )
