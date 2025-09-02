@@ -104,9 +104,10 @@ class LoginView(RedirectURLMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        """Security check complete. Log the user in."""
-        auth_login(self.request, form.get_user())
-        return HttpResponseRedirect(self.get_success_url())
+        user = form.get_user()
+        login(self.request, user)
+        redirect_url = self.request.GET.get('next', '/')
+        return HttpResponseRedirect(redirect_url) 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
