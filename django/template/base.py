@@ -53,6 +53,7 @@ times with multiple contexts)
 import inspect
 import logging
 import re
+import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
@@ -329,6 +330,13 @@ class PartialTemplate:
     @property
     def source(self):
         template = self.origin.loader.get_template(self.origin.template_name)
+        if not template.engine.debug:
+            warnings.warn(
+                "PartialTemplate.source is only available when template "
+                "debugging is enabled.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self.find_partial_source(template.source, self.name)
 
     def _render(self, context):
