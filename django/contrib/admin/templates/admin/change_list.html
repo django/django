@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_list %}
+{% load i18n admin_urls static admin_list admin_form %}
 
 {% block title %}{% if cl.formset and cl.formset.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrastyle %}
@@ -37,6 +37,43 @@
 {% endblock %}
 {% endif %}
 
+{% block pretitle %}
+{% if cl.formset and cl.formset.errors %}
+{% translate 'The following fields have errors:' as field_error_title %}
+<div class="errornote" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+  <h2 id="error-summary-title">
+    {% translate 'There is a problem' %}
+  </h2>
+  <div class="group">
+    <h3>
+      <span>{% if cl.formset.max_num == 1 %}{{ cl.opts.verbose_name|capfirst }}{% else %}{{ cl.opts.verbose_name_plural|capfirst }}{% endif %}</span>
+      {{ inline_admin_formset.formset.non_form_errors }}
+    </h3>
+    {% for form in cl.formset %}
+      {% if form.errors %}
+      <div class="inline">
+        <h4>
+          <span>{{ cl.opts.verbose_name|capfirst }}: #{{ forloop.counter }}</span>
+          {{ form.non_field_errors }}
+        </h4>
+        {% if form|has_field_errors %}
+        <p>{{ field_error_title }}</p>
+        <ul class="errorlist">
+          {% for field in form %}
+            {% if field.errors %}
+              <li><a href="#{{ field.id_for_label }}">{{ field.label }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block coltype %}{% endblock %}
 
 {% block content %}
@@ -48,12 +85,6 @@
           {% endblock %}
         </ul>
     {% endblock %}
-    {% if cl.formset and cl.formset.errors %}
-        <p class="errornote">
-        {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-        </p>
-        {{ cl.formset.non_form_errors }}
-    {% endif %}
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
       <div class="changelist-form-container">
         {% block filters %}

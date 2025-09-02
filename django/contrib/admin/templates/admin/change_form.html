@@ -24,6 +24,79 @@
 {% endblock %}
 {% endif %}
 
+{% block pretitle %}
+  {% block errornote %}
+  {% if errors %}
+    {% translate 'The following fields have errors:' as field_error_title %}
+    <div class="errornote" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+      <h2 id="error-summary-title">
+        {% translate 'There is a problem' %}
+      </h2>
+      {% if adminform.has_field_error or adminform.non_field_errors %}
+      <div class="group">
+        <h3>
+          <span>{{ opts.verbose_name|capfirst }}</span>
+          {{ adminform.form.non_field_errors }}
+        </h3>
+        {% if adminform.has_field_error %}
+        <p>{{ field_error_title }}</p>
+        <ul class="errorlist">
+          {% for fieldset in adminform %}
+            {% for line in fieldset %}
+              {% for field in line %}
+                {% if field.errors %}
+                  <li>
+                    <a href="#{{ field.field.id_for_label }}">{{ field.field.label }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% for inline_admin_formset in inline_admin_formsets %}
+        {% if inline_admin_formset.has_error %}
+        <div class="group">
+        <h3>
+          <span>{% if inline_admin_formset.formset.max_num == 1 %}{{ inline_admin_formset.opts.verbose_name|capfirst }}{% else %}{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}{% endif %}</span>
+          {{ inline_admin_formset.formset.non_form_errors }}
+        </h3>
+        {% endif %}
+        {% for inline_admin_form in inline_admin_formset %}
+        {% if not forloop.last %}
+          {% if inline_admin_form.has_error %}
+          <div class="inline">
+            <h4>
+              <span>{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %}{{ inline_admin_formset.opts.verbose_name|capfirst }}: #{{ forloop.counter }}{% endif %}</span>
+              {{ inline_admin_form.form.non_field_errors }}
+            </h4>
+            {% if inline_admin_form.has_field_error %}
+            <p>{{ field_error_title }}</p>
+            <ul class="errorlist">
+            {% for fieldset in inline_admin_form %}
+              {% for line in fieldset %}
+                {% for field in line %}
+                  {% if field.errors %}
+                    <li><a href="#{{ field.field.id_for_label }}">{{ field.field.label }}</a></li>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endif %}
+        {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% endblock %}
+{% endblock %}
+
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change and not is_popup %}
@@ -38,13 +111,8 @@
 <div>
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+{{ adminform.form.non_field_errors }}
 {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
-{% if errors %}
-    <p class="errornote">
-    {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-    </p>
-    {{ adminform.form.non_field_errors }}
-{% endif %}
 
 {% block field_sets %}
 {% for fieldset in adminform %}
