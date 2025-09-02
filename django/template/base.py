@@ -89,11 +89,6 @@ UNKNOWN_SOURCE = "<unknown source>"
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
-combined_partial_re = re.compile(
-    r"{%\s*partialdef\s+(?P<name>[\w-]+)(?:\s+inline)?\s*%}"
-    r"|{%\s*endpartialdef(?:\s+[\w-]+)?\s*%}"
-)
-
 logger = logging.getLogger("django.template")
 
 
@@ -301,29 +296,26 @@ class PartialTemplate:
     Wraps nodelist as a partial, in order to be able to bind context.
     """
 
-    def __init__(self, nodelist, origin, name):
+    def __init__(self, nodelist, origin, name, source_start=None, source_end=None):
         self.nodelist = nodelist
         self.origin = origin
         self.name = name
+        # If available (debug mode), the absolute character offsets in the
+        # template.source correspond to the full partial region.
+        self._source_start = source_start
+        self._source_end = source_end
 
     def get_exception_info(self, exception, token):
         template = self.origin.loader.get_template(self.origin.template_name)
         return template.get_exception_info(exception, token)
 
-    def find_partial_source(self, full_source, partial_name):
-        start_match = None
-        nesting = 0
-
-        for match in combined_partial_re.finditer(full_source):
-            if name := match["name"]:  # Opening tag.
-                if start_match is None and name == partial_name:
-                    start_match = match
-                if start_match is not None:
-                    nesting += 1
-            elif start_match is not None:
-                nesting -= 1
-                if nesting == 0:
-                    return full_source[start_match.start() : match.end()]
+    def find_partial_source(self, full_source):
+        if (
+            self._source_start is not None
+            and self._source_end is not None
+            and 0 <= self._source_start <= self._source_end <= len(full_source)
+        ):
+            return full_source[self._source_start : self._source_end]
 
         return ""
 
@@ -337,7 +329,7 @@ class PartialTemplate:
                 RuntimeWarning,
                 stacklevel=2,
             )
-        return self.find_partial_source(template.source, self.name)
+        return self.find_partial_source(template.source)
 
     def _render(self, context):
         return self.nodelist.render(context)
