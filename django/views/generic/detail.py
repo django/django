@@ -30,6 +30,22 @@ class SingleObjectMixin(ContextMixin):
         if queryset is None:
             queryset = self.get_queryset()
 
+        # Next, try looking up by composite primary key.
+        pk_fields = getattr(queryset.model._meta, "pk_fields", None)
+        if (
+            pk_fields
+            and len(pk_fields) > 1
+            and all(f.attname in self.kwargs for f in pk_fields)
+        ):
+            lookups = {f.attname: self.kwargs[f.attname] for f in pk_fields}
+            try:
+                return queryset.get(**lookups)
+            except queryset.model.DoesNotExist:
+                raise Http404(
+                    _("No %(verbose_name)s found matching the query")
+                    % {"verbose_name": queryset.model._meta.verbose_name}
+                )
+
         # Next, try looking up by primary key.
         pk = self.kwargs.get(self.pk_url_kwarg)
         slug = self.kwargs.get(self.slug_url_kwarg)

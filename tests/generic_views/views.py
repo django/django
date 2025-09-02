@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 
 from .forms import AuthorForm, ConfirmDeleteForm, ContactForm
-from .models import Artist, Author, Book, BookSigning, Page
+from .models import Artist, Author, Book, BookSigning, Item, Page
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -350,3 +350,8 @@ class LateValidationView(generic.FormView):
     def form_valid(self, form):
         form.add_error(None, "There is an error")
         return self.form_invalid(form)
+
+
+class ItemDetail(generic.DetailView):
+    template_name = "generic_views/detail.html"
+    model = Item
