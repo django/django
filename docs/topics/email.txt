@@ -662,8 +662,6 @@ Obtaining an instance of an email backend
 The :meth:`get_connection` function in ``django.core.mail`` returns an
 instance of the email backend that you can use.
 
-.. currentmodule:: django.core.mail
-
 .. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
