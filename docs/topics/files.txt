@@ -292,27 +292,38 @@ need to override the :setting:`STORAGES` setting in tests, you should use a
     class MyModel(models.Model):
         upload = models.FileField(storage=my_storage)
 
-The ``LazyObject`` delays the evaluation of the storage until it's actually needed, allowing :func:`~django.test.override_settings` to take effect::
+The ``LazyObject`` delays the evaluation of the storage until it's actually
+needed, allowing :func:`~django.test.override_settings` to take effect::
+
+    @override_settings(
+        STORAGES={
+            "mystorage": {
+                "BACKEND": "django.core.files.storage.InMemoryStorage",
+            }
+        }
+    )
+    def test_storage():
+        model = MyModel()
+        assert isinstance(model.upload.storage, InMemoryStorage)
 
 .. note::
 
-   When testing models with FileFields, using the ``override_settings`` decorator
-   to change storage settings may not work as expected due to the way
-   ``LazyObject`` evaluates storage instances at import time. This means that
-   changes to storage settings in tests might not take effect properly. For
-   reliable testing, consider alternative approaches such as explicitly
-   configuring storage within test setup or using mock objects.
+    Django itself resets ``default_storage`` and ``staticfiles_storage``
+    when settings change by connecting to the ``setting_changed`` signal.
+    You can apply the same approach for ``FileField.storage`` if you want
+    ``override_settings()`` in tests to work without using a ``LazyObject``.
 
-   .. code-block:: python
+    For example::
 
-       @override_settings(
-           STORAGES={
-               "mystorage": {
-                   "BACKEND": "django.core.files.storage.InMemoryStorage",
-               }
-           }
-       )
-       def test_storage():
-           model = MyModel()
-           assert isinstance(model.upload.storage, InMemoryStorage)
+        from django.core.files.storage import storages
+        from django.core.signals import setting_changed
+        from django.dispatch import receiver
+
+        @receiver(setting_changed)
+        def update_filefield_storage(setting, **kwargs):
+            if setting == "STORAGES":
+                storages._storages.clear()
+
+    This ensures that storages are reinitialized whenever the ``STORAGES``
+    setting is overridden in tests.
 
