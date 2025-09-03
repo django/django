@@ -86,8 +86,8 @@ Python's older legacy (``Compat32``) API, which relied on lower-level MIME
 classes (from :mod:`email.mime`) and required more manual handling of
 message structure and encoding.
 
-Notably, the return type of the :class:`EmailMessage.message()
-<django.core.mail.EmailMessage>` method is now an instance of Python's
+Notably, the return type of the :meth:`EmailMessage.message()
+<django.core.mail.EmailMessage.message>` method is now an instance of Python's
 :class:`email.message.EmailMessage`. This supports the same API as the
 previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
 instance of those now-deprecated classes.
@@ -226,13 +226,14 @@ Decorators
 Email
 ~~~~~
 
-* The new ``policy`` argument for :class:`EmailMessage.message()
-  <django.core.mail.EmailMessage>` allows specifying the email policy, the set
-  of rules for updating and serializing the representation of the message.
-  Defaults to :data:`email.policy.default`.
+* The new ``policy`` argument for :meth:`EmailMessage.message()
+  <django.core.mail.EmailMessage.message>` allows specifying the email policy,
+  the set of rules for updating and serializing the representation of the
+  message. Defaults to :data:`email.policy.default`.
 
-* :class:`EmailMessage.attach() <django.core.mail.EmailMessage>` now accepts a
-  :class:`~email.message.MIMEPart` object from Python's modern email API.
+* :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` now
+  accepts a :class:`~email.message.MIMEPart` object from Python's modern email
+  API.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
@@ -565,7 +566,8 @@ Miscellaneous
 * Using a percent sign in a column alias or annotation is deprecated.
 
 * Support for passing Python's legacy email :class:`~email.mime.base.MIMEBase`
-  object to :class:`EmailMessage.attach() <django.core.mail.EmailMessage>` (or
+  object to
+  :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` (or
   including one in the message's ``attachments`` list) is deprecated. For
   complex attachments requiring additional headers or parameters, switch to the
   modern email API's :class:`~email.message.MIMEPart`.
