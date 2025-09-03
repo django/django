@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+September 3, 2025 - :cve:`2025-57833`
+-------------------------------------
+
+Potential SQL injection in FilteredRelation column aliases.
+`Full description
+<https://www.djangoproject.com/weblog/2025/sep/03/security-releases/>`__
+
+* Django 5.2 :commit:`(patch) <4c044fcc866ec226f612c475950b690b0139d243>`
+* Django 5.1 :commit:`(patch) <102965ea93072fe3c39a30be437c683ec1106ef5>`
+* Django 4.2 :commit:`(patch) <31334e6965ad136a5e369993b01721499c5d1a92>`
+
 June 4, 2025 - :cve:`2025-48432`
 --------------------------------
 
