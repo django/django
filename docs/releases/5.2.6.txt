@@ -4,8 +4,7 @@ Django 5.2.6 release notes
 
 *September 3, 2025*
 
-Django 5.2.6 fixes a security issue with severity "high" and several bugs in
-5.2.5.
+Django 5.2.6 fixes a security issue with severity "high" and one bug in 5.2.5.
 
 Bugfixes
 ========
