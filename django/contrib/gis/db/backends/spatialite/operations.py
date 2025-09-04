@@ -73,6 +73,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "ForcePolygonCW": "ST_ForceLHR",
         "FromWKB": "ST_GeomFromWKB",
         "FromWKT": "ST_GeomFromText",
+        "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
         "NumPoints": "ST_NPoints",

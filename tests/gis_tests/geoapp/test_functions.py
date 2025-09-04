@@ -445,19 +445,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_IsEmpty_function")
     def test_isempty_geometry_null(self):
-        null_geometry = Town.objects.create(name="Nowhere", point=None)
-        Town.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
-        if connection.ops.spatialite:
-            expected = [null_geometry]
-        else:
-            expected = []
+        nowhere = Town.objects.create(name="Nowhere", point=None)
+        somewhere = Town.objects.create(
+            name="Somewhere", point=Point(6.825, 47.1, srid=4326)
+        )
+        self.assertSequenceEqual(
+            Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=None
+            ),
+            [nowhere],
+        )
+        self.assertSequenceEqual(
+            Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=False
+            ),
+            [somewhere],
+        )
         self.assertSequenceEqual(
             Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
                 isempty=True
             ),
-            expected,
+            [],
         )
-        self.assertSequenceEqual(Town.objects.filter(point__isempty=True), expected)
+        self.assertSequenceEqual(Town.objects.filter(point__isempty=True), [])
 
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):

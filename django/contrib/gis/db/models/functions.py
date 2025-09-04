@@ -451,6 +451,13 @@ class IsEmpty(GeoFuncMixin, Transform):
     lookup_name = "isempty"
     output_field = BooleanField()
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = super().as_sql(compiler, connection, **extra_context)
+        return (
+            "CASE WHEN %s = -1 THEN NULL WHEN %s = 0 THEN 0 ELSE 1 END" % (sql, sql),
+            params,
+        )
+
 
 @BaseSpatialField.register_lookup
 class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
