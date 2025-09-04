@@ -52,10 +52,12 @@ times with multiple contexts)
 
 import inspect
 import logging
+import os
 import re
 import warnings
 from enum import Enum
 
+import django
 from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
@@ -327,7 +329,7 @@ class PartialTemplate:
                 "PartialTemplate.source is only available when template "
                 "debugging is enabled.",
                 RuntimeWarning,
-                stacklevel=2,
+                skip_file_prefixes=(os.path.dirname(django.__file__),),
             )
         return self.find_partial_source(template.source)
 
