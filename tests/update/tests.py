@@ -165,6 +165,14 @@ class AdvancedTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo="whatever")
 
+    def test_update_reverse_m2m_descriptor(self):
+        msg = (
+            "Cannot update model field <ManyToManyRel: update.bar> "
+            "(only non-relations and foreign keys permitted)."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(m2m_foo="whatever")
+
     def test_update_transformed_field(self):
         A.objects.create(x=5)
         A.objects.create(x=-6)
