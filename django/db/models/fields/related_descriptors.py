@@ -166,8 +166,10 @@ class ForwardManyToOneDescriptor:
     def is_cached(self, instance):
         return self.field.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.field.remote_field.model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).all()
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -175,8 +177,9 @@ class ForwardManyToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
-        queryset._add_hints(instance=instances[0])
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -456,8 +459,10 @@ class ReverseOneToOneDescriptor:
     def is_cached(self, instance):
         return self.related.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.related.related_model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.related.related_model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).all()
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -465,8 +470,9 @@ class ReverseOneToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
-        queryset._add_hints(instance=instances[0])
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
 
         rel_obj_attr = self.related.field.get_local_related_value
         instance_attr = self.related.field.get_foreign_related_value
