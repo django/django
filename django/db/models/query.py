@@ -683,6 +683,7 @@ class QuerySet(AltersData):
         obj = self.model(**kwargs)
         self._for_write = True
         obj.save(force_insert=True, using=self.db)
+        obj._state.fetch_mode = self._fetch_mode
         return obj
 
     create.alters_data = True
