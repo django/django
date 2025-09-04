@@ -39,7 +39,7 @@ process. These are listed below.
 September 3, 2025 - :cve:`2025-57833`
 -------------------------------------
 
-Potential SQL injection in FilteredRelation column aliases.
+Potential SQL injection in ``FilteredRelation`` column aliases.
 `Full description
 <https://www.djangoproject.com/weblog/2025/sep/03/security-releases/>`__
 
