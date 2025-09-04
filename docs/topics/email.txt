@@ -133,13 +133,12 @@ can be ``0`` or ``1`` since it can only send one message).
     (subject, message, from_email, recipient_list)
 
 ``fail_silently``, ``auth_user``, ``auth_password`` and ``connection`` have the
-same functions as in :func:`~django.core.mail.send_mail`. They must be given
-as keyword arguments if used.
+same functions as in :func:`send_mail`. They must be given as keyword arguments
+if used.
 
 Each separate element of ``datatuple`` results in a separate email message.
-As in :func:`~django.core.mail.send_mail`, recipients in the same
-``recipient_list`` will all see the other addresses in the email messages'
-"To:" field.
+As in :func:`send_mail`, recipients in the same ``recipient_list`` will all see
+the other addresses in the email messages' "To:" field.
 
 For example, the following code would send two different messages to
 two different sets of recipients; however, only one connection to the
@@ -169,12 +168,10 @@ The return value will be the number of successfully delivered messages.
 ``send_mass_mail()`` vs. ``send_mail()``
 ----------------------------------------
 
-The main difference between :func:`~django.core.mail.send_mass_mail` and
-:func:`~django.core.mail.send_mail` is that
-:func:`~django.core.mail.send_mail` opens a connection to the mail server
-each time it's executed, while :func:`~django.core.mail.send_mass_mail` uses
-a single connection for all of its messages. This makes
-:func:`~django.core.mail.send_mass_mail` slightly more efficient.
+The main difference between :func:`send_mass_mail` and :func:`send_mail` is
+that :func:`send_mail` opens a connection to the mail server each time it's
+executed, while :func:`send_mass_mail` uses a single connection for all of its
+messages. This makes :func:`send_mass_mail` slightly more efficient.
 
 ``mail_admins()``
 =================
@@ -248,9 +245,9 @@ scripts generate.
 The Django email functions outlined above all protect against header injection
 by forbidding newlines in header values. If any ``subject``, ``from_email`` or
 ``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :func:`~django.core.mail.send_mail`) will raise
-:exc:`ValueError` and, hence, will not send the email. It's your responsibility
-to validate all data before passing it to the email functions.
+the email function (e.g. :func:`send_mail`) will raise :exc:`ValueError` and,
+hence, will not send the email. It's your responsibility to validate all data
+before passing it to the email functions.
 
 If a ``message`` contains headers at the start of the string, the headers will
 be printed as the first bit of the email message.
@@ -291,27 +288,24 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The ``EmailMessage`` class
 ==========================
 
-Django's :func:`~django.core.mail.send_mail` and
-:func:`~django.core.mail.send_mass_mail` functions are actually thin
-wrappers that make use of the :class:`~django.core.mail.EmailMessage` class.
+Django's :func:`send_mail` and :meth:`send_mass_mail` functions are actually
+thin wrappers that make use of the :class:`EmailMessage` class.
 
-Not all features of the :class:`~django.core.mail.EmailMessage` class are
-available through the :func:`~django.core.mail.send_mail` and related
-wrapper functions. If you wish to use advanced features, such as BCC'ed
-recipients, file attachments, or multi-part email, you'll need to create
-:class:`~django.core.mail.EmailMessage` instances directly.
+Not all features of the :class:`EmailMessage` class are available through the
+:func:`send_mail` and related wrapper functions. If you wish to use advanced
+features, such as BCC'ed recipients, file attachments, or multi-part email,
+you'll need to create :class:`EmailMessage` instances directly.
 
 .. note::
-    This is a design feature. :func:`~django.core.mail.send_mail` and
-    related functions were originally the only interface Django provided.
-    However, the list of parameters they accepted was slowly growing over
-    time. It made sense to move to a more object-oriented design for email
-    messages and retain the original functions only for backwards
-    compatibility.
+    This is a design feature. :func:`send_mail` and related functions were
+    originally the only interface Django provided. However, the list of
+    parameters they accepted was slowly growing over time. It made sense to
+    move to a more object-oriented design for email messages and retain the
+    original functions only for backwards compatibility.
 
-:class:`~django.core.mail.EmailMessage` is responsible for creating the email
-message itself. The :ref:`email backend <topic-email-backends>` is then
-responsible for sending the email.
+:class:`EmailMessage` is responsible for creating the email message itself. The
+:ref:`email backend <topic-email-backends>` is then responsible for sending the
+email.
 
 For convenience, :class:`EmailMessage` provides a :meth:`~EmailMessage.send`
 method for sending a single email. If you need to send multiple messages, the
@@ -540,7 +534,7 @@ Sending multiple content versions
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
 Django's email library, you can do this using the
-:class:`~django.core.mail.EmailMultiAlternatives` class.
+:class:`EmailMultiAlternatives` class.
 
 .. class:: EmailMultiAlternatives
 
@@ -551,7 +545,7 @@ Django's email library, you can do this using the
 
     .. attribute:: alternatives
 
-        A list of :class:`~django.core.mail.EmailAlternative` named tuples.
+        A list of :class:`EmailAlternative` named tuples.
         This is particularly useful in tests::
 
             self.assertEqual(len(msg.alternatives), 1)
@@ -564,8 +558,7 @@ Django's email library, you can do this using the
         .. versionchanged:: 5.2
 
             In older versions, ``alternatives`` was a list of regular tuples,
-            as opposed to :class:`~django.core.mail.EmailAlternative` named
-            tuples.
+            as opposed to :class:`EmailAlternative` named tuples.
 
     .. method:: attach_alternative(content, mimetype)
 
@@ -618,15 +611,14 @@ Django's email library, you can do this using the
 Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, the MIME type of the ``body`` parameter in an
-:class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
-practice to leave this alone, because it guarantees that any recipient will be
-able to read the email, regardless of their mail client. However, if you are
-confident that your recipients can handle an alternative content type, you can
-use the ``content_subtype`` attribute on the
-:class:`~django.core.mail.EmailMessage` class to change the main content type.
-The major type will always be ``"text"``, but you can change the
-subtype. For example::
+By default, the MIME type of the ``body`` parameter in an :class:`EmailMessage`
+is ``"text/plain"``. It is good practice to leave this alone, because it
+guarantees that any recipient will be able to read the email, regardless of
+their mail client. However, if you are confident that your recipients can
+handle an alternative content type, you can use the ``content_subtype``
+attribute on the :class:`EmailMessage` class to change the main content type.
+The major type will always be ``"text"``, but you can change the subtype. For
+example::
 
     msg = EmailMessage(subject, html_content, from_email, [to])
     msg.content_subtype = "html"  # Main content is now text/html
@@ -645,11 +637,10 @@ The email backend class has the following methods:
 
 * ``close()`` closes the current email-sending connection.
 
-* ``send_messages(email_messages)`` sends a list of
-  :class:`~django.core.mail.EmailMessage` objects. If the connection is
-  not open, this call will implicitly open the connection, and close the
-  connection afterward. If the connection is already open, it will be
-  left open after mail has been sent.
+* ``send_messages(email_messages)`` sends a list of :class:`EmailMessage`
+  objects. If the connection is not open, this call will implicitly open the
+  connection, and close the connection afterward. If the connection is already
+  open, it will be left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
 ``open()`` and ``close()`` as needed::
@@ -754,9 +745,8 @@ File backend
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
-written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
-the ``file_path`` keyword when creating a connection with
-:func:`~django.core.mail.get_connection`.
+written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from the
+``file_path`` keyword when creating a connection with :func:`get_connection`.
 
 To specify this backend, put the following in your settings::
 
@@ -772,10 +762,9 @@ In-memory backend
 ~~~~~~~~~~~~~~~~~
 
 The ``'locmem'`` backend stores messages in a special attribute of the
-``django.core.mail`` module. The ``outbox`` attribute is created when the
-first message is sent. It's a list with an
-:class:`~django.core.mail.EmailMessage` instance for each message that would
-be sent.
+``django.core.mail`` module. The ``outbox`` attribute is created when the first
+message is sent. It's a list with an :class:`EmailMessage` instance for each
+message that would be sent.
 
 To specify this backend, put the following in your settings::
 
@@ -812,11 +801,10 @@ the Python import path for your backend class.
 Custom email backends should subclass ``BaseEmailBackend`` that is located in
 the ``django.core.mail.backends.base`` module. A custom email backend must
 implement the ``send_messages(email_messages)`` method. This method receives a
-list of :class:`~django.core.mail.EmailMessage` instances and returns the
-number of successfully delivered messages. If your backend has any concept of
-a persistent session or connection, you should also implement the ``open()``
-and ``close()`` methods. Refer to ``smtp.EmailBackend`` for a reference
-implementation.
+list of :class:`EmailMessage` instances and returns the number of successfully
+delivered messages. If your backend has any concept of a persistent session or
+connection, you should also implement the ``open()`` and ``close()`` methods.
+Refer to ``smtp.EmailBackend`` for a reference implementation.
 
 .. _topics-sending-multiple-emails:
 
@@ -836,9 +824,9 @@ using that single connection. As a consequence, any :class:`connection
 <EmailMessage>` set on an individual message is ignored.
 
 For example, if you have a function called ``get_notification_email()`` that
-returns a list of :class:`~django.core.mail.EmailMessage` objects representing
-some periodic email you wish to send out, you could send these emails using
-a single call to send_messages::
+returns a list of :class:`EmailMessage` objects representing some periodic
+email you wish to send out, you could send these emails using a single call to
+``send_messages()``::
 
     from django.core import mail
 
