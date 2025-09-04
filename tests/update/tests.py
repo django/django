@@ -160,7 +160,7 @@ class AdvancedTests(TestCase):
         msg = (
             "Cannot update model field "
             "<django.db.models.fields.related.ManyToManyField: m2m_foo> "
-            "(only non-relations and foreign keys permitted)."
+            "(only concrete fields are permitted)."
         )
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo="whatever")
