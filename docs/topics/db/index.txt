@@ -24,3 +24,4 @@ Generally, each model maps to a single database table.
    instrumentation
    fixtures
    examples/index
+   connection-pooling
