@@ -27,6 +27,15 @@ from django.utils.translation import gettext_lazy as _
 ACTION_CHECKBOX_NAME = "_selected_action"
 
 
+class CollapsibleMixin:
+    """Mixin for admin components that can be collapsed."""
+
+    @cached_property
+    def is_collapsible(self):
+        """Return True if the component can be collapsed."""
+        return "collapse" in self.classes
+
+
 class ActionForm(forms.Form):
     action = forms.ChoiceField(label=_("Action:"))
     select_across = forms.BooleanField(
@@ -97,7 +106,7 @@ class AdminForm:
         return media
 
 
-class Fieldset:
+class Fieldset(CollapsibleMixin):
     def __init__(
         self,
         form,
@@ -123,7 +132,7 @@ class Fieldset:
     def is_collapsible(self):
         if any(field in self.fields for field in self.form.errors):
             return False
-        return "collapse" in self.classes
+        return super().is_collapsible
 
     def __iter__(self):
         for field in self.fields:
@@ -301,7 +310,7 @@ class AdminReadonlyField:
         return conditional_escape(result_repr)
 
 
-class InlineAdminFormSet:
+class InlineAdminFormSet(CollapsibleMixin):
     """
     A wrapper around an inline formset for use in the admin system.
     """
@@ -444,7 +453,7 @@ class InlineAdminFormSet:
     def is_collapsible(self):
         if any(self.formset.errors):
             return False
-        return "collapse" in self.classes
+        return super().is_collapsible
 
     def non_form_errors(self):
         return self.formset.non_form_errors()
