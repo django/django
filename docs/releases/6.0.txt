@@ -685,6 +685,10 @@ Miscellaneous
   arguments to select all related fields, is deprecated. Specify the related
   fields to fetch instead.
 
+* Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
+  ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
+  Specify the related fields to fetch instead.
+
 Features removed in 6.0
 =======================
 
