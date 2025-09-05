@@ -42,6 +42,12 @@ database constraints. Constraints are added to models using the
 
 Minor features
 --------------
+.. code-block:: rst
+
+    :mod:`django.shortcuts`
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    * The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

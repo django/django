@@ -317,3 +317,14 @@ This example is equivalent to::
         if not my_objects:
             raise Http404("No MyModel matches the given query.")
 
+
+.. code-block:: rst
+
+    ``make_toast()``
+    ================
+
+    .. function:: make_toast()
+
+    .. versionadded:: 2.2
+
+    Returns ``'toast'``.
