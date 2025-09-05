@@ -272,3 +272,9 @@ to remove usage of these features.
 * Fallbacks to ``request.user`` and ``request.auser()`` when ``user`` is
   ``None`` in ``django.contrib.auth.login()`` and
   ``django.contrib.auth.alogin()``, respectively, are removed.
+
+* The ``ordering`` keyword parameter of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` are removed in favor
+  of the ``order_by`` parameter.
