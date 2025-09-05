@@ -16,6 +16,9 @@ class FetchOne(FetchMode):
     def fetch(self, fetcher, instance):
         fetcher.fetch_one(instance)
 
+    def __reduce__(self):
+        return "FETCH_ONE"
+
 
 FETCH_ONE = FetchOne()
 
@@ -36,6 +39,9 @@ class FetchPeers(FetchMode):
         else:
             fetcher.fetch_one(instance)
 
+    def __reduce__(self):
+        return "FETCH_PEERS"
+
 
 FETCH_PEERS = FetchPeers()
 
@@ -47,6 +53,9 @@ class Raise(FetchMode):
         klass = instance.__class__.__qualname__
         field_name = fetcher.field.name
         raise FieldFetchBlocked(f"Fetching of {klass}.{field_name} blocked.") from None
+
+    def __reduce__(self):
+        return "RAISE"
 
 
 RAISE = Raise()
