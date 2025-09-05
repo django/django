@@ -383,7 +383,7 @@ normal field object, these examples will *not* work:
     >>> TaggedItem.objects.get(content_object=guido)
 
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
-does not appear in :class:`~django.forms.ModelForm`\s.
+do not appear in :class:`~django.forms.ModelForm`\s.
 
 Reverse generic relations
 -------------------------
