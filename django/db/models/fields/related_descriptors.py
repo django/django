@@ -78,7 +78,7 @@ from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
-from django.db.models.query import QuerySet
+from django.db.models.query import QuerySet, prefetch_related_objects
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
 from django.utils.functional import cached_property
@@ -166,8 +166,10 @@ class ForwardManyToOneDescriptor:
     def is_cached(self, instance):
         return self.field.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.field.remote_field.model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -175,8 +177,9 @@ class ForwardManyToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
-        queryset._add_hints(instance=instances[0])
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -254,13 +257,9 @@ class ForwardManyToOneDescriptor:
                             break
 
             if rel_obj is None and has_value:
-                rel_obj = self.get_object(instance)
-                remote_field = self.field.remote_field
-                # If this is a one-to-one relation, set the reverse accessor
-                # cache on the related object to the current instance to avoid
-                # an extra SQL query if it's accessed later on.
-                if not remote_field.multiple:
-                    remote_field.set_cached_value(rel_obj, instance)
+                instance._state.fetch_mode.fetch(self, instance)
+                return self.field.get_cached_value(instance)
+
             self.field.set_cached_value(instance, rel_obj)
 
         if rel_obj is None and not self.field.null:
@@ -269,6 +268,21 @@ class ForwardManyToOneDescriptor:
             )
         else:
             return rel_obj
+
+    def fetch_one(self, instance):
+        rel_obj = self.get_object(instance)
+        self.field.set_cached_value(instance, rel_obj)
+        # If this is a one-to-one relation, set the reverse accessor cache on
+        # the related object to the current instance to avoid an extra SQL
+        # query if it's accessed later on.
+        remote_field = self.field.remote_field
+        if not remote_field.multiple:
+            remote_field.set_cached_value(rel_obj, instance)
+
+    def fetch_many(self, instances):
+        is_cached = self.is_cached
+        missing_instances = [i for i in instances if not is_cached(i)]
+        prefetch_related_objects(missing_instances, self.field.name)
 
     def __set__(self, instance, value):
         """
@@ -384,6 +398,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
                 obj = rel_model(**kwargs)
                 obj._state.adding = instance._state.adding
                 obj._state.db = instance._state.db
+                obj._state.fetch_mode = instance._state.fetch_mode
                 return obj
         return super().get_object(instance)
 
@@ -445,8 +460,10 @@ class ReverseOneToOneDescriptor:
     def is_cached(self, instance):
         return self.related.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.related.related_model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.related.related_model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -454,8 +471,9 @@ class ReverseOneToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
-        queryset._add_hints(instance=instances[0])
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
 
         rel_obj_attr = self.related.field.get_local_related_value
         instance_attr = self.related.field.get_foreign_related_value
@@ -504,16 +522,8 @@ class ReverseOneToOneDescriptor:
             if not instance._is_pk_set():
                 rel_obj = None
             else:
-                filter_args = self.related.field.get_forward_related_filter(instance)
-                try:
-                    rel_obj = self.get_queryset(instance=instance).get(**filter_args)
-                except self.related.related_model.DoesNotExist:
-                    rel_obj = None
-                else:
-                    # Set the forward accessor cache on the related object to
-                    # the current instance to avoid an extra SQL query if it's
-                    # accessed later on.
-                    self.related.field.set_cached_value(rel_obj, instance)
+                instance._state.fetch_mode.fetch(self, instance)
+                rel_obj = self.related.get_cached_value(instance)
             self.related.set_cached_value(instance, rel_obj)
 
         if rel_obj is None:
@@ -523,6 +533,34 @@ class ReverseOneToOneDescriptor:
             )
         else:
             return rel_obj
+
+    @property
+    def field(self):
+        """
+        Add compatibility with the fetcher protocol. While self.related is not
+        a field but a OneToOneRel, it quacks enough like a field to work.
+        """
+        return self.related
+
+    def fetch_one(self, instance):
+        # Kept for backwards compatibility with overridden
+        # get_forward_related_filter()
+        filter_args = self.related.field.get_forward_related_filter(instance)
+        try:
+            rel_obj = self.get_queryset(instance=instance).get(**filter_args)
+        except self.related.related_model.DoesNotExist:
+            rel_obj = None
+        else:
+            self.related.field.set_cached_value(rel_obj, instance)
+        self.related.set_cached_value(instance, rel_obj)
+
+    def fetch_many(self, instances):
+        is_cached = self.is_cached
+        missing_instances = [i for i in instances if not is_cached(i)]
+        prefetch_related_objects(
+            missing_instances,
+            self.related.get_accessor_name(),
+        )
 
     def __set__(self, instance, value):
         """
@@ -703,6 +741,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._fetch_mode = self.instance._state.fetch_mode
             queryset._defer_next_filter = True
             queryset = queryset.filter(**self.core_filters)
             for field in self.field.foreign_related_fields:
@@ -1104,6 +1143,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._fetch_mode = self.instance._state.fetch_mode
             queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 

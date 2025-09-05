@@ -1683,15 +1683,15 @@ a join with an ``F()`` object, a ``FieldError`` will be raised:
 Related objects
 ===============
 
-When you define a relationship in a model (i.e., a
+When you define a relationship in a model (with
 :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.OneToOneField`, or
-:class:`~django.db.models.ManyToManyField`), instances of that model will have
-a convenient API to access the related object(s).
+:class:`~django.db.models.ManyToManyField`), instances of the model class gain
+accessor attributes for the related object(s).
 
 Using the models at the top of this page, for example, an ``Entry`` object
-``e`` can get its associated ``Blog`` object by accessing the ``blog``
-attribute: ``e.blog``.
+``e`` has its associated ``Blog`` object accessible in its ``blog`` attribute:
+``e.blog``.
 
 (Behind the scenes, this functionality is implemented by Python
 :doc:`descriptors <python:howto/descriptor>`. This shouldn't really matter to
@@ -1699,8 +1699,14 @@ you, but we point it out here for the curious.)
 
 Django also creates API accessors for the "other" side of the relationship --
 the link from the related model to the model that defines the relationship.
-For example, a ``Blog`` object ``b`` has access to a list of all related
-``Entry`` objects via the ``entry_set`` attribute: ``b.entry_set.all()``.
+For example, a ``Blog`` object ``b`` has a manager that returns all related
+``Entry`` objects in the ``entry_set`` attribute: ``b.entry_set.all()``.
+
+These accessors may be prefetched by the ``QuerySet`` methods
+:meth:`~django.db.models.query.QuerySet.select_related` or
+:meth:`~django.db.models.query.QuerySet.prefetch_related`. If not prefetched,
+access will trigger an on-demand fetch through the model's
+:doc:`fetch mode </topics/db/fetch-modes>`.
 
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
