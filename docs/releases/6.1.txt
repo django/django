@@ -99,6 +99,11 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
+* When :attr:`.ModelAdmin.list_select_related` is ``False`` (the default),
+  the change list now selects only the foreign key fields specified in
+  :attr:`.ModelAdmin.list_display`, rather than all foreign key fields. This
+  should improve performance for models with many foreign key fields.
+
 * The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
   confirmation pages before the remainder is truncated. The default is
@@ -479,6 +484,9 @@ backends.
 
 * The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
   ``name`` as the first positional argument.
+
+* The undocumented ``ChangeList.has_related_field_in_list_display()`` method
+  has been replaced with ``ChangeList.get_select_related_fields()``.
 
 :mod:`django.contrib.auth`
 --------------------------
