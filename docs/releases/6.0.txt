@@ -116,11 +116,13 @@ Minor features
 * The Font Awesome Free icon set (version 6.7.2) is now used for the admin
   interface icons.
 
+* The new :attr:`.AdminSite.password_change_form` attribute allows customizing
+  the form used in the admin site password change view.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :attr:`.AdminSite.password_change_form` attribute allows customizing
-  the form used in the admin site password change view.
+* ...
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
