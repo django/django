@@ -262,6 +262,10 @@ form .form-row p.datetime {
     float: right;
 }
 
+span.clearable-file-input {
+    margin-right: 15px;
+}
+
 /* MISC */
 
 .inline-related h2, .inline-group h2 {
