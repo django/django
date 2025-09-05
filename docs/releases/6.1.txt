@@ -261,4 +261,5 @@ in Django 6.1.
 See :ref:`deprecated-features-5.2` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* The ``all`` parameter for the ``django.contrib.staticfiles.finders.find()``
+  function is removed in favor of the ``find_all`` parameter.
