@@ -2252,7 +2252,7 @@ class ModelAdmin(BaseModelAdmin):
                 object_id=unquote(object_id),
                 content_type=get_content_type_for_model(model),
             )
-            .select_related()
+            .select_related("user", "content_type")
             .order_by("action_time")
         )
 
