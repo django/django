@@ -125,10 +125,6 @@ This example is equivalent to::
    ``True``   ``True``         308
    =========  ================ ================
 
-   .. versionchanged:: 5.2
-
-       The argument ``preserve_request`` was added.
-
 Examples
 --------
 
