@@ -1,5 +1,7 @@
 from django.core.exceptions import FieldError
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Bookmark,
@@ -94,7 +96,11 @@ class SelectRelatedTests(TestCase):
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
-            world = Species.objects.select_related()
+            with ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ):
+                world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
                 sorted(families),
@@ -105,6 +111,14 @@ class SelectRelatedTests(TestCase):
                     "Hominidae",
                 ],
             )
+
+    def test_select_related_no_arguments_deprecated(self):
+        msg = (
+            "Calling select_related() with no arguments is deprecated. "
+            "Specify the fields to fetch instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            Species.objects.select_related()
 
     def test_list_with_depth(self):
         """
@@ -120,11 +134,15 @@ class SelectRelatedTests(TestCase):
             )
 
     def test_select_related_with_extra(self):
-        s = (
-            Species.objects.all()
-            .select_related()
-            .extra(select={"a": "select_related_species.id + 10"})[0]
-        )
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            s = (
+                Species.objects.all()
+                .select_related()
+                .extra(select={"a": "select_related_species.id + 10"})[0]
+            )
         self.assertEqual(s.id + 10, s.a)
 
     def test_certain_fields(self):
