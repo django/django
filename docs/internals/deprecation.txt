@@ -53,6 +53,11 @@ details on these changes.
 * The ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions will be removed.
 
+See the :ref:`Django 6.1 release notes <deprecated-features-6.1>` for more
+details on these changes.
+
+* ...
+
 .. _deprecation-removed-in-6.1:
 
 6.1
