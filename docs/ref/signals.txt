@@ -703,3 +703,60 @@ Arguments sent with this signal:
     The database connection that was opened. This can be used in a
     multiple-database configuration to differentiate connection signals
     from different databases.
+
+Tasks signals
+=============
+
+.. versionadded:: 6.0
+
+Signals sent by the :doc:`tasks </ref/tasks>` framework.
+
+``task_enqueued``
+-----------------
+
+.. data:: django.tasks.signals.task_enqueued
+   :module:
+
+Sent once a Task has been enqueued. If
+:attr:`django.tasks.Task.enqueue_on_commit` is set, the signal is only sent
+once the transaction commits successfully.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The enqueued :class:`TaskResult <django.tasks.TaskResult>`.
+
+``task_started``
+----------------
+
+.. data:: django.tasks.signals.task_started
+   :module:
+
+Sent when a Task has started executing.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The started :class:`TaskResult <django.tasks.TaskResult>`.
+
+``task_finished``
+-----------------
+
+.. data:: django.tasks.signals.task_finished
+   :module:
+
+Sent once a Task has finished executing, successfully or otherwise.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The finished :class:`TaskResult <django.tasks.TaskResult>`.
