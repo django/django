@@ -54,11 +54,6 @@ General-purpose aggregation functions
             ArrayAgg("a_field", order_by="-some_field")
             ArrayAgg("a_field", order_by=F("some_field").desc())
 
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`ArrayAgg.order_by` instead.
-
 ``BitAnd``
 ----------
 
@@ -180,11 +175,6 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`JSONBAgg.order_by` instead.
-
 ``StringAgg``
 -------------
 
@@ -241,11 +231,6 @@ General-purpose aggregation functions
         <QuerySet [{
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
-
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`StringAgg.order_by` instead.
 
 Aggregate functions for statistics
 ==================================
