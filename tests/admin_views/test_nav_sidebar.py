@@ -232,3 +232,40 @@ class SeleniumTests(AdminSeleniumTestCase):
         filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
         filter_input.send_keys("users")
         self.assertEqual(self.selenium.execute_script(filter_value_script), "users")
+
+    def test_sidebar_state_ignore_on_mobile(self):
+        from selenium.webdriver.common.by import By
+
+        def get_nav_sidebar():
+            return self.selenium.find_element(By.ID, "nav-sidebar")
+
+        def get_users_link():
+            return self.selenium.find_element(By.CSS_SELECTOR, "#auth-user a")
+
+        self.selenium.get(
+            self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
+        )
+        with self.mobile_size():
+            self.assertIsNone(
+                self.selenium.execute_script(
+                    "return localStorage.getItem('django.admin.navSidebarIsOpen')"
+                )
+            )
+            users_link = get_users_link()
+            users_link.click()
+            nav_sidebar = get_nav_sidebar()
+            self.assertFalse(nav_sidebar.is_displayed())
+            toggle_button = self.selenium.find_element(
+                By.CSS_SELECTOR, "#toggle-nav-sidebar"
+            )
+            toggle_button.click()
+            self.assertEqual(
+                self.selenium.execute_script(
+                    "return localStorage.getItem('django.admin.navSidebarIsOpen')"
+                ),
+                "true",
+            )
+            users_link = get_users_link()
+            users_link.click()
+            nav_sidebar = get_nav_sidebar()
+            self.assertFalse(nav_sidebar.is_displayed())
