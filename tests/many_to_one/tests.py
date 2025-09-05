@@ -450,15 +450,15 @@ class ManyToOneTests(TestCase):
             headline="Second", pub_date=datetime.date(1980, 4, 23), reporter=r2
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "day")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "day")),
             [datetime.date(1980, 4, 23), datetime.date(2005, 7, 27)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "month")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "month")),
             [datetime.date(1980, 4, 1), datetime.date(2005, 7, 1)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "year")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "year")),
             [datetime.date(1980, 1, 1), datetime.date(2005, 1, 1)],
         )
 

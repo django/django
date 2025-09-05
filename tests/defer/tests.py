@@ -118,14 +118,14 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(qs.only("name").get(pk=self.p1.pk), 2)
 
     def test_defer_with_select_related(self):
-        obj = Primary.objects.select_related().defer(
+        obj = Primary.objects.select_related("related").defer(
             "related__first", "related__second"
         )[0]
         self.assert_delayed(obj.related, 2)
         self.assert_delayed(obj, 0)
 
     def test_only_with_select_related(self):
-        obj = Primary.objects.select_related().only("related__first")[0]
+        obj = Primary.objects.select_related("related").only("related__first")[0]
         self.assert_delayed(obj, 2)
         self.assert_delayed(obj.related, 1)
         self.assertEqual(obj.related_id, self.s1.pk)

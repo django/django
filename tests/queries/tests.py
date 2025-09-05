@@ -615,7 +615,7 @@ class Queries1Tests(TestCase):
     def test_ticket2496(self):
         self.assertSequenceEqual(
             Item.objects.extra(tables=["queries_author"])
-            .select_related()
+            .select_related("creator")
             .order_by("name")[:1],
             [self.i4],
         )
@@ -666,7 +666,9 @@ class Queries1Tests(TestCase):
         self.assertEqual(len(qs.query.alias_map), 1)
 
     def test_tickets_2874_3002(self):
-        qs = Item.objects.select_related().order_by("note__note", "name")
+        qs = Item.objects.select_related("creator", "note").order_by(
+            "note__note", "name"
+        )
         self.assertQuerySetEqual(qs, [self.i2, self.i4, self.i1, self.i3])
 
         # This is also a good select_related() test because there are multiple
@@ -851,7 +853,7 @@ class Queries1Tests(TestCase):
         # We should also be able to pickle things that use select_related().
         # The only tricky thing here is to ensure that we do the related
         # selections properly after unpickling.
-        qs = Item.objects.select_related()
+        qs = Item.objects.select_related("creator", "note")
         query = qs.query.get_compiler(qs.db).as_sql()[0]
         query2 = pickle.loads(pickle.dumps(qs.query))
         self.assertEqual(query2.get_compiler(qs.db).as_sql()[0], query)

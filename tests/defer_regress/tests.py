@@ -65,11 +65,13 @@ class DeferRegressionTest(TestCase):
         c2 = Child.objects.create(name="c2", value=37)
         Leaf.objects.create(name="l1", child=c1, second_child=c2)
 
-        obj = Leaf.objects.only("name", "child").select_related()[0]
+        obj = Leaf.objects.only("name", "child").select_related("child")[0]
         self.assertEqual(obj.child.name, "c1")
 
         self.assertQuerySetEqual(
-            Leaf.objects.select_related().only("child__name", "second_child__name"),
+            Leaf.objects.select_related("child", "second_child").only(
+                "child__name", "second_child__name"
+            ),
             [
                 "l1",
             ],
@@ -86,13 +88,15 @@ class DeferRegressionTest(TestCase):
 
         # Regression for #10733 - only() can be used on a model with two
         # foreign keys.
-        results = Leaf.objects.only("name", "child", "second_child").select_related()
+        results = Leaf.objects.only("name", "child", "second_child").select_related(
+            "child", "second_child"
+        )
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
         results = Leaf.objects.only(
             "name", "child", "second_child", "child__name", "second_child__name"
-        ).select_related()
+        ).select_related("child", "second_child")
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
@@ -213,7 +217,7 @@ class DeferRegressionTest(TestCase):
         item = Item.objects.create(name="first", value=47)
         RelatedItem.objects.create(item=item)
         # Defer fields with only()
-        obj = ProxyRelated.objects.select_related().only("item__name")[0]
+        obj = ProxyRelated.objects.select_related("item").only("item__name")[0]
         with self.assertNumQueries(0):
             self.assertEqual(obj.item.name, "first")
         with self.assertNumQueries(1):

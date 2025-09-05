@@ -93,7 +93,7 @@ class SelectRelatedRegressTests(TestCase):
         c = Class.objects.create(org=o)
         Enrollment.objects.create(std=s, cls=c)
 
-        e_related = Enrollment.objects.select_related()[0]
+        e_related = Enrollment.objects.select_related("std", "cls")[0]
         self.assertEqual(e_related.std.person.user.name, "std")
         self.assertEqual(e_related.cls.org.person.user.name, "org")
 
@@ -112,7 +112,9 @@ class SelectRelatedRegressTests(TestCase):
         client = Client.objects.create(name="client", status=active)
 
         self.assertEqual(client.status, active)
-        self.assertEqual(Client.objects.select_related()[0].status, active)
+        self.assertEqual(
+            Client.objects.select_related("state", "status")[0].status, active
+        )
         self.assertEqual(Client.objects.select_related("state")[0].status, active)
         self.assertEqual(
             Client.objects.select_related("state", "status")[0].status, active
@@ -221,7 +223,7 @@ class SelectRelatedRegressTests(TestCase):
         Chick.objects.create(name="Chick", mother=hen)
 
         self.assertEqual(Chick.objects.all()[0].mother.name, "Hen")
-        self.assertEqual(Chick.objects.select_related()[0].mother.name, "Hen")
+        self.assertEqual(Chick.objects.select_related("mother")[0].mother.name, "Hen")
 
     def test_regression_10733(self):
         a = A.objects.create(name="a", lots_of_text="lots_of_text_a", a_field="a_field")
@@ -237,7 +239,7 @@ class SelectRelatedRegressTests(TestCase):
             "c_b__lots_of_text",
             "c_a__name",
             "c_b__name",
-        ).select_related()
+        ).select_related("c_a", "c_b")
         self.assertSequenceEqual(results, [c])
         with self.assertNumQueries(0):
             qs_c = results[0]
