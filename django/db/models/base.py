@@ -1310,7 +1310,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = meta or self._meta
         field_map = {}
         generated_fields = []
-        for field in meta.local_concrete_fields:
+        for field in meta.local_fields:
             if field.name in exclude:
                 continue
             if field.generated:

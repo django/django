@@ -3,7 +3,7 @@ import datetime
 import pickle
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
@@ -19,6 +19,7 @@ from .models import (
     Group,
     Membership,
     NewsArticle,
+    PatronTab,
     Person,
 )
 
@@ -767,3 +768,12 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
+
+
+class ForeignObjectConstraintTests(TestCase):
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_with_foreign_key_id(self):
+        patron_tab = PatronTab(patron_id=None)
+        with self.assertRaises(ValidationError) as cm:
+            patron_tab.validate_constraints()
+        self.assertIn("patron_not_null", str(cm.exception))

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class Address(models.Model):
@@ -39,3 +40,27 @@ class Contact(models.Model):
         to_fields=["customer_id", "company"],
         from_fields=["customer_code", "company_code"],
     )
+
+
+class Patron(models.Model):
+    pass
+
+
+class PatronTab(models.Model):
+    patron_id = models.IntegerField(null=True)
+    patron = models.ForeignObject(
+        Patron,
+        from_fields=["patron_id"],
+        to_fields=["id"],
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_table_check_constraints"}
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(patron__isnull=False),
+                name="patron_not_null",
+            ),
+        ]
