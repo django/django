@@ -564,8 +564,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 ``ColorInput``
 ~~~~~~~~~~~~~~
 
-.. versionadded:: 5.2
-
 .. class:: ColorInput
 
     * ``input_type``: ``'color'``
@@ -575,8 +573,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 ``SearchInput``
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 5.2
-
 .. class:: SearchInput
 
     * ``input_type``: ``'search'``
@@ -585,8 +581,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 ``TelInput``
 ~~~~~~~~~~~~
-
-.. versionadded:: 5.2
 
 .. class:: TelInput
 

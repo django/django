@@ -1254,11 +1254,6 @@ By default, fixtures are only loaded into the ``default`` database. If you are
 using multiple databases and set :attr:`TransactionTestCase.databases`,
 fixtures will be loaded into all specified databases.
 
-.. versionchanged:: 5.2
-
-    For :class:`TransactionTestCase`, fixtures were made available during
-    ``setUpClass()``.
-
 URLconf configuration
 ---------------------
 

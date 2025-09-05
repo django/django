@@ -503,8 +503,6 @@ you see fit:
 Simple block tags
 -----------------
 
-.. versionadded:: 5.2
-
 .. method:: django.template.Library.simple_block_tag()
 
 When a section of rendered template needs to be passed into a custom tag,
