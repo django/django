@@ -92,6 +92,17 @@ class ManyToManyFieldTests(SimpleTestCase):
                     db_table="custom_name",
                 )
 
+    @isolate_apps("model_fields")
+    def test_m2m_field_is_not_concrete(self):
+        class Foo(models.Model):
+            bar = models.ManyToManyField("self")
+
+        field = Foo._meta.get_field("bar")
+        self.assertFalse(
+            field.concrete,
+            msg="ManyToManyField should not be marked as concrete",
+        )
+
 
 class ManyToManyFieldDBTests(TestCase):
     def test_value_from_object_instance_without_pk(self):
