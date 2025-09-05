@@ -272,6 +272,13 @@ to ``True`` to use the ``ConnectionPool`` defaults::
 This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
 and is ignored with ``psycopg2``.
 
+
+.. seealso::
+
+   For general guidance on connection pooling across backends,
+   see :doc:`/topics/db/connection-pooling`.
+
+
 .. _database-server-side-parameters-binding:
 
 Server-side parameters binding
@@ -294,6 +301,7 @@ cursors <psycopg:client-side-binding-cursors>`. If you want to use the
     }
 
 This option is ignored with ``psycopg2``.
+
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------

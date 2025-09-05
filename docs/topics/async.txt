@@ -153,6 +153,13 @@ via the :setting:`CONN_MAX_AGE` setting, should also be disabled in async mode.
 Instead, use your database backend's built-in connection pooling if available,
 or investigate a third-party connection pooling option if required.
 
+
+.. seealso::
+
+   For backend-specific details on pooling support, see
+   :doc:`/topics/db/connection-pooling`.
+
+
 .. _async_performance:
 
 Performance
