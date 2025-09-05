@@ -35,6 +35,7 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
+from django.db.models.fields.json import KeyTransform
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -1437,11 +1438,15 @@ class Query(BaseExpression):
                 return
 
         lookup = lookup_class(lhs, rhs)
-        # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
-        # uses of None as a query value unless the lookup supports it.
+        # Interpret '__exact=None' as the SQL 'IS NULL'. For '__iexact=None' on
+        # KeyTransform, interpret it as '__exact=None' instead of 'IS NULL'
+        # (#36508). For all other cases, reject the use of None as a query
+        # value unless the lookup explicitly supports it.
         if lookup.rhs is None and not lookup.can_use_none_as_rhs:
             if lookup_name not in ("exact", "iexact"):
                 raise ValueError("Cannot use None as a query value")
+            if lookup_name == "iexact" and isinstance(lhs, KeyTransform):
+                return lhs.get_lookup("exact")(lhs, None)
             return lhs.get_lookup("isnull")(lhs, True)
 
         # For Oracle '' is equivalent to null. The check must be done at this
