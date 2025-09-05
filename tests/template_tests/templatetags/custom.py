@@ -385,6 +385,7 @@ def counter(parser, token):
 
 class CounterNode(template.Node):
     def __init__(self):
+        super().__init__()
         self.count = 0
 
     def render(self, context):
