@@ -136,7 +136,7 @@ can be ``0`` or ``1`` since it can only send one message).
 same functions as in :meth:`send_mail`. They must be given as keyword arguments
 if used.
 
-Each separate element of ``datatuple`` results in a separate email message. 
+Each separate element of ``datatuple`` results in a separate email message.
 As in :meth:`send_mail`, recipients in the same ``recipient_list`` will all see
 the other addresses in the email messages' "To:" field.
 
@@ -599,7 +599,7 @@ guarantees that any recipient will be able to read the email, regardless of
 their mail client. However, if you are confident that your recipients can
 handle an alternative content type, you can use the ``content_subtype``
 attribute on the :class:`EmailMessage` class to change the main content type.
-The major type will always be ``"text"``, but you can change the subtype. 
+The major type will always be ``"text"``, but you can change the subtype.
 For example::
 
     msg = EmailMessage(subject, html_content, from_email, [to])
