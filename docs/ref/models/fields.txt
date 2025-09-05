@@ -564,10 +564,6 @@ alongside the old one.
 The primary key field is set to ``None`` when
 :meth:`deleting <django.db.models.Model.delete>` an object.
 
-.. versionchanged:: 5.2
-
-    The ``CompositePrimaryKey`` field was added.
-
 ``unique``
 ----------
 
@@ -716,8 +712,6 @@ isn't defined.
 ``CompositePrimaryKey``
 -----------------------
 
-.. versionadded:: 5.2
-
 .. class:: CompositePrimaryKey(*field_names, **options)
 
 A virtual field used for defining a composite primary key.
@@ -757,10 +751,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
-
-    .. versionchanged:: 5.2
-
-       Support for unlimited ``VARCHAR`` columns was added on SQLite.
 
 .. attribute:: CharField.db_collation
 

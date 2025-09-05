@@ -285,10 +285,6 @@ following attributes and methods:
 
             re.compile(r"API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
 
-        .. versionchanged:: 5.2
-
-            The term ``AUTH`` was added.
-
     .. method:: is_active(request)
 
         Returns ``True`` to activate the filtering in

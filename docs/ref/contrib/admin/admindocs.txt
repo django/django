@@ -52,10 +52,6 @@ Templates           ``:template:`path/to/template.html```
 Each of these support custom link text with the format
 ``:role:`link text <link>```. For example, ``:tag:`block <built_in-block>```.
 
-.. versionchanged:: 5.2
-
-    Support for custom link text was added.
-
 .. _admindocs-model-reference:
 
 Model reference
@@ -88,11 +84,6 @@ A model with useful documentation might look like this::
         def publish(self):
             """Makes the blog entry live on the site."""
             ...
-
-.. versionchanged:: 5.2
-
-    Access was restricted to only allow users with model view or change
-    permissions.
 
 View reference
 ==============

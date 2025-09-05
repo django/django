@@ -356,11 +356,6 @@ The following parameters must be given as keyword arguments if used:
   :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
   ``(filename, content, mimetype)``.
 
-  .. versionchanged:: 5.2
-
-    Support for :class:`~django.core.mail.EmailAttachment` items of
-    ``attachments`` was added.
-
   .. versionchanged:: 6.0
 
     Support for :class:`~email.message.MIMEPart` objects in the ``attachments``
@@ -505,8 +500,6 @@ The class has the following methods:
 
 .. class:: EmailAttachment
 
-    .. versionadded:: 5.2
-
     A named tuple to store attachments to an email.
 
     The named tuple has the following indexes:
@@ -545,12 +538,6 @@ Django's email library, you can do this using the
         Alternatives should only be added using the :meth:`attach_alternative`
         method, or passed to the constructor.
 
-        .. versionchanged:: 5.2
-
-            In older versions, ``alternatives`` was a list of regular tuples,
-            as opposed to :class:`~django.core.mail.EmailAlternative` named
-            tuples.
-
     .. method:: attach_alternative(content, mimetype)
 
         Attach an alternative representation of the message body in the email.
@@ -570,8 +557,6 @@ Django's email library, you can do this using the
 
     .. method:: body_contains(text)
 
-        .. versionadded:: 5.2
-
         Returns a boolean indicating whether the provided ``text`` is
         contained in the email ``body`` and in all attached MIME type
         ``text/*`` alternatives.
@@ -589,8 +574,6 @@ Django's email library, you can do this using the
                 self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
 
 .. class:: EmailAlternative
-
-    .. versionadded:: 5.2
 
     A named tuple to store alternative versions of email content.
 

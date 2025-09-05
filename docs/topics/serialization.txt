@@ -423,11 +423,6 @@ Then add the module containing the serializer definitions to your
         "json": "django.core.serializers.json",
     }
 
-.. versionchanged:: 5.2
-
-    A ``Deserializer`` class definition was added to each of the provided
-    serialization formats.
-
 .. _topics-serialization-natural-keys:
 
 Natural keys

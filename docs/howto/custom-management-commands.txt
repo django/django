@@ -324,8 +324,6 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.get_check_kwargs(options)
 
-    .. versionadded:: 5.2
-
     Supplies kwargs for the call to :meth:`check`, including transforming the
     value of :attr:`requires_system_checks` to the ``tag`` kwarg.
 
