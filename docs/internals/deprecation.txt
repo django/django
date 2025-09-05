@@ -88,6 +88,12 @@ details on these changes.
 * :meth:`.QuerySet.select_related` will raise :exc:`TypeError` if passed
   ``True`` rather than :exc:`AttributeError`.
 
+* :class:`.ModelAdmin` will raise :exc:`ValueError` if subclassed with its
+  :attr:`.list_select_related` attribute set to ``True``.
+
+* :class:`.ModelAdmin` will raise :exc:`ValueError` if its
+  :meth:`.get_list_select_related` method returns ``True``.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

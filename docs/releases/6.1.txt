@@ -604,6 +604,10 @@ Miscellaneous
   arguments to select all related fields, is deprecated. Specify the related
   fields to fetch instead.
 
+* Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
+  ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
+  Specify the related fields to fetch instead.
+
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
