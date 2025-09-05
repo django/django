@@ -53,6 +53,8 @@ details on these changes.
 * The ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions will be removed.
 
+* :meth:`.QuerySet.select_related` will raise ``TypeError`` if passed ``True``.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
