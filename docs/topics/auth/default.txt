@@ -1876,3 +1876,43 @@ User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
 a password change form that allows admins to change or unset user passwords.
+
+Using LogoutView with a link
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can create a logout button that works for all users using the standard logout URL:
+
+.. code-block:: html+django
+
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Log out</button>
+    </form>
+
+If you prefer the button to appear as a text link, style it with CSS:
+
+.. code-block:: html+django
+
+    <style>
+    .link-button {
+        background: none;
+        border: none;
+        color: blue;
+        text-decoration: underline;
+        cursor: pointer;
+        font: inherit;
+        padding: 0;
+    }
+    </style>
+
+.. code-block:: html+django
+
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="link-button">Log out</button>
+    </form>
+
+*Note:* This approach works for all users and is preferred over `admin:logout`, which is limited to admin users.
+
+
+
