@@ -1,6 +1,5 @@
 import functools
 import os
-import warnings
 
 from django.apps import apps
 from django.conf import settings
@@ -9,38 +8,11 @@ from django.core.checks import Error, Warning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import FileSystemStorage, Storage, default_storage
 from django.utils._os import safe_join
-from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.functional import LazyObject, empty
 from django.utils.module_loading import import_string
 
 # To keep track on which directories the finder has searched the static files.
 searched_locations = []
-
-
-# RemovedInDjango61Warning: When the deprecation ends, remove completely.
-def _check_deprecated_find_param(class_name="", find_all=False, stacklevel=3, **kwargs):
-    method_name = "find" if not class_name else f"{class_name}.find"
-    if "all" in kwargs:
-        legacy_all = kwargs.pop("all")
-        msg = (
-            "Passing the `all` argument to find() is deprecated. Use `find_all` "
-            "instead."
-        )
-        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=stacklevel)
-
-        # If both `find_all` and `all` were given, raise TypeError.
-        if find_all is not False:
-            raise TypeError(
-                f"{method_name}() got multiple values for argument 'find_all'"
-            )
-
-        find_all = legacy_all
-
-    if kwargs:  # any remaining kwargs must be a TypeError
-        first = list(kwargs.keys()).pop()
-        raise TypeError(f"{method_name}() got an unexpected keyword argument '{first}'")
-
-    return find_all
 
 
 class BaseFinder:
@@ -52,25 +24,6 @@ class BaseFinder:
         raise NotImplementedError(
             "subclasses may provide a check() method to verify the finder is "
             "configured correctly."
-        )
-
-    # RemovedInDjango61Warning: When the deprecation ends, remove completely.
-    def _check_deprecated_find_param(self, **kwargs):
-        return _check_deprecated_find_param(
-            class_name=self.__class__.__qualname__, stacklevel=4, **kwargs
-        )
-
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # def find(self, path, find_all=False):
-    def find(self, path, find_all=False, **kwargs):
-        """
-        Given a relative file path, find an absolute file path.
-
-        If the ``find_all`` parameter is False (default) return only the first
-        found file path; if True, return a list of all found files paths.
-        """
-        raise NotImplementedError(
-            "subclasses of BaseFinder must provide a find() method"
         )
 
     def list(self, ignore_patterns):
@@ -149,15 +102,10 @@ class FileSystemFinder(BaseFinder):
                 )
         return errors
 
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # def find(self, path, find_all=False):
-    def find(self, path, find_all=False, **kwargs):
+    def find(self, path, find_all=False):
         """
         Look for files in the extra locations as defined in STATICFILES_DIRS.
         """
-        # RemovedInDjango61Warning.
-        if kwargs:
-            find_all = self._check_deprecated_find_param(find_all=find_all, **kwargs)
         matches = []
         for prefix, root in self.locations:
             if root not in searched_locations:
@@ -232,15 +180,10 @@ class AppDirectoriesFinder(BaseFinder):
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # def find(self, path, find_all=False):
-    def find(self, path, find_all=False, **kwargs):
+    def find(self, path, find_all=False):
         """
         Look for files in the app directories.
         """
-        # RemovedInDjango61Warning.
-        if kwargs:
-            find_all = self._check_deprecated_find_param(find_all=find_all, **kwargs)
         matches = []
         for app in self.apps:
             app_location = self.storages[app].location
@@ -287,15 +230,10 @@ class BaseStorageFinder(BaseFinder):
             self.storage = self.storage()
         super().__init__(*args, **kwargs)
 
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # def find(self, path, find_all=False):
-    def find(self, path, find_all=False, **kwargs):
+    def find(self, path, find_all=False):
         """
         Look for files in the default file storage, if it's local.
         """
-        # RemovedInDjango61Warning.
-        if kwargs:
-            find_all = self._check_deprecated_find_param(find_all=find_all, **kwargs)
         try:
             self.storage.path("")
         except NotImplementedError:
@@ -336,18 +274,13 @@ class DefaultStorageFinder(BaseStorageFinder):
             )
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# def find(path, find_all=False):
-def find(path, find_all=False, **kwargs):
+def find(path, find_all=False):
     """
     Find a static file with the given path using all enabled finders.
 
     If ``find_all`` is ``False`` (default), return the first matching
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
-    # RemovedInDjango61Warning.
-    if kwargs:
-        find_all = _check_deprecated_find_param(find_all=find_all, **kwargs)
     searched_locations[:] = []
     matches = []
     for finder in get_finders():
