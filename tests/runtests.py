@@ -28,10 +28,7 @@ else:
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango61Warning,
-        RemovedInDjango70Warning,
-    )
+    from django.utils.deprecation import RemovedInDjango70Warning
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
     from django.utils.version import PYPY
@@ -47,7 +44,6 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango70Warning)
-warnings.simplefilter("error", RemovedInDjango61Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)

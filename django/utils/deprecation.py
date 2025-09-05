@@ -9,7 +9,7 @@ from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_asy
 import django
 
 
-class RemovedInDjango61Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
@@ -17,7 +17,6 @@ class RemovedInDjango70Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango61Warning
 RemovedAfterNextVersionWarning = RemovedInDjango70Warning
 
 
