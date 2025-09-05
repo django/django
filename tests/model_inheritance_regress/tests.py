@@ -527,7 +527,7 @@ class ModelInheritanceTest(TestCase):
         Supplier.objects.create(name="Jane", restaurant=r2)
 
         self.assertQuerySetEqual(
-            Supplier.objects.order_by("name").select_related(),
+            Supplier.objects.order_by("name").select_related("restaurant"),
             [
                 "Jane",
                 "John",
