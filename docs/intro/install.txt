@@ -19,13 +19,12 @@ database called SQLite_ so you won't need to set up a database just yet.
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
-You can verify that Python is installed by typing ``python`` from your shell;
+You can verify that Python is installed by typing ``python3`` from your shell;
 you should see something like:
 
-.. code-block:: pycon
+.. parsed-literal::
 
-    Python 3.x.y
-    [GCC 4.x] on linux
+    Python 3.x.y (main, |today|, 12:00:00) [GCC x.y.z] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
 
@@ -62,7 +61,6 @@ You've got three options to install Django:
     documentation marked **new in development version**. That phrase flags
     features that are only available in development versions of Django, and
     they likely won't work with an official release.
-
 
 Verifying
 =========
