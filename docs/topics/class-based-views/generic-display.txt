@@ -241,6 +241,42 @@ you can override it to send more::
     :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data` for
     an example.
 
+
+Composite primary keys with Class-Based Views
+=============================================
+
+:class:`~django.views.generic.detail.DetailView` and related views
+can retrieve objects with composite primary keys when all primary key fields
+are provided as URL parameters::
+
+    # views.py
+    class OrderLineItemDetailView(DetailView):
+        model = OrderLineItem
+
+
+    # urls.py
+    urlpatterns = [
+        path("item/<int:product_id>/<str:order_id>/", OrderLineItemDetailView.as_view()),
+    ]
+
+.. note::
+
+    All field names from :attr:`~django.db.models.options.Options.pk_fields`
+    must be present as URL parameters. No comma separators or specific ordering
+    required.
+
+    In other words, the following URLconfs would have worked as well when
+    fetching composite-pk models:
+
+        path("item/<int:product_id>/<str:order_id>/",
+             OrderLineItemDetailView.as_view()),
+        path("order/<str:order_id>/item/<int:product_id>/",
+             OrderLineItemDetailView.as_view()),
+        path("detail/item/<int:product_id>/from/order/<str:order_id>/",
+             OrderLineItemDetailView.as_view()),
+
+    (Order and separators do not matter, as long as all PK fields are present.)
+
 .. _generic-views-list-subsets:
 
 Viewing subsets of objects

@@ -79,6 +79,11 @@ Single object mixins
         :attr:`slug_url_kwarg` argument, and performs a slug lookup using the
         :attr:`slug_field`.
 
+        For models with a composite primary key, ``get_object()`` will
+        look for all primary key field names (as defined in ``pk_fields``)
+        in the keyword arguments. If all are present, it performs a get
+        lookup with those values. If any are missing, it returns a 404.
+
         When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
         perform its lookup using both the primary key and the slug.
 
