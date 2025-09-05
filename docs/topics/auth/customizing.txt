@@ -802,10 +802,6 @@ utility methods:
         Retrieves a user instance using the contents of the field
         nominated by ``USERNAME_FIELD``.
 
-        .. versionchanged:: 5.2
-
-            ``aget_by_natural_key()`` method was added.
-
 Extending Django's default ``User``
 -----------------------------------
 
@@ -1204,8 +1200,6 @@ using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
 Adding an async interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 5.2
 
 To optimize performance when called from an async context authentication,
 backends can implement async versions of each function - ``aget_user(user_id)``

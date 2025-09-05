@@ -17,8 +17,6 @@ existing ``shell`` management command. For more details, refer to the guide on
 Customize automatic imports
 ===========================
 
-.. versionadded:: 5.2
-
 To customize the automatic import behavior of the :djadmin:`shell` management
 command, override the ``get_auto_imports()`` method. This method should return
 a sequence of import paths for objects or modules available in the application.

@@ -136,8 +136,6 @@ paths to these files.
 ``Script`` objects
 ~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 5.2
-
 .. class:: Script(src, **attributes)
 
     Represents a script file.
@@ -320,10 +318,6 @@ HTML:
             crossorigin="anonymous"
             async>
     </script>
-
-.. versionchanged:: 5.2
-
-    The object class ``Script`` was added.
 
 ``Media`` objects
 =================
