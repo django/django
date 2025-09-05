@@ -116,7 +116,7 @@ class RelatedGeoModelTest(TestCase):
         select_related on a query over a model with an FK to a model subclass.
         """
         # Regression test for #9752.
-        list(DirectoryEntry.objects.select_related())
+        list(DirectoryEntry.objects.select_related("location"))
 
     @skipUnlessGISLookup("within")
     def test06_f_expressions(self):
