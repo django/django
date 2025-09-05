@@ -590,25 +590,28 @@ class ChangeList:
             return qs.select_related()
 
         if self.list_select_related is False:
-            if self.has_related_field_in_list_display():
-                return qs.select_related()
+            if fields := self.get_select_related_fields():
+                return qs.select_related(*fields)
 
         if self.list_select_related:
             return qs.select_related(*self.list_select_related)
         return qs
 
-    def has_related_field_in_list_display(self):
+    def get_select_related_fields(self):
+        fields = []
         for field_name in self.list_display:
             try:
                 field = self.lookup_opts.get_field(field_name)
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.remote_field, ManyToOneRel):
+                if (
+                    isinstance(field.remote_field, ManyToOneRel)
                     # <FK>_id field names don't require a join.
-                    if field_name != field.attname:
-                        return True
-        return False
+                    and field_name != field.attname
+                ):
+                    fields.append(field_name)
+        return fields
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
