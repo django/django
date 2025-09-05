@@ -273,3 +273,7 @@ to remove usage of these features.
   ``django.contrib.postgres.aggregates.JSONBAgg``, and
   ``django.contrib.postgres.aggregates.StringAgg`` are removed in favor
   of the ``order_by`` parameter.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` is
+  removed.
