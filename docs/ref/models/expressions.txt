@@ -1100,8 +1100,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: set_returning
 
-        .. versionadded:: 5.2
-
         Tells Django that this expression contains a set-returning function,
         enforcing subquery evaluation. It's used, for example, to allow some
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
@@ -1109,8 +1107,6 @@ calling the appropriate methods on the wrapped expression.
         annotations spawn rows themselves. Defaults to ``False``.
 
     .. attribute:: allows_composite_expressions
-
-        .. versionadded:: 5.2
 
         Tells Django that this expression allows composite expressions, for
         example, to support :ref:`composite primary keys
