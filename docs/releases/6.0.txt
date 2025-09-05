@@ -540,6 +540,9 @@ Miscellaneous
   deleted files when ``--verbosity`` is 1. To see the details for each file
   deleted, set the ``--verbosity`` flag to 2 or higher.
 
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
+  separate descriptor class, the private ``GenericForeignKeyDescriptor``.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
