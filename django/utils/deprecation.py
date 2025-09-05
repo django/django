@@ -8,6 +8,8 @@ from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_asy
 
 import django
 
+django_file_prefixes = (os.path.dirname(django.__file__),)
+
 
 class RemovedInDjango61Warning(DeprecationWarning):
     pass
@@ -237,7 +239,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
                 f"Passing positional argument(s) {remapped_names_str} to {func_name}() "
                 "is deprecated. Use keyword arguments instead.",
                 deprecation_warning,
-                skip_file_prefixes=(os.path.dirname(django.__file__),),
+                skip_file_prefixes=django_file_prefixes,
             )
 
             return remaining_args, updated_kwargs
