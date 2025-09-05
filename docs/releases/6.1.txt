@@ -268,3 +268,7 @@ to remove usage of these features.
 
 * The ``all`` parameter for the ``django.contrib.staticfiles.finders.find()``
   function is removed in favor of the ``find_all`` parameter.
+
+* Fallbacks to ``request.user`` and ``request.auser()`` when ``user`` is
+  ``None`` in ``django.contrib.auth.login()`` and
+  ``django.contrib.auth.alogin()``, respectively, are removed.
