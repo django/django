@@ -960,6 +960,11 @@ subclass::
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
 
+    .. deprecated:: 6.0
+
+        Using ``True`` for ``list_select_related`` is deprecated. Use a list or
+        tuple of field names instead.
+
     .. note::
 
         ``ModelAdmin`` ignores this attribute when
@@ -1613,6 +1618,11 @@ default templates used by the :class:`ModelAdmin` views:
     The ``get_list_select_related`` method is given the ``HttpRequest`` and
     should return a boolean or list as :attr:`ModelAdmin.list_select_related`
     does.
+
+    .. deprecated:: 6.0
+
+        Returning ``True`` is deprecated. Return a list or tuple of field names
+        instead.
 
 .. method:: ModelAdmin.get_search_fields(request)
 

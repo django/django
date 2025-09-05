@@ -18,7 +18,7 @@ class M2MIntermediaryTests(TestCase):
         w2 = Writer.objects.create(reporter=r2, article=a, position="Contributor")
 
         self.assertQuerySetEqual(
-            a.writer_set.select_related().order_by("-position"),
+            a.writer_set.select_related("reporter", "article").order_by("-position"),
             [
                 ("John Smith", "Main writer"),
                 ("Jane Doe", "Contributor"),
