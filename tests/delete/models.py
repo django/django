@@ -32,6 +32,11 @@ class RChild(R):
     pass
 
 
+class RProxy(R):
+    class Meta:
+        proxy = True
+
+
 class RChildChild(RChild):
     pass
 
@@ -179,7 +184,7 @@ class RelToBase(models.Model):
 
 
 class Origin(models.Model):
-    pass
+    r_proxy = models.ForeignKey("RProxy", models.CASCADE, null=True)
 
 
 class Referrer(models.Model):
