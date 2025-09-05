@@ -1128,13 +1128,6 @@ is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related
 object.
 
-There may be some situations where you wish to call ``select_related()`` with a
-lot of related objects, or where you don't know all of the relations. In these
-cases it is possible to call ``select_related()`` with no arguments. This will
-follow all non-null foreign keys it can find - nullable foreign keys must be
-specified. This is not recommended in most cases as it is likely to make the
-underlying query more complex, and return more data, than is actually needed.
-
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter:
 
@@ -1145,6 +1138,18 @@ If you need to clear the list of related fields added by past calls of
 Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
+
+There may be some situations where you wish to call ``select_related()`` with a
+lot of related objects, or where you don't know all of the relations. In these
+cases it is possible to call ``select_related()`` with no arguments. This will
+follow all non-null foreign keys it can find - nullable foreign keys must be
+specified. This is not recommended in most cases as it is likely to make the
+underlying query more complex, and return more data, than is actually needed.
+
+.. deprecated:: 6.0
+
+    Calling ``select_related()`` with no arguments is deprecated and support
+    for it will be removed in Django 7.0. Specify the field to fetch instead.
 
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~

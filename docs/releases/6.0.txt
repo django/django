@@ -681,6 +681,10 @@ Miscellaneous
 * The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions are deprecated.
 
+* Calling :meth:`~django.db.models.query.QuerySet.select_related` with no
+  arguments to select all related fields, is deprecated. Specify the related
+  fields to fetch instead.
+
 Features removed in 6.0
 =======================
 

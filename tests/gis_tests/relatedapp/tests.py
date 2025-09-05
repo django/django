@@ -3,8 +3,9 @@ from django.contrib.gis.db.models.functions import Centroid
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import override_settings
+from django.test.utils import ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
 
@@ -15,7 +16,13 @@ class RelatedGeoModelTest(TestCase):
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.order_by("id")
-        qs2 = City.objects.order_by("id").select_related()
+        # RemovedInDjango70Warning: when the deprecation ends, the below
+        # queryset can be removed.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            qs2 = City.objects.order_by("id").select_related()
         qs3 = City.objects.order_by("id").select_related("location")
 
         # Reference data for what's in the fixtures.

@@ -1,4 +1,6 @@
 from django.test import TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     A,
@@ -58,13 +60,17 @@ class SelectRelatedRegressTests(TestCase):
             [(c1.id, "router/4", "switch/7"), (c2.id, "switch/7", "server/1")],
         )
 
-        connections = (
-            Connection.objects.filter(
-                start__device__building=b, end__device__building=b
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            connections = (
+                Connection.objects.filter(
+                    start__device__building=b, end__device__building=b
+                )
+                .select_related()
+                .order_by("id")
             )
-            .select_related()
-            .order_by("id")
-        )
         self.assertEqual(
             [(c.id, str(c.start), str(c.end)) for c in connections],
             [(c1.id, "router/4", "switch/7"), (c2.id, "switch/7", "server/1")],
