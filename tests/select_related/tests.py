@@ -3,7 +3,8 @@ import gc
 from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import garbage_collect
+from django.test.utils import garbage_collect, ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Bookmark,
@@ -106,10 +107,15 @@ class SelectRelatedTests(TestCase):
                 ],
             )
 
+    # RemovedInDjango70Warning.
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
-            world = Species.objects.select_related()
+            with ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ):
+                world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
                 sorted(families),
@@ -120,6 +126,15 @@ class SelectRelatedTests(TestCase):
                     "Hominidae",
                 ],
             )
+
+    # RemovedInDjango70Warning.
+    def test_select_related_no_arguments_deprecated(self):
+        msg = (
+            "Calling select_related() with no arguments is deprecated. "
+            "Specify the fields to fetch instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            Species.objects.select_related()
 
     def test_list_with_depth(self):
         """
