@@ -19,7 +19,7 @@ At the highest level, you can serialize data like this::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all())
+    data = serializers.serialize("json", SomeModel.objects.all())
 
 The arguments to the ``serialize`` function are the format to serialize the data
 to (see `Serialization formats`_) and a
@@ -31,16 +31,16 @@ almost always be a QuerySet).
 
 You can also use a serializer object directly::
 
-    XMLSerializer = serializers.get_serializer("xml")
-    xml_serializer = XMLSerializer()
-    xml_serializer.serialize(queryset)
-    data = xml_serializer.getvalue()
+    JSONSerializer = serializers.get_serializer("json")
+    json_serializer = JSONSerializer()
+    json_serializer.serialize(queryset)
+    data = json_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
 (which includes an :class:`~django.http.HttpResponse`)::
 
-    with open("file.xml", "w") as out:
-        xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+    with open("file.json", "w") as out:
+        json_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
@@ -58,7 +58,7 @@ specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all(), fields=["name", "size"])
+    data = serializers.serialize("json", SomeModel.objects.all(), fields=["name", "size"])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
 be serialized. The primary key is always serialized as the ``pk`` element in the
@@ -94,7 +94,7 @@ model will be serialized. For example, consider the following models::
 
 If you only serialize the Restaurant model::
 
-    data = serializers.serialize("xml", Restaurant.objects.all())
+    data = serializers.serialize("json", Restaurant.objects.all())
 
 the fields on the serialized output will only contain the ``serves_hot_dogs``
 attribute. The ``name`` attribute of the base class will be ignored.
@@ -103,14 +103,14 @@ In order to fully serialize your ``Restaurant`` instances, you will need to
 serialize the ``Place`` models as well::
 
     all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
-    data = serializers.serialize("xml", all_objects)
+    data = serializers.serialize("json", all_objects)
 
 Deserializing data
 ==================
 
 Deserializing data is very similar to serializing it::
 
-    for obj in serializers.deserialize("xml", data):
+    for obj in serializers.deserialize("json", data):
         do_something_with(obj)
 
 As you can see, the ``deserialize`` function takes the same format argument as
@@ -133,7 +133,7 @@ data in your serialized representation doesn't match what's currently in the
 database. Usually, working with these ``DeserializedObject`` instances looks
 something like::
 
-    for deserialized_object in serializers.deserialize("xml", data):
+    for deserialized_object in serializers.deserialize("json", data):
         if object_should_be_saved(deserialized_object):
             deserialized_object.save()
 
@@ -146,7 +146,7 @@ If fields in the serialized data do not exist on a model, a
 ``DeserializationError`` will be raised unless the ``ignorenonexistent``
 argument is passed in as ``True``::
 
-    serializers.deserialize("xml", data, ignorenonexistent=True)
+    serializers.deserialize("json", data, ignorenonexistent=True)
 
 .. _serialization-formats:
 
@@ -671,7 +671,7 @@ Typical usage looks like this::
 
     objs_with_deferred_fields = []
 
-    for obj in serializers.deserialize("xml", data, handle_forward_references=True):
+    for obj in serializers.deserialize("json", data, handle_forward_references=True):
         obj.save()
         if obj.deferred_fields is not None:
             objs_with_deferred_fields.append(obj)
