@@ -1158,6 +1158,41 @@ class FormattingTests(SimpleTestCase):
                 ),
             )
 
+    def test_fr_ca_locale(self):
+        """
+        Test for French Canadian locale (uses 'h' as time format seperator)
+        """
+        with translation.override("fr-ca", deactivate=True):
+            self.assertEqual("j F Y", get_format("DATE_FORMAT"))
+            self.assertEqual(0, get_format("FIRST_DAY_OF_WEEK"))
+            self.assertEqual(",", get_format("DECIMAL_SEPARATOR"))
+            self.assertEqual("31 décembre 2009", date_format(self.d))
+            self.assertEqual("10\xa0h\xa015", time_format(self.t))
+            self.assertEqual(
+                "31 décembre 2009, 20\xa0h\xa050",
+                date_format(self.dt, "DATETIME_FORMAT"),
+            )
+            self.assertEqual("décembre 2009", date_format(self.d, "YEAR_MONTH_FORMAT"))
+            self.assertEqual("31 décembre", date_format(self.d, "MONTH_DAY_FORMAT"))
+            self.assertEqual("2009-12-31", date_format(self.d, "SHORT_DATE_FORMAT"))
+            self.assertEqual(
+                "2009-12-31 20\xa0h\xa050",
+                date_format(self.dt, "SHORT_DATETIME_FORMAT"),
+            )
+            self.assertEqual("No localizable", localize("No localizable"))
+
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
+                self.assertEqual("66\xa0666,666", localize(self.n))
+                self.assertEqual("99\xa0999,999", localize(self.f))
+                self.assertEqual("10\xa0000", localize(self.long))
+
+            with self.settings(USE_THOUSAND_SEPARATOR=False):
+                self.assertEqual("66666,666", localize(self.n))
+                self.assertEqual("99999,999", localize(self.f))
+                self.assertEqual("10000", localize(self.long))
+                self.assertEqual("31 décembre 2009", localize(self.d))
+                self.assertEqual("31 décembre 2009, 20\xa0h\xa050", localize(self.dt))
+
     def test_sub_locales(self):
         """
         Check if sublocales fall back to the main locale
