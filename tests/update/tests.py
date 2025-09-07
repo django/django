@@ -19,6 +19,14 @@ from .models import (
     UniqueNumberChild,
 )
 
+from typing import cast
+from django.db.models.fields.related import ForeignKey
+from django.test import TestCase
+from unittest import mock
+import sys
+
+from .models import A, B, D
+
 
 class SimpleTest(TestCase):
     @classmethod
@@ -26,55 +34,49 @@ class SimpleTest(TestCase):
         cls.a1 = A.objects.create()
         cls.a2 = A.objects.create()
         B.objects.bulk_create(B(a=cls.a1) for _ in range(20))
-        for x in range(20):
+        for _ in range(20):
             D.objects.create(a=cls.a1)
 
+    def _get_reverse_manager(self, model_cls, fk_field, instance):
+        """Utility to get the reverse manager dynamically."""
+        fk = cast(ForeignKey, model_cls._meta.get_field(fk_field))
+        manager_name = fk.remote_field.get_accessor_name()
+        return getattr(instance, manager_name)
+
     def test_nonempty_update(self):
-        """
-        Update changes the right number of rows for a nonempty queryset
-        """
-        num_updated = self.a1.b_set.update(y=100)
+        num_updated = self._get_reverse_manager(B, "a", self.a1).update(y=100)
         self.assertEqual(num_updated, 20)
         cnt = B.objects.filter(y=100).count()
         self.assertEqual(cnt, 20)
 
     def test_empty_update(self):
-        """
-        Update changes the right number of rows for an empty queryset
-        """
-        num_updated = self.a2.b_set.update(y=100)
+        num_updated = self._get_reverse_manager(B, "a", self.a2).update(y=100)
         self.assertEqual(num_updated, 0)
         cnt = B.objects.filter(y=100).count()
         self.assertEqual(cnt, 0)
 
     def test_nonempty_update_with_inheritance(self):
-        """
-        Update changes the right number of rows for an empty queryset
-        when the update affects only a base table
-        """
-        num_updated = self.a1.d_set.update(y=100)
+        num_updated = self._get_reverse_manager(D, "a", self.a1).update(y=100)
         self.assertEqual(num_updated, 20)
         cnt = D.objects.filter(y=100).count()
         self.assertEqual(cnt, 20)
 
     def test_empty_update_with_inheritance(self):
-        """
-        Update changes the right number of rows for an empty queryset
-        when the update affects only a base table
-        """
-        num_updated = self.a2.d_set.update(y=100)
+        num_updated = self._get_reverse_manager(D, "a", self.a2).update(y=100)
         self.assertEqual(num_updated, 0)
         cnt = D.objects.filter(y=100).count()
         self.assertEqual(cnt, 0)
 
     def test_foreign_key_update_with_id(self):
-        """
-        Update works using <field>_id for foreign keys
-        """
-        num_updated = self.a1.d_set.update(a_id=self.a2)
+        num_updated = self._get_reverse_manager(D, "a", self.a1).update(a_id=self.a2.pk)
         self.assertEqual(num_updated, 20)
-        self.assertEqual(self.a2.d_set.count(), 20)
+        self.assertEqual(self._get_reverse_manager(D, "a", self.a2).count(), 20)
 
+    def test_mysql_importerror_simulation(self):
+        with mock.patch.dict(sys.modules, {"MySQLdb": None}):
+            from django.db.backends.mysql.base import DatabaseWrapper
+            with self.assertRaises(ImportError):
+                DatabaseWrapper({"NAME": "dummy"})
 
 class AdvancedTests(TestCase):
     @classmethod

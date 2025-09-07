@@ -7,7 +7,6 @@
 #
 # * update_catalogs: check for new strings in core and contrib catalogs, and
 #                    output how much strings are new/changed.
-#
 # * lang_stats: output statistics for each catalog/language combination
 #
 # * fetch: fetch translations from transifex.com
