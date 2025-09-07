@@ -39,8 +39,8 @@ else:
 
 try:
     import MySQLdb
-except ImportError:
-    pass
+except ImportError as e:
+    raise ImportError(f"Failed to import MyModel: {e}")
 else:
     # Ignore informational warnings from QuerySet.explain().
     warnings.filterwarnings("ignore", r"\(1003, *", category=MySQLdb.Warning)
