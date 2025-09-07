@@ -14,6 +14,14 @@ from django.utils.http import http_date, parse_http_date
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
+from typing import Optional
+from pathlib import Path
+import posixpath
+
+from django.utils._os import safe_join
+from django.http import HttpRequest, HttpResponse
+from django.views import static as static_views  # optional, for helpers
+
 
 def builtin_template_path(name):
     """
@@ -25,7 +33,7 @@ def builtin_template_path(name):
     return Path(__file__).parent / "templates" / name
 
 
-def serve(request, path, document_root=None, show_indexes=False):
+def serve(request: HttpRequest,path: str,document_root: Optional[str] = None,show_indexes: bool = False,) -> HttpResponse:
     """
     Serve static files below a given point in the directory structure.
 
@@ -42,8 +50,10 @@ def serve(request, path, document_root=None, show_indexes=False):
     ``static/directory_index.html``.
     """
     path = posixpath.normpath(path).lstrip("/")
+    if document_root is None:
+        raise ValueError("serve() requires a document_root")
     fullpath = Path(safe_join(document_root, path))
-    if fullpath.is_dir():
+    if fullpath.is_dir():   
         if show_indexes:
             return directory_index(path, fullpath)
         raise Http404(_("Directory indexes are not allowed here."))
