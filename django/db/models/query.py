@@ -731,7 +731,8 @@ class QuerySet(AltersData):
                 )
             if any(f in self.model._meta.pk_fields for f in update_fields):
                 raise ValueError(
-                    "bulk_create() cannot be used with primary keys in update_fields."
+                    "bulk_create() cannot be used with primary keys in "
+                    "update_fields."
                 )
             if unique_fields:
                 if any(not f.concrete or f.many_to_many for f in unique_fields):
@@ -1445,9 +1446,7 @@ class QuerySet(AltersData):
         clone._iterable_class = (
             NamedValuesListIterable
             if named
-            else FlatValuesListIterable
-            if flat
-            else ValuesListIterable
+            else FlatValuesListIterable if flat else ValuesListIterable
         )
         return clone
 
@@ -1735,7 +1734,8 @@ class QuerySet(AltersData):
         for alias, annotation in annotations.items():
             if alias in names:
                 raise ValueError(
-                    "The annotation '%s' conflicts with a field on the model." % alias
+                    "The annotation '%s' conflicts with a field on "
+                    "the model." % alias
                 )
             if isinstance(annotation, FilteredRelation):
                 clone.query.add_filtered_relation(annotation, alias)
