@@ -1450,6 +1450,14 @@ class QuerySet(AltersData):
         )
         return clone
 
+    async def avalues(self, *fields, **expressions):
+        """Return a list of dictionaries instead of a QuerySet."""
+        return [obj async for obj in self.values(*fields, **expressions)]
+
+    async def avalues_list(self, *fields, **kwargs):
+        """Return a list of tuples instead of a QuerySet."""
+        return [obj async for obj in self.values_list(*fields, **kwargs)]
+
     def dates(self, field_name, kind, order="ASC"):
         """
         Return a list of date objects representing all available dates for
@@ -1527,6 +1535,13 @@ class QuerySet(AltersData):
         """
         self._not_support_combined_queries("filter")
         return self._filter_or_exclude(False, args, kwargs)
+
+    def afilter(self, *args, **kwargs):
+        """
+        Return a new QuerySet instance with the args ANDed to the existing
+        set.
+        """
+        return self.filter(*args, **kwargs)
 
     def exclude(self, *args, **kwargs):
         """

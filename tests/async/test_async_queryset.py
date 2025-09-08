@@ -257,3 +257,18 @@ class AsyncQuerySetTest(TestCase):
         sql = "SELECT id, field FROM async_simplemodel WHERE created=%s"
         qs = SimpleModel.objects.raw(sql, [self.s1.created])
         self.assertEqual([o async for o in qs], [self.s1])
+
+    async def test_afilter(self):
+        qs = SimpleModel.objects.afilter(field=1)
+        self.assertEqual(await qs.acount(), 1)
+        self.assertEqual(await qs.afirst(), self.s1)
+
+    async def test_avalues(self):
+        data = await SimpleModel.objects.filter(field=1).avalues("field")
+        self.assertEqual(data, [{"field": 1}])
+
+    async def test_avalues_list_flat(self):
+        data = await SimpleModel.objects.filter(field=1).avalues_list(
+            "field", flat=True
+        )
+        self.assertEqual(data, [1])
