@@ -463,7 +463,7 @@ def _init_worker(
             process_setup(*process_setup_args)
         django.setup()
         setup_test_environment(debug=debug_mode)
-        with open(os.devnull, 'w') as devnull:
+        with open(os.devnull, "w") as devnull:
             with redirect_stdout(devnull):
                 call_command("check", verbosity=0, databases=used_aliases)
 
