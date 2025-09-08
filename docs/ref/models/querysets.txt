@@ -201,16 +201,91 @@ executed.
 
 .. method:: filter(*args, **kwargs)
 
-Returns a new ``QuerySet`` containing objects that match the given lookup
+Returns a new ``QuerySet`` containing objects that match the given lookup 
 parameters.
 
-The lookup parameters (``**kwargs``) should be in the format described in
-`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
+The lookup parameters (``**kwargs``) should be in the form described in 
+`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the 
 underlying SQL statement.
 
-If you need to execute more complex queries (for example, queries with ``OR``
-statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+If you need to execute more complex quries (for example, queries with ``OR`` statements),
+you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+.. _filtering-across-relationships:
+
+Combining Filters on Related Models
+--------------------------------------
+
+When filtering querysets across related models, combining conditions in a single
+``filter()`` call (e.g., ``filter(a, b)``) is not always equivalent to chaining
+multiple ``filter()`` calls (e.g., ``filter(a).filter(b)``). This is due to how
+Django generates SQL joins for related models.
+
+For example, consider two models: ``MaintenanceOperation`` and
+``UnscheduledMaintenance``, where an unscheduled maintenance has a foreign key to a
+maintenance operation:
+
+.. code-block:: python
+
+    # Single filter with multiple conditions
+    qs1 = MaintenanceOperation.objects.filter(
+        maintenances__execution_start__gt='2030-04-10T12:00:00Z',
+        maintenances__execution_start__lt='2030-04-20T12:00:00Z'
+    )
+
+This generates SQL with a single ``INNER JOIN``, requiring the *same* unscheduled
+maintenance to satisfy both conditions (execution start after April 10, 2030, *and*
+before April 20, 2030). If no single unscheduled maintenance meets both criteria,
+the queryset will be empty.
+
+In contrast:
+
+.. code-block:: python
+
+    # Chained filters
+    qs2 = MaintenanceOperation.objects.filter(
+        maintenances__execution_start__gt='2030-04-10T12:00:00Z'
+    ).filter(
+        maintenances__execution_start__lt='2030-04-20T12:00:00Z'
+    )
+
+This generates SQL with multiple ``INNER JOIN``\s, allowing *different* unscheduled
+maintenances to satisfy each condition. For example, one unscheduled maintenance
+might have an execution start after April 10, 2030, and another before April 20,
+2030, causing the maintenance operation to be included in the queryset.
+
+The resulting SQL for ``qs1`` might look like:
+
+.. code-block:: sql
+
+    SELECT "maintenance_maintenanceoperation"."id"
+    FROM "maintenance_maintenanceoperation"
+    INNER JOIN "maintenance_maintenance" ON
+        ("maintenance_maintenanceoperation"."id" = "maintenance_maintenance"."operation_id")
+    WHERE ("maintenance_maintenanceoperation"."deleted_at" IS NULL AND
+           "maintenance_maintenance"."execution_start" > '2030-04-10 12:00:00+00:00' AND
+           "maintenance_maintenance"."execution_start" < '2030-04-20 12:00:00+00:00')
+
+For ``qs2``, the SQL includes an additional join:
+
+.. code-block:: sql
+
+    SELECT "maintenance_maintenanceoperation"."id"
+    FROM "maintenance_maintenanceoperation"
+    INNER JOIN "maintenance_maintenance" ON
+        ("maintenance_maintenanceoperation"."id" = "maintenance_maintenance"."operation_id")
+    INNER JOIN "maintenance_maintenance" T3 ON
+        ("maintenance_maintenanceoperation"."id" = T3."operation_id")
+    WHERE ("maintenance_maintenanceoperation"."deleted_at" IS NULL AND
+           "maintenance_maintenance"."execution_start" > '2030-04-10 12:00:00+00:00' AND
+           T3."execution_start" < '2030-04-20 12:00:00+00:00')
+
+**Note**: When filtering across relationships, choose the approach that matches
+your intended logic. Use a single ``filter()`` for conditions that must apply to
+the same related object, and chained ``filter()`` calls for conditions that can
+apply to different related objects.
+
+    
 ``exclude()``
 ~~~~~~~~~~~~~
 
