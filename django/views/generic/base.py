@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.utils.decorators import classonlymethod
 from django.utils.functional import classproperty
 from django.utils.log import log_response
-
+from urllib.parse import urlparse
 logger = logging.getLogger("django.request")
 
 
@@ -252,7 +252,10 @@ class RedirectView(View):
 
         args = self.request.META.get("QUERY_STRING", "")
         if args and self.query_string:
-            url = "%s?%s" % (url, args)
+            if urlparse(url).query:
+                url = f"{url}&{args}"
+            else:
+                url = f"{url}?{args}"
         return url
 
     def get(self, request, *args, **kwargs):
