@@ -96,7 +96,7 @@ def check_line_too_long_django(file, lines, options=None):
                     continue
             except IndexError:
                 # End of file
-                continue
+                pass
             if len(set(line.strip())) == 1 and len(line) == len(lines[lno - 1]):
                 continue  # Ignore heading underline
             if lno in table_rows:

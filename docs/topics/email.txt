@@ -313,7 +313,7 @@ recipients, file attachments, or multi-part email, you'll need to create
 message itself. The :ref:`email backend <topic-email-backends>` is then
 responsible for sending the email.
 
-For convenience, :class:`~django.core.mail.EmailMessage` provides a ``send()``
+For convenience, :class:`EmailMessage` provides a :meth:`~EmailMessage.send`
 method for sending a single email. If you need to send multiple messages, the
 email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
@@ -323,185 +323,201 @@ email backend API :ref:`provides an alternative
 
 .. class:: EmailMessage
 
-The :class:`~django.core.mail.EmailMessage` class is initialized with the
-following parameters. All parameters are optional and can be set at any time
-prior to calling the ``send()`` method.
+    The :class:`!EmailMessage` class is initialized with the following
+    parameters. All parameters are optional and can be set at any time prior
+    to calling the :meth:`send` method.
 
-The first four parameters can be passed as positional or keyword arguments,
-but must be in the given order if positional arguments are used:
+    The first four parameters can be passed as positional or keyword arguments,
+    but must be in the given order if positional arguments are used:
 
-* ``subject``: The subject line of the email.
+    * ``subject``: The subject line of the email.
 
-* ``body``: The body text. This should be a plain text message.
+    * ``body``: The body text. This should be a plain text message.
 
-* ``from_email``: The sender's address. Both ``fred@example.com`` and
-  ``"Fred" <fred@example.com>`` forms are legal. If omitted, the
-  :setting:`DEFAULT_FROM_EMAIL` setting is used.
+    * ``from_email``: The sender's address. Both ``fred@example.com`` and
+      ``"Fred" <fred@example.com>`` forms are legal. If omitted, the
+      :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
-* ``to``: A list or tuple of recipient addresses.
+    * ``to``: A list or tuple of recipient addresses.
 
-The following parameters must be given as keyword arguments if used:
+    The following parameters must be given as keyword arguments if used:
 
-* ``cc``: A list or tuple of recipient addresses used in the "Cc" header
-  when sending the email.
+    * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
+      when sending the email.
 
-* ``bcc``: A list or tuple of addresses used in the "Bcc" header when
-  sending the email.
+    * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
+      sending the email.
 
-* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
-  header when sending the email.
+    * ``reply_to``: A list or tuple of recipient addresses used in the
+      "Reply-To" header when sending the email.
 
-* ``attachments``: A list of attachments to put on the message. Each can
-  be an instance of :class:`~email.message.MIMEPart` or
-  :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
-  ``(filename, content, mimetype)``.
+    * ``attachments``: A list of attachments to put on the message. Each can
+      be an instance of :class:`~email.message.MIMEPart` or
+      :class:`EmailAttachment`, or a tuple with attributes
+      ``(filename, content, mimetype)``.
 
-  .. versionchanged:: 5.2
+      .. versionchanged:: 5.2
 
-    Support for :class:`~django.core.mail.EmailAttachment` items of
-    ``attachments`` was added.
+          Support for :class:`EmailAttachment` items of ``attachments`` was
+          added.
 
-  .. versionchanged:: 6.0
+      .. versionchanged:: 6.0
 
-    Support for :class:`~email.message.MIMEPart` objects in the ``attachments``
-    list was added.
+          Support for :class:`~email.message.MIMEPart` objects in the
+          ``attachments`` list was added.
 
-  .. deprecated:: 6.0
+      .. deprecated:: 6.0
 
-    Support for Python's legacy :class:`~email.mime.base.MIMEBase` objects in
-    ``attachments`` is deprecated. Use :class:`~email.message.MIMEPart`
-    instead.
+          Support for Python's legacy :class:`~email.mime.base.MIMEBase`
+          objects in ``attachments`` is deprecated. Use
+          :class:`~email.message.MIMEPart` instead.
 
-* ``headers``: A dictionary of extra headers to put on the message. The
-  keys are the header name, values are the header values. It's up to the
-  caller to ensure header names and values are in the correct format for
-  an email message. The corresponding attribute is ``extra_headers``.
+    * ``headers``: A dictionary of extra headers to put on the message. The
+      keys are the header name, values are the header values. It's up to the
+      caller to ensure header names and values are in the correct format for
+      an email message. The corresponding attribute is ``extra_headers``.
 
-* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
-  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
-  want to use the same connection for multiple messages. If omitted, a new
-  connection is created when ``send()`` is called. This parameter is ignored
-  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
-
-.. deprecated:: 6.0
-
-    Passing all except the first four parameters as positional arguments is
-    deprecated.
-
-For example::
-
-    from django.core.mail import EmailMessage
-
-    email = EmailMessage(
-        subject="Hello",
-        body="Body goes here",
-        from_email="from@example.com",
-        to=["to1@example.com", "to2@example.com"],
-        bcc=["bcc@example.com"],
-        reply_to=["another@example.com"],
-        headers={"Message-ID": "foo"},
-    )
-
-The class has the following methods:
-
-* ``send(fail_silently=False)`` sends the message. If a connection was
-  specified when the email was constructed, that connection will be used.
-  Otherwise, an instance of the default backend will be instantiated and
-  used. If the keyword argument ``fail_silently`` is ``True``, exceptions
-  raised while sending the message will be quashed. An empty list of
-  recipients will not raise an exception. It will return ``1`` if the message
-  was sent successfully, otherwise ``0``.
-
-* ``message(policy=email.policy.default)`` constructs and returns a Python
-  :class:`email.message.EmailMessage` object representing the message to be
-  sent.
-
-  The keyword argument ``policy`` allows specifying the set of rules for
-  updating and serializing the representation of the message. It must be an
-  :mod:`email.policy.Policy <email.policy>` object. Defaults to
-  :data:`email.policy.default`. In certain cases you may want to use
-  :data:`~email.policy.SMTP`, :data:`~email.policy.SMTPUTF8` or a custom
-  policy. For example, :class:`django.core.mail.backends.smtp.EmailBackend`
-  uses the :data:`~email.policy.SMTP` policy to ensure ``\r\n`` line endings
-  as required by the SMTP protocol.
-
-  If you ever need to extend Django's :class:`~django.core.mail.EmailMessage`
-  class, you'll probably want to override this method to put the content you
-  want into the Python EmailMessage object.
-
-  .. versionchanged:: 6.0
-
-      The ``policy`` keyword argument was added and the return type was updated
-      to an instance of :class:`~email.message.EmailMessage`.
-
-* ``recipients()`` returns a list of all the recipients of the message,
-  whether they're recorded in the ``to``, ``cc`` or ``bcc`` attributes. This
-  is another method you might need to override when subclassing, because the
-  SMTP server needs to be told the full list of recipients when the message
-  is sent. If you add another way to specify recipients in your class, they
-  need to be returned from this method as well.
-
-* ``attach()`` creates a new attachment and adds it to the message.
-  There are two ways to call ``attach()``:
-
-  * You can pass it three arguments: ``filename``, ``content`` and
-    ``mimetype``. ``filename`` is the name of the file attachment as it will
-    appear in the email, ``content`` is the data that will be contained inside
-    the attachment and ``mimetype`` is the optional MIME type for the
-    attachment. If you omit ``mimetype``, the MIME content type will be guessed
-    from the filename of the attachment.
-
-    For example::
-
-       message.attach("design.png", img_data, "image/png")
-
-    If you specify a ``mimetype`` of :mimetype:`message/rfc822`, ``content``
-    can be a :class:`django.core.mail.EmailMessage` or Python's
-    :class:`email.message.EmailMessage` or :class:`email.message.Message`.
-
-    For a ``mimetype`` starting with :mimetype:`text/`, content is expected to
-    be a string. Binary data will be decoded using UTF-8, and if that fails,
-    the MIME type will be changed to :mimetype:`application/octet-stream` and
-    the data will be attached unchanged.
-
-  * Or for attachments requiring additional headers or parameters, you can pass
-    ``attach()`` a single Python :class:`~email.message.MIMEPart` object.
-    This will be attached directly to the resulting message. For example,
-    to attach an inline image with a :mailheader:`Content-ID`::
-
-        cid = email.utils.make_msgid()
-        inline_image = email.message.MIMEPart()
-        inline_image.set_content(
-            image_data_bytes,
-            maintype="image",
-            subtype="png",
-            disposition="inline",
-            cid=f"<{cid}>",
-        )
-        message.attach(inline_image)
-        message.attach_alternative(f'… <img src="cid:${cid}"> …', "text/html")
-
-    Python's :meth:`email.contentmanager.set_content` documentation describes
-    the supported arguments for ``MIMEPart.set_content()``.
-
-    .. versionchanged:: 6.0
-
-        Support for :class:`~email.message.MIMEPart` attachments was added.
+    * ``connection``: An :ref:`email backend <topic-email-backends>` instance.
+      Use this parameter if you are sending the :class:`!EmailMessage` via
+      :meth:`send` and you want to use the same connection for multiple
+      messages. If omitted, a new connection is created when :meth:`send` is
+      called. This parameter is ignored when using
+      :ref:`send_messages() <topics-sending-multiple-emails>`.
 
     .. deprecated:: 6.0
 
-        Support for :class:`email.mime.base.MIMEBase` attachments is
-        deprecated. Use :class:`~email.message.MIMEPart` instead.
+        Passing all except the first four parameters as positional arguments is
+        deprecated.
 
-* ``attach_file()`` creates a new attachment using a file from your
-  filesystem. Call it with the path of the file to attach and, optionally,
-  the MIME type to use for the attachment. If the MIME type is omitted, it
-  will be guessed from the filename. You can use it like this::
+    For example::
 
-    message.attach_file("/images/weather_map.png")
+        from django.core.mail import EmailMessage
 
-  For MIME types starting with :mimetype:`text/`, binary data is handled as in
-  ``attach()``.
+        email = EmailMessage(
+            subject="Hello",
+            body="Body goes here",
+            from_email="from@example.com",
+            to=["to1@example.com", "to2@example.com"],
+            bcc=["bcc@example.com"],
+            reply_to=["another@example.com"],
+            headers={"Message-ID": "foo"},
+        )
+
+    The class has the following methods:
+
+    .. method:: send(fail_silently=False)
+
+        Sends the message. If a connection was specified when the email was
+        constructed, that connection will be used. Otherwise, an instance of
+        the default backend will be instantiated and used. If the keyword
+        argument ``fail_silently`` is ``True``, exceptions raised while sending
+        the message will be quashed. An empty list of recipients will not raise
+        an exception. It will return ``1`` if the message was sent
+        successfully, otherwise ``0``.
+
+    .. method:: message(policy=email.policy.default)
+
+        Constructs and returns a Python :class:`email.message.EmailMessage`
+        object representing the message to be sent.
+
+        The keyword argument ``policy`` allows specifying the set of rules for
+        updating and serializing the representation of the message. It must be
+        an :mod:`email.policy.Policy <email.policy>` object. Defaults to
+        :data:`email.policy.default`. In certain cases you may want to use
+        :data:`~email.policy.SMTP`, :data:`~email.policy.SMTPUTF8` or a custom
+        policy. For example,
+        :class:`django.core.mail.backends.smtp.EmailBackend` uses the
+        :data:`~email.policy.SMTP` policy to ensure ``\r\n`` line endings as
+        required by the SMTP protocol.
+
+        If you ever need to extend Django's :class:`EmailMessage` class,
+        you'll probably want to override this method to put the content you
+        want into the Python EmailMessage object.
+
+        .. versionchanged:: 6.0
+
+            The ``policy`` keyword argument was added and the return type was
+            updated to an instance of :class:`~email.message.EmailMessage`.
+
+    .. method:: recipients()
+
+        Returns a list of all the recipients of the message, whether they're
+        recorded in the ``to``, ``cc`` or ``bcc`` attributes. This is another
+        method you might need to override when subclassing, because the SMTP
+        server needs to be told the full list of recipients when the message
+        is sent. If you add another way to specify recipients in your class,
+        they need to be returned from this method as well.
+
+    .. method:: attach(filename, content, mimetype)
+                attach(mimepart)
+
+        Creates a new attachment and adds it to the message. There are two ways
+        to call :meth:`!attach`:
+
+        * You can pass it three arguments: ``filename``, ``content`` and
+          ``mimetype``. ``filename`` is the name of the file attachment as it
+          will appear in the email, ``content`` is the data that will be
+          contained inside the attachment and ``mimetype`` is the optional MIME
+          type for the attachment. If you omit ``mimetype``, the MIME content
+          type will be guessed from the filename of the attachment.
+
+          For example::
+
+              message.attach("design.png", img_data, "image/png")
+
+          If you specify a ``mimetype`` of :mimetype:`message/rfc822`,
+          ``content`` can be a :class:`django.core.mail.EmailMessage` or
+          Python's :class:`email.message.EmailMessage` or
+          :class:`email.message.Message`.
+
+          For a ``mimetype`` starting with :mimetype:`text/`, content is
+          expected to be a string. Binary data will be decoded using UTF-8,
+          and if that fails, the MIME type will be changed to
+          :mimetype:`application/octet-stream` and the data will be attached
+          unchanged.
+
+        * Or for attachments requiring additional headers or parameters, you
+          can pass :meth:`!attach` a single Python
+          :class:`~email.message.MIMEPart` object. This will be attached
+          directly to the resulting message. For example, to attach an inline
+          image with a :mailheader:`Content-ID`::
+
+              cid = email.utils.make_msgid()
+              inline_image = email.message.MIMEPart()
+              inline_image.set_content(
+                  image_data_bytes,
+                  maintype="image",
+                  subtype="png",
+                  disposition="inline",
+                  cid=f"<{cid}>",
+              )
+              message.attach(inline_image)
+              message.attach_alternative(f'… <img src="cid:${cid}"> …', "text/html")
+
+          Python's :meth:`email.contentmanager.set_content` documentation
+          describes the supported arguments for ``MIMEPart.set_content()``.
+
+          .. versionchanged:: 6.0
+
+              Support for :class:`~email.message.MIMEPart` attachments was
+              added.
+
+          .. deprecated:: 6.0
+
+              Support for :class:`email.mime.base.MIMEBase` attachments is
+              deprecated. Use :class:`~email.message.MIMEPart` instead.
+
+    .. method:: attach_file(path, mimetype=None)
+
+        Creates a new attachment using a file from your filesystem. Call it
+        with the path of the file to attach and, optionally, the MIME type to
+        use for the attachment. If the MIME type is omitted, it will be guessed
+        from the filename. You can use it like this::
+
+            message.attach_file("/images/weather_map.png")
+
+        For MIME types starting with :mimetype:`text/`, binary data is handled
+        as in :meth:`attach`.
 
 .. class:: EmailAttachment
 
@@ -661,8 +677,6 @@ Obtaining an instance of an email backend
 
 The :meth:`get_connection` function in ``django.core.mail`` returns an
 instance of the email backend that you can use.
-
-.. currentmodule:: django.core.mail
 
 .. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
 

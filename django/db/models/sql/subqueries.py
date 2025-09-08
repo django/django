@@ -87,15 +87,12 @@ class UpdateQuery(Query):
         values_seq = []
         for name, val in values.items():
             field = self.get_meta().get_field(name)
-            direct = (
-                not (field.auto_created and not field.concrete) or not field.concrete
-            )
             model = field.model._meta.concrete_model
             if field.name == "pk" and model._meta.is_composite_pk:
                 raise FieldError(
                     "Composite primary key fields must be updated individually."
                 )
-            if not direct or (field.is_relation and field.many_to_many):
+            if not field.concrete or (field.is_relation and field.many_to_many):
                 raise FieldError(
                     "Cannot update model field %r (only non-relations and "
                     "foreign keys permitted)." % field

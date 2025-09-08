@@ -1235,10 +1235,17 @@ def partialdef_func(parser, token):
 
     # Parse the content until the end tag.
     valid_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
+
+    pos_open = getattr(token, "position", None)
+    source_start = pos_open[0] if isinstance(pos_open, tuple) else None
+
     nodelist = parser.parse(valid_endpartials)
     endpartial = parser.next_token()
     if endpartial.contents not in valid_endpartials:
         parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
+
+    pos_close = getattr(endpartial, "position", None)
+    source_end = pos_close[1] if isinstance(pos_close, tuple) else None
 
     # Store the partial nodelist in the parser.extra_data attribute.
     partials = parser.extra_data.setdefault("partials", {})
@@ -1247,7 +1254,13 @@ def partialdef_func(parser, token):
             f"Partial '{partial_name}' is already defined in the "
             f"'{parser.origin.name}' template."
         )
-    partials[partial_name] = PartialTemplate(nodelist, parser.origin, partial_name)
+    partials[partial_name] = PartialTemplate(
+        nodelist,
+        parser.origin,
+        partial_name,
+        source_start=source_start,
+        source_end=source_end,
+    )
 
     return PartialDefNode(partial_name, inline, nodelist)
 

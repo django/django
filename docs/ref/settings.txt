@@ -1279,10 +1279,15 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 ``DEFAULT_AUTO_FIELD``
 ----------------------
 
-Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
+
+.. versionchanged:: 6.0
+
+    In older versions, the default value is
+    :class:`django.db.models.AutoField`.
 
 .. admonition:: Migrating auto-created through tables
 
