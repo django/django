@@ -587,6 +587,31 @@ class RedirectViewTest(LoggingAssertionMixin, SimpleTestCase):
                     handler, f"Gone: {escaped}", logging.WARNING, 410, request
                 )
 
+    def test_redirect_with_querry_string_in_destination(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/bar/?pork=spam")
+
+    def test_redirect_with_query_string_in_destination_and_request(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo/?utm_source=social")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"], "/bar/?pork=spam&utm_source=social"
+        )
+
+    def test_redirect_with_same_query_string_param_will_append_not_replace(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo/?utm_source=social&pork=ham")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"], "/bar/?pork=spam&utm_source=social&pork=ham"
+        )
+
 
 class GetContextDataTest(SimpleTestCase):
     def test_get_context_data_super(self):
