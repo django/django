@@ -14,7 +14,7 @@ import textwrap
 import unittest
 import unittest.suite
 from collections import defaultdict
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stdout
 from importlib import import_module
 
 import django
@@ -463,7 +463,9 @@ def _init_worker(
             process_setup(*process_setup_args)
         django.setup()
         setup_test_environment(debug=debug_mode)
-        call_command("check", verbosity=0, databases=used_aliases)
+        with open(os.devnull, 'w') as devnull:
+            with redirect_stdout(devnull):
+                call_command("check", verbosity=0, databases=used_aliases)
 
     db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:
