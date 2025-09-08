@@ -536,7 +536,20 @@ class StreamingHttpResponse(HttpResponseBase):
             )
             # sync iterator. Consume via sync_to_async and yield via async
             # generator.
-            for part in await sync_to_async(list)(self.streaming_content):
+            _iterator = self.streaming_content
+            _sentinel = object()
+
+            def _next_wrapper():
+                try:
+                    return _iterator.__next__()
+                except StopIteration:
+                    return _sentinel
+
+            _next = sync_to_async(_next_wrapper, thread_sensitive=False)
+            while True:
+                part = await _next()
+                if part is _sentinel:
+                    break
                 yield part
 
     def getvalue(self):

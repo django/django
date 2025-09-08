@@ -769,6 +769,17 @@ class StreamingHttpResponseTests(SimpleTestCase):
             chunks.append(chunk)
         self.assertEqual(chunks, [b"hello", b"world"])
 
+    async def test_async_streaming_response_sync_iterator_with_none(self):
+        def sync_iter_with_none():
+            yield b"hello"
+            yield b"world"
+
+        r = StreamingHttpResponse(sync_iter_with_none())
+        chunks = []
+        async for chunk in r:
+            chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
+
     def test_async_streaming_response_warning(self):
         async def async_iter():
             yield b"hello"
