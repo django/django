@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
@@ -15,7 +16,7 @@ from django.urls import reverse
 from django.utils.decorators import classonlymethod
 from django.utils.functional import classproperty
 from django.utils.log import log_response
-from urllib.parse import urlparse
+
 logger = logging.getLogger("django.request")
 
 
