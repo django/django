@@ -107,6 +107,11 @@ with :func:`~django.template.Engine.get_template`,
 template-loading tools, enabling more modular and maintainable templates
 without needing to split components into separate files.
 
+A `migration guide`_ is available if you're updating from the
+:pypi:`django-template-partials` third-party package.
+
+.. _migration guide: https://github.com/carltongibson/django-template-partials/blob/main/Migration.md
+
 Minor features
 --------------
 
