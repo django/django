@@ -180,12 +180,39 @@ backend whose :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` option is set to
 ``True``. By convention ``DjangoTemplates`` looks for a "templates"
 subdirectory in each of the :setting:`INSTALLED_APPS`.
 
-Within the ``templates`` directory you have just created, create another
-directory called ``polls``, and within that create a file called
-``index.html``. In other words, your template should be at
-``polls/templates/polls/index.html``. Because of how the ``app_directories``
-template loader works as described above, you can refer to this template within
-Django as ``polls/index.html``.
+So go to ``mysite/settings.py``, and under `TEMPLATES` add the predefined
+ `BASE_DIR` variable:
+
+.. code-block:: python
+    :caption: ``mysite/settings.py``
+
+    TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            BASE_DIR # Add this
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
+    # Leave the rest unchanged
+
+This tells Django where the ``templates`` directory is.
+
+Within templates, create another directory called polls, and within
+that create a file called index.html. In other words, your template should
+be at polls/templates/polls/index.html. Because of how the
+app_directories template loader works as described above, you can refer to
+this template within Django as polls/index.html.
 
 .. admonition:: Template namespacing
 
