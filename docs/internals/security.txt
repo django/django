@@ -292,7 +292,8 @@ requires a security release:
   * Exploits which fail to follow security best practices, such as failure to
     sanitize user input. For other examples, see our :ref:`security
     documentation <cross-site-scripting>`.
-  * Exploits in AI generated code that do not adhere to security best practices.
+  * Exploits in AI generated code that do not adhere to security best
+    practices.
 
 The security team may conclude that the source of the vulnerability is within
 the Python standard library, in which case the reporter will be asked to report
@@ -303,8 +304,8 @@ On occasion, a security release may be issued to help resolve a security
 vulnerability within a popular third-party package. These reports should come
 from the package maintainers.
 
-If you are unsure whether your finding meets these criteria, please still report
-it :ref:`privately by emailing security@djangoproject.com
+If you are unsure whether your finding meets these criteria, please still
+report it :ref:`privately by emailing security@djangoproject.com
 <reporting-security-issues>`. The security team will review your report and
 recommend the correct course of action.
 

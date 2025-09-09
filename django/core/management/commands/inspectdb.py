@@ -193,8 +193,8 @@ class Command(BaseCommand):
                             )
                         used_relations.add(rel_to)
                     else:
-                        # Calling `get_field_type` to get the field type string and any
-                        # additional parameters and notes.
+                        # Calling `get_field_type` to get the field type string
+                        # and any additional parameters and notes.
                         field_type, field_params, field_notes = self.get_field_type(
                             connection, table_name, row
                         )
@@ -203,8 +203,8 @@ class Command(BaseCommand):
 
                         field_type += "("
 
-                    # Don't output 'id = meta.AutoField(primary_key=True)', because
-                    # that's assumed if it doesn't exist.
+                    # Don't output 'id = meta.AutoField(primary_key=True)',
+                    # because that's assumed if it doesn't exist.
                     if att_name == "id" and extra_params == {"primary_key": True}:
                         if field_type == "AutoField(":
                             continue
@@ -215,8 +215,8 @@ class Command(BaseCommand):
                         ):
                             comment_notes.append("AutoField?")
 
-                    # Add 'null' and 'blank', if the 'null_ok' flag was present in the
-                    # table description.
+                    # Add 'null' and 'blank', if the 'null_ok' flag was present
+                    # in the table description.
                     if row.null_ok:  # If it's NULL...
                         extra_params["blank"] = True
                         extra_params["null"] = True
@@ -287,7 +287,8 @@ class Command(BaseCommand):
             while new_name.find(LOOKUP_SEP) >= 0:
                 new_name = new_name.replace(LOOKUP_SEP, "_")
             if col_name.lower().find(LOOKUP_SEP) >= 0:
-                # Only add the comment if the double underscore was in the original name
+                # Only add the comment if the double underscore was in the
+                # original name
                 field_notes.append(
                     "Field renamed because it contained more than one '_' in a row."
                 )

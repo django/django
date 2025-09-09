@@ -34,7 +34,8 @@ class GeometryFieldTest(SimpleTestCase):
         xform_geom = GEOSGeometry(
             "POINT (951640.547328465 4219369.26171664)", srid=32140
         )
-        # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
+        # The cleaned geometry is transformed to 32140 (the widget map_srid is
+        # 3857).
         cleaned_geom = fld.clean(
             "SRID=3857;POINT (-10615777.40976205 3473169.895707852)"
         )
@@ -73,7 +74,8 @@ class GeometryFieldTest(SimpleTestCase):
             GEOSGeometry("POINT(5 23)", srid=pnt_fld.widget.map_srid),
             pnt_fld.clean("POINT(5 23)"),
         )
-        # a WKT for any other geom_type will be properly transformed by `to_python`
+        # a WKT for any other geom_type will be properly transformed by
+        # `to_python`
         self.assertEqual(
             GEOSGeometry("LINESTRING(0 0, 1 1)", srid=pnt_fld.widget.map_srid),
             pnt_fld.to_python("LINESTRING(0 0, 1 1)"),
@@ -212,7 +214,7 @@ class GeometryFieldTest(SimpleTestCase):
             "id": "id_p",
             "geom_name": "Point",
         }
-        expected = json_script(attrs, "mapwidget-options")
+        expected = json_script(attrs, "id_p_mapwidget_options")
         self.assertInHTML(expected, rendered)
 
 
@@ -303,7 +305,7 @@ class SpecializedFieldTest(SimpleTestCase):
                 "id": map_field.id_for_label,
                 "geom_name": geom_name,
             }
-            expected = json_script(attrs, "mapwidget-options")
+            expected = json_script(attrs, f"{map_field.id_for_label}_mapwidget_options")
             self.assertInHTML(expected, rendered)
         self.assertIn("gis/js/OLMapWidget.js", str(form_instance.media))
 
@@ -473,7 +475,7 @@ class OSMWidgetTest(SimpleTestCase):
             "id": "id_p",
             "geom_name": "Point",
         }
-        expected = json_script(attrs, "mapwidget-options")
+        expected = json_script(attrs, "id_p_mapwidget_options")
         self.assertInHTML(expected, rendered)
 
 

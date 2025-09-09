@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from contextlib import nullcontext
 from functools import reduce
 from itertools import chain, islice
 
@@ -34,6 +35,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -755,7 +757,8 @@ class QuerySet(AltersData):
         Insert each of the instances into the database. Do *not* call
         save() on each of the instances, do not send any pre/post_save
         signals, and do not set the primary key attribute if it is an
-        autoincrement field (except if features.can_return_rows_from_bulk_insert=True).
+        autoincrement field (except if
+        features.can_return_rows_from_bulk_insert=True).
         Multi-table models are not supported.
         """
         # When you bulk insert you don't get the primary keys back (if it's an
@@ -774,8 +777,9 @@ class QuerySet(AltersData):
             raise ValueError("Batch size must be a positive integer.")
         # Check that the parents share the same concrete model with the our
         # model to detect the inheritance pattern ConcreteGrandParent ->
-        # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
-        # would not identify that case as involving multiple tables.
+        # MultiTableParent -> ProxyChild. Simply checking
+        # self.model._meta.proxy would not identify that case as involving
+        # multiple tables.
         for parent in self.model._meta.all_parents:
             if parent._meta.concrete_model is not self.model._meta.concrete_model:
                 raise ValueError("Can't bulk create a multi-table inherited model")
@@ -800,7 +804,11 @@ class QuerySet(AltersData):
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
-        with transaction.atomic(using=self.db, savepoint=False):
+        if objs_with_pk and objs_without_pk:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
             self._handle_order_with_respect_to(objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
@@ -1180,10 +1188,8 @@ class QuerySet(AltersData):
             if not id_list:
                 return {}
             filter_key = "{}__in".format(field_name)
-            max_params = connections[self.db].features.max_query_params or 0
-            num_fields = len(opts.pk_fields) if field_name == "pk" else 1
-            batch_size = max_params // num_fields
             id_list = tuple(id_list)
+            batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
             if batch_size and batch_size < len(id_list):
@@ -1302,10 +1308,10 @@ class QuerySet(AltersData):
 
     def _update(self, values):
         """
-        A version of update() that accepts field objects instead of field names.
-        Used primarily for model saving and not intended for use by general
-        code (it requires too much poking around at model internals to be
-        useful at that level).
+        A version of update() that accepts field objects instead of field
+        names. Used primarily for model saving and not intended for use by
+        general code (it requires too much poking around at model internals to
+        be useful at that level).
         """
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
@@ -1389,7 +1395,12 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            clone = clone.annotate(**expressions)
+            # RemovedInDjango70Warning: When the deprecation ends, deindent as:
+            # clone = clone.annotate(**expressions)
+            with warnings.catch_warnings(
+                action="ignore", category=RemovedInDjango70Warning
+            ):
+                clone = clone.annotate(**expressions)
         clone._fields = fields
         clone.query.set_values(fields)
         return clone
@@ -1916,11 +1927,21 @@ class QuerySet(AltersData):
         max_batch_size = max(ops.bulk_batch_size(fields, objs), 1)
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         inserted_rows = []
-        bulk_return = connection.features.can_return_rows_from_bulk_insert
-        for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and (
-                on_conflict is None or on_conflict == OnConflict.UPDATE
-            ):
+        returning_fields = (
+            self.model._meta.db_returning_fields
+            if (
+                connection.features.can_return_rows_from_bulk_insert
+                and (on_conflict is None or on_conflict == OnConflict.UPDATE)
+            )
+            else None
+        )
+        batches = [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]
+        if len(batches) > 1:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
+            for item in batches:
                 inserted_rows.extend(
                     self._insert(
                         item,
@@ -1929,17 +1950,8 @@ class QuerySet(AltersData):
                         on_conflict=on_conflict,
                         update_fields=update_fields,
                         unique_fields=unique_fields,
-                        returning_fields=self.model._meta.db_returning_fields,
+                        returning_fields=returning_fields,
                     )
-                )
-            else:
-                self._insert(
-                    item,
-                    fields=fields,
-                    using=self.db,
-                    on_conflict=on_conflict,
-                    update_fields=update_fields,
-                    unique_fields=unique_fields,
                 )
         return inserted_rows
 
@@ -2326,7 +2338,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
         return  # nothing to do
 
     # We need to be able to dynamically add to the list of prefetch_related
-    # lookups that we look up (see below).  So we need some book keeping to
+    # lookups that we look up (see below). So we need some book keeping to
     # ensure we don't do duplicate work.
     done_queries = {}  # dictionary of things like 'foo__bar': [results]
 
@@ -2365,9 +2377,9 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # Prepare objects:
             good_objects = True
             for obj in obj_list:
-                # Since prefetching can re-use instances, it is possible to have
-                # the same instance multiple times in obj_list, so obj might
-                # already be prepared.
+                # Since prefetching can re-use instances, it is possible to
+                # have the same instance multiple times in obj_list, so obj
+                # might already be prepared.
                 if not hasattr(obj, "_prefetched_objects_cache"):
                     try:
                         obj._prefetched_objects_cache = {}
@@ -2376,7 +2388,8 @@ def prefetch_related_objects(model_instances, *related_lookups):
                         # values_list(flat=True), for example (TypeError) or
                         # a QuerySet subclass that isn't returning Model
                         # instances (AttributeError), either in Django or a 3rd
-                        # party. prefetch_related() doesn't make sense, so quit.
+                        # party. prefetch_related() doesn't make sense, so
+                        # quit.
                         good_objects = False
                         break
             if not good_objects:
@@ -2384,8 +2397,9 @@ def prefetch_related_objects(model_instances, *related_lookups):
 
             # Descend down tree
 
-            # We assume that objects retrieved are homogeneous (which is the premise
-            # of prefetch_related), so what applies to first object applies to all.
+            # We assume that objects retrieved are homogeneous (which is the
+            # premise of prefetch_related), so what applies to first object
+            # applies to all.
             first_obj = obj_list[0]
             to_attr = lookup.get_current_to_attr(level)[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
@@ -2462,8 +2476,8 @@ def prefetch_related_objects(model_instances, *related_lookups):
                     if new_obj is None:
                         continue
                     # We special-case `list` rather than something more generic
-                    # like `Iterable` because we don't want to accidentally match
-                    # user models that define __iter__.
+                    # like `Iterable` because we don't want to accidentally
+                    # match user models that define __iter__.
                     if isinstance(new_obj, list):
                         new_obj_list.extend(new_obj)
                     else:
@@ -2528,8 +2542,8 @@ def get_prefetcher(instance, through_attr, to_attr):
                 if through_attr == to_attr:
                     is_fetched = rel_obj_descriptor.is_cached
             else:
-                # descriptor doesn't support prefetching, so we go ahead and get
-                # the attribute on the instance rather than the class to
+                # descriptor doesn't support prefetching, so we go ahead and
+                # get the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, through_attr)
                 if hasattr(rel_obj, "get_prefetch_querysets"):
@@ -2556,12 +2570,14 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # prefetcher must have a method get_prefetch_querysets() which takes a list
     # of instances, and returns a tuple:
 
-    # (queryset of instances of self.model that are related to passed in instances,
+    # (queryset of instances of self.model that are related to passed in
+    #  instances,
     #  callable that gets value to be matched for returned instances,
     #  callable that gets value to be matched for passed in instances,
     #  boolean that is True for singly related objects,
     #  cache or field name to assign to,
-    #  boolean that is True when the previous argument is a cache name vs a field name).
+    #  boolean that is True when the previous argument is a cache name vs a
+    #  field name).
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
@@ -2601,8 +2617,9 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     to_attr, as_attr = lookup.get_current_to_attr(level)
     # Make sure `to_attr` does not conflict with a field.
     if as_attr and instances:
-        # We assume that objects retrieved are homogeneous (which is the premise
-        # of prefetch_related), so what applies to first object applies to all.
+        # We assume that objects retrieved are homogeneous (which is the
+        # premise of prefetch_related), so what applies to first object applies
+        # to all.
         model = instances[0].__class__
         try:
             model._meta.get_field(to_attr)

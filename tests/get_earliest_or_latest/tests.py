@@ -50,8 +50,8 @@ class EarliestOrLatestTests(TestCase):
             Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).earliest(), a2
         )
 
-        # Pass a custom field name to earliest() to change the field that's used
-        # to determine the earliest object.
+        # Pass a custom field name to earliest() to change the field that's
+        # used to determine the earliest object.
         self.assertEqual(Article.objects.earliest("expire_date"), a2)
         self.assertEqual(
             Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).earliest(
@@ -143,7 +143,8 @@ class EarliestOrLatestTests(TestCase):
             a3,
         )
 
-        # latest() overrides any other ordering specified on the query (#11283).
+        # latest() overrides any other ordering specified on the query
+        # (#11283).
         self.assertEqual(Article.objects.order_by("id").latest(), a4)
 
         # Error is raised if get_latest_by isn't in Model.Meta.

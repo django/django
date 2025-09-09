@@ -43,9 +43,9 @@ protect the following:
 
 .. highlighting as html+django fails due to intentionally missing quotes.
 
-If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
-in unauthorized JavaScript execution, depending on how the browser renders
-imperfect HTML. (Quoting the attribute value would fix this case.)
+If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can
+result in unauthorized JavaScript execution, depending on how the browser
+renders imperfect HTML. (Quoting the attribute value would fix this case.)
 
 It is also important to be particularly careful when using ``is_safe`` with
 custom template tags, the :tfilter:`safe` template tag, :mod:`mark_safe
@@ -65,17 +65,17 @@ Cross site request forgery (CSRF) protection
 CSRF attacks allow a malicious user to execute actions using the credentials
 of another user without that user's knowledge or consent.
 
-Django has built-in protection against most types of CSRF attacks, providing you
-have :ref:`enabled and used it <using-csrf>` where appropriate. However, as with
-any mitigation technique, there are limitations. For example, it is possible to
-disable the CSRF module globally or for particular views. You should only do
-this if you know what you are doing. There are other :ref:`limitations
-<csrf-limitations>` if your site has subdomains that are outside of your
-control.
+Django has built-in protection against most types of CSRF attacks, providing
+you have :ref:`enabled and used it <using-csrf>` where appropriate. However, as
+with any mitigation technique, there are limitations. For example, it is
+possible to disable the CSRF module globally or for particular views. You
+should only do this if you know what you are doing. There are other
+:ref:`limitations <csrf-limitations>` if your site has subdomains that are
+outside of your control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
 POST request. This ensures that a malicious user cannot "replay" a form POST to
-your website and have another logged in user unwittingly submit that form. The
+your website and have another logged-in user unwittingly submit that form. The
 malicious user would have to know the secret, which is user specific (using a
 cookie).
 
@@ -107,8 +107,9 @@ Django also gives developers power to write :ref:`raw queries
 <executing-raw-queries>` or execute :ref:`custom sql <executing-custom-sql>`.
 These capabilities should be used sparingly and you should always be careful to
 properly escape any parameters that the user can control. In addition, you
-should exercise caution when using :meth:`~django.db.models.query.QuerySet.extra`
-and :class:`~django.db.models.expressions.RawSQL`.
+should exercise caution when using
+:meth:`~django.db.models.query.QuerySet.extra` and
+:class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
@@ -117,12 +118,12 @@ Clickjacking is a type of attack where a malicious site wraps another site
 in a frame. This attack can result in an unsuspecting user being tricked
 into performing unintended actions on the target site.
 
-Django contains :ref:`clickjacking protection <clickjacking-prevention>` in
-the form of the
-:mod:`X-Frame-Options middleware <django.middleware.clickjacking.XFrameOptionsMiddleware>`
-which in a supporting browser can prevent a site from being rendered inside
-a frame. It is possible to disable the protection on a per view basis
-or to configure the exact header value sent.
+Django contains :ref:`clickjacking protection <clickjacking-prevention>` in the
+form of the :mod:`X-Frame-Options middleware
+<django.middleware.clickjacking.XFrameOptionsMiddleware>` which in a supporting
+browser can prevent a site from being rendered inside a frame. It is possible
+to disable the protection on a per view basis or to configure the exact header
+value sent.
 
 The middleware is strongly recommended for any site that does not need to have
 its pages wrapped in a frame by third party sites, or only needs to allow that
@@ -159,21 +160,21 @@ server, there are some additional steps you may need:
   If a browser connects initially via HTTP, which is the default for most
   browsers, it is possible for existing cookies to be leaked. For this reason,
   you should set your :setting:`SESSION_COOKIE_SECURE` and
-  :setting:`CSRF_COOKIE_SECURE` settings to ``True``. This instructs the browser
-  to only send these cookies over HTTPS connections. Note that this will mean
-  that sessions will not work over HTTP, and the CSRF protection will prevent
-  any POST data being accepted over HTTP (which will be fine if you are
+  :setting:`CSRF_COOKIE_SECURE` settings to ``True``. This instructs the
+  browser to only send these cookies over HTTPS connections. Note that this
+  will mean that sessions will not work over HTTP, and the CSRF protection will
+  prevent any POST data being accepted over HTTP (which will be fine if you are
   redirecting all HTTP traffic to HTTPS).
 
 * Use :ref:`http-strict-transport-security` (HSTS)
 
-  HSTS is an HTTP header that informs a browser that all future connections
-  to a particular site should always use HTTPS. Combined with redirecting
-  requests over HTTP to HTTPS, this will ensure that connections always enjoy
-  the added security of SSL provided one successful connection has occurred.
-  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS`,
-  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`, and :setting:`SECURE_HSTS_PRELOAD`,
-  or on the web server.
+  HSTS is an HTTP header that informs a browser that all future connections to
+  a particular site should always use HTTPS. Combined with redirecting requests
+  over HTTP to HTTPS, this will ensure that connections always enjoy the added
+  security of SSL provided one successful connection has occurred. HSTS may
+  either be configured with :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`, and
+  :setting:`SECURE_HSTS_PRELOAD`, or on the web server.
 
 .. _host-headers-virtual-hosting:
 
@@ -188,9 +189,9 @@ cache poisoning attacks, and poisoning links in emails.
 Because even seemingly-secure web server configurations are susceptible to fake
 ``Host`` headers, Django validates ``Host`` headers against the
 :setting:`ALLOWED_HOSTS` setting in the
-:meth:`django.http.HttpRequest.get_host()` method.
+:meth:`django.http.HttpRequest.get_host` method.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~django.http.HttpRequest.get_host`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
@@ -198,8 +199,8 @@ For more details see the full :setting:`ALLOWED_HOSTS` documentation.
 
 .. warning::
 
-   Previous versions of this document recommended configuring your web server to
-   ensure it validates incoming HTTP ``Host`` headers. While this is still
+   Previous versions of this document recommended configuring your web server
+   to ensure it validates incoming HTTP ``Host`` headers. While this is still
    recommended, in many common web servers a configuration that seems to
    validate the ``Host`` header may not in fact do so. For instance, even if
    Apache is configured such that your Django site is served from a non-default
@@ -255,9 +256,9 @@ User-uploaded content
   can be easily set using the LimitRequestBody_ directive.
 
 * If you are serving your own static files, be sure that handlers like Apache's
-  ``mod_php``, which would execute static files as code, are disabled. You don't
-  want users to be able to execute arbitrary code by uploading and requesting a
-  specially crafted file.
+  ``mod_php``, which would execute static files as code, are disabled. You
+  don't want users to be able to execute arbitrary code by uploading and
+  requesting a specially crafted file.
 
 * Django's media upload handling poses some vulnerabilities when that media is
   served in ways that do not follow security best practices. Specifically, an
@@ -362,8 +363,8 @@ security protection of the web server, operating system and other components.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 * Take a look at the Open Web Application Security Project (OWASP) `Top 10
-  list`_ which identifies some common vulnerabilities in web applications. While
-  Django has tools to address some of the issues, other issues must be
+  list`_ which identifies some common vulnerabilities in web applications.
+  While Django has tools to address some of the issues, other issues must be
   accounted for in the design of your project.
 * Mozilla discusses various topics regarding `web security`_. Their
   pages also include security principles that apply to any system.

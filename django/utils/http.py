@@ -284,10 +284,10 @@ def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
         url_info = urlsplit(url)
     except ValueError:  # e.g. invalid IPv6 addresses
         return False
-    # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
-    # In that URL, example.com is not the hostname but, a path component. However,
-    # Chrome will still consider example.com to be the hostname, so we must not
-    # allow this syntax.
+    # Forbid URLs like http:///example.com - with a scheme, but without a
+    # hostname. In that URL, example.com is not the hostname but, a path
+    # component. However, Chrome will still consider example.com to be the
+    # hostname, so we must not allow this syntax.
     if not url_info.netloc and url_info.scheme:
         return False
     # Forbid URLs that start with control characters. Some browsers (like

@@ -152,10 +152,30 @@ To edit this page, for example, we would edit the file
 :source:`docs/internals/contributing/writing-documentation.txt` and rebuild the
 HTML with ``make html``.
 
+.. _documentation-checks:
+
+Documentation quality checks
+----------------------------
+
+Several checks help maintain Django's documentation quality, including
+:ref:`spelling <documentation-spelling-check>`,
+:ref:`code block formatting <documentation-code-block-format-check>`, and
+:ref:`documentation style <documentation-lint-check>`.
+
+These checks are run automatically in CI and must pass before documentation
+changes can be merged. They can also be run locally with a single command:
+
+.. console::
+
+     $ make check
+
+This command runs all current checks and will include any new checks added in
+the future.
+
 .. _documentation-spelling-check:
 
 Spelling check
---------------
+~~~~~~~~~~~~~~
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
@@ -172,10 +192,54 @@ If you encounter false-positives (error output that actually is correct), do
 one of the following:
 
 * Surround inline code or brand/technology names with double grave accents
-  (``).
+  (\`\`)
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+.. _documentation-code-block-format-check:
+
+Code block format check
+~~~~~~~~~~~~~~~~~~~~~~~
+
+All Python code blocks should be formatted using the :pypi:`blacken-docs`
+auto-formatter. This is automatically run by the :ref:`pre-commit hook
+<coding-style-pre-commit>` if configured.
+
+The check can also be run manually: provided that ``blacken-docs`` is
+installed, run the following command from the ``docs`` directory:
+
+.. console::
+
+     $ make black
+
+The formatter will report any issues by printing them to the terminal and will
+reformat code blocks where possible.
+
+.. _documentation-lint-check:
+
+Documentation lint check
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's documentation is checked for reStructuredText style and formal issues
+using :pypi:`sphinx-lint`. This helps catch problems like stray tabs, trailing
+whitespace, excessive line length, and similar formatting problems.
+
+Once ``sphinx-lint`` is installed, the check can be run with the following
+command from the ``docs`` directory:
+
+.. console::
+
+     $ make lint
+
+The command prints any violations to the terminal in the form
+``path:line: message``. If problems are encountered:
+
+* Read the message and fix the indicated issue (for example, remove trailing
+  whitespace, adjust backticks, or replace tabs with spaces).
+* For long lines consider wrapping text onto new lines or breaking long inline
+  links into named references. The custom line length check should already skip
+  common false positives such as headings, tables and long links.
 
 .. _documentation-link-check:
 
@@ -207,8 +271,8 @@ Entries that have a status of "broken" need to be fixed. Those that have a
 status of "redirected" may need to be updated to point to the canonical
 location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
-point to the latest or stable version of the documentation, e.g. ``/en/stable/`` →
-``/en/3.2/``.
+point to the latest or stable version of the documentation, e.g.
+``/en/stable/`` → ``/en/3.2/``.
 
 Writing style
 =============
@@ -304,10 +368,6 @@ documentation:
   You can prefix the target with a ``~`` (that's a tilde) to get only the
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
-
-* All Python code blocks should be formatted using the :pypi:`blacken-docs`
-  auto-formatter. This will be run by :ref:`pre-commit
-  <coding-style-pre-commit>` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
@@ -489,12 +549,12 @@ General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
-These ``versionadded`` and ``versionchanged`` blocks should be "self-contained."
-In other words, since we only keep these annotations around for two releases,
-it's nice to be able to remove the annotation and its contents without having
-to reflow, reindent, or edit the surrounding text. For example, instead of
-putting the entire description of a new or changed feature in a block, do
-something like this:
+These ``versionadded`` and ``versionchanged`` blocks should be
+"self-contained." In other words, since we only keep these annotations around
+for two releases, it's nice to be able to remove the annotation and its
+contents without having to reflow, reindent, or edit the surrounding text. For
+example, instead of putting the entire description of a new or changed feature
+in a block, do something like this:
 
 .. code-block:: rst
 
@@ -625,12 +685,12 @@ you'd like to help translate the documentation into another language.
 ``django-admin`` man page
 =========================
 
-Sphinx can generate a manual page for the
-:doc:`django-admin </ref/django-admin>` command. This is configured in
-``docs/conf.py``. Unlike other documentation output, this man page should be
-included in the Django repository and the releases as
-``docs/man/django-admin.1``. There isn't a need to update this file when
-updating the documentation, as it's updated once as part of the release process.
+Sphinx can generate a manual page for the :doc:`django-admin
+</ref/django-admin>` command. This is configured in ``docs/conf.py``. Unlike
+other documentation output, this man page should be included in the Django
+repository and the releases as ``docs/man/django-admin.1``. There isn't a need
+to update this file when updating the documentation, as it's updated once as
+part of the release process.
 
 To generate an updated version of the man page, in the ``docs`` directory, run:
 

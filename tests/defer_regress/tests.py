@@ -96,7 +96,8 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Regression for #16409 - make sure defer() and only() work with
+        # annotate()
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).defer("name")), list
         )
@@ -105,7 +106,8 @@ class DeferRegressionTest(TestCase):
         )
 
     def test_ticket_16409(self):
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Regression for #16409 - make sure defer() and only() work with
+        # annotate()
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).defer("name")), list
         )
@@ -161,8 +163,8 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(
             len(Item.objects.select_related("one_to_one_item").defer("value")), 1
         )
-        # Make sure that `only()` doesn't break when we pass in a unique relation,
-        # rather than a field on the relation.
+        # Make sure that `only()` doesn't break when we pass in a unique
+        # relation, rather than a field on the relation.
         self.assertEqual(len(Item.objects.only("one_to_one_item")), 1)
         with self.assertNumQueries(1):
             i = Item.objects.select_related("one_to_one_item")[0]

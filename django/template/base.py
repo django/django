@@ -52,9 +52,12 @@ times with multiple contexts)
 
 import inspect
 import logging
+import os
 import re
+import warnings
 from enum import Enum
 
+import django
 from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
@@ -288,6 +291,61 @@ class Template:
         }
 
 
+class PartialTemplate:
+    """
+    A lightweight Template lookalike used for template partials.
+
+    Wraps nodelist as a partial, in order to be able to bind context.
+    """
+
+    def __init__(self, nodelist, origin, name, source_start=None, source_end=None):
+        self.nodelist = nodelist
+        self.origin = origin
+        self.name = name
+        # If available (debug mode), the absolute character offsets in the
+        # template.source correspond to the full partial region.
+        self._source_start = source_start
+        self._source_end = source_end
+
+    def get_exception_info(self, exception, token):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return template.get_exception_info(exception, token)
+
+    def find_partial_source(self, full_source):
+        if (
+            self._source_start is not None
+            and self._source_end is not None
+            and 0 <= self._source_start <= self._source_end <= len(full_source)
+        ):
+            return full_source[self._source_start : self._source_end]
+
+        return ""
+
+    @property
+    def source(self):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        if not template.engine.debug:
+            warnings.warn(
+                "PartialTemplate.source is only available when template "
+                "debugging is enabled.",
+                RuntimeWarning,
+                skip_file_prefixes=(os.path.dirname(django.__file__),),
+            )
+        return self.find_partial_source(template.source)
+
+    def _render(self, context):
+        return self.nodelist.render(context)
+
+    def render(self, context):
+        with context.render_context.push_state(self):
+            if context.template is None:
+                with context.bind_template(self):
+                    context.template_name = self.name
+                    return self._render(context)
+            else:
+                return self._render(context)
+
+
 def linebreak_iter(template_source):
     yield 0
     p = template_source.find("\n")
@@ -482,7 +540,8 @@ class Parser:
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TokenType.* for a tiny performance boost.
+            # Use the raw values here for TokenType.* for a tiny performance
+            # boost.
             token_type = token.token_type.value
             if token_type == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
@@ -845,8 +904,8 @@ class Variable:
             try:
                 self.literal = mark_safe(unescape_string_literal(var))
             except ValueError:
-                # Otherwise we'll set self.lookups so that resolve() knows we're
-                # dealing with a bonafide variable
+                # Otherwise we'll set self.lookups so that resolve() knows
+                # we're dealing with a bonafide variable
                 if VARIABLE_ATTRIBUTE_SEPARATOR + "_" in var or var[0] == "_":
                     raise TemplateSyntaxError(
                         "Variables and attributes may "
@@ -907,7 +966,8 @@ class Variable:
                     # numpy < 1.9 and 1.9+ respectively
                 except (TypeError, AttributeError, KeyError, ValueError, IndexError):
                     try:  # attribute lookup
-                        # Don't return class attributes if the class is the context:
+                        # Don't return class attributes if the class is the
+                        # context:
                         if isinstance(current, BaseContext) and getattr(
                             type(current), bit
                         ):

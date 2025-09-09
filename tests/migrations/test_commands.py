@@ -445,7 +445,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
         """
-        showmigrations --list  displays migrations and whether or not they're
+        showmigrations --list displays migrations and whether or not they're
         applied.
         """
         out = io.StringIO()
@@ -463,7 +463,8 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", "0001", verbosity=0)
 
         out = io.StringIO()
-        # Giving the explicit app_label tests for selective `show_list` in the command
+        # Giving the explicit app_label tests for selective `show_list` in the
+        # command
         call_command(
             "showmigrations",
             "migrations",
@@ -1696,7 +1697,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertEqual(has_table.call_count, 4)
 
     def test_failing_migration(self):
-        # If a migration fails to serialize, it shouldn't generate an empty file. #21280
+        # If a migration fails to serialize, it shouldn't generate an empty
+        # file. #21280
         apps.register_model("migrations", UnserializableModel)
 
         with self.temporary_migration_module() as migration_dir:
@@ -1754,7 +1756,8 @@ class MakeMigrationsTests(MigrationTestBase):
             with open(initial_file, encoding="utf-8") as fp:
                 content = fp.read()
 
-                # Remove all whitespace to check for empty dependencies and operations
+                # Remove all whitespace to check for empty dependencies and
+                # operations
                 content = content.replace(" ", "")
                 self.assertIn(
                     "dependencies=[]" if HAS_BLACK else "dependencies=[\n]", content
@@ -1778,7 +1781,8 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_makemigrations_no_changes_no_apps(self):
         """
-        makemigrations exits when there are no changes and no apps are specified.
+        makemigrations exits when there are no changes and no apps are
+        specified.
         """
         out = io.StringIO()
         call_command("makemigrations", stdout=out)
@@ -2165,7 +2169,8 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_makemigrations_handle_merge(self):
         """
-        makemigrations properly merges the conflicting migrations with --noinput.
+        makemigrations properly merges the conflicting migrations with
+        --noinput.
         """
         out = io.StringIO()
         with self.temporary_migration_module(
@@ -2965,8 +2970,9 @@ class SquashMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(
             module="migrations.test_migrations_squashed_loop"
         ):
-            # Hits a squash replacement cycle check error, but the actual failure is
-            # dependent on the order in which the files are read on disk.
+            # Hits a squash replacement cycle check error, but the actual
+            # failure is dependent on the order in which the files are read on
+            # disk.
             with self.assertRaisesRegex(
                 CommandError,
                 r"Cyclical squash replacement found, starting at"
@@ -3039,7 +3045,8 @@ class SquashMigrationsTests(MigrationTestBase):
                 interactive=False,
             )
 
-            # Update the 4th migration to depend on the squash(replacement) migration.
+            # Update the 4th migration to depend on the squash(replacement)
+            # migration.
             loader = MigrationLoader(connection)
             migration = loader.disk_migrations[
                 ("migrations", "0004_remove_mymodel1_field_1_mymodel1_field_3_and_more")
@@ -3219,7 +3226,8 @@ class SquashMigrationsTests(MigrationTestBase):
 
     def test_squashmigrations_invalid_start(self):
         """
-        squashmigrations doesn't accept a starting migration after the ending migration.
+        squashmigrations doesn't accept a starting migration after the ending
+        migration.
         """
         with self.temporary_migration_module(
             module="migrations.test_migrations_no_changes"

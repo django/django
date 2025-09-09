@@ -107,10 +107,10 @@ class LayerMapping:
         using=None,
     ):
         """
-        A LayerMapping object is initialized using the given Model (not an instance),
-        a DataSource (or string path to an OGR-supported data file), and a mapping
-        dictionary.  See the module level docstring for more details and keyword
-        argument usage.
+        A LayerMapping object is initialized using the given Model (not an
+        instance), a DataSource (or string path to an OGR-supported data file),
+        and a mapping dictionary. See the module level docstring for more
+        details and keyword argument usage.
         """
         # Getting the DataSource and the associated Layer.
         if isinstance(data, (str, Path)):
@@ -175,7 +175,7 @@ class LayerMapping:
         else:
             raise LayerMapError("Unrecognized transaction mode: %s" % transaction_mode)
 
-    # #### Checking routines used during initialization ####
+    # Checking routines used during initialization.
     def check_fid_range(self, fid_range):
         "Check the `fid_range` keyword."
         if fid_range:
@@ -195,7 +195,7 @@ class LayerMapping:
         need to increment through each feature in the Layer.
         """
         # The geometry field of the model is set here.
-        # TODO: Support more than one geometry field / model.  However, this
+        # TODO: Support more than one geometry field / model. However, this
         # depends on the GDAL Driver in use.
         self.geom_field = False
         self.fields = {}
@@ -227,7 +227,8 @@ class LayerMapping:
                     'Given mapping field "%s" not in given Model fields.' % field_name
                 )
 
-            # Getting the string name for the Django field class (e.g., 'PointField').
+            # Getting the string name for the Django field class (e.g.,
+            # 'PointField').
             fld_name = model_field.__class__.__name__
 
             if isinstance(model_field, GeometryField):
@@ -262,9 +263,9 @@ class LayerMapping:
                         % (fld_name, "(dim=3)" if coord_dim == 3 else "", ltype)
                     )
 
-                # Setting the `geom_field` attribute w/the name of the model field
-                # that is a Geometry.  Also setting the coordinate dimension
-                # attribute.
+                # Setting the `geom_field` attribute w/the name of the model
+                # field that is a Geometry.  Also setting the coordinate
+                # dimension attribute.
                 self.geom_field = field_name
                 self.coord_dim = coord_dim
                 fields_val = model_field
@@ -339,7 +340,7 @@ class LayerMapping:
                 "Unique keyword argument must be set with a tuple, list, or string."
             )
 
-    # Keyword argument retrieval routines ####
+    # Keyword argument retrieval routines.
     def feature_kwargs(self, feat):
         """
         Given an OGR Feature, return a dictionary of keyword arguments for
@@ -384,7 +385,7 @@ class LayerMapping:
         else:
             return {fld: kwargs[fld] for fld in self.unique}
 
-    # #### Verification routines used in constructing model keyword arguments. ####
+    # Verification routines used in constructing model keyword arguments.
     def verify_ogr_field(self, ogr_field, model_field):
         """
         Verify if the OGR Field contents are acceptable to the model field. If
@@ -424,7 +425,8 @@ class LayerMapping:
             digits = dtup[1]
             d_idx = dtup[2]  # index where the decimal is
 
-            # Maximum amount of precision, or digits to the left of the decimal.
+            # Maximum amount of precision, or digits to the left of the
+            # decimal.
             max_prec = model_field.max_digits - model_field.decimal_places
 
             # Getting the digits to the left of the decimal place for the
@@ -446,7 +448,8 @@ class LayerMapping:
         elif isinstance(ogr_field, (OFTReal, OFTString)) and isinstance(
             model_field, models.IntegerField
         ):
-            # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
+            # Attempt to convert any OFTReal and OFTString value to an
+            # OFTInteger.
             try:
                 val = int(ogr_field.value)
             except ValueError:
@@ -513,7 +516,7 @@ class LayerMapping:
         # Returning the WKT of the geometry.
         return g.wkt
 
-    # #### Other model methods ####
+    # Other model methods.
     def coord_transform(self):
         "Return the coordinate transformation object."
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
@@ -533,7 +536,10 @@ class LayerMapping:
             ) from exc
 
     def geometry_field(self):
-        "Return the GeometryField instance associated with the geographic column."
+        """
+        Return the GeometryField instance associated with the geographic
+        column.
+        """
         # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
@@ -542,7 +548,8 @@ class LayerMapping:
     def make_multi(self, geom_type, model_field):
         """
         Given the OGRGeomType for a geometry and its associated GeometryField,
-        determine whether the geometry should be turned into a GeometryCollection.
+        determine whether the geometry should be turned into a
+        GeometryCollection.
         """
         return (
             geom_type.num in self.MULTI_TYPES
@@ -570,7 +577,7 @@ class LayerMapping:
 
          fid_range:
            May be set with a slice or tuple of (begin, end) feature ID's to map
-           from the data source.  In other words, this keyword enables the user
+           from the data source. In other words, this keyword enables the user
            to selectively import a subset range of features in the geographic
            data source.
 
@@ -581,14 +588,15 @@ class LayerMapping:
 
          progress:
            When this keyword is set, status information will be printed giving
-           the number of features processed and successfully saved.  By default,
+           the number of features processed and successfully saved. By default,
            progress information will pe printed every 1000 features processed,
-           however, this default may be overridden by setting this keyword with an
-           integer for the desired interval.
+           however, this default may be overridden by setting this keyword with
+           an integer for the desired interval.
 
          stream:
-           Status information will be written to this file handle.  Defaults to
-           using `sys.stdout`, but any object with a `write` method is supported.
+           Status information will be written to this file handle. Defaults to
+           using `sys.stdout`, but any object with a `write` method is
+           supported.
 
          silent:
            By default, non-fatal error notifications are printed to stdout, but
@@ -596,7 +604,7 @@ class LayerMapping:
 
          strict:
            Execution of the model mapping will cease upon the first error
-           encountered.  The default behavior is to attempt to continue.
+           encountered. The default behavior is to attempt to continue.
         """
         # Getting the default Feature ID range.
         default_range = self.check_fid_range(fid_range)
@@ -631,8 +639,8 @@ class LayerMapping:
                     # Constructing the model using the keyword args
                     is_update = False
                     if self.unique:
-                        # If we want unique models on a particular field, handle the
-                        # geometry appropriately.
+                        # If we want unique models on a particular field,
+                        # handle the geometry appropriately.
                         try:
                             # Getting the keyword arguments and retrieving
                             # the unique model.
@@ -688,8 +696,8 @@ class LayerMapping:
                         "Processed %d features, saved %d ...\n" % (num_feat, num_saved)
                     )
 
-            # Only used for status output purposes -- incremental saving uses the
-            # values returned here.
+            # Only used for status output purposes -- incremental saving uses
+            # the values returned here.
             return num_saved, num_feat
 
         if self.transaction_decorator is not None:
@@ -708,8 +716,8 @@ class LayerMapping:
             n_i = len(indices)
 
             for i, end in enumerate(indices):
-                # Constructing the slice to use for this step; the last slice is
-                # special (e.g, [100:] instead of [90:100]).
+                # Constructing the slice to use for this step; the last slice
+                # is special (e.g, [100:] instead of [90:100]).
                 if i + 1 == n_i:
                     step_slice = slice(beg, None)
                 else:

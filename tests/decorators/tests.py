@@ -134,7 +134,8 @@ def simple_dec(func):
 simple_dec_m = method_decorator(simple_dec)
 
 
-# For testing method_decorator, two decorators that add an attribute to the function
+# For testing method_decorator, two decorators that add an attribute to the
+# function
 def myattr_dec(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)

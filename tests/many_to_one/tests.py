@@ -98,7 +98,8 @@ class ManyToOneTests(TestCase):
             [new_article, new_article2, self.a],
         )
 
-        # Add the same article to a different article set - check that it moves.
+        # Add the same article to a different article set - check that it
+        # moves.
         self.r2.article_set.add(new_article2)
         self.assertEqual(new_article2.reporter.id, self.r2.id)
         self.assertSequenceEqual(self.r2.article_set.all(), [new_article2])
@@ -193,7 +194,8 @@ class ManyToOneTests(TestCase):
             [new_article, self.a],
         )
         self.assertSequenceEqual(self.r2.article_set.all(), [new_article2])
-        # Reporter cannot be null - there should not be a clear or remove method
+        # Reporter cannot be null - there should not be a clear or remove
+        # method
         self.assertFalse(hasattr(self.r2.article_set, "remove"))
         self.assertFalse(hasattr(self.r2.article_set, "clear"))
 
@@ -384,7 +386,8 @@ class ManyToOneTests(TestCase):
             john_smith,
         )
 
-        # Counting in the opposite direction works in conjunction with distinct()
+        # Counting in the opposite direction works in conjunction with
+        # distinct()
         self.assertEqual(
             Reporter.objects.filter(article__headline__startswith="T").count(), 2
         )
@@ -578,7 +581,8 @@ class ManyToOneTests(TestCase):
             )
 
     def test_fk_assignment_and_related_object_cache(self):
-        # Tests of ForeignKey assignment and the related-object cache (see #6886).
+        # Tests of ForeignKey assignment and the related-object cache (see
+        # #6886).
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
@@ -594,7 +598,8 @@ class ManyToOneTests(TestCase):
         del c._state.fields_cache["parent"]
         self.assertIsNot(c.parent, p)
 
-        # Assigning a new object results in that object getting cached immediately.
+        # Assigning a new object results in that object getting cached
+        # immediately.
         p2 = Parent.objects.create(name="Parent 2")
         c.parent = p2
         self.assertIs(c.parent, p2)
@@ -773,7 +778,8 @@ class ManyToOneTests(TestCase):
         private_school = School.objects.create(is_public=False)
         private_student = Student.objects.create(school=private_school)
 
-        # Only one school is available via all() due to the custom default manager.
+        # Only one school is available via all() due to the custom default
+        # manager.
         self.assertSequenceEqual(School.objects.all(), [public_school])
 
         self.assertEqual(public_student.school, public_school)

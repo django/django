@@ -79,7 +79,8 @@ class TestTicket14567(TestCase):
         self.assertIsInstance(
             form.cleaned_data["multi_choice_optional"], models.query.QuerySet
         )
-        # While we're at it, test whether a QuerySet is returned if there *is* a value.
+        # While we're at it, test whether a QuerySet is returned if there *is*
+        # a value.
         self.assertIsInstance(form.cleaned_data["multi_choice"], models.query.QuerySet)
 
 
@@ -247,7 +248,7 @@ class ModelFormCallableModelDefault(TestCase):
 
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
-        # FileModel with Unicode filename and data #########################
+        # FileModel with Unicode filename and data.
         file1 = SimpleUploadedFile(
             "我隻氣墊船裝滿晒鱔.txt", "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode()
         )
@@ -263,7 +264,7 @@ class FormsModelTestCase(TestCase):
         m.delete()
 
     def test_boundary_conditions(self):
-        # Boundary conditions on a PositiveIntegerField #########################
+        # Boundary conditions on a PositiveIntegerField.
         class BoundaryForm(ModelForm):
             class Meta:
                 model = BoundaryModel
@@ -293,8 +294,8 @@ class FormsModelTestCase(TestCase):
         r2 = DefaultsForm()["callable_default"].as_widget()
         self.assertNotEqual(r1, r2)
 
-        # In a ModelForm that is passed an instance, the initial values come from the
-        # instance's values, not the model's defaults.
+        # In a ModelForm that is passed an instance, the initial values come
+        # from the instance's values, not the model's defaults.
         foo_instance = Defaults(
             name="instance value", def_date=datetime.date(1969, 4, 4), value=12
         )
@@ -370,7 +371,8 @@ class RelatedModelFormTests(SimpleTestCase):
 
 class ManyToManyExclusionTestCase(TestCase):
     def test_m2m_field_exclusion(self):
-        # Issue 12337. save_instance should honor the passed-in exclude keyword.
+        # Issue 12337. save_instance should honor the passed-in exclude
+        # keyword.
         opt1 = ChoiceOptionModel.objects.create(id=1, name="default")
         opt2 = ChoiceOptionModel.objects.create(id=2, name="option 2")
         opt3 = ChoiceOptionModel.objects.create(id=3, name="option 3")

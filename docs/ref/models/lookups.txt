@@ -12,19 +12,22 @@ the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
 :doc:`/topics/db/queries`; to learn how to *create* new lookups, see
 :doc:`/howto/custom-lookups`.
 
-The lookup API has two components: a :class:`~lookups.RegisterLookupMixin` class
-that registers lookups, and the :ref:`Query Expression API <query-expression>`, a
-set of methods that a class has to implement to be registrable as a lookup.
+The lookup API has two components: a :class:`~lookups.RegisterLookupMixin`
+class that registers lookups, and the :ref:`Query Expression API
+<query-expression>`, a set of methods that a class has to implement to be
+registrable as a lookup.
 
 Django has two base classes that follow the query expression API and from where
 all Django builtin lookups are derived:
 
-* :class:`Lookup`: to lookup a field (e.g. the ``exact`` of ``field_name__exact``)
+* :class:`Lookup`: to lookup a field (e.g. the ``exact`` of
+  ``field_name__exact``)
 * :class:`Transform`: to transform a field
 
 A lookup expression consists of three parts:
 
-* Fields part (e.g. ``Book.objects.filter(author__best_friends__first_name...``);
+* Fields part (e.g.
+  ``Book.objects.filter(author__best_friends__first_name...``);
 * Transforms part (may be omitted) (e.g. ``__lower__first3chars__reversed``);
 * A lookup (e.g. ``__icontains``) that, if omitted, defaults to ``__exact``.
 
@@ -33,8 +36,8 @@ A lookup expression consists of three parts:
 Registration API
 ================
 
-Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
-register lookups on itself or its instances. The two prominent examples are
+Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface
+to register lookups on itself or its instances. The two prominent examples are
 :class:`~django.db.models.Field`, the base class of all model fields, and
 :class:`Transform`, the base class of all Django transforms.
 
@@ -88,10 +91,10 @@ The Query Expression API
 ========================
 
 The query expression API is a common set of methods that classes define to be
-usable in query expressions to translate themselves into SQL expressions. Direct
-field references, aggregates, and ``Transform`` are examples that follow this
-API. A class is said to follow the query expression API when it implements the
-following methods:
+usable in query expressions to translate themselves into SQL expressions.
+Direct field references, aggregates, and ``Transform`` are examples that follow
+this API. A class is said to follow the query expression API when it implements
+the following methods:
 
 .. method:: as_sql(compiler, connection)
 
@@ -146,18 +149,20 @@ following methods:
     The notation to use a ``Transform`` in a lookup expression is
     ``<expression>__<transformation>`` (e.g. ``date__year``).
 
-    This class follows the :ref:`Query Expression API <query-expression>`, which
-    implies that you can use ``<expression>__<transform1>__<transform2>``. It's
-    a specialized :ref:`Func() expression <func-expressions>` that only accepts
-    one argument.  It can also be used on the right hand side of a filter or
-    directly as an annotation.
+    This class follows the :ref:`Query Expression API <query-expression>`,
+    which implies that you can use
+    ``<expression>__<transform1>__<transform2>``. It's a specialized
+    :ref:`Func() expression <func-expressions>` that only accepts one argument.
+    It can also be used on the right hand side of a filter or directly as an
+    annotation.
 
     .. attribute:: bilateral
 
         A boolean indicating whether this transformation should apply to both
-        ``lhs`` and ``rhs``. Bilateral transformations will be applied to ``rhs`` in
-        the same order as they appear in the lookup expression. By default it is set
-        to ``False``. For example usage, see :doc:`/howto/custom-lookups`.
+        ``lhs`` and ``rhs``. Bilateral transformations will be applied to
+        ``rhs`` in the same order as they appear in the lookup expression. By
+        default it is set to ``False``. For example usage, see
+        :doc:`/howto/custom-lookups`.
 
     .. attribute:: lhs
 

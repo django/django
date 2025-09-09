@@ -70,8 +70,8 @@ class Command(BaseCommand):
         # Set up a dictionary to serve as the environment for the shell.
         imported_objects = self.get_namespace(**options)
 
-        # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
-        # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
+        # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow
+        # system conventions and get $PYTHONSTARTUP first then .pythonrc.py.
         if not options["no_startup"]:
             for pythonrc in OrderedSet(
                 [os.environ.get("PYTHONSTARTUP"), os.path.expanduser("~/.pythonrc.py")]
@@ -89,9 +89,9 @@ class Command(BaseCommand):
                 except Exception:
                     traceback.print_exc()
 
-        # By default, this will set up readline to do tab completion and to read and
-        # write history to the .python_history file, but this can be overridden by
-        # $PYTHONSTARTUP or ~/.pythonrc.py.
+        # By default, this will set up readline to do tab completion and to
+        # read and write history to the .python_history file, but this can be
+        # overridden by $PYTHONSTARTUP or ~/.pythonrc.py.
         try:
             hook = sys.__interactivehook__
         except AttributeError:

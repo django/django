@@ -51,7 +51,8 @@ class RelatedGeoModelTest(TestCase):
         e3 = aggs["location__point__extent"]
 
         # The tolerance value is to four decimal places because of differences
-        # between the Oracle and PostGIS spatial backends on the extent calculation.
+        # between the Oracle and PostGIS spatial backends on the extent
+        # calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
             for ref_val, e_val in zip(ref, e):
@@ -77,7 +78,7 @@ class RelatedGeoModelTest(TestCase):
         aggs = City.objects.aggregate(Union("location__point"))
 
         # These are the points that are components of the aggregate geographic
-        # union that is returned.  Each point # corresponds to City PK.
+        # union that is returned. Each point # corresponds to City PK.
         p1 = Point(-104.528056, 33.387222)
         p2 = Point(-97.516111, 33.058333)
         p3 = Point(-79.460734, 40.18476)
@@ -85,8 +86,8 @@ class RelatedGeoModelTest(TestCase):
         p5 = Point(-95.363151, 29.763374)
 
         # The second union aggregate is for a union
-        # query that includes limiting information in the WHERE clause (in other
-        # words a `.filter()` precedes the call to `.aggregate(Union()`).
+        # query that includes limiting information in the WHERE clause (in
+        # other words a `.filter()` precedes the call to `.aggregate(Union()`).
         ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
@@ -133,7 +134,7 @@ class RelatedGeoModelTest(TestCase):
         )
 
         # Now creating a second Parcel where the borders are the same, just
-        # in different coordinate systems.  The center points are also the
+        # in different coordinate systems. The center points are also the
         # same (but in different coordinate systems), and this time they
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
@@ -187,8 +188,8 @@ class RelatedGeoModelTest(TestCase):
         # Incrementing through each of the models, dictionaries, and tuples
         # returned by each QuerySet.
         for m, d, t in zip(gqs, gvqs, gvlqs):
-            # The values should be Geometry objects and not raw strings returned
-            # by the spatial database.
+            # The values should be Geometry objects and not raw strings
+            # returned by the spatial database.
             self.assertIsInstance(d["point"], GEOSGeometry)
             self.assertIsInstance(t[1], GEOSGeometry)
             self.assertEqual(m.point, d["point"])
@@ -208,9 +209,12 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):
-        "Ensuring correct primary key column is selected across relations. See #10757."
+        """
+        Ensuring correct primary key column is selected across relations. See
+        #10757.
+        """
         # The expected ID values -- notice the last two location IDs
-        # are out of order.  Dallas and Houston have location IDs that differ
+        # are out of order. Dallas and Houston have location IDs that differ
         # from their PKs -- this is done to ensure that the related location
         # ID column is selected instead of ID column for the city.
         city_ids = (1, 2, 3, 4, 5)
@@ -262,7 +266,7 @@ class RelatedGeoModelTest(TestCase):
 
     @skipUnlessDBFeature("allows_group_by_lob")
     def test13c_count(self):
-        "Testing `Count` aggregate with `.values()`.  See #15305."
+        "Testing `Count` aggregate with `.values()`. See #15305."
         qs = (
             Location.objects.filter(id=5)
             .annotate(num_cities=Count("city"))
@@ -426,13 +430,16 @@ class RelatedGeoModelTest(TestCase):
         select_related on the related name manager of a unique FK.
         """
         qs = Article.objects.select_related("author__article")
-        # This triggers TypeError when `get_default_columns` has no `local_only`
-        # keyword.  The TypeError is swallowed if QuerySet is actually
-        # evaluated as list generation swallows TypeError in CPython.
+        # This triggers TypeError when `get_default_columns` has no
+        # `local_only` keyword. The TypeError is swallowed if QuerySet is
+        # actually evaluated as list generation swallows TypeError in CPython.
         str(qs.query)
 
     def test16_annotated_date_queryset(self):
-        "Ensure annotated date querysets work if spatial backend is used.  See #14648."
+        """
+        Ensure annotated date querysets work if spatial backend is used.  See
+        #14648.
+        """
         birth_years = [
             dt.year
             for dt in list(

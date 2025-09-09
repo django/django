@@ -1,0 +1,14 @@
+===========================
+Django 5.1.12 release notes
+===========================
+
+*September 3, 2025*
+
+Django 5.1.12 fixes a security issue with severity "high" in 5.1.11.
+
+CVE-2025-57833: Potential SQL injection in ``FilteredRelation`` column aliases
+==============================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases,
+using a suitably crafted dictionary, with dictionary expansion, as the
+``**kwargs`` passed to :meth:`.QuerySet.annotate` or :meth:`.QuerySet.alias`.

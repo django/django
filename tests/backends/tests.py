@@ -57,8 +57,8 @@ class DateQuotingTest(TestCase):
 
     def test_django_date_extract(self):
         """
-        Test the custom ``django_date_extract method``, in particular against fields
-        which clash with strings passed to it (e.g. 'day') (#12818).
+        Test the custom ``django_date_extract method``, in particular against
+        fields which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
         SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -234,7 +234,10 @@ class LongNameTest(TransactionTestCase):
 @skipUnlessDBFeature("supports_sequence_reset")
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
-        "Sequence names are correct when resetting generic relations (Ref #13941)"
+        """
+        Sequence names are correct when resetting generic relations (Ref
+        #13941)
+        """
         # Create an object with a manually specified PK
         Post.objects.create(id=10, name="1st post", text="hello world")
 
@@ -737,7 +740,8 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_check_constraints(self):
         """
-        Constraint checks should raise an IntegrityError when bad data is in the DB.
+        Constraint checks should raise an IntegrityError when bad data is in
+        the DB.
         """
         with transaction.atomic():
             # Create an Article.

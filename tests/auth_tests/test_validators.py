@@ -114,7 +114,8 @@ class PasswordValidationTest(SimpleTestCase):
 
         help_text = password_validators_help_text_html([AmpersandValidator()])
         self.assertEqual(help_text, "<ul><li>Must contain &amp;</li></ul>")
-        # help_text is marked safe and therefore unchanged by conditional_escape().
+        # help_text is marked safe and therefore unchanged by
+        # conditional_escape().
         self.assertEqual(help_text, conditional_escape(help_text))
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[])

@@ -12,6 +12,7 @@ from itertools import groupby
 from django.conf import settings
 from django.http import QueryDict
 from django.utils import timezone
+from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -29,6 +30,7 @@ from .base import (
     VARIABLE_TAG_START,
     Node,
     NodeList,
+    PartialTemplate,
     TemplateSyntaxError,
     VariableDoesNotExist,
     kwarg_re,
@@ -87,7 +89,7 @@ class CsrfTokenNode(Node):
             if settings.DEBUG:
                 warnings.warn(
                     "A {% csrf_token %} was used in a template, but the context "
-                    "did not provide the value.  This is usually caused by not "
+                    "did not provide the value. This is usually caused by not "
                     "using RequestContext."
                 )
             return ""
@@ -205,8 +207,8 @@ class ForNode(Node):
                 values = reversed(values)
             num_loopvars = len(self.loopvars)
             unpack = num_loopvars > 1
-            # Create a forloop value in the context.  We'll update counters on each
-            # iteration just below.
+            # Create a forloop value in the context. We'll update counters on
+            # each iteration just below.
             loop_dict = context["forloop"] = {
                 "parentloop": parentloop,
                 "length": len_values,
@@ -224,8 +226,8 @@ class ForNode(Node):
 
                 pop_context = False
                 if unpack:
-                    # If there are multiple loop variables, unpack the item into
-                    # them.
+                    # If there are multiple loop variables, unpack the item
+                    # into them.
                     try:
                         len_item = len(item)
                     except TypeError:  # not an iterable
@@ -293,8 +295,8 @@ class IfChangedNode(Node):
         # changes.
         if "forloop" in context:
             # Ifchanged is bound to the local for loop.
-            # When there is a loop-in-loop, the state is bound to the inner loop,
-            # so it resets when the outer loop continues.
+            # When there is a loop-in-loop, the state is bound to the inner
+            # loop, so it resets when the outer loop continues.
             return context["forloop"]
         else:
             # Using ifchanged outside loops. Effectively this is a no-op
@@ -406,6 +408,31 @@ class NowNode(Node):
             return ""
         else:
             return formatted
+
+
+class PartialDefNode(Node):
+    def __init__(self, partial_name, inline, nodelist):
+        self.partial_name = partial_name
+        self.inline = inline
+        self.nodelist = nodelist
+
+    def render(self, context):
+        return self.nodelist.render(context) if self.inline else ""
+
+
+class PartialNode(Node):
+    def __init__(self, partial_name, partial_mapping):
+        # Defer lookup in `partial_mapping` and nodelist to runtime.
+        self.partial_name = partial_name
+        self.partial_mapping = partial_mapping
+
+    def render(self, context):
+        try:
+            return self.partial_mapping[self.partial_name].render(context)
+        except KeyError:
+            raise TemplateSyntaxError(
+                f"Partial '{self.partial_name}' is not defined in the current template."
+            )
 
 
 class ResetCycleNode(Node):
@@ -720,7 +747,7 @@ def do_filter(parser, token):
         filter_name = getattr(func, "_filter_name", None)
         if filter_name in ("escape", "safe"):
             raise TemplateSyntaxError(
-                '"filter %s" is not permitted.  Use the "autoescape" tag instead.'
+                '"filter %s" is not permitted. Use the "autoescape" tag instead.'
                 % filter_name
             )
     nodelist = parser.parse(("endfilter",))
@@ -764,7 +791,7 @@ def firstof(parser, token):
 
     Or if only some variables should be escaped, you can use::
 
-        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+        {% firstof var1 var2|safe var3 "<strong>fallback</strong>"|safe %}
     """
     bits = token.split_contents()[1:]
     asvar = None
@@ -825,20 +852,21 @@ def do_for(parser, token):
 
     The for loop sets a number of variables available within the loop:
 
-        ==========================  ================================================
-        Variable                    Description
-        ==========================  ================================================
-        ``forloop.counter``         The current iteration of the loop (1-indexed)
-        ``forloop.counter0``        The current iteration of the loop (0-indexed)
-        ``forloop.revcounter``      The number of iterations from the end of the
-                                    loop (1-indexed)
-        ``forloop.revcounter0``     The number of iterations from the end of the
-                                    loop (0-indexed)
-        ``forloop.first``           True if this is the first time through the loop
-        ``forloop.last``            True if this is the last time through the loop
-        ``forloop.parentloop``      For nested loops, this is the loop "above" the
-                                    current one
-        ==========================  ================================================
+        =======================  ==============================================
+        Variable                 Description
+        =======================  ==============================================
+        ``forloop.counter``      The current iteration of the loop (1-indexed)
+        ``forloop.counter0``     The current iteration of the loop (0-indexed)
+        ``forloop.revcounter``   The number of iterations from the end of the
+                                 loop (1-indexed)
+        ``forloop.revcounter0``  The number of iterations from the end of the
+                                 loop (0-indexed)
+        ``forloop.first``        True if this is the first time through the
+                                 loop
+        ``forloop.last``         True if this is the last time through the loop
+        ``forloop.parentloop``   For nested loops, this is the loop "above" the
+                                 current one
+        =======================  ==============================================
     """
     bits = token.split_contents()
     if len(bits) < 4:
@@ -1173,6 +1201,88 @@ def now(parser, token):
     return NowNode(format_string, asvar)
 
 
+@register.tag(name="partialdef")
+def partialdef_func(parser, token):
+    """
+    Declare a partial that can be used in the template.
+
+    Usage::
+
+        {% partialdef partial_name %}
+        Content goes here.
+        {% endpartialdef %}
+
+    Store the nodelist in the context under the key "partials". It can be
+    retrieved using the ``{% partial %}`` tag.
+
+    The optional ``inline`` argument renders the partial's contents
+    immediately, at the point where it is defined.
+    """
+    match token.split_contents():
+        case "partialdef", partial_name, "inline":
+            inline = True
+        case "partialdef", partial_name, _:
+            raise TemplateSyntaxError(
+                "The 'inline' argument does not have any parameters; either use "
+                "'inline' or remove it completely."
+            )
+        case "partialdef", partial_name:
+            inline = False
+        case ["partialdef"]:
+            raise TemplateSyntaxError("'partialdef' tag requires a name")
+        case _:
+            raise TemplateSyntaxError("'partialdef' tag takes at most 2 arguments")
+
+    # Parse the content until the end tag.
+    valid_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
+
+    pos_open = getattr(token, "position", None)
+    source_start = pos_open[0] if isinstance(pos_open, tuple) else None
+
+    nodelist = parser.parse(valid_endpartials)
+    endpartial = parser.next_token()
+    if endpartial.contents not in valid_endpartials:
+        parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
+
+    pos_close = getattr(endpartial, "position", None)
+    source_end = pos_close[1] if isinstance(pos_close, tuple) else None
+
+    # Store the partial nodelist in the parser.extra_data attribute.
+    partials = parser.extra_data.setdefault("partials", {})
+    if partial_name in partials:
+        raise TemplateSyntaxError(
+            f"Partial '{partial_name}' is already defined in the "
+            f"'{parser.origin.name}' template."
+        )
+    partials[partial_name] = PartialTemplate(
+        nodelist,
+        parser.origin,
+        partial_name,
+        source_start=source_start,
+        source_end=source_end,
+    )
+
+    return PartialDefNode(partial_name, inline, nodelist)
+
+
+@register.tag(name="partial")
+def partial_func(parser, token):
+    """
+    Render a partial previously declared with the ``{% partialdef %}`` tag.
+
+    Usage::
+
+        {% partial partial_name %}
+    """
+    match token.split_contents():
+        case "partial", partial_name:
+            extra_data = parser.extra_data
+            partial_mapping = DeferredSubDict(extra_data, "partials")
+            return PartialNode(partial_name, partial_mapping=partial_mapping)
+        case _:
+            raise TemplateSyntaxError("'partial' tag requires a single argument")
+
+
 @register.simple_tag(name="querystring", takes_context=True)
 def querystring(context, *args, **kwargs):
     """
@@ -1273,10 +1383,10 @@ def regroup(parser, token):
     and ``Trumpet``, and ``list`` is the list of musicians who play this
     instrument.
 
-    Note that ``{% regroup %}`` does not work when the list to be grouped is not
-    sorted by the key you are grouping by! This means that if your list of
-    musicians was not sorted by instrument, you'd need to make sure it is sorted
-    before using it, i.e.::
+    Note that ``{% regroup %}`` does not work when the list to be grouped is
+    not sorted by the key you are grouping by! This means that if your list of
+    musicians was not sorted by instrument, you'd need to make sure it is
+    sorted before using it, i.e.::
 
         {% regroup musicians|dictsort:"instrument" by instrument as grouped %}
     """
@@ -1417,7 +1527,11 @@ def url(parser, token):
     For example, if you have a view ``app_name.views.client_details`` taking
     the client's id and the corresponding line in a URLconf looks like this::
 
-        path('client/<int:id>/', views.client_details, name='client-detail-view')
+        path(
+            'client/<int:id>/',
+            views.client_details,
+            name='client-detail-view',
+        )
 
     and this app's URLconf is included into the project's URLconf under some
     path::
@@ -1496,7 +1610,8 @@ def widthratio(parser, token):
     For example::
 
         <img src="bar.png" alt="Bar"
-             height="10" width="{% widthratio this_value max_value max_width %}">
+             height="10"
+             width="{% widthratio this_value max_value max_width %}">
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide

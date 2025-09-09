@@ -94,9 +94,10 @@ class BaseDatabaseCreation:
                 settings.MIGRATION_MODULES = old_migration_modules
 
         # We then serialize the current state of the database into a string
-        # and store it on the connection. This slightly horrific process is so people
-        # who are testing on databases without transactions or who are using
-        # a TransactionTestCase still get a clean database on every test run.
+        # and store it on the connection. This slightly horrific process is so
+        # people who are testing on databases without transactions or who are
+        # using a TransactionTestCase still get a clean database on every test
+        # run.
         if serialize is not None:
             warnings.warn(
                 "DatabaseCreation.create_test_db(serialize) is deprecated. Call "
@@ -112,7 +113,8 @@ class BaseDatabaseCreation:
 
         call_command("createcachetable", database=self.connection.alias)
 
-        # Ensure a connection for the side effect of initializing the test database.
+        # Ensure a connection for the side effect of initializing the test
+        # database.
         self.connection.ensure_connection()
 
         if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
@@ -220,8 +222,8 @@ class BaseDatabaseCreation:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception as e:
-                # if we want to keep the db, then no need to do any of the below,
-                # just return and skip it all.
+                # if we want to keep the db, then no need to do any of the
+                # below, just return and skip it all.
                 if keepdb:
                     return test_database_name
 
@@ -365,7 +367,8 @@ class BaseDatabaseCreation:
             for test_name in tests:
                 test_case_name, _, test_method_name = test_name.rpartition(".")
                 test_app = test_name.split(".")[0]
-                # Importing a test app that isn't installed raises RuntimeError.
+                # Importing a test app that isn't installed raises
+                # RuntimeError.
                 if test_app in settings.INSTALLED_APPS:
                     test_case = import_string(test_case_name)
                     test_method = getattr(test_case, test_method_name)

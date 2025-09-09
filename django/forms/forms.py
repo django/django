@@ -137,12 +137,12 @@ class BaseForm(RenderableFormMixin):
         """
         Rearrange the fields according to field_order.
 
-        field_order is a list of field names specifying the order. Append fields
-        not included in the list in the default order for backward compatibility
-        with subclasses not overriding field_order. If field_order is None,
-        keep all fields in the order defined in the class. Ignore unknown
-        fields in field_order to allow disabling fields in form subclasses
-        without redefining ordering.
+        field_order is a list of field names specifying the order. Append
+        fields not included in the list in the default order for backward
+        compatibility with subclasses not overriding field_order. If
+        field_order is None, keep all fields in the order defined in the class.
+        Ignore unknown fields in field_order to allow disabling fields in form
+        subclasses without redefining ordering.
         """
         if field_order is None:
             return
@@ -367,10 +367,10 @@ class BaseForm(RenderableFormMixin):
 
     def clean(self):
         """
-        Hook for doing any extra form-wide cleaning after Field.clean() has been
-        called on every field. Any ValidationError raised by this method will
-        not be associated with a particular field; it will have a special-case
-        association with the field named '__all__'.
+        Hook for doing any extra form-wide cleaning after Field.clean() has
+        been called on every field. Any ValidationError raised by this method
+        will not be associated with a particular field; it will have a
+        special-case association with the field named '__all__'.
         """
         return self.cleaned_data
 

@@ -5,6 +5,7 @@ from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX,
     UNUSABLE_PASSWORD_SUFFIX_LENGTH,
+    Argon2PasswordHasher,
     BasePasswordHasher,
     BCryptPasswordHasher,
     BCryptSHA256PasswordHasher,
@@ -378,7 +379,8 @@ class TestUtilsHashPass(SimpleTestCase):
             # Revert to the old iteration count and ...
             hasher.iterations = old_iterations
 
-            # ... check if the password would get updated to the new iteration count.
+            # ... check if the password would get updated to the new iteration
+            # count.
             self.assertTrue(check_password("letmein", encoded, setter))
             self.assertTrue(state["upgraded"])
         finally:
@@ -519,6 +521,54 @@ class TestUtilsHashPass(SimpleTestCase):
                 with self.subTest(hasher_class.__name__, salt=salt):
                     with self.assertRaisesMessage(ValueError, msg):
                         hasher.encode("password", salt)
+
+    def test_password_and_salt_in_str_and_bytes(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                passwords = ["password", b"password"]
+                for password in passwords:
+                    for salt in [hasher.salt(), hasher.salt().encode()]:
+                        encoded = hasher.encode(password, salt)
+                        for password_to_verify in passwords:
+                            self.assertIs(
+                                hasher.verify(password_to_verify, encoded), True
+                            )
+
+    @skipUnless(argon2, "argon2-cffi not installed")
+    def test_password_and_salt_in_str_and_bytes_argon2(self):
+        hasher = Argon2PasswordHasher()
+        passwords = ["password", b"password"]
+        for password in passwords:
+            for salt in [hasher.salt(), hasher.salt().encode()]:
+                encoded = hasher.encode(password, salt)
+                for password_to_verify in passwords:
+                    self.assertIs(hasher.verify(password_to_verify, encoded), True)
+
+    @skipUnless(bcrypt, "bcrypt not installed")
+    def test_password_and_salt_in_str_and_bytes_bcrypt(self):
+        hasher_classes = [
+            BCryptPasswordHasher,
+            BCryptSHA256PasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                passwords = ["password", b"password"]
+                for password in passwords:
+                    salts = [hasher.salt().decode(), hasher.salt()]
+                    for salt in salts:
+                        encoded = hasher.encode(password, salt)
+                        for password_to_verify in passwords:
+                            self.assertIs(
+                                hasher.verify(password_to_verify, encoded), True
+                            )
 
     def test_encode_password_required(self):
         hasher_classes = [

@@ -69,7 +69,10 @@ class TestDataMixin:
 )
 class FlatpageMiddlewareTests(TestDataMixin, TestCase):
     def test_view_flatpage(self):
-        "A flatpage can be served through a view, even when the middleware is in use"
+        """
+        A flatpage can be served through a view, even when the middleware is in
+        use
+        """
         response = self.client.get("/flatpage_root/flatpage/")
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
@@ -161,7 +164,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage(self):
-        "A flatpage can be served by the fallback middleware and should add a slash"
+        """
+        A flatpage can be served by the fallback middleware and should add a
+        slash
+        """
         response = self.client.get("/flatpage")
         self.assertRedirects(response, "/flatpage/", status_code=301)
 
@@ -193,7 +199,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         )
 
     def test_redirect_fallback_flatpage_root(self):
-        "A flatpage at / should not cause a redirect loop when APPEND_SLASH is set"
+        """
+        A flatpage at / should not cause a redirect loop when APPEND_SLASH is
+        set
+        """
         fp = FlatPage.objects.create(
             url="/",
             title="Root",

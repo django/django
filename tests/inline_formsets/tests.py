@@ -57,8 +57,8 @@ class DeletionTests(TestCase):
 
     def test_change_form_deletion_when_invalid(self):
         """
-        Make sure that a change form that is filled out, but marked for deletion
-        doesn't cause validation errors.
+        Make sure that a change form that is filled out, but marked for
+        deletion doesn't cause validation errors.
         """
         PoemFormSet = inlineformset_factory(
             Poet, Poem, can_delete=True, fields="__all__"

@@ -79,7 +79,7 @@ class AsyncAuthTest(TestCase):
             ),
             self.assertWarnsMessage(
                 RemovedInDjango61Warning,
-                "Fallback to request.user when user is None will be removed.",
+                "Fallback to request.auser() when user is None will be removed.",
             ),
         ):
             await alogin(request, None)
@@ -100,7 +100,7 @@ class AsyncAuthTest(TestCase):
             ),
             self.assertWarnsMessage(
                 RemovedInDjango61Warning,
-                "Fallback to request.user when user is None will be removed.",
+                "Fallback to request.auser() when user is None will be removed.",
             ),
         ):
             await alogin(request, None)
@@ -116,7 +116,7 @@ class AsyncAuthTest(TestCase):
         request.session = await self.client.asession()
         with self.assertWarnsMessage(
             RemovedInDjango61Warning,
-            "Fallback to request.user when user is None will be removed.",
+            "Fallback to request.auser() when user is None will be removed.",
         ):
             await alogin(request, None)
         user = await aget_user(request)
@@ -143,7 +143,11 @@ class AsyncAuthTest(TestCase):
         await self.client.alogin(username="testuser", password="testpw")
         request = HttpRequest()
         request.session = await self.client.asession()
-        request.user = self.test_user
+
+        async def auser():
+            return self.test_user
+
+        request.auser = auser
         await aupdate_session_auth_hash(request, self.test_user)
         user = await aget_user(request)
         self.assertIsInstance(user, User)

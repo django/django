@@ -130,7 +130,8 @@ class LayerMapTest(TestCase):
                 self.assertEqual(Decimal(str(feat["Length"])), istate.length)
             elif feat.fid == 1:
                 # Everything but the first two decimal digits were truncated,
-                # because the Interstate model's `length` field has decimal_places=2.
+                # because the Interstate model's `length` field has
+                # decimal_places=2.
                 self.assertAlmostEqual(feat.get("Length"), float(istate.length), 2)
 
             for p1, p2 in zip(feat.geom, istate.path):
@@ -138,7 +139,9 @@ class LayerMapTest(TestCase):
                 self.assertAlmostEqual(p1[1], p2[1], 6)
 
     def county_helper(self, county_feat=True):
-        "Helper function for ensuring the integrity of the mapped County models."
+        """
+        Helper function for ensuring the integrity of the mapped County models.
+        """
         for name, n, st in zip(NAMES, NUMS, STATES):
             # Should only be one record b/c of `unique` keyword.
             c = County.objects.get(name=name)
@@ -157,10 +160,12 @@ class LayerMapTest(TestCase):
         """
         # All the following should work.
 
-        # Telling LayerMapping that we want no transformations performed on the data.
+        # Telling LayerMapping that we want no transformations performed on the
+        # data.
         lm = LayerMapping(County, co_shp, co_mapping, transform=False)
 
-        # Specifying the source spatial reference system via the `source_srs` keyword.
+        # Specifying the source spatial reference system via the `source_srs`
+        # keyword.
         lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
         lm = LayerMapping(County, co_shp, co_mapping, source_srs="NAD83")
 
@@ -179,13 +184,14 @@ class LayerMapTest(TestCase):
             with self.assertRaises(e):
                 LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
 
-        # No source reference system defined in the shapefile, should raise an error.
+        # No source reference system defined in the shapefile, should raise an
+        # error.
         if connection.features.supports_transform:
             with self.assertRaises(LayerMapError):
                 LayerMapping(County, co_shp, co_mapping)
 
-        # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
-        # mapping for the model the ForeignKey points to.
+        # Passing in invalid ForeignKey mapping parameters -- must be a
+        # dictionary mapping for the model the ForeignKey points to.
         bad_fk_map1 = copy(co_mapping)
         bad_fk_map1["state"] = "name"
         bad_fk_map2 = copy(co_mapping)
@@ -195,9 +201,9 @@ class LayerMapTest(TestCase):
         with self.assertRaises(LayerMapError):
             LayerMapping(County, co_shp, bad_fk_map2, transform=False)
 
-        # There exist no State models for the ForeignKey mapping to work -- should raise
-        # a MissingForeignKey exception (this error would be ignored if the `strict`
-        # keyword is not set).
+        # There exist no State models for the ForeignKey mapping to work --
+        # should raise a MissingForeignKey exception (this error would be
+        # ignored if the `strict` keyword is not set).
         lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique="name")
         with self.assertRaises(MissingForeignKey):
             lm.save(silent=True, strict=True)
@@ -208,23 +214,24 @@ class LayerMapTest(TestCase):
         )
 
         # If a mapping is specified as a collection, all OGR fields that
-        # are not collections will be converted into them.  For example,
-        # a Point column would be converted to MultiPoint. Other things being done
+        # are not collections will be converted into them. For example, a Point
+        # column would be converted to MultiPoint. Other things being done
         # w/the keyword args:
         #  `transform=False`: Specifies that no transform is to be done; this
-        #    has the effect of ignoring the spatial reference check (because the
-        #    county shapefile does not have implicit spatial reference info).
+        #    has the effect of ignoring the spatial reference check (because
+        #    the county shapefile does not have implicit spatial reference
+        #    info).
         #
         #  `unique='name'`: Creates models on the condition that they have
         #    unique county names; geometries from each feature however will be
-        #    appended to the geometry collection of the unique model.  Thus,
+        #    appended to the geometry collection of the unique model. Thus,
         #    all of the various islands in Honolulu county will be in one
         #    database record with a MULTIPOLYGON type.
         lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique="name")
         lm.save(silent=True, strict=True)
 
-        # A reference that doesn't use the unique keyword; a new database record will
-        # created for each polygon.
+        # A reference that doesn't use the unique keyword; a new database
+        # record will created for each polygon.
         lm = LayerMapping(CountyFeat, co_shp, cofeat_mapping, transform=False)
         lm.save(silent=True, strict=True)
 
@@ -270,7 +277,7 @@ class LayerMapTest(TestCase):
         lm.save(fid_range=slice(None, 1), silent=True, strict=True)  # layer[:1]
 
         # Only Pueblo & Honolulu counties should be present because of
-        # the `unique` keyword.  Have to set `order_by` on this QuerySet
+        # the `unique` keyword. Have to set `order_by` on this QuerySet
         # or else MySQL will return a different ordering than the other dbs.
         qs = County.objects.order_by("name")
         self.assertEqual(2, qs.count())
@@ -290,7 +297,7 @@ class LayerMapTest(TestCase):
             self.county_helper(county_feat=False)
 
     def test_model_inheritance(self):
-        "Tests LayerMapping on inherited models.  See #12093."
+        "Tests LayerMapping on inherited models. See #12093."
         icity_mapping = {
             "name": "Name",
             "population": "Population",
@@ -310,7 +317,7 @@ class LayerMapTest(TestCase):
         self.assertEqual(3, ICity2.objects.count())
 
     def test_invalid_layer(self):
-        "Tests LayerMapping on invalid geometries.  See #15378."
+        "Tests LayerMapping on invalid geometries. See #15378."
         invalid_mapping = {"point": "POINT"}
         lm = LayerMapping(Invalid, invalid_shp, invalid_mapping, source_srs=4326)
         lm.save(silent=True)

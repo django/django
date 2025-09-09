@@ -39,9 +39,9 @@ lookup, then we need to tell Django about it::
           return "%s <> %s" % (lhs, rhs), params
 
 To register the ``NotEqual`` lookup we will need to call ``register_lookup`` on
-the field class we want the lookup to be available for. In this case, the lookup
-makes sense on all ``Field`` subclasses, so we register it with ``Field``
-directly::
+the field class we want the lookup to be available for. In this case, the
+lookup makes sense on all ``Field`` subclasses, so we register it with
+``Field`` directly::
 
   from django.db.models import Field
 
@@ -61,10 +61,10 @@ could place the implementation in a ``models.py`` file, or register the lookup
 in the ``ready()`` method of an ``AppConfig``.
 
 Taking a closer look at the implementation, the first required attribute is
-``lookup_name``. This allows the ORM to understand how to interpret ``name__ne``
-and use ``NotEqual`` to generate the SQL. By convention, these names are always
-lowercase strings containing only letters, but the only hard requirement is
-that it must not contain the string ``__``.
+``lookup_name``. This allows the ORM to understand how to interpret
+``name__ne`` and use ``NotEqual`` to generate the SQL. By convention, these
+names are always lowercase strings containing only letters, but the only hard
+requirement is that it must not contain the string ``__``.
 
 We then need to define the ``as_sql`` method. This takes a ``SQLCompiler``
 object, called ``compiler``,  and the active database connection.
@@ -112,8 +112,8 @@ or where it did not exceed a certain amount
     functionality which is possible in a database backend independent manner,
     and without duplicating functionality already in Django.
 
-We will start by writing an ``AbsoluteValue`` transformer. This will use the SQL
-function ``ABS()`` to transform the value before comparison::
+We will start by writing an ``AbsoluteValue`` transformer. This will use the
+SQL function ``ABS()`` to transform the value before comparison::
 
   from django.db.models import Transform
 
@@ -227,16 +227,16 @@ Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
 
 The final query does the inversion (``27`` to ``-27``) directly in the
-database. The reason for doing this is that if the ``self.rhs`` is something else
-than a plain integer value (for example an ``F()`` reference) we can't do the
-transformations in Python.
+database. The reason for doing this is that if the ``self.rhs`` is something
+else than a plain integer value (for example an ``F()`` reference) we can't do
+the transformations in Python.
 
 .. note::
     In fact, most lookups with ``__abs`` could be implemented as range queries
-    like this, and on most database backends it is likely to be more sensible to
-    do so as you can make use of the indexes. However with PostgreSQL you may
-    want to add an index on ``abs(change)`` which would allow these queries to
-    be very efficient.
+    like this, and on most database backends it is likely to be more sensible
+    to do so as you can make use of the indexes. However with PostgreSQL you
+    may want to add an index on ``abs(change)`` which would allow these queries
+    to be very efficient.
 
 A bilateral transformer example
 ===============================
@@ -252,10 +252,10 @@ very useful in practice as Django already comes with a bunch of built-in
 case-insensitive lookups, but it will be a nice demonstration of bilateral
 transformations in a database-agnostic way.
 
-We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
-transform the values before comparison. We define
-:attr:`bilateral = True <django.db.models.Transform.bilateral>` to indicate that
-this transformation should apply to both ``lhs`` and ``rhs``::
+We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()``
+to transform the values before comparison. We define :attr:`bilateral = True
+<django.db.models.Transform.bilateral>` to indicate that this transformation
+should apply to both ``lhs`` and ``rhs``::
 
   from django.db.models import Transform
 
@@ -272,8 +272,8 @@ Next, let's register it::
   CharField.register_lookup(UpperCase)
   TextField.register_lookup(UpperCase)
 
-Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a case
-insensitive query like this:
+Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a
+case insensitive query like this:
 
 .. code-block:: sql
 

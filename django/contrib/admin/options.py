@@ -170,10 +170,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         # ForeignKey or ManyToManyFields
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            # Combine the field kwargs with any options for formfield_overrides.
-            # Make sure the passed in **kwargs override anything in
-            # formfield_overrides because **kwargs is more specific, and should
-            # always win.
+            # Combine the field kwargs with any options for
+            # formfield_overrides. Make sure the passed in **kwargs override
+            # anything in formfield_overrides because **kwargs is more
+            # specific, and should always win.
             if db_field.__class__ in self.formfield_overrides:
                 kwargs = {**self.formfield_overrides[db_field.__class__], **kwargs}
 
@@ -250,7 +250,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def get_field_queryset(self, db, db_field, request):
         """
         If the ModelAdmin specifies ordering, the queryset should respect that
-        ordering.  Otherwise don't specify the queryset, let the field decide
+        ordering. Otherwise don't specify the queryset, let the field decide
         (return None in that case).
         """
         try:
@@ -1047,7 +1047,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
-        Return a list of choices for use in a form object.  Each choice is a
+        Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [*default_choices]
@@ -1059,7 +1059,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_action(self, action):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin.  Return is a tuple of
+        or the name of a method on the ModelAdmin. Return is a tuple of
         (callable, name, description).
         """
         # If the action is a callable, just use it.
@@ -1629,7 +1629,7 @@ class ModelAdmin(BaseModelAdmin):
             # the action explicitly on all objects.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
-                # Reminder that something needs to be selected or nothing will happen
+                # Something needs to be selected or nothing will happen.
                 msg = _(
                     "Items must be selected in order to perform "
                     "actions on them. No items have been changed."
@@ -2182,8 +2182,8 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
 
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
+        # Populate deleted_objects, a data structure of all related objects
+        # that will also be deleted.
         (
             deleted_objects,
             model_count,
@@ -2399,7 +2399,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Return a BaseInlineFormSet class for use in admin add/change views."""
+        """Return a BaseInlineFormSet class for use in add/change views."""
         if "fields" in kwargs:
             fields = kwargs.pop("fields")
         else:

@@ -36,9 +36,9 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
     .. attribute:: response_redirect_class
 
-        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
-        ``CommonMiddleware`` and override the attribute to customize the redirects
-        issued by the middleware.
+        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.
+        Subclass ``CommonMiddleware`` and override the attribute to customize
+        the redirects issued by the middleware.
 
 Adds a few conveniences for perfectionists:
 
@@ -137,7 +137,7 @@ If the response has an ``ETag`` header, the ETag is made weak to comply with
 :rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.gzip.gzip_page()` decorator.
+:func:`~django.views.decorators.gzip.gzip_page` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -154,7 +154,7 @@ header, the middleware adds one if needed. If the response has an ``ETag`` or
 :class:`~django.http.HttpResponseNotModified`.
 
 You can handle conditional GET operations with individual views using the
-:func:`~django.views.decorators.http.conditional_page()` decorator.
+:func:`~django.views.decorators.http.conditional_page` decorator.
 
 Locale middleware
 -----------------
@@ -240,10 +240,10 @@ so that infrequent visitors will be protected (31536000 seconds, i.e. 1 year,
 is common).
 
 Additionally, if you set the :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting
-to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains`` directive
-to the ``Strict-Transport-Security`` header. This is recommended (assuming all
-subdomains are served exclusively using HTTPS), otherwise your site may still
-be vulnerable via an insecure connection to a subdomain.
+to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains``
+directive to the ``Strict-Transport-Security`` header. This is recommended
+(assuming all subdomains are served exclusively using HTTPS), otherwise your
+site may still be vulnerable via an insecure connection to a subdomain.
 
 If you wish to submit your site to the `browser preload list`_, set the
 :setting:`SECURE_HSTS_PRELOAD` setting to ``True``. That appends the
@@ -339,13 +339,11 @@ this setting are:
     Instructs the browser to send the full URL as the referrer for same-origin
     links, and only the origin for cross-origin links.
 
-``same-origin``
-    Instructs the browser to send a full URL, but only for same-origin links. No
-    referrer will be sent for cross-origin links.
+``same-origin`` Instructs the browser to send a full URL, but only for
+same-origin links. No referrer will be sent for cross-origin links.
 
-``strict-origin``
-    Instructs the browser to send only the origin, not the full URL, and to send
-    no referrer when a protocol downgrade occurs.
+``strict-origin`` Instructs the browser to send only the origin, not the full
+URL, and to send no referrer when a protocol downgrade occurs.
 
 ``strict-origin-when-cross-origin``
     Instructs the browser to send the full URL when the link is same-origin and
@@ -416,7 +414,7 @@ the browser when you expected it to be something harmless.
 
 To prevent the browser from guessing the content type and force it to
 always use the type provided in the ``Content-Type`` header, you can pass
-the `X-Content-Type-Options: nosniff`__ header.  ``SecurityMiddleware`` will
+the `X-Content-Type-Options: nosniff`__ header. ``SecurityMiddleware`` will
 do this for all responses if the :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting
 is ``True``.
 
@@ -509,19 +507,19 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
     .. method:: get_login_url()
 
-        Returns the URL that unauthenticated requests will be redirected to. This
-        result is either the ``login_url`` set on the
-        :func:`~django.contrib.auth.decorators.login_required` decorator (if not
-        ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+        Returns the URL that unauthenticated requests will be redirected to.
+        This result is either the ``login_url`` set on the
+        :func:`~django.contrib.auth.decorators.login_required` decorator (if
+        not ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
     .. method:: get_redirect_field_name()
 
         Returns the name of the query parameter that contains the URL the user
         should be redirected to after a successful login. This result is either
         the ``redirect_field_name`` set on the
-        :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
-        ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
-        parameter won't be added.
+        :func:`~.django.contrib.auth.decorators.login_required` decorator (if
+        not ``None``), or :attr:`redirect_field_name`. If ``None`` is returned,
+        a query parameter won't be added.
 
 Redirects all unauthenticated requests to a login page, except for views
 excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
@@ -596,7 +594,7 @@ fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
 You can add Cross Site Request Forgery protection to individual views using the
-:func:`~django.views.decorators.csrf.csrf_protect()` decorator.
+:func:`~django.views.decorators.csrf.csrf_protect` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -605,7 +603,8 @@ You can add Cross Site Request Forgery protection to individual views using the
 
 .. class:: XFrameOptionsMiddleware
 
-Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
+Simple :doc:`clickjacking protection via the X-Frame-Options header
+</ref/clickjacking/>`.
 
 Content Security Policy middleware
 ----------------------------------
@@ -625,7 +624,8 @@ This middleware sets the following headers on the response depending on the
 available settings:
 
 * ``Content-Security-Policy``, based on :setting:`SECURE_CSP`.
-* ``Content-Security-Policy-Report-Only``, based on :setting:`SECURE_CSP_REPORT_ONLY`.
+* ``Content-Security-Policy-Report-Only``, based on
+  :setting:`SECURE_CSP_REPORT_ONLY`.
 
 .. _middleware-ordering:
 

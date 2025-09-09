@@ -90,7 +90,9 @@ class HttpRequest:
 
     @cached_property
     def accepted_types(self):
-        """Return a list of MediaType instances, in order of preference (quality)."""
+        """
+        Return a list of MediaType instances, in order of preference (quality).
+        """
         header_value = self.headers.get("Accept", "*/*")
         return sorted(
             (
@@ -105,7 +107,8 @@ class HttpRequest:
     @cached_property
     def accepted_types_by_precedence(self):
         """
-        Return a list of MediaType instances, in order of precedence (specificity).
+        Return a list of MediaType instances, in order of precedence
+        (specificity).
         """
         return sorted(
             self.accepted_types,
@@ -232,7 +235,7 @@ class HttpRequest:
         """
         Attempt to return a signed cookie. If the signature fails or the
         cookie has expired, raise an exception, unless the `default` argument
-        is provided,  in which case return that value.
+        is provided, in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
@@ -347,7 +350,8 @@ class HttpRequest:
     @property
     def upload_handlers(self):
         if not self._upload_handlers:
-            # If there are no upload handlers defined, initialize them from settings.
+            # If there are no upload handlers defined, initialize them from
+            # settings.
             self._initialize_handlers()
         return self._upload_handlers
 
@@ -380,7 +384,8 @@ class HttpRequest:
                     "You cannot access body after reading from request's data stream"
                 )
 
-            # Limit the maximum request data size that will be handled in-memory.
+            # Limit the maximum request data size that will be handled
+            # in-memory.
             if (
                 settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
                 and int(self.META.get("CONTENT_LENGTH") or 0)
@@ -404,7 +409,9 @@ class HttpRequest:
         self._files = MultiValueDict()
 
     def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
+        """
+        Populate self._post and self._files if the content-type is a form type
+        """
         if self.method != "POST":
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -543,8 +550,8 @@ class QueryDict(MultiValueDict):
     By default QueryDicts are immutable, though the copy() method
     will always return a mutable copy.
 
-    Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to str.
+    Both keys and values set on this class are converted from the given
+    encoding (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class
@@ -562,7 +569,8 @@ class QueryDict(MultiValueDict):
             "max_num_fields": settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
         }
         if isinstance(query_string, bytes):
-            # query_string normally contains URL-encoded data, a subset of ASCII.
+            # query_string normally contains URL-encoded data, a subset of
+            # ASCII.
             try:
                 query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
@@ -747,7 +755,8 @@ class MediaType:
                 return False
 
         if bool(self.range_params) == bool(other.range_params):
-            # If both have params or neither have params, they must be identical.
+            # If both have params or neither have params, they must be
+            # identical.
             result = self.range_params == other.range_params
         else:
             # If self has params and other does not, it's a match.

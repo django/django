@@ -19,9 +19,9 @@ class MySQLIntrospection(DatabaseIntrospection):
             # column.
             for column, typ, null, key, default, extra in cursor.fetchall():
                 if column == description.name:
-                    # Using OGRGeomType to convert from OGC name to Django field.
-                    # MySQL does not support 3D or SRIDs, so the field params
-                    # are empty.
+                    # Using OGRGeomType to convert from OGC name to Django
+                    # field. MySQL does not support 3D or SRIDs, so the field
+                    # params are empty.
                     field_type = OGRGeomType(typ).django
                     field_params = {}
                     break

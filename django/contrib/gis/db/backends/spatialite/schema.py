@@ -91,7 +91,8 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     def delete_model(self, model, **kwargs):
         from django.contrib.gis.db.models import GeometryField
 
-        # Drop spatial metadata (dropping the table does not automatically remove them)
+        # Drop spatial metadata (dropping the table does not automatically
+        # remove them)
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
                 self.remove_geometry_metadata(model, field)
@@ -126,9 +127,9 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
 
         # NOTE: If the field is a geometry field, the table is just recreated,
         # the parent's remove_field can't be used cause it will skip the
-        # recreation if the field does not have a database type. Geometry fields
-        # do not have a db type cause they are added and removed via stored
-        # procedures.
+        # recreation if the field does not have a database type. Geometry
+        # fields do not have a db type cause they are added and removed via
+        # stored procedures.
         if isinstance(field, GeometryField):
             self._remake_table(model, delete_field=field)
         else:

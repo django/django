@@ -92,8 +92,9 @@ class MigrationAutodetector:
         elif isinstance(obj, COMPILED_REGEX_TYPE):
             return RegexObject(obj)
         elif isinstance(obj, type):
-            # If this is a type that implements 'deconstruct' as an instance method,
-            # avoid treating this as being deconstructible itself - see #22951
+            # If this is a type that implements 'deconstruct' as an instance
+            # method, avoid treating this as being deconstructible itself - see
+            # #22951
             return obj
         elif hasattr(obj, "deconstruct"):
             deconstructed = obj.deconstruct()
@@ -754,7 +755,8 @@ class MigrationAutodetector:
                 beginning=True,
             )
 
-            # Don't add operations which modify the database for unmanaged models
+            # Don't add operations which modify the database for unmanaged
+            # models
             if not model_state.options.get("managed", True):
                 continue
 
@@ -904,7 +906,8 @@ class MigrationAutodetector:
                     bases=model_state.bases,
                     managers=model_state.managers,
                 ),
-                # Depend on the deletion of any possible non-proxy version of us
+                # Depend on the deletion of any possible non-proxy version of
+                # us
                 dependencies=dependencies,
             )
 
@@ -980,8 +983,8 @@ class MigrationAutodetector:
                     ],
                 )
             # Finally, remove the model.
-            # This depends on both the removal/alteration of all incoming fields
-            # and the removal of all its own related fields, and if it's
+            # This depends on both the removal/alteration of all incoming
+            # fields and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
             relations = self.from_state.relations
@@ -1218,9 +1221,9 @@ class MigrationAutodetector:
                 model_name=model_name,
                 name=field_name,
             ),
-            # We might need to depend on the removal of an
-            # order_with_respect_to or index/constraint/unique_together operation;
-            # this is safely ignored if there isn't one
+            # Include dependencies such as order_with_respect_to, constraints,
+            # and any generated fields that may depend on this field. These
+            # are safely ignored if not present.
             dependencies=[
                 OperationDependency(
                     app_label,
@@ -1239,6 +1242,9 @@ class MigrationAutodetector:
                     model_name,
                     field_name,
                     OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
+                ),
+                *self._get_generated_field_dependencies_for_removed_field(
+                    app_label, model_name, field_name
                 ),
             ],
         )
@@ -1265,8 +1271,8 @@ class MigrationAutodetector:
                 field_name
             )
             dependencies = []
-            # Implement any model renames on relations; these are handled by RenameModel
-            # so we need to exclude them from the comparison
+            # Implement any model renames on relations; these are handled by
+            # RenameModel so we need to exclude them from the comparison
             if hasattr(new_field, "remote_field") and getattr(
                 new_field.remote_field, "model", None
             ):
@@ -1287,7 +1293,8 @@ class MigrationAutodetector:
                         new_field.remote_field.field_name = (
                             old_field.remote_field.field_name
                         )
-                # Handle ForeignObjects which can have multiple from_fields/to_fields.
+                # Handle ForeignObjects which can have multiple
+                # from_fields/to_fields.
                 from_fields = getattr(new_field, "from_fields", None)
                 if from_fields:
                     from_rename_key = (app_label, model_name)
@@ -1694,6 +1701,27 @@ class MigrationAutodetector:
                 )
         return dependencies
 
+    def _get_generated_field_dependencies_for_removed_field(
+        self, app_label, model_name, field_name
+    ):
+        dependencies = []
+        model_state = self.from_state.models[app_label, model_name]
+        generated_fields = (f for f in model_state.fields.values() if f.generated)
+        for field in generated_fields:
+            if any(
+                field_name == name
+                for name, *_ in models.Model._get_expr_references(field.expression)
+            ):
+                dependencies.append(
+                    OperationDependency(
+                        app_label,
+                        model_name,
+                        field.name,
+                        OperationDependency.Type.REMOVE,
+                    )
+                )
+        return dependencies
+
     def _get_dependencies_for_model(self, app_label, model_name):
         """Return foreign key dependencies of the given model."""
         dependencies = []
@@ -1718,7 +1746,8 @@ class MigrationAutodetector:
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
 
-            # We run the old version through the field renames to account for those
+            # We run the old version through the field renames to account for
+            # those
             old_value = old_model_state.options.get(option_name)
             old_value = (
                 {

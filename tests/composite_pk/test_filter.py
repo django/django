@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import (
     Case,
     F,
@@ -9,11 +9,12 @@ from django.db.models import (
     Q,
     Subquery,
     TextField,
+    Value,
     When,
 )
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Comment, Tenant, User
 
@@ -478,7 +479,7 @@ class CompositePKFilterTests(TestCase):
             Comment.objects.filter(text=Case(When(text="", then="text"), default="pk"))
 
     def test_outer_ref_pk(self):
-        subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id"))
+        subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id")[:1])
         tests = [
             ("", 5),
             ("__gt", 0),
@@ -490,6 +491,39 @@ class CompositePKFilterTests(TestCase):
             with self.subTest(f"id{lookup}"):
                 queryset = Comment.objects.filter(**{f"id{lookup}": subquery})
                 self.assertEqual(queryset.count(), expected_count)
+
+    def test_outer_ref_pk_filter_on_pk_exact(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        qs = Comment.objects.filter(pk=subquery)
+        self.assertEqual(qs.count(), 2)
+
+    @skipUnlessDBFeature("supports_tuple_comparison_against_subquery")
+    def test_outer_ref_pk_filter_on_pk_comparison(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        tests = [
+            ("gt", 0),
+            ("gte", 2),
+            ("lt", 0),
+            ("lte", 2),
+        ]
+        for lookup, expected_count in tests:
+            with self.subTest(f"pk__{lookup}"):
+                qs = Comment.objects.filter(**{f"pk__{lookup}": subquery})
+                self.assertEqual(qs.count(), expected_count)
+
+    @skipIfDBFeature("supports_tuple_comparison_against_subquery")
+    def test_outer_ref_pk_filter_on_pk_comparison_unsupported(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        tests = ["gt", "gte", "lt", "lte"]
+        for lookup in tests:
+            with self.subTest(f"pk__{lookup}"):
+                qs = Comment.objects.filter(**{f"pk__{lookup}": subquery})
+                with self.assertRaisesMessage(
+                    NotSupportedError,
+                    f'"{lookup}" cannot be used to target composite fields '
+                    "through subqueries on this backend",
+                ):
+                    qs.count()
 
     def test_unsupported_rhs(self):
         pk = Exact(F("tenant_id"), 1)
@@ -526,7 +560,7 @@ class CompositePKFilterTests(TestCase):
         )
 
     def test_outer_ref_not_composite_pk(self):
-        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")
+        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")[:1]
         queryset = Comment.objects.filter(id=Subquery(subquery))
 
         msg = "Composite field lookups only work with composite expressions."
@@ -549,11 +583,22 @@ class CompositePKFilterTests(TestCase):
                 [self.tenant_1],
             )
 
+    def test_filter_by_tuple_containing_expression(self):
+        pk_lookup = (self.comment_1.tenant.id, (Value(self.comment_1.id) + 1) - 1)
+        for lookup in ({"pk": pk_lookup}, {"pk__in": [pk_lookup]}):
+            with self.subTest(lookup=lookup):
+                qs = Comment.objects.filter(**lookup)
+                self.assertEqual(qs.get(), self.comment_1)
+
 
 @skipUnlessDBFeature("supports_tuple_lookups")
 class CompositePKFilterTupleLookupFallbackTests(CompositePKFilterTests):
     def setUp(self):
-        feature_patch = patch.object(
+        feature_patch_1 = patch.object(
             connection.features, "supports_tuple_lookups", False
         )
-        self.enterContext(feature_patch)
+        feature_patch_2 = patch.object(
+            connection.features, "supports_tuple_comparison_against_subquery", False
+        )
+        self.enterContext(feature_patch_1)
+        self.enterContext(feature_patch_2)

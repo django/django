@@ -10,7 +10,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
-from django.core.validators import EmailValidator
+from django.core.validators import DomainNameValidator, EmailValidator
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -256,8 +256,8 @@ def smart_urlquote(url):
     netloc = unquote_quote(netloc)
 
     if query:
-        # Separately unquoting key/value, so as to not mix querystring separators
-        # included in query values. See #22267.
+        # Separately unquoting key/value, so as to not mix querystring
+        # separators included in query values. See #22267.
         query_parts = [
             (unquote(q[0]), unquote(q[1]))
             for q in parse_qsl(query, keep_blank_values=True)
@@ -296,7 +296,9 @@ class Urlizer:
 
     simple_url_re = _lazy_re_compile(r"^https?://\[?\w", re.IGNORECASE)
     simple_url_2_re = _lazy_re_compile(
-        r"^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$", re.IGNORECASE
+        rf"^www\.|^(?!http)(?:{DomainNameValidator.hostname_re})"
+        r"\.(com|edu|gov|int|mil|net|org)($|/.*)$",
+        re.IGNORECASE,
     )
     word_split_re = _lazy_re_compile(r"""([\s<>"']+)""")
 
@@ -352,7 +354,8 @@ class Urlizer:
                 url = smart_urlquote(html.unescape(middle))
             elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
                 unescaped_middle = html.unescape(middle)
-                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
                 # url = smart_urlquote(f"https://{unescaped_middle}")
                 protocol = (
                     "https"
@@ -462,7 +465,8 @@ class Urlizer:
                     trail_start = len(rstripped)
                     amount_trailing_semicolons = len(middle) - len(middle.rstrip(";"))
                     if amp > -1 and amount_trailing_semicolons > 1:
-                        # Leave up to most recent semicolon as might be an entity.
+                        # Leave up to most recent semicolon as might be an
+                        # entity.
                         recent_semicolon = middle[trail_start:].index(";")
                         middle_semicolon_index = recent_semicolon + trail_start + 1
                         trail = middle[middle_semicolon_index:] + trail

@@ -595,8 +595,8 @@ class BaseDatabaseWrapper:
         """
         if self.connection is not None:
             self.health_check_done = False
-            # If the application didn't restore the original autocommit setting,
-            # don't take chances, drop the connection.
+            # If the application didn't restore the original autocommit
+            # setting, don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
                 self.close()
                 return

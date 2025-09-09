@@ -18,6 +18,7 @@ from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
+from django.views.decorators.csp import csp_override, csp_report_only_override
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
 # Minimal Django templates engine to render the error templates
@@ -59,6 +60,8 @@ class CallableSettingWrapper:
         return repr(self._wrapped)
 
 
+@csp_override({})
+@csp_report_only_override({})
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
@@ -233,7 +236,8 @@ class SafeExceptionReporterFilter:
             return "{!r} while evaluating {!r}".format(e, value)
 
         if is_multivalue_dict:
-            # Cleanse MultiValueDicts (request.POST is the one we usually care about)
+            # Cleanse MultiValueDicts (request.POST is the one we usually care
+            # about)
             value = self.get_cleansed_multivaluedict(request, value)
         return value
 
@@ -605,6 +609,8 @@ class ExceptionReporter:
             tb = tb.tb_next
 
 
+@csp_override({})
+@csp_report_only_override({})
 def technical_404_response(request, exception):
     """Create a technical 404 error response. `exception` is the Http404."""
     try:

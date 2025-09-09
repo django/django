@@ -47,7 +47,8 @@ class CSPMiddlewareTest(SimpleTestCase):
     @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
     def test_csp_basic_with_nonce_but_unused(self):
         """
-        Test if `request.csp_nonce` is never accessed, it is not added to the header.
+        Test if `request.csp_nonce` is never accessed, it is not added to the
+        header.
         """
         response = self.client.get("/csp-base/")
         nonce = response.text
@@ -99,9 +100,79 @@ class CSPMiddlewareTest(SimpleTestCase):
         """
         Test that the CSP headers are not added to the debug view.
         """
-        response = self.client.get("/csp-500/")
+        with self.assertLogs("django.request", "WARNING"):
+            response = self.client.get("/csp-500/")
         self.assertNotIn(CSP.HEADER_ENFORCE, response)
         self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
+
+
+@override_settings(
+    MIDDLEWARE=["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+    ROOT_URLCONF="middleware.urls",
+    SECURE_CSP=basic_config,
+    SECURE_CSP_REPORT_ONLY=basic_config,
+)
+class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
+    def test_no_decorators(self):
+        response = self.client.get("/csp-base/")
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_disabled_enforced(self):
+        """
+        `csp_override({})` only disables the enforced CSP header.
+        """
+        response = self.client.get("/csp-disabled-enforced/")
+        self.assertNotIn(CSP.HEADER_ENFORCE, response)
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_report_only_disabled(self):
+        """
+        `csp_report_only_override({})` only disables the report-only header.
+        """
+        response = self.client.get("/csp-disabled-report-only/")
+        self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+
+    def test_csp_disabled_both(self):
+        """
+        Using both CSP decorators with empty mappings will clear both headers.
+        """
+        response = self.client.get("/csp-disabled-both/")
+        self.assertNotIn(CSP.HEADER_ENFORCE, response)
+        self.assertNotIn(CSP.HEADER_REPORT_ONLY, response)
+
+    def test_csp_override_enforced(self):
+        """
+        `csp_override` only overrides the enforced header.
+        """
+        response = self.client.get("/csp-override-enforced/")
+        self.assertEqual(
+            response[CSP.HEADER_ENFORCE], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    def test_csp_report_only_override(self):
+        """
+        `csp_report_only_override` only overrides the report-only header.
+        """
+        response = self.client.get("/csp-override-report-only/")
+        self.assertEqual(
+            response[CSP.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+
+    def test_csp_override_both_decorator(self):
+        """
+        Using both CSP decorators overrides both CSP Django settings.
+        """
+        response = self.client.get("/csp-override-both/")
+        self.assertEqual(
+            response[CSP.HEADER_ENFORCE], "default-src 'self'; img-src 'self' data:"
+        )
+        self.assertEqual(
+            response[CSP.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+        )
 
 
 @override_settings(

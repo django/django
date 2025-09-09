@@ -16,8 +16,8 @@ class LimitedStream(IOBase):
     """
     Wrap another stream to disallow reading it past a number of bytes.
 
-    Based on the implementation from werkzeug.wsgi.LimitedStream
-    See https://github.com/pallets/werkzeug/blob/dbf78f67/src/werkzeug/wsgi.py#L828
+    Based on the implementation from werkzeug.wsgi.LimitedStream. See:
+    https://github.com/pallets/werkzeug/blob/dbf78f67/src/werkzeug/wsgi.py#L828
     """
 
     def __init__(self, stream, limit):

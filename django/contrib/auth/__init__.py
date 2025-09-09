@@ -205,7 +205,7 @@ async def alogin(request, user, backend=None):
     # RemovedInDjango61Warning.
     if user is None:
         warnings.warn(
-            "Fallback to request.user when user is None will be removed.",
+            "Fallback to request.auser() when user is None will be removed.",
             RemovedInDjango61Warning,
             stacklevel=2,
         )
@@ -234,8 +234,12 @@ async def alogin(request, user, backend=None):
     await request.session.aset(SESSION_KEY, user._meta.pk.value_to_string(user))
     await request.session.aset(BACKEND_SESSION_KEY, backend)
     await request.session.aset(HASH_SESSION_KEY, session_auth_hash)
-    if hasattr(request, "user"):
-        request.user = user
+    if hasattr(request, "auser"):
+
+        async def auser():
+            return user
+
+        request.auser = auser
     rotate_token(request)
     await user_logged_in.asend(sender=user.__class__, request=request, user=user)
 
@@ -265,14 +269,17 @@ async def alogout(request):
     user = getattr(request, "auser", None)
     if user is not None:
         user = await user()
-    if not getattr(user, "is_authenticated", True):
-        user = None
+        if not getattr(user, "is_authenticated", True):
+            user = None
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
-    if hasattr(request, "user"):
+    if hasattr(request, "auser"):
         from django.contrib.auth.models import AnonymousUser
 
-        request.user = AnonymousUser()
+        async def auser():
+            return AnonymousUser()
+
+        request.auser = auser
 
 
 def get_user_model():
@@ -357,8 +364,8 @@ async def aget_user(request):
                     session_hash_verified = False
                 else:
                     session_auth_hash = user.get_session_auth_hash()
-                    session_hash_verified = session_hash and constant_time_compare(
-                        session_hash, user.get_session_auth_hash()
+                    session_hash_verified = constant_time_compare(
+                        session_hash, session_auth_hash
                     )
                 if not session_hash_verified:
                     # If the current secret does not verify the session, try
@@ -401,5 +408,5 @@ def update_session_auth_hash(request, user):
 async def aupdate_session_auth_hash(request, user):
     """See update_session_auth_hash()."""
     await request.session.acycle_key()
-    if hasattr(user, "get_session_auth_hash") and request.user == user:
+    if hasattr(user, "get_session_auth_hash") and await request.auser() == user:
         await request.session.aset(HASH_SESSION_KEY, user.get_session_auth_hash())

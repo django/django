@@ -300,7 +300,8 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
 class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
     def test_filter_choices_by_request_user(self):
         """
-        Ensure the user can only see their own cars in the foreign key dropdown.
+        Ensure the user can only see their own cars in the foreign key
+        dropdown.
         """
         self.client.force_login(self.superuser)
         response = self.client.get(reverse("admin:admin_widgets_cartire_add"))
@@ -398,7 +399,8 @@ class AdminDateWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="text" class="vDateField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="vDateField" name="test" '
             'size="10"></p>',
         )
         # pass attrs to widget
@@ -406,7 +408,8 @@ class AdminDateWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="text" class="myDateField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="myDateField" name="test" '
             'size="20"></p>',
         )
 
@@ -417,7 +420,8 @@ class AdminTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="text" class="vTimeField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="vTimeField" name="test" '
             'size="8"></p>',
         )
         # pass attrs to widget
@@ -425,7 +429,8 @@ class AdminTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="text" class="myTimeField" name="test" '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="myTimeField" name="test" '
             'size="20"></p>',
         )
 
@@ -434,12 +439,16 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
             '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8"></p>',
+            '<label for="id_test_0">Date:</label> '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="2007-12-01" type="text" class="vDateField" '
+            'name="test_0" size="10" id="id_test_0"><br>'
+            '<label for="id_test_1">Time:</label> '
+            '<input aria-describedby="id_test_timezone_warning_helptext" '
+            'value="09:30:00" type="text" class="vTimeField" '
+            'name="test_1" size="8" id="id_test_1"></p>',
         )
 
     def test_localization(self):
@@ -448,12 +457,16 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         with translation.override("de-at"):
             w.is_localized = True
             self.assertHTMLEqual(
-                w.render("test", datetime(2007, 12, 1, 9, 30)),
+                w.render("test", datetime(2007, 12, 1, 9, 30), attrs={"id": "id_test"}),
                 '<p class="datetime">'
-                'Datum: <input value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8"></p>',
+                '<label for="id_test_0">Datum:</label> '
+                '<input aria-describedby="id_test_timezone_warning_helptext" '
+                'value="01.12.2007" type="text" '
+                'class="vDateField" name="test_0" size="10" id="id_test_0"><br>'
+                '<label for="id_test_1">Zeit:</label> '
+                '<input aria-describedby="id_test_timezone_warning_helptext" '
+                'value="09:30:00" type="text" class="vTimeField" '
+                'name="test_1" size="8" id="id_test_1"></p>',
             )
 
 
@@ -965,6 +978,21 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         """
         self.assertHTMLEqual(output, expected)
 
+    def test_non_select_widget_cant_change_delete_related(self):
+        main_band = Event._meta.get_field("main_band")
+        widget = widgets.AdminRadioSelect()
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            widget,
+            main_band,
+            widget_admin_site,
+            can_add_related=True,
+            can_change_related=True,
+            can_delete_related=True,
+        )
+        self.assertTrue(wrapper.can_add_related)
+        self.assertFalse(wrapper.can_change_related)
+        self.assertFalse(wrapper.can_delete_related)
+
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
@@ -1052,8 +1080,8 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_calendar_nonday_class(self):
         """
-        Ensure cells that are not days of the month have the `nonday` CSS class.
-        Refs #4574.
+        Ensure cells that are not days of the month have the `nonday` CSS
+        class. Refs #4574.
         """
         from selenium.webdriver.common.by import By
 
@@ -1184,9 +1212,9 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         date/time/datetime picker shortcuts work in the current time zone.
         Refs #20663.
 
-        This test case is fairly tricky, it relies on selenium still running the browser
-        in the default time zone "America/Chicago" despite `override_settings` changing
-        the time zone to "Asia/Singapore".
+        This test case is fairly tricky, it relies on selenium still running
+        the browser in the default time zone "America/Chicago" despite
+        `override_settings` changing the time zone to "Asia/Singapore".
         """
         from selenium.webdriver.common.by import By
 
@@ -1502,7 +1530,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.peter.id))
         self.select_option(from_box, str(self.lisa.id))
 
-        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        # Confirm they're selected after clicking inactive buttons: ticket
+        # #26575
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
         self.selenium.find_element(By.ID, remove_button).click()
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
@@ -1515,7 +1544,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(to_box, str(self.jason.id))
         self.select_option(to_box, str(self.john.id))
 
-        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        # Confirm they're selected after clicking inactive buttons: ticket
+        # #26575
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
         self.selenium.find_element(By.ID, choose_button).click()
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])

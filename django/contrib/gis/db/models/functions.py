@@ -9,6 +9,7 @@ from django.db import NotSupportedError
 from django.db.models import (
     BinaryField,
     BooleanField,
+    CharField,
     FloatField,
     Func,
     IntegerField,
@@ -120,8 +121,8 @@ class GeomOutputGeoFunc(GeoFunc):
 
 class SQLiteDecimalToFloatMixin:
     """
-    By default, Decimal values are converted to str by the SQLite backend, which
-    is not acceptable by the GIS functions expecting numeric values.
+    By default, Decimal values are converted to str by the SQLite backend,
+    which is not acceptable by the GIS functions expecting numeric values.
     """
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -423,6 +424,29 @@ class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
 
 
 @BaseSpatialField.register_lookup
+class GeometryType(GeoFuncMixin, Transform):
+    output_field = CharField()
+    lookup_name = "geom_type"
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        lhs, params = compiler.compile(self.lhs)
+        sql = (
+            "(SELECT DECODE("
+            f"SDO_GEOMETRY.GET_GTYPE({lhs}),"
+            "1, 'POINT',"
+            "2, 'LINESTRING',"
+            "3, 'POLYGON',"
+            "4, 'COLLECTION',"
+            "5, 'MULTIPOINT',"
+            "6, 'MULTILINESTRING',"
+            "7, 'MULTIPOLYGON',"
+            "8, 'SOLID',"
+            "'UNKNOWN'))"
+        )
+        return sql, params
+
+
+@BaseSpatialField.register_lookup
 class IsEmpty(GeoFuncMixin, Transform):
     lookup_name = "isempty"
     output_field = BooleanField()
@@ -459,7 +483,8 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
         if self.source_is_geography():
             clone.source_expressions.append(Value(self.spheroid))
         elif self.geo_field.geodetic(connection):
-            # Geometry fields with geodetic (lon/lat) coordinates need length_spheroid
+            # Geometry fields with geodetic (lon/lat) coordinates need
+            # length_spheroid
             function = connection.ops.spatial_function_name("LengthSpheroid")
             clone.source_expressions.append(Value(self.geo_field.spheroid(connection)))
         else:

@@ -48,7 +48,8 @@ database to match it.
 The field instance should be an unbound field (so just
 ``models.CharField(...)``, rather than a field taken from another model).
 
-``options`` is an optional dictionary of values from the model's ``Meta`` class.
+``options`` is an optional dictionary of values from the model's ``Meta``
+class.
 
 ``bases`` is an optional list of other classes to have this model inherit from;
 it can contain both class objects as well as strings in the format
@@ -330,10 +331,11 @@ irreversible.
 
 The ``state_operations`` argument allows you to supply operations that are
 equivalent to the SQL in terms of project state. For example, if you are
-manually creating a column, you should pass in a list containing an ``AddField``
-operation here so that the autodetector still has an up-to-date state of the
-model. If you don't, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again. For example::
+manually creating a column, you should pass in a list containing an
+``AddField`` operation here so that the autodetector still has an up-to-date
+state of the model. If you don't, when you next run ``makemigrations``, it
+won't see any operation that adds that field and so will try to run it again.
+For example::
 
     migrations.RunSQL(
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
@@ -385,9 +387,10 @@ database hints.
 The optional ``elidable`` argument determines whether or not the operation will
 be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
-You are advised to write the code as a separate function above the ``Migration``
-class in the migration file, and pass it to ``RunPython``. Here's an example of
-using ``RunPython`` to create some initial objects on a ``Country`` model::
+You are advised to write the code as a separate function above the
+``Migration`` class in the migration file, and pass it to ``RunPython``. Here's
+an example of using ``RunPython`` to create some initial objects on a
+``Country`` model::
 
     from django.db import migrations
 
@@ -427,10 +430,10 @@ custom data updates and alterations, and anything else you need access to an
 ORM and/or Python code for.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
-either doing it outside the scope of the Django model system (e.g. triggers)
-or that you use :class:`SeparateDatabaseAndState` to add in operations that will
-reflect your changes to the model state - otherwise, the versioned ORM and
-the autodetector will stop working correctly.
+either doing it outside the scope of the Django model system (e.g. triggers) or
+that you use :class:`SeparateDatabaseAndState` to add in operations that will
+reflect your changes to the model state - otherwise, the versioned ORM and the
+autodetector will stop working correctly.
 
 By default, ``RunPython`` will run its contents inside a transaction on
 databases that do not support DDL transactions (for example, MySQL and
@@ -455,8 +458,8 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
 
 .. warning::
 
-    ``RunPython`` does not magically alter the connection of the models for you;
-    any model methods you call will go to the default database unless you
+    ``RunPython`` does not magically alter the connection of the models for
+    you; any model methods you call will go to the default database unless you
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
@@ -608,7 +611,8 @@ Some things to note:
         ...
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
-  the one that will be the current state once the migration has finished reversing.
+  the one that will be the current state once the migration has finished
+  reversing.
 
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for

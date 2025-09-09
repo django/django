@@ -29,11 +29,11 @@ all_sites = WeakSet()
 
 class AdminSite:
     """
-    An AdminSite object encapsulates an instance of the Django admin application, ready
-    to be hooked in to your URLconf. Models are registered with the AdminSite using the
-    register() method, and the get_urls() method can then be used to access Django view
-    functions that present a full admin interface for the collection of registered
-    models.
+    An AdminSite object encapsulates an instance of the Django admin
+    application, ready to be hooked in to your URLconf. Models are registered
+    with the AdminSite using the register() method, and the get_urls() method
+    can then be used to access Django view functions that present a full admin
+    interface for the collection of registered models.
     """
 
     # Text to put at the end of each page's <title>.
@@ -136,9 +136,9 @@ class AdminSite:
                 # If we got **options then dynamically construct a subclass of
                 # admin_class with those **options.
                 if options:
-                    # For reasons I don't quite understand, without a __module__
-                    # the created class appears to "live" in the wrong place,
-                    # which causes issues later on.
+                    # For reasons I don't quite understand, without a
+                    # __module__ the created class appears to "live" in the
+                    # wrong place, which causes issues later on.
                     options["__module__"] = __name__
                     admin_class = type(
                         "%sAdmin" % model.__name__, (admin_class,), options

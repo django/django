@@ -118,7 +118,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def wait_page_ready(self, timeout=10):
         """
-        Block until the  page is ready.
+        Block until the page is ready.
         """
         self.wait_until(
             lambda driver: driver.execute_script("return document.readyState;")
@@ -142,8 +142,8 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             self.wait_until(ec.staleness_of(old_page), timeout=timeout)
         except WebDriverException:
             # Issue in version 113+ of Chrome driver where a WebDriverException
-            # error is raised rather than a StaleElementReferenceException, see:
-            # https://issues.chromium.org/issues/42323468
+            # error is raised rather than a StaleElementReferenceException.
+            # See: https://issues.chromium.org/issues/42323468
             pass
 
         self.wait_page_ready(timeout=timeout)
@@ -218,9 +218,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
                 actual_values.append(option.get_attribute("value"))
             self.assertEqual(values, actual_values)
         else:
-            # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from blocking
-            # if the selector doesn't match any options as we expect it
-            # to be the case.
+            # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from
+            # blocking if the selector doesn't match any options as we expect
+            # it to be the case.
             with self.disable_implicit_wait():
                 self.wait_until(
                     lambda driver: not driver.find_elements(

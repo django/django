@@ -306,6 +306,33 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
+    **Partial loading:**
+
+    When using the :class:`~django.template.backends.django.DjangoTemplates`
+    backend, a specific fragment from a template can be loaded by name. This
+    fragment should have been previously defined using the :ttag:`partialdef`
+    template tag::
+
+        from django.template.loader import get_template
+
+        # Load an entire template.
+        template = get_template("template.html")
+
+        # Load a specific fragment from a template.
+        partial = get_template("template.html#partial_name")
+
+    When loading a partial, the returned object behaves like a regular
+    ``Template`` but contains only the partial's content.
+
+    See :ref:`template-partials` for more information about defining and using
+    template fragments.
+
+    .. versionchanged:: 6.0
+
+        Support for loading template partials when using the
+        :class:`~django.template.backends.django.DjangoTemplates` backend was
+        added.
+
 .. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
@@ -354,9 +381,10 @@ must provide a ``render()`` method with the following signature:
     If ``context`` is provided, it must be a :class:`dict`. If it isn't
     provided, the engine will render the template with an empty context.
 
-    If ``request`` is provided, it must be an :class:`~django.http.HttpRequest`.
-    Then the engine must make it, as well as the CSRF token, available in the
-    template. How this is achieved is up to each backend.
+    If ``request`` is provided, it must be an
+    :class:`~django.http.HttpRequest`. Then the engine must make it, as well as
+    the CSRF token, available in the template. How this is achieved is up to
+    each backend.
 
 Here's an example of the search algorithm. For this example the
 :setting:`TEMPLATES` setting is::
@@ -384,8 +412,8 @@ will look for, in order:
 * ``/home/html/default/story_detail.html`` (``'django'`` engine)
 * ``/home/html/jinja2/story_detail.html`` (``'jinja2'`` engine)
 
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+If you call ``select_template(['story_253_detail.html',
+'story_detail.html'])``, here's what Django will look for:
 
 * ``/home/html/example.com/story_253_detail.html`` (``'django'`` engine)
 * ``/home/html/default/story_253_detail.html`` (``'django'`` engine)
@@ -398,7 +426,7 @@ When Django finds a template that exists, it stops looking.
 
 .. admonition:: Use ``django.template.loader.select_template()`` for more flexibility
 
-    You can use :func:`~django.template.loader.select_template()` for flexible
+    You can use :func:`~django.template.loader.select_template` for flexible
     template loading. For example, if you've written a news story and want
     some stories to have custom templates, use something like
     ``select_template(['story_%s_detail.html' % story.id,
@@ -458,8 +486,8 @@ templates, Django provides a shortcut function which automates the process.
 
         rendered = render_to_string("my_template.html", {"foo": "bar"})
 
-See also the :func:`~django.shortcuts.render()` shortcut which calls
-:func:`render_to_string()` and feeds the result into an
+See also the :func:`~django.shortcuts.render` shortcut which calls
+:func:`render_to_string` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
@@ -607,12 +635,12 @@ adds defaults that differ from Jinja2's for a few options:
 
   .. admonition:: Using context processors with Jinja2 templates is discouraged.
 
-    Context processors are useful with Django templates because Django templates
-    don't support calling functions with arguments. Since Jinja2 doesn't have
-    that limitation, it's recommended to put the function that you would use as a
-    context processor in the global variables available to the template using
-    ``jinja2.Environment`` as described below. You can then call that function in
-    the template:
+    Context processors are useful with Django templates because Django
+    templates don't support calling functions with arguments. Since Jinja2
+    doesn't have that limitation, it's recommended to put the function that you
+    would use as a context processor in the global variables available to the
+    template using ``jinja2.Environment`` as described below. You can then call
+    that function in the template:
 
     .. code-block:: jinja
 
@@ -628,11 +656,11 @@ adds defaults that differ from Jinja2's for a few options:
     * Needing the result in every template.
     * Using the result multiple times in each template.
 
-    Unless all of these conditions are met, passing a function to the template is
-    more in line with the design of Jinja2.
+    Unless all of these conditions are met, passing a function to the template
+    is more in line with the design of Jinja2.
 
 The default configuration is purposefully kept to a minimum. If a template is
-rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
+rendered with a request (e.g. when using :func:`~django.shortcuts.render`),
 the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
 ``csrf_token`` to the context. Apart from that, this backend doesn't create a
 Django-flavored environment. It doesn't know about Django filters and tags.

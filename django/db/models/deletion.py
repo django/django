@@ -82,8 +82,9 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_candidate_relations_to_delete(opts):
-    # The candidate relations are the ones that come from N-1 and 1-1 relations.
-    # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
+    # The candidate relations are the ones that come from N-1 and 1-1
+    # relations. N-N  (i.e., many-to-many) relations aren't candidates for
+    # deletion.
     return (
         f
         for f in opts.get_fields(include_hidden=True)
@@ -115,7 +116,7 @@ class Collector:
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
-        Add 'objs' to the collection of objects to be deleted.  If the call is
+        Add 'objs' to the collection of objects to be deleted. If the call is
         the result of a cascade, 'source' should be the model that caused it,
         and 'nullable' should be set to True if the relation can be null.
 
@@ -254,8 +255,8 @@ class Collector:
     ):
         """
         Add 'objs' to the collection of objects to be deleted as well as all
-        parent instances.  'objs' must be a homogeneous iterable collection of
-        model instances (e.g. a QuerySet).  If 'collect_related' is True,
+        parent instances. 'objs' must be a homogeneous iterable collection of
+        model instances (e.g. a QuerySet). If 'collect_related' is True,
         related objects will be handled by their respective on_delete handler.
 
         If the call is the result of a cascade, 'source' should be the model
@@ -434,8 +435,8 @@ class Collector:
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
-        # don't support transactions or cannot defer constraint checks until the
-        # end of a transaction.
+        # don't support transactions or cannot defer constraint checks until
+        # the end of a transaction.
         self.sort()
         # number of objects deleted for each model label
         deleted_counter = Counter()

@@ -170,8 +170,8 @@ class CheckURLMixin:
         Check that the pattern does not begin with a forward slash.
         """
         if not settings.APPEND_SLASH:
-            # Skip check as it can be useful to start a URL pattern with a slash
-            # when APPEND_SLASH=False.
+            # Skip check as it can be useful to start a URL pattern with a
+            # slash when APPEND_SLASH=False.
             return []
         if self._regex.startswith(("/", "^/", "^\\/")) and not self._regex.endswith(
             "/"
@@ -325,7 +325,8 @@ class RoutePattern(CheckURLMixin):
         # Only use regex overhead if there are converters.
         if self.converters:
             if match := self.regex.search(path):
-                # RoutePattern doesn't allow non-named groups so args are ignored.
+                # RoutePattern doesn't allow non-named groups so args are
+                # ignored.
                 kwargs = match.groupdict()
                 for key, value in kwargs.items():
                     converter = self.converters[key]
@@ -334,7 +335,8 @@ class RoutePattern(CheckURLMixin):
                     except ValueError:
                         return None
                 return path[match.end() :], (), kwargs
-        # If this is an endpoint, the path should be exactly the same as the route.
+        # If this is an endpoint, the path should be exactly the same as the
+        # route.
         elif self._is_endpoint:
             if self._route == path:
                 return "", (), {}
@@ -680,11 +682,12 @@ class URLResolver:
                     if sub_match:
                         # Merge captured arguments in match with submatch
                         sub_match_dict = {**kwargs, **self.default_kwargs}
-                        # Update the sub_match_dict with the kwargs from the sub_match.
+                        # Update the sub_match_dict with the kwargs from the
+                        # sub_match.
                         sub_match_dict.update(sub_match.kwargs)
-                        # If there are *any* named groups, ignore all non-named groups.
-                        # Otherwise, pass all non-named arguments as positional
-                        # arguments.
+                        # If there are *any* named groups, ignore all non-named
+                        # groups. Otherwise, pass all non-named arguments as
+                        # positional arguments.
                         sub_match_args = sub_match.args
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args

@@ -77,7 +77,8 @@ class LazySettings(LazyObject):
         val = getattr(_wrapped, name)
 
         # Special case some settings which require further modification.
-        # This is done here for performance reasons so the modified value is cached.
+        # This is done here for performance reasons so the modified value is
+        # cached.
         if name in {"MEDIA_URL", "STATIC_URL"} and val is not None:
             val = self._add_script_prefix(val)
         elif name == "SECRET_KEY" and not val:
@@ -149,7 +150,8 @@ class LazySettings(LazyObject):
 
 class Settings:
     def __init__(self, settings_module):
-        # update this dict from global settings (but only for ALL_CAPS settings)
+        # update this dict from global settings (but only for ALL_CAPS
+        # settings)
         for setting in dir(global_settings):
             if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))

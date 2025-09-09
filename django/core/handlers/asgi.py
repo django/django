@@ -94,7 +94,11 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
+            if corrected_name == "HTTP_COOKIE":
+                value = value.rstrip("; ")
+                if "HTTP_COOKIE" in self.META:
+                    value = self.META[corrected_name] + "; " + value
+            elif corrected_name in self.META:
                 value = self.META[corrected_name] + "," + value
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
@@ -331,8 +335,8 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly, to
-            #   allow mapping of a sync iterator.
+            # - Consume via `__aiter__` and not `streaming_content` directly,
+            #   to allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter. See
             #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
             async with aclosing(aiter(response)) as content:
@@ -342,8 +346,9 @@ class ASGIHandler(base.BaseHandler):
                             {
                                 "type": "http.response.body",
                                 "body": chunk,
-                                # Ignore "more" as there may be more parts; instead,
-                                # use an empty final closing message with False.
+                                # Ignore "more" as there may be more parts;
+                                # instead, use an empty final closing message
+                                # with False.
                                 "more_body": True,
                             }
                         )

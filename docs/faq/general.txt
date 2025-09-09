@@ -32,8 +32,9 @@ thrilled to be able to give something back to the open-source community.
 What does "Django" mean, and how do you pronounce it?
 =====================================================
 
-Django is named after `Django Reinhardt`_, a jazz manouche guitarist from the 1930s
-to early 1950s. To this day, he's considered one of the best guitarists of all time.
+Django is named after `Django Reinhardt`_, a jazz manouche guitarist from the
+1930s to early 1950s. To this day, he's considered one of the best guitarists
+of all time.
 
 Listen to his music. You'll like it.
 
@@ -185,9 +186,10 @@ corresponds to a web page on the official Django site.
 Because the documentation is :source:`stored in revision control <docs>`, you
 can browse documentation changes just like you can browse code changes.
 
-Technically, the docs on Django's site are generated from the latest development
-versions of those reST documents, so the docs on the Django site may offer more
-information than the docs that come with the latest Django release.
+Technically, the docs on Django's site are generated from the latest
+development versions of those reST documents, so the docs on the Django site
+may offer more information than the docs that come with the latest Django
+release.
 
 How do I cite Django?
 =====================

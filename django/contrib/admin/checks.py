@@ -316,7 +316,8 @@ class BaseModelAdminChecks:
 
     def _check_fields(self, obj):
         """Check that `fields` only refer to existing fields, doesn't contain
-        duplicates. Check if at most one of `fields` and `fieldsets` is defined.
+        duplicates. Check if at most one of `fields` and `fieldsets` is
+        defined.
         """
 
         if obj.fields is None:
@@ -907,7 +908,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return inline(obj.model, obj.admin_site).check()
 
     def _check_list_display(self, obj):
-        """Check that list_display only contains fields or usable attributes."""
+        """Check list_display only contains fields or usable attributes."""
 
         if not isinstance(obj.list_display, (list, tuple)):
             return must_be(
@@ -1012,7 +1013,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_filter_item(self, obj, item, label):
         """
-        Check one item of `list_filter`, i.e. check if it is one of three options:
+        Check one item of `list_filter`, the three valid options are:
         1. 'field' -- a basic field filter, possibly w/ relationships (e.g.
            'field__rel')
         2. ('field', SomeFieldListFilter) - a field-based list filter class
@@ -1026,7 +1027,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return must_inherit_from(
                     parent="ListFilter", option=label, obj=obj, id="admin.E113"
                 )
-            # ...  but not a FieldListFilter.
+            # ... but not a FieldListFilter.
             elif issubclass(item, FieldListFilter):
                 return [
                     checks.Error(

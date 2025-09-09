@@ -39,6 +39,7 @@ backport
 backported
 backports
 backtick
+backticks
 backtraces
 balancer
 basename
@@ -509,6 +510,7 @@ titlecase
 tokenized
 toolkits
 toolset
+tooltip
 trac
 tracebacks
 Transifex

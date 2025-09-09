@@ -13,8 +13,8 @@ validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
 In general, any cleaning method can raise ``ValidationError`` if there is a
-problem with the data it is processing, passing the relevant information to
-the ``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
+problem with the data it is processing, passing the relevant information to the
+``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
 for the best practice in raising ``ValidationError``. If no ``ValidationError``
 is raised, the method should return the cleaned (normalized) data as a Python
 object.
@@ -83,23 +83,23 @@ overridden:
   called, you also have access to the form's ``errors`` attribute which
   contains all the errors raised by cleaning of individual fields.
 
-  Note that any errors raised by your :meth:`Form.clean()` override will not
+  Note that any errors raised by your :meth:`Form.clean` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
   :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
   want to attach errors to a specific field in the form, you need to call
-  :meth:`~django.forms.Form.add_error()`.
+  :meth:`~django.forms.Form.add_error`.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
   :ref:`ModelForm documentation
   <overriding-modelform-clean-method>` for more information)
 
-These methods are run in the order given above, one field at a time.  That is,
+These methods are run in the order given above, one field at a time. That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the :meth:`Form.clean()` method, or its override, is executed whether
+field, the :meth:`Form.clean` method, or its override, is executed whether
 or not the previous methods have raised errors.
 
 Examples of each of these methods are provided below.
@@ -335,7 +335,7 @@ Cleaning and validating fields that depend on each other
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
 performing validation on more than one field at a time, so the form's
-:meth:`~Form.clean()` method is a good spot to do this. Notice that we are
+:meth:`~Form.clean` method is a good spot to do this. Notice that we are
 talking about the ``clean()`` method on the form here, whereas earlier we were
 writing a ``clean()`` method on a field. It's important to keep the field and
 form difference clear when working out where to validate things. Fields are

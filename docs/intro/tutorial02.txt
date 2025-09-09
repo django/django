@@ -51,7 +51,8 @@ come with Django:
 * :mod:`django.contrib.staticfiles` -- A framework for managing
   static files.
 
-These applications are included by default as a convenience for the common case.
+These applications are included by default as a convenience for the common
+case.
 
 Some of these applications make use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
@@ -62,13 +63,13 @@ that, run the following command:
     $ python manage.py migrate
 
 The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
-and creates any necessary database tables according to the database settings
-in your :file:`mysite/settings.py` file and the database migrations shipped
-with the app (we'll cover those later). You'll see a message for each
-migration it applies. If you're interested, run the command-line client for your
-database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MariaDB, MySQL),
-``.tables`` (SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to
-display the tables Django created.
+and creates any necessary database tables according to the database settings in
+your :file:`mysite/settings.py` file and the database migrations shipped with
+the app (we'll cover those later). You'll see a message for each migration it
+applies. If you're interested, run the command-line client for your database
+and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MariaDB, MySQL), ``.tables``
+(SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to display the
+tables Django created.
 
 .. admonition:: For the minimalists
 
@@ -94,8 +95,8 @@ additional metadata.
    Django follows the :ref:`DRY Principle <dry>`. The goal is to define your
    data model in one place and automatically derive things from it.
 
-   This includes the migrations - unlike in Ruby On Rails, for example, migrations
-   are entirely derived from your models file, and are essentially a
+   This includes the migrations - unlike in Ruby On Rails, for example,
+   migrations are entirely derived from your models file, and are essentially a
    history that Django can roll through to update your database schema to
    match your current models.
 
@@ -138,12 +139,12 @@ format. You'll use this value in your Python code, and your database will use
 it as the column name.
 
 You can use an optional first positional argument to a
-:class:`~django.db.models.Field` to designate a human-readable name. That's used
-in a couple of introspective parts of Django, and it doubles as documentation.
-If this field isn't provided, Django will use the machine-readable name. In this
-example, we've only defined a human-readable name for ``Question.pub_date``.
-For all other fields in this model, the field's machine-readable name will
-suffice as its human-readable name.
+:class:`~django.db.models.Field` to designate a human-readable name. That's
+used in a couple of introspective parts of Django, and it doubles as
+documentation. If this field isn't provided, Django will use the
+machine-readable name. In this example, we've only defined a human-readable
+name for ``Question.pub_date``. For all other fields in this model, the field's
+machine-readable name will suffice as its human-readable name.
 
 Some :class:`~django.db.models.Field` classes have required arguments.
 :class:`~django.db.models.CharField`, for example, requires that you give it a
@@ -166,7 +167,8 @@ That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
 * Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python database-access API for accessing ``Question`` and ``Choice`` objects.
+* Create a Python database-access API for accessing ``Question`` and ``Choice``
+  objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
@@ -223,8 +225,8 @@ they're designed to be human-editable in case you want to manually tweak how
 Django changes things.
 
 There's a command that will run the migrations for you and manage your database
-schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
-moment - but first, let's see what SQL that migration would run. The
+schema automatically - that's called :djadmin:`migrate`, and we'll come to it
+in a moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
 .. console::
@@ -297,7 +299,8 @@ If you're interested, you can also run
 :djadmin:`python manage.py check <check>`; this checks for any problems in
 your project without making migrations or touching the database.
 
-Now, run :djadmin:`migrate` again to create those model tables in your database:
+Now, run :djadmin:`migrate` again to create those model tables in your
+database:
 
 .. console::
 
@@ -534,8 +537,8 @@ Introducing the Django Admin
 
     Django was written in a newsroom environment, with a very clear separation
     between "content publishers" and the "public" site. Site managers use the
-    system to add news stories, events, sports scores, etc., and that content is
-    displayed on the public site. Django solves the problem of creating a
+    system to add news stories, events, sports scores, etc., and that content
+    is displayed on the public site. Django solves the problem of creating a
     unified interface for site administrators to edit content.
 
     The admin isn't intended to be used by site visitors. It's for site
@@ -597,8 +600,8 @@ given language (if Django has appropriate translations).
 Enter the admin site
 --------------------
 
-Now, try logging in with the superuser account you created in the previous step.
-You should see the Django admin index page:
+Now, try logging in with the superuser account you created in the previous
+step. You should see the Django admin index page:
 
 .. image:: _images/admin02.png
    :alt: Django admin index page
@@ -628,15 +631,15 @@ edit it to look like this:
 Explore the free admin functionality
 ------------------------------------
 
-Now that we've registered ``Question``, Django knows that it should be displayed on
-the admin index page:
+Now that we've registered ``Question``, Django knows that it should be
+displayed on the admin index page:
 
 .. image:: _images/admin03t.png
    :alt: Django admin index page, now with polls displayed
 
-Click "Questions". Now you're at the "change list" page for questions. This page
-displays all the questions in the database and lets you choose one to change it.
-There's the "What's up?" question we created earlier:
+Click "Questions". Now you're at the "change list" page for questions. This
+page displays all the questions in the database and lets you choose one to
+change it. There's the "What's up?" question we created earlier:
 
 .. image:: _images/admin04t.png
    :alt: Polls change list page

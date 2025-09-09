@@ -45,12 +45,12 @@ class PostgreSQLModel(models.Model):
 
 
 class IntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField(), default=list, blank=True)
+    field = ArrayField(models.BigIntegerField(), default=list, blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField(), blank=True, null=True)
-    field_nested = ArrayField(ArrayField(models.IntegerField(null=True)), null=True)
+    field = ArrayField(models.BigIntegerField(), blank=True, null=True)
+    field_nested = ArrayField(ArrayField(models.BigIntegerField(null=True)), null=True)
     order = models.IntegerField(null=True)
 
 

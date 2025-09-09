@@ -124,8 +124,8 @@ use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
     WSGIProcessGroup example.com
 
 If you want to serve your project in a subdirectory
-(``https://example.com/mysite`` in this example), you can add ``WSGIScriptAlias``
-to the configuration above:
+(``https://example.com/mysite`` in this example), you can add
+``WSGIScriptAlias`` to the configuration above:
 
 .. code-block:: apache
 

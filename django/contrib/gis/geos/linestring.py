@@ -13,8 +13,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize on the given sequence -- may take lists, tuples, NumPy arrays
-        of X,Y pairs, or Point objects.  If Point objects are used, ownership is
+        Initialize on the given sequence: may take lists, tuples, NumPy arrays
+        of X,Y pairs, or Point objects. If Point objects are used, ownership is
         _not_ transferred to the LineString object.
 
         Examples:
@@ -62,7 +62,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             self._checkdim(shape[1])
             ndim = shape[1]
         else:
-            # Getting the number of coords and the number of dimensions -- which
+            # Getting the number of coords and the number of dimensions, which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ndim = None
             # Incrementing through each of the coordinates and verifying

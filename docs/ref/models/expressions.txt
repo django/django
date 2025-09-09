@@ -166,12 +166,12 @@ To access the new value saved this way, the object must be reloaded::
 As well as being used in operations on single instances as above, ``F()`` can
 be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
 reduces the two queries we were using above - the ``get()`` and the
-:meth:`~Model.save()` - to just one::
+:meth:`~Model.save` - to just one::
 
     reporter = Reporters.objects.filter(name="Tintin")
     reporter.update(stories_filed=F("stories_filed") + 1)
 
-We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
+We can also use :meth:`~django.db.models.query.QuerySet.update` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
@@ -218,14 +218,14 @@ based on the original value; the work of the first thread will be lost.
 
 If the database is responsible for updating the field, the process is more
 robust: it will only ever update the field based on the value of the field in
-the database when the :meth:`~Model.save()` or ``update()`` is executed, rather
+the database when the :meth:`~Model.save` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
 ``F()`` assignments persist after ``Model.save()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``F()`` objects assigned to model fields persist after saving the model
-instance and will be applied on each :meth:`~Model.save()`. For example::
+instance and will be applied on each :meth:`~Model.save`. For example::
 
     reporter = Reporters.objects.get(name="Tintin")
     reporter.stories_filed = F("stories_filed") + 1
@@ -237,7 +237,7 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
 the final value will be ``3``. This persistence can be avoided by reloading the
 model object after saving it, for example, by using
-:meth:`~Model.refresh_from_db()`.
+:meth:`~Model.refresh_from_db`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,8 +261,8 @@ different fields with arithmetic::
 
 If the fields that you're combining are of different types you'll need to tell
 Django what kind of field will be returned. Most expressions support
-:ref:`output_field<output-field>` for this case, but since ``F()`` does not, you
-will need to wrap the expression with :class:`ExpressionWrapper`::
+:ref:`output_field<output-field>` for this case, but since ``F()`` does not,
+you will need to wrap the expression with :class:`ExpressionWrapper`::
 
     from django.db.models import DateTimeField, ExpressionWrapper, F
 
@@ -340,7 +340,8 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL:
         ...
         LOWER("db_table"."field") as "field_lower"
 
-See :doc:`database-functions` for a list of built-in database functions.
+See :doc:`/ref/models/database-functions` for a list of built-in database
+functions.
 
 The ``Func`` API is as follows:
 
@@ -404,14 +405,15 @@ The ``Func`` API is as follows:
                     )
 
         To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
-        not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
-        as these values are interpolated into the SQL string rather than passed
-        as query parameters, where the database driver would escape them.
+        not contain untrusted user input
+        <avoiding-sql-injection-in-query-expressions>` as these values are
+        interpolated into the SQL string rather than passed as query
+        parameters, where the database driver would escape them.
 
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
-joined together with ``arg_joiner``, and then interpolated into the ``template``
-as the ``expressions`` placeholder.
+joined together with ``arg_joiner``, and then interpolated into the
+``template`` as the ``expressions`` placeholder.
 
 Positional arguments can be expressions or Python values. Strings are
 assumed to be column references and will be wrapped in ``F()`` expressions
@@ -562,7 +564,7 @@ values into their corresponding database type.
 
 If no :ref:`output_field<output-field>` is specified, it will be inferred from
 the type of the provided ``value`` for many common types. For example, passing
-an instance of :py:class:`datetime.datetime` as ``value`` defaults
+an instance of :class:`datetime.datetime` as ``value`` defaults
 ``output_field`` to :class:`~django.db.models.DateTimeField`.
 
 ``ExpressionWrapper()`` expressions
@@ -581,7 +583,7 @@ Conditional expressions
 
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
-expressions. For more details see :doc:`conditional-expressions`.
+expressions. For more details see :doc:`/ref/models/conditional-expressions`.
 
 ``Subquery()`` expressions
 --------------------------
@@ -830,7 +832,7 @@ an expression that's compatible in a window clause.
 
 The ``partition_by`` argument accepts an expression or a sequence of
 expressions (column names should be wrapped in an ``F``-object) that control
-the partitioning of the rows.  Partitioning narrows which rows are used to
+the partitioning of the rows. Partitioning narrows which rows are used to
 compute the result set.
 
 The :ref:`output_field<output-field>` is specified either as an argument or by
@@ -1093,7 +1095,7 @@ calling the appropriate methods on the wrapped expression.
 
         Tells Django which value should be returned when the expression is used
         to apply a function over an empty result set. Defaults to
-        :py:data:`NotImplemented` which forces the expression to be computed on
+        :data:`NotImplemented` which forces the expression to be computed on
         the database.
 
     .. attribute:: set_returning
@@ -1199,8 +1201,10 @@ calling the appropriate methods on the wrapped expression.
         implementing ``NULLS LAST`` would change its value to be
         ``NULLS FIRST``. Modifications are only required for expressions that
         implement sort order like ``OrderBy``. This method is called when
-        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        :meth:`~django.db.models.query.QuerySet.reverse` is called on a
         queryset.
+
+.. _writing-your-own-query-expressions:
 
 Writing your own Query Expressions
 ----------------------------------
@@ -1216,7 +1220,6 @@ values. It will return the first column or value that isn't ``NULL``.
 We'll start by defining the template to be used for SQL generation and
 an ``__init__()`` method to set some attributes::
 
-  import copy
   from django.db.models import Expression
 
 
@@ -1262,7 +1265,7 @@ Next, we write the method responsible for generating the SQL::
             sql_params.extend(params)
         template = template or self.template
         data = {"expressions": ",".join(sql_expressions)}
-        return template % data, sql_params
+        return template % data, tuple(sql_params)
 
 
     def as_oracle(self, compiler, connection):
@@ -1379,14 +1382,17 @@ class::
 
     Length.as_sqlserver = sqlserver_length
 
-You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
+You can also customize the SQL using the ``template`` parameter of
+``as_sql()``.
 
 We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
 ``sqlserver`` for the backend.
 
 Third-party backends can register their functions in the top level
-``__init__.py`` file of the backend package or in a top level ``expressions.py``
-file (or package) that is imported from the top level ``__init__.py``.
+``__init__.py`` file of the backend package or in a top level
+``expressions.py`` file (or package) that is imported from the top level
+``__init__.py``.
 
 For user projects wishing to patch the backend that they're using, this code
-should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.
+should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>`
+method.

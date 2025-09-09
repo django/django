@@ -244,7 +244,9 @@ class AtomicTests(TransactionTestCase):
 
 
 class AtomicInsideTransactionTests(AtomicTests):
-    """All basic tests for atomic should also pass within an existing transaction."""
+    """
+    All basic tests for atomic should also pass within an existing transaction.
+    """
 
     def setUp(self):
         self.atomic = transaction.atomic()
@@ -255,7 +257,9 @@ class AtomicInsideTransactionTests(AtomicTests):
 
 
 class AtomicWithoutAutocommitTests(AtomicTests):
-    """All basic tests for atomic should also pass when autocommit is turned off."""
+    """
+    All basic tests for atomic should also pass when autocommit is turned off.
+    """
 
     def setUp(self):
         transaction.set_autocommit(False)
@@ -393,7 +397,9 @@ class AtomicMySQLTests(TransactionTestCase):
 
     @skipIf(threading is None, "Test requires threading")
     def test_implicit_savepoint_rollback(self):
-        """MySQL implicitly rolls back savepoints when it deadlocks (#22291)."""
+        """
+        MySQL implicitly rolls back savepoints when it deadlocks (#22291).
+        """
         Reporter.objects.create(id=1)
         Reporter.objects.create(id=2)
 
@@ -457,7 +463,8 @@ class AtomicMiscTests(TransactionTestCase):
                         sid = connection.savepoint_ids[-1]
                         raise Exception("Oops")
 
-                # This is expected to fail because the savepoint no longer exists.
+                # This is expected to fail because the savepoint no longer
+                # exists.
                 connection.savepoint_rollback(sid)
 
     def test_mark_for_rollback_on_error_in_transaction(self):
@@ -497,8 +504,8 @@ class AtomicMiscTests(TransactionTestCase):
 
                 raise Exception("Oops")
 
-            # Ensure that `mark_for_rollback_on_error` did not mark the transaction
-            # as broken, since we are in autocommit mode …
+            # Ensure that `mark_for_rollback_on_error` did not mark the
+            # transaction as broken, since we are in autocommit mode …
             self.assertFalse(transaction.get_connection().needs_rollback)
 
         # … and further queries work nicely.
@@ -526,7 +533,9 @@ class NonAutocommitTests(TransactionTestCase):
         Reporter.objects.last()
 
     def test_orm_query_without_autocommit(self):
-        """#24921 -- ORM queries must be possible after set_autocommit(False)."""
+        """
+        #24921 -- ORM queries must be possible after set_autocommit(False).
+        """
         Reporter.objects.create(first_name="Tintin")
 
 

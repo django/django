@@ -174,7 +174,8 @@ class LookupTests(TestCase):
         )
 
     def test_in_bulk(self):
-        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to objects.
+        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to
+        # objects.
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
@@ -247,28 +248,21 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.in_bulk([self.au1], field_name="author")
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering(self):
-        articles = (
-            Article.objects.order_by("author_id", "-pub_date")
-            .distinct("author_id")
-            .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-        )
         self.assertEqual(
-            articles,
-            {self.au1.id: self.a4, self.au2.id: self.a5},
+            list(Article.objects.in_bulk([self.a2.id, self.a1.id])),
+            [self.a2.id, self.a1.id],
         )
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        qs = Article.objects.all()
         with (
-            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            mock.patch.object(connection.ops, "bulk_batch_size", return_value=2),
             self.assertNumQueries(2),
         ):
             self.assertEqual(
-                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
-                {self.au1.id: self.a4, self.au2.id: self.a5},
+                list(qs.in_bulk([self.a4.id, self.a3.id, self.a2.id, self.a1.id])),
+                [self.a4.id, self.a3.id, self.a2.id, self.a1.id],
             )
 
     @skipUnlessDBFeature("can_distinct_on_fields")
@@ -331,7 +325,7 @@ class LookupTests(TestCase):
             Author.objects.values_list().in_bulk()
 
     def test_values(self):
-        # values() returns a list of dictionaries instead of object instances --
+        # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
         self.assertSequenceEqual(
             Article.objects.values("headline"),
@@ -375,7 +369,8 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
-        # The values() method works with "extra" fields specified in extra(select).
+        # The values() method works with "extra" fields specified in
+        # extra(select).
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
                 "id", "id_plus_one"
@@ -415,7 +410,8 @@ class LookupTests(TestCase):
                 }
             ],
         )
-        # You can specify fields from forward and reverse relations, just like filter().
+        # You can specify fields from forward and reverse relations, just like
+        # filter().
         self.assertSequenceEqual(
             Article.objects.values("headline", "author__name"),
             [
@@ -660,8 +656,9 @@ class LookupTests(TestCase):
         )
 
     def test_escaping(self):
-        # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # Underscores, percent signs and backslashes have special meaning in
+        # the underlying SQL code, but Django handles the quoting of them
+        # automatically.
         a8 = Article.objects.create(
             headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )

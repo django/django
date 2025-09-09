@@ -169,9 +169,10 @@ def floatformat(text, arg=-1):
         # Exponent values can be "F", "n", "N".
         number_of_digits_and_exponent_sum = 0
 
-    # Values with more than 200 digits, or with a large exponent, are returned "as is"
-    # to avoid high memory consumption and potential denial-of-service attacks.
-    # The cut-off of 200 is consistent with django.utils.numberformat.floatformat().
+    # Values with more than 200 digits, or with a large exponent, are returned
+    # "as is" to avoid high memory consumption and potential denial-of-service
+    # attacks. The cut-off of 200 is consistent with
+    # django.utils.numberformat.floatformat().
     if number_of_digits_and_exponent_sum > 200:
         return input_val
 
@@ -281,7 +282,8 @@ def stringformat(value, arg):
     This specifier uses Python string formatting syntax, with the exception
     that the leading "%" is dropped.
 
-    See https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
+    See
+    https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
     if isinstance(value, tuple):
@@ -430,7 +432,10 @@ def rjust(value, arg):
 @stringfilter
 def center(value, arg):
     """Center the value in a field of a given width."""
-    return value.center(int(arg))
+    width = int(arg)
+    if width <= 0:
+        return value
+    return f"{value:^{width}}"
 
 
 @register.filter

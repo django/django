@@ -23,7 +23,7 @@ introduce controlled coupling for convenience's sake.
    Django does not provide a shortcut function which returns a
    :class:`~django.template.response.TemplateResponse` because the constructor
    of :class:`~django.template.response.TemplateResponse` offers the same level
-   of convenience as :func:`render()`.
+   of convenience as :func:`render`.
 
 Required arguments
 ------------------
@@ -98,7 +98,7 @@ This example is equivalent to::
 
    The arguments could be:
 
-   * A model: the model's :meth:`~django.db.models.Model.get_absolute_url()`
+   * A model: the model's :meth:`~django.db.models.Model.get_absolute_url`
      function will be called.
 
    * A view name, possibly with arguments: :func:`~django.urls.reverse` will be
@@ -196,7 +196,7 @@ original HTTP method::
 
     *Asynchronous version*: ``aget_object_or_404()``
 
-    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model
+    Calls :meth:`~django.db.models.query.QuerySet.get` on a given model
     manager, but it raises :class:`~django.http.Http404` instead of the model's
     :class:`~django.db.models.Model.DoesNotExist` exception.
 
@@ -277,7 +277,7 @@ will be raised if more than one object is found.
 
     *Asynchronous version*: ``aget_list_or_404()``
 
-    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on
+    Returns the result of :meth:`~django.db.models.query.QuerySet.filter` on
     a given model manager cast to a list, raising :class:`~django.http.Http404`
     if the resulting list is empty.
 

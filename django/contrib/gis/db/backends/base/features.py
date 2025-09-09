@@ -8,10 +8,12 @@ from .operations import BaseSpatialOperations
 class BaseSpatialFeatures:
     gis_enabled = True
 
-    # Does the database contain a SpatialRefSys model to store SRID information?
+    # Does the database contain a SpatialRefSys model to store SRID
+    # information?
     has_spatialrefsys_table = True
 
-    # Does the backend support the django.contrib.gis.utils.add_srs_entry() utility?
+    # Does the backend support the django.contrib.gis.utils.add_srs_entry()
+    # utility?
     supports_add_srs_entry = True
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True

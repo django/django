@@ -463,8 +463,8 @@ class FileMoveSafeTests(unittest.TestCase):
                 ):
                     with self.assertRaises(OSError):
                         file_move_safe(self.file_a, self.file_b, allow_overwrite=True)
-                # When copystat() throws PermissionError, copymode() error besides
-                # PermissionError isn't ignored.
+                # When copystat() throws PermissionError, copymode() error
+                # besides PermissionError isn't ignored.
                 with mock.patch(
                     "django.core.files.move.copystat", side_effect=permission_error
                 ):

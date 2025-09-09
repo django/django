@@ -108,8 +108,9 @@ class Serializer:
         self.first = True
         for count, obj in enumerate(queryset, start=1):
             self.start_object(obj)
-            # Use the concrete parent class' _meta instead of the object's _meta
-            # This is to avoid local_fields problems for proxy models. Refs #17717.
+            # Use the concrete parent class' _meta instead of the object's
+            # _meta This is to avoid local_fields problems for proxy models.
+            # Refs #17717.
             concrete_model = obj._meta.concrete_model
             # When using natural primary keys, retrieve the pk field of the
             # parent for multi-table inheritance child models. That field must

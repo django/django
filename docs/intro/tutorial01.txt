@@ -39,8 +39,8 @@ Creating a project
 ==================
 
 If this is your first time using Django, you'll have to take care of some
-initial setup. Namely, you'll need to auto-generate some code that establishes a
-Django :term:`project` -- a collection of settings for an instance of Django,
+initial setup. Namely, you'll need to auto-generate some code that establishes
+a Django :term:`project` -- a collection of settings for an instance of Django,
 including database configuration, Django-specific options and
 application-specific settings.
 
@@ -91,7 +91,7 @@ These files are:
   read :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
-  project.  :doc:`/topics/settings` will tell you all about how settings
+  project. :doc:`/topics/settings` will tell you all about how settings
   work.
 
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a
@@ -122,8 +122,8 @@ You'll see the following output on the command line:
 
     System check identified no issues (0 silenced).
 
-    You have unapplied migrations; your app may not work properly until they are applied.
-    Run 'python manage.py migrate' to apply them.
+    You have unapplied migrations; your app may not work properly until they are
+    applied. Run 'python manage.py migrate' to apply them.
 
     |today| - 15:50:53
     Django version |version|, using settings 'mysite.settings'
@@ -150,7 +150,8 @@ Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making web frameworks, not web servers.)
 
-(To serve the site on a different port, see the :djadmin:`runserver` reference.)
+(To serve the site on a different port, see the :djadmin:`runserver`
+reference.)
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
@@ -282,7 +283,7 @@ plug-and-play URLs. Since polls are in their own URLconf
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
-.. admonition:: When to use :func:`~django.urls.include()`
+.. admonition:: When to use :func:`~django.urls.include`
 
     You should always use ``include()`` when you include other URL patterns.
     The only exception is ``admin.site.urls``, which is a pre-built URLconf

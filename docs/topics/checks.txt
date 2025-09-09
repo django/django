@@ -15,9 +15,10 @@ WSGI stack that is used in deployment. If you need to run system checks on your
 deployment server, trigger them explicitly using :djadmin:`check`.
 
 Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
-running at all. Minor problems are reported to the console. If you have inspected
-the cause of a warning and are happy to ignore it, you can hide specific warnings
-using the :setting:`SILENCED_SYSTEM_CHECKS` setting in your project settings file.
+running at all. Minor problems are reported to the console. If you have
+inspected the cause of a warning and are happy to ignore it, you can hide
+specific warnings using the :setting:`SILENCED_SYSTEM_CHECKS` setting in your
+project settings file.
 
 A full list of all checks that can be raised by Django can be found in the
 :doc:`System check reference </ref/checks>`.
@@ -61,8 +62,8 @@ The ``**kwargs`` argument is required for future expansion.
 Messages
 --------
 
-The function must return a list of messages. If no problems are found as a result
-of the check, the check function must return an empty list.
+The function must return a list of messages. If no problems are found as a
+result of the check, the check function must return an empty list.
 
 The warnings and errors raised by the check method must be instances of
 :class:`~django.core.checks.CheckMessage`. An instance of
@@ -145,9 +146,9 @@ delegate each check to separate methods.
 
 Consider an example where you are implementing a custom field named
 ``RangedIntegerField``. This field adds ``min`` and ``max`` arguments to the
-constructor of ``IntegerField``. You may want to add a check to ensure that users
-provide a min value that is less than or equal to the max value. The following
-code snippet shows how you can implement this check::
+constructor of ``IntegerField``. You may want to add a check to ensure that
+users provide a min value that is less than or equal to the max value. The
+following code snippet shows how you can implement this check::
 
     from django.core import checks
     from django.db import models
@@ -186,7 +187,8 @@ If you wanted to add checks to a model manager, you would take the same
 approach on your subclass of :class:`~django.db.models.Manager`.
 
 If you want to add a check to a model class, the approach is *almost* the same:
-the only difference is that the check is a classmethod, not an instance method::
+the only difference is that the check is a classmethod, not an instance
+method::
 
     class MyModel(models.Model):
         @classmethod

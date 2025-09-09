@@ -297,7 +297,7 @@ class Command(BaseCommand):
             nargs="?",
             help=(
                 "Controls '#: filename:line' lines. If the option is 'full' "
-                "(the default if not given), the lines  include both file name "
+                "(the default if not given), the lines include both file name "
                 "and line number. If it's 'file', the line number is omitted. If "
                 "it's 'never', the lines are suppressed (same as --no-location). "
                 "--add-location requires gettext 0.19 or newer."
@@ -382,10 +382,15 @@ class Command(BaseCommand):
             self.invoked_for_django = True
         else:
             if self.settings_available:
-                self.locale_paths.extend(settings.LOCALE_PATHS)
+                for path in settings.LOCALE_PATHS:
+                    locale_path = os.path.abspath(path)
+                    if locale_path not in self.locale_paths:
+                        self.locale_paths.append(locale_path)
             # Allow to run makemessages inside an app dir
             if os.path.isdir("locale"):
-                self.locale_paths.append(os.path.abspath("locale"))
+                locale_path = os.path.abspath("locale")
+                if locale_path not in self.locale_paths:
+                    self.locale_paths.append(locale_path)
             if self.locale_paths:
                 self.default_locale_path = self.locale_paths[0]
                 os.makedirs(self.default_locale_path, exist_ok=True)
@@ -420,9 +425,11 @@ class Command(BaseCommand):
             for locale in locales:
                 if not is_valid_locale(locale):
                     # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
+                    # Valid examples are: en_GB, shi_Latn_MA and
+                    # nl_NL-x-informal
 
-                    # Search for characters followed by a non character (i.e. separator)
+                    # Search for characters followed by a non character (i.e.
+                    # separator)
                     match = re.match(
                         r"^(?P<language>[a-zA-Z]+)"
                         r"(?P<separator>[^a-zA-Z])"
@@ -464,8 +471,9 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
-        # when looking up the version. It's especially a problem on Windows.
+        # Gettext tools will output system-encoded bytestrings instead of
+        # UTF-8, when looking up the version. It's especially a problem on
+        # Windows.
         out, err, status = popen_wrapper(
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
@@ -548,9 +556,10 @@ class Command(BaseCommand):
                         self.stdout.write("ignoring directory %s" % dirname)
                 elif dirname == "locale":
                     dirnames.remove(dirname)
-                    self.locale_paths.insert(
-                        0, os.path.join(os.path.abspath(dirpath), dirname)
-                    )
+                    locale_dir = os.path.join(os.path.abspath(dirpath), dirname)
+                    if locale_dir in self.locale_paths:
+                        self.locale_paths.remove(locale_dir)
+                    self.locale_paths.insert(0, locale_dir)
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
