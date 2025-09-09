@@ -165,6 +165,38 @@ class AdvancedTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo="whatever")
 
+    def test_update_reverse_m2m_descriptor(self):
+        msg = (
+            "Cannot update model field <ManyToManyRel: update.bar> "
+            "(only non-relations and foreign keys permitted)."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(m2m_foo="whatever")
+
+    def test_update_reverse_fk_descriptor(self):
+        msg = (
+            "Cannot update model field <ManyToOneRel: update.bar> "
+            "(only non-relations and foreign keys permitted)."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(bar="whatever")
+
+    def test_update_reverse_o2o_descriptor(self):
+        msg = (
+            "Cannot update model field <OneToOneRel: update.bar> "
+            "(only non-relations and foreign keys permitted)."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(o2o_bar="whatever")
+
+    def test_update_reverse_mti_parent_link_descriptor(self):
+        msg = (
+            "Cannot update model field <OneToOneRel: update.uniquenumberchild> "
+            "(only non-relations and foreign keys permitted)."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            UniqueNumber.objects.update(uniquenumberchild="whatever")
+
     def test_update_transformed_field(self):
         A.objects.create(x=5)
         A.objects.create(x=-6)

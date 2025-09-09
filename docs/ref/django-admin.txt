@@ -1319,6 +1319,15 @@ zip files, you can use a URL like:
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
+.. warning::
+
+    Templates provided via ``--template`` are used as is. Malicious or poorly
+    constructed templates may introduce security weaknesses or unintended
+    behavior. Compressed archives may also consume excessive resources during
+    extraction, potentially causing crashes or hangs.
+
+    Contents of templates should be carefully inspected before use.
+
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies which file extensions in the app template should be rendered with the
@@ -1412,7 +1421,10 @@ For example:
 .. django-admin-option:: --template TEMPLATE
 
 Specifies a directory, file path, or URL of a custom project template. See the
-:option:`startapp --template` documentation for examples and usage.
+:option:`startapp --template` documentation for examples and usage. The same
+**security considerations** described for ``startapp`` templates apply here:
+malicious or poorly constructed templates may introduce weaknesses or consume
+excessive resources, and templates should be carefully inspected before use.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 

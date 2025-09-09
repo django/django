@@ -429,7 +429,8 @@ Models
 * **models.E042**: ``<field name>`` cannot be included in the composite
   primary key.
 * **models.W042**: Auto-created primary key used when not defining a primary
-  key type, by default ``django.db.models.AutoField``.
+  key type, by default ``django.db.models.AutoField``. *This check appeared in
+  Django 3.2 - 5.2*.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.

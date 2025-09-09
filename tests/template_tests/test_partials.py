@@ -144,8 +144,9 @@ class PartialTagsTests(TestCase):
             RuntimeWarning,
             "PartialTemplate.source is only available when template "
             "debugging is enabled.",
-        ):
+        ) as ctx:
             self.assertEqual(partial.template.source, "")
+        self.assertEqual(ctx.filename, __file__)
 
 
 class RobustPartialHandlingTests(TestCase):

@@ -153,7 +153,6 @@ this. For a small app like polls, this process isn't too difficult.
 
 
        class PollsConfig(AppConfig):
-           default_auto_field = "django.db.models.BigAutoField"
            name = "django_polls"
            label = "polls"
 

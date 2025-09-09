@@ -436,7 +436,7 @@ DEFAULT_TABLESPACE = ""
 DEFAULT_INDEX_TABLESPACE = ""
 
 # Default primary key field type.
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = "DENY"

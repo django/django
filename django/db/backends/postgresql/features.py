@@ -123,6 +123,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "test_group_by_nested_expression_with_params",
                 }
             )
+        if not is_psycopg3:
+            expected_failures.update(
+                {
+                    # operator does not exist: bigint[] = integer[]
+                    "postgres_tests.test_array.TestQuerying.test_gt",
+                    "postgres_tests.test_array.TestQuerying.test_in",
+                    "postgres_tests.test_array.TestQuerying.test_lt",
+                }
+            )
         return expected_failures
 
     @cached_property
