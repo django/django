@@ -5,6 +5,7 @@
     {{ block.super }}
     {{ media }}
     <script src="{% static 'admin/js/cancel.js' %}" async></script>
+    <script src="{% static "admin/js/shortcuts_delete_confirmation.js" %}"></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
@@ -48,3 +49,7 @@
   {% endblock %}
 {% endif %}
 {% endblock content %}
+
+{% block shortcuts %}
+  {% include "admin/delete_confirmation_shortcuts.html" %}
+{% endblock %}
