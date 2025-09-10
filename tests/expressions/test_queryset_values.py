@@ -37,8 +37,8 @@ class ValuesExpressionsTests(TestCase):
     def test_values_expression_alias_sql_injection(self):
         crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Company.objects.values(**{crafted_alias: F("ceo__salary")})
@@ -47,8 +47,8 @@ class ValuesExpressionsTests(TestCase):
     def test_values_expression_alias_sql_injection_json_field(self):
         crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             JSONFieldModel.objects.values(f"data__{crafted_alias}")

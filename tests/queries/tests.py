@@ -1961,8 +1961,8 @@ class Queries5Tests(TestCase):
     def test_extra_select_alias_sql_injection(self):
         crafted_alias = """injected_name" from "queries_note"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Note.objects.extra(select={crafted_alias: "1"})

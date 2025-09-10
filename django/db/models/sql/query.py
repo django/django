@@ -48,9 +48,9 @@ from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
 
-# Quotation marks ('"`[]), whitespace characters, semicolons, or inline
+# Quotation marks ('"`[]), whitespace characters, semicolons, hashes, or inline
 # SQL comments are forbidden in column aliases.
-FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|#|--|/\*|\*/")
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -1208,8 +1208,8 @@ class Query(BaseExpression):
     def check_alias(self, alias):
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
-                "Column aliases cannot contain whitespace characters, quotation marks, "
-                "semicolons, or SQL comments."
+                "Column aliases cannot contain whitespace characters, hashes, "
+                "quotation marks, semicolons, or SQL comments."
             )
 
     def add_annotation(self, annotation, alias, select=True):

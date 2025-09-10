@@ -7,4 +7,11 @@ Django 4.2.25 release notes
 Django 4.2.25 fixes one security issue with severity "high" and one security
 issue with severity "low" in 4.2.24.
 
-...
+CVE-2025-59681: Potential SQL injection in ``QuerySet.annotate()``, ``alias()``, ``aggregate()``, and ``extra()`` on MySQL and MariaDB
+======================================================================================================================================
+
+:meth:`.QuerySet.annotate`, :meth:`~.QuerySet.alias`,
+:meth:`~.QuerySet.aggregate`, and :meth:`~.QuerySet.extra` methods were subject
+to SQL injection in column aliases, using a suitably crafted dictionary, with
+dictionary expansion, as the ``**kwargs`` passed to these methods (follow up to
+:cve:`2022-28346`).
