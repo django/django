@@ -1127,8 +1127,8 @@ class NonAggregateAnnotationTestCase(TestCase):
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.annotate(**{crafted_alias: Value(1)})
@@ -1136,8 +1136,8 @@ class NonAggregateAnnotationTestCase(TestCase):
     def test_alias_filtered_relation_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.annotate(**{crafted_alias: FilteredRelation("author")})
@@ -1154,13 +1154,14 @@ class NonAggregateAnnotationTestCase(TestCase):
             "ali/*as",
             "alias*/",
             "alias;",
-            # [] are used by MSSQL.
+            # [] and # are used by MSSQL.
             "alias[",
             "alias]",
+            "ali#as",
         ]
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         for crafted_alias in tests:
             with self.subTest(crafted_alias):
@@ -1439,8 +1440,8 @@ class AliasTests(TestCase):
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: Value(1)})
@@ -1448,8 +1449,8 @@ class AliasTests(TestCase):
     def test_alias_filtered_relation_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
