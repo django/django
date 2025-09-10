@@ -1161,12 +1161,12 @@ class NonAggregateAnnotationTestCase(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.annotate(**{crafted_alias: Value(1)})
@@ -1175,12 +1175,12 @@ class NonAggregateAnnotationTestCase(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.annotate(**{crafted_alias: FilteredRelation("author")})
@@ -1199,18 +1199,19 @@ class NonAggregateAnnotationTestCase(TestCase):
             "alias;",
             # RemovedInDjango70Warning: When the deprecation ends, add this:
             # "alias%",
-            # [] are used by MSSQL.
+            # [] and # are used by MSSQL.
             "alias[",
             "alias]",
+            "ali#as",
         ]
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         for crafted_alias in tests:
             with self.subTest(crafted_alias):
@@ -1516,12 +1517,12 @@ class AliasTests(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: Value(1)})
@@ -1530,12 +1531,12 @@ class AliasTests(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
