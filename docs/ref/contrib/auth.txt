@@ -293,7 +293,7 @@ Methods
 
         Sends an email to the user. If ``from_email`` is ``None``, Django uses
         the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` are passed to the
-        underlying :meth:`~django.core.mail.send_mail()` call.
+        underlying :func:`~django.core.mail.send_mail` call.
 
 Manager methods
 ---------------

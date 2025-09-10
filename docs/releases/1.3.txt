@@ -292,8 +292,8 @@ requests. These include:
 
 * Support for HttpOnly_ cookies.
 
-* :meth:`~django.core.mail.mail_admins()` and
-  :meth:`~django.core.mail.mail_managers()` now support easily attaching
+* :func:`~django.core.mail.mail_admins` and
+  :func:`~django.core.mail.mail_managers` now support easily attaching
   HTML content to messages.
 
 * :class:`~django.core.mail.EmailMessage` now supports CC's.

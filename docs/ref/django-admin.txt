@@ -1051,12 +1051,12 @@ together:
 .. django-admin-option:: --managers
 
 Mails the email addresses specified in :setting:`MANAGERS` using
-:meth:`~django.core.mail.mail_managers()`.
+:func:`~django.core.mail.mail_managers`.
 
 .. django-admin-option:: --admins
 
 Mails the email addresses specified in :setting:`ADMINS` using
-:meth:`~django.core.mail.mail_admins()`.
+:func:`~django.core.mail.mail_admins`.
 
 ``shell``
 ---------

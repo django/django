@@ -417,7 +417,7 @@ Minor features
 
 * Any ``**kwargs`` passed to
   :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
-  underlying :meth:`~django.core.mail.send_mail()` call.
+  underlying :func:`~django.core.mail.send_mail` call.
 
 * The :func:`~django.contrib.auth.decorators.permission_required` decorator can
   take a list of permissions as well as a single permission.
