@@ -405,8 +405,13 @@ class UniqueConstraint(BaseConstraint):
         ):
             errors.append(
                 checks.Warning(
-                    f"{connection.display_name} does not support unique constraints "
-                    "with nulls distinct.",
+                    (
+                        f"{connection.display_name} does not support UNIQUE"
+                        "constraints with nulls_distinct=True or False. "
+                        "This option is only supported on PostgreSQL 15+. "
+                        "On other databases (e.g. SQLite, MySQL, MariaDB) "
+                        "the argument is ignored."
+                    ),
                     hint=(
                         "A constraint won't be created. Silence this warning if you "
                         "don't care about it."
