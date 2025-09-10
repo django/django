@@ -49,7 +49,7 @@
     padding: 8px;
 }
 
-.aligned .selector-chosen-title label {
+.selector-chosen-title label {
     color: var(--header-link-color);
     width: 100%;
 }
@@ -60,7 +60,7 @@
     padding: 8px;
 }
 
-.aligned .selector-available-title label {
+.selector-available-title label {
     width: 100%;
 }
 
