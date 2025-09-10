@@ -206,3 +206,21 @@ class TestLoginRequiredMiddleware(TestCase):
     def test_get_redirect_field_name_default(self):
         redirect_field_name = self.middleware.get_redirect_field_name(lambda: None)
         self.assertEqual(redirect_field_name, REDIRECT_FIELD_NAME)
+
+    def test_public_view_logged_in_performance(self):
+        """
+        Public views don't trigger fetching the user from the database.
+        """
+        self.client.force_login(self.user)
+        with self.assertNumQueries(0):
+            response = self.client.get("/public_view/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_protected_view_logged_in_performance(self):
+        """
+        Protected views do trigger fetching the user from the database.
+        """
+        self.client.force_login(self.user)
+        with self.assertNumQueries(2):  # session and user
+            response = self.client.get("/protected_view/")
+        self.assertEqual(response.status_code, 200)
