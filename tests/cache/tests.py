@@ -1165,6 +1165,14 @@ class BaseCacheTests:
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
 
+    async def test_async_impl(self):
+        if hasattr(cache, "get_many"):
+            self.assertTrue(hasattr(cache, "aget_many"))
+        if hasattr(cache, "set_many"):
+            self.assertTrue(hasattr(cache, "aset_many"))
+        if hasattr(cache, "delete_many"):
+            self.assertTrue(hasattr(cache, "adelete_many"))
+
 
 @override_settings(
     CACHES=caches_setting_for_tests(
