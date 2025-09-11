@@ -1166,6 +1166,8 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
+        if id_list is not None and not id_list:
+            return {}
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
@@ -1236,8 +1238,6 @@ class QuerySet(AltersData):
             )
 
         if id_list is not None:
-            if not id_list:
-                return {}
             filter_key = "{}__in".format(field_name)
             id_list = tuple(id_list)
             batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
