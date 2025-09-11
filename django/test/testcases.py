@@ -139,8 +139,12 @@ class _AssertTemplateUsedContext:
         self.context.append(copy(context))
 
     def test(self):
-        template_names=[t.name for t in self.rendered_templates if t.name is not None]
-        template_names.extend(f"{t.origin.template_name}#{t.name}" for t in self.rendered_templates if t.name is not None)
+        template_names = [t.name for t in self.rendered_templates if t.name is not None]
+        template_names.extend(
+            f"{t.origin.template_name}#{t.name}"
+            for t in self.rendered_templates
+            if t.name is not None
+        )
         self.test_case._assert_template_used(
             self.template_name,
             template_names,
