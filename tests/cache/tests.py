@@ -1165,13 +1165,33 @@ class BaseCacheTests:
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
 
-    async def test_async_impl(self):
-        if hasattr(cache, "get_many"):
-            self.assertEqual(cache.aget_many, BaseCache.aget_many)
-        if hasattr(cache, "set_many"):
-            self.assertEqual(cache.aset_many, BaseCache.aset_many)
-        if hasattr(cache, "delete_many"):
-            self.assertEqual(cache.adelete_many, BaseCache.adelete_many)
+    def test_async_impl(self):
+        # Assert that the inherited method matches the BaseCache
+        # implementation. Object IDs will not necessarily match,
+        # so we need another basis of comparison.
+        methods = ["aget_many", "aset_many", "adelete_many"]
+        if isinstance(cache, BaseCache):
+            for m in methods:
+                cache_m = getattr(cache, m)
+                bcache_m = getattr(BaseCache, m)
+                self.assertEqual(pickle.dumps(cache_m), pickle.dumps(bcache_m))
+
+    async def test_async_calls_sync(self):
+        getp = mock.patch.object(cache, "get_many")
+        setp = mock.patch.object(cache, "set_many")
+        deletep = mock.patch.object(cache, "delete_many")
+        get_many = getp.start()
+        set_many = setp.start()
+        delete_many = deletep.start()
+        await cache.aset_many({"ford1": 37, "arthur1": 42})
+        await cache.aget_many(["ford1", "arthur1"])
+        await cache.adelete_many(["ford1", "arthur1"])
+        get_many.assert_called()
+        set_many.assert_called()
+        delete_many.assert_called()
+        getp.stop()
+        setp.stop()
+        deletep.stop()
 
 
 @override_settings(
