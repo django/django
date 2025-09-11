@@ -1817,7 +1817,7 @@ class Query(BaseExpression):
                     available = sorted(
                         [
                             *get_field_names_from_opts(opts),
-                            *self.annotation_select,
+                            *self.annotations,
                             *self._filtered_relations,
                         ]
                     )
