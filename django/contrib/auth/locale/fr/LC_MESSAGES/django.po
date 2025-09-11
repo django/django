@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2019,2021,2023-2024
+# Claude Paroz <claude@2xlibre.net>, 2013-2019,2021,2023-2025
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mlorant <maxime.lorant@gmail.com>, 2014
@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>, "
-"2013-2019,2021,2023-2024\n"
+"2013-2019,2021,2023-2025\n"
 "Language-Team: French (http://app.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,12 +61,12 @@ msgstr "mot de passe"
 msgid "last login"
 msgstr "dernière connexion"
 
-msgid "No password set."
-msgstr "Aucun mot de passe défini."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "Format de mot de passe non valide ou algorithme de hachage non reconnu."
+
+msgid "No password set."
+msgstr "Aucun mot de passe défini."
 
 msgid "Reset password"
 msgstr "Réinitialiser le mot de passe"
@@ -77,6 +77,15 @@ msgstr "Définir un mot de passe"
 msgid "The two password fields didn’t match."
 msgstr "Les deux mots de passe ne correspondent pas."
 
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Password confirmation"
+msgstr "Confirmation du mot de passe"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Saisissez le même mot de passe que précédemment, pour vérification."
+
 msgid ""
 "Whether the user will be able to authenticate using a password or not. If "
 "disabled, they may still be able to authenticate using other backends, such "
@@ -86,15 +95,6 @@ msgstr ""
 "pas. Si ce n'est pas le cas, il est possible que l'authentification puisse "
 "tout de même se faire par d'autres procédés, comme l'authentification unique "
 "(Single Sign-On) ou LDAP."
-
-msgid "Password"
-msgstr "Mot de passe"
-
-msgid "Password confirmation"
-msgstr "Confirmation du mot de passe"
-
-msgid "Enter the same password as before, for verification."
-msgstr "Saisissez le même mot de passe que précédemment, pour vérification."
 
 msgid "Password-based authentication"
 msgstr "Authentification par mot de passe"
@@ -270,21 +270,15 @@ msgid "users"
 msgstr "utilisateurs"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d "
-"caractère."
+"Ce mot de passe est trop court. Il doit contenir au minimum %d caractère."
 msgstr[1] ""
-"Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d "
-"caractères."
+"Ce mot de passe est trop court. Il doit contenir au minimum %d caractères."
 msgstr[2] ""
-"Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d "
-"caractères."
+"Ce mot de passe est trop court. Il doit contenir au minimum %d caractères."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

@@ -923,6 +923,7 @@ class TestMigrations(TransactionTestCase):
     def test_deconstruct(self):
         field = ArrayField(models.IntegerField())
         name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(kwargs.keys(), {"base_field"})
         new = ArrayField(*args, **kwargs)
         self.assertEqual(type(new.base_field), type(field.base_field))
         self.assertIsNot(new.base_field, field.base_field)
@@ -972,7 +973,8 @@ class TestMigrations(TransactionTestCase):
     )
     def test_adding_arrayfield_with_index(self):
         """
-        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops indexes.
+        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops
+        indexes.
         """
         table_name = "postgres_tests_chartextarrayindexmodel"
         call_command("migrate", "postgres_tests", verbosity=0)

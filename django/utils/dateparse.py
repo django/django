@@ -118,7 +118,7 @@ def parse_datetime(value):
             kw["microsecond"] = kw["microsecond"] and kw["microsecond"].ljust(6, "0")
             tzinfo = kw.pop("tzinfo")
             if tzinfo == "Z":
-                tzinfo = datetime.timezone.utc
+                tzinfo = datetime.UTC
             elif tzinfo is not None:
                 offset_mins = int(tzinfo[-2:]) if len(tzinfo) > 3 else 0
                 offset = 60 * int(tzinfo[1:3]) + offset_mins

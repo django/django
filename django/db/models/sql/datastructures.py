@@ -37,8 +37,8 @@ class Join:
         - table_alias (possible alias for the table, can be None)
         - join_type (can be None for those entries that aren't joined from
           anything)
-        - parent_alias (which table is this join's parent, can be None similarly
-          to join_type)
+        - parent_alias (which table is this join's parent, can be None
+          similarly to join_type)
         - as_sql()
         - relabeled_clone()
     """
@@ -76,7 +76,8 @@ class Join:
     def as_sql(self, compiler, connection):
         """
         Generate the full
-           LEFT OUTER JOIN sometable ON sometable.somecol = othertable.othercol, params
+           LEFT OUTER JOIN sometable
+           ON sometable.somecol = othertable.othercol, params
         clause for this join.
         """
         join_conditions = []

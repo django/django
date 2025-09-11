@@ -98,8 +98,8 @@ class JSONObject(Func):
 
     def as_postgresql(self, compiler, connection, **extra_context):
         # Casting keys to text is only required when using JSONB_BUILD_OBJECT
-        # or when using JSON_OBJECT on PostgreSQL 16+ with server-side bindings.
-        # This is done in all cases for consistency.
+        # or when using JSON_OBJECT on PostgreSQL 16+ with server-side
+        # bindings. This is done in all cases for consistency.
         copy = self.copy()
         copy.set_source_expressions(
             [

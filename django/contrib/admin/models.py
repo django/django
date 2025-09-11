@@ -44,10 +44,12 @@ class LogEntryManager(models.Manager):
             for obj in queryset
         ]
 
-        if single_object and log_entry_list:
+        if len(log_entry_list) == 1:
             instance = log_entry_list[0]
             instance.save()
-            return instance
+            if single_object:
+                return instance
+            return [instance]
 
         return self.model.objects.bulk_create(log_entry_list)
 

@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 import sys
@@ -5,8 +6,6 @@ import tempfile
 import threading
 import time
 import unittest
-from datetime import datetime, timedelta
-from datetime import timezone as datetime_timezone
 from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
@@ -114,7 +113,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -131,15 +130,15 @@ class FileStorageTests(SimpleTestCase):
             self.assertEqual(now.tzname(), dt.tzname())
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and now should be the same effective time.
-            self.assertLess(abs(dt - now), timedelta(seconds=2))
+            self.assertLess(abs(dt - now), datetime.timedelta(seconds=2))
 
     @override_settings(USE_TZ=False, TIME_ZONE="Africa/Algiers")
     def _test_file_time_getter_tz_handling_off(self, getter):
@@ -147,7 +146,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -162,20 +161,20 @@ class FileStorageTests(SimpleTestCase):
             self.assertTrue(timezone.is_naive(dt))
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and naive_now should be the same effective time.
-            self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
+            self.assertLess(abs(dt - naive_now), datetime.timedelta(seconds=2))
             # If we convert dt to an aware object using the Algiers
             # timezone then it should be the same effective time to
             # now_in_algiers.
             _dt = timezone.make_aware(dt, now_in_algiers.tzinfo)
-            self.assertLess(abs(_dt - now_in_algiers), timedelta(seconds=2))
+            self.assertLess(abs(_dt - now_in_algiers), datetime.timedelta(seconds=2))
 
     def test_file_get_accessed_time(self):
         """
@@ -187,14 +186,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
-            atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            atime,
+            datetime.datetime.fromtimestamp(os.path.getatime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_accessed_time(f_name),
-            timedelta(seconds=2),
+        self.assertAlmostEqual(
+            atime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -210,13 +214,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         ctime = self.storage.get_created_time(f_name)
 
-        self.assertEqual(
-            ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            ctime,
+            datetime.datetime.fromtimestamp(os.path.getctime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name), timedelta(seconds=2)
+        self.assertAlmostEqual(
+            ctime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -232,14 +242,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         mtime = self.storage.get_modified_time(f_name)
 
-        self.assertEqual(
-            mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name)))
+        self.assertAlmostEqual(
+            mtime,
+            datetime.datetime.fromtimestamp(os.path.getmtime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_modified_time(f_name),
-            timedelta(seconds=2),
+        self.assertAlmostEqual(
+            mtime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -344,7 +359,8 @@ class FileStorageTests(SimpleTestCase):
             self.storage.url("""a/b\\c.file"""), "/test_media_url/a/b/c.file"
         )
 
-        # #25905: remove leading slashes from file names to prevent unsafe url output
+        # #25905: remove leading slashes from file names to prevent unsafe url
+        # output
         self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
@@ -391,8 +407,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_file_storage_prevents_directory_traversal(self):
         """
-        File storage prevents directory traversal (files can only be accessed if
-        they're below the storage location).
+        File storage prevents directory traversal (files can only be accessed
+        if they're below the storage location).
         """
         with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists("..")
@@ -419,7 +435,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_makedirs_race_handling(self):
         """
-        File storage should be robust against directory creation race conditions.
+        File storage should be robust against directory creation race
+        conditions.
         """
         real_makedirs = os.makedirs
 
@@ -634,6 +651,18 @@ class OverwritingStorageTests(FileStorageTests):
         finally:
             self.storage.delete(name)
 
+    def test_save_overwrite_behavior_truncate(self):
+        name = "test.file"
+        original_content = b"content extra extra extra"
+        new_smaller_content = b"content"
+        self.storage.save(name, ContentFile(original_content))
+        try:
+            self.storage.save(name, ContentFile(new_smaller_content))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), new_smaller_content)
+        finally:
+            self.storage.delete(name)
+
     def test_save_overwrite_behavior_temp_file(self):
         """Saving to same file name twice overwrites the first file."""
         name = "test.file"
@@ -797,7 +826,8 @@ class FileFieldStorageTests(TestCase):
         obj.normal.close()
 
     def test_duplicate_filename(self):
-        # Multiple files with the same name get _(7 random chars) appended to them.
+        # Multiple files with the same name get _(7 random chars) appended to
+        # them.
         tests = [
             ("multiple_files", "txt"),
             ("multiple_files_many_extensions", "tar.gz"),
@@ -834,7 +864,8 @@ class FileFieldStorageTests(TestCase):
             self.assertEqual(names[0], "tests/%s" % filename)
             self.assertRegex(names[1], "tests/fi_%s.ext" % FILE_SUFFIX_REGEX)
 
-            # Testing exception is raised when filename is too short to truncate.
+            # Testing exception is raised when filename is too short to
+            # truncate.
             filename = "short.longext"
             objs[0].limited_length.save(filename, ContentFile("Same Content"))
             with self.assertRaisesMessage(

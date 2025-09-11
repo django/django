@@ -52,9 +52,13 @@ A list of all the people who get code error notifications. When
 is configured in :setting:`LOGGING` (done by default), Django emails these
 people the details of exceptions raised in the request/response cycle.
 
-Each item in the list should be a tuple of (Full name, email address). Example::
+Each item in the list should be an email address string. Example::
 
-    [("John", "john@example.com"), ("Mary", "mary@example.com")]
+    ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -86,7 +90,7 @@ strips when performing host validation.
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
-list, the :meth:`django.http.HttpRequest.get_host()` method will raise
+list, the :meth:`django.http.HttpRequest.get_host` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
 When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
@@ -95,7 +99,7 @@ is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
 ``ALLOWED_HOSTS`` is also :ref:`checked when running tests
 <topics-testing-advanced-multiple-hosts>`.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~django.http.HttpRequest.get_host`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
@@ -164,8 +168,8 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 ``KEY_FUNCTION``
 ~~~~~~~~~~~~~~~~
 
-A string containing a dotted path to a function (or any callable) that defines how to
-compose a prefix, version and key into a final cache key. The default
+A string containing a dotted path to a function (or any callable) that defines
+how to compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
@@ -307,9 +311,9 @@ keep the cookies in-memory instead of on persistent storage.
 
 Default: ``None``
 
-The domain to be used when setting the CSRF cookie.  This can be useful for
+The domain to be used when setting the CSRF cookie. This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
-site request forgery protection.  It should be set to a string such as
+site request forgery protection. It should be set to a string such as
 ``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
@@ -1112,7 +1116,8 @@ The default formatting to use for displaying date fields in any part of the
 system. Note that the locale-dictated format has higher precedence and will be
 applied instead. See :tfilter:`allowed date format strings <date>`.
 
-See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
+See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and
+:setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: DATE_INPUT_FORMATS
 
@@ -1156,7 +1161,8 @@ The default formatting to use for displaying datetime fields in any part of the
 system. Note that the locale-dictated format has higher precedence and will be
 applied instead. See :tfilter:`allowed date format strings <date>`.
 
-See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
+See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and
+:setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: DATETIME_INPUT_FORMATS
 
@@ -1273,10 +1279,15 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 ``DEFAULT_AUTO_FIELD``
 ----------------------
 
-Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
+
+.. versionchanged:: 6.0
+
+    In older versions, the default value is
+    :class:`django.db.models.AutoField`.
 
 .. admonition:: Migrating auto-created through tables
 
@@ -1520,9 +1531,9 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 Default: ``'[Django] '``
 
-Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
-or ``django.core.mail.mail_managers``. You'll probably want to include the
-trailing space.
+Subject-line prefix for email messages sent with
+``django.core.mail.mail_admins`` or ``django.core.mail.mail_managers``. You'll
+probably want to include the trailing space.
 
 .. setting:: EMAIL_USE_LOCALTIME
 
@@ -1606,11 +1617,11 @@ If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
 optionally specify the path to a PEM-formatted private key file for client
 authentication of the SSL connection along with :setting:`EMAIL_SSL_CERTFILE`.
 
-Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
-doesn't result in any certificate checking. They're passed to the underlying SSL
-connection. Please refer to the documentation of Python's
-:meth:`python:ssl.SSLContext.wrap_socket` function for details on how the
-certificate chain file and private key file are handled.
+Note that setting :setting:`EMAIL_SSL_CERTFILE` and
+:setting:`EMAIL_SSL_KEYFILE` doesn't result in any certificate checking.
+They're passed to the underlying SSL connection. Please refer to the
+documentation of Python's :meth:`python:ssl.SSLContext.wrap_socket` function
+for details on how the certificate chain file and private key file are handled.
 
 .. setting:: EMAIL_TIMEOUT
 
@@ -1756,7 +1767,7 @@ If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
 the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
-:func:`django.setup()` to set the URL resolver script prefix outside of the
+:func:`django.setup` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
@@ -1915,17 +1926,17 @@ A list of IP addresses, as strings, that:
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be in
-standard :term:`language ID format <language code>`. For example, U.S. English
-is ``"en-us"``. See also the `list of language identifiers`_ and
+A string representing the language code for this installation. This should be
+in standard :term:`language ID format <language code>`. For example, U.S.
+English is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
 
 It serves three purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
-* If the locale middleware is active, it provides a fallback language in case the
-  user's preferred language can't be determined or is not supported by the
+* If the locale middleware is active, it provides a fallback language in case
+  the user's preferred language can't be determined or is not supported by the
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
 * If localization is explicitly disabled via the :tfilter:`unlocalize` filter
@@ -1999,19 +2010,19 @@ application). See :doc:`/topics/i18n/index`.
 
 Default: ``'/'``
 
-The path set on the language cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+The path set on the language cookie. This should either match the URL path of
+your Django installation or be a parent of that path.
 
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths and each instance will only see
 its own language cookie.
 
 Be cautious when updating this setting on a production site. If you update this
-setting to use a deeper path than it previously used, existing user cookies that
-have the old path will not be updated. This will result in site users being
-unable to switch the language as long as these cookies persist. The only safe
-and reliable option to perform the switch is to change the language cookie name
-permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
+setting to use a deeper path than it previously used, existing user cookies
+that have the old path will not be updated. This will result in site users
+being unable to switch the language as long as these cookies persist. The only
+safe and reliable option to perform the switch is to change the language cookie
+name permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
 
@@ -2022,8 +2033,8 @@ deletes the one.
 
 Default: ``None``
 
-The value of the `SameSite`_ flag on the language cookie. This flag prevents the
-cookie from being sent in cross-site requests.
+The value of the `SameSite`_ flag on the language cookie. This flag prevents
+the cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
@@ -2104,8 +2115,9 @@ Example::
         "/var/local/translations/locale",
     ]
 
-Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
-directories containing the actual translation files.
+Django will look within each of these paths for the
+``<locale_code>/LC_MESSAGES`` directories containing the actual translation
+files.
 
 .. setting:: LOGGING
 
@@ -2149,6 +2161,10 @@ Default: ``[]`` (Empty list)
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: MEDIA_ROOT
 
@@ -2311,8 +2327,8 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 
 Default: ``False``
 
-Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if :class:`~django.middleware.common.CommonMiddleware` is installed
+Whether to prepend the "www." subdomain to URLs that don't have it. This is
+only used if :class:`~django.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`APPEND_SLASH`.
 
 .. setting:: ROOT_URLCONF
@@ -2360,7 +2376,7 @@ The secret key is used for:
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
   or are using the default
-  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
@@ -2431,6 +2447,94 @@ Unless set to ``None``, the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
 
+.. setting:: SECURE_CSP
+
+``SECURE_CSP``
+--------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting defines the directives used by the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`, which
+generates and adds a :ref:`Content-Security-Policy <csp-overview>` (CSP) header
+to all responses that do not already include one.
+
+The ``Content-Security-Policy`` header instructs browsers to restrict which
+resources a page is allowed to load. A properly configured CSP can block
+content that violates defined rules, helping prevent cross-site scripting (XSS)
+and other content injection attacks by explicitly declaring trusted sources for
+content such as scripts, styles, images, fonts, and more.
+
+The setting must be a mapping (typically a dictionary) of directive names to
+their values. Each key should be a valid CSP directive such as ``default-src``
+or ``script-src``. The corresponding value can be a list, tuple, or set of
+source expressions or URLs to allow for that directive. If a set is used, it
+will be automatically sorted to ensure consistent output in the generated
+headers.
+
+This example illustrates the expected structure, using the constants defined in
+:ref:`csp-constants`::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+    }
+
+.. admonition:: Directives validation
+
+   Django's CSP middleware helps construct and send the appropriate header
+   based on your settings, but it does **not validate** that the directives and
+   values conform to the CSP specification. It is your responsibility to ensure
+   that the configuration is syntactically and semantically correct. Use
+   browser developer tools or external CSP validators during development.
+
+   For a list of available directives and their values, refer to the `MDN
+   documentation on CSP directives
+   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_.
+
+
+.. setting:: SECURE_CSP_REPORT_ONLY
+
+``SECURE_CSP_REPORT_ONLY``
+--------------------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting is just like :setting:`SECURE_CSP`, but instead of enforcing the
+policy, it instructs the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to apply a
+``Content-Security-Policy-Report-Only`` header to responses, which allows
+browsers to monitor and report policy violations without blocking content. This
+is useful for testing and refining a policy before enforcement.
+
+Most browsers log CSP violations to the developer console and can optionally
+send them to a reporting endpoint. To collect these reports, the ``report-uri``
+directive must be defined (see :ref:`csp-reports` for more details).
+
+As noted in the `MDN documentation on Content-Security-Policy-Report-Only
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>`_,
+the ``report-uri`` directive must be specified for reports to be sent;
+otherwise, the header has no reporting effect (other than logging to the
+browser's developer tools console).
+
+Following the example from the :setting:`SECURE_CSP` setting::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP_REPORT_ONLY = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+        "report-uri": "/my-site/csp/reports/",
+    }
+
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -2439,9 +2543,9 @@ have it to the value provided.
 Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
-the ``includeSubDomains`` directive to the :ref:`http-strict-transport-security`
-header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
-non-zero value.
+the ``includeSubDomains`` directive to the
+:ref:`http-strict-transport-security` header. It has no effect unless
+:setting:`SECURE_HSTS_SECONDS` is set to a non-zero value.
 
 .. warning::
     Setting this incorrectly can irreversibly (for the value of
@@ -2550,8 +2654,8 @@ available in ``request.META``.)
 
 Default: ``[]`` (Empty list)
 
-If a URL path matches a regular expression in this list, the request will not be
-redirected to HTTPS. The
+If a URL path matches a regular expression in this list, the request will not
+be redirected to HTTPS. The
 :class:`~django.middleware.security.SecurityMiddleware` strips leading slashes
 from URL paths, so patterns shouldn't include them, e.g.
 ``SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$', …]``. If
@@ -2576,8 +2680,8 @@ to the value provided.
 Default: ``None``
 
 If a string (e.g. ``secure.example.com``), all SSL redirects will be directed
-to this host rather than the originally-requested host
-(e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+to this host rather than the originally-requested host (e.g.
+``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
 setting has no effect.
 
 .. setting:: SECURE_SSL_REDIRECT
@@ -2628,7 +2732,7 @@ protocol.
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    regular email messages sent with :meth:`~django.core.mail.send_mail`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT
@@ -2995,7 +3099,8 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 Default: ``True``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
-If this is set to ``True``, Django will use timezone-aware datetimes internally.
+If this is set to ``True``, Django will use timezone-aware datetimes
+internally.
 
 When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
 when parsing ISO 8601 formatted strings, where timezone information will always
@@ -3030,6 +3135,21 @@ preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
 
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
+
+.. setting:: URLIZE_ASSUME_HTTPS
+
+``URLIZE_ASSUME_HTTPS``
+-----------------------
+
+.. versionadded:: 6.0
+.. deprecated:: 6.0
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to opt into using HTTPS as the
+default protocol when none is provided in URLs processed by the
+:tfilter:`urlize` and :tfilter:`urlizetrunc` template filters during the Django
+6.x release cycle.
 
 .. setting:: WSGI_APPLICATION
 
@@ -3247,13 +3367,15 @@ Controls where Django stores message data. Valid values are:
 * ``'django.contrib.messages.storage.session.SessionStorage'``
 * ``'django.contrib.messages.storage.cookie.CookieStorage'``
 
-See :ref:`message storage backends <message-storage-backends>` for more details.
+See :ref:`message storage backends <message-storage-backends>` for more
+details.
 
 The backends that use cookies --
 :class:`~django.contrib.messages.storage.cookie.CookieStorage` and
 :class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
-use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
-and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
+use the value of :setting:`SESSION_COOKIE_DOMAIN`,
+:setting:`SESSION_COOKIE_SECURE` and :setting:`SESSION_COOKIE_HTTPONLY` when
+setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
@@ -3377,8 +3499,8 @@ The name of the cookie to use for sessions. This can be whatever you want
 
 Default: ``'/'``
 
-The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
+The path set on the session cookie. This should either match the URL path of
+your Django installation or be parent of that path.
 
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
@@ -3802,6 +3924,8 @@ HTTP
 
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  * :setting:`SECURE_CSP`
+  * :setting:`SECURE_CSP_REPORT_ONLY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
@@ -3842,6 +3966,7 @@ Security
 
 * :setting:`SECRET_KEY`
 * :setting:`SECRET_KEY_FALLBACKS`
+* :setting:`URLIZE_ASSUME_HTTPS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

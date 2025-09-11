@@ -3,10 +3,13 @@ import select
 import sys
 import traceback
 from collections import defaultdict
+from importlib import import_module
 
 from django.apps import apps
+from django.core.exceptions import AppRegistryNotReady
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
+from django.utils.module_loading import import_string as import_dotted_path
 
 
 class Command(BaseCommand):
@@ -54,30 +57,21 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(
-            argv=[],
-            user_ns=self.get_and_report_namespace(
-                options["verbosity"], options["no_imports"]
-            ),
-        )
+        start_ipython(argv=[], user_ns=self.get_namespace(**options))
 
     def bpython(self, options):
         import bpython
 
-        bpython.embed(
-            self.get_and_report_namespace(options["verbosity"], options["no_imports"])
-        )
+        bpython.embed(self.get_namespace(**options))
 
     def python(self, options):
         import code
 
         # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = self.get_and_report_namespace(
-            options["verbosity"], options["no_imports"]
-        )
+        imported_objects = self.get_namespace(**options)
 
-        # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
-        # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
+        # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow
+        # system conventions and get $PYTHONSTARTUP first then .pythonrc.py.
         if not options["no_startup"]:
             for pythonrc in OrderedSet(
                 [os.environ.get("PYTHONSTARTUP"), os.path.expanduser("~/.pythonrc.py")]
@@ -95,9 +89,9 @@ class Command(BaseCommand):
                 except Exception:
                     traceback.print_exc()
 
-        # By default, this will set up readline to do tab completion and to read and
-        # write history to the .python_history file, but this can be overridden by
-        # $PYTHONSTARTUP or ~/.pythonrc.py.
+        # By default, this will set up readline to do tab completion and to
+        # read and write history to the .python_history file, but this can be
+        # overridden by $PYTHONSTARTUP or ~/.pythonrc.py.
         try:
             hook = sys.__interactivehook__
         except AttributeError:
@@ -127,40 +121,121 @@ class Command(BaseCommand):
         # Start the interactive interpreter.
         code.interact(local=imported_objects)
 
-    def get_and_report_namespace(self, verbosity, no_imports=False):
-        if no_imports:
+    def get_auto_imports(self):
+        """Return a sequence of import paths for objects to be auto-imported.
+
+        By default, import paths for models in INSTALLED_APPS and some common
+        utilities are included, with models from earlier apps taking precedence
+        in case of a name collision.
+
+        For example, for an unchanged INSTALLED_APPS, this method returns:
+
+        [
+            "django.conf.settings",
+            "django.db.connection",
+            "django.db.models",
+            "django.db.models.functions",
+            "django.db.reset_queries",
+            "django.utils.timezone",
+            "django.contrib.sessions.models.Session",
+            "django.contrib.contenttypes.models.ContentType",
+            "django.contrib.auth.models.User",
+            "django.contrib.auth.models.Group",
+            "django.contrib.auth.models.Permission",
+            "django.contrib.admin.models.LogEntry",
+        ]
+
+        """
+        default_imports = [
+            "django.conf.settings",
+            "django.db.connection",
+            "django.db.models",
+            "django.db.models.functions",
+            "django.db.reset_queries",
+            "django.utils.timezone",
+        ]
+        app_models_imports = default_imports + [
+            f"{model.__module__}.{model.__name__}"
+            for model in reversed(apps.get_models())
+            if model.__module__
+        ]
+        return app_models_imports
+
+    def get_namespace(self, **options):
+        if options and options.get("no_imports"):
             return {}
 
-        namespace = self.get_namespace()
+        verbosity = options["verbosity"] if options else 0
+
+        try:
+            apps.check_models_ready()
+        except AppRegistryNotReady:
+            if verbosity > 0:
+                settings_env_var = os.getenv("DJANGO_SETTINGS_MODULE")
+                self.stdout.write(
+                    "Automatic imports are disabled since settings are not configured."
+                    f"\nDJANGO_SETTINGS_MODULE value is {settings_env_var!r}.\n"
+                    "HINT: Ensure that the settings module is configured and set.",
+                    self.style.ERROR,
+                    ending="\n\n",
+                )
+            return {}
+
+        path_imports = self.get_auto_imports()
+        if path_imports is None:
+            return {}
+
+        auto_imports = defaultdict(list)
+        import_errors = []
+        for path in path_imports:
+            try:
+                obj = import_dotted_path(path) if "." in path else import_module(path)
+            except ImportError:
+                import_errors.append(path)
+                continue
+
+            if "." in path:
+                module, name = path.rsplit(".", 1)
+            else:
+                module = None
+                name = path
+            if (name, obj) not in auto_imports[module]:
+                auto_imports[module].append((name, obj))
+
+        namespace = {
+            name: obj for items in auto_imports.values() for name, obj in items
+        }
 
         if verbosity < 1:
             return namespace
 
+        errors = len(import_errors)
+        if errors:
+            msg = "\n".join(f"  {e}" for e in import_errors)
+            objects = "objects" if errors != 1 else "object"
+            self.stdout.write(
+                f"{errors} {objects} could not be automatically imported:\n\n{msg}",
+                self.style.ERROR,
+                ending="\n\n",
+            )
+
         amount = len(namespace)
-        msg = f"{amount} objects imported automatically"
+        objects_str = "objects" if amount != 1 else "object"
+        msg = f"{amount} {objects_str} imported automatically"
 
         if verbosity < 2:
-            self.stdout.write(f"{msg} (use -v 2 for details).", self.style.SUCCESS)
+            if amount:
+                msg += " (use -v 2 for details)"
+            self.stdout.write(f"{msg}.", self.style.SUCCESS, ending="\n\n")
             return namespace
 
-        imports_by_module = defaultdict(list)
-        for obj_name, obj in namespace.items():
-            if hasattr(obj, "__module__") and (
-                (hasattr(obj, "__qualname__") and obj.__qualname__.find(".") == -1)
-                or not hasattr(obj, "__qualname__")
-            ):
-                imports_by_module[obj.__module__].append(obj_name)
-            if not hasattr(obj, "__module__") and hasattr(obj, "__name__"):
-                tokens = obj.__name__.split(".")
-                if obj_name in tokens:
-                    module = ".".join(t for t in tokens if t != obj_name)
-                    imports_by_module[module].append(obj_name)
-
+        top_level = auto_imports.pop(None, [])
         import_string = "\n".join(
-            [
+            [f"  import {obj}" for obj, _ in top_level]
+            + [
                 f"  from {module} import {objects}"
-                for module, imported_objects in imports_by_module.items()
-                if (objects := ", ".join(imported_objects))
+                for module, imported_objects in auto_imports.items()
+                if (objects := ", ".join(i[0] for i in imported_objects))
             ]
         )
 
@@ -171,24 +246,19 @@ class Command(BaseCommand):
         else:
             import_string = isort.code(import_string)
 
-        self.stdout.write(
-            f"{msg}, including:\n\n{import_string}", self.style.SUCCESS, ending="\n\n"
-        )
+        if import_string:
+            msg = f"{msg}:\n\n{import_string}"
+        else:
+            msg = f"{msg}."
 
-        return namespace
+        self.stdout.write(msg, self.style.SUCCESS, ending="\n\n")
 
-    def get_namespace(self):
-        apps_models = apps.get_models()
-        namespace = {}
-        for model in reversed(apps_models):
-            if model.__module__:
-                namespace[model.__name__] = model
         return namespace
 
     def handle(self, **options):
         # Execute the command and exit.
         if options["command"]:
-            exec(options["command"], {**globals(), **self.get_namespace()})
+            exec(options["command"], {**globals(), **self.get_namespace(**options)})
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -198,7 +268,7 @@ class Command(BaseCommand):
             and not sys.stdin.isatty()
             and select.select([sys.stdin], [], [], 0)[0]
         ):
-            exec(sys.stdin.read(), {**globals(), **self.get_namespace()})
+            exec(sys.stdin.read(), {**globals(), **self.get_namespace(**options)})
             return
 
         available_shells = (

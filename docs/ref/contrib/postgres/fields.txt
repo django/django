@@ -11,8 +11,8 @@ Indexing these fields
 =====================
 
 :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
-B-tree index, which isn't particularly helpful when querying complex data types.
-Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
+B-tree index, which isn't particularly helpful when querying complex data
+types. Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
 :class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
 the index choice is dependent on the queries that you're using. Generally, GiST
 may be a good choice for the :ref:`range fields <range-fields>` and
@@ -47,8 +47,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`) and file fields (
-        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ManyToManyField`) and file fields
+        (:class:`~django.db.models.FileField` and
         :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
@@ -450,8 +450,8 @@ operator ``?|``. For example:
 ``has_keys``
 ~~~~~~~~~~~~
 
-Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example:
+Returns objects where all of the given keys are in the data. Uses the SQL
+operator ``?&``. For example:
 
 .. code-block:: pycon
 
@@ -516,6 +516,15 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 `different bounds`_). The default bounds can be changed for non-discrete range
 fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
 the ``default_bounds`` argument.
+
+.. admonition:: PostgreSQL normalizes a range with no points to the empty range
+
+    A range with equal values specified for an included lower bound and an
+    excluded upper bound, such as ``Range(datetime.date(2005, 6, 21),
+    datetime.date(2005, 6, 21))`` or ``[4, 4)``, has no points. PostgreSQL will
+    normalize the value to empty when saving to the database, and the original
+    bound values will be lost. See the `PostgreSQL documentation for details
+    <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO>`_.
 
 ``IntegerRangeField``
 ---------------------
@@ -732,8 +741,8 @@ passed range.
 ``not_gt``
 ^^^^^^^^^^
 
-The returned ranges do not contain any points greater than the passed range, that
-is the upper bound of the returned range is at most the upper bound of the
+The returned ranges do not contain any points greater than the passed range,
+that is the upper bound of the returned range is at most the upper bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_gt=NumericRange(3, 10))

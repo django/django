@@ -53,7 +53,7 @@ Single object mixins
 
     .. attribute:: query_pk_and_slug
 
-        If ``True``, causes :meth:`get_object()` to perform its lookup using
+        If ``True``, causes :meth:`get_object` to perform its lookup using
         both the primary key and the slug. Defaults to ``False``.
 
         This attribute can help mitigate `insecure direct object reference`_
@@ -102,9 +102,10 @@ Single object mixins
 
         Returns context data for displaying the object.
 
-        The base implementation of this method requires that the ``self.object``
-        attribute be set by the view (even if ``None``). Be sure to do this if
-        you are using this mixin without one of the built-in views that does so.
+        The base implementation of this method requires that the
+        ``self.object`` attribute be set by the view (even if ``None``). Be
+        sure to do this if you are using this mixin without one of the built-in
+        views that does so.
 
         It returns a dictionary with these contents:
 

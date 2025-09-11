@@ -26,8 +26,9 @@ option.
     (including ``name``) each time. To work around name collisions, part of the
     name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
     replaced, respectively, by the lowercased app label and class name of the
-    concrete model. For example ``CheckConstraint(condition=Q(age__gte=18),
-    name='%(app_label)s_%(class)s_is_adult')``.
+    concrete model. For example::
+
+        CheckConstraint(condition=Q(age__gte=18), name="%(app_label)s_%(class)s_is_adult")
 
 .. admonition:: Validation of Constraints
 
@@ -99,7 +100,10 @@ This method must be implemented by a subclass.
 A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
 specifies the conditional check you want the constraint to enforce.
 
-For example, ``CheckConstraint(condition=Q(age__gte=18), name='age_gte_18')``
+For example::
+
+    CheckConstraint(condition=Q(age__gte=18), name="age_gte_18")
+
 ensures the age field is never less than 18.
 
 .. admonition:: Expression order
@@ -156,9 +160,11 @@ Functional unique constraints have the same database restrictions as
 A list of field names that specifies the unique set of columns you want the
 constraint to enforce.
 
-For example, ``UniqueConstraint(fields=['room', 'date'],
-name='unique_booking')`` ensures each room can only be booked once for each
-date.
+For example::
+
+    UniqueConstraint(fields=["room", "date"], name="unique_booking")
+
+ensures each room can only be booked once for each date.
 
 ``condition``
 -------------
@@ -200,7 +206,7 @@ enforced immediately after every command.
 .. admonition:: MySQL, MariaDB, and SQLite.
 
     Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
-    neither supports them.
+    they do not support them.
 
 .. warning::
 
@@ -282,10 +288,10 @@ Defaults to :attr:`.BaseConstraint.violation_error_code`, when either
 is not set.
 
 If :attr:`.UniqueConstraint.fields` is set without a
-:attr:`.UniqueConstraint.condition`, defaults to the :attr:`Meta.unique_together
-<django.db.models.Options.unique_together>` error code when there are multiple
-fields, and to the :attr:`.Field.unique` error code when there is a single
-field.
+:attr:`.UniqueConstraint.condition`, defaults to the
+:attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
+code when there are multiple fields, and to the :attr:`.Field.unique` error
+code when there is a single field.
 
 .. versionchanged:: 5.2
 
@@ -307,10 +313,10 @@ Defaults to :attr:`.BaseConstraint.violation_error_message`, when either
 is not set.
 
 If :attr:`.UniqueConstraint.fields` is set without a
-:attr:`.UniqueConstraint.condition`, defaults to the :attr:`Meta.unique_together
-<django.db.models.Options.unique_together>` error message when there are
-multiple fields, and to the :attr:`.Field.unique` error message when there is a
-single field.
+:attr:`.UniqueConstraint.condition`, defaults to the
+:attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
+message when there are multiple fields, and to the :attr:`.Field.unique` error
+message when there is a single field.
 
 .. versionchanged:: 5.2
 

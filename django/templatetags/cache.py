@@ -77,7 +77,7 @@ def do_cache(parser, token):
 
     Optionally the cache to use may be specified thus::
 
-        {% cache ....  using="cachename" %}
+        {% cache .... using="cachename" %}
 
     Each unique set of arguments will result in a unique cache entry.
     """

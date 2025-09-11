@@ -145,7 +145,7 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :meth:`.GEOSGeometry.make_valid()` method allows converting invalid
+* The new :meth:`.GEOSGeometry.make_valid` method allows converting invalid
   geometries to valid ones.
 
 * The new ``clone`` argument for :meth:`.GEOSGeometry.normalize` allows
@@ -247,8 +247,8 @@ Forms
   transitional renderers will be deprecated, for removal in Django 6.0. The
   ``FORM_RENDERER`` declaration can be removed at that time.
 
-* If the new ``<div>`` output style is not appropriate for your project, you should
-  define a renderer subclass specifying
+* If the new ``<div>`` output style is not appropriate for your project, you
+  should define a renderer subclass specifying
   :attr:`~django.forms.renderers.BaseRenderer.form_template_name` and
   :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` for your
   required style, and set :setting:`FORM_RENDERER` accordingly.
@@ -536,7 +536,7 @@ Miscellaneous
 
 * :class:`~django.test.runner.DiscoverRunner` now returns a non-zero error code
   for unexpected successes from tests marked with
-  :py:func:`unittest.expectedFailure`.
+  :func:`unittest.expectedFailure`.
 
 * :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
   cookie like it does the CSRF token in the DOM.
@@ -608,7 +608,7 @@ Features deprecated in 4.1
 Log out via GET
 ---------------
 
-Logging out via ``GET`` requests to the :py:class:`built-in logout view
+Logging out via ``GET`` requests to the :class:`built-in logout view
 <django.contrib.auth.views.LogoutView>` is deprecated. Use ``POST`` requests
 instead.
 

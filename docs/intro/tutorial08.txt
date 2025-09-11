@@ -2,11 +2,11 @@
 Writing your first Django app, part 8
 =====================================
 
-This tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>` left off. We've
-built our web-poll application and will now look at third-party packages. One of
-Django's strengths is the rich ecosystem of third-party packages. They're
-community developed packages that can be used to quickly improve the feature set
-of an application.
+This tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>` left off.
+We've built our web-poll application and will now look at third-party packages.
+One of Django's strengths is the rich ecosystem of third-party packages.
+They're community developed packages that can be used to quickly improve the
+feature set of an application.
 
 This tutorial will show how to add :pypi:`Django Debug Toolbar
 <django-debug-toolbar>`, a commonly used third-party package. The Django Debug
@@ -63,12 +63,13 @@ toolbar may not render. When this happens and you're unable to
 resolve the issue yourself, there are options available to you.
 
 #. If the problem is with a specific package, check if there's a
-   troubleshooting of FAQ in the package's documentation. For example the
+   troubleshooting guide or FAQ in the package's documentation. For example the
    Django Debug Toolbar has a `Tips section
    <https://django-debug-toolbar.readthedocs.io/en/latest/tips.html>`_ that
    outlines troubleshooting options.
 #. Search for similar issues on the package's issue tracker. Django Debug
-   Toolbar’s is `on GitHub <https://github.com/django-commons/django-debug-toolbar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>`_.
+   Toolbar’s is `on GitHub
+   <https://github.com/django-commons/django-debug-toolbar/issues>`_.
 #. Consult the `Django Forum <https://forum.djangoproject.com/>`_.
 #. Join the `Django Discord server <https://chat.djangoproject.com>`_.
 

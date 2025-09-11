@@ -61,7 +61,8 @@ Fields
 
     .. attribute:: user_permissions
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to
+        :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -79,8 +80,8 @@ Fields
         flag but the default backend
         (:class:`~django.contrib.auth.backends.ModelBackend`) and the
         :class:`~django.contrib.auth.backends.RemoteUserBackend` do. You can
-        use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`
-        or :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
+        use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` or
+        :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
         if you want to allow inactive users to login. In this case, you'll also
         want to customize the
         :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
@@ -124,9 +125,9 @@ Attributes
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
-        differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
-        objects. Generally, you should prefer using
-        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        differentiating :class:`~models.User` and
+        :class:`~models.AnonymousUser` objects. Generally, you should prefer
+        using :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
 Methods
@@ -159,7 +160,7 @@ Methods
 
         When the ``raw_password`` is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        :meth:`~django.contrib.auth.models.User.set_unusable_password`
         were used.
 
     .. method:: check_password(raw_password)
@@ -176,7 +177,7 @@ Methods
         Marks the user as having no password set by updating the metadata in
         the :attr:`~django.contrib.auth.models.User.password` field. This isn't
         the same as having a blank string for a password.
-        :meth:`~django.contrib.auth.models.User.check_password()` for this user
+        :meth:`~django.contrib.auth.models.User.check_password` for this user
         will never return ``True``. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
 
@@ -192,7 +193,7 @@ Methods
     .. method:: has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
+        :meth:`~django.contrib.auth.models.User.set_unusable_password` has
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
@@ -246,8 +247,8 @@ Methods
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
-        documentation on :ref:`permissions <topic-authorization>`). If the user is
-        inactive, this method will always return ``False``. For an active
+        documentation on :ref:`permissions <topic-authorization>`). If the user
+        is inactive, this method will always return ``False``. For an active
         superuser, this method will always return ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
@@ -293,7 +294,7 @@ Methods
 
         Sends an email to the user. If ``from_email`` is ``None``, Django uses
         the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` are passed to the
-        underlying :meth:`~django.core.mail.send_mail()` call.
+        underlying :meth:`~django.core.mail.send_mail` call.
 
 Manager methods
 ---------------
@@ -319,15 +320,19 @@ Manager methods
         :attr:`~django.contrib.auth.models.User.is_active` set to ``True``.
 
         If no password is provided,
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
+        :meth:`~django.contrib.auth.models.User.set_unusable_password` will
         be called.
+
+        If no email is provided, :attr:`~django.contrib.auth.models.User.email`
+        will be set to an empty string.
 
         The ``extra_fields`` keyword arguments are passed through to the
         :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
-        See :ref:`Creating users <topics-auth-creating-users>` for example usage.
+        See :ref:`Creating users <topics-auth-creating-users>` for example
+        usage.
 
         .. versionchanged:: 5.2
 
@@ -377,7 +382,7 @@ Manager methods
     * :ref:`id <automatic-primary-key-fields>` is always ``None``.
     * :attr:`~django.contrib.auth.models.User.username` is always the empty
       string.
-    * :meth:`~django.contrib.auth.models.User.get_username()` always returns
+    * :meth:`~django.contrib.auth.models.User.get_username` always returns
       the empty string.
     * :attr:`~django.contrib.auth.models.User.is_anonymous` is ``True``
       instead of ``False``.
@@ -390,10 +395,10 @@ Manager methods
     * :attr:`~django.contrib.auth.models.User.groups` and
       :attr:`~django.contrib.auth.models.User.user_permissions` are always
       empty.
-    * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`,
+    * :meth:`~django.contrib.auth.models.User.set_password`,
+      :meth:`~django.contrib.auth.models.User.check_password`,
       :meth:`~django.db.models.Model.save` and
-      :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
+      :meth:`~django.db.models.Model.delete` raise :exc:`NotImplementedError`.
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
@@ -520,10 +525,11 @@ can be used for notification when a user logs in or out.
         The name of the module used for authentication.
 
     ``credentials``
-        A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate()` or your own custom
-        authentication backend. Credentials matching a set of 'sensitive' patterns,
-        (including password) will not be sent in the clear as part of the signal.
+        A dictionary of keyword arguments containing the user credentials that
+        were passed to :func:`~django.contrib.auth.authenticate` or your own
+        custom authentication backend. Credentials matching a set of
+        'sensitive' patterns (including password) will not be sent in the clear
+        as part of the signal.
 
     ``request``
         The :class:`~django.http.HttpRequest` object, if one was provided to
@@ -601,9 +607,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: ModelBackend
 
-    This is the default authentication backend used by Django.  It
+    This is the default authentication backend used by Django. It
     authenticates using credentials consisting of a user identifier and
-    password.  For Django's default user model, the user identifier is the
+    password. For Django's default user model, the user identifier is the
     username, for custom user models it is the field specified by
     USERNAME_FIELD (see :doc:`Customizing Users and authentication
     </topics/auth/customizing>`).
@@ -612,11 +618,11 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :class:`~django.contrib.auth.models.User` and
     :class:`~django.contrib.auth.models.PermissionsMixin`.
 
-    :meth:`has_perm`, :meth:`get_all_permissions`, :meth:`get_user_permissions`,
-    and :meth:`get_group_permissions` allow an object to be passed as a
-    parameter for object-specific permissions, but this backend does not
-    implement them other than returning an empty set of permissions if
-    ``obj is not None``.
+    :meth:`has_perm`, :meth:`get_all_permissions`,
+    :meth:`get_user_permissions`, and :meth:`get_group_permissions` allow an
+    object to be passed as a parameter for object-specific permissions, but
+    this backend does not implement them other than returning an empty set of
+    permissions if ``obj is not None``.
 
     :meth:`with_perm` also allows an object to be passed as a parameter, but
     unlike others methods it returns an empty queryset if ``obj is not None``.
@@ -675,8 +681,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         *Asynchronous version*: ``aget_all_permissions()``
 
-        Returns the set of permission strings the ``user_obj`` has, including both
-        user permissions and group permissions. Returns an empty set if
+        Returns the set of permission strings the ``user_obj`` has, including
+        both user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
@@ -737,7 +743,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: AllowAllUsersModelBackend
 
     Same as :class:`ModelBackend` except that it doesn't reject inactive users
-    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
+    because :meth:`~ModelBackend.user_can_authenticate` always returns
+    ``True``.
 
     When using this backend, you'll likely want to customize the
     :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
@@ -748,8 +755,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: RemoteUserBackend
 
     Use this backend to take advantage of external-to-Django-handled
-    authentication.  It authenticates using usernames passed in
-    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    authentication. It authenticates using usernames passed in
+    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`. See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
 

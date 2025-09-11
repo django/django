@@ -13,6 +13,7 @@ from django.db import (
     OperationalError,
     connection,
     models,
+    transaction,
 )
 from django.db.models import (
     Count,
@@ -39,7 +40,13 @@ from django.db.models.functions import Cast
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from .models import CustomJSONDecoder, JSONModel, NullableJSONModel, RelatedJSONModel
+from .models import (
+    CustomJSONDecoder,
+    CustomSerializationJSONModel,
+    JSONModel,
+    NullableJSONModel,
+    RelatedJSONModel,
+)
 
 
 @skipUnlessDBFeature("supports_json_field")
@@ -296,6 +303,16 @@ class TestSaveLoad(TestCase):
         obj = JSONModel.objects.create(value=value)
         obj.refresh_from_db()
         self.assertEqual(obj.value, value)
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_bulk_update_custom_get_prep_value(self):
+        obj = CustomSerializationJSONModel.objects.create(json_field={"version": "1"})
+        obj.json_field["version"] = "1-alpha"
+        CustomSerializationJSONModel.objects.bulk_update([obj], ["json_field"])
+        self.assertSequenceEqual(
+            CustomSerializationJSONModel.objects.values("json_field"),
+            [{"json_field": '{"version": "1-alpha"}'}],
+        )
 
 
 @skipUnlessDBFeature("supports_json_field")
@@ -768,6 +785,21 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipIfDBFeature("supports_json_negative_indexing")
+    def test_unsupported_negative_lookup(self):
+        msg = (
+            "Using negative JSON array indices is not supported on this database "
+            "backend."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            NullableJSONModel.objects.filter(**{"value__-2": 1}).get()
+
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_shallow_list_negative_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-2": 1}), [self.objs[5]]
+        )
+
     def test_shallow_obj_lookup(self):
         self.assertCountEqual(
             NullableJSONModel.objects.filter(value__a="b"),
@@ -800,9 +832,23 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_deep_negative_lookup_array(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-1__0": 2}),
+            [self.objs[5]],
+        )
+
     def test_deep_lookup_mixed(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__d__1__f="g"),
+            [self.objs[4]],
+        )
+
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_deep_negative_lookup_mixed(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__d__-1__f": "g"}),
             [self.objs[4]],
         )
 
@@ -974,7 +1020,7 @@ class TestQuerying(TestCase):
             ("value__i__in", [False, "foo"], [self.objs[4]]),
         ]
         for lookup, value, expected in tests:
-            with self.subTest(lookup=lookup, value=value):
+            with self.subTest(lookup=lookup, value=value), transaction.atomic():
                 self.assertCountEqual(
                     NullableJSONModel.objects.filter(**{lookup: value}),
                     expected,

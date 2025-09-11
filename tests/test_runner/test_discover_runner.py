@@ -97,6 +97,16 @@ class DiscoverRunnerParallelArgumentTests(SimpleTestCase):
         mocked_cpu_count,
     ):
         mocked_get_start_method.return_value = "forkserver"
+        self.assertEqual(get_max_test_processes(), 12)
+        with mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"}):
+            self.assertEqual(get_max_test_processes(), 7)
+
+    def test_get_max_test_processes_other(
+        self,
+        mocked_get_start_method,
+        mocked_cpu_count,
+    ):
+        mocked_get_start_method.return_value = "other"
         self.assertEqual(get_max_test_processes(), 1)
         with mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"}):
             self.assertEqual(get_max_test_processes(), 1)
@@ -364,7 +374,8 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_duplicates_ignored(self):
         """
-        Tests shouldn't be discovered twice when discovering on overlapping paths.
+        Tests shouldn't be discovered twice when discovering on overlapping
+        paths.
         """
         base_app = "forms_tests"
         sub_app = "forms_tests.field_tests"

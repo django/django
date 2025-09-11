@@ -58,7 +58,8 @@ class BlockNode(Node):
                 push = block = block_context.pop(self.name)
                 if block is None:
                     block = self
-                # Create new block so we can store context without thread-safety issues.
+                # Create new block so we can store context without
+                # thread-safety issues.
                 block = type(self)(block.name, block.nodelist)
                 block.context = context
                 context["block"] = block
@@ -256,6 +257,13 @@ def construct_relative_path(
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name
+
+    if current_template_name is None:
+        # Unknown origin (e.g. Template('...').render(Context({...})).
+        raise TemplateSyntaxError(
+            f"The relative path {relative_name} cannot be evaluated due to "
+            "an unknown template origin."
+        )
 
     new_name = posixpath.normpath(
         posixpath.join(

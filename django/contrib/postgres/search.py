@@ -11,6 +11,8 @@ from django.db.models import (
 from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
 
+from .utils import CheckPostgresInstalledMixin
+
 
 class SearchVectorExact(Lookup):
     lookup_name = "exact"
@@ -25,16 +27,16 @@ class SearchVectorExact(Lookup):
     def as_sql(self, qn, connection):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
+        params = (*lhs_params, *rhs_params)
         return "%s @@ %s" % (lhs, rhs), params
 
 
-class SearchVectorField(Field):
+class SearchVectorField(CheckPostgresInstalledMixin, Field):
     def db_type(self, connection):
         return "tsvector"
 
 
-class SearchQueryField(Field):
+class SearchQueryField(CheckPostgresInstalledMixin, Field):
     def db_type(self, connection):
         return "tsquery"
 
@@ -146,7 +148,7 @@ class SearchVector(SearchVectorCombinable, Func):
             weight_sql, extra_params = compiler.compile(clone.weight)
             sql = "setweight({}, {})".format(sql, weight_sql)
 
-        return sql, config_params + params + extra_params
+        return sql, (*config_params, *params, *extra_params)
 
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
@@ -211,7 +213,7 @@ class SearchQuery(SearchQueryCombinable, Func):
         expressions = (value,)
         self.config = SearchConfig.from_parameter(config)
         if self.config is not None:
-            expressions = (self.config,) + expressions
+            expressions = [self.config, *expressions]
         self.invert = invert
         super().__init__(*expressions, output_field=output_field)
 
@@ -258,16 +260,16 @@ class SearchRank(Func):
             vector = SearchVector(vector)
         if not hasattr(query, "resolve_expression"):
             query = SearchQuery(query)
-        expressions = (vector, query)
+        expressions = [vector, query]
         if weights is not None:
             if not hasattr(weights, "resolve_expression"):
                 weights = Value(weights)
             weights = Cast(weights, ArrayField(_Float4Field()))
-            expressions = (weights,) + expressions
+            expressions = [weights, *expressions]
         if normalization is not None:
             if not hasattr(normalization, "resolve_expression"):
                 normalization = Value(normalization)
-            expressions += (normalization,)
+            expressions.append(normalization)
         if cover_density:
             self.function = "ts_rank_cd"
         super().__init__(*expressions)
@@ -311,18 +313,18 @@ class SearchHeadline(Func):
         expressions = (expression, query)
         if config is not None:
             config = SearchConfig.from_parameter(config)
-            expressions = (config,) + expressions
+            expressions = (config, *expressions)
         super().__init__(*expressions)
 
     def as_sql(self, compiler, connection, function=None, template=None):
         options_sql = ""
-        options_params = []
+        options_params = ()
         if self.options:
-            options_params.append(
+            options_params = (
                 ", ".join(
                     connection.ops.compose_sql(f"{option}=%s", [value])
                     for option, value in self.options.items()
-                )
+                ),
             )
             options_sql = ", %s"
         sql, params = super().as_sql(

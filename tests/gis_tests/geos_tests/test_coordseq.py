@@ -9,7 +9,7 @@ class GEOSCoordSeqTest(SimpleTestCase):
             with self.subTest(i):
                 self.assertEqual(coord_seq[i], (i, i))
         for i in (-3, 10):
-            msg = "invalid GEOS Geometry index: %s" % i
+            msg = f"Invalid GEOS Geometry index: {i}"
             with self.subTest(i):
                 with self.assertRaisesMessage(IndexError, msg):
                     coord_seq[i]

@@ -188,7 +188,8 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
     def test_helpful_error_message_for_many2many_natural1(self):
         """
         Invalid many-to-many keys should throw a helpful error message.
-        This tests the code path where one of a list of natural keys is invalid.
+        This tests the code path where one of a list of natural keys is
+        invalid.
         """
         test_string = """[{
             "pk": 1,

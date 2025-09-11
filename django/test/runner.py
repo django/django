@@ -16,7 +16,6 @@ import unittest.suite
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
-from io import StringIO
 
 import django
 from django.core.management import call_command
@@ -41,16 +40,47 @@ except ImportError:
     tblib = None
 
 
+class QueryFormatter(logging.Formatter):
+    def format(self, record):
+        if (alias := getattr(record, "alias", None)) in connections:
+            format_sql = connections[alias].ops.format_debug_sql
+
+            sql = None
+            formatted_sql = None
+            if args := record.args:
+                if isinstance(args, tuple) and len(args) > 1 and (sql := args[1]):
+                    record.args = (args[0], formatted_sql := format_sql(sql), *args[2:])
+                elif isinstance(record.args, dict) and (sql := record.args.get("sql")):
+                    record.args["sql"] = formatted_sql = format_sql(sql)
+
+            if extra_sql := getattr(record, "sql", None):
+                if extra_sql == sql:
+                    record.sql = formatted_sql
+                else:
+                    record.sql = format_sql(extra_sql)
+
+        return super().format(record)
+
+
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger("django.db.backends")
         self.logger.setLevel(logging.DEBUG)
-        self.debug_sql_stream = None
+        self.handler = None
         super().__init__(stream, descriptions, verbosity)
 
+    def _read_logger_stream(self):
+        if self.handler is None:
+            # Error before tests e.g. in setUpTestData().
+            sql = ""
+        else:
+            self.handler.stream.seek(0)
+            sql = self.handler.stream.read()
+        return sql
+
     def startTest(self, test):
-        self.debug_sql_stream = StringIO()
-        self.handler = logging.StreamHandler(self.debug_sql_stream)
+        self.handler = logging.StreamHandler(io.StringIO())
+        self.handler.setFormatter(QueryFormatter())
         self.logger.addHandler(self.handler)
         super().startTest(test)
 
@@ -58,35 +88,26 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         super().stopTest(test)
         self.logger.removeHandler(self.handler)
         if self.showAll:
-            self.debug_sql_stream.seek(0)
-            self.stream.write(self.debug_sql_stream.read())
+            self.stream.write(self._read_logger_stream())
             self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
         super().addError(test, err)
-        if self.debug_sql_stream is None:
-            # Error before tests e.g. in setUpTestData().
-            sql = ""
-        else:
-            self.debug_sql_stream.seek(0)
-            sql = self.debug_sql_stream.read()
-        self.errors[-1] = self.errors[-1] + (sql,)
+        self.errors[-1] = self.errors[-1] + (self._read_logger_stream(),)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.debug_sql_stream.seek(0)
-        self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
+        self.failures[-1] = self.failures[-1] + (self._read_logger_stream(),)
 
     def addSubTest(self, test, subtest, err):
         super().addSubTest(test, subtest, err)
         if err is not None:
-            self.debug_sql_stream.seek(0)
             errors = (
                 self.failures
                 if issubclass(err[0], test.failureException)
                 else self.errors
             )
-            errors[-1] = errors[-1] + (self.debug_sql_stream.read(),)
+            errors[-1] = errors[-1] + (self._read_logger_stream(),)
 
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
@@ -383,8 +404,9 @@ def get_max_test_processes():
     The maximum number of test processes when using the --parallel option.
     """
     # The current implementation of the parallel test runner requires
-    # multiprocessing to start subprocesses with fork() or spawn().
-    if multiprocessing.get_start_method() not in {"fork", "spawn"}:
+    # multiprocessing to start subprocesses with fork(), forkserver(), or
+    # spawn().
+    if multiprocessing.get_start_method() not in {"fork", "spawn", "forkserver"}:
         return 1
     try:
         return int(os.environ["DJANGO_TEST_PROCESSES"])
@@ -429,9 +451,12 @@ def _init_worker(
         counter.value += 1
         _worker_id = counter.value
 
-    start_method = multiprocessing.get_start_method()
+    is_spawn_or_forkserver = multiprocessing.get_start_method() in {
+        "forkserver",
+        "spawn",
+    }
 
-    if start_method == "spawn":
+    if is_spawn_or_forkserver:
         if process_setup and callable(process_setup):
             if process_setup_args is None:
                 process_setup_args = ()
@@ -442,7 +467,7 @@ def _init_worker(
     db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:
         connection = connections[alias]
-        if start_method == "spawn":
+        if is_spawn_or_forkserver:
             # Restore initial settings in spawned processes.
             connection.settings_dict.update(initial_settings[alias])
             if value := serialized_contents.get(alias):
@@ -585,7 +610,7 @@ class ParallelTestSuite(unittest.TestSuite):
         return iter(self.subsuites)
 
     def initialize_suite(self):
-        if multiprocessing.get_start_method() == "spawn":
+        if multiprocessing.get_start_method() in {"forkserver", "spawn"}:
             self.initial_settings = {
                 alias: connections[alias].settings_dict for alias in connections
             }

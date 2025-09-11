@@ -3,22 +3,24 @@
 # Translators:
 # Bruno Miguel Custódio <bruno@brunomcustodio.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manuela Silva <mmsrs@sky.com>, 2025
 # Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015,2017
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2025\n"
+"Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 msgid "Administrative Documentation"
 msgstr "Documentação Administrativa"
@@ -103,18 +105,18 @@ msgstr "Por favor, instale o docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
-"A documentação do sistema de admin requer a biblioteca <a href=\"%(link)s"
-"\">docutils</a> do Python."
+"O sistema de documentação de administração requer a biblioteca <a "
+"href=\"%(link)s\">docutils</a> do Python."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Por favor, peça aos seu administradores para instalar o <a href=\"%(link)s"
-"\">docutils</a>."
+"Por favor, peça aos seu administradores para instalar o <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid "Model: %(name)s"
@@ -158,13 +160,13 @@ msgid "Template: %(name)s"
 msgstr "Template: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Modelo: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Caminho de pesquisa para o template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Caminho de pesquisa para o modelo <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(Não existe)"

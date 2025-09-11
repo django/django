@@ -96,7 +96,7 @@ def get_git_changeset():
         text=True,
     )
     timestamp = git_log.stdout
-    tz = datetime.timezone.utc
+    tz = datetime.UTC
     try:
         timestamp = datetime.datetime.fromtimestamp(int(timestamp), tz=tz)
     except ValueError:

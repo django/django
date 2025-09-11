@@ -2,10 +2,10 @@
 Writing your first Django app, part 7
 =====================================
 
-This tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>` left off. We're
-continuing the web-poll application and will focus on customizing Django's
-automatically-generated admin site that we first explored in :doc:`Tutorial 2
-</intro/tutorial02>`.
+This tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>` left off.
+We're continuing the web-poll application and will focus on customizing
+Django's automatically-generated admin site that we first explored in
+:doc:`Tutorial 2 </intro/tutorial02>`.
 
 .. admonition:: Where to get help:
 
@@ -71,8 +71,8 @@ up into fieldsets:
     admin.site.register(Question, QuestionAdmin)
 
 The first element of each tuple in
-:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
-Here's what our form looks like now:
+:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the
+fieldset. Here's what our form looks like now:
 
 .. image:: _images/admin08t.png
    :alt: Form has fieldsets now
@@ -104,10 +104,10 @@ looks like this:
 .. image:: _images/admin09.png
    :alt: Choice admin page
 
-In that form, the "Question" field is a select box containing every question in the
-database. Django knows that a :class:`~django.db.models.ForeignKey` should be
-represented in the admin as a ``<select>`` box. In our case, only one question
-exists at this point.
+In that form, the "Question" field is a select box containing every question in
+the database. Django knows that a :class:`~django.db.models.ForeignKey` should
+be represented in the admin as a ``<select>`` box. In our case, only one
+question exists at this point.
 
 Also note the "Add another question" link next to "Question." Every object with
 a ``ForeignKey`` relationship to another gets this for free. When you click
@@ -116,12 +116,12 @@ If you add a question in that window and click "Save", Django will save the
 question to the database and dynamically add it as the selected choice on the
 "Add choice" form you're looking at.
 
-But, really, this is an inefficient way of adding ``Choice`` objects to the system.
-It'd be better if you could add a bunch of Choices directly when you create the
-``Question`` object. Let's make that happen.
+But, really, this is an inefficient way of adding ``Choice`` objects to the
+system. It'd be better if you could add a bunch of Choices directly when you
+create the ``Question`` object. Let's make that happen.
 
-Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
-registration code to read:
+Remove the ``register()`` call for the ``Choice`` model. Then, edit the
+``Question`` registration code to read:
 
 .. code-block:: python
     :caption: ``polls/admin.py``
@@ -146,8 +146,8 @@ registration code to read:
 
     admin.site.register(Question, QuestionAdmin)
 
-This tells Django: "``Choice`` objects are edited on the ``Question`` admin page. By
-default, provide enough fields for 3 choices."
+This tells Django: "``Choice`` objects are edited on the ``Question`` admin
+page. By default, provide enough fields for 3 choices."
 
 Load the "Add question" page to see how that looks:
 
@@ -159,7 +159,7 @@ by ``extra`` -- and each time you come back to the "Change" page for an
 already-created object, you get another three extra slots.
 
 At the end of the three current slots you will find an "Add another Choice"
-link.  If you click on it, a new slot will be added. If you want to remove the
+link. If you click on it, a new slot will be added. If you want to remove the
 added slot, you can click on the X to the top right of the added slot. This
 image shows an added slot:
 
@@ -167,8 +167,8 @@ image shows an added slot:
    :alt: Additional slot added dynamically
 
 One small problem, though. It takes a lot of screen space to display all the
-fields for entering related ``Choice`` objects. For that reason, Django offers a
-tabular way of displaying inline related objects. To use it, change the
+fields for entering related ``Choice`` objects. For that reason, Django offers
+a tabular way of displaying inline related objects. To use it, change the
 ``ChoiceInline`` declaration to read:
 
 .. code-block:: python
@@ -278,10 +278,10 @@ This is shaping up well. Let's add some search capability::
     search_fields = ["question_text"]
 
 That adds a search box at the top of the change list. When somebody enters
-search terms, Django will search the ``question_text`` field. You can use as many
-fields as you'd like -- although because it uses a ``LIKE`` query behind the
-scenes, limiting the number of search fields to a reasonable number will make
-it easier for your database to do the search.
+search terms, Django will search the ``question_text`` field. You can use as
+many fields as you'd like -- although because it uses a ``LIKE`` query behind
+the scenes, limiting the number of search fields to a reasonable number will
+make it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
 default is to display 100 items per page. :attr:`Change list pagination
@@ -413,16 +413,16 @@ Customize the admin index page
 On a similar note, you might want to customize the look and feel of the Django
 admin index page.
 
-By default, it displays all the apps in :setting:`INSTALLED_APPS` that have been
-registered with the admin application, in alphabetical order. You may want to
-make significant changes to the layout. After all, the index is probably the
+By default, it displays all the apps in :setting:`INSTALLED_APPS` that have
+been registered with the admin application, in alphabetical order. You may want
+to make significant changes to the layout. After all, the index is probably the
 most important page of the admin, and it should be easy to use.
 
 The template to customize is ``admin/index.html``. (Do the same as with
 ``admin/base_site.html`` in the previous section -- copy it from the default
 directory to your custom template directory). Edit the file, and you'll see it
 uses a template variable called ``app_list``. That variable contains every
-installed Django app. Instead of using that, you can hard-code links to
+installed Django app. Instead of using that, you can hardcode links to
 object-specific admin pages in whatever way you think is best.
 
 When you're comfortable with the admin, read :doc:`part 8 of this

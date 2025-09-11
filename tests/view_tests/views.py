@@ -125,10 +125,10 @@ def render_no_template(request):
 
 def send_log(request, exc_info):
     logger = logging.getLogger("django")
-    # The default logging config has a logging filter to ensure admin emails are
-    # only sent with DEBUG=False, but since someone might choose to remove that
-    # filter, we still want to be able to test the behavior of error emails
-    # with DEBUG=True. So we need to remove the filter temporarily.
+    # The default logging config has a logging filter to ensure admin emails
+    # are only sent with DEBUG=False, but since someone might choose to remove
+    # that filter, we still want to be able to test the behavior of error
+    # emails with DEBUG=True. So we need to remove the filter temporarily.
     admin_email_handler = [
         h for h in logger.handlers if h.__class__.__name__ == "AdminEmailHandler"
     ][0]
@@ -417,7 +417,8 @@ def json_response_view(request):
         {
             "a": [1, 2, 3],
             "foo": {"bar": "baz"},
-            # Make sure datetime and Decimal objects would be serialized properly
+            # Make sure datetime and Decimal objects would be serialized
+            # properly
             "timestamp": datetime.datetime(2013, 5, 19, 20),
             "value": decimal.Decimal("3.14"),
         }

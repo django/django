@@ -15,7 +15,8 @@ Bugfixes
 * Added a more helpful error message if you try to migrate an app without first
   creating the ``contenttypes`` table (:ticket:`22411`).
 
-* Modified migrations dependency algorithm to avoid possible infinite recursion.
+* Modified migrations dependency algorithm to avoid possible infinite
+  recursion.
 
 * Fixed a ``UnicodeDecodeError`` when the ``flush`` error message contained
   Unicode characters (:ticket:`22882`).
@@ -62,9 +63,9 @@ Bugfixes
 * Fixed renaming of models with a self-referential many-to-many field
   (``ManyToManyField('self')``) (:ticket:`23503`).
 
-* Added the :meth:`~django.contrib.admin.InlineModelAdmin.get_extra()`,
-  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num()`, and
-  :meth:`~django.contrib.admin.InlineModelAdmin.get_min_num()` hooks to
+* Added the :meth:`~django.contrib.admin.InlineModelAdmin.get_extra`,
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num`, and
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_min_num` hooks to
   :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
   (:ticket:`23539`).
 

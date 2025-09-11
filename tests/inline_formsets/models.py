@@ -15,6 +15,11 @@ class Child(models.Model):
     school = models.ForeignKey(School, models.CASCADE)
     name = models.CharField(max_length=100)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("mother", "father", name="unique_parents"),
+        ]
+
 
 class Poet(models.Model):
     name = models.CharField(max_length=100)

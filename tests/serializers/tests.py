@@ -391,7 +391,9 @@ class SerializersTestBase:
         self.assertEqual(Category.objects.count(), 5)
 
     def test_deterministic_mapping_ordering(self):
-        """Mapping such as fields should be deterministically ordered. (#24558)"""
+        """
+        Mapping such as fields should be deterministically ordered. (#24558)
+        """
         output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
         categories = self.a1.categories.values_list("pk", flat=True)
         self.assertEqual(
@@ -406,7 +408,9 @@ class SerializersTestBase:
         )
 
     def test_deserialize_force_insert(self):
-        """Deserialized content can be saved with force_insert as a parameter."""
+        """
+        Deserialized content can be saved with force_insert as a parameter.
+        """
         serial_str = serializers.serialize(self.serializer_name, [self.a1])
         deserial_obj = list(serializers.deserialize(self.serializer_name, serial_str))[
             0
@@ -489,7 +493,8 @@ class SerializerAPITests(SimpleTestCase):
         self.assertIs(serializer.stream_class, File)
         self.assertIsInstance(serializer.stream, File)
         self.assertEqual(
-            data, '[{"model": "serializers.score", "pk": 1, "fields": {"score": 3.4}}]'
+            data,
+            '[{"model": "serializers.score", "pk": 1, "fields": {"score": 3.4}}]\n',
         )
 
 

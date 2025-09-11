@@ -21,15 +21,10 @@ Join the Django community
 There are several ways you can help the Django community and others to maintain
 a great ecosystem to work in:
 
-* Join the `Django forum`_. This forum is a place for discussing the Django
+* Join the `Django Forum`_. This forum is a place for discussing the Django
   framework and applications and projects that use it. This is also a good
   place to ask and answer any questions related to installing, using, or
   contributing to Django.
-
-* Join the |django-users| mailing list and answer questions. This
-  mailing list has a huge audience, and we really want to maintain a
-  friendly and helpful atmosphere. If you're new to the Django community,
-  you should read the `posting guidelines`_.
 
 * Join the `Django Discord server`_ to discuss and answer questions. By
   explaining Django to other users, you're going to learn a lot about the
@@ -44,10 +39,9 @@ a great ecosystem to work in:
   ecosystem of pluggable applications is a big strength of Django, help us
   build it!
 
-.. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _community page: https://www.djangoproject.com/community/
 .. _Django Discord server: https://chat.djangoproject.com
-.. _Django forum: https://forum.djangoproject.com/
+.. _Django Forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 
 Getting started
@@ -113,8 +107,15 @@ Explore additional avenues of contributing to Django beyond coding. Django's
 `ticket tracker`_ is the central hub for managing issues, improvements, and
 contributions to Django. It's a valuable resource where you can report bugs you
 encounter or assist in triaging existing tickets to ensure a smooth development
-workflow. Explore the ways you can make a difference below, and join us in
-making Django better for everyone.
+workflow.
+
+Django also has a :ref:`process for suggesting ideas <requesting-features>`
+where you can join the community in discussing ideas for new features. Beyond
+the Django codebase, there's a `vibrant ecosystem`_ that is maintained by the
+community that you can contribute to.
+
+Explore the ways you can make a difference below, and join us in making Django
+better for everyone.
 
 .. toctree::
    :maxdepth: 2
@@ -123,5 +124,6 @@ making Django better for everyone.
    triaging-tickets
 
 .. _ticket tracker: https://code.djangoproject.com/
+.. _vibrant ecosystem: https://www.djangoproject.com/community/ecosystem/
 
 We're looking forward to working with you. Welcome aboard!

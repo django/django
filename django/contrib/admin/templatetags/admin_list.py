@@ -42,12 +42,14 @@ def paginator_number(cl, i):
     if i == cl.paginator.ELLIPSIS:
         return format_html("{} ", cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{}</span> ', i)
+        return format_html(
+            '<a role="button" href="" aria-current="page">{}</a> ',
+            i,
+        )
     else:
         return format_html(
-            '<a href="{}"{}>{}</a> ',
+            '<a role="button" href="{}">{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
-            mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
         )
 
@@ -254,7 +256,8 @@ def items_for_result(cl, result, form):
                 ):
                     row_classes.append("nowrap")
         row_class = mark_safe(' class="%s"' % " ".join(row_classes))
-        # If list_display_links not defined, add the link tag to the first field
+        # If list_display_links not defined, add the link tag to the first
+        # field
         if link_to_changelist:
             table_tag = "th" if first else "td"
             first = False
@@ -291,9 +294,9 @@ def items_for_result(cl, result, form):
                 "<{}{}>{}</{}>", table_tag, row_class, link_or_text, table_tag
             )
         else:
-            # By default the fields come from ModelAdmin.list_editable, but if we pull
-            # the fields out of the form instead of list_editable custom admins
-            # can provide fields on a per request basis
+            # By default the fields come from ModelAdmin.list_editable, but if
+            # we pull the fields out of the form instead of list_editable
+            # custom admins can provide fields on a per request basis
             if (
                 form
                 and field_name in form.fields

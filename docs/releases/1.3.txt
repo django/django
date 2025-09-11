@@ -69,16 +69,16 @@ provided, along with a completely generic view base class that can be
 used as the basis for reusable applications that can be easily
 extended.
 
-See :doc:`the documentation on class-based generic views</topics/class-based-views/index>`
-for more details. There is also a document to help you `convert
-your function-based generic views to class-based
-views <https://raw.githubusercontent.com/django/django/ea9dc9f4b03ae034c1dc080730422dda7a9c2e47/docs/topics/generic-views-migration.txt>`_.
+See :doc:`the documentation on class-based generic views
+</topics/class-based-views/index>` for more details. There is also a document
+to help you `convert your function-based generic views to class-based views
+<https://raw.githubusercontent.com/django/django/ea9dc9f4b03ae034c1dc080730422dda7a9c2e47/docs/topics/generic-views-migration.txt>`__.
 
 Logging
 -------
 
 Django 1.3 adds framework-level support for Python's ``logging``
-module.  This means you can now easily configure and control logging
+module. This means you can now easily configure and control logging
 as part of your Django project. A number of logging handlers and
 logging calls have been added to Django's own code as well -- most
 notably, the error emails sent on an HTTP 500 server error are now
@@ -236,7 +236,7 @@ Permissions for inactive users
 
 If you provide a custom auth backend with ``supports_inactive_user``
 set to ``True``, an inactive ``User`` instance will check the backend
-for permissions.  This is useful for further centralizing the
+for permissions. This is useful for further centralizing the
 permission handling. See the :doc:`authentication docs </topics/auth/index>`
 for more details.
 
@@ -266,7 +266,7 @@ and in Django 1.5 will raise an ``ImproperlyConfigured`` exception.
 Everything else
 ---------------
 
-Django :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
+Django :doc:`1.1 </releases/1.1>` and :doc:`1.2 </releases/1.2>` added
 lots of big ticket items to Django, like multiple-database support,
 model validation, and a session-based messages framework. However,
 this focus on big features came at the cost of lots of smaller
@@ -292,8 +292,8 @@ requests. These include:
 
 * Support for HttpOnly_ cookies.
 
-* :meth:`~django.core.mail.mail_admins()` and
-  :meth:`~django.core.mail.mail_managers()` now support easily attaching
+* :meth:`~django.core.mail.mail_admins` and
+  :meth:`~django.core.mail.mail_managers` now support easily attaching
   HTML content to messages.
 
 * :class:`~django.core.mail.EmailMessage` now supports CC's.
@@ -305,7 +305,7 @@ requests. These include:
   ``takes_context`` argument, making it easier to write simple
   template tags that require access to template context.
 
-* A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
+* A new :meth:`~django.shortcuts.render` shortcut -- an alternative
   to ``django.shortcuts.render_to_response()`` providing a
   :class:`~django.template.RequestContext` by default.
 
@@ -520,9 +520,9 @@ behavior:
     u'&lt;bound method User.get_full_name of &lt;...
 
 This has been resolved in Django 1.3 - the result in both cases will be ``u'Joe
-Bloggs'``. Although the previous behavior was not useful for a template language
-designed for web designers, and was never deliberately supported, it is possible
-that some templates may be broken by this change.
+Bloggs'``. Although the previous behavior was not useful for a template
+language designed for web designers, and was never deliberately supported, it
+is possible that some templates may be broken by this change.
 
 Use of custom SQL to load initial data in tests
 -----------------------------------------------
@@ -580,9 +580,9 @@ gettext domain):
 * The ``locale`` subdirectory of the directory containing the settings, that
   usually coincides with and is known as the *project directory* is being
   deprecated in this release as a source of translations. (the precedence of
-  these translations is intermediate between applications and :setting:`LOCALE_PATHS`
-  translations). See the `corresponding deprecated features section`_
-  of this document.
+  these translations is intermediate between applications and
+  :setting:`LOCALE_PATHS` translations). See the `corresponding deprecated
+  features section`_ of this document.
 
 For translatable literals found in JavaScript code (``'djangojs'`` gettext
 domain):
@@ -808,9 +808,9 @@ GeoDjango
 
 * Previously, calling
   :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would
-  silently do nothing when GDAL wasn't available.  Now, a
+  silently do nothing when GDAL wasn't available. Now, a
   :class:`~django.contrib.gis.geos.GEOSException` is properly raised
-  to indicate possible faulty application code.  A warning is now
+  to indicate possible faulty application code. A warning is now
   raised if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is
   called when the SRID of the geometry is less than 0 or ``None``.
 

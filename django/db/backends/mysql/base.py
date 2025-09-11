@@ -22,7 +22,8 @@ except ImportError as err:
 from MySQLdb.constants import CLIENT, FIELD_TYPE
 from MySQLdb.converters import conversions
 
-# Some of these import MySQLdb, so import them after checking if it's installed.
+# Some of these import MySQLdb, so import them after checking if it's
+# installed.
 from .client import DatabaseClient
 from .creation import DatabaseCreation
 from .features import DatabaseFeatures
@@ -32,9 +33,9 @@ from .schema import DatabaseSchemaEditor
 from .validation import DatabaseValidation
 
 version = Database.version_info
-if version < (1, 4, 3):
+if version < (2, 2, 1):
     raise ImproperlyConfigured(
-        "mysqlclient 1.4.3 or newer is required; you have %s." % Database.__version__
+        "mysqlclient 2.2.1 or newer is required; you have %s." % Database.__version__
     )
 
 
@@ -57,7 +58,8 @@ class CursorWrapper:
     exception instances and reraises them with the correct types.
 
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
-    to the particular underlying representation returned by Connection.cursor().
+    to the particular underlying representation returned by
+    Connection.cursor().
     """
 
     codes_for_integrityerror = (
@@ -101,9 +103,10 @@ class CursorWrapper:
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "mysql"
     # This dictionary maps Field objects to their associated MySQL column
-    # types, as strings. Column-type strings can contain format strings; they'll
-    # be interpolated against the values of Field.__dict__ before being output.
-    # If a column type is set to None, it won't be included in the output.
+    # types, as strings. Column-type strings can contain format strings;
+    # they'll be interpolated against the values of Field.__dict__ before being
+    # output. If a column type is set to None, it won't be included in the
+    # output.
 
     _data_types = {
         "AutoField": "integer AUTO_INCREMENT",
@@ -123,7 +126,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "IPAddressField": "char(15)",
         "GenericIPAddressField": "char(39)",
         "JSONField": "json",
-        "OneToOneField": "integer",
         "PositiveBigIntegerField": "bigint UNSIGNED",
         "PositiveIntegerField": "integer UNSIGNED",
         "PositiveSmallIntegerField": "smallint UNSIGNED",
@@ -175,13 +177,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
-    # the right-hand side of the lookup isn't a raw string (it might be an expression
-    # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # the right-hand side of the lookup isn't a raw string (it might be an
+    # expression or the result of a bilateral transformation). In those cases,
+    # special characters for LIKE operators (e.g. \, *, _) should be escaped on
+    # database side.
     #
-    # Note: we use str.format() here for readability as '%' is used as a wildcard for
-    # the LIKE operator.
+    # Note: we use str.format() here for readability as '%' is used as a
+    # wildcard for the LIKE operator.
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
         "contains": "LIKE BINARY CONCAT('%%', {}, '%%')",
@@ -254,12 +256,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def get_new_connection(self, conn_params):
         connection = Database.connect(**conn_params)
-        # bytes encoder in mysqlclient doesn't work and was added only to
-        # prevent KeyErrors in Django < 2.0. We can remove this workaround when
-        # mysqlclient 2.1 becomes the minimal mysqlclient supported by Django.
-        # See https://github.com/PyMySQL/mysqlclient/issues/489
-        if connection.encoders.get(bytes) is bytes:
-            connection.encoders.pop(bytes)
         return connection
 
     def init_connection_state(self):

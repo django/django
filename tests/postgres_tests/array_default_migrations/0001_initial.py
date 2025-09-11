@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -20,9 +20,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    django.contrib.postgres.fields.ArrayField(
-                        models.IntegerField(), size=None
-                    ),
+                    django.contrib.postgres.fields.ArrayField(models.IntegerField()),
                 ),
             ],
             options={},

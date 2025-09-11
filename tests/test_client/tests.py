@@ -331,7 +331,9 @@ class ClientTest(TestCase):
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
 
     def test_follow_relative_redirect_no_trailing_slash(self):
-        "A URL with a relative redirect with no trailing slash can be followed."
+        """
+        A URL with a relative redirect with no trailing slash can be followed.
+        """
         response = self.client.get("/accounts/no_trailing_slash", follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
@@ -681,7 +683,9 @@ class ClientTest(TestCase):
         ]
     )
     def test_view_with_inactive_force_login(self):
-        "Request a page that is protected with @login, but use an inactive login"
+        """
+        Request a page that is protected with @login, but use an inactive login
+        """
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get("/login_protected_view/")

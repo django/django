@@ -1,7 +1,8 @@
 """
 Dummy database backend for Django.
 
-Django uses this if the database ENGINE setting is empty (None or empty string).
+Django uses this if the database ENGINE setting is empty (None or empty
+string).
 
 Each of these API functions, except connection.close(), raise
 ImproperlyConfigured.
@@ -39,6 +40,7 @@ class DatabaseClient(BaseDatabaseClient):
 class DatabaseCreation(BaseDatabaseCreation):
     create_test_db = ignore
     destroy_test_db = ignore
+    serialize_db_to_string = ignore
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):

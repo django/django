@@ -58,8 +58,16 @@ class MapWidget {
                 this.options[property] = options[property];
             }
         }
-        if (!options.base_layer) {
-            this.options.base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
+
+        // Options' base_layer can be empty, or contain a layerBuilder key, or
+        // be a layer already constructed.
+        const base_layer = options.base_layer;
+        if (typeof base_layer === 'string' && base_layer in MapWidget.layerBuilder) {
+            this.baseLayer = MapWidget.layerBuilder[base_layer]();
+        } else if (base_layer && typeof base_layer !== 'string') {
+            this.baseLayer = base_layer;
+        } else {
+            this.baseLayer = MapWidget.layerBuilder.osm();
         }
 
         this.map = this.createMap();
@@ -120,7 +128,7 @@ class MapWidget {
     createMap() {
         return new ol.Map({
             target: this.options.map_id,
-            layers: [this.options.base_layer],
+            layers: [this.baseLayer],
             view: new ol.View({
                 zoom: this.options.default_zoom
             })
@@ -231,3 +239,45 @@ class MapWidget {
         document.getElementById(this.options.id).value = jsonFormat.writeGeometry(geometry);
     }
 }
+
+// Static property assignment (ES6-compatible)
+MapWidget.layerBuilder = {
+    nasaWorldview: () => {
+        return new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                attributions: "NASA Worldview",
+                maxZoom: 8,
+                url: "https://map1{a-c}.vis.earthdata.nasa.gov/wmts-webmerc/" +
+                     "BlueMarble_ShadedRelief_Bathymetry/default/%7BTime%7D/" +
+                     "GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg"
+            })
+        });
+    },
+    osm: () => {
+        return new ol.layer.Tile({source: new ol.source.OSM()});
+    }
+};
+
+function initMapWidgetInSection(section) {
+    const maps = [];
+
+    section.querySelectorAll(".dj_map_wrapper").forEach((wrapper) => {
+        // Avoid initializing map widget on an empty form.
+        if (wrapper.id.includes('__prefix__')) {
+            return;
+        }
+        const textarea_id = wrapper.querySelector("textarea").id;
+        const options_script = wrapper.querySelector(`script#${textarea_id}_mapwidget_options`);
+        const options = JSON.parse(options_script.textContent);
+        options.id = textarea_id;
+        options.map_id = wrapper.querySelector(".dj_map").id;
+        maps.push(new MapWidget(options));
+    });
+
+    return maps;
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    initMapWidgetInSection(document);
+    document.addEventListener('formset:added', (ev) => {initMapWidgetInSection(ev.target);});
+});

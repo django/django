@@ -20,7 +20,7 @@ conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
 def require_http_methods(request_method_list):
     """
-    Decorator to make a view only accept particular request methods.  Usage::
+    Decorator to make a view only accept particular request methods. Usage::
 
         @require_http_methods(["GET", "POST"])
         def my_view(request):
@@ -110,7 +110,7 @@ def condition(etag_func=None, last_modified_func=None):
             if last_modified_func:
                 if dt := last_modified_func(request, *args, **kwargs):
                     if not timezone.is_aware(dt):
-                        dt = timezone.make_aware(dt, datetime.timezone.utc)
+                        dt = timezone.make_aware(dt, datetime.UTC)
                     res_last_modified = int(dt.timestamp())
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None

@@ -18,6 +18,7 @@ from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
+from django.views.decorators.csp import csp_override, csp_report_only_override
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
 # Minimal Django templates engine to render the error templates
@@ -59,15 +60,18 @@ class CallableSettingWrapper:
         return repr(self._wrapped)
 
 
+@csp_override({})
+@csp_report_only_override({})
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
     reporter = get_exception_reporter_class(request)(request, exc_type, exc_value, tb)
-    if request.accepts("text/html"):
+    preferred_type = request.get_preferred_type(["text/html", "text/plain"])
+    if preferred_type == "text/html":
         html = reporter.get_traceback_html()
-        return HttpResponse(html, status=status_code)
+        return HttpResponse(html, status=status_code, content_type="text/html")
     else:
         text = reporter.get_traceback_text()
         return HttpResponse(
@@ -232,7 +236,8 @@ class SafeExceptionReporterFilter:
             return "{!r} while evaluating {!r}".format(e, value)
 
         if is_multivalue_dict:
-            # Cleanse MultiValueDicts (request.POST is the one we usually care about)
+            # Cleanse MultiValueDicts (request.POST is the one we usually care
+            # about)
             value = self.get_cleansed_multivaluedict(request, value)
         return value
 
@@ -414,7 +419,9 @@ class ExceptionReporter:
         if self.exc_type:
             c["exception_type"] = self.exc_type.__name__
         if self.exc_value:
-            c["exception_value"] = str(self.exc_value)
+            c["exception_value"] = getattr(
+                self.exc_value, "raw_error_message", self.exc_value
+            )
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:
@@ -602,6 +609,8 @@ class ExceptionReporter:
             tb = tb.tb_next
 
 
+@csp_override({})
+@csp_report_only_override({})
 def technical_404_response(request, exception):
     """Create a technical 404 error response. `exception` is the Http404."""
     try:

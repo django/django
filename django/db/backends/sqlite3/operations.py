@@ -30,15 +30,20 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def bulk_batch_size(self, fields, objs):
         """
-        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
-        999 variables per query.
-
-        If there's only a single field to insert, the limit is 500
-        (SQLITE_MAX_COMPOUND_SELECT).
+        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
+        (reflected in max_query_params).
         """
-        if len(fields) == 1:
-            return 500
-        elif len(fields) > 1:
+        fields = list(
+            chain.from_iterable(
+                (
+                    field.fields
+                    if isinstance(field, models.CompositePrimaryKey)
+                    else [field]
+                )
+                for field in fields
+            )
+        )
+        if fields:
             return self.connection.features.max_query_params // len(fields)
         else:
             return len(objs)
@@ -78,13 +83,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
-
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the list of returned data.
-        """
-        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -365,7 +363,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
             raise DatabaseError("Invalid connector for timedelta: %s." % connector)
-        fn_params = ["'%s'" % connector] + sub_expressions
+        fn_params = ["'%s'" % connector, *sub_expressions]
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
         return "django_format_dtdelta(%s)" % ", ".join(fn_params)
@@ -394,20 +392,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "INSERT OR IGNORE INTO"
         return super().insert_statement(on_conflict=on_conflict)
 
-    def return_insert_columns(self, fields):
-        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
-
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if (
             on_conflict == OnConflict.UPDATE
@@ -431,3 +415,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+
+    def format_json_path_numeric_index(self, num):
+        return "[#%s]" % num if num < 0 else super().format_json_path_numeric_index(num)

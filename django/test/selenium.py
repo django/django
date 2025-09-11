@@ -29,7 +29,8 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         multiple browsers specs are provided (e.g. --selenium=firefox,chrome).
         """
         test_class = super().__new__(cls, name, bases, attrs)
-        # If the test class is either browser-specific or a test base, return it.
+        # If the test class is either browser-specific or a test base, return
+        # it.
         if test_class.browser or not any(
             name.startswith("test") and callable(value) for name, value in attrs.items()
         ):
@@ -62,7 +63,8 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                 )
                 setattr(module, browser_test_class.__name__, browser_test_class)
             return test_class
-        # If no browsers were specified, skip this class (it'll still be discovered).
+        # If no browsers were specified, skip this class (it'll still be
+        # discovered).
         return unittest.skip("No browsers specified.")(test_class)
 
     @classmethod
@@ -77,10 +79,18 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def get_capability(cls, browser):
         from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-        return getattr(DesiredCapabilities, browser.upper())
+        caps = getattr(DesiredCapabilities, browser.upper())
+        if browser == "chrome":
+            caps["goog:loggingPrefs"] = {"browser": "ALL"}
+
+        return caps
 
     def create_options(self):
         options = self.import_options(self.browser)()
+        if self.browser == "chrome":
+            # Disable Google Password Manager "Data Breach" alert pop-ups.
+            options.add_argument("--guest")
+            options.add_argument("--disable-infobars")
         if self.headless:
             match self.browser:
                 case "chrome" | "edge":
@@ -206,8 +216,8 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         if features is not None:
             params["features"] = features
 
-        # Not using .execute_cdp_cmd() as it isn't supported by the remote web driver
-        # when using --selenium-hub.
+        # Not using .execute_cdp_cmd() as it isn't supported by the remote web
+        # driver when using --selenium-hub.
         self.selenium.execute(
             driver_command="executeCdpCommand",
             params={"cmd": "Emulation.setEmulatedMedia", "params": params},
@@ -232,6 +242,21 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         path = Path.cwd() / "screenshots" / filename
         path.parent.mkdir(exist_ok=True, parents=True)
         self.selenium.save_screenshot(path)
+
+    def get_browser_logs(self, source=None, level="ALL"):
+        """
+        Return Chrome console logs filtered by level and optionally source.
+        """
+        try:
+            logs = self.selenium.get_log("browser")
+        except AttributeError:
+            logs = []
+        return [
+            log
+            for log in logs
+            if (level == "ALL" or log["level"] == level)
+            and (source is None or log["source"] == source)
+        ]
 
     @classmethod
     def _quit_selenium(cls):

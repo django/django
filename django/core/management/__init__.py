@@ -117,7 +117,8 @@ def call_command(command_name, *args, **options):
         else:
             command = load_command_class(app_name, command_name)
 
-    # Simulate argument parsing to get the option defaults (see #10080 for details).
+    # Simulate argument parsing to get the option defaults (see #10080 for
+    # details).
     parser = command.create_parser("", command_name)
     # Use the `dest` option name from the parser option
     opt_mapping = {
@@ -256,9 +257,9 @@ class ManagementUtility:
         except KeyError:
             if os.environ.get("DJANGO_SETTINGS_MODULE"):
                 # If `subcommand` is missing due to misconfigured settings, the
-                # following line will retrigger an ImproperlyConfigured exception
-                # (get_commands() swallows the original one) so the user is
-                # informed about it.
+                # following line will retrigger an ImproperlyConfigured
+                # exception (get_commands() swallows the original one) so the
+                # user is informed about it.
                 settings.INSTALLED_APPS
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")

@@ -51,7 +51,8 @@ Glossary
         See :class:`property`.
 
     queryset
-        An object representing some set of rows to be fetched from the database.
+        An object representing some set of rows to be fetched from the
+        database.
 
         See :doc:`/topics/db/queries`.
 

@@ -60,15 +60,15 @@ You can use normal strings or bytestrings (starting with a 'b').
 If your code only uses ASCII data, it's safe to use your normal strings,
 passing them around at will, because ASCII is a subset of UTF-8.
 
-Don't be fooled into thinking that if your :setting:`DEFAULT_CHARSET` setting is set
-to something other than ``'utf-8'`` you can use that other encoding in your
-bytestrings! :setting:`DEFAULT_CHARSET` only applies to the strings generated as
-the result of template rendering (and email). Django will always assume UTF-8
-encoding for internal bytestrings. The reason for this is that the
-:setting:`DEFAULT_CHARSET` setting is not actually under your control (if you are the
-application developer). It's under the control of the person installing and
-using your application -- and if that person chooses a different setting, your
-code must still continue to work. Ergo, it cannot rely on that setting.
+Don't be fooled into thinking that if your :setting:`DEFAULT_CHARSET` setting
+is set to something other than ``'utf-8'`` you can use that other encoding in
+your bytestrings! :setting:`DEFAULT_CHARSET` only applies to the strings
+generated as the result of template rendering (and email). Django will always
+assume UTF-8 encoding for internal bytestrings. The reason for this is that the
+:setting:`DEFAULT_CHARSET` setting is not actually under your control (if you
+are the application developer). It's under the control of the person installing
+and using your application -- and if that person chooses a different setting,
+your code must still continue to work. Ergo, it cannot rely on that setting.
 
 In most cases when Django is dealing with strings, it will convert them to
 strings before doing anything else. So, as a general rule, if you pass
@@ -150,7 +150,7 @@ URL from an :rfc:`IRI <3987>` -- very loosely speaking, a :rfc:`URI <3986>`
 that can contain Unicode characters. Use these functions for quoting and
 converting an IRI to a URI:
 
-* The :func:`django.utils.encoding.iri_to_uri()` function, which implements the
+* The :func:`django.utils.encoding.iri_to_uri` function, which implements the
   conversion from IRI to URI as required by :rfc:`3987#section-3.1`.
 
 * The :func:`urllib.parse.quote` and :func:`urllib.parse.quote_plus`
@@ -192,7 +192,7 @@ you can construct your IRI without worrying about whether it contains
 non-ASCII characters and then, right at the end, call ``iri_to_uri()`` on the
 result.
 
-Similarly, Django provides :func:`django.utils.encoding.uri_to_iri()` which
+Similarly, Django provides :func:`django.utils.encoding.uri_to_iri` which
 implements the conversion from URI to IRI as per :rfc:`3987#section-3.2`.
 
 An example to demonstrate:
@@ -209,8 +209,8 @@ In the first example, the UTF-8 characters are unquoted. In the second, the
 percent-encodings remain unchanged because they lie outside the valid UTF-8
 range or represent a reserved character.
 
-Both ``iri_to_uri()`` and ``uri_to_iri()`` functions are idempotent, which means the
-following is always true::
+Both ``iri_to_uri()`` and ``uri_to_iri()`` functions are idempotent, which
+means the following is always true::
 
     iri_to_uri(iri_to_uri(some_string)) == iri_to_uri(some_string)
     uri_to_iri(uri_to_iri(some_string)) == uri_to_iri(some_string)
@@ -268,12 +268,12 @@ Use strings when creating templates manually::
 
 But the common case is to read templates from the filesystem. If your template
 files are not stored with a UTF-8 encoding, adjust the :setting:`TEMPLATES`
-setting. The built-in :py:mod:`~django.template.backends.django` backend
+setting. The built-in :mod:`~django.template.backends.django` backend
 provides the ``'file_charset'`` option to change the encoding used to read
 files from disk.
 
-The :setting:`DEFAULT_CHARSET` setting controls the encoding of rendered templates.
-This is set to UTF-8 by default.
+The :setting:`DEFAULT_CHARSET` setting controls the encoding of rendered
+templates. This is set to UTF-8 by default.
 
 Template tags and filters
 -------------------------
@@ -337,9 +337,10 @@ two fields will return their members as Unicode data. All other attributes and
 methods of ``HttpRequest`` return data exactly as it was submitted by the
 client.
 
-By default, the :setting:`DEFAULT_CHARSET` setting is used as the assumed encoding
-for form data. If you need to change this for a particular form, you can set
-the ``encoding`` attribute on an ``HttpRequest`` instance. For example::
+By default, the :setting:`DEFAULT_CHARSET` setting is used as the assumed
+encoding for form data. If you need to change this for a particular form, you
+can set the ``encoding`` attribute on an ``HttpRequest`` instance. For
+example::
 
     def some_view(request):
         # We know that the data must be encoded as KOI8-R (for some reason).

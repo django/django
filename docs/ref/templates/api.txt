@@ -115,9 +115,10 @@ overridden by what's passed by
 
       It defaults to ``'utf-8'``.
 
-    * ``'libraries'``: A dictionary of labels and dotted Python paths of template
-      tag modules to register with the template engine. This is used to add new
-      libraries or provide alternate labels for existing ones. For example::
+    * ``'libraries'``: A dictionary of labels and dotted Python paths of
+      template tag modules to register with the template engine. This is used
+      to add new libraries or provide alternate labels for existing ones. For
+      example::
 
           Engine(
               libraries={
@@ -136,8 +137,8 @@ overridden by what's passed by
               builtins=["myapp.builtins"],
           )
 
-      Tags and filters from built-in libraries can be used without first calling
-      the :ttag:`{% load %}<load>` tag.
+      Tags and filters from built-in libraries can be used without first
+      calling the :ttag:`{% load %}<load>` tag.
 
 .. staticmethod:: Engine.get_default()
 
@@ -368,7 +369,7 @@ straight lookups. Here are some things to keep in mind:
   To prevent this, set an ``alters_data`` attribute on the callable
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
-  ``string_if_invalid``, unconditionally.  The
+  ``string_if_invalid``, unconditionally. The
   dynamically-generated :meth:`~django.db.models.Model.delete` and
   :meth:`~django.db.models.Model.save` methods on Django model objects get
   ``alters_data=True`` automatically. Example::
@@ -381,8 +382,8 @@ straight lookups. Here are some things to keep in mind:
 
 * Occasionally you may want to turn off this feature for other reasons,
   and tell the template system to leave a variable uncalled no matter
-  what.  To do so, set a ``do_not_call_in_templates`` attribute on the
-  callable with the value ``True``.  The template system then will act as
+  what. To do so, set a ``do_not_call_in_templates`` attribute on the
+  callable with the value ``True``. The template system then will act as
   if your variable is not callable (allowing you to access attributes of
   the callable, for example).
 
@@ -434,11 +435,11 @@ Django's template language has no way to escape the characters used for its own
 syntax. For example, the :ttag:`templatetag` tag is required if you need to
 output character sequences like ``{%`` and ``%}``.
 
-A similar issue exists if you want to include these sequences in template filter
-or tag arguments. For example, when parsing a block tag, Django's template
-parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
-the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
-will be raised for the following expressions:
+A similar issue exists if you want to include these sequences in template
+filter or tag arguments. For example, when parsing a block tag, Django's
+template parser looks for the first occurrence of ``%}`` after a ``{%``. This
+prevents the use of ``"%}"`` as a string literal. For example, a
+``TemplateSyntaxError`` will be raised for the following expressions:
 
 .. code-block:: html+django
 
@@ -588,8 +589,8 @@ tags <howto-writing-custom-template-tags>`.
 
 .. method:: Context.flatten()
 
-Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
-including builtin variables.
+Using ``flatten()`` method you can get whole ``Context`` stack as one
+dictionary including builtin variables.
 
 .. code-block:: pycon
 
@@ -600,7 +601,8 @@ including builtin variables.
     >>> c.flatten()
     {'True': True, 'None': None, 'foo': 'first level', 'False': False, 'bar': 'second level'}
 
-A ``flatten()`` method is also internally used to make ``Context`` objects comparable.
+A ``flatten()`` method is also internally used to make ``Context`` objects
+comparable.
 
 .. code-block:: pycon
 
@@ -666,7 +668,7 @@ processors::
     ]
 
 In addition to these, :class:`RequestContext` always enables
-``'django.template.context_processors.csrf'``.  This is a security related
+``'django.template.context_processors.csrf'``. This is a security related
 context processor required by the admin and other contrib apps, and, in case
 of accidental misconfiguration, it is deliberately hardcoded in and cannot be
 turned off in the ``context_processors`` option.
@@ -801,6 +803,18 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
+
+``django.template.context_processors.csp``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: csp(request)
+
+.. versionadded:: 6.0
+
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``csp_nonce``, providing a securely generated, request-specific nonce suitable
+for use under a Content Security Policy. See :ref:`CSP nonce usage <csp-nonce>`
+for details.
 
 ``django.template.context_processors.request``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1088,7 +1102,7 @@ Loader methods
         source.
 
         For example, the filesystem loader may receive ``'index.html'`` as a
-        ``template_name`` argument.  This method would yield origins for the
+        ``template_name`` argument. This method would yield origins for the
         full path of ``index.html`` as it appears in each template directory
         the loader looks at.
 

@@ -457,7 +457,9 @@ class BaseModelBackendTest:
         PASSWORD_HASHERS=["auth_tests.test_auth_backends.CountingMD5PasswordHasher"]
     )
     def test_authentication_timing(self):
-        """Hasher is run once regardless of whether the user exists. Refs #20760."""
+        """
+        Hasher is run once regardless of whether the user exists. Refs #20760.
+        """
         # Re-set the password, because this tests overrides PASSWORD_HASHERS
         self.user.set_password("test")
         self.user.save()
@@ -875,7 +877,8 @@ class InActiveUserBackendTest(TestCase):
 
 class PermissionDeniedBackend:
     """
-    Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
+    Always raises PermissionDenied in `authenticate`, `has_perm` and
+    `has_module_perms`.
     """
 
     def authenticate(self, request, username=None, password=None):
@@ -920,7 +923,10 @@ class PermissionDeniedBackendTest(TestCase):
 
     @modify_settings(AUTHENTICATION_BACKENDS={"prepend": backend})
     def test_permission_denied(self):
-        "user is not authenticated after a backend raises permission denied #2550"
+        """
+        user is not authenticated after a backend raises permission denied
+        #2550
+        """
         self.assertIsNone(authenticate(username="test", password="test"))
         # user_login_failed signal is sent.
         self.assertEqual(

@@ -125,7 +125,8 @@ class GetOrCreateTests(TestCase):
         # Create an Author not tied to any books.
         Author.objects.create(name="Ted")
 
-        # There should be three Authors in total. The book object should have two.
+        # There should be three Authors in total. The book object should have
+        # two.
         self.assertEqual(Author.objects.count(), 3)
         self.assertEqual(book.authors.count(), 2)
 
@@ -371,9 +372,9 @@ class UpdateOrCreateTests(TestCase):
     def test_error_contains_full_traceback(self):
         """
         update_or_create should raise IntegrityErrors with the full traceback.
-        This is tested by checking that a known method call is in the traceback.
-        We cannot use assertRaises/assertRaises here because we need to inspect
-        the actual traceback. Refs #16340.
+        This is tested by checking that a known method call is in the
+        traceback. We cannot use assertRaises/assertRaises here because we need
+        to inspect the actual traceback. Refs #16340.
         """
         try:
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")

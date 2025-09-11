@@ -247,6 +247,7 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
+        "postgres.E005",  # django.contrib.postgres must be installed to use feature.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
@@ -714,7 +715,8 @@ if __name__ == "__main__":
     if options.screenshots and options.tags:
         parser.error("--screenshots and --tag are mutually exclusive.")
 
-    # Allow including a trailing slash on app_labels for tab completion convenience
+    # Allow including a trailing slash on app_labels for tab completion
+    # convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
 
     mutually_exclusive_options = [

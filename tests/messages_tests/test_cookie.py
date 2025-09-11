@@ -131,8 +131,8 @@ class CookieTests(BaseTests, SimpleTestCase):
 
         # When storing as a cookie, the cookie has constant overhead of approx
         # 54 chars, and each message has a constant overhead of about 37 chars
-        # and a variable overhead of zero in the best case. We aim for a message
-        # size which will fit 4 messages into the cookie, but not 5.
+        # and a variable overhead of zero in the best case. We aim for a
+        # message size which will fit 4 messages into the cookie, but not 5.
         # See also FallbackTest.test_session_fallback
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
         first_msg = None

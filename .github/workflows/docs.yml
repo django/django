@@ -22,7 +22,7 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-24.04
-    name: docs
+    name: spelling
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
       - name: Build docs
         run: |
           cd docs
-          sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
+          sphinx-build -b spelling -n -q -W -d _build/doctrees -D language=en_US -j auto . _build/spelling
 
   blacken-docs:
     runs-on: ubuntu-latest
@@ -58,3 +58,19 @@ jobs:
               echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"
           fi;
           exit $RESULT
+
+  lint-docs:
+    runs-on: ubuntu-latest
+    name: lint-docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install sphinx-lint
+      - name: Build docs
+        run: |
+          cd docs
+          make lint

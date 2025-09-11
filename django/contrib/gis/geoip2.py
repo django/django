@@ -81,7 +81,7 @@ class GeoIP2:
         * cache: The cache settings when opening up the GeoIP datasets. May be
             an integer in (0, 1, 2, 4, 8) corresponding to the MODE_AUTO,
             MODE_MMAP_EXT, MODE_MMAP, MODE_FILE, and MODE_MEMORY,
-            `GeoIPOptions` C API settings,  respectively. Defaults to 0,
+            `GeoIPOptions` C API settings, respectively. Defaults to 0,
             meaning MODE_AUTO.
 
         * country: The name of the GeoIP country data file. Defaults to

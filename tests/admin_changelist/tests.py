@@ -143,7 +143,8 @@ class ChangeListTests(TestCase):
     def test_select_related_preserved(self):
         """
         Regression test for #10348: ChangeList.get_queryset() shouldn't
-        overwrite a custom select_related provided by ModelAdmin.get_queryset().
+        overwrite a custom select_related provided by
+        ModelAdmin.get_queryset().
         """
         m = ChildAdmin(Child, custom_site)
         request = self.factory.get("/child/")
@@ -874,7 +875,8 @@ class ChangeListTests(TestCase):
             request = self.factory.get("/", data={SEARCH_VAR: search_term})
             request.user = self.superuser
             with self.subTest(search_term=search_term):
-                # 1 query for filtered result, 1 for filtered count, 1 for total count.
+                # 1 query for filtered result, 1 for filtered count, 1 for
+                # total count.
                 with self.assertNumQueries(3):
                     cl = model_admin.get_changelist_instance(request)
                 self.assertCountEqual(cl.queryset, expected_result)
@@ -945,6 +947,41 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.queryset.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
+
+    def test_pagination_render(self):
+        objs = [Swallow(origin=f"Swallow {i}", load=i, speed=i) for i in range(1, 5)]
+        Swallow.objects.bulk_create(objs)
+
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+
+        admin = SwallowAdmin(Swallow, custom_site)
+        cl = admin.get_changelist_instance(request)
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% pagination cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": cl.opts})
+        pagination_output = template.render(context)
+        self.assertTrue(
+            pagination_output.startswith(
+                '<nav class="paginator" aria-labelledby="pagination">'
+            )
+        )
+        self.assertInHTML(
+            '<h2 id="pagination" class="visually-hidden">Pagination swallows</h2>',
+            pagination_output,
+        )
+        self.assertTrue(pagination_output.endswith("</nav>"))
+        self.assertInHTML(
+            '<li><a role="button" href="" aria-current="page">1</a></li>',
+            pagination_output,
+        )
+        self.assertInHTML(
+            '<li><a role="button" href="?p=2">2</a></li>',
+            pagination_output,
+        )
+        self.assertEqual(pagination_output.count('aria-current="page"'), 1)
+        self.assertEqual(pagination_output.count('href=""'), 1)
 
     def test_computed_list_display_localization(self):
         """
@@ -1312,7 +1349,9 @@ class ChangeListTests(TestCase):
         self.assertEqual(queryset.count(), 1)
 
     def test_changelist_view_list_editable_changed_objects_uses_filter(self):
-        """list_editable edits use a filtered queryset to limit memory usage."""
+        """
+        list_editable edits use a filtered queryset to limit memory usage.
+        """
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
         Swallow.objects.create(origin="Swallow B", load=2, speed=2)
         data = {
@@ -1332,7 +1371,8 @@ class ChangeListTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("WHERE", context.captured_queries[4]["sql"])
             self.assertIn("IN", context.captured_queries[4]["sql"])
-            # Check only the first few characters since the UUID may have dashes.
+            # Check only the first few characters since the UUID may have
+            # dashes.
             self.assertIn(str(a.pk)[:8], context.captured_queries[4]["sql"])
 
     def test_list_editable_error_title(self):
@@ -1385,7 +1425,8 @@ class ChangeListTests(TestCase):
         check_results_order()
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by -pk as well.
+        # value for that field, make sure everything gets ordered by -pk as
+        # well.
         UnorderedObjectAdmin.ordering = ["bool"]
         check_results_order()
 
@@ -1446,7 +1487,8 @@ class ChangeListTests(TestCase):
         check_results_order(ascending=True)
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by -pk as well.
+        # value for that field, make sure everything gets ordered by -pk as
+        # well.
         OrderedObjectAdmin.ordering = ["bool"]
         check_results_order()
 
@@ -1745,7 +1787,12 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertContains(
             response,
-            '<form id="changelist-search" method="get" role="search">',
+            '<h2 id="changelist-search-form" class="visually-hidden">Search bands</h2>',
+        )
+        self.assertContains(
+            response,
+            '<form id="changelist-search" method="get" role="search" '
+            'aria-labelledby="changelist-search-form">',
         )
 
     def test_search_bar_total_link_preserves_options(self):
@@ -1845,7 +1892,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
+        LogEntry.objects.log_actions(user.pk, [user], 1)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"
