@@ -17,9 +17,9 @@ class NullFkTests(TestCase):
         # specified set of fields will properly LEFT JOIN multiple levels of
         # NULLs (and the things that come after the NULLs, or else data that
         # should exist won't). Regression test for #7369.
-        c = Comment.objects.select_related().get(id=c1.id)
+        c = Comment.objects.select_related("post").get(id=c1.id)
         self.assertEqual(c.post, p)
-        self.assertIsNone(Comment.objects.select_related().get(id=c2.id).post)
+        self.assertIsNone(Comment.objects.select_related("post").get(id=c2.id).post)
 
         self.assertQuerySetEqual(
             Comment.objects.select_related("post__forum__system_info").all(),

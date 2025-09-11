@@ -12,7 +12,8 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     FK1,
@@ -615,7 +616,7 @@ class Queries1Tests(TestCase):
     def test_ticket2496(self):
         self.assertSequenceEqual(
             Item.objects.extra(tables=["queries_author"])
-            .select_related()
+            .select_related("creator")
             .order_by("name")[:1],
             [self.i4],
         )
@@ -666,7 +667,9 @@ class Queries1Tests(TestCase):
         self.assertEqual(len(qs.query.alias_map), 1)
 
     def test_tickets_2874_3002(self):
-        qs = Item.objects.select_related().order_by("note__note", "name")
+        qs = Item.objects.select_related("creator", "note").order_by(
+            "note__note", "name"
+        )
         self.assertQuerySetEqual(qs, [self.i2, self.i4, self.i1, self.i3])
 
         # This is also a good select_related() test because there are multiple
@@ -851,7 +854,7 @@ class Queries1Tests(TestCase):
         # We should also be able to pickle things that use select_related().
         # The only tricky thing here is to ensure that we do the related
         # selections properly after unpickling.
-        qs = Item.objects.select_related()
+        qs = Item.objects.select_related("creator", "note")
         query = qs.query.get_compiler(qs.db).as_sql()[0]
         query2 = pickle.loads(pickle.dumps(qs.query))
         self.assertEqual(query2.get_compiler(qs.db).as_sql()[0], query)
@@ -1996,7 +1999,13 @@ class SelectRelatedTests(TestCase):
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
         self.assertSequenceEqual(X.objects.all(), [])
-        self.assertSequenceEqual(X.objects.select_related(), [])
+        # RemovedInDjango70Warning: when the deprecation ends, remove this test
+        # case.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            self.assertSequenceEqual(X.objects.select_related(), [])
 
 
 class SubclassFKTests(TestCase):
