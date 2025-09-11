@@ -509,6 +509,12 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         with self.assertTemplateUsed("template_used/base.html"):
             render_to_string("template_used/base.html")
             render_to_string("template_used/base.html")
+            
+        with self.assertTemplateUsed("hello"):
+            render_to_string("template_used/partials.html#hello")
+
+        with self.assertTemplateUsed("template_used/partials.html#hello"):
+            render_to_string("template_used/partials.html#hello")
 
     def test_nested_usage(self):
         with self.assertTemplateUsed("template_used/base.html"):
