@@ -328,6 +328,25 @@ class LookupTests(TestCase):
         # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
         self.assertSequenceEqual(
+            Article.objects.filter(id__in=(self.a5.id, self.a6.id)).values(),
+            [
+                {
+                    "id": self.a5.id,
+                    "headline": "Article 5",
+                    "pub_date": datetime(2005, 8, 1, 9, 0),
+                    "author_id": self.au2.id,
+                    "slug": "a5",
+                },
+                {
+                    "id": self.a6.id,
+                    "headline": "Article 6",
+                    "pub_date": datetime(2005, 8, 1, 8, 0),
+                    "author_id": self.au2.id,
+                    "slug": "a6",
+                },
+            ],
+        )
+        self.assertSequenceEqual(
             Article.objects.values("headline"),
             [
                 {"headline": "Article 5"},
@@ -522,6 +541,37 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
+        self.assertSequenceEqual(
+            Article.objects.filter(id__in=(self.a5.id, self.a6.id)).values_list(),
+            [
+                (
+                    self.a5.id,
+                    "Article 5",
+                    datetime(2005, 8, 1, 9, 0),
+                    self.au2.id,
+                    "a5",
+                ),
+                (
+                    self.a6.id,
+                    "Article 6",
+                    datetime(2005, 8, 1, 8, 0),
+                    self.au2.id,
+                    "a6",
+                ),
+            ],
+        )
+        self.assertSequenceEqual(
+            Article.objects.values_list(flat=True),
+            [
+                self.a5.id,
+                self.a6.id,
+                self.a4.id,
+                self.a2.id,
+                self.a3.id,
+                self.a7.id,
+                self.a1.id,
+            ],
+        )
         self.assertSequenceEqual(
             Article.objects.values_list("headline"),
             [
