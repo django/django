@@ -9,7 +9,4 @@ Django 5.2.7 fixes several bugs in 5.2.6.
 Bugfixes
 ========
 
-* ``BaseDatabaseCache`` subclasses that implement a specialized
-  ``get_many()``\, ``set_many()``\, or ``delete_many()`` method should also
-  implement a specialized async version of that method, instead of inheriting
-  from ``BaseCache`` (:ticket:`36590`).
+* ...

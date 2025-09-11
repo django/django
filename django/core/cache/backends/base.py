@@ -207,13 +207,7 @@ class BaseCache:
         return d
 
     async def aget_many(self, keys, version=None):
-        """See get_many()."""
-        d = {}
-        for k in keys:
-            val = await self.aget(k, self._missing_key, version=version)
-            if val is not self._missing_key:
-                d[k] = val
-        return d
+        return await sync_to_async(self.get_many)(keys, version=version)
 
     def get_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -317,9 +311,9 @@ class BaseCache:
         return []
 
     async def aset_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        for key, value in data.items():
-            await self.aset(key, value, timeout=timeout, version=version)
-        return []
+        return await sync_to_async(self.set_many)(
+            data, timeout=timeout, version=version
+        )
 
     def delete_many(self, keys, version=None):
         """
@@ -331,8 +325,7 @@ class BaseCache:
             self.delete(key, version=version)
 
     async def adelete_many(self, keys, version=None):
-        for key in keys:
-            await self.adelete(key, version=version)
+        return await sync_to_async(self.delete_many)(keys, version=version)
 
     def clear(self):
         """Remove *all* values from the cache at once."""
