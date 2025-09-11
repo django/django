@@ -25,7 +25,7 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1167,11 +1167,11 @@ class BaseCacheTests:
 
     async def test_async_impl(self):
         if hasattr(cache, "get_many"):
-            self.assertTrue(hasattr(cache, "aget_many"))
+            self.assertEqual(cache.aget_many, BaseCache.aget_many)
         if hasattr(cache, "set_many"):
-            self.assertTrue(hasattr(cache, "aset_many"))
+            self.assertEqual(cache.aset_many, BaseCache.aset_many)
         if hasattr(cache, "delete_many"):
-            self.assertTrue(hasattr(cache, "adelete_many"))
+            self.assertEqual(cache.adelete_many, BaseCache.adelete_many)
 
 
 @override_settings(

@@ -4,24 +4,10 @@ import base64
 import pickle
 from datetime import UTC, datetime
 
-from asgiref.sync import sync_to_async
-
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils.timezone import now as tz_now
-
-
-async def aget_impl(cls, keys, version=None):
-    return await sync_to_async(cls.get_many)(keys, version=version)
-
-
-async def aset_impl(cls, data, timeout=DEFAULT_TIMEOUT, version=None):
-    return await sync_to_async(cls.set_many)(data, timeout=timeout, version=version)
-
-
-async def adelete_impl(cls, keys, version=None):
-    return await sync_to_async(cls.delete_many)(keys, version=version)
 
 
 class Options:
@@ -52,18 +38,6 @@ class BaseDatabaseCache(BaseCache):
             _meta = Options(table)
 
         self.cache_model_class = CacheEntry
-
-    def __init_subclass__(cls, **kwargs):
-        # If a subclass implements a specialized *_many method,
-        # it should use that method for the async implementation,
-        # vs the version inherited from BaseCache.
-        super().__init_subclass__(**kwargs)
-        if hasattr(cls, "get_many"):
-            setattr(cls, "aget_many", aget_impl)
-        if hasattr(cls, "set_many"):
-            setattr(cls, "aset_many", aset_impl)
-        if hasattr(cls, "delete_many"):
-            setattr(cls, "adelete_many", adelete_impl)
 
 
 class DatabaseCache(BaseDatabaseCache):

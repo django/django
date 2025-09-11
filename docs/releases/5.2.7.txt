@@ -16,3 +16,4 @@ Bugfixes
   ``get_many()``\, ``set_many()``\, or ``delete_many()`` method should also
   implement a specialized async version of that method, instead of inheriting
   from ``BaseCache`` (:ticket:`36590`).
+* ...
