@@ -1121,12 +1121,20 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
+            returning_fields = meta.db_returning_fields
             fields = [
                 f
                 for f in meta.local_concrete_fields
-                if not f.generated and (pk_set or f is not meta.auto_field)
+                if not f.generated
+                and (
+                    f not in returning_fields
+                    or (
+                        f.db_default is not NOT_PROVIDED
+                        and getattr(self, f.attname) is not f.db_default
+                    )
+                    or getattr(self, f.attname) is not None
+                )
             ]
-            returning_fields = meta.db_returning_fields
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
             )
