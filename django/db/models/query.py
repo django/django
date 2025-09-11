@@ -1164,6 +1164,9 @@ class QuerySet(AltersData):
         Return a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, evaluate the entire QuerySet.
         """
+        if id_list is not None and not id_list:
+            return {}
+
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
         opts = self.model._meta
@@ -1237,8 +1240,6 @@ class QuerySet(AltersData):
             )
 
         if id_list is not None:
-            if not id_list:
-                return {}
             filter_key = "{}__in".format(field_name)
             id_list = tuple(id_list)
             batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
