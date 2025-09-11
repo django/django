@@ -172,4 +172,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         operator.attrgetter("is_postgresql_15")
     )
 
+    supports_order_by_grouped_table = property(operator.attrgetter("is_postgresql_16"))
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
