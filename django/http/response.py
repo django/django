@@ -545,7 +545,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 except StopIteration:
                     return _sentinel
 
-            _next = sync_to_async(_next_wrapper, thread_sensitive=False)
+            _next = sync_to_async(_next_wrapper)
             while True:
                 part = await _next()
                 if part is _sentinel:
