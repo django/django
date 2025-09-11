@@ -200,6 +200,7 @@ def _send_server_message(
     html_message=None,
     fail_silently=False,
     connection=None,
+    provider=None,
 ):
     recipients = getattr(settings, setting_name)
     if not recipients:
@@ -228,6 +229,7 @@ def _send_server_message(
         from_email=settings.SERVER_EMAIL,
         to=recipients,
         connection=connection,
+        provider=provider,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
@@ -253,8 +255,8 @@ def mail_admins(
         message=message,
         html_message=html_message,
         fail_silently=fail_silently,
-        provider=provider,
         connection=connection,
+        provider=provider,
     )
 
 

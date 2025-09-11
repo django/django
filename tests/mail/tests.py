@@ -1360,7 +1360,15 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "Subject")
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+            },
+        },
+        ADMINS=[("nobody", "nobody@example.com")],
+        MANAGERS=[("nobody", "nobody@example.com")],
+    )
     def test_connection_arg_send_mass_mail(self):
         mail.outbox = []
         # Send using non-default connection.
@@ -1378,7 +1386,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(connection.test_outbox[1].subject, "Subject2")
 
     @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+            },
+        },
         ADMINS=["nobody@example.com"],
     )
     def test_connection_arg_mail_admins(self):
@@ -1391,7 +1403,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
 
     @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+            },
+        },
         MANAGERS=["nobody@example.com"],
     )
     def test_connection_arg_mail_managers(self):
@@ -2283,8 +2299,9 @@ class ConsumingDeprecatedEmailSettingsTests(SimpleTestCase):
 class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
     def assertPathEqual(self, path1, path2):
         if sys.platform == "win32":
-            path1 = path1[2:] if path1.startswith("D:") else path1
-            path2 = path2[2:] if path2.startswith("D:") else path2
+            from re import match
+            path1 = path1[2:] if match(r"^[A-Z]:", path1) else path1
+            path2 = path2[2:] if match(r"^[A-Z]:", path2) else path2
         self.assertEqual(os.path.normpath(path1), os.path.normpath(path2))
 
     def test_deprecated_host_configuration(self):
@@ -3326,7 +3343,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 kwargs.setdefault("timeout", 42)
                 super().__init__(*args, **kwargs)
 
-        myemailbackend = MyEmailBackend()
+        # myemailbackend = MyEmailBackend()
+        myemailbackend = mail.get_connection()
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)

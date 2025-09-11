@@ -110,8 +110,8 @@ if used.
   an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
   docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
-* ``html_message``: If ``html_message`` is provided, the resulting email will be a
-  :mimetype:`multipart/alternative` email with ``message`` as the
+* ``html_message``: If ``html_message`` is provided, the resulting email will
+  be a :mimetype:`multipart/alternative` email with ``message`` as the
   :mimetype:`text/plain` content type and ``html_message`` as the
   :mimetype:`text/html` content type.
 * ``provider``: A string used as alias for the preferred email provider. If
@@ -764,8 +764,8 @@ want to specify an alternative, put the following in your settings::
         },
     }
 
-    If unspecified, the default ``timeout`` will be the one provided by
-    :func:`socket.getdefaulttimeout`, which defaults to ``None`` (no timeout).
+If unspecified, the default ``timeout`` will be the one provided by
+:func:`socket.getdefaulttimeout`, which defaults to ``None`` (no timeout).
 
 .. _topic-email-console-backend:
 
