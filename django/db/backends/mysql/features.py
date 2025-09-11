@@ -103,6 +103,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
+            "MySQL does not correctly support ORDER BY in JSON_ARRAYAGG.": {
+                "aggregation.tests.JSONArrayAggTests.test_order_by",
+            },
         }
         if not self.connection.mysql_is_mariadb:
             skips.update(

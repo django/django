@@ -2,7 +2,7 @@ import datetime
 import math
 import re
 from decimal import Decimal
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -2818,10 +2818,6 @@ class JSONArrayAggTests(TestCase):
         )
         self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
 
-    @skipIf(
-        connection.vendor == "mysql",
-        "MySQL does not correctly support ORDER BY in JSON_ARRAYAGG.",
-    )
     @skipUnlessDBFeature("supports_aggregate_order_by_clause")
     def test_order_by(self):
         for order_by, expected_result in (
