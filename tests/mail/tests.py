@@ -3335,16 +3335,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         connection = mail.get_connection("django.core.mail.backends.smtp.EmailBackend")
         self.assertIsNone(connection.timeout)
 
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "mail.custombackend.CustomTimeoutBackend",
+            },
+        },
+    )
     def test_connection_timeout_custom(self):
-        """The timeout parameter can be customized."""
-
-        class MyEmailBackend(smtp.EmailBackend):
-            def __init__(self, *args, **kwargs):
-                kwargs.setdefault("timeout", 42)
-                super().__init__(*args, **kwargs)
-
-        # myemailbackend = MyEmailBackend()
-        myemailbackend = mail.get_connection()
+        """We use a custom backend with a custom timeout parameter."""
+        myemailbackend = mail.get_connection(
+            host=self.smtp_controller.hostname,
+            port=self.smtp_controller.port,
+        )
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
