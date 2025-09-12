@@ -295,7 +295,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
-            stacklevel=django_file_prefixes(),
+            skip_file_prefixes=django_file_prefixes(),
         )
         old_private_helper()
         ...
