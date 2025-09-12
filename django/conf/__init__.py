@@ -120,8 +120,9 @@ class LazySettings(LazyObject):
         try:
             val = getattr(_wrapped, name)
         except AttributeError:
-            # Special case for EMAIL_* settings. To avoid breaking existing third-party
-            # apps accessing the current Django settings. RemovedInDjango70Warning.
+            # Special case for EMAIL_* settings. To avoid breaking existing
+            # third-party apps accessing the current Django settings.
+            # RemovedInDjango70Warning.
             if name == "EMAIL_BACKEND":
                 return self.EMAIL_PROVIDERS["default"]["BACKEND"]
             if name in DEPRECATED_EMAIL_SETTINGS:

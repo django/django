@@ -52,8 +52,10 @@ __all__ = [
 def get_connection(backend=None, *, fail_silently=False, provider=None, **kwargs):
     """Load an email backend and return an instance of it.
 
-    If backend is None (default), use settings.EMAIL_PROVIDERS[provider]["BACKEND"].
-    If provider is None as well, use settings.EMAIL_PROVIDERS["default"]["BACKEND"].
+    If backend is None (default), use
+    settings.EMAIL_PROVIDERS[provider]["BACKEND"]`
+    If provider is None as well, use
+    settings.EMAIL_PROVIDERS["default"]["BACKEND"].
 
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.

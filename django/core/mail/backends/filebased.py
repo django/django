@@ -17,8 +17,8 @@ class EmailBackend(ConsoleEmailBackend):
             options = settings.EMAIL_PROVIDERS[provider].get("OPTIONS", {})
             file_path = options.get("file_path")
         else:
-            # RemovedInDjango70Warning: Not being initialized from EMAIL_PROVIDERS.
-            # Check the deprecated EMAIL_FILE_PATH setting.
+            # RemovedInDjango70Warning: Not being initialized from
+            # EMAIL_PROVIDERS. Check the deprecated EMAIL_FILE_PATH settings.
             file_path = file_path or getattr(settings, "EMAIL_FILE_PATH", None)
 
         if not file_path:

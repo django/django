@@ -56,8 +56,8 @@ class EmailBackend(BaseEmailBackend):
             )
             self.timeout = options.get("timeout") if timeout is None else timeout
         else:
-            # RemovedInDjango70Warning: Not being initialized from EMAIL_PROVIDERS.
-            # Check the deprecated EMAIL_FILE_PATH setting.
+            # RemovedInDjango70Warning: Not being initialized from
+            # EMAIL_PROVIDERS. Check the deprecated EMAIL_FILE_PATH settings.
             self.host = host or getattr(settings, "EMAIL_HOST", self.DEFAULT_HOST)
             self.port = port or getattr(settings, "EMAIL_PORT", self.DEFAULT_PORT)
             self.username = (

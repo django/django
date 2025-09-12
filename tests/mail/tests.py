@@ -2410,7 +2410,8 @@ class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
         EMAIL_FILE_PATH="/tmp/foo",
     )
     def test_get_connection_specified_filebased_backend(self):
-        # specific backend overrides EMAIL_BACKEND setting; kwargs work as above
+        # specific backend overrides EMAIL_BACKEND setting; kwargs work as
+        # above
         connection = mail.get_connection(
             "django.core.mail.backends.filebased.EmailBackend",
             file_path="/tmp/bar",
