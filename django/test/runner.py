@@ -566,6 +566,9 @@ class ParallelTestSuite(unittest.TestSuite):
             (self.runner_class, index, subsuite, self.failfast, self.buffer)
             for index, subsuite in enumerate(self.subsuites)
         ]
+        # Don't buffer in the main process to avoid error propagation issues.
+        result.buffer = False
+
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
 
         while True:
