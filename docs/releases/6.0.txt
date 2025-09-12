@@ -210,6 +210,15 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
+* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+  supports a ``keep_original_files`` attribute which can be set to ``False``
+  if you only want to retain the hashed copies.
+
+* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+  supports using the settings' ``OPTIONS`` dict to configure the attributes
+  ``keep_original_files``, ``manifest_name``, ``manifest_strict``.
+  ``support_js_module_import_aggregation``.
+
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
