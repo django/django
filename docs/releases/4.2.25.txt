@@ -1,0 +1,10 @@
+===========================
+Django 4.2.25 release notes
+===========================
+
+*October 1, 2025*
+
+Django 4.2.25 fixes one security issue with severity "high" and one security
+issue with severity "low" in 4.2.24.
+
+...
