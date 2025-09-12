@@ -19,6 +19,7 @@ from .models import (
     Child,
     ChildModel1,
     ChildModel2,
+    EditablePKBook,
     ExtraTerrestrial,
     Fashionista,
     FootNote,
@@ -707,6 +708,21 @@ class TestInline(TestDataMixin, TestCase):
             html=True,
             count=1,
         )
+
+    def test_inline_manual_pk_is_readonly_when_editing(self):
+        author = Author.objects.create(name="Jane Austen")
+        EditablePKBook.objects.create(
+            author=author, manual_pk=101, title="Pride and Prejudice"
+        )
+
+        response = self.client.get(
+            reverse("admin:admin_inlines_author_change", args=[author.pk])
+        )
+
+        self.assertContains(
+            response, 'name="editablepkbook_set-0-manual_pk"', html=False
+        )
+        self.assertContains(response, "readonly", html=False)
 
     def test_stacked_inline_edit_form_contains_has_original_class(self):
         holder = Holder.objects.create(dummy=1)
