@@ -2299,9 +2299,8 @@ class ConsumingDeprecatedEmailSettingsTests(SimpleTestCase):
 class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
     def assertPathEqual(self, path1, path2):
         if sys.platform == "win32":
-            from re import match
-            path1 = path1[2:] if match(r"^[A-Z]:", path1) else path1
-            path2 = path2[2:] if match(r"^[A-Z]:", path2) else path2
+            path1 = path1[2:] if re.match(r"^[A-Z]:", path1) else path1
+            path2 = path2[2:] if re.match(r"^[A-Z]:", path2) else path2
         self.assertEqual(os.path.normpath(path1), os.path.normpath(path2))
 
     def test_deprecated_host_configuration(self):

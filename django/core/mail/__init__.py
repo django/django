@@ -266,7 +266,8 @@ def mail_admins(
     RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_managers(
-    subject, message,
+    subject,
+    message,
     *,
     fail_silently=False,
     connection=None,
