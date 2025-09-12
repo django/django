@@ -405,6 +405,8 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
                     label = "--"
                 else:
                     label = pretty_name(attr.__name__)
+            elif hasattr(attr, "verbose_name"):
+                label = attr.verbose_name
             else:
                 label = pretty_name(name)
     except FieldIsAForeignKeyColumnName:
