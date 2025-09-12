@@ -50,16 +50,6 @@ class ParallelTestRunnerTest(SimpleTestCase):
                 self.assertEqual(i, i)
 
 
-# class AbortingTest(DjangoTestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         raise RuntimeError("Boo!")
-
-#     @unittest.expectedFailure
-#     def test_pass(self):
-#         pass
-
-
 class SampleFailingSubtest(SimpleTestCase):
     # This method name doesn't begin with "test" to prevent test discovery
     # from seeing it.
@@ -292,6 +282,15 @@ class ParallelTestSuiteTest(SimpleTestCase):
 
 class ParallelBufferTest(DjangoTestCase):
     def test_parallel_buffer(self):
+        """
+        Test that ParallelTestSuite.run() properly handles buffered TestResult
+        to prevent AttributeError when setUpTestData raises exceptions.
+        Before the fix, running tests with
+        --parallel --buffer would crash with AttributeError when setUpTestData
+        raised an exception because the main process TestResult had buffer=True
+        but _setupStdout() was never called.
+        """
+
         class AbortingTest(DjangoTestCase):
             @classmethod
             def setUpTestData(cls):
