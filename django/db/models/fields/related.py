@@ -1395,6 +1395,7 @@ class ManyToManyField(RelatedField):
         swappable=True,
         **kwargs,
     ):
+        super().__init__(to, **kwargs)
         try:
             to._meta
         except AttributeError:
@@ -2067,3 +2068,12 @@ class ManyToManyField(RelatedField):
 
     def db_parameters(self, connection):
         return {"type": None, "check": None}
+
+    @property
+    def concrete(self):
+        return False
+
+    @concrete.setter
+    def concrete(self, value):
+        # Ignore attempts to set this; M2M fields are always non-concrete.
+        self._concrete = False
