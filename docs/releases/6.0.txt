@@ -619,6 +619,10 @@ Miscellaneous
 * The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions are deprecated.
 
+* Support for a double-dot variable lookup like ``{{ book..title }}`` which
+  maps to a lookup of the empty string before the next lookup of the named
+  attribute is deprecated.
+
 Features removed in 6.0
 =======================
 
