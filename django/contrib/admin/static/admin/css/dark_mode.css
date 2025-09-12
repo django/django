@@ -20,6 +20,14 @@
       --border-color: #353535;
   
       --error-fg: #e35f5f;
+      --error-note-section-bg: #400202;
+      --error-note-section-border-color: #f28080;
+      --error-note-info-bg: #2e1c00;
+      --error-note-info-border-color: #f2b56b;
+      --error-note-inline-border-color: #f5a15d;
+      --error-note-link-border-color: #eb7878;
+      --error-note-link-hover-bg: #000000;
+      --error-note-link-hover-border-color: #4a4a4a;
 
       --message-debug-bg: #4e4e4e;
       --message-debug-icon: url(../img/icon-debug-dark.svg);
@@ -65,6 +73,14 @@ html[data-theme="dark"] {
     --border-color: #353535;
 
     --error-fg: #e35f5f;
+    --error-note-section-bg: #2b0303;
+    --error-note-section-border-color: #f28080;
+    --error-note-info-bg: #2e1c00;
+    --error-note-info-border-color: #f2b56b;
+    --error-note-inline-border-color: #f5a15d;
+    --error-note-link-border-color: #eb7878;
+    --error-note-link-hover-bg: #000000;
+    --error-note-link-hover-border-color: #4a4a4a;
 
     --message-debug-bg: #4e4e4e;
     --message-debug-icon: url(../img/icon-debug-dark.svg);
