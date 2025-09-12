@@ -565,6 +565,11 @@ class ParallelTestSuite(unittest.TestSuite):
         ]
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
 
+        # Disable buffering on the local test result that will accumulate
+        # remote suites results as each process will take care of its own
+        # buffering and there's nothing to capture on the main process.
+        result.buffer = False
+
         while True:
             if result.shouldStop:
                 pool.terminate()
@@ -580,6 +585,7 @@ class ParallelTestSuite(unittest.TestSuite):
 
             tests = list(self.subsuites[subsuite_index])
             for event in events:
+                print("tessss", self, event, self.subsuites[subsuite_index])
                 self.handle_event(result, tests, event)
 
         pool.join()
