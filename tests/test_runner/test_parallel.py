@@ -8,6 +8,8 @@ from unittest.suite import TestSuite, _ErrorHolder
 from django.test import SimpleTestCase
 from django.test.runner import ParallelTestSuite, RemoteTestResult
 
+from . import models
+
 try:
     import tblib.pickling_support
 except ImportError:
@@ -47,6 +49,9 @@ class ParallelTestRunnerTest(SimpleTestCase):
         for i in range(2):
             with self.subTest(index=i):
                 self.assertEqual(i, i)
+
+    def test_system_checks(self):
+        self.assertEqual(models.Person.system_check_run_count, 1)
 
 
 class SampleFailingSubtest(SimpleTestCase):
