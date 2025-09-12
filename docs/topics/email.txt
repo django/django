@@ -158,7 +158,7 @@ can be ``0`` or ``1`` since it can only send one message).
 used.
 
 Each separate element of ``datatuple`` results in a separate email message.
-As in :meth:`~django.core.mail.send_mail`, recipients in the same
+As in :func:`~django.core.mail.send_mail`, recipients in the same
 ``recipient_list`` will all see the other addresses in the email messages'
 "To:" field.
 
@@ -190,12 +190,12 @@ The return value will be the number of successfully delivered messages.
 ``send_mass_mail()`` vs. ``send_mail()``
 ----------------------------------------
 
-The main difference between :meth:`~django.core.mail.send_mass_mail` and
-:meth:`~django.core.mail.send_mail` is that
-:meth:`~django.core.mail.send_mail` opens a connection to the mail server
-each time it's executed, while :meth:`~django.core.mail.send_mass_mail` uses
+The main difference between :func:`~django.core.mail.send_mass_mail` and
+:func:`~django.core.mail.send_mail` is that
+:func:`~django.core.mail.send_mail` opens a connection to the mail server
+each time it's executed, while :func:`~django.core.mail.send_mass_mail` uses
 a single connection for all of its messages. This makes
-:meth:`~django.core.mail.send_mass_mail` slightly more efficient.
+:func:`~django.core.mail.send_mass_mail` slightly more efficient.
 
 ``mail_admins()``
 =================
@@ -269,7 +269,7 @@ scripts generate.
 The Django email functions outlined above all protect against header injection
 by forbidding newlines in header values. If any ``subject``, ``from_email`` or
 ``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :meth:`~django.core.mail.send_mail`) will raise
+the email function (e.g. :func:`~django.core.mail.send_mail`) will raise
 :exc:`ValueError` and, hence, will not send the email. It's your responsibility
 to validate all data before passing it to the email functions.
 
@@ -312,18 +312,18 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The ``EmailMessage`` class
 ==========================
 
-Django's :meth:`~django.core.mail.send_mail` and
-:meth:`~django.core.mail.send_mass_mail` functions are actually thin
+Django's :func:`~django.core.mail.send_mail` and
+:func:`~django.core.mail.send_mass_mail` functions are actually thin
 wrappers that make use of the :class:`~django.core.mail.EmailMessage` class.
 
 Not all features of the :class:`~django.core.mail.EmailMessage` class are
-available through the :meth:`~django.core.mail.send_mail` and related
+available through the :func:`~django.core.mail.send_mail` and related
 wrapper functions. If you wish to use advanced features, such as BCC'ed
 recipients, file attachments, or multi-part email, you'll need to create
 :class:`~django.core.mail.EmailMessage` instances directly.
 
 .. note::
-    This is a design feature. :meth:`~django.core.mail.send_mail` and
+    This is a design feature. :func:`~django.core.mail.send_mail` and
     related functions were originally the only interface Django provided.
     However, the list of parameters they accepted was slowly growing over
     time. It made sense to move to a more object-oriented design for email
@@ -696,7 +696,7 @@ It can also be used as a context manager, which will automatically call
 Obtaining an instance of an email backend
 -----------------------------------------
 
-The :meth:`get_connection` function in ``django.core.mail`` returns an
+The :func:`get_connection` function in ``django.core.mail`` returns an
 instance of the email backend that you can use.
 
 .. function:: get_connection(backend=None, *, fail_silently=False, provider=None, **kwargs)
