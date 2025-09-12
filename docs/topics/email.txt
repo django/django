@@ -793,7 +793,8 @@ The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
 written is either taken from the :setting:`EMAIL_PROVIDERS`, actually the
 setting ``EMAIL_PROVIDERS["default"]["file_path"]``, or from the ``file_path``
-keyword when creating a connection with :meth:`~django.core.mail.get_connection`.
+keyword when creating a connection with
+:meth:`~django.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
