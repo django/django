@@ -62,3 +62,9 @@ class Page(models.Model):
 
 class BookSigning(models.Model):
     event_date = models.DateTimeField()
+
+
+class Item(models.Model):
+    pk = models.CompositePrimaryKey("order_id", "product_id")
+    order_id = models.PositiveIntegerField()
+    product_id = models.PositiveIntegerField()
