@@ -114,7 +114,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_text(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input type="text">.
+        Return a string of HTML for representing this as an
+        <input type="text">.
         """
         return self.as_widget(TextInput(), attrs, **kwargs)
 
@@ -124,7 +125,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_hidden(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input type="hidden">.
+        Return a string of HTML for representing this as an
+        <input type="hidden">.
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
@@ -181,7 +183,8 @@ class BoundField(RenderableFieldMixin):
             )
         # Only add the suffix if the label does not end in punctuation.
         # Translators: If found as last label character, these punctuation
-        # characters will prevent the default label_suffix to be appended to the label
+        # characters will prevent the default label_suffix to be appended to
+        # the label
         if label_suffix and contents and contents[-1] not in _(":?.!"):
             contents = format_html("{}{}", contents, label_suffix)
         widget = self.field.widget
@@ -239,7 +242,8 @@ class BoundField(RenderableFieldMixin):
     def auto_id(self):
         """
         Calculate and return the ID attribute for this BoundField, if the
-        associated Form has specified auto_id. Return an empty string otherwise.
+        associated Form has specified auto_id. Return an empty string
+        otherwise.
         """
         auto_id = self.form.auto_id  # Boolean or string
         if auto_id and "%s" in str(auto_id):

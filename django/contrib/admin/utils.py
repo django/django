@@ -73,7 +73,8 @@ def prepare_lookup_value(key, value, separator=","):
     # if key ends with __in, split parameter into separate values
     if key.endswith("__in"):
         value = value.split(separator)
-    # if key ends with __isnull, special case '' and the string literals 'false' and '0'
+    # if key ends with __isnull, special case '' and the string literals
+    # 'false' and '0'
     elif key.endswith("__isnull"):
         value = value.lower() not in ("", "false", "0")
     return value
@@ -558,9 +559,10 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
-    # Evaluating `form.changed_data` prior to disabling translations is required
-    # to avoid fields affected by localization from being included incorrectly,
-    # e.g. where date formats differ such as MM/DD/YYYY vs DD/MM/YYYY.
+    # Evaluating `form.changed_data` prior to disabling translations is
+    # required to avoid fields affected by localization from being included
+    # incorrectly, e.g. where date formats differ such as MM/DD/YYYY vs
+    # DD/MM/YYYY.
     changed_data = form.changed_data
     with translation_override(None):
         # Deactivate translations while fetching verbose_name for form

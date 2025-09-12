@@ -1,63 +1,44 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="15"
-   height="30"
-   viewBox="0 0 1792 3584"
-   version="1.1"
-   id="svg5"
-   sodipodi:docname="calendar-icons.svg"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview5"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     inkscape:zoom="13.3"
-     inkscape:cx="15.526316"
-     inkscape:cy="20.977444"
-     inkscape:window-width="1920"
-     inkscape:window-height="1011"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg5" />
-  <defs
-     id="defs2">
-    <g
-       id="previous">
+  width="15"
+  height="30"
+  viewBox="0 0 512 1024"
+  version="1.1"
+  id="svg5"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns="http://www.w3.org/2000/svg">
+  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+  <defs id="defs2">
+    <g id="previous">
+      <!--
+      Icon Name: circle-chevron-left
+      Icon Family: classic
+      Icon Style: solid
+      -->
       <path
-         d="m 1037,1395 102,-102 q 19,-19 19,-45 0,-26 -19,-45 L 832,896 1139,589 q 19,-19 19,-45 0,-26 -19,-45 L 1037,397 q -19,-19 -45,-19 -26,0 -45,19 L 493,851 q -19,19 -19,45 0,26 19,45 l 454,454 q 19,19 45,19 26,0 45,-19 z m 627,-499 q 0,209 -103,385.5 Q 1458,1458 1281.5,1561 1105,1664 896,1664 687,1664 510.5,1561 334,1458 231,1281.5 128,1105 128,896 128,687 231,510.5 334,334 510.5,231 687,128 896,128 1105,128 1281.5,231 1458,334 1561,510.5 1664,687 1664,896 Z"
-         id="path1" />
+          d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"
+          id="path2" />
     </g>
-    <g
-       id="next">
+    <g id="next">
+      <!--
+      Icon Name: circle-chevron-right
+      Icon Family: classic
+      Icon Style: solid
+      -->
       <path
-         d="m 845,1395 454,-454 q 19,-19 19,-45 0,-26 -19,-45 L 845,397 q -19,-19 -45,-19 -26,0 -45,19 L 653,499 q -19,19 -19,45 0,26 19,45 l 307,307 -307,307 q -19,19 -19,45 0,26 19,45 l 102,102 q 19,19 45,19 26,0 45,-19 z m 819,-499 q 0,209 -103,385.5 Q 1458,1458 1281.5,1561 1105,1664 896,1664 687,1664 510.5,1561 334,1458 231,1281.5 128,1105 128,896 128,687 231,510.5 334,334 510.5,231 687,128 896,128 1105,128 1281.5,231 1458,334 1561,510.5 1664,687 1664,896 Z"
-         id="path2" />
+          d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM241 377c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l87-87-87-87c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L345 239c9.4 9.4 9.4 24.6 0 33.9L241 377z"
+          id="path1" />
     </g>
   </defs>
   <use
-     xlink:href="#next"
-     x="0"
-     y="5376"
-     fill="#000000"
-     id="use5"
-     transform="translate(0,-3584)" />
+      xlink:href="#next"
+      x="0"
+      y="512"
+      fill="#000000"
+      id="use5" />
   <use
-     xlink:href="#previous"
-     x="0"
-     y="0"
-     fill="#333333"
-     id="use2"
-     style="fill:#000000;fill-opacity:1" />
+      xlink:href="#previous"
+      x="0"
+      y="0"
+      fill="#333333"
+      id="use2" />
 </svg>

@@ -28,6 +28,10 @@ class AuthorWithAge(Author):
     age = models.IntegerField()
 
 
+class AuthorWithAgeChild(AuthorWithAge):
+    pass
+
+
 class FavoriteAuthors(models.Model):
     author = models.ForeignKey(
         Author, models.CASCADE, to_field="name", related_name="i_like"
@@ -278,6 +282,10 @@ class Employee(models.Model):
 
     class Meta:
         ordering = ["id"]
+
+
+class SelfDirectedEmployee(Employee):
+    pass
 
 
 # Ticket #19607

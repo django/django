@@ -184,7 +184,8 @@ class FileUploadTests(TestCase):
 
     def test_unicode_file_name(self):
         with sys_tempfile.TemporaryDirectory() as temp_dir:
-            # This file contains Chinese symbols and an accented char in the name.
+            # This file contains Chinese symbols and an accented char in the
+            # name.
             with open(os.path.join(temp_dir, UNICODE_FILENAME), "w+b") as file1:
                 file1.write(b"b" * (2**10))
                 file1.seek(0)
@@ -372,12 +373,14 @@ class FileUploadTests(TestCase):
         self.assertEqual(received["file"], "non-printable_chars.txt")
 
     def test_dangerous_file_names(self):
-        """Uploaded file names should be sanitized before ever reaching the view."""
+        """
+        Uploaded file names should be sanitized before ever reaching the view.
+        """
         # This test simulates possible directory traversal attacks by a
-        # malicious uploader We have to do some monkeybusiness here to construct
-        # a malicious payload with an invalid file name (containing os.sep or
-        # os.pardir). This similar to what an attacker would need to do when
-        # trying such an attack.
+        # malicious uploader We have to do some monkeybusiness here to
+        # construct a malicious payload with an invalid file name (containing
+        # os.sep or os.pardir). This similar to what an attacker would need to
+        # do when trying such an attack.
         payload = client.FakePayload()
         for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
             payload.write(
@@ -402,14 +405,18 @@ class FileUploadTests(TestCase):
             "wsgi.input": payload,
         }
         response = self.client.request(**r)
-        # The filenames should have been sanitized by the time it got to the view.
+        # The filenames should have been sanitized by the time it got to the
+        # view.
         received = response.json()
         for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
             got = received["file%s" % i]
             self.assertEqual(got, "hax0rd.txt")
 
     def test_filename_overflow(self):
-        """File names over 256 characters (dangerous on some platforms) get fixed up."""
+        """
+        File names over 256 characters (dangerous on some platforms) get fixed
+        up.
+        """
         long_str = "f" * 300
         cases = [
             # field name, filename, expected
@@ -740,8 +747,9 @@ class FileUploadTests(TestCase):
 
         # Maybe this is a little more complicated that it needs to be; but if
         # the django.test.client.FakePayload.read() implementation changes then
-        # this test would fail.  So we need to know exactly what kind of error
-        # it raises when there is an attempt to read more than the available bytes:
+        # this test would fail. So we need to know exactly what kind of error
+        # it raises when there is an attempt to read more than the available
+        # bytes:
         try:
             client.FakePayload(b"a").read(2)
         except Exception as err:

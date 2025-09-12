@@ -29,6 +29,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     Min,
     Model,
@@ -83,6 +84,7 @@ from .models import (
     Company,
     Employee,
     Experiment,
+    JSONFieldModel,
     Manager,
     Number,
     RemoteEmployee,
@@ -366,6 +368,21 @@ class BasicExpressionsTests(TestCase):
         self.assertQuerySetEqual(
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_update_jsonfield_case_when_key_is_null(self):
+        obj = JSONFieldModel.objects.create(data={"key": None})
+        updated = JSONFieldModel.objects.update(
+            data=Case(
+                When(
+                    data__key=Value(None, JSONField()),
+                    then=Value({"key": "something"}, JSONField()),
+                ),
+            )
+        )
+        self.assertEqual(updated, 1)
+        obj.refresh_from_db()
+        self.assertEqual(obj.data, {"key": "something"})
 
     def test_filter_with_join(self):
         # F Expressions can also span joins
@@ -728,9 +745,27 @@ class BasicExpressionsTests(TestCase):
         subquery_test = Company.objects.filter(pk__in=Subquery(small_companies))
         self.assertCountEqual(subquery_test, [self.foobar_ltd, self.gmbh])
         subquery_test2 = Company.objects.filter(
-            pk=Subquery(small_companies.filter(num_employees=3))
+            pk=Subquery(small_companies.filter(num_employees=3)[:1])
         )
         self.assertCountEqual(subquery_test2, [self.foobar_ltd])
+
+    def test_lookups_subquery(self):
+        smallest_company = Company.objects.order_by("num_employees").values("name")[:1]
+        for lookup in CharField.get_lookups():
+            if lookup == "isnull":
+                continue  # not allowed, rhs must be a literal boolean.
+            if (
+                lookup == "in"
+                and not connection.features.allow_sliced_subqueries_with_in
+            ):
+                continue
+            if lookup == "range":
+                rhs = (Subquery(smallest_company), Subquery(smallest_company))
+            else:
+                rhs = Subquery(smallest_company)
+            with self.subTest(lookup=lookup):
+                qs = Company.objects.filter(**{f"name__{lookup}": rhs})
+                self.assertGreater(len(qs), 0)
 
     def test_uuid_pk_subquery(self):
         u = UUIDPK.objects.create()
@@ -953,10 +988,23 @@ class BasicExpressionsTests(TestCase):
                 )
                 .order_by("-salary_raise")
                 .values("salary_raise")[:1],
-                output_field=IntegerField(),
             ),
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
+
+    def test_annotation_with_outerref_and_output_field(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef("num_employees") + F("num_employees"),
+                )
+                .order_by("-salary_raise")
+                .values("salary_raise")[:1],
+                output_field=DecimalField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332.0)
+        self.assertIsInstance(gmbh_salary.max_ceo_salary_raise, Decimal)
 
     def test_annotation_with_nested_outerref(self):
         self.gmbh.point_of_contact = Employee.objects.get(lastname="Meyer")
@@ -2504,6 +2552,15 @@ class ExistsTests(TestCase):
         qs = Manager.objects.annotate(exists=Exists(Manager.objects.none())).filter(
             pk=manager.pk, exists=False
         )
+        self.assertSequenceEqual(qs, [manager])
+        self.assertIs(qs.get().exists, False)
+
+    def test_annotate_by_empty_custom_exists(self):
+        class CustomExists(Exists):
+            template = Subquery.template
+
+        manager = Manager.objects.create()
+        qs = Manager.objects.annotate(exists=CustomExists(Manager.objects.none()))
         self.assertSequenceEqual(qs, [manager])
         self.assertIs(qs.get().exists, False)
 

@@ -296,7 +296,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_trailing_period(self):
         """
-        #18644 - Check urlize trims trailing period when followed by parenthesis
+        #18644 - Check urlize trims trailing period when followed by
+        parenthesis
         """
         self.assertEqual(
             urlize("(Go to http://www.example.com/foo.)"),
@@ -358,9 +359,8 @@ class FunctionTests(SimpleTestCase):
             "www.example.com</a>]",
         )
         self.assertEqual(
-            urlize("see test[at[example.com"),
-            'see <a href="https://test[at[example.com" rel="nofollow">'
-            "test[at[example.com</a>",
+            urlize("see test[at[example.com"),  # Invalid hostname.
+            "see test[at[example.com",
         )
         self.assertEqual(
             urlize("[http://168.192.0.1](http://168.192.0.1)"),

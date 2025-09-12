@@ -454,29 +454,19 @@ class RelativeFieldTests(SimpleTestCase):
                 "Parent", on_delete=models.CASCADE, related_name="child_string_set"
             )
 
+        error = (
+            "Field defines a relation involving model 'Parent' which has a "
+            "CompositePrimaryKey and such relations are not supported."
+        )
         field = Child._meta.get_field("rel_string_parent")
         self.assertEqual(
             field.check(),
-            [
-                Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
-                    obj=field,
-                    id="fields.E347",
-                ),
-            ],
+            [Error(error, obj=field, id="fields.E347")],
         )
         field = Child._meta.get_field("rel_class_parent")
         self.assertEqual(
             field.check(),
-            [
-                Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
-                    obj=field,
-                    id="fields.E347",
-                ),
-            ],
+            [Error(error, obj=field, id="fields.E347")],
         )
 
     def test_many_to_many_to_model_with_composite_primary_key(self):
@@ -493,29 +483,45 @@ class RelativeFieldTests(SimpleTestCase):
                 "Parent", related_name="child_string_set"
             )
 
+        error = (
+            "Field defines a relation involving model 'Parent' which has a "
+            "CompositePrimaryKey and such relations are not supported."
+        )
         field = Child._meta.get_field("rel_string_parent")
         self.assertEqual(
             field.check(from_model=Child),
-            [
-                Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
-                    obj=field,
-                    id="fields.E347",
-                ),
-            ],
+            [Error(error, obj=field, id="fields.E347")],
         )
         field = Child._meta.get_field("rel_class_parent")
         self.assertEqual(
             field.check(from_model=Child),
-            [
-                Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
-                    obj=field,
-                    id="fields.E347",
-                ),
-            ],
+            [Error(error, obj=field, id="fields.E347")],
+        )
+
+    def test_many_to_many_from_model_with_composite_primary_key(self):
+        class Parent(models.Model):
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                app_label = "invalid_models_tests"
+
+        class Child(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+            parents = models.ManyToManyField(Parent)
+
+            class Meta:
+                app_label = "invalid_models_tests"
+
+        error = (
+            "Field defines a relation involving model 'Child' which has a "
+            "CompositePrimaryKey and such relations are not supported."
+        )
+        field = Child._meta.get_field("parents")
+        self.assertEqual(
+            field.check(from_model=Child),
+            [Error(error, obj=field, id="fields.E347")],
         )
 
     def test_foreign_key_to_non_unique_field(self):
@@ -1038,8 +1044,8 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
+                    "Field defines a relation involving model 'Parent' which has a "
+                    "CompositePrimaryKey and such relations are not supported.",
                     obj=field,
                     id="fields.E347",
                 ),
@@ -1060,8 +1066,8 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "Field defines a relation to the CompositePrimaryKey of model "
-                    "'Parent' which is not supported.",
+                    "Field defines a relation involving model 'Parent' which has a "
+                    "CompositePrimaryKey and such relations are not supported.",
                     obj=field,
                     id="fields.E347",
                 ),

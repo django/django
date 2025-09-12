@@ -69,11 +69,11 @@ command from any place in the Django source tree:
     $ tox
 
 By default, ``tox`` runs the test suite with the bundled test settings file for
-SQLite, ``black``, ``blacken-docs``, ``flake8``, ``isort``, and the
-documentation spelling checker. In addition to the system dependencies noted
-elsewhere in this documentation, the command ``python3`` must be on your path
-and linked to the appropriate version of Python. A list of default environments
-can be seen as follows:
+SQLite, ``black``, ``blacken-docs``, ``flake8``, ``isort``, ``lint-docs`` and
+the documentation spelling checker. In addition to the system dependencies
+noted elsewhere in this documentation, the command ``python3`` must be on your
+path and linked to the appropriate version of Python. A list of default
+environments can be seen as follows:
 
 .. console::
 
@@ -84,6 +84,7 @@ can be seen as follows:
     flake8>=3.7.0
     docs
     isort>=5.1.0
+    lint-docs
 
 Testing other Python versions and database backends
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -271,6 +272,11 @@ faster and more stable. Add the ``--headless`` option to enable this mode.
 
 .. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/trunk/py/selenium/webdriver
 
+.. _screenshot-tests:
+
+Screenshot tests
+~~~~~~~~~~~~~~~~
+
 For testing changes to the admin UI, the selenium tests can be run with the
 ``--screenshots`` option enabled. Screenshots will be saved to the
 ``tests/screenshots/`` directory.
@@ -308,7 +314,7 @@ dependencies:
 
 * :pypi:`aiosmtpd` 1.4.5+
 * :pypi:`argon2-cffi` 23.1.0+
-* :pypi:`asgiref` 3.8.1+ (required)
+* :pypi:`asgiref` 3.9.1+ (required)
 * :pypi:`bcrypt` 4.1.1+
 * :pypi:`colorama` 0.4.6+
 * :pypi:`docutils` 0.19+
@@ -393,9 +399,9 @@ and also excludes several directories not relevant to the results
 Contrib apps
 ============
 
-Tests for contrib apps can be found in the :source:`tests/` directory, typically
-under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
-in :source:`tests/auth_tests`.
+Tests for contrib apps can be found in the :source:`tests/` directory,
+typically under ``<app_name>_tests``. For example, tests for ``contrib.auth``
+are located in :source:`tests/auth_tests`.
 
 .. _troubleshooting-unit-tests:
 

@@ -15,7 +15,8 @@ If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
 requests without a Trac ticket.
 
-See the :doc:`working-with-git` for more details on how to use pull requests.
+See the :doc:`/internals/contributing/writing-code/working-with-git` for more
+details on how to use pull requests.
 
 "Claiming" tickets
 ==================
@@ -36,7 +37,8 @@ and time availability), claim it by following these steps:
   reset it using the `password reset page`_.
 
 * If a ticket for this issue doesn't exist yet, create one in our
-  `ticket tracker`_.
+  `ticket tracker`_. Remember that proposals for new features should follow
+  the :ref:`process for suggesting new features <requesting-features>`.
 
 * If a ticket for this issue already exists, make sure nobody else has
   claimed it. To do this, look at the "Owned by" section of the ticket.
@@ -108,19 +110,20 @@ requirements:
 
 * The code required to fix a problem or add a feature is an essential part
   of a solution, but it is not the only part. A good fix should also include a
-  :doc:`regression test <unit-tests>` to validate the behavior that has been
-  fixed and to prevent the problem from arising again. Also, if some tickets
-  are relevant to the code that you've written, mention the ticket numbers in
-  some comments in the test so that one can easily trace back the relevant
-  discussions after your patch gets committed, and the tickets get closed.
+  :doc:`regression test </internals/contributing/writing-code/unit-tests>` to
+  validate the behavior that has been fixed and to prevent the problem from
+  arising again. Also, if some tickets are relevant to the code that you've
+  written, mention the ticket numbers in some comments in the test so that one
+  can easily trace back the relevant discussions after your patch gets
+  committed, and the tickets get closed.
 
 * If the code adds a new feature, or modifies the behavior of an existing
   feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`.
-If you can't send a pull request for some reason, you can also use patches in
-Trac. When using this style, follow these guidelines.
+request </internals/contributing/writing-code/working-with-git>`. If you can't
+send a pull request for some reason, you can also use patches in Trac. When
+using this style, follow these guidelines.
 
 * Submit patches in the format returned by the ``git diff`` command.
 
@@ -154,11 +157,20 @@ or introduces breaking changes.
 
 The following are different approaches for gaining feedback from the community.
 
+The new feature ideas tracker
+-----------------------------
+
+If you have an idea for a new feature, please create a new proposal (or join an
+existing discussion) following the :ref:`process for suggesting new features
+<requesting-features>`. You should explain the need for the change, go into
+details of the approach and discuss alternatives.
+
 The Django Forum
 ----------------
 
-You can propose a change on the `Django Forum`_. You should explain the need
-for the change, go into details of the approach and discuss alternatives.
+You can propose a change (that is not a new feature idea) on the
+`Django Forum`_. You should explain the need for the change, go into details of
+the approach and discuss alternatives.
 
 Please include a link to such discussions in your contributions.
 
@@ -174,8 +186,8 @@ third-party package first. You can iterate on the public API much faster, while
 also validating the need for the feature.
 
 Once this package becomes stable and there are clear benefits of incorporating
-aspects into Django core, starting a discussion on the `Django Forum`_ would be
-the next step.
+aspects into Django core, the next step is to propose its inclusion by
+following the :ref:`process for suggesting new features <requesting-features>`.
 
 Django Enhancement Proposal (DEP)
 ---------------------------------
@@ -187,15 +199,19 @@ specifications of features, along with rationales. DEPs are also the primary
 mechanism for proposing and collecting community input on major new features.
 
 Before considering writing a DEP, it is recommended to first open a discussion
-on the `Django Forum`_. This allows the community to provide feedback and helps
-refine the proposal. Once the DEP is ready the :ref:`Steering Council
-<steering-council>` votes on whether to accept it.
+following the :ref:`process for suggesting new features <requesting-features>`.
+This allows the community to provide feedback and helps refine the proposal.
+Once the DEP is ready the :ref:`Steering Council <steering-council>` votes on
+whether to accept it.
 
 Some examples of DEPs that have been approved and fully implemented:
 
-* `DEP 181: ORM Expressions <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
-* `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
-* `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
+* `DEP 181: ORM Expressions
+  <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
+* `DEP 182: Multiple Template Engines
+  <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+* `DEP 201: Simplified routing syntax
+  <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
 .. _Django Forum: https://forum.djangoproject.com/
 .. _Django Enhancement Proposals: https://github.com/django/deps
@@ -215,19 +231,19 @@ There are a couple of reasons that code in Django might be deprecated:
   no longer needs to support the older version of Python that doesn't include
   the library, the library will be deprecated in Django.
 
-As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
-the first release of Django that deprecates a feature (``A.B``) should raise a
-``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
-will be removed) when the deprecated feature is invoked. Assuming we have good
-test coverage, these warnings are converted to errors when :ref:`running the
-test suite <running-unit-tests>` with warnings enabled:
+As the :ref:`deprecation policy<internal-release-deprecation-policy>`
+describes, the first release of Django that deprecates a feature (``A.B``)
+should raise a ``RemovedInDjangoXXWarning`` (where XX is the Django version
+where the feature will be removed) when the deprecated feature is invoked.
+Assuming we have good test coverage, these warnings are converted to errors
+when :ref:`running the test suite <running-unit-tests>` with warnings enabled:
 ``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
-The first step is to remove any use of the deprecated behavior by Django itself.
-Next you can silence warnings in tests that actually test the deprecated
-behavior by using the ``ignore_warnings`` decorator, either at the test or class
-level:
+The first step is to remove any use of the deprecated behavior by Django
+itself. Next you can silence warnings in tests that actually test the
+deprecated behavior by using the ``ignore_warnings`` decorator, either at the
+test or class level:
 
 #) In a particular test::
 
@@ -294,12 +310,37 @@ Finally, there are a couple of updates to Django's documentation to make:
    applicable, to the current release notes (``docs/releases/A.B.txt``) under
    the "Features deprecated in A.B" heading.
 
-#) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the appropriate version describing what code will be removed.
+#) Add an entry in the deprecation timeline
+   (``docs/internals/deprecation.txt``) under the appropriate version
+   describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
 ``RemovedInDjangoXXWarning``\s matching the new version are removed.
+
+The ``django.utils.deprecation`` module provides some helpful deprecation
+utilities, such as a ``@deprecate_posargs`` decorator to assist with converting
+positional-or-keyword arguments to keyword-only. See the inline documentation
+in the module source.
+
+Testing with a Django project
+=============================
+
+It's important to test local changes using a Django project. This allows
+ensuring that the changes behave as expected in a real environment, especially
+for user-facing features such as templates, forms, or the admin.
+
+To do this:
+
+#. Create a virtual environment and :ref:`install the cloned copy of Django in
+   editable mode <intro-contributing-install-local-copy>`.
+
+#. Set up a Django project outside the source tree (you can use the :doc:`first
+   part of the tutorial </intro/tutorial01>` for guidance).
+
+With this setup, any changes made to the Django checkout will take effect
+immediately in the test project, allowing manual testing of contributions
+against a new or existing app.
 
 JavaScript contributions
 ========================
@@ -367,10 +408,10 @@ Bugs
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
-* If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
-  to the stable version of Django, is there a release note in
-  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
-  branch don't need a release note.
+* If it's a bug that :ref:`qualifies for a backport
+  <supported-versions-policy>` to the stable version of Django, is there a
+  release note in ``docs/releases/A.B.C.txt``? Bug fixes that will be applied
+  only to the main branch don't need a release note.
 
 New Features
 ------------
@@ -397,6 +438,8 @@ All code changes
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?
+* If the change affects the Django admin or rendered HTML output, has
+  :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 
 All tickets
 -----------

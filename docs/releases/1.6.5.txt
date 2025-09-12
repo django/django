@@ -23,10 +23,10 @@ types. Therefore, Django would remove the header if the request was made by
 Internet Explorer.
 
 To remedy this, the special behavior for these older Internet Explorer versions
-has been removed, and the ``Vary`` header is no longer stripped from the response.
-In addition, modifications to the ``Cache-Control`` header for all Internet Explorer
-requests with a ``Content-Disposition`` header have also been removed as they
-were found to have similar issues.
+has been removed, and the ``Vary`` header is no longer stripped from the
+response. In addition, modifications to the ``Cache-Control`` header for all
+Internet Explorer requests with a ``Content-Disposition`` header have also been
+removed as they were found to have similar issues.
 
 Issue: Malformed redirect URLs from user input not correctly validated
 ======================================================================
@@ -43,8 +43,8 @@ The security checks for these redirects (namely
 URLs, such as ``http:\\\\\\djangoproject.com``, which are accepted by some
 browsers with more liberal URL parsing.
 
-To remedy this, the validation in ``is_safe_url()`` has been tightened to be able
-to handle and correctly validate these malformed URLs.
+To remedy this, the validation in ``is_safe_url()`` has been tightened to be
+able to handle and correctly validate these malformed URLs.
 
 Bugfixes
 ========
@@ -55,8 +55,8 @@ Bugfixes
 * Fixed ``pgettext_lazy`` crash when receiving bytestring content on Python 2
   (:ticket:`22565`).
 
-* Fixed the SQL generated when filtering by a negated ``Q`` object that contains
-  a ``F`` object. (:ticket:`22429`).
+* Fixed the SQL generated when filtering by a negated ``Q`` object that
+  contains a ``F`` object. (:ticket:`22429`).
 
 * Avoided overwriting data fetched by ``select_related()`` in certain cases
   which could cause minor performance regressions

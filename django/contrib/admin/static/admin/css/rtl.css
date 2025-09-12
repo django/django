@@ -26,7 +26,12 @@ th {
 }
 
 .object-tools {
-    float: left;
+    text-align: left;
+}
+
+.object-tools li + li {
+    margin-right: 15px;
+    margin-left: 0;
 }
 
 thead th:first-child,
@@ -107,7 +112,7 @@ thead th.sorted .text {
     border-left: none;
 }
 
-.paginator .end {
+.paginator ul {
     margin-left: 6px;
     margin-right: 0;
 }
@@ -237,16 +242,8 @@ fieldset .fieldBox {
     background-position: 0 -168px;
 }
 
-.selector-chooseall {
-    background: url(../img/selector-icons.svg) right -128px no-repeat;
-}
-
 :enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -144px;
-}
-
-.selector-clearall {
-    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
 }
 
 :enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
@@ -290,4 +287,9 @@ form .form-row p.datetime {
 
 .selector .selector-chooser {
     margin: 0;
+}
+
+ul.messagelist li {
+    padding: 10px 65px 10px 10px;
+    background-position-x: calc(100% - 40px);
 }

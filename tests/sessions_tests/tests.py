@@ -41,9 +41,9 @@ from .models import SessionStore as CustomDatabaseSession
 
 
 class SessionTestsMixin:
-    # This does not inherit from TestCase to avoid any tests being run with this
-    # class, which wouldn't work, and to allow different TestCase subclasses to
-    # be used.
+    # This does not inherit from TestCase to avoid any tests being run with
+    # this class, which wouldn't work, and to allow different TestCase
+    # subclasses to be used.
 
     backend = None  # subclasses must specify
 
@@ -326,8 +326,8 @@ class SessionTestsMixin:
         self.assertEqual(await self.session.aget("a"), "b")
 
     def test_invalid_key(self):
-        # Submitting an invalid session key (either by guessing, or if the db has
-        # removed the key) results in a new key being generated.
+        # Submitting an invalid session key (either by guessing, or if the db
+        # has removed the key) results in a new key being generated.
         try:
             session = self.backend("1")
             session.save()
@@ -340,8 +340,8 @@ class SessionTestsMixin:
             session.delete("1")
 
     async def test_invalid_key_async(self):
-        # Submitting an invalid session key (either by guessing, or if the db has
-        # removed the key) results in a new key being generated.
+        # Submitting an invalid session key (either by guessing, or if the db
+        # has removed the key) results in a new key being generated.
         try:
             session = self.backend("1")
             await session.asave()
@@ -490,8 +490,8 @@ class SessionTestsMixin:
         )
 
     def test_get_expire_at_browser_close(self):
-        # Tests get_expire_at_browser_close with different settings and different
-        # set_expiry calls
+        # Tests get_expire_at_browser_close with different settings and
+        # different set_expiry calls
         with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=False):
             self.session.set_expiry(10)
             self.assertIs(self.session.get_expire_at_browser_close(), False)
@@ -513,8 +513,8 @@ class SessionTestsMixin:
             self.assertIs(self.session.get_expire_at_browser_close(), True)
 
     async def test_get_expire_at_browser_close_async(self):
-        # Tests get_expire_at_browser_close with different settings and different
-        # set_expiry calls
+        # Tests get_expire_at_browser_close with different settings and
+        # different set_expiry calls
         with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=False):
             await self.session.aset_expiry(10)
             self.assertIs(await self.session.aget_expire_at_browser_close(), False)
@@ -868,7 +868,8 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
     backend = FileSession
 
     def setUp(self):
-        # Do file session tests in an isolated directory, and kill it after we're done.
+        # Do file session tests in an isolated directory, and kill it after
+        # we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
         self.temp_session_store = settings.SESSION_FILE_PATH = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_session_store)
@@ -1247,7 +1248,8 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
 
     @unittest.expectedFailure
     def test_actual_expiry(self):
-        # The cookie backend doesn't handle non-default expiry dates, see #19201
+        # The cookie backend doesn't handle non-default expiry dates, see
+        # #19201
         super().test_actual_expiry()
 
     async def test_actual_expiry_async(self):

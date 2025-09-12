@@ -70,12 +70,12 @@ class GEOSCoordSeq(GEOSBase):
     def _checkindex(self, index):
         "Check the given index."
         if not (0 <= index < self.size):
-            raise IndexError("invalid GEOS Geometry index: %s" % index)
+            raise IndexError(f"Invalid GEOS Geometry index: {index}")
 
     def _checkdim(self, dim):
         "Check the given dimension."
         if dim < 0 or dim > 2:
-            raise GEOSException('invalid ordinate dimension "%d"' % dim)
+            raise GEOSException(f'Invalid ordinate dimension: "{dim:d}"')
 
     def _get_x(self, index):
         return capi.cs_getx(self.ptr, index, byref(c_double()))
@@ -180,8 +180,8 @@ class GEOSCoordSeq(GEOSBase):
     @property
     def kml(self):
         "Return the KML representation for the coordinates."
-        # Getting the substitution string depending on whether the coordinates have
-        #  a Z dimension.
+        # Getting the substitution string depending on whether the coordinates
+        # have a Z dimension.
         if self.hasz:
             substr = "%s,%s,%s "
         else:

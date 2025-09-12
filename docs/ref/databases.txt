@@ -299,11 +299,11 @@ Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
 
 When specifying ``db_index=True`` on your model fields, Django typically
-outputs a single ``CREATE INDEX`` statement.  However, if the database type
+outputs a single ``CREATE INDEX`` statement. However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perform
+for the column. The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
@@ -439,10 +439,10 @@ Django supports MySQL 8.0.11 and higher.
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
 
-Django expects the database to support Unicode (UTF-8 encoding) and delegates to
-it the task of enforcing transactions and referential integrity. It is important
-to be aware of the fact that the two latter ones aren't actually enforced by
-MySQL when using the MyISAM storage engine, see the next section.
+Django expects the database to support Unicode (UTF-8 encoding) and delegates
+to it the task of enforcing transactions and referential integrity. It is
+important to be aware of the fact that the two latter ones aren't actually
+enforced by MySQL when using the MyISAM storage engine, see the next section.
 
 .. _mysql-storage-engines:
 
@@ -691,8 +691,8 @@ storage engine, you have a couple of options.
 Table names
 -----------
 
-There are `known issues`_ in even the latest versions of MySQL that can cause the
-case of a table name to be altered when certain SQL statements are executed
+There are `known issues`_ in even the latest versions of MySQL that can cause
+the case of a table name to be altered when certain SQL statements are executed
 under certain conditions. It is recommended that you use lowercase table
 names, if possible, to avoid any problems that might arise from this behavior.
 Django uses lowercase table names when it auto-generates table names from
@@ -710,10 +710,10 @@ Both the Django ORM and MySQL (when using the InnoDB :ref:`storage engine
 
 If you use the MyISAM storage engine please be aware of the fact that you will
 receive database-generated errors if you try to use the :ref:`savepoint-related
-methods of the transactions API <topics-db-transactions-savepoints>`. The reason
-for this is that detecting the storage engine of a MySQL database/table is an
-expensive operation so it was decided it isn't worth to dynamically convert
-these methods in no-op's based in the results of such detection.
+methods of the transactions API <topics-db-transactions-savepoints>`. The
+reason for this is that detecting the storage engine of a MySQL database/table
+is an expensive operation so it was decided it isn't worth to dynamically
+convert these methods in no-op's based in the results of such detection.
 
 Notes on specific fields
 ------------------------
@@ -748,9 +748,9 @@ MySQL can store fractional seconds, provided that the column definition
 includes a fractional indication (e.g. ``DATETIME(6)``).
 
 Django will not upgrade existing columns to include fractional seconds if the
-database server supports it. If you want to enable them on an existing database,
-it's up to you to either manually update the column on the target database, by
-executing a command like:
+database server supports it. If you want to enable them on an existing
+database, it's up to you to either manually update the column on the target
+database, by executing a command like:
 
 .. code-block:: sql
 
@@ -762,11 +762,12 @@ or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
 ``TIMESTAMP`` columns
 ~~~~~~~~~~~~~~~~~~~~~
 
-If you are using a legacy database that contains ``TIMESTAMP`` columns, you must
-set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
+If you are using a legacy database that contains ``TIMESTAMP`` columns, you
+must set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
 :djadmin:`inspectdb` maps these columns to
 :class:`~django.db.models.DateTimeField` and if you enable timezone support,
-both MySQL and Django will attempt to convert the values from UTC to local time.
+both MySQL and Django will attempt to convert the values from UTC to local
+time.
 
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
@@ -795,9 +796,10 @@ Automatic typecasting can cause unexpected results
 When performing a query on a string type, but with an integer value, MySQL will
 coerce the types of all values in the table to an integer before performing the
 comparison. If your table contains the values ``'abc'``, ``'def'`` and you
-query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolumn=1``
-will match the value ``'abc1'``. Therefore, string type fields included in Django
-will always cast the value to a string before using it in a query.
+query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE
+mycolumn=1`` will match the value ``'abc1'``. Therefore, string type fields
+included in Django will always cast the value to a string before using it in a
+query.
 
 If you implement custom model fields that inherit from
 :class:`~django.db.models.Field` directly, are overriding
@@ -827,7 +829,7 @@ Substring matching and case sensitivity
 ---------------------------------------
 
 For all SQLite versions, there is some slightly counterintuitive behavior when
-attempting to match some types of strings.  These are triggered when using the
+attempting to match some types of strings. These are triggered when using the
 :lookup:`iexact` or :lookup:`contains` filters in querysets. The behavior
 splits into two cases:
 
@@ -865,14 +867,13 @@ __ https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
 SQLite is meant to be a lightweight database, and thus can't support a high
 level of concurrency. ``OperationalError: database is locked`` errors indicate
 that your application is experiencing more concurrency than ``sqlite`` can
-handle in default configuration. This error means that one thread or process has
-an exclusive lock on the database connection and another thread timed out
+handle in default configuration. This error means that one thread or process
+has an exclusive lock on the database connection and another thread timed out
 waiting for the lock the be released.
 
-Python's SQLite wrapper has
-a default timeout value that determines how long the second thread is allowed to
-wait on the lock before it times out and raises the ``OperationalError: database
-is locked`` error.
+Python's SQLite wrapper has a default timeout value that determines how long
+the second thread is allowed to wait on the lock before it times out and raises
+the ``OperationalError: database is locked`` error.
 
 If you're getting this error, you can solve it by:
 
@@ -950,7 +951,7 @@ Enabling JSON1 extension on SQLite
 ----------------------------------
 
 To use :class:`~django.db.models.JSONField` on SQLite, you need to enable the
-`JSON1 extension`_ on Python's :py:mod:`sqlite3` library. If the extension is
+`JSON1 extension`_ on Python's :mod:`sqlite3` library. If the extension is
 not enabled on your installation, a system error (``fields.E180``) will be
 raised.
 
@@ -1139,24 +1140,11 @@ alternatively set ``"pool"`` to be a dict::
 
 .. _`create_pool()`: https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connection-pooling
 
-Threaded option
----------------
-
-If you plan to run Django in a multithreaded environment (e.g. Apache using the
-default MPM module on any modern operating system), then you **must** set
-the ``threaded`` option of your Oracle database configuration to ``True``::
-
-    "OPTIONS": {
-        "threaded": True,
-    }
-
-Failure to do this may result in crashes and other odd behavior.
-
 INSERT ... RETURNING INTO
 -------------------------
 
 By default, the Oracle backend uses a ``RETURNING INTO`` clause to efficiently
-retrieve the value of an ``AutoField`` when inserting new rows.  This behavior
+retrieve the value of an ``AutoField`` when inserting new rows. This behavior
 may result in a ``DatabaseError`` in certain unusual setups, such as when
 inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
@@ -1195,9 +1183,9 @@ backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the
-value of a ``db_column`` option.  Django quotes all identifiers used
+value of a ``db_column`` option. Django quotes all identifiers used
 in queries to prevent most such problems, but this error can still
-occur when an Oracle datatype is used as a column name.  In
+occur when an Oracle datatype is used as a column name. In
 particular, take care to avoid using the names ``date``,
 ``timestamp``, ``number`` or ``float`` as a field name.
 
@@ -1295,6 +1283,7 @@ by 3rd parties that allow you to use other databases with Django:
 * :pypi:`Firebird <django-firebird>`
 * :pypi:`Google Cloud Spanner <django-google-spanner>`
 * :pypi:`Microsoft SQL Server <mssql-django>`
+* :pypi:`MongoDB <django-mongodb-backend>`
 * :pypi:`Snowflake <django-snowflake>`
 * :pypi:`TiDB <django-tidb>`
 * :pypi:`YugabyteDB <django-yugabytedb>`

@@ -26,7 +26,7 @@ class Cast(Func):
                 compiler, connection, template=template, **extra_context
             )
             format_string = "%H:%M:%f" if db_type == "time" else "%Y-%m-%d %H:%M:%f"
-            params.insert(0, format_string)
+            params = (format_string, *params)
             return sql, params
         elif db_type == "date":
             template = "date(%(expressions)s)"

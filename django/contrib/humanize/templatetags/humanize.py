@@ -1,6 +1,6 @@
 import re
 from datetime import UTC, date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django import template
 from django.template import defaultfilters
@@ -39,11 +39,14 @@ def ordinal(value):
         templates = (
             # Translators: Ordinal format when value ends with 0, e.g. 80th.
             pgettext("ordinal 0", "{}th"),
-            # Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+            # Translators: Ordinal format when value ends with 1, e.g. 81st,
+            # except 11.
             pgettext("ordinal 1", "{}st"),
-            # Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+            # Translators: Ordinal format when value ends with 2, e.g. 82nd,
+            # except 12.
             pgettext("ordinal 2", "{}nd"),
-            # Translators: Ordinal format when value ends with 3, e.g. 83rd, except 13.
+            # Translators: Ordinal format when value ends with 3, e.g. 83rd,
+            # except 13.
             pgettext("ordinal 3", "{}rd"),
             # Translators: Ordinal format when value ends with 4, e.g. 84th.
             pgettext("ordinal 4", "{}th"),
@@ -66,14 +69,15 @@ def ordinal(value):
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
     """
-    Convert an integer to a string containing commas every three digits.
-    For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
+    Convert an integer or float (or a string representation of either) to a
+    string containing commas every three digits. Format localization is
+    respected. For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
     if use_l10n:
         try:
             if not isinstance(value, (float, Decimal)):
-                value = int(value)
-        except (TypeError, ValueError):
+                value = Decimal(value)
+        except (TypeError, ValueError, InvalidOperation):
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
@@ -211,7 +215,8 @@ def naturaltime(value):
 
 class NaturalTimeFormatter:
     time_strings = {
-        # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
+        # Translators: delta will contain a string like '2 months' or
+        # '1 month, 2 weeks'
         "past-day": gettext_lazy("%(delta)s ago"),
         # Translators: please keep a non-breaking space (U+00A0) between count
         # and time unit.
@@ -224,25 +229,27 @@ class NaturalTimeFormatter:
         "past-second": ngettext_lazy("a second ago", "%(count)s seconds ago", "count"),
         "now": gettext_lazy("now"),
         # fmt: off
-        # fmt turned off to avoid black splitting the ngettext_lazy calls to multiple
-        # lines, as this results in gettext missing the 'Translators:' comments.
+        # fmt turned off to avoid black splitting the ngettext_lazy calls to
+        # multiple lines, as this results in gettext missing the 'Translators:'
+        # comments.
         "future-second": ngettext_lazy(
-            # Translators: please keep a non-breaking space (U+00A0) between count
-            # and time unit.
+            # Translators: please keep a non-breaking space (U+00A0) between
+            # count and time unit.
             "a second from now", "%(count)s seconds from now", "count"
         ),
         "future-minute": ngettext_lazy(
-            # Translators: please keep a non-breaking space (U+00A0) between count
-            # and time unit.
+            # Translators: please keep a non-breaking space (U+00A0) between
+            # count and time unit.
             "a minute from now", "%(count)s minutes from now", "count",
         ),
         "future-hour": ngettext_lazy(
-            # Translators: please keep a non-breaking space (U+00A0) between count
-            # and time unit.
+            # Translators: please keep a non-breaking space (U+00A0) between
+            # count and time unit.
             "an hour from now", "%(count)s hours from now", "count",
         ),
         # fmt: on
-        # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
+        # Translators: delta will contain a string like '2 months' or
+        # '1 month, 2 weeks'
         "future-day": gettext_lazy("%(delta)s from now"),
     }
     past_substrings = {

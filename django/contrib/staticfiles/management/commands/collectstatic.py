@@ -25,6 +25,8 @@ class Command(BaseCommand):
         self.symlinked_files = []
         self.unmodified_files = []
         self.post_processed_files = []
+        self.skipped_files = []
+        self.deleted_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
 
@@ -134,12 +136,13 @@ class Command(BaseCommand):
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
                 else:
+                    self.skipped_files.append(prefixed_path)
                     self.log(
                         "Found another file with the destination path '%s'. It "
                         "will be ignored since only the first encountered file "
                         "is collected. If this is not what you want, make sure "
                         "every static file has a unique path." % prefixed_path,
-                        level=1,
+                        level=2,
                     )
 
         # Storage backends may define a post_process() method.
@@ -165,6 +168,8 @@ class Command(BaseCommand):
             "modified": self.copied_files + self.symlinked_files,
             "unmodified": self.unmodified_files,
             "post_processed": self.post_processed_files,
+            "skipped": self.skipped_files,
+            "deleted": self.deleted_files,
         }
 
     def handle(self, **options):
@@ -209,13 +214,21 @@ class Command(BaseCommand):
         collected = self.collect()
 
         if self.verbosity >= 1:
+            deleted_count = len(collected["deleted"])
             modified_count = len(collected["modified"])
             unmodified_count = len(collected["unmodified"])
             post_processed_count = len(collected["post_processed"])
+            skipped_count = len(collected["skipped"])
             return (
-                "\n%(modified_count)s %(identifier)s %(action)s"
-                "%(destination)s%(unmodified)s%(post_processed)s."
+                "\n%(deleted)s%(modified_count)s %(identifier)s %(action)s"
+                "%(destination)s%(unmodified)s%(post_processed)s%(skipped)s."
             ) % {
+                "deleted": (
+                    "%s static file%s deleted, "
+                    % (deleted_count, "" if deleted_count == 1 else "s")
+                    if deleted_count > 0
+                    else ""
+                ),
                 "modified_count": modified_count,
                 "identifier": "static file" + ("" if modified_count == 1 else "s"),
                 "action": "symlinked" if self.symlink else "copied",
@@ -231,6 +244,11 @@ class Command(BaseCommand):
                     collected["post_processed"]
                     and ", %s post-processed" % post_processed_count
                     or ""
+                ),
+                "skipped": (
+                    ", %s skipped due to conflict" % skipped_count
+                    if collected["skipped"]
+                    else ""
                 ),
             }
 
@@ -255,9 +273,11 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" % fpath, level=1)
+                self.log("Pretending to delete '%s'" % fpath, level=2)
+                self.deleted_files.append(fpath)
             else:
-                self.log("Deleting '%s'" % fpath, level=1)
+                self.log("Deleting '%s'" % fpath, level=2)
+                self.deleted_files.append(fpath)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:

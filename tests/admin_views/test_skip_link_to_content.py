@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.test import override_settings
 from django.urls import reverse
 
+from .models import Podcast
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
@@ -36,12 +38,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertTrue(skip_link.is_displayed())
 
         # Press RETURN to skip the navbar links (view site / documentation /
-        # change password / log out) and focus first model in the admin_views list.
+        # change password / log out) and focus first model in the admin_views
+        # list.
         skip_link.send_keys(Keys.RETURN)
         self.assertFalse(skip_link.is_displayed())  # `skip link` disappear.
         keys = [Keys.TAB, Keys.TAB]  # The 1st TAB is the section title.
         if self.browser == "firefox":
-            # For some reason Firefox doesn't focus the section title ('ADMIN_VIEWS').
+            # For some reason Firefox doesn't focus the section title
+            # ('ADMIN_VIEWS').
             keys.remove(Keys.TAB)
         body.send_keys(keys)
         actors_a_tag = self.selenium.find_element(By.LINK_TEXT, "Actors")
@@ -61,7 +65,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertEqual(self.selenium.switch_to.active_element, actors_a_tag)
 
-        # Go to the Actor form and the first input will be focused automatically.
+        # Go to the Actor form and the first input will be focused
+        # automatically.
         with self.wait_page_loaded():
             actors_a_tag.send_keys(Keys.RETURN)
         first_input = self.selenium.find_element(By.ID, "id_name")
@@ -122,3 +127,45 @@ class SeleniumTests(AdminSeleniumTestCase):
             )
             self.assertTrue(is_vertical_scrolleable)
             self.assertFalse(is_horizontal_scrolleable)
+
+    def test_skip_link_keyboard_navigation_in_changelist(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        Podcast.objects.create(name="apple", release_date="2000-09-19")
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_podcast_changelist")
+        )
+        selectors = [
+            "ul.object-tools",  # object_tools.
+            "search#changelist-filter",  # list_filter.
+            "form#changelist-search",  # search_fields.
+            "nav.toplinks",  # date_hierarchy.
+            "form#changelist-form div.actions",  # action.
+            "table#result_list",  # table.
+            "div.changelist-footer",  # footer.
+        ]
+        content = self.selenium.find_element(By.ID, "content-start")
+        content.send_keys(Keys.TAB)
+
+        for selector in selectors:
+            with self.subTest(selector=selector):
+                # Currently focused element.
+                focused_element = self.selenium.switch_to.active_element
+                expected_element = self.selenium.find_element(By.CSS_SELECTOR, selector)
+                element_points = self.selenium.find_elements(
+                    By.CSS_SELECTOR,
+                    f"{selector} a, {selector} input, {selector} button",
+                )
+                self.assertIn(
+                    focused_element.get_attribute("outerHTML"),
+                    expected_element.get_attribute("innerHTML"),
+                )
+                # Move to the next container element via TAB.
+                for point in element_points[::-1]:
+                    if point.is_displayed():
+                        point.send_keys(Keys.TAB)
+                        break

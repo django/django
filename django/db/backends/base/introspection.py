@@ -158,8 +158,9 @@ class BaseDatabaseIntrospection:
     def get_sequences(self, cursor, table_name, table_fields=()):
         """
         Return a list of introspected sequences for table_name. Each sequence
-        is a dict: {'table': <table_name>, 'column': <column_name>}. An optional
-        'name' key can be added if the backend supports named sequences.
+        is a dict: {'table': <table_name>, 'column': <column_name>}. An
+        optional 'name' key can be added if the backend supports named
+        sequences.
         """
         raise NotImplementedError(
             "subclasses of BaseDatabaseIntrospection may require a get_sequences() "
@@ -168,8 +169,8 @@ class BaseDatabaseIntrospection:
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all foreign keys in the given table.
+        Return a dictionary of {field_name: (field_name_other_table,
+        other_table)} representing all foreign keys in the given table.
         """
         raise NotImplementedError(
             "subclasses of BaseDatabaseIntrospection may require a "

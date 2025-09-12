@@ -153,7 +153,6 @@ this. For a small app like polls, this process isn't too difficult.
 
 
        class PollsConfig(AppConfig):
-           default_auto_field = "django.db.models.BigAutoField"
            name = "django_polls"
            label = "polls"
 
@@ -209,7 +208,7 @@ this. For a small app like polls, this process isn't too difficult.
        :caption: ``django-polls/pyproject.toml``
 
        [build-system]
-       requires = ["setuptools>=61.0"]
+       requires = ["setuptools>=69.3"]
        build-backend = "setuptools.build_meta"
 
        [project]
@@ -285,7 +284,7 @@ this. For a small app like polls, this process isn't too difficult.
 #. Check that the :pypi:`build` package is installed (``python -m pip install
    build``) and try building your package by running ``python -m build`` inside
    ``django-polls``. This creates a directory called ``dist`` and builds your
-   new package into source and binary formats, ``django-polls-0.1.tar.gz`` and
+   new package into source and binary formats, ``django_polls-0.1.tar.gz`` and
    ``django_polls-0.1-py3-none-any.whl``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
@@ -315,7 +314,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
    .. code-block:: shell
 
-      python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+      python -m pip install --user django-polls/dist/django_polls-0.1.tar.gz
 
 #. Update ``mysite/settings.py`` to point to the new module name::
 
@@ -344,8 +343,8 @@ the world! If this wasn't just an example, you could now:
 * Upload the package on your website.
 
 * Post the package on a public repository, such as `the Python Package Index
-  (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
-  tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
+  (PyPI)`_. There is `a good tutorial
+  <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
 Installing Python packages with a virtual environment

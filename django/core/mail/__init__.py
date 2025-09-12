@@ -13,18 +13,15 @@ from django.core.exceptions import ImproperlyConfigured
 # backends and the subsequent reorganization (See #10355)
 from django.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
-    BadHeaderError,
     EmailAlternative,
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    SafeMIMEMultipart,
-    SafeMIMEText,
     forbid_multi_line_headers,
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
 from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
@@ -33,12 +30,8 @@ __all__ = [
     "DNS_NAME",
     "EmailMessage",
     "EmailMultiAlternatives",
-    "SafeMIMEText",
-    "SafeMIMEMultipart",
     "DEFAULT_ATTACHMENT_MIME_TYPE",
     "make_msgid",
-    "BadHeaderError",
-    "forbid_multi_line_headers",
     "get_connection",
     "send_mail",
     "send_mass_mail",
@@ -46,10 +39,17 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
+    # RemovedInDjango70Warning: When the deprecation ends, remove the last
+    # entries.
+    "BadHeaderError",
+    "SafeMIMEText",
+    "SafeMIMEMultipart",
+    "forbid_multi_line_headers",
 ]
 
 
-def get_connection(backend=None, fail_silently=False, **kwds):
+@deprecate_posargs(RemovedInDjango70Warning, ["fail_silently"])
+def get_connection(backend=None, *, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
     If backend is None (default), use settings.EMAIL_BACKEND.
@@ -61,11 +61,22 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     return klass(fail_silently=fail_silently, **kwds)
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    [
+        "fail_silently",
+        "auth_user",
+        "auth_password",
+        "connection",
+        "html_message",
+    ],
+)
 def send_mail(
     subject,
     message,
     from_email,
     recipient_list,
+    *,
     fail_silently=False,
     auth_user=None,
     auth_password=None,
@@ -97,8 +108,22 @@ def send_mail(
     return mail.send()
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    [
+        "fail_silently",
+        "auth_user",
+        "auth_password",
+        "connection",
+    ],
+)
 def send_mass_mail(
-    datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None
+    datatuple,
+    *,
+    fail_silently=False,
+    auth_user=None,
+    auth_password=None,
+    connection=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -166,8 +191,11 @@ def _send_server_message(
     mail.send(fail_silently=fail_silently)
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+)
 def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     _send_server_message(
@@ -180,8 +208,11 @@ def mail_admins(
     )
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+)
 def mail_managers(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     _send_server_message(
@@ -192,3 +223,31 @@ def mail_managers(
         fail_silently=fail_silently,
         connection=connection,
     )
+
+
+# RemovedInDjango70Warning.
+_deprecate_on_import = {
+    "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
+    "SafeMIMEText": (
+        "SafeMIMEText is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+    "SafeMIMEMultipart": (
+        "SafeMIMEMultipart is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+}
+
+
+# RemovedInDjango70Warning.
+def __getattr__(name):
+    try:
+        msg = _deprecate_on_import[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    else:
+        # Issue deprecation warnings at time of import.
+        from django.core.mail import message
+
+        warnings.warn(msg, category=RemovedInDjango70Warning)
+        return getattr(message, name)

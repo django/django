@@ -33,7 +33,7 @@ def get_srid_info(srid, connection):
     """
     Return the units, unit name, and spheroid WKT associated with the
     given SRID from the `spatial_ref_sys` (or equivalent) spatial database
-    table for the given database connection.  These results are cached.
+    table for the given database connection. These results are cached.
     """
     from django.contrib.gis.gdal import SpatialReference
 
@@ -81,15 +81,15 @@ class BaseSpatialField(Field):
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """
-        The initialization function for base spatial fields. Takes the following
-        as keyword arguments:
+        The initialization function for base spatial fields. Takes the
+        following as keyword arguments:
 
         srid:
          The spatial reference system identifier, an OGC standard.
          Defaults to 4326 (WGS84).
 
         spatial_index:
-         Indicates whether to create a spatial index.  Defaults to True.
+         Indicates whether to create a spatial index. Defaults to True.
          Set this instead of 'db_index' for geographic fields since index
          creation is different for geometry columns.
         """
@@ -97,7 +97,7 @@ class BaseSpatialField(Field):
         # Setting the index flag with the value of the `spatial_index` keyword.
         self.spatial_index = spatial_index
 
-        # Setting the SRID and getting the units.  Unit information must be
+        # Setting the SRID and getting the units. Unit information must be
         # easily available in the field instance for distance queries.
         self.srid = srid
 
@@ -195,7 +195,8 @@ class BaseSpatialField(Field):
         if isinstance(obj, GEOSGeometry):
             pass
         else:
-            # Check if input is a candidate for conversion to raster or geometry.
+            # Check if input is a candidate for conversion to raster or
+            # geometry.
             is_candidate = isinstance(obj, (bytes, str)) or hasattr(
                 obj, "__geo_interface__"
             )
@@ -251,16 +252,16 @@ class GeometryField(BaseSpatialField):
         arguments:
 
         dim:
-         The number of dimensions for this geometry.  Defaults to 2.
+         The number of dimensions for this geometry. Defaults to 2.
 
         extent:
          Customize the extent, in a 4-tuple of WGS 84 coordinates, for the
-         geometry field entry in the `USER_SDO_GEOM_METADATA` table.  Defaults
+         geometry field entry in the `USER_SDO_GEOM_METADATA` table. Defaults
          to (-180.0, -90.0, 180.0, 90.0).
 
         tolerance:
          Define the tolerance, in meters, to use for the geometry field
-         entry in the `USER_SDO_GEOM_METADATA` table.  Defaults to 0.05.
+         entry in the `USER_SDO_GEOM_METADATA` table. Defaults to 0.05.
         """
         # Setting the dimension of the geometry field.
         self.dim = dim
@@ -395,7 +396,8 @@ class RasterField(BaseSpatialField):
     geography = False
 
     def _check_connection(self, connection):
-        # Make sure raster fields are used only on backends with raster support.
+        # Make sure raster fields are used only on backends with raster
+        # support.
         if (
             not connection.features.gis_enabled
             or not connection.features.supports_raster

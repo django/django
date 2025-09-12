@@ -973,7 +973,8 @@ class TestMigrations(TransactionTestCase):
     )
     def test_adding_arrayfield_with_index(self):
         """
-        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops indexes.
+        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops
+        indexes.
         """
         table_name = "postgres_tests_chartextarrayindexmodel"
         call_command("migrate", "postgres_tests", verbosity=0)

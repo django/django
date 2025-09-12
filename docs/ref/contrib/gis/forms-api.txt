@@ -5,8 +5,8 @@ GeoDjango Forms API
 .. module:: django.contrib.gis.forms
     :synopsis: GeoDjango forms API.
 
-GeoDjango provides some specialized form fields and widgets in order to visually
-display and edit geolocalized data on a map. By default, they use
+GeoDjango provides some specialized form fields and widgets in order to
+visually display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
 .. _OpenLayers: https://openlayers.org/
@@ -96,6 +96,14 @@ Widget attributes
 GeoDjango widgets are template-based, so their attributes are mostly different
 from other Django widget attributes.
 
+.. attribute:: BaseGeometryWidget.base_layer
+
+    .. versionadded:: 6.0
+
+    A string that specifies the identifier for the default base map layer to be
+    used by the corresponding JavaScript map widget. It is passed as part of
+    the widget options when rendering, allowing the ``MapWidget`` to determine
+    which map tile provider or base layer to initialize (default is ``None``).
 
 .. attribute:: BaseGeometryWidget.geom_type
 
@@ -137,32 +145,69 @@ Widget classes
 
     This is an abstract base widget containing the logic needed by subclasses.
     You cannot directly use this widget for a geometry field.
-    Note that the rendering of GeoDjango widgets is based on a template,
-    identified by the :attr:`template_name` class attribute.
+    Note that the rendering of GeoDjango widgets is based on a base layer name,
+    identified by the :attr:`base_layer` class attribute.
 
 ``OpenLayersWidget``
 
 .. class:: OpenLayersWidget
 
-    This is the default widget used by all GeoDjango form fields.
-    ``template_name`` is ``gis/openlayers.html``.
+    This is the default widget used by all GeoDjango form fields. Attributes
+    are:
 
-    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``ol.js`` file hosted
-    on the ``cdn.jsdelivr.net`` content-delivery network. You can subclass
-    these widgets in order to specify your own version of the ``ol.js`` file in
-    the ``js`` property of the inner ``Media`` class (see
+    .. attribute:: base_layer
+
+        .. versionadded:: 6.0
+
+        ``nasaWorldview``
+
+    .. attribute:: template_name
+
+        ``gis/openlayers.html``.
+
+    .. attribute:: map_srid
+
+        ``3857``
+
+    ``OpenLayersWidget`` and :class:`OSMWidget` include the ``ol.js`` and
+    ``ol.css`` files hosted on the ``cdn.jsdelivr.net`` content-delivery
+    network. These files can be overridden by subclassing the widget and
+    setting the ``js`` and ``css`` properties of the inner ``Media`` class (see
     :ref:`assets-as-a-static-definition`).
+
+    .. admonition:: External assets with CSP
+
+        When :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is
+        enabled, the default OpenLayers CDN assets (``ol.js`` and ``ol.css``)
+        will be blocked unless explicitly allowed. This can be addressed in one
+        of two ways: **serve assets locally** by subclassing the widget and
+        provide local copies of the JavaScript and CSS files, or
+        **allow the CDN in the CSP policy**.
+
+        For example, to allow the default NASA Worldview base layer (replace
+        ``x.y.z`` with the actual version)::
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                "default-src": [CSP.SELF],
+                "script-src": [CSP.SELF, "https://cdn.jsdelivr.net/npm/ol@x.y.z/dist/ol.js"],
+                "style-src": [CSP.SELF, "https://cdn.jsdelivr.net/npm/ol@x.y.z/ol.css"],
+                "img-src": [CSP.SELF, "https://*.earthdata.nasa.gov"],
+            }
 
 ``OSMWidget``
 
 .. class:: OSMWidget
 
-    This widget uses an OpenStreetMap base layer to display geographic objects
-    on. Attributes are:
+    This widget specialized :class:`OpenLayersWidget` and uses an OpenStreetMap
+    base layer to display geographic objects on. Attributes are:
 
-    .. attribute:: template_name
+    .. attribute:: base_layer
 
-        ``gis/openlayers-osm.html``
+        .. versionadded:: 6.0
+
+        ``osm``
 
     .. attribute:: default_lat
     .. attribute:: default_lon
@@ -174,8 +219,55 @@ Widget classes
 
         The default map zoom is ``12``.
 
-    The :class:`OpenLayersWidget` note about JavaScript file hosting above also
-    applies here. See also this `FAQ answer`_ about ``https`` access to map
-    tiles.
+    The :class:`OpenLayersWidget` note about using external assets also applies
+    here. See also this `FAQ answer`_ about ``https`` access to map tiles.
+
+    .. admonition:: OpenStreetMap tiles with CSP
+
+        This widget uses OpenStreetMap tiles instead of NASA Worldview. If
+        :ref:`security-csp` enabled, both the OpenLayers CDN resources (as
+        required by :class:`OpenLayersWidget`) and the OpenStreetMap tile
+        servers must be allowed::
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                # other directives
+                "img-src": [CSP.SELF, "https://tile.openstreetmap.org"],
+            }
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
+
+    .. versionchanged:: 6.0
+
+        The ``OSMWidget`` no longer uses a custom template. Consequently, the
+        ``gis/openlayers-osm.html`` template was removed.
+
+.. _geometry-widgets-customization:
+
+Customizing the base layer used in OpenLayers-based widgets
+-----------------------------------------------------------
+
+.. versionadded:: 6.0
+
+To customize the base layer displayed in OpenLayers-based geometry widgets,
+define a new layer builder in a custom JavaScript file. For example:
+
+.. code-block:: javascript
+   :caption: ``path-to-file.js``
+
+    MapWidget.layerBuilder.custom_layer_name = function () {
+        // Return an OpenLayers layer instance.
+        return new ol.layer.Tile({source: new ol.source.<ChosenSource>()});
+    };
+
+Then, subclass a standard geometry widget and set the ``base_layer``::
+
+    from django.contrib.gis.forms.widgets import OpenLayersWidget
+
+
+    class YourCustomWidget(OpenLayersWidget):
+        base_layer = "custom_layer_name"
+
+        class Media:
+            js = ["path-to-file.js"]

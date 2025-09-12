@@ -239,7 +239,8 @@ Instead of a constant, you can also pass any callable:
     >>> print(DateForm())
     <div><label for="id_day">Day:</label><input type="text" name="day" value="2023-02-11" required id="id_day"></div>
 
-The callable will be evaluated only when the unbound form is displayed, not when it is defined.
+The callable will be evaluated only when the unbound form is displayed, not
+when it is defined.
 
 ``widget``
 ----------
@@ -326,8 +327,8 @@ inside ``aria-describedby``:
 .. attribute:: Field.error_messages
 
 The ``error_messages`` argument lets you override the default messages that the
-field will raise. Pass in a dictionary with keys matching the error messages you
-want to override. For example, here is the default error message:
+field will raise. Pass in a dictionary with keys matching the error messages
+you want to override. For example, here is the default error message:
 
 .. code-block:: pycon
 
@@ -411,10 +412,10 @@ Checking if the field data has changed
 
 .. method:: Field.has_changed()
 
-The ``has_changed()`` method is used to determine if the field value has changed
-from the initial value. Returns ``True`` or ``False``.
+The ``has_changed()`` method is used to determine if the field value has
+changed from the initial value. Returns ``True`` or ``False``.
 
-See the :class:`Form.has_changed()` documentation for more information.
+See the :class:`Form.has_changed` documentation for more information.
 
 .. _built-in-fields:
 
@@ -443,10 +444,10 @@ For each field, we describe the default widget used if you don't specify
     .. note::
 
         Since all ``Field`` subclasses have ``required=True`` by default, the
-        validation condition here is important. If you want to include a boolean
-        in your form that can be either ``True`` or ``False`` (e.g. a checked or
-        unchecked checkbox), you must remember to pass in ``required=False`` when
-        creating the ``BooleanField``.
+        validation condition here is important. If you want to include a
+        boolean in your form that can be either ``True`` or ``False`` (e.g. a
+        checked or unchecked checkbox), you must remember to pass in
+        ``required=False`` when creating the ``BooleanField``.
 
 ``CharField``
 -------------
@@ -489,8 +490,8 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the given value exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
-    replaced with the selected choice.
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will
+    be replaced with the selected choice.
 
     Takes one extra argument:
 
@@ -678,8 +679,9 @@ For each field, we describe the default widget used if you don't specify
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
     The ``max_length`` error refers to the length of the filename. In the error
-    message for that key, ``%(max)d`` will be replaced with the maximum filename
-    length and ``%(length)d`` will be replaced with the current filename length.
+    message for that key, ``%(max)d`` will be replaced with the maximum
+    filename length and ``%(length)d`` will be replaced with the current
+    filename length.
 
 ``FilePathField``
 -----------------
@@ -692,8 +694,8 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The field allows choosing from files inside a certain directory. It takes five
-    extra arguments; only ``path`` is required:
+    The field allows choosing from files inside a certain directory. It takes
+    five extra arguments; only ``path`` is required:
 
     .. attribute:: path
 
@@ -708,21 +710,20 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: match
 
-        A regular expression pattern; only files with names matching this expression
-        will be allowed as choices.
+        A regular expression pattern; only files with names matching this
+        expression will be allowed as choices.
 
     .. attribute:: allow_files
 
-        Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
-        whether files in the specified location should be included.  Either this or
-        :attr:`allow_folders` must be ``True``.
+        Optional. Either ``True`` or ``False``. Default is ``True``. Specifies
+        whether files in the specified location should be included. Either this
+        or :attr:`allow_folders` must be ``True``.
 
     .. attribute:: allow_folders
 
-        Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
-        whether folders in the specified location should be included.  Either this or
-        :attr:`allow_files` must be ``True``.
-
+        Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
+        whether folders in the specified location should be included. Either
+        this or :attr:`allow_files` must be ``True``.
 
 ``FloatField``
 --------------
@@ -765,15 +766,16 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A string. IPv6 addresses are normalized as described below.
+    * Normalizes to: A string. IPv6 addresses are normalized as described
+      below.
     * Validates that the given value is a valid IP address.
     * Error message keys: ``required``, ``invalid``, ``max_length``
 
     The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
-    including using the IPv4 format suggested in paragraph 3 of that section, like
-    ``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
-    ``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
-    are converted to lowercase.
+    including using the IPv4 format suggested in paragraph 3 of that section,
+    like ``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be
+    normalized to ``2001::1``, and ``::ffff:0a0a:0a0a`` to
+    ``::ffff:10.10.10.10``. All characters are converted to lowercase.
 
     Takes three optional arguments:
 
@@ -917,7 +919,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: encoder
 
-        A :py:class:`json.JSONEncoder` subclass to serialize data types not
+        A :class:`json.JSONEncoder` subclass to serialize data types not
         supported by the standard JSON serializer (e.g. ``datetime.datetime``
         or :class:`~python:uuid.UUID`). For example, you can use the
         :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
@@ -926,14 +928,14 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: decoder
 
-        A :py:class:`json.JSONDecoder` subclass to deserialize the input. Your
+        A :class:`json.JSONDecoder` subclass to deserialize the input. Your
         deserialization may need to account for the fact that you can't be
         certain of the input type. For example, you run the risk of returning a
         ``datetime`` that was actually a string that just happened to be in the
         same format chosen for ``datetime``\s.
 
         The ``decoder`` can be used to validate the input. If
-        :py:class:`json.JSONDecodeError` is raised during the deserialization,
+        :class:`json.JSONDecodeError` is raised during the deserialization,
         a ``ValidationError`` will be raised.
 
         Defaults to ``json.JSONDecoder``.
@@ -962,10 +964,11 @@ For each field, we describe the default widget used if you don't specify
       of choices.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
-    replaced with the selected choice.
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will
+    be replaced with the selected choice.
 
-    Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
+    Takes one extra required argument, ``choices``, as for
+    :class:`ChoiceField`.
 
 ``NullBooleanField``
 --------------------
@@ -1074,8 +1077,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: TypedChoiceField(**kwargs)
 
-    Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
-    extra arguments, :attr:`coerce` and :attr:`empty_value`.
+    Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes
+    two extra arguments, :attr:`coerce` and :attr:`empty_value`.
 
     * Default widget: :class:`Select`
     * Empty value: Whatever you've given as :attr:`empty_value`.
@@ -1089,26 +1092,27 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: coerce
 
-        A function that takes one argument and returns a coerced value. Examples
-        include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
-        to an identity function. Note that coercion happens after input
-        validation, so it is possible to coerce to a value not present in
-        ``choices``.
+        A function that takes one argument and returns a coerced value.
+        Examples include the built-in ``int``, ``float``, ``bool`` and other
+        types. Defaults to an identity function. Note that coercion happens
+        after input validation, so it is possible to coerce to a value not
+        present in ``choices``.
 
     .. attribute:: empty_value
 
         The value to use to represent "empty." Defaults to the empty string;
-        ``None`` is another common choice here. Note that this value will not be
-        coerced by the function given in the ``coerce`` argument, so choose it
-        accordingly.
+        ``None`` is another common choice here. Note that this value will not
+        be coerced by the function given in the ``coerce`` argument, so choose
+        it accordingly.
 
 ``TypedMultipleChoiceField``
 ----------------------------
 
 .. class:: TypedMultipleChoiceField(**kwargs)
 
-    Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
-    takes two extra arguments, ``coerce`` and ``empty_value``.
+    Just like a :class:`MultipleChoiceField`, except
+    :class:`TypedMultipleChoiceField` takes two extra arguments, ``coerce`` and
+    ``empty_value``.
 
     * Default widget: :class:`SelectMultiple`
     * Empty value: Whatever you've given as ``empty_value``
@@ -1118,8 +1122,8 @@ For each field, we describe the default widget used if you don't specify
       coerced.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
-    replaced with the selected choice.
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will
+    be replaced with the selected choice.
 
     Takes two extra arguments, ``coerce`` and ``empty_value``, as for
     :class:`TypedChoiceField`.
@@ -1178,8 +1182,8 @@ Slightly complex built-in ``Field`` classes
 
     .. attribute:: fields
 
-        The list of fields that should be used to validate the field's value (in
-        the order in which they are provided).
+        The list of fields that should be used to validate the field's value
+        (in the order in which they are provided).
 
         .. code-block:: pycon
 
@@ -1199,7 +1203,8 @@ Slightly complex built-in ``Field`` classes
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: the type returned by the ``compress`` method of the subclass.
+    * Normalizes to: the type returned by the ``compress`` method of the
+      subclass.
     * Validates the given value against each of the fields specified
       as an argument to the ``MultiValueField``.
     * Error message keys: ``required``, ``invalid``, ``incomplete``
@@ -1217,7 +1222,7 @@ Slightly complex built-in ``Field`` classes
     .. attribute:: fields
 
         A tuple of fields whose values are cleaned and subsequently combined
-        into a single value.  Each value of the field is cleaned by the
+        into a single value. Each value of the field is cleaned by the
         corresponding field in ``fields`` -- the first value is cleaned by the
         first field, the second value is cleaned by the second field, etc.
         Once all fields are cleaned, the list of clean values is combined into
@@ -1307,16 +1312,16 @@ Slightly complex built-in ``Field`` classes
         A list of formats used to attempt to convert a string to a valid
         ``datetime.date`` object.
 
-    If no ``input_date_formats`` argument is provided, the default input formats
-    for :class:`DateField` are used.
+    If no ``input_date_formats`` argument is provided, the default input
+    formats for :class:`DateField` are used.
 
     .. attribute:: input_time_formats
 
         A list of formats used to attempt to convert a string to a valid
         ``datetime.time`` object.
 
-    If no ``input_time_formats`` argument is provided, the default input formats
-    for :class:`TimeField` are used.
+    If no ``input_time_formats`` argument is provided, the default input
+    formats for :class:`TimeField` are used.
 
 .. _fields-which-handle-relationships:
 
@@ -1325,9 +1330,9 @@ Fields which handle relationships
 
 Two fields are available for representing relationships between
 models: :class:`ModelChoiceField` and
-:class:`ModelMultipleChoiceField`.  Both of these fields require a
+:class:`ModelMultipleChoiceField`. Both of these fields require a
 single ``queryset`` parameter that is used to create the choices for
-the field.  Upon form validation, these fields will place either one
+the field. Upon form validation, these fields will place either one
 model object (in the case of ``ModelChoiceField``) or multiple model
 objects (in the case of ``ModelMultipleChoiceField``) into the
 ``cleaned_data`` dictionary of the form.
@@ -1378,11 +1383,11 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
     .. attribute:: empty_label
 
-        By default the ``<select>`` widget used by ``ModelChoiceField`` will have an
-        empty choice at the top of the list. You can change the text of this
-        label (which is ``"---------"`` by default) with the ``empty_label``
-        attribute, or you can disable the empty label entirely by setting
-        ``empty_label`` to ``None``::
+        By default the ``<select>`` widget used by ``ModelChoiceField`` will
+        have an empty choice at the top of the list. You can change the text of
+        this label (which is ``"---------"`` by default) with the
+        ``empty_label`` attribute, or you can disable the empty label entirely
+        by setting ``empty_label`` to ``None``::
 
             # A custom empty label
             field1 = forms.ModelChoiceField(queryset=..., empty_label="(Nothing)")
@@ -1631,7 +1636,7 @@ only requirements are that it implement a ``clean()`` method and that its
 
 You can also customize how a field will be accessed by overriding
 :attr:`~django.forms.Field.bound_field_class` or override
-:meth:`.Field.get_bound_field()` if you need more flexibility when creating
+:meth:`.Field.get_bound_field` if you need more flexibility when creating
 the ``BoundField``:
 
 .. method:: Field.get_bound_field(form, field_name)

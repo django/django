@@ -29,7 +29,14 @@ class Signal:
     Internal attributes:
 
         receivers:
-            [((id(receiver), id(sender)), ref(receiver), ref(sender), is_async)]
+            [
+                (
+                    (id(receiver), id(sender)),
+                    ref(receiver),
+                    ref(sender),
+                    is_async,
+                )
+            ]
         sender_receivers_cache:
             WeakKeyDictionary[sender, list[receiver]]
     """
@@ -75,12 +82,12 @@ class Signal:
             weak
                 Whether to use weak references to the receiver. By default, the
                 module will attempt to use weak references to the receiver
-                objects. If this parameter is false, then strong references will
-                be used.
+                objects. If this parameter is false, then strong references
+                will be used.
 
             dispatch_uid
-                An identifier used to uniquely identify a particular instance of
-                a receiver. This will usually be a string, though it may be
+                An identifier used to uniquely identify a particular instance
+                of a receiver. This will usually be a string, though it may be
                 anything hashable.
         """
         from django.conf import settings
@@ -133,8 +140,8 @@ class Signal:
         """
         Disconnect receiver from sender for signal.
 
-        If weak references are used, disconnect need not be called. The receiver
-        will be removed from dispatch automatically.
+        If weak references are used, disconnect need not be called. The
+        receiver will be removed from dispatch automatically.
 
         Arguments:
 
@@ -173,9 +180,9 @@ class Signal:
         """
         Send signal from sender to all connected receivers.
 
-        If any receiver raises an error, the error propagates back through send,
-        terminating the dispatch loop. So it's possible that all receivers
-        won't be called if an error is raised.
+        If any receiver raises an error, the error propagates back through
+        send, terminating the dispatch loop. So it's possible that all
+        receivers won't be called if an error is raised.
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
@@ -292,8 +299,8 @@ class Signal:
         Arguments:
 
             sender
-                The sender of the signal. Can be any Python object (normally one
-                registered with a connect if you actually want something to
+                The sender of the signal. Can be any Python object (normally
+                one registered with a connect if you actually want something to
                 occur).
 
             named
@@ -357,8 +364,8 @@ class Signal:
         Arguments:
 
             sender
-                The sender of the signal. Can be any Python object (normally one
-                registered with a connect if you actually want something to
+                The sender of the signal. Can be any Python object (normally
+                one registered with a connect if you actually want something to
                 occur).
 
             named
@@ -439,8 +446,9 @@ class Signal:
         receivers = None
         if self.use_caching and not self._dead_receivers:
             receivers = self.sender_receivers_cache.get(sender)
-            # We could end up here with NO_RECEIVERS even if we do check this case in
-            # .send() prior to calling _live_receivers() due to concurrent .send() call.
+            # We could end up here with NO_RECEIVERS even if we do check this
+            # case in .send() prior to calling _live_receivers() due to
+            # concurrent .send() call.
             if receivers is NO_RECEIVERS:
                 return [], []
         if receivers is None:

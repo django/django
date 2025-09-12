@@ -208,13 +208,6 @@ class BaseDatabaseOperations:
         else:
             return ["DISTINCT"], []
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the newly created data.
-        """
-        return cursor.fetchone()
-
     def force_group_by(self):
         """
         Return a GROUP BY clause to use with a HAVING clause when no grouping
@@ -358,13 +351,31 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_columns(self, fields):
+    def returning_columns(self, fields):
         """
-        For backends that support returning columns as part of an insert query,
-        return the SQL and params to append to the INSERT query. The returned
-        fragment should contain a format string to hold the appropriate column.
+        For backends that support returning columns as part of an insert or
+        update query, return the SQL and params to append to the query.
+        The returned fragment should contain a format string to hold the
+        appropriate column.
         """
-        pass
+        if not fields:
+            return "", ()
+        columns = [
+            "%s.%s"
+            % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            for field in fields
+        ]
+        return "RETURNING %s" % ", ".join(columns), ()
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        """
+        Given a cursor object for a DML query with a RETURNING statement,
+        return the selected returning rows of tuples.
+        """
+        return cursor.fetchall()
 
     def compiler(self, compiler_name):
         """
@@ -546,8 +557,8 @@ class BaseDatabaseOperations:
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
         """
         if value is None:
             return None
@@ -792,3 +803,32 @@ class BaseDatabaseOperations:
     def format_debug_sql(self, sql):
         # Hook for backends (e.g. NoSQL) to customize formatting.
         return sqlparse.format(sql, reindent=True, keyword_case="upper")
+
+    def format_json_path_numeric_index(self, num):
+        """
+        Hook for backends to customize array indexing in JSON paths.
+        """
+        return "[%s]" % num
+
+    def compile_json_path(self, key_transforms, include_root=True):
+        """
+        Hook for backends to customize all aspects of JSON path construction.
+        """
+        path = ["$"] if include_root else []
+        for key_transform in key_transforms:
+            try:
+                num = int(key_transform)
+            except ValueError:  # Non-integer.
+                path.append(".")
+                path.append(json.dumps(key_transform))
+            else:
+                if (
+                    num < 0
+                    and not self.connection.features.supports_json_negative_indexing
+                ):
+                    raise NotSupportedError(
+                        "Using negative JSON array indices is not supported on this "
+                        "database backend."
+                    )
+                path.append(self.format_json_path_numeric_index(num))
+        return "".join(path)

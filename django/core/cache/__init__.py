@@ -3,7 +3,7 @@ Caching framework.
 
 This package defines set of cache backends that all conform to a simple API.
 In a nutshell, a cache is a set of values -- which can be any object that
-may be pickled -- identified by string keys.  For the complete API, see
+may be pickled -- identified by string keys. For the complete API, see
 the abstract BaseCache class in django.core.cache.backends.base.
 
 Client code should use the `cache` variable defined here to access the default

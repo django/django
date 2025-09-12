@@ -22,7 +22,7 @@ from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
-from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
+from .utils import BoundVar, BulkInsertMapper, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -298,12 +298,27 @@ END;
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        columns = []
-        for param in returning_params:
-            value = param.get_value()
-            columns.append(value[0])
-        return tuple(columns)
+    def returning_columns(self, fields):
+        if not fields:
+            return "", ()
+        field_names = []
+        params = []
+        for field in fields:
+            field_names.append(
+                "%s.%s"
+                % (
+                    self.quote_name(field.model._meta.db_table),
+                    self.quote_name(field.column),
+                )
+            )
+            params.append(BoundVar(field))
+        return "RETURNING %s INTO %s" % (
+            ", ".join(field_names),
+            ", ".join(["%s"] * len(params)),
+        ), tuple(params)
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        return list(zip(*(param.get_value() for param in returning_params)))
 
     def no_limit_value(self):
         return None
@@ -372,15 +387,15 @@ END;
         return value.read()
 
     def quote_name(self, name):
-        # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+        # SQL92 requires delimited (quoted) names to be case-sensitive. When
         # not quoted, Oracle has case-insensitive behavior for identifiers, but
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % truncate_name(name, self.max_name_length())
-        # Oracle puts the query text into a (query % args) construct, so % signs
-        # in names need to be escaped. The '%%' will be collapsed back to '%' at
-        # that stage so we aren't really making the name longer here.
+        # Oracle puts the query text into a (query % args) construct, so %
+        # signs in names need to be escaped. The '%%' will be collapsed back to
+        # '%' at that stage so we aren't really making the name longer here.
         name = name.replace("%", "%%")
         return name.upper()
 
@@ -390,25 +405,6 @@ END;
         else:
             match_option = "'i'"
         return "REGEXP_LIKE(%%s, %%s, %s)" % match_option
-
-    def return_insert_columns(self, fields):
-        if not fields:
-            return "", ()
-        field_names = []
-        params = []
-        for field in fields:
-            field_names.append(
-                "%s.%s"
-                % (
-                    self.quote_name(field.model._meta.db_table),
-                    self.quote_name(field.column),
-                )
-            )
-            params.append(InsertVar(field))
-        return "RETURNING %s INTO %s" % (
-            ", ".join(field_names),
-            ", ".join(["%s"] * len(params)),
-        ), tuple(params)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
@@ -589,8 +585,8 @@ END;
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
 
         If naive datetime is passed assumes that is in UTC. Normally Django
         models.DateTimeField makes sure that if USE_TZ is True passed datetime

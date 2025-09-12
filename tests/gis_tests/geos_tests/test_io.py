@@ -25,18 +25,27 @@ class GEOSIOTest(SimpleTestCase):
         g2 = wkt_r.read(wkt)
 
         for geom in (g1, g2):
-            self.assertEqual(ref, geom)
+            with self.subTest(geom=geom):
+                self.assertEqual(ref, geom)
 
         # Should only accept string objects.
-        with self.assertRaises(TypeError):
-            wkt_r.read(1)
-        with self.assertRaises(TypeError):
-            wkt_r.read(memoryview(b"foo"))
+        bad_input = (1, 5.23, None, False, memoryview(b"foo"))
+        msg = "'wkt' must be bytes or str (got {} instead)."
+        for bad_wkt in bad_input:
+            with (
+                self.subTest(bad_wkt=bad_wkt),
+                self.assertRaisesMessage(TypeError, msg.format(bad_wkt)),
+            ):
+                wkt_r.read(bad_wkt)
 
     def test02_wktwriter(self):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
-        with self.assertRaises(TypeError):
+        msg = (
+            "Incompatible pointer type: "
+            "<class 'django.contrib.gis.geos.prototypes.io.LP_WKTReader_st'>."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             wkt_w.ptr = WKTReader.ptr_type()
 
         ref = GEOSGeometry("POINT (5 23)")
@@ -67,11 +76,16 @@ class GEOSIOTest(SimpleTestCase):
         g2 = wkb_r.read(hex_bin)
         g3 = wkb_r.read(hex_str)
         for geom in (g1, g2, g3):
-            self.assertEqual(ref, geom)
+            with self.subTest(geom=geom):
+                self.assertEqual(ref, geom)
 
         bad_input = (1, 5.23, None, False)
+        msg = "'wkb' must be bytes, str or memoryview (got {} instead)."
         for bad_wkb in bad_input:
-            with self.assertRaises(TypeError):
+            with (
+                self.subTest(bad_wkb=bad_wkb),
+                self.assertRaisesMessage(TypeError, msg.format(bad_wkb)),
+            ):
                 wkb_r.read(bad_wkb)
 
     def test04_wkbwriter(self):
@@ -89,9 +103,13 @@ class GEOSIOTest(SimpleTestCase):
         self.assertEqual(wkb1, wkb_w.write(g))
 
         # Ensuring bad byteorders are not accepted.
+        msg = "Byte order parameter must be 0 (Big Endian) or 1 (Little Endian)."
         for bad_byteorder in (-1, 2, 523, "foo", None):
             # Equivalent of `wkb_w.byteorder = bad_byteorder`
-            with self.assertRaises(ValueError):
+            with (
+                self.subTest(bad_byteorder=bad_byteorder),
+                self.assertRaisesMessage(ValueError, msg),
+            ):
                 wkb_w._set_byteorder(bad_byteorder)
 
         # Setting the byteorder to 0 (for Big Endian)
@@ -114,9 +132,11 @@ class GEOSIOTest(SimpleTestCase):
         wkb3d_srid = memoryview(binascii.a2b_hex(hex3d_srid))
 
         # Ensuring bad output dimensions are not accepted
+        msg = "WKB output dimension must be 2 or 3"
         for bad_outdim in (-1, 0, 1, 4, 423, "foo", None):
-            with self.assertRaisesMessage(
-                ValueError, "WKB output dimension must be 2 or 3"
+            with (
+                self.subTest(bad_outdim=bad_outdim),
+                self.assertRaisesMessage(ValueError, msg),
             ):
                 wkb_w.outdim = bad_outdim
 
@@ -221,9 +241,12 @@ class GEOSIOTest(SimpleTestCase):
             wkb_w.byteorder = byteorder
             for srid, hex in enumerate(hexes):
                 wkb_w.srid = srid
-                self.assertEqual(wkb_w.write_hex(p), hex)
-                self.assertEqual(
-                    GEOSGeometry(wkb_w.write_hex(p)), p if srid else p_no_srid
-                )
-                self.assertEqual(wkb_w.write(p), memoryview(binascii.a2b_hex(hex)))
-                self.assertEqual(GEOSGeometry(wkb_w.write(p)), p if srid else p_no_srid)
+                with self.subTest(byteorder=byteorder, hexes=hexes):
+                    self.assertEqual(wkb_w.write_hex(p), hex)
+                    self.assertEqual(
+                        GEOSGeometry(wkb_w.write_hex(p)), p if srid else p_no_srid
+                    )
+                    self.assertEqual(wkb_w.write(p), memoryview(binascii.a2b_hex(hex)))
+                    self.assertEqual(
+                        GEOSGeometry(wkb_w.write(p)), p if srid else p_no_srid
+                    )

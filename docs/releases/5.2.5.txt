@@ -1,0 +1,27 @@
+==========================
+Django 5.2.5 release notes
+==========================
+
+*August 6, 2025*
+
+Django 5.2.5 fixes several bugs in 5.2.4.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2.1 that prevented the usage of ``UNNEST``
+  PostgreSQL strategy of ``QuerySet.bulk_create()`` with foreign keys
+  (:ticket:`36502`).
+
+* Fixed a crash in Django 5.2 when filtering against a composite primary key
+  using a tuple containing expressions (:ticket:`36522`).
+
+* Fixed a crash in Django 5.2 when validating a model that uses
+  ``GeneratedField`` or constraints composed of ``Q`` and ``Case`` lookups
+  (:ticket:`36518`).
+
+* Added compatibility for ``docutils`` 0.22 (:ticket:`36535`).
+
+* Fixed a crash in Django 5.2 when using a ``ManyToManyField`` on a model with
+  a composite primary key, by extending the ``fields.E347`` system check
+  (:ticket:`36530`).

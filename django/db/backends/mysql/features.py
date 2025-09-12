@@ -44,13 +44,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     # COLLATE must be wrapped in parentheses because MySQL treats COLLATE as an
@@ -64,6 +57,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
+
+    supports_json_negative_indexing = False
 
     @cached_property
     def minimum_database_version(self):
@@ -116,16 +111,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
-            skips.update(
-                {
-                    "GROUP BY cannot contain nonaggregated column when "
-                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #34262.": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_group_by_nested_expression_with_params",
-                    },
-                }
-            )
         if self.connection.mysql_version < (8, 0, 31):
             skips.update(
                 {
@@ -152,7 +137,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def _mysql_storage_engine(self):
-        "Internal method used in Django tests. Don't rely on this from your code"
+        """
+        Internal method used in Django tests. Don't rely on this from your code
+        """
         return self.connection.mysql_server_data["default_storage_engine"]
 
     @cached_property
@@ -302,3 +289,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
         return True
+
+    @cached_property
+    def supports_any_value(self):
+        return not self.connection.mysql_is_mariadb

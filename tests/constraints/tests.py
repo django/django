@@ -3,7 +3,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
-from django.db.models import F
+from django.db.models import Case, F, When
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
 from django.db.models.functions import Abs, Lower, Sqrt, Upper
 from django.db.transaction import atomic
@@ -360,6 +360,22 @@ class CheckConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             constraint_with_pk.validate(ChildModel, ChildModel(id=1, age=1))
         constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=1), exclude={"pk"})
+
+    def test_validate_fk_attname(self):
+        constraint_with_fk = models.CheckConstraint(
+            condition=models.Q(uniqueconstraintproduct_ptr_id__isnull=False),
+            name="parent_ptr_present",
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "Constraint “parent_ptr_present” is violated."
+        ):
+            constraint_with_fk.validate(
+                ChildUniqueConstraintProduct, ChildUniqueConstraintProduct()
+            )
+        constraint_with_fk.validate(
+            ChildUniqueConstraintProduct,
+            ChildUniqueConstraintProduct(uniqueconstraintproduct_ptr_id=1),
+        )
 
     @skipUnlessDBFeature("supports_json_field")
     def test_validate_jsonfield_exact(self):
@@ -1046,6 +1062,23 @@ class UniqueConstraintTests(TestCase):
         constraint.validate(
             UniqueConstraintProduct,
             UniqueConstraintProduct(updated=updated_date + timedelta(days=1)),
+        )
+
+    def test_validate_case_when(self):
+        UniqueConstraintProduct.objects.create(name="p1")
+        constraint = models.UniqueConstraint(
+            Case(When(color__isnull=True, then=F("name"))),
+            name="name_without_color_uniq",
+        )
+        msg = "Constraint “name_without_color_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(name="p1"),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name="p1", color="green"),
         )
 
     def test_validate_ordered_expression(self):

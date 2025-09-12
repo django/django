@@ -30,7 +30,7 @@ def get_admin_log(parser, token):
 
     Usage::
 
-        {% get_admin_log [limit] as [varname] for_user [context_var_with_user_obj] %}
+        {% get_admin_log [limit] as [varname] for_user [user_id_or_varname] %}
 
     Examples::
 
@@ -38,9 +38,9 @@ def get_admin_log(parser, token):
         {% get_admin_log 10 as admin_log for_user user %}
         {% get_admin_log 10 as admin_log %}
 
-    Note that ``context_var_containing_user_obj`` can be a hard-coded integer
-    (user ID) or the name of a template context variable containing the user
-    object whose ID you want.
+    Note that ``user_id_or_varname`` can be a hard-coded integer (user ID)
+    or the name of a template context variable containing the user object
+    whose ID you want.
     """
     tokens = token.contents.split()
     if len(tokens) < 4:

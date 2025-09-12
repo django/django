@@ -49,7 +49,7 @@ msgstr "選擇已選取的 %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "移除選取的 %s"
 
 #, javascript-format
 msgid "Chosen %s"

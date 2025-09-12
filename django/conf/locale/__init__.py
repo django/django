@@ -1,10 +1,11 @@
 """
-LANG_INFO is a dictionary structure to provide meta information about languages.
+LANG_INFO is a dictionary structure to provide meta information about
+languages.
 
 About name_local: capitalize it as if your language name was appearing
 inside a sentence in your language.
-The 'fallback' key can be used to specify a special fallback logic which doesn't
-follow the traditional 'fr-ca' -> 'fr' fallback logic.
+The 'fallback' key can be used to specify a special fallback logic which
+doesn't follow the traditional 'fr-ca' -> 'fr' fallback logic.
 """
 
 LANG_INFO = {

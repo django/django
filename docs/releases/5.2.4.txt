@@ -1,0 +1,23 @@
+==========================
+Django 5.2.4 release notes
+==========================
+
+*July 2, 2025*
+
+Django 5.2.4 fixes several bugs in 5.2.3.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2.2 where
+  :meth:`HttpRequest.get_preferred_type() <django.http.HttpRequest.get_preferred_type>`
+  incorrectly preferred more specific media types with a lower quality
+  (:ticket:`36447`).
+
+* Fixed a regression in Django 5.2.3 where ``Value(None, JSONField())`` used in
+  a :class:`~django.db.models.expressions.When` condition was incorrectly
+  serialized as SQL ``NULL`` instead of JSON ``null`` (:ticket:`36453`).
+
+* Fixed a crash in Django 5.2 when performing an ``__in`` lookup involving a
+  composite primary key and a subquery on backends that lack native support for
+  tuple lookups (:ticket:`36464`).

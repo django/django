@@ -576,7 +576,8 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         ]
     )
     def test_custom_login_allowed_policy(self):
-        # The user is inactive, but our custom form policy allows them to log in.
+        # The user is inactive, but our custom form policy allows them to log
+        # in.
         data = {
             "username": "inactive",
             "password": "password",
@@ -1266,7 +1267,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
                     "Sorry to hear you forgot your password.",
                     None,
                     [to_email],
-                    ["site_monitor@example.com"],
+                    bcc=["site_monitor@example.com"],
                     headers={"Reply-To": "webmaster@example.com"},
                     alternatives=[
                         ("Really sorry to hear you forgot your password.", "text/html")
@@ -1322,9 +1323,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_plaintext_email(self):
         """
-        Test the PasswordResetForm.save() method with no html_email_template_name
-        parameter passed in.
-        Test to ensure original behavior is unchanged after the parameter was added.
+        Test the PasswordResetForm.save() method with no
+        html_email_template_name parameter passed in. Test to ensure original
+        behavior is unchanged after the parameter was added.
         """
         (user, username, email) = self.create_dummy_user()
         form = PasswordResetForm({"email": email})
@@ -1366,13 +1367,13 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertTrue(
             re.match(
                 r"^http://example.com/reset/[\w/-]+",
-                message.get_payload(0).get_payload(),
+                message.get_payload(0).get_content(),
             )
         )
         self.assertTrue(
             re.match(
                 r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
-                message.get_payload(1).get_payload(),
+                message.get_payload(1).get_content(),
             )
         )
 

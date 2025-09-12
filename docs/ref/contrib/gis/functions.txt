@@ -29,7 +29,7 @@ Measurements
 .. class:: Area(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
@@ -48,8 +48,8 @@ geographic SRSes.
 `PostGIS <https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the distance between
-them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
-float value is returned when the coordinates are geodetic.
+them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a
+raw float value is returned when the coordinates are geodetic.
 
 On backends that support distance calculation on geodetic coordinates, the
 proper backend function is automatically chosen depending on the SRID value of
@@ -81,10 +81,11 @@ queryset is calculated:
 .. note::
 
     Because the ``distance`` attribute is a
-    :class:`~django.contrib.gis.measure.Distance` object, you can easily express
-    the value in the units of your choice. For example, ``city.distance.mi`` is
-    the distance value in miles and ``city.distance.km`` is the distance value
-    in kilometers. See :doc:`measure` for usage details and the list of
+    :class:`~django.contrib.gis.measure.Distance` object, you can easily
+    express the value in the units of your choice. For example,
+    ``city.distance.mi`` is the distance value in miles and
+    ``city.distance.km`` is the distance value in kilometers. See
+    :doc:`/ref/contrib/gis/measure` for usage details and the list of
     :ref:`supported_units`.
 
 ``GeometryDistance``
@@ -92,7 +93,8 @@ queryset is calculated:
 
 .. class:: GeometryDistance(expr1, expr2, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
+*Availability*: `PostGIS
+<https://postgis.net/docs/geometry_distance_knn.html>`__
 
 Accepts two geographic fields or expressions and returns the distance between
 them. When used in an :meth:`~django.db.models.query.QuerySet.order_by` clause,
@@ -126,8 +128,8 @@ MySQL doesn't support length calculations on geographic SRSes.
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Perimeter.html>`__,
 Oracle, SpatiaLite
 
-Accepts a single geographic field or expression and returns the perimeter of the
-geometry field as a :class:`~django.contrib.gis.measure.Distance` object.
+Accepts a single geographic field or expression and returns the perimeter of
+the geometry field as a :class:`~django.contrib.gis.measure.Distance` object.
 
 Relationships
 =============
@@ -150,8 +152,9 @@ south = ``π``; west = ``3π/2``.
 
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__, `Oracle
+<https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_,
 SpatiaLite 5.1+
 
@@ -205,8 +208,8 @@ representing the bounding box of the geometry.
 *Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
 SpatiaLite
 
-Returns a float between 0 and 1 representing the location of the closest point on
-``linestring`` to the given ``point``, as a fraction of the 2D line length.
+Returns a float between 0 and 1 representing the location of the closest point
+on ``linestring`` to the given ``point``, as a fraction of the 2D line length.
 
 ``PointOnSurface``
 ------------------
@@ -216,8 +219,9 @@ Returns a float between 0 and 1 representing the location of the closest point o
 *Availability*: `PostGIS <https://postgis.net/docs/ST_PointOnSurface.html>`__,
 MariaDB, Oracle, SpatiaLite
 
-Accepts a single geographic field or expression and returns a ``Point`` geometry
-guaranteed to lie on the surface of the field; otherwise returns ``None``.
+Accepts a single geographic field or expression and returns a ``Point``
+geometry guaranteed to lie on the surface of the field; otherwise returns
+``None``.
 
 Operations
 ==========
@@ -334,7 +338,8 @@ parameter.
 
 .. class:: Scale(expression, x, y, z=0.0, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Scale.html>`__, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Scale.html>`__,
+SpatiaLite
 
 Accepts a single geographic field or expression and returns a geometry with
 scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
@@ -349,7 +354,7 @@ scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
 SpatiaLite
 
 Accepts a single geographic field or expression and returns a geometry with all
-points snapped to the given grid.  How the geometry is snapped to the grid
+points snapped to the given grid. How the geometry is snapped to the grid
 depends on how many numeric (either float, integer, or long) arguments are
 given.
 
@@ -376,7 +381,7 @@ the transformed geometry to the spatial reference system specified by the
 .. note::
 
     What spatial reference system an integer SRID corresponds to may depend on
-    the spatial database used.  In other words, the SRID numbers used for Oracle
+    the spatial database used. In other words, the SRID numbers used for Oracle
     are not necessarily the same as those used by PostGIS.
 
 ``Translate``
@@ -469,8 +474,8 @@ Keyword Argument       Description
 *Availability*: Oracle, `PostGIS <https://postgis.net/docs/ST_AsGML.html>`__,
 SpatiaLite
 
-Accepts a single geographic field or expression and returns a `Geographic Markup
-Language (GML)`__ representation of the geometry.
+Accepts a single geographic field or expression and returns a `Geographic
+Markup Language (GML)`__ representation of the geometry.
 
 Example:
 
@@ -498,7 +503,8 @@ __ https://en.wikipedia.org/wiki/Geography_Markup_Language
 
 .. class:: AsKML(expression, precision=8, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_AsKML.html>`__, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_AsKML.html>`__,
+SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Keyhole Markup
 Language (KML)`__ representation of the geometry.
@@ -527,7 +533,8 @@ __ https://developers.google.com/kml/documentation/
 
 .. class:: AsSVG(expression, relative=False, precision=8, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_AsSVG.html>`__, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_AsSVG.html>`__,
+SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Scalable Vector
 Graphics (SVG)`__ representation of the geometry.
@@ -589,7 +596,7 @@ Example:
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
 `PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
 (LWGEOM/RTTOPO)
@@ -601,6 +608,10 @@ The ``precision`` keyword argument controls the number of characters in the
 result.
 
 __ https://en.wikipedia.org/wiki/Geohash
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
 
 Miscellaneous
 =============
@@ -620,12 +631,28 @@ geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 
 .. class:: IsValid(expr)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
 `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
+
+``GeometryType``
+----------------
+
+.. versionadded:: 6.0
+
+.. class:: GeometryType(expr)
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle 23c+, MariaDB, MySQL, SpatiaLite
+
+Accepts a geographic field or expression and returns its geometry type.
 
 ``MemSize``
 -----------
@@ -648,8 +675,8 @@ Accepts a single geographic field or expression and returns the memory size
 SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of
-geometries if the geometry field is a collection (e.g., a ``GEOMETRYCOLLECTION``
-or ``MULTI*`` field). Returns 1 for single geometries.
+geometries if the geometry field is a collection (e.g., a
+``GEOMETRYCOLLECTION`` or ``MULTI*`` field). Returns 1 for single geometries.
 
 On MySQL, returns ``None`` for single geometries.
 
@@ -662,7 +689,7 @@ On MySQL, returns ``None`` for single geometries.
 <https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints>`__,
 `PostGIS <https://postgis.net/docs/ST_NPoints.html>`__, Oracle, SpatiaLite
 
-Accepts a single geographic field or expression and returns the number of points
-in a geometry.
+Accepts a single geographic field or expression and returns the number of
+points in a geometry.
 
 On MySQL, returns ``None`` for any non-``LINESTRING`` geometry.

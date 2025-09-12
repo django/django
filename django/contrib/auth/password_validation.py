@@ -227,7 +227,8 @@ class CommonPasswordValidator:
 
     The password is rejected if it occurs in a provided list of passwords,
     which may be gzipped. The list Django ships with contains 20000 common
-    passwords (unhexed, lowercased and deduplicated), created by Royce Williams:
+    passwords (unhexed, lowercased and deduplicated), created by Royce
+    Williams:
     https://gist.github.com/roycewilliams/226886fd01572964e1431ac8afc999ce
     The password list must be lowercased to match the comparison in validate().
     """

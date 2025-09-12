@@ -14,9 +14,10 @@ Specifically, it implements two objects, :class:`Distance` and
 Example
 =======
 
-:class:`Distance` objects may be instantiated using a keyword argument indicating the
-context of the units.  In the example below, two different distance objects are
-instantiated in units of kilometers (``km``) and miles (``mi``):
+:class:`Distance` objects may be instantiated using a keyword argument
+indicating the context of the units. In the example below, two different
+distance objects are instantiated in units of kilometers (``km``) and miles
+(``mi``):
 
 .. code-block:: pycon
 
@@ -205,6 +206,7 @@ Measurement API
     Alias for :class:`Area` class.
 
 .. rubric:: Footnotes
-.. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the measure objects,
-       and was inspired by Brian Beck's work in `geopy <https://github.com/geopy/geopy/>`_
-       and Geoff Biggs' PhD work on dimensioned units for robotics.
+.. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the
+       measure objects, and was inspired by Brian Beck's work in `geopy
+       <https://github.com/geopy/geopy/>`_ and Geoff Biggs' PhD work on
+       dimensioned units for robotics.

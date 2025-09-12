@@ -75,7 +75,6 @@ class AdminScriptTestCase(SimpleTestCase):
                 settings_file.write("%s\n" % extra)
             exports = [
                 "DATABASES",
-                "DEFAULT_AUTO_FIELD",
                 "ROOT_URLCONF",
                 "SECRET_KEY",
                 "USE_TZ",
@@ -191,7 +190,10 @@ class AdminScriptTestCase(SimpleTestCase):
             )
 
     def assertNotInOutput(self, stream, msg):
-        "Utility assertion: assert that the given message doesn't exist in the output"
+        """
+        Utility assertion: assert that the given message doesn't exist in the
+        output
+        """
         self.assertNotIn(
             msg, stream, "'%s' matches actual output text '%s'" % (msg, stream)
         )
@@ -503,7 +505,10 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "minimal: django-admin can't execute user commands unless settings are provided"
+        """
+        minimal: django-admin can't execute user commands unless settings are
+        provided
+        """
         args = ["noargs_command"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
@@ -745,7 +750,10 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
             )
 
     def test_setup_environ_custom_template(self):
-        "directory: startapp creates the correct directory with a custom template"
+        """
+        directory: startapp creates the correct directory with a custom
+        template
+        """
         template_path = os.path.join(custom_templates_dir, "app_template")
         args = ["startapp", "--template", template_path, "custom_settings_test"]
         app_path = os.path.join(self.test_dir, "custom_settings_test")
@@ -1089,7 +1097,10 @@ class ManageMinimalSettings(AdminScriptTestCase):
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
-        "minimal: manage.py builtin commands fail if settings are provided as argument"
+        """
+        minimal: manage.py builtin commands fail if settings are provided as
+        argument
+        """
         args = ["check", "--settings=test_project.settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -1126,7 +1137,10 @@ class ManageMinimalSettings(AdminScriptTestCase):
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "minimal: manage.py can't execute user commands without appropriate settings"
+        """
+        minimal: manage.py can't execute user commands without appropriate
+        settings
+        """
         args = ["noargs_command"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -1175,7 +1189,10 @@ class ManageAlternateSettings(AdminScriptTestCase):
         )
 
     def test_builtin_with_settings(self):
-        "alternate: manage.py builtin commands work with settings provided as argument"
+        """
+        alternate: manage.py builtin commands work with settings provided as
+        argument
+        """
         args = ["check", "--settings=alternate_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -1331,7 +1348,9 @@ class ManageMultipleSettings(AdminScriptTestCase):
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "multiple: manage.py can't execute user commands using default settings"
+        """
+        multiple: manage.py can't execute user commands using default settings
+        """
         args = ["noargs_command"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -1558,7 +1577,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ["check"]
         out, err = self.run_manage(args)
         expected_err = (
-            "System check identified some issues:\n"  # No "CommandError: " part
+            "System check identified some issues:\n"  # No "CommandError: "
             "\n"
             "WARNINGS:\n"
             "?: A warning\n"
@@ -1594,6 +1613,7 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "anything-but-true"})
     def test_zero_ip_addr(self):
         self.cmd.addr = "0"
         self.cmd._raw_ipv6 = False
@@ -1612,6 +1632,7 @@ class ManageRunserver(SimpleTestCase):
             self.output.getvalue(),
         )
 
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "anything-but-true"})
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
         self.cmd._raw_ipv6 = False
@@ -1707,7 +1728,8 @@ class ManageRunserver(SimpleTestCase):
 
     def test_readonly_database(self):
         """
-        runserver.check_migrations() doesn't choke when a database is read-only.
+        runserver.check_migrations() doesn't choke when a database is
+        read-only.
         """
         with mock.patch.object(MigrationRecorder, "has_table", return_value=False):
             self.cmd.check_migrations()
@@ -1752,7 +1774,9 @@ class ManageRunserver(SimpleTestCase):
         self.addCleanup(setattr, registry, "registered_checks", original_checks)
 
         class CustomRunserverCommand(RunserverCommand):
-            """Rather than mock run(), raise immediately after system checks run."""
+            """
+            Rather than mock run(), raise immediately after system checks run.
+            """
 
             def check_migrations(self, *args, **kwargs):
                 raise CustomException
@@ -1919,7 +1943,8 @@ class CommandTypes(AdminScriptTestCase):
     def test_version_alternative(self):
         "--version is equivalent to version"
         args1, args2 = ["version"], ["--version"]
-        # It's possible one outputs on stderr and the other on stdout, hence the set
+        # It's possible one outputs on stderr and the other on stdout, hence
+        # the set
         self.assertEqual(set(self.run_manage(args1)), set(self.run_manage(args2)))
 
     def test_help(self):
@@ -2134,13 +2159,18 @@ class CommandTypes(AdminScriptTestCase):
         self._test_base_command(args, expected_labels, option_a="'x'")
 
     def test_base_command_with_options(self):
-        "User BaseCommands can execute with multiple options when a label is provided"
+        """
+        User BaseCommands can execute with multiple options when a label is
+        provided
+        """
         args = ["base_command", "testlabel", "-a", "x", "--option_b=y"]
         expected_labels = "('testlabel',)"
         self._test_base_command(args, expected_labels, option_a="'x'", option_b="'y'")
 
     def test_base_command_with_wrong_option(self):
-        "User BaseCommands outputs command usage when wrong option is specified"
+        """
+        User BaseCommands outputs command usage when wrong option is specified
+        """
         args = ["base_command", "--invalid"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -2162,8 +2192,8 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_base_run_from_argv(self):
         """
-        Test run_from_argv properly terminates even with custom execute() (#19665)
-        Also test proper traceback display.
+        Test run_from_argv properly terminates even with custom execute()
+        (#19665) Also test proper traceback display.
         """
         err = StringIO()
         command = BaseCommand(stderr=err)
@@ -2290,7 +2320,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
     def test_app_command_some_invalid_app_labels(self):
-        "User AppCommands can execute when some of the provided app names are invalid"
+        """
+        User AppCommands can execute when some of the provided app names are
+        invalid
+        """
         args = ["app_command", "auth", "NOT_AN_APP"]
         out, err = self.run_manage(args)
         self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
@@ -2314,7 +2347,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(err, "Enter at least one label")
 
     def test_label_command_multiple_label(self):
-        "User LabelCommands are executed multiple times if multiple labels are provided"
+        """
+        User LabelCommands are executed multiple times if multiple labels are
+        provided
+        """
         args = ["label_command", "testlabel", "anotherlabel"]
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
@@ -2556,7 +2592,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         )
 
     def test_invalid_project_name(self):
-        "Make sure the startproject management command validates a project name"
+        """
+        Make sure the startproject management command validates a project name
+        """
         for bad_name in ("7testproject", "../testproject"):
             with self.subTest(project_name=bad_name):
                 args = ["startproject", bad_name]
@@ -2771,7 +2809,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
 
     def test_file_without_extension(self):
-        "Make sure the startproject management command is able to render custom files"
+        """
+        Make sure the startproject management command is able to render custom
+        files
+        """
         template_path = os.path.join(custom_templates_dir, "project_template")
         args = [
             "startproject",
@@ -2843,8 +2884,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_destination_missing(self):
         """
-        Make sure an exception is raised when the provided
-        destination directory doesn't exist
+        Create the directory when the provided destination directory doesn't
+        exist.
         """
         template_path = os.path.join(custom_templates_dir, "project_template")
         args = [
@@ -2857,12 +2898,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "project_dir2")
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err,
-            "Destination directory '%s' does not exist, please create it first."
-            % testproject_dir,
-        )
-        self.assertFalse(os.path.exists(testproject_dir))
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testproject_dir))
 
     def test_custom_project_template_with_non_ascii_templates(self):
         """
@@ -3089,15 +3126,70 @@ class StartApp(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class NewAppConfig(AppConfig)", content)
-            if HAS_BLACK:
-                test_str = 'default_auto_field = "django.db.models.BigAutoField"'
-            else:
-                test_str = "default_auto_field = 'django.db.models.BigAutoField'"
-            self.assertIn(test_str, content)
             self.assertIn(
                 'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
                 content,
             )
+
+    def test_creates_directory_when_custom_app_destination_missing(self):
+        args = [
+            "startapp",
+            "my_app",
+            "my_app",
+        ]
+        testapp_dir = os.path.join(self.test_dir, "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testapp_dir))
+
+    def test_custom_app_destination_missing_with_nested_subdirectory(self):
+        args = [
+            "startapp",
+            "my_app",
+            "apps/my_app",
+        ]
+        testapp_dir = os.path.join(self.test_dir, "apps", "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testapp_dir))
+
+    def test_custom_name_with_app_within_other_app(self):
+        parent_app_dir = os.path.join(self.test_dir, "parent")
+        self.run_django_admin(["startapp", "parent"])
+        self.assertTrue(os.path.exists(parent_app_dir))
+
+        nested_args = ["startapp", "child", "parent/child"]
+        child_app_dir = os.path.join(self.test_dir, "parent", "child")
+        out, err = self.run_django_admin(nested_args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(child_app_dir))
+
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "Windows only partially supports umasks and chmod.",
+    )
+    def test_custom_app_directory_creation_error_handling(self):
+        """The error is displayed to the user in case of OSError."""
+        args = [
+            "startapp",
+            "my_app",
+            "project_dir/my_app",
+        ]
+        # Create a read-only parent directory.
+        os.makedirs(
+            os.path.join(self.test_dir, "project_dir"), exist_ok=True, mode=0o200
+        )
+        testapp_dir = os.path.join(self.test_dir, "project_dir", "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertOutput(
+            err,
+            "Permission denied",
+        )
+        self.assertFalse(os.path.exists(testapp_dir))
 
 
 class DiffSettings(AdminScriptTestCase):

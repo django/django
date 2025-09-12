@@ -90,23 +90,42 @@ class HttpRequest:
 
     @cached_property
     def accepted_types(self):
-        """Return a list of MediaType instances, in order of preference."""
+        """
+        Return a list of MediaType instances, in order of preference (quality).
+        """
         header_value = self.headers.get("Accept", "*/*")
         return sorted(
-            (MediaType(token) for token in header_value.split(",") if token.strip()),
+            (
+                media_type
+                for token in header_value.split(",")
+                if token.strip() and (media_type := MediaType(token)).quality != 0
+            ),
             key=operator.attrgetter("quality", "specificity"),
+            reverse=True,
+        )
+
+    @cached_property
+    def accepted_types_by_precedence(self):
+        """
+        Return a list of MediaType instances, in order of precedence
+        (specificity).
+        """
+        return sorted(
+            self.accepted_types,
+            key=operator.attrgetter("specificity", "quality"),
             reverse=True,
         )
 
     def accepted_type(self, media_type):
         """
-        Return the preferred MediaType instance which matches the given media type.
+        Return the MediaType instance which best matches the given media type.
         """
+        media_type = MediaType(media_type)
         return next(
             (
                 accepted_type
-                for accepted_type in self.accepted_types
-                if accepted_type.match(media_type)
+                for accepted_type in self.accepted_types_by_precedence
+                if media_type.match(accepted_type)
             ),
             None,
         )
@@ -125,7 +144,7 @@ class HttpRequest:
         if not desired_types:
             return None
 
-        # Of the desired media types, select the one which is most desirable.
+        # Of the desired media types, select the one which is preferred.
         return min(desired_types, key=lambda t: self.accepted_types.index(t[0]))[1]
 
     def accepts(self, media_type):
@@ -216,7 +235,7 @@ class HttpRequest:
         """
         Attempt to return a signed cookie. If the signature fails or the
         cookie has expired, raise an exception, unless the `default` argument
-        is provided,  in which case return that value.
+        is provided, in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
@@ -331,7 +350,8 @@ class HttpRequest:
     @property
     def upload_handlers(self):
         if not self._upload_handlers:
-            # If there are no upload handlers defined, initialize them from settings.
+            # If there are no upload handlers defined, initialize them from
+            # settings.
             self._initialize_handlers()
         return self._upload_handlers
 
@@ -364,7 +384,8 @@ class HttpRequest:
                     "You cannot access body after reading from request's data stream"
                 )
 
-            # Limit the maximum request data size that will be handled in-memory.
+            # Limit the maximum request data size that will be handled
+            # in-memory.
             if (
                 settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
                 and int(self.META.get("CONTENT_LENGTH") or 0)
@@ -388,7 +409,9 @@ class HttpRequest:
         self._files = MultiValueDict()
 
     def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
+        """
+        Populate self._post and self._files if the content-type is a form type
+        """
         if self.method != "POST":
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -527,8 +550,8 @@ class QueryDict(MultiValueDict):
     By default QueryDicts are immutable, though the copy() method
     will always return a mutable copy.
 
-    Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to str.
+    Both keys and values set on this class are converted from the given
+    encoding (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class
@@ -546,7 +569,8 @@ class QueryDict(MultiValueDict):
             "max_num_fields": settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
         }
         if isinstance(query_string, bytes):
-            # query_string normally contains URL-encoded data, a subset of ASCII.
+            # query_string normally contains URL-encoded data, a subset of
+            # ASCII.
             try:
                 query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
@@ -705,18 +729,40 @@ class MediaType:
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__qualname__, self)
 
-    @property
-    def is_all_types(self):
-        return self.main_type == "*" and self.sub_type == "*"
+    @cached_property
+    def range_params(self):
+        params = self.params.copy()
+        params.pop("q", None)
+        return params
 
     def match(self, other):
-        if self.is_all_types:
-            return True
-        other = MediaType(other)
-        return self.main_type == other.main_type and self.sub_type in {
-            "*",
-            other.sub_type,
-        }
+        if not other:
+            return False
+
+        if not isinstance(other, MediaType):
+            other = MediaType(other)
+
+        main_types = [self.main_type, other.main_type]
+        sub_types = [self.sub_type, other.sub_type]
+
+        # Main types and sub types must be defined.
+        if not all((*main_types, *sub_types)):
+            return False
+
+        # Main types must match or one be "*", same for sub types.
+        for this_type, other_type in (main_types, sub_types):
+            if this_type != other_type and this_type != "*" and other_type != "*":
+                return False
+
+        if bool(self.range_params) == bool(other.range_params):
+            # If both have params or neither have params, they must be
+            # identical.
+            result = self.range_params == other.range_params
+        else:
+            # If self has params and other does not, it's a match.
+            # If other has params and self does not, don't match.
+            result = bool(self.range_params or not other.range_params)
+        return result
 
     @cached_property
     def quality(self):
@@ -741,7 +787,7 @@ class MediaType:
             return 0
         elif self.sub_type == "*":
             return 1
-        elif self.quality == 1:
+        elif not self.range_params:
             return 2
         return 3
 

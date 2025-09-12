@@ -4,8 +4,7 @@ an interface for reading vector geometry data from many different file
 formats (including ESRI shapefiles).
 
 When instantiating a DataSource object, use the filename of a
-GDAL-supported data source.  For example, a SHP file or a
-TIGER/Line file from the government.
+GDAL-supported data source. For example, an SHP file.
 
 The ds_driver keyword is used internally when a ctypes pointer
 is passed in directly.

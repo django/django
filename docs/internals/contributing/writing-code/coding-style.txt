@@ -46,22 +46,18 @@ Python style
 * Unless otherwise specified, follow :pep:`8`.
 
   Use :pypi:`flake8` to check for problems in this area. Note that our
-  ``.flake8`` file contains some excluded files (deprecated modules we don't
-  care about cleaning up and some third-party code that Django vendors) as well
-  as some excluded errors that we don't consider as gross violations. Remember
-  that :pep:`8` is only a guide, so respect the style of the surrounding code
-  as a primary goal.
+  ``.flake8`` file excludes some errors that we don't consider as gross
+  violations. Remember that :pep:`8` is only a guide, so respect the style of
+  the surrounding code as a primary goal.
 
-  An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
-  code to 79 characters if it means the code looks significantly uglier or is
-  harder to read. We allow up to 88 characters as this is the line length used
-  by ``black``. This check is included when you run ``flake8``. Documentation,
-  comments, and docstrings should be wrapped at 79 characters, even though
-  :pep:`8` suggests 72.
+  An exception to :pep:`8` is our rules on line lengths. We allow up to 88
+  characters in code, as this is the line length used by ``black``.
+  Documentation, comments, and docstrings should be wrapped at 79 characters.
+  These limits are checked when ``flake8`` is run.
 
 * String variable interpolation may use
-  :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
-  <f-strings>`, or :py:meth:`str.format` as appropriate, with the goal of
+  :ref:`%-formatting <old-string-formatting>`, :ref:`f-strings
+  <f-strings>`, or :meth:`str.format` as appropriate, with the goal of
   maximizing code readability.
 
   Final judgments of readability are left to the Merger's discretion. As a
@@ -100,13 +96,12 @@ Python style
 
 * In docstrings, follow the style of existing docstrings and :pep:`257`.
 
-* In tests, use
-  :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
-  :meth:`~django.test.SimpleTestCase.assertWarnsMessage`
-  instead of :meth:`~unittest.TestCase.assertRaises` and
-  :meth:`~unittest.TestCase.assertWarns` so you can check the
-  exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
-  and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
+  :meth:`~django.test.SimpleTestCase.assertWarnsMessage` instead of
+  :meth:`~unittest.TestCase.assertRaises` and
+  :meth:`~unittest.TestCase.assertWarns` so you can check the exception or
+  warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex` and
+  :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
   expression matching.
 
   Use :meth:`assertIs(…, True/False)<unittest.TestCase.assertIs>` for testing
@@ -153,9 +148,10 @@ Imports
 
 * Put imports in these groups: future, standard library, third-party libraries,
   other Django components, local Django component, try/excepts. Sort lines in
-  each group alphabetically by the full module name. Place all ``import module``
-  statements before ``from module import objects`` in each section. Use absolute
-  imports for other Django components and relative imports for local components.
+  each group alphabetically by the full module name. Place all
+  ``import module`` statements before ``from module import objects`` in each
+  section. Use absolute imports for other Django components and relative
+  imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lowercase items.
@@ -508,6 +504,6 @@ JavaScript style
 ================
 
 For details about the JavaScript code style used by Django, see
-:doc:`javascript`.
+:doc:`/internals/contributing/writing-code/javascript`.
 
 .. _editorconfig: https://editorconfig.org/

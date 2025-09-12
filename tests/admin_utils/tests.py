@@ -329,7 +329,8 @@ class UtilsTests(SimpleTestCase):
 
         self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
         self.assertEqual(label_for_field("site_id", Article), "Site id")
-        # The correct name and attr are returned when `__` is in the field name.
+        # The correct name and attr are returned when `__` is in the field
+        # name.
         self.assertEqual(label_for_field("site__domain", Article), "Site  domain")
         self.assertEqual(
             label_for_field("site__domain", Article, return_attr=True),

@@ -593,8 +593,8 @@ class UniqueConstraint(BaseConstraint):
                             ].features.interprets_empty_strings_as_nulls
                         )
                     ):
-                        # A composite constraint containing NULL value cannot cause
-                        # a violation since NULL != NULL in SQL.
+                        # A composite constraint containing NULL value cannot
+                        # cause a violation since NULL != NULL in SQL.
                         return
                     lookup_kwargs[field.name] = lookup_value
             lookup_args = []
@@ -646,8 +646,8 @@ class UniqueConstraint(BaseConstraint):
                     and self.violation_error_message
                     == self.default_violation_error_message
                 ):
-                    # When fields are defined, use the unique_error_message() as
-                    # a default for backward compatibility.
+                    # When fields are defined, use the unique_error_message()
+                    # as a default for backward compatibility.
                     validation_error_message = instance.unique_error_message(
                         model, self.fields
                     )

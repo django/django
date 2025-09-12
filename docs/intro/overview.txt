@@ -9,15 +9,15 @@ overview of how to write a database-driven web app with Django.
 The goal of this document is to give you enough technical specifics to
 understand how Django works, but this isn't intended to be a tutorial or
 reference -- but we've got both! When you're ready to start a project, you can
-:doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into more
-detailed documentation </topics/index>`.
+:doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into
+more detailed documentation </topics/index>`.
 
 Design your model
 =================
 
 Although you can use Django without a database, it comes with an
-`object-relational mapper`_ in which you describe your database layout in Python
-code.
+`object-relational mapper`_ in which you describe your database layout in
+Python code.
 
 .. _object-relational mapper: https://en.wikipedia.org/wiki/Object-relational_mapping
 
@@ -247,19 +247,19 @@ and renders the template with the retrieved data. Here's an example view for
         context = {"year": year, "article_list": a_list}
         return render(request, "news/year_archive.html", context)
 
-This example uses Django's :doc:`template system </topics/templates>`, which has
-several powerful features but strives to stay simple enough for non-programmers
-to use.
+This example uses Django's :doc:`template system </topics/templates>`, which
+has several powerful features but strives to stay simple enough for
+non-programmers to use.
 
 Design your templates
 =====================
 
 The code above loads the ``news/year_archive.html`` template.
 
-Django has a template search path, which allows you to minimize redundancy among
-templates. In your Django settings, you specify a list of directories to check
-for templates with :setting:`DIRS <TEMPLATES-DIRS>`. If a template doesn't exist
-in the first directory, it checks the second, and so on.
+Django has a template search path, which allows you to minimize redundancy
+among templates. In your Django settings, you specify a list of directories to
+check for templates with :setting:`DIRS <TEMPLATES-DIRS>`. If a template
+doesn't exist in the first directory, it checks the second, and so on.
 
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
@@ -287,14 +287,14 @@ used only for attribute lookup. They also can do dictionary-key lookup, index
 lookup and function calls.
 
 Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
-character). This is called a template filter, and it's a way to filter the value
-of a variable. In this case, the date filter formats a Python datetime object in
-the given format (as found in PHP's date function).
+character). This is called a template filter, and it's a way to filter the
+value of a variable. In this case, the date filter formats a Python datetime
+object in the given format (as found in PHP's date function).
 
-You can chain together as many filters as you'd like. You can write :ref:`custom
-template filters <howto-writing-custom-template-filters>`. You can write
-:doc:`custom template tags </howto/custom-template-tags>`, which run custom
-Python code behind the scenes.
+You can chain together as many filters as you'd like. You can write
+:ref:`custom template filters <howto-writing-custom-template-filters>`. You can
+write :doc:`custom template tags </howto/custom-template-tags>`, which run
+custom Python code behind the scenes.
 
 Finally, Django uses the concept of "template inheritance". That's what the
 ``{% extends "base.html" %}`` does. It means "First load the template called
@@ -319,9 +319,9 @@ Here's what the "base.html" template, including the use of :doc:`static files
     </body>
     </html>
 
-Simplistically, it defines the look-and-feel of the site (with the site's logo),
-and provides "holes" for child templates to fill. This means that a site redesign
-can be done by changing a single file -- the base template.
+Simplistically, it defines the look-and-feel of the site (with the site's
+logo), and provides "holes" for child templates to fill. This means that a site
+redesign can be done by changing a single file -- the base template.
 
 It also lets you create multiple versions of a site, with different base
 templates, while reusing child templates. Django's creators have used this

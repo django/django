@@ -4,12 +4,12 @@ Aggregation
 
 .. currentmodule:: django.db.models
 
-The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
-described the way that you can use Django queries that create,
-retrieve, update and delete individual objects. However, sometimes you will
-need to retrieve values that are derived by summarizing or *aggregating* a
-collection of objects. This topic guide describes the ways that aggregate values
-can be generated and returned using Django queries.
+The topic guide on :doc:`Django's database-abstraction API
+</topics/db/queries>` described the way that you can use Django queries that
+create, retrieve, update and delete individual objects. However, sometimes you
+will need to retrieve values that are derived by summarizing or *aggregating* a
+collection of objects. This topic guide describes the ways that aggregate
+values can be generated and returned using Django queries.
 
 Throughout this guide, we'll refer to the following models. These models are
 used to track the inventory for a series of online bookstores:
@@ -322,12 +322,14 @@ We can also ask for the oldest book of any of those managed by every publisher:
     >>> Publisher.objects.aggregate(oldest_pubdate=Min("book__pubdate"))
 
 (The resulting dictionary will have a key called ``'oldest_pubdate'``. If no
-such alias were specified, it would be the rather long ``'book__pubdate__min'``.)
+such alias were specified, it would be the rather long
+``'book__pubdate__min'``.)
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
-number of pages considering all the books the author has (co-)authored (note how we
-use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop):
+number of pages considering all the books the author has (co-)authored (note
+how we use ``'book'`` to specify the ``Author`` -> ``Book`` reverse
+many-to-many hop):
 
 .. code-block:: pycon
 
@@ -345,7 +347,8 @@ file:
     >>> Author.objects.aggregate(average_rating=Avg("book__rating"))
 
 (The resulting dictionary will have a key called ``'average_rating'``. If no
-such alias were specified, it would be the rather long ``'book__rating__avg'``.)
+such alias were specified, it would be the rather long
+``'book__rating__avg'``.)
 
 Aggregations and other ``QuerySet`` clauses
 ===========================================
@@ -527,7 +530,8 @@ rating of books written by each author:
 This will return one result for each author in the database, annotated with
 their average book rating.
 
-However, the result will be slightly different if you use a ``values()`` clause:
+However, the result will be slightly different if you use a ``values()``
+clause:
 
 .. code-block:: pycon
 
@@ -679,3 +683,65 @@ no books can be found:
 Under the hood, the :ref:`default <aggregate-default>` argument is implemented
 by wrapping the aggregate function with
 :class:`~django.db.models.functions.Coalesce`.
+
+.. _aggregation-mysql-only-full-group-by:
+
+Aggregating with MySQL ``ONLY_FULL_GROUP_BY`` enabled
+-----------------------------------------------------
+
+When using the ``values()`` clause to group query results for annotations in
+MySQL with the ``ONLY_FULL_GROUP_BY`` SQL mode enabled, you may need to apply
+:class:`~django.db.models.AnyValue` if the annotation includes a mix of
+aggregate and non-aggregate expressions.
+
+Take the following example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Count, Greatest
+    >>> Book.objects.values(greatest_pages=Greatest("pages", 600)).annotate(
+    ...     num_authors=Count("authors"),
+    ...     pages_per_author=F("greatest_pages") / F("num_authors"),
+    ... ).aggregate(Avg("pages_per_author"))
+
+This creates groups of books based on the SQL column ``GREATEST(pages, 600)``.
+One unique group consists of books with 600 pages or less, and other unique
+groups will consist of books with the same pages. The ``pages_per_author``
+annotation is composed of aggregate and non-aggregate expressions,
+``num_authors`` is an aggregate expression while ``greatest_page`` isn't.
+
+Since the grouping is based on the ``greatest_pages`` expression, MySQL may be
+unable to determine that ``greatest_pages`` (used in the ``pages_per_author``
+expression) is functionally dependent on the grouped column. As a result, it
+may raise an error like:
+
+.. code-block:: pytb
+
+    OperationalError: (1055, "Expression #2 of SELECT list is not in GROUP BY
+    clause and contains nonaggregated column 'book_book.pages' which is not
+    functionally dependent on columns in GROUP BY clause; this is incompatible
+    with sql_mode=only_full_group_by")
+
+To avoid this, you can wrap the non-aggregate expression with
+:class:`~django.db.models.AnyValue`.
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Count, Greatest
+    >>> Book.objects.values(
+    ...     greatest_pages=Greatest("pages", 600),
+    ... ).annotate(
+    ...     num_authors=Count("authors"),
+    ...     pages_per_author=AnyValue(F("greatest_pages")) / F("num_authors"),
+    ... ).aggregate(Avg("pages_per_author"))
+    {'pages_per_author__avg': 532.57143333}
+
+Other supported databases do not encounter the ``OperationalError`` in the
+example above because they can detect the functional dependency. In general,
+``AnyValue`` is useful when dealing with select list columns that involve
+non-aggregate functions or complex expressions not recognized by the database
+as functionally dependent on the columns in the grouping clause.
+
+.. versionchanged:: 6.0
+
+    The :class:`~django.db.models.AnyValue` aggregate was added.

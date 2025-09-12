@@ -264,7 +264,7 @@ Template filter code falls into one of two situations:
    reviewing your code.
 
    Marking a filter ``is_safe`` will coerce the filter's return value to
-   a string.  If your filter should return a boolean or other non-string
+   a string. If your filter should return a boolean or other non-string
    value, marking it ``is_safe`` will probably have unintended
    consequences (such as converting a boolean False to the string
    'False').
@@ -285,13 +285,13 @@ Template filter code falls into one of two situations:
    order to make things easier for your template authors.
 
    In order for your filter to know the current auto-escaping state, set the
-   ``needs_autoescape`` flag to ``True`` when you register your filter function.
-   (If you don't specify this flag, it defaults to ``False``). This flag tells
-   Django that your filter function wants to be passed an extra keyword
-   argument, called ``autoescape``, that is ``True`` if auto-escaping is in
-   effect and ``False`` otherwise. It is recommended to set the default of the
-   ``autoescape`` parameter to ``True``, so that if you call the function
-   from Python code it will have escaping enabled by default.
+   ``needs_autoescape`` flag to ``True`` when you register your filter
+   function. (If you don't specify this flag, it defaults to ``False``). This
+   flag tells Django that your filter function wants to be passed an extra
+   keyword argument, called ``autoescape``, that is ``True`` if auto-escaping
+   is in effect and ``False`` otherwise. It is recommended to set the default
+   of the ``autoescape`` parameter to ``True``, so that if you call the
+   function from Python code it will have escaping enabled by default.
 
    For example, let's write a filter that emphasizes the first character of
    a string::
@@ -509,7 +509,7 @@ Simple block tags
 
 When a section of rendered template needs to be passed into a custom tag,
 Django provides the ``simple_block_tag`` helper function to accomplish this.
-Similar to :meth:`~django.template.Library.simple_tag()`, this function accepts
+Similar to :meth:`~django.template.Library.simple_tag`, this function accepts
 a custom tag function, but with the additional ``content`` argument, which
 contains the rendered content as defined inside the tag. This allows dynamic
 template sections to be easily incorporated into custom tags.
@@ -827,8 +827,8 @@ Advanced custom template tags
 -----------------------------
 
 Sometimes the basic features for custom template tag creation aren't enough.
-Don't worry, Django gives you complete access to the internals required to build
-a template tag from the ground up.
+Don't worry, Django gives you complete access to the internals required to
+build a template tag from the ground up.
 
 A quick overview
 ----------------
@@ -841,7 +841,7 @@ When Django compiles a template, it splits the raw template text into *nodes*.
 Each node is an instance of ``django.template.Node`` and has a ``render()``
 method. A compiled template is a list of ``Node`` objects. When you call
 ``render()`` on a compiled template object, the template calls ``render()`` on
-each ``Node`` in its node list, with the given context.  The results are all
+each ``Node`` in its node list, with the given context. The results are all
 concatenated together to form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
@@ -856,10 +856,10 @@ function with the tag contents and the parser object itself. This function is
 responsible for returning a ``Node`` instance based on the contents of the tag.
 
 For example, let's write a full implementation of our template tag,
-``{% current_time %}``, that displays the current date/time, formatted according
-to a parameter given in the tag, in :func:`~time.strftime` syntax. It's a good
-idea to decide the tag syntax before anything else. In our case, let's say the
-tag should be used like this:
+``{% current_time %}``, that displays the current date/time, formatted
+according to a parameter given in the tag, in :func:`~time.strftime` syntax.
+It's a good idea to decide the tag syntax before anything else. In our case,
+let's say the tag should be used like this:
 
 .. code-block:: html+django
 
@@ -1159,7 +1159,7 @@ Now your tag should begin to look like this::
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
 
 You also have to change the renderer to retrieve the actual contents of the
-``date_updated`` property of the ``blog_entry`` object.  This can be
+``date_updated`` property of the ``blog_entry`` object. This can be
 accomplished by using the ``Variable()`` class in ``django.template``.
 
 To use the ``Variable`` class, instantiate it with the name of the variable to
@@ -1300,9 +1300,10 @@ Here's how a simplified ``{% comment %}`` tag might be implemented::
     The actual implementation of :ttag:`{% comment %}<comment>` is slightly
     different in that it allows broken template tags to appear between
     ``{% comment %}`` and ``{% endcomment %}``. It does so by calling
-    ``parser.skip_past('endcomment')`` instead of ``parser.parse(('endcomment',))``
-    followed by ``parser.delete_first_token()``, thus avoiding the generation of a
-    node list.
+    ``parser.skip_past('endcomment')`` instead of
+    ``parser.parse(('endcomment',))`` followed by
+    ``parser.delete_first_token()``, thus avoiding the generation of a node
+    list.
 
 ``parser.parse()`` takes a tuple of names of block tags *to parse until*. It
 returns an instance of ``django.template.NodeList``, which is a list of

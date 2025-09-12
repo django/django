@@ -186,17 +186,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             atime,
-            datetime.datetime.fromtimestamp(
-                os.path.getatime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getatime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_accessed_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            atime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -212,17 +214,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         ctime = self.storage.get_created_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             ctime,
-            datetime.datetime.fromtimestamp(
-                os.path.getctime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getctime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            ctime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -238,17 +242,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         mtime = self.storage.get_modified_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             mtime,
-            datetime.datetime.fromtimestamp(
-                os.path.getmtime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getmtime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_modified_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            mtime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -353,7 +359,8 @@ class FileStorageTests(SimpleTestCase):
             self.storage.url("""a/b\\c.file"""), "/test_media_url/a/b/c.file"
         )
 
-        # #25905: remove leading slashes from file names to prevent unsafe url output
+        # #25905: remove leading slashes from file names to prevent unsafe url
+        # output
         self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
@@ -400,8 +407,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_file_storage_prevents_directory_traversal(self):
         """
-        File storage prevents directory traversal (files can only be accessed if
-        they're below the storage location).
+        File storage prevents directory traversal (files can only be accessed
+        if they're below the storage location).
         """
         with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists("..")
@@ -428,7 +435,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_makedirs_race_handling(self):
         """
-        File storage should be robust against directory creation race conditions.
+        File storage should be robust against directory creation race
+        conditions.
         """
         real_makedirs = os.makedirs
 
@@ -818,7 +826,8 @@ class FileFieldStorageTests(TestCase):
         obj.normal.close()
 
     def test_duplicate_filename(self):
-        # Multiple files with the same name get _(7 random chars) appended to them.
+        # Multiple files with the same name get _(7 random chars) appended to
+        # them.
         tests = [
             ("multiple_files", "txt"),
             ("multiple_files_many_extensions", "tar.gz"),
@@ -855,7 +864,8 @@ class FileFieldStorageTests(TestCase):
             self.assertEqual(names[0], "tests/%s" % filename)
             self.assertRegex(names[1], "tests/fi_%s.ext" % FILE_SUFFIX_REGEX)
 
-            # Testing exception is raised when filename is too short to truncate.
+            # Testing exception is raised when filename is too short to
+            # truncate.
             filename = "short.longext"
             objs[0].limited_length.save(filename, ContentFile("Same Content"))
             with self.assertRaisesMessage(

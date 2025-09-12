@@ -19,13 +19,13 @@ auto-generated model definition, where appropriate.
 
 The ``ogrinspect`` management command will inspect the given OGR-compatible
 :class:`~django.contrib.gis.gdal.DataSource` (e.g., a shapefile) and will
-output a GeoDjango model with the given model name.  There's a detailed example
+output a GeoDjango model with the given model name. There's a detailed example
 of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --blank BLANK
 
     Use a comma separated list of OGR field names to add the ``blank=True``
-    keyword option to the field definition.  Set with ``true`` to apply
+    keyword option to the field definition. Set with ``true`` to apply
     to all applicable fields.
 
 .. django-admin-option:: --decimal DECIMAL
@@ -68,15 +68,16 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --no-imports
 
-    Suppresses the ``from django.contrib.gis.db import models`` import statement.
+    Suppresses the ``from django.contrib.gis.db import models`` import
+    statement.
 
 .. django-admin-option:: --null NULL
 
     Use a comma separated list of OGR field names to add the ``null=True``
-    keyword option to the field definition.  Set with ``true`` to apply to
+    keyword option to the field definition. Set with ``true`` to apply to
     all applicable fields.
 
 .. django-admin-option:: --srid SRID
 
-    The SRID to use for the geometry field.  If not set, ``ogrinspect`` attempts
+    The SRID to use for the geometry field. If not set, ``ogrinspect`` attempts
     to automatically determine of the SRID of the data source.

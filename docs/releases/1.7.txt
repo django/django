@@ -23,11 +23,11 @@ The Django 1.6 series is the last to support Python 2.6. Django 1.7 is the
 first release to support Python 3.4.
 
 This change should affect only a small number of Django users, as most
-operating-system vendors today are shipping Python 2.7 or newer as their default
-version. If you're still using Python 2.6, however, you'll need to stick to
-Django 1.6 until you can upgrade your Python version. Per :doc:`our support
-policy </internals/release-process>`, Django 1.6 will continue to receive
-security support until the release of Django 1.8.
+operating-system vendors today are shipping Python 2.7 or newer as their
+default version. If you're still using Python 2.6, however, you'll need to
+stick to Django 1.6 until you can upgrade your Python version. Per :doc:`our
+support policy </internals/release-process>`, Django 1.6 will continue to
+receive security support until the release of Django 1.8.
 
 .. _whats-new-1.7:
 
@@ -37,9 +37,9 @@ What's new in Django 1.7
 Schema migrations
 -----------------
 
-Django now has built-in support for schema migrations. It allows models
-to be updated, changed, and deleted by creating migration files that represent
-the model changes and which can be run on any development, staging or production
+Django now has built-in support for schema migrations. It allows models to be
+updated, changed, and deleted by creating migration files that represent the
+model changes and which can be run on any development, staging or production
 database.
 
 Migrations are covered in :doc:`their own documentation</topics/migrations>`,
@@ -58,15 +58,18 @@ but a few of the key features are:
   new signals have slightly different arguments. Check the
   documentation for details.
 
-* The ``allow_syncdb`` method on database routers is now called ``allow_migrate``,
-  but still performs the same function. Routers with ``allow_syncdb`` methods
-  will still work, but that method name is deprecated and you should change
-  it as soon as possible (nothing more than renaming is required).
+* The ``allow_syncdb`` method on database routers is now called
+  ``allow_migrate``, but still performs the same function. Routers with
+  ``allow_syncdb`` methods will still work, but that method name is deprecated
+  and you should change it as soon as possible (nothing more than renaming is
+  required).
 
 * ``initial_data`` fixtures are no longer loaded for apps with migrations; if
-  you want to load initial data for an app, we suggest you create a migration for
-  your application and define a :class:`~django.db.migrations.operations.RunPython`
-  or :class:`~django.db.migrations.operations.RunSQL` operation in the ``operations`` section of the migration.
+  you want to load initial data for an app, we suggest you create a migration
+  for your application and define a
+  :class:`~django.db.migrations.operations.RunPython` or
+  :class:`~django.db.migrations.operations.RunSQL` operation in the
+  ``operations`` section of the migration.
 
 * Test rollback behavior is different for apps with migrations; in particular,
   Django will no longer emulate rollbacks on non-transactional databases or
@@ -109,7 +112,7 @@ Improvements thus far include:
 * The name of applications can be customized in the admin with the
   :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
 
-* The admin automatically calls :func:`~django.contrib.admin.autodiscover()`
+* The admin automatically calls :func:`~django.contrib.admin.autodiscover`
   when Django starts. You can consequently remove this line from your
   URLconf.
 
@@ -129,18 +132,20 @@ This method takes no arguments, and returns a tuple of four items:
 
 * ``name``: The field's attribute name on its parent model, or ``None`` if it
   is not part of a model
-* ``path``: A dotted, Python path to the class of this field, including the class name.
+* ``path``: A dotted, Python path to the class of this field, including the
+  class name.
 * ``args``: Positional arguments, as a list
 * ``kwargs``: Keyword arguments, as a dict
 
 These four values allow any field to be serialized into a file, as well as
-allowing the field to be copied safely, both essential parts of these new features.
+allowing the field to be copied safely, both essential parts of these new
+features.
 
 This change should not affect you unless you write custom Field subclasses;
 if you do, you may need to reimplement the ``deconstruct()`` method if your
 subclass changes the method signature of ``__init__`` in any way. If your
-field just inherits from a built-in Django field and doesn't override ``__init__``,
-no changes are necessary.
+field just inherits from a built-in Django field and doesn't override
+``__init__``, no changes are necessary.
 
 If you do need to override ``deconstruct()``, a good place to start is the
 built-in Django fields (``django/db/models/fields/__init__.py``) as several
@@ -233,9 +238,9 @@ You can specify the ``QuerySet`` used to traverse a given relation
 or customize the storage location of prefetch results.
 
 This enables things like filtering prefetched relations, calling
-:meth:`~django.db.models.query.QuerySet.select_related()` from a prefetched
+:meth:`~django.db.models.query.QuerySet.select_related` from a prefetched
 relation, or prefetching the same relation multiple times with different
-querysets. See :meth:`~django.db.models.query.QuerySet.prefetch_related()`
+querysets. See :meth:`~django.db.models.query.QuerySet.prefetch_related`
 for more details.
 
 Admin shortcuts support time zones
@@ -316,7 +321,7 @@ automatically process them. This remains the canonical way of adding errors
 when possible. However the latter was fiddly and error-prone, since the burden
 of handling edge cases fell on the user.
 
-The new :meth:`~django.forms.Form.add_error()` method allows adding errors
+The new :meth:`~django.forms.Form.add_error` method allows adding errors
 to specific form fields from anywhere without having to worry about the details
 such as creating instances of ``django.forms.utils.ErrorList`` or dealing with
 ``Form.cleaned_data``. This new API replaces manipulating ``Form._errors``
@@ -416,8 +421,8 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Any ``**kwargs`` passed to
-  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
-  underlying :meth:`~django.core.mail.send_mail()` call.
+  :meth:`~django.contrib.auth.models.User.email_user` are passed to the
+  underlying :meth:`~django.core.mail.send_mail` call.
 
 * The :func:`~django.contrib.auth.decorators.permission_required` decorator can
   take a list of permissions as well as a single permission.
@@ -507,7 +512,8 @@ Minor features
   subclassed to override the permissions that collected static files and
   directories receive by setting the
   :attr:`~django.core.files.storage.FileSystemStorage.file_permissions_mode`
-  and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
+  and
+  :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
 
 * The ``CachedStaticFilesStorage`` backend gets a sibling class called
@@ -519,8 +525,9 @@ Minor features
   when running the :djadmin:`collectstatic` management command and should
   be a less expensive alternative for remote storages such as Amazon S3.
 
-  See the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
-  docs for more information.
+  See the
+  :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` docs
+  for more information.
 
 * :djadmin:`findstatic` now accepts verbosity flag level 2, meaning it will
   show the relative paths of the directories it searched. See
@@ -608,9 +615,9 @@ Forms
 * The ``<label>`` and ``<input>`` tags rendered by
   :class:`~django.forms.RadioSelect` and
   :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
-  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
-  Each radio button or checkbox includes an ``id_for_label`` attribute to
-  output the element's ID.
+  buttons or checkboxes now include ``for`` and ``id`` attributes,
+  respectively. Each radio button or checkbox includes an ``id_for_label``
+  attribute to output the element's ID.
 
 * The ``<textarea>`` tags rendered by :class:`~django.forms.Textarea` now
   include a ``maxlength`` attribute if the :class:`~django.db.models.TextField`
@@ -784,20 +791,22 @@ Models
 * Custom intermediate models having more than one foreign key to any of the
   models participating in a many-to-many relationship are now permitted,
   provided you explicitly specify which foreign keys should be used by setting
-  the new :attr:`ManyToManyField.through_fields <django.db.models.ManyToManyField.through_fields>`
-  argument.
+  the new :attr:`ManyToManyField.through_fields
+  <django.db.models.ManyToManyField.through_fields>` argument.
 
 * Assigning a model instance to a non-relation field will now throw an error.
   Previously this used to work if the field accepted integers as input as it
   took the primary key.
 
 * Integer fields are now validated against database backend specific min and
-  max values based on their :meth:`internal_type <django.db.models.Field.get_internal_type>`.
-  Previously model field validation didn't prevent values out of their associated
-  column data type range from being saved resulting in an integrity error.
+  max values based on their :meth:`internal_type
+  <django.db.models.Field.get_internal_type>`. Previously model field
+  validation didn't prevent values out of their associated column data type
+  range from being saved resulting in an integrity error.
 
-* It is now possible to explicitly :meth:`~django.db.models.query.QuerySet.order_by`
-  a relation ``_id`` field by using its attribute name.
+* It is now possible to explicitly
+  :meth:`~django.db.models.query.QuerySet.order_by` a relation ``_id`` field by
+  using its attribute name.
 
 Signals
 ~~~~~~~
@@ -824,8 +833,8 @@ Templates
 
 * ``Context`` objects can now be compared for equality (internally, this
   uses :meth:`Context.flatten() <django.template.Context.flatten>` so the
-  internal structure of each ``Context``'s stack doesn't matter as long as their
-  flattened version is identical).
+  internal structure of each ``Context``'s stack doesn't matter as long as
+  their flattened version is identical).
 
 * The :ttag:`widthratio` template tag now accepts an ``"as"`` parameter to
   capture the result in a variable.
@@ -847,9 +856,9 @@ Templates
 * The following functions now accept a ``dirs`` parameter which is a list or
   tuple to override ``TEMPLATE_DIRS``:
 
-  * :func:`django.template.loader.get_template()`
-  * :func:`django.template.loader.select_template()`
-  * :func:`django.shortcuts.render()`
+  * :func:`django.template.loader.get_template`
+  * :func:`django.template.loader.select_template`
+  * :func:`django.shortcuts.render`
   * ``django.shortcuts.render_to_response()``
 
 * The :tfilter:`time` filter now accepts timezone-related :ref:`format
@@ -877,7 +886,8 @@ Requests and Responses
   relative URLs.
 
 * The new :class:`~django.http.JsonResponse` subclass of
-  :class:`~django.http.HttpResponse` helps easily create JSON-encoded responses.
+  :class:`~django.http.HttpResponse` helps easily create JSON-encoded
+  responses.
 
 Tests
 ~~~~~
@@ -919,11 +929,11 @@ Validators
 
 * :class:`~django.core.validators.RegexValidator` now accepts the optional
   :attr:`~django.core.validators.RegexValidator.flags` and
-  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` arguments.
-  The :attr:`~django.core.validators.RegexValidator.inverse_match` attribute
-  determines if the :exc:`~django.core.exceptions.ValidationError` should
-  be raised when the regular expression pattern matches (``True``) or does not
-  match (``False``, by default) the provided ``value``. The
+  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match`
+  arguments. The :attr:`~django.core.validators.RegexValidator.inverse_match`
+  attribute determines if the :exc:`~django.core.exceptions.ValidationError`
+  should be raised when the regular expression pattern matches (``True``) or
+  does not match (``False``, by default) the provided ``value``. The
   :attr:`~django.core.validators.RegexValidator.flags` attribute sets the flags
   used when compiling a regular expression string.
 
@@ -955,17 +965,18 @@ should be renamed to ``allow_migrate``, there is a subtle difference in which
 models get passed to these methods.
 
 For apps with migrations, ``allow_migrate`` will now get passed
-:ref:`historical models <historical-models>`, which are special versioned models
-without custom attributes, methods or managers. Make sure your ``allow_migrate``
-methods are only referring to fields or other items in ``model._meta``.
+:ref:`historical models <historical-models>`, which are special versioned
+models without custom attributes, methods or managers. Make sure your
+``allow_migrate`` methods are only referring to fields or other items in
+``model._meta``.
 
 initial_data
 ------------
 
 Apps with migrations will not load ``initial_data`` fixtures when they have
-finished migrating. Apps without migrations will continue to load these fixtures
-during the phase of ``migrate`` which emulates the old ``syncdb`` behavior,
-but any new apps will not have this support.
+finished migrating. Apps without migrations will continue to load these
+fixtures during the phase of ``migrate`` which emulates the old ``syncdb``
+behavior, but any new apps will not have this support.
 
 Instead, you are encouraged to load initial data in migrations if you need it
 (using the ``RunPython`` operation and your model classes);
@@ -1218,8 +1229,8 @@ model implemented a custom ``get_queryset()``).
 
 Fixing the issues introduced some backward incompatible changes:
 
-- The default implementation of ``remove()`` for ``ForeignKey`` related managers
-  changed from a series of ``Model.save()`` calls to a single
+- The default implementation of ``remove()`` for ``ForeignKey`` related
+  managers changed from a series of ``Model.save()`` calls to a single
   ``QuerySet.update()`` call. The change means that ``pre_save`` and
   ``post_save`` signals aren't sent anymore. You can use the ``bulk=False``
   keyword argument to revert to the previous behavior.
@@ -1252,7 +1263,7 @@ has been set to the more regular ``invalid_login`` key.
 ----------------------------------------------
 
 Historically, queries that use
-:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+:meth:`~django.db.models.query.QuerySet.select_for_update` could be
 executed in autocommit mode, outside of a transaction. Before Django
 1.6, Django's automatic transactions mode allowed this to be used to
 lock records until the next write operation. Django 1.6 introduced
@@ -1296,7 +1307,7 @@ project's needs. You should also check for any code that accesses
 Miscellaneous
 -------------
 
-* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file()`
+* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file`
   method is now passed an additional ``content_type_extra`` parameter. If you
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
@@ -1326,9 +1337,9 @@ Miscellaneous
   two ``Model`` instances without primary key values won't be considered
   equal (unless they are the same instance).
 
-* The :meth:`django.db.models.Model.__hash__` method will now raise ``TypeError``
-  when called on an instance without a primary key value. This is done to
-  avoid mutable ``__hash__`` values in containers.
+* The :meth:`django.db.models.Model.__hash__` method will now raise
+  ``TypeError`` when called on an instance without a primary key value. This is
+  done to avoid mutable ``__hash__`` values in containers.
 
 * :class:`~django.db.models.AutoField` columns in SQLite databases will now be
   created using the ``AUTOINCREMENT`` option, which guarantees monotonic
@@ -1344,7 +1355,7 @@ Miscellaneous
   #) Use :djadmin:`loaddata` to import the fixtures you exported in (1).
 
 * ``django.contrib.auth.models.AbstractUser`` no longer defines a
-  :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
+  :meth:`~django.db.models.Model.get_absolute_url` method. The old definition
   returned  ``"/users/%s/" % urlquote(self.username)`` which was arbitrary
   since applications may or may not define such a url in ``urlpatterns``.
   Define a ``get_absolute_url()`` method on your own custom user object or use
@@ -1357,9 +1368,9 @@ Miscellaneous
   (similarly to what one gets with :setting:`DEBUG = True <DEBUG>` at
   development-time) has been moved to a new class that lives in the
   ``staticfiles`` application (the one actually in charge of such feature):
-  :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`. In other
-  words, ``LiveServerTestCase`` itself is less powerful but at the same time
-  has less magic.
+  :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`. In
+  other words, ``LiveServerTestCase`` itself is less powerful but at the same
+  time has less magic.
 
   Rationale behind this is removal of dependency of non-contrib code on
   contrib applications.
@@ -1431,7 +1442,8 @@ Miscellaneous
 * As part of the :doc:`System check framework </ref/checks>`, :ref:`fields,
   models, and model managers <field-checking>` all implement a ``check()``
   method that is registered with the check framework. If you have an existing
-  method called ``check()`` on one of these objects, you will need to rename it.
+  method called ``check()`` on one of these objects, you will need to rename
+  it.
 
 * As noted above in the "Cache" section of "Minor Features", defining the
   :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
@@ -1535,11 +1547,10 @@ Custom SQL location for models package
 
 Previously, if models were organized in a package (``myapp/models/``) rather
 than simply ``myapp/models.py``, Django would look for initial SQL data in
-``myapp/models/sql/``. This bug has been fixed so that Django
-will search ``myapp/sql/`` as documented. After this issue was fixed, migrations
-were added which deprecates initial SQL data. Thus, while this change still
-exists, the deprecation is irrelevant as the entire feature will be removed in
-Django 1.9.
+``myapp/models/sql/``. This bug has been fixed so that Django will search
+``myapp/sql/`` as documented. After this issue was fixed, migrations were added
+which deprecates initial SQL data. Thus, while this change still exists, the
+deprecation is irrelevant as the entire feature will be removed in Django 1.9.
 
 Reorganization of ``django.contrib.sites``
 ------------------------------------------
@@ -1566,9 +1577,10 @@ Reorganization of ``django.contrib.contenttypes``
 -------------------------------------------------
 
 Since ``django.contrib.contenttypes.generic`` defined both admin and model
-related objects, an import of this module could trigger unexpected side effects.
-As a consequence, its contents were split into :mod:`~django.contrib.contenttypes`
-submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
+related objects, an import of this module could trigger unexpected side
+effects. As a consequence, its contents were split into
+:mod:`~django.contrib.contenttypes` submodules and the
+``django.contrib.contenttypes.generic`` module is deprecated:
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` and
   :class:`~django.contrib.contenttypes.fields.GenericRelation` now live in
@@ -1584,9 +1596,10 @@ submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
 ``syncdb``
 ----------
 
-The ``syncdb`` command has been deprecated in favor of the new :djadmin:`migrate`
-command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
-more, so it's safe to just change the name you're calling and nothing else.
+The ``syncdb`` command has been deprecated in favor of the new
+:djadmin:`migrate` command. ``migrate`` takes the same arguments as ``syncdb``
+used to plus a few more, so it's safe to just change the name you're calling
+and nothing else.
 
 ``util`` modules renamed to ``utils``
 -------------------------------------
@@ -1725,9 +1738,9 @@ The ``django.contrib.admin.validation`` module is deprecated.
 ``django.db.backends.DatabaseValidation.validate_field``
 --------------------------------------------------------
 
-This method is deprecated in favor of a new ``check_field`` method.
-The functionality required by ``check_field()`` is the same as that provided
-by ``validate_field()``, but the output format is different. Third-party database
+This method is deprecated in favor of a new ``check_field`` method. The
+functionality required by ``check_field()`` is the same as that provided by
+``validate_field()``, but the output format is different. Third-party database
 backends needing this functionality should provide an implementation of
 ``check_field()``.
 
@@ -1743,9 +1756,9 @@ will be removed in Django 1.9. You can simply remove the
 ``django.utils.text.javascript_quote``
 --------------------------------------
 
-``javascript_quote()`` was an undocumented function present in ``django.utils.text``.
-It was used internally in the ``javascript_catalog()`` view
-whose implementation was changed to make use of ``json.dumps()`` instead.
+``javascript_quote()`` was an undocumented function present in
+``django.utils.text``. It was used internally in the ``javascript_catalog()``
+view whose implementation was changed to make use of ``json.dumps()`` instead.
 If you were relying on this function to provide safe output from untrusted
 strings, you should use ``django.utils.html.escapejs`` or the
 :tfilter:`escapejs` template filter.
@@ -1756,14 +1769,14 @@ If all you need is to generate valid JavaScript strings, you can simply use
 ---------------------------------------------------
 
 The ``django.utils.html.fix_ampersands`` method and the ``fix_ampersands``
-template filter are deprecated, as the escaping of ampersands is already taken care
-of by Django's standard HTML escaping features. Combining this with ``fix_ampersands``
-would either result in double escaping, or, if the output is assumed to be safe,
-a risk of introducing XSS vulnerabilities. Along with ``fix_ampersands``,
-``django.utils.html.clean_html`` is deprecated, an undocumented function that calls
-``fix_ampersands``.
-As this is an accelerated deprecation, ``fix_ampersands`` and ``clean_html``
-will be removed in Django 1.8.
+template filter are deprecated, as the escaping of ampersands is already taken
+care of by Django's standard HTML escaping features. Combining this with
+``fix_ampersands`` would either result in double escaping, or, if the output is
+assumed to be safe, a risk of introducing XSS vulnerabilities. Along with
+``fix_ampersands``, ``django.utils.html.clean_html`` is deprecated, an
+undocumented function that calls ``fix_ampersands``. As this is an accelerated
+deprecation, ``fix_ampersands`` and ``clean_html`` will be removed in Django
+1.8.
 
 Reorganization of database test settings
 ----------------------------------------

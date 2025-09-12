@@ -10,7 +10,8 @@ test_srs = (
         "srid": 4326,
         "auth_name": ("EPSG", True),
         "auth_srid": 4326,
-        # Only the beginning, because there are differences depending on installed libs
+        # Only the beginning, because there are differences depending on
+        # installed libs
         "srtext": 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
         "proj_re": (
             r"\+proj=longlat (\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ?"
@@ -86,9 +87,9 @@ class SpatialRefSysTest(TestCase):
             srs = self.SpatialRefSys.objects.get(srid=sd["srid"])
             self.assertEqual(sd["srid"], srs.srid)
 
-            # Some of the authority names are borked on Oracle, e.g., SRID=32140.
-            #  also, Oracle Spatial seems to add extraneous info to fields, hence the
-            #  the testing with the 'startswith' flag.
+            # Some of the authority names are borked on Oracle, e.g.,
+            # SRID=32140. Also, Oracle Spatial seems to add extraneous info to
+            # fields, hence the testing with the 'startswith' flag.
             auth_name, oracle_flag = sd["auth_name"]
             # Compare case-insensitively because srs.auth_name is lowercase
             # ("epsg") on Spatialite.

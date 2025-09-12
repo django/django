@@ -4,8 +4,8 @@ Built-in class-based generic views
 
 Writing web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
-and template layers, but web developers also experience this boredom at the view
-level.
+and template layers, but web developers also experience this boredom at the
+view level.
 
 Django's *generic views* were developed to ease that pain. They take certain
 common idioms and patterns found in view development and abstract them so that
@@ -229,8 +229,8 @@ you can override it to send more::
     Generally, ``get_context_data`` will merge the context data of all parent
     classes with those of the current class. To preserve this behavior in your
     own classes where you want to alter the context, you should be sure to call
-    ``get_context_data`` on the super class. When no two classes try to define the
-    same key, this will give the expected results. However if any class
+    ``get_context_data`` on the super class. When no two classes try to define
+    the same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
     to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
@@ -295,8 +295,8 @@ list of books by a particular publisher, you can use the same technique::
         template_name = "books/acme_list.html"
 
 Notice that along with a filtered ``queryset``, we're also using a custom
-template name. If we didn't, the generic view would use the same template as the
-"vanilla" object list, which might not be what we want.
+template name. If we didn't, the generic view would use the same template as
+the "vanilla" object list, which might not be what we want.
 
 Also notice that this isn't a very elegant way of doing publisher-specific
 books. If we want to add another publisher page, we'd need another handful of
@@ -306,8 +306,8 @@ We'll deal with this problem in the next section.
 .. note::
 
     If you get a 404 when requesting ``/books/acme/``, check to ensure you
-    actually have a Publisher with the name 'ACME Publishing'.  Generic
-    views have an ``allow_empty`` parameter for this case.  See the
+    actually have a Publisher with the name 'ACME Publishing'. Generic
+    views have an ``allow_empty`` parameter for this case. See the
     :doc:`class-based-views reference</ref/class-based-views/index>` for more
     details.
 
@@ -317,8 +317,8 @@ Dynamic filtering
 
 Another common need is to filter down the objects given in a list page by some
 key in the URL. Earlier we hardcoded the publisher's name in the URLconf, but
-what if we wanted to write a view that displayed all the books by some arbitrary
-publisher?
+what if we wanted to write a view that displayed all the books by some
+arbitrary publisher?
 
 Handily, the ``ListView`` has a
 :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method we

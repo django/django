@@ -22,6 +22,7 @@ if lib_path:
 elif os.name == "nt":
     # Windows NT shared libraries
     lib_names = [
+        "gdal311",
         "gdal310",
         "gdal309",
         "gdal308",
@@ -38,6 +39,7 @@ elif os.name == "posix":
     lib_names = [
         "gdal",
         "GDAL",
+        "gdal3.11.0",
         "gdal3.10.0",
         "gdal3.9.0",
         "gdal3.8.0",
@@ -52,7 +54,7 @@ elif os.name == "posix":
 else:
     raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
 
-# Using the ctypes `find_library` utility  to find the
+# Using the ctypes `find_library` utility to find the
 # path to the GDAL library from the list of library names.
 if lib_names:
     for lib_name in lib_names:
@@ -71,7 +73,7 @@ if lib_path is None:
 lgdal = CDLL(lib_path)
 
 # On Windows, the GDAL binaries have some OSR routines exported with
-# STDCALL, while others are not.  Thus, the library will also need to
+# STDCALL, while others are not. Thus, the library will also need to
 # be loaded up as WinDLL for said OSR functions that require the
 # different calling convention.
 if os.name == "nt":

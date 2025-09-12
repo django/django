@@ -34,18 +34,14 @@
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .object-tools li {
-        float: right;
-    }
-
-    [dir="rtl"] .object-tools li + li {
-        margin-left: 0;
-        margin-right: 15px;
-    }
-
     [dir="rtl"] .dashboard .module table td a {
         padding-left: 0;
         padding-right: 16px;
+    }
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 55px 10px 10px;
+        background-position-x: calc(100% - 30px);
     }
 }
 
@@ -67,6 +63,11 @@
         margin-left: 0;
         margin-right: 0;
     }
+
+    [dir="rtl"] .object-tools {
+        text-align: right;
+    }
+
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;
     }
@@ -85,5 +86,10 @@
 
     [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
         background-position: 0 -72px;
+    }
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 40px 10px 10px;
+        background-position-x: calc(100% - 15px);
     }
 }
