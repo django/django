@@ -2,10 +2,12 @@ import time
 import traceback
 from datetime import date, datetime, timedelta
 from threading import Event, Thread, Timer
+from unittest import mock
 from unittest.mock import patch
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
+from django.db.models import QuerySet
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 from django.utils.functional import lazy
@@ -812,3 +814,39 @@ class InvalidCreateArgumentsTests(TransactionTestCase):
             Thing.objects.update_or_create(
                 name_in_all_caps="FRANK", defaults={"name": "Frank"}
             )
+
+
+class GetOrCreateOneToOneRaceConditionTest(TestCase):
+    def test_race_condition_does_not_leave_stale_cache(self):
+        person = Person.objects.create(
+            first_name="Brian",
+            last_name="Atkinson",
+            birthday="1980-01-01",
+            defaults="foo",
+            create_defaults="bar",
+        )
+
+        triggered = False
+
+        def effect(*args, **kwargs):
+            nonlocal triggered
+            if not triggered and kwargs.get("person") == person:
+                triggered = True
+                Profile.objects.update_or_create(
+                    person=Person.objects.get(pk=person.pk),
+                    defaults={},
+                )
+            return mock.DEFAULT
+
+        with mock.patch.object(
+            QuerySet,
+            "_extract_model_params",
+            autospec=True,
+            wraps=QuerySet._extract_model_params,
+            side_effect=effect,
+        ):
+            profile, created = Profile.objects.get_or_create(person=person, defaults={})
+            self.assertFalse(created)
+
+        self.assertIsNotNone(profile.person_id)
+        self.assertTrue(Profile.objects.filter(person=person).exists())
