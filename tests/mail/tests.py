@@ -2418,6 +2418,19 @@ class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
         self.assertIsInstance(connection, filebased.EmailBackend)
         self.assertPathEqual(connection.file_path, "/tmp/bar")  # from kwargs
 
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
+        EMAIL_HOST="mail.example.com",
+        EMAIL_PORT=9876,
+    )
+    def test_third_party_app_read_config(self):
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            "django.core.mail.backends.smtp.EmailBackend",
+        )
+        self.assertEqual(settings.EMAIL_HOST, "mail.example.com")
+        self.assertEqual(settings.EMAIL_PORT, 9876)
+
 
 class BaseEmailBackendTests(MailTestsMixin):
     email_backend = None
