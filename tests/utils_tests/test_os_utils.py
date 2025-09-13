@@ -1,9 +1,10 @@
 import os
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.utils._os import safe_join, to_path
+from django.utils._os import safe_join, symlinks_supported, to_path
 
 
 class SafeJoinTests(unittest.TestCase):
@@ -38,3 +39,17 @@ class ToPathTests(unittest.TestCase):
     def test_to_path_invalid_value(self):
         with self.assertRaises(TypeError):
             to_path(42)
+
+
+class SymlinksSupportedTests(unittest.TestCase):
+    def test_supported(self):
+        os.symlink = Mock()
+        self.assertTrue(symlinks_supported())
+
+    def test_os_error(self):
+        os.symlink = Mock(side_effect=OSError("os_failed"))
+        self.assertFalse(symlinks_supported())
+
+    def test_not_implemented_error(self):
+        os.symlink = Mock(side_effect=NotImplementedError("not_implemented"))
+        self.assertFalse(symlinks_supported())
