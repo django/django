@@ -171,6 +171,13 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* The PostgreSQL full text search module adds a
+  :class:`Lexeme <django.contrib.postgres.search.Lexeme>` expression, enabling
+  fine-grained control over search term handling. Lexemes support logical
+  combinations (``&``, ``|``, ``~``), prefix matching, term weighting, and
+  relieve the need for manually escaping user input when creating complex
+  search expressions.
+
 * Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
   now include system checks to verify that ``django.contrib.postgres`` is an
   installed app.
