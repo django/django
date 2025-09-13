@@ -49,6 +49,7 @@
     padding: 8px;
 }
 
+.tabular .selector-chosen-title label,
 .aligned .selector-chosen-title label {
     color: var(--header-link-color);
     width: 100%;
