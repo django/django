@@ -17,6 +17,7 @@ from django.db.migrations.utils import (
     RegexObject,
     resolve_relation,
 )
+from django.db.models.options import DEFAULT_NAMES
 from django.utils.functional import cached_property
 
 
@@ -269,6 +270,24 @@ class MigrationAutodetector:
         return self.migrations
 
     def generate_3rd_party_operations(self):
+
+        new_model_keys = self.new_model_keys - self.old_model_keys
+
+        for app_label, model_name in new_model_keys:
+            to_model_state = self.to_state.models[app_label, model_name]
+            for operation in registry.apply(
+                app_label,
+                model_name,
+                self.from_state,
+                self.to_state,
+                None,
+                to_model_state,
+            ):
+                self.add_operation(app_label, operation)
+            for option in DEFAULT_NAMES.extra:
+                # Remove from CreateModel operation
+                to_model_state.options.pop(option, None)
+
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get(
                 (app_label, model_name), model_name
