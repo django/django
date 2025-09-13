@@ -563,6 +563,11 @@ class ParallelTestSuite(unittest.TestSuite):
             (self.runner_class, index, subsuite, self.failfast, self.buffer)
             for index, subsuite in enumerate(self.subsuites)
         ]
+        # Disable buffering on the local test result that will accumulate
+        # remote suites results as each process will take care of its own
+        # buffering and there's nothing to capture on the main process.
+        result.buffer = False
+
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
 
         while True:

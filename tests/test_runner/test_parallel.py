@@ -6,6 +6,7 @@ from unittest.result import TestResult
 from unittest.suite import TestSuite, _ErrorHolder
 
 from django.test import SimpleTestCase
+from django.test import TestCase as DjangoTestCase
 from django.test.runner import ParallelTestSuite, RemoteTestResult
 
 try:
@@ -277,3 +278,44 @@ class ParallelTestSuiteTest(SimpleTestCase):
 
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
+
+
+class ParallelBufferTest(DjangoTestCase):
+    def test_parallel_buffer(self):
+        """
+        Test that ParallelTestSuite.run() properly handles buffered TestResult
+        to prevent AttributeError when setUpTestData raises exceptions.
+        Before the fix, running tests with
+        --parallel --buffer would crash with AttributeError when setUpTestData
+        raised an exception because the main process TestResult had buffer=True
+        but _setupStdout() was never called.
+        """
+
+        class AbortingTest(DjangoTestCase):
+            @classmethod
+            def setUpTestData(cls):
+                raise RuntimeError("Boo!")
+
+            def test_pass(self):
+                pass
+
+        test = AbortingTest("test_pass")
+        remote_result = RemoteTestResult()
+        suite = TestSuite([test])
+        suite.run(remote_result)
+
+        pts = ParallelTestSuite([suite], processes=2, buffer=True)
+        pts.serialized_aliases = set()
+        test_result = TestResult()
+        test_result.buffer = True
+
+        with unittest.mock.patch("multiprocessing.Pool") as mock_pool:
+
+            def fake_next(*args, **kwargs):
+                test_result.shouldStop = True
+                return (0, remote_result.events)
+
+            mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
+                next=fake_next
+            )
+            pts.run(test_result)
