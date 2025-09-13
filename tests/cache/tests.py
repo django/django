@@ -25,7 +25,7 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1164,6 +1164,34 @@ class BaseCacheTests:
             # default value should be returned.
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
+
+    def test_async_impl(self):
+        # Assert that the inherited method matches the BaseCache
+        # implementation. Object IDs will not necessarily match,
+        # so we need another basis of comparison.
+        methods = ["aget_many", "aset_many", "adelete_many"]
+        if isinstance(cache, BaseCache):
+            for m in methods:
+                cache_m = getattr(cache, m)
+                bcache_m = getattr(BaseCache, m)
+                self.assertEqual(pickle.dumps(cache_m), pickle.dumps(bcache_m))
+
+    async def test_async_calls_sync(self):
+        getp = mock.patch.object(cache, "get_many")
+        setp = mock.patch.object(cache, "set_many")
+        deletep = mock.patch.object(cache, "delete_many")
+        get_many = getp.start()
+        set_many = setp.start()
+        delete_many = deletep.start()
+        await cache.aset_many({"ford1": 37, "arthur1": 42})
+        await cache.aget_many(["ford1", "arthur1"])
+        await cache.adelete_many(["ford1", "arthur1"])
+        get_many.assert_called()
+        set_many.assert_called()
+        delete_many.assert_called()
+        getp.stop()
+        setp.stop()
+        deletep.stop()
 
 
 @override_settings(
