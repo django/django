@@ -229,6 +229,11 @@ Email
   accepts a :class:`~email.message.MIMEPart` object from Python's modern email
   API.
 
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added support and translations for the Haitian Creole language.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
