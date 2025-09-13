@@ -400,3 +400,15 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def combine_expression(self, connector, sub_expressions, output_field=None):
+        if (
+            connector == "/"
+            and output_field
+            and output_field.get_internal_type() in ("FloatField", "DecimalField")
+        ):
+            lhs, rhs = sub_expressions
+            return f"CAST({lhs} AS NUMERIC) / {rhs}"
+        return super().combine_expression(
+            connector, sub_expressions, output_field=output_field
+        )

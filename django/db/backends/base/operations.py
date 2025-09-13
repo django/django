@@ -669,7 +669,7 @@ class BaseDatabaseOperations:
         """
         return True
 
-    def combine_expression(self, connector, sub_expressions):
+    def combine_expression(self, connector, sub_expressions, output_field=None):
         """
         Combine a list of subexpressions into a single expression, using
         the provided connecting operator. This is required because operators
