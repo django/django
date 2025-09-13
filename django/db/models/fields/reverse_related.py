@@ -10,6 +10,7 @@ they're the closest concept currently available.
 """
 
 from django.core import exceptions
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -184,7 +185,9 @@ class ForeignObjectRel(FieldCacheMixin):
         initially for utilization by RelatedFieldListFilter.
         """
         limit_choices_to = limit_choices_to or self.limit_choices_to
-        qs = self.related_model._default_manager.complex_filter(limit_choices_to)
+        if not isinstance(limit_choices_to, Q):
+            limit_choices_to = Q(**limit_choices_to)
+        qs = self.related_model._default_manager.filter(limit_choices_to)
         if ordering:
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
