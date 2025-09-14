@@ -38,7 +38,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313, get_docs_version
+from django.utils.version import PY313, PY314, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -3328,3 +3328,19 @@ class DjangoAdminSuggestions(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertNotInOutput(err, "Did you mean")
+
+
+class AdminScriptsColorizedHelp(AdminScriptTestCase):
+    @unittest.skipUnless(PY314, "argparse colorized help requires Python 3.14+")
+    def test_help_is_colorized_on_py314(self):
+        # Use a command that doesn't need settings.
+        with mock.patch.dict(os.environ, {}, clear=False):
+            out, err = self.run_django_admin(["startproject", "--help"])
+        # Look for ANSI SGR sequences.
+        self.assertRegex(out, r"\x1b\\[[0-9;]*m")
+
+    @unittest.skipUnless(PY314, "argparse colorized help requires Python 3.14+")
+    def test_help_not_colorized_when_django_colors_nocolor(self):
+        with mock.patch.dict(os.environ, {"DJANGO_COLORS": "nocolor"}, clear=False):
+            out, err = self.run_django_admin(["startproject", "--help"])
+        self.assertNotRegex(out, r"\x1b\\[[0-9;]*m")

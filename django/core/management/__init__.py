@@ -24,6 +24,7 @@ from django.core.management.base import (
 )
 from django.core.management.color import color_style
 from django.utils import autoreload
+from django.utils.version import PY314
 
 
 def find_commands(management_dir):
@@ -364,11 +365,16 @@ class ManagementUtility:
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
+        if PY314:
+            color_kwargs = {"color": os.environ.get("DJANGO_COLORS") != "nocolor"}
+        else:
+            color_kwargs = {}
         parser = CommandParser(
             prog=self.prog_name,
             usage="%(prog)s subcommand [options] [args]",
             add_help=False,
             allow_abbrev=False,
+            **color_kwargs,
         )
         parser.add_argument("--settings")
         parser.add_argument("--pythonpath")
