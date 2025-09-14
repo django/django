@@ -461,6 +461,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_name = "staticfiles.json"
     manifest_strict = True
     keep_intermediate_files = False
+    keep_original_files = True
 
     def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -495,9 +496,26 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def post_process(self, *args, **kwargs):
         self.hashed_files = {}
-        yield from super().post_process(*args, **kwargs)
+        original_files_to_delete = []
+
+        for name, hashed_name, processed in super().post_process(*args, **kwargs):
+            yield name, hashed_name, processed
+            # Track original files to delete if keep_original_files is False
+            if (
+                not self.keep_original_files
+                and processed
+                and name != hashed_name
+                and self.exists(name)
+            ):
+                original_files_to_delete.append(name)
+
         if not kwargs.get("dry_run"):
             self.save_manifest()
+            # Delete original files after processing is complete
+            if not self.keep_original_files:
+                for name in original_files_to_delete:
+                    if self.exists(name):
+                        self.delete(name)
 
     def save_manifest(self):
         sorted_hashed_files = sorted(self.hashed_files.items())
@@ -540,7 +558,29 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
     hashed copies of the files it saves.
     """
 
-    pass
+    def __init__(
+        self,
+        location=None,
+        base_url=None,
+        support_js_module_import_aggregation=None,
+        manifest_name=None,
+        manifest_strict=None,
+        keep_original_files=None,
+        *args,
+        **kwargs,
+    ):
+        # Set configurable attributes as instance attributes if provided
+        if support_js_module_import_aggregation is not None:
+            self.support_js_module_import_aggregation = (
+                support_js_module_import_aggregation
+            )
+        if manifest_name is not None:
+            self.manifest_name = manifest_name
+        if manifest_strict is not None:
+            self.manifest_strict = manifest_strict
+        if keep_original_files is not None:
+            self.keep_original_files = keep_original_files
+        super().__init__(location, base_url, *args, **kwargs)
 
 
 class ConfiguredStorage(LazyObject):

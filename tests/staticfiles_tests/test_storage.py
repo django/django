@@ -583,6 +583,172 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # The manifest file content should not change.
         self.assertEqual(original_manifest_content, manifest_file_content)
 
+    def test_keep_original_files_false(self):
+        original_keep_original_files = storage.staticfiles_storage.keep_original_files
+        try:
+            storage.staticfiles_storage.keep_original_files = False
+            self.run_collectstatic()
+
+            # Check that hashed CSS files exist but original files are deleted
+            cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, "cached"))
+            hashed_css_files = [
+                f
+                for f in cached_files
+                if f.startswith("styles.") and f.endswith(".css") and len(f) > 10
+            ]
+            self.assertTrue(len(hashed_css_files) > 0, "No hashed CSS files found")
+
+            # Check that original CSS file was deleted
+            original_css_files = [f for f in cached_files if f == "styles.css"]
+            self.assertEqual(
+                len(original_css_files), 0, "Original CSS file should have been deleted"
+            )
+
+        finally:
+            storage.staticfiles_storage.keep_original_files = (
+                original_keep_original_files
+            )
+
+    def test_keep_original_files_true(self):
+        original_keep_original_files = storage.staticfiles_storage.keep_original_files
+        try:
+            storage.staticfiles_storage.keep_original_files = True
+            self.run_collectstatic()
+
+            # Check that both hashed and original CSS files exist
+            cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, "cached"))
+            hashed_css_files = [
+                f
+                for f in cached_files
+                if f.startswith("styles.") and f.endswith(".css") and len(f) > 10
+            ]
+            original_css_files = [f for f in cached_files if f == "styles.css"]
+
+            self.assertTrue(len(hashed_css_files) > 0, "No hashed CSS files found")
+            self.assertEqual(
+                len(original_css_files), 1, "Original CSS file should have been kept"
+            )
+
+        finally:
+            storage.staticfiles_storage.keep_original_files = (
+                original_keep_original_files
+            )
+
+
+class TestManifestStorageOptions(CollectionTestCase):
+    hashed_file_path = hashed_file_path
+
+    @override_settings(
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                ),
+                "OPTIONS": {
+                    "support_js_module_import_aggregation": True,
+                },
+            },
+        }
+    )
+    def test_support_js_module_import_aggregation_true(self):
+        self.run_collectstatic()
+
+        # Check that module.js file is not processed for imports
+        relpath = self.hashed_file_path("cached/module.js")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            # Should contain original import paths, not processed ones
+            self.assertNotIn(b'import testConst from "./module_test.js";', content)
+            self.assertIn(
+                b'import testConst from "./module_test.477bbebe77f0.js";', content
+            )
+
+    @override_settings(
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                ),
+                "OPTIONS": {
+                    "manifest_name": "custom-manifest.json",
+                },
+            },
+        }
+    )
+    def test_manifest_name_option(self):
+        custom_manifest_name = "custom-manifest.json"
+
+        self.run_collectstatic()
+
+        # Check that custom manifest file exists
+        manifest_path = storage.staticfiles_storage.path(custom_manifest_name)
+        self.assertTrue(os.path.exists(manifest_path))
+
+        # Check that the storage is using the custom manifest name
+        self.assertEqual(
+            storage.staticfiles_storage.manifest_name, custom_manifest_name
+        )
+
+    @override_settings(
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                ),
+                "OPTIONS": {
+                    "manifest_strict": False,
+                },
+            },
+        }
+    )
+    def test_manifest_strict_false(self):
+        self.run_collectstatic()
+
+        missing_file_name = "cached/missing.css"
+
+        # Should not raise ValueError for missing entry when
+        # manifest_strict=False Instead should try to find the file on disk
+        err_msg = "The file '%s' could not be found with %r." % (
+            missing_file_name,
+            storage.staticfiles_storage._wrapped,
+        )
+        with self.assertRaisesMessage(ValueError, err_msg):
+            self.hashed_file_path(missing_file_name)
+
+    @override_settings(
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                ),
+                "OPTIONS": {
+                    "keep_original_files": False,
+                },
+            },
+        }
+    )
+    def test_keep_original_files_false(self):
+        self.run_collectstatic()
+
+        # Check that hashed CSS files exist but original files are deleted
+        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, "cached"))
+        hashed_css_files = [
+            f
+            for f in cached_files
+            if f.startswith("styles.") and f.endswith(".css") and len(f) > 10
+        ]
+        self.assertTrue(len(hashed_css_files) > 0, "No hashed CSS files found")
+
+        # Check that original CSS file was deleted
+        original_css_files = [f for f in cached_files if f == "styles.css"]
+        self.assertEqual(
+            len(original_css_files), 0, "Original CSS file should have been deleted"
+        )
+
 
 @override_settings(
     STATIC_URL="/",

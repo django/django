@@ -301,9 +301,8 @@ method). The regular expressions used to find those paths
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
 
-Subclass ``ManifestStaticFilesStorage`` and set the
-``support_js_module_import_aggregation`` attribute to ``True``, if you want to
-use the experimental regular expressions to cover:
+Configure the ``support_js_module_import_aggregation`` to ``True`` via the
+``OPTIONS``, if you want to use the experimental regular expressions to cover:
 
 * The `modules import`_ in JavaScript.
 * The `modules aggregation`_ in JavaScript.
@@ -333,6 +332,27 @@ For example, the ``'css/styles.css'`` file with this content:
     :djadmin:`collectstatic`). At the moment, there is no out-of-the-box
     tooling available for this.
 
+To enable the ``ManifestStaticFilesStorage`` you have to make sure the
+following requirements are met:
+
+* the ``staticfiles`` storage backend in :setting:`STORAGES` setting is set to
+  ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
+* the :setting:`DEBUG` setting is set to ``False``
+* you've collected all your static files by using the
+  :djadmin:`collectstatic` management command
+
+Since creating the MD5 hash can be a performance burden to your website
+during runtime, ``staticfiles`` will automatically store the mapping with
+hashed names for all processed files in a file called ``staticfiles.json``.
+This happens once when you run the :djadmin:`collectstatic` management
+command.
+
+.. admonition:: References in comments
+
+    ``ManifestStaticFilesStorage`` doesn't ignore paths in statements that are
+    commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
+    You should check and eventually strip comments.
+
 You can change the location of the manifest file by using a custom
 ``ManifestStaticFilesStorage`` subclass that sets the ``manifest_storage``
 argument. For example::
@@ -348,12 +368,6 @@ argument. For example::
         def __init__(self, *args, **kwargs):
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
-
-.. admonition:: References in comments
-
-    ``ManifestStaticFilesStorage`` doesn't ignore paths in statements that are
-    commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
-    You should check and eventually strip comments.
 
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
 
@@ -373,26 +387,11 @@ passes might be needed. Increase the maximum number of passes by subclassing
 ``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
 attribute. It defaults to 5.
 
-To enable the ``ManifestStaticFilesStorage`` you have to make sure the
-following requirements are met:
-
-* the ``staticfiles`` storage backend in :setting:`STORAGES` setting is set to
-  ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
-* the :setting:`DEBUG` setting is set to ``False``
-* you've collected all your static files by using the
-  :djadmin:`collectstatic` management command
-
-Since creating the MD5 hash can be a performance burden to your website
-during runtime, ``staticfiles`` will automatically store the mapping with
-hashed names for all processed files in a file called ``staticfiles.json``.
-This happens once when you run the :djadmin:`collectstatic` management
-command.
-
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_strict
 
 If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
-``ValueError`` is raised. This behavior can be disabled by subclassing
-``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
+``ValueError`` is raised. This behavior can be disabled by providing an
+``OPTIONS`` key with a dict and setting the ``manifest_strict`` attribute to
 ``False`` -- nonexistent paths will remain unchanged.
 
 Due to the requirement of running :djadmin:`collectstatic`, this storage
@@ -400,6 +399,16 @@ typically shouldn't be used when running tests as ``collectstatic`` isn't run
 as part of the normal test setup. During testing, ensure that ``staticfiles``
 storage backend in the :setting:`STORAGES` setting is set to something else
 like ``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
+
+.. attribute:: storage.ManifestStaticFilesStorage.keep_original_files
+
+.. versionadded:: 6.0
+
+Once the cached copies have been created you can optionally have the
+original files deleted, e.g. ``css/styles.css``, by setting the
+``keep_original_files`` attribute to ``False``. This can be useful in
+deployment scenarios where it is important to reduce the size of the
+build artifact as much as possible.
 
 .. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
