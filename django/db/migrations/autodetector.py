@@ -1682,7 +1682,10 @@ class MigrationAutodetector:
 
     def _get_dependencies_for_generated_field(self, field):
         dependencies = []
-        referenced_base_fields = models.Q(field.expression).referenced_base_fields
+        referenced_base_fields = [
+            name
+            for name, *lookups in models.Model._get_expr_references(field.expression)
+        ]
         newly_added_fields = sorted(self.new_field_keys - self.old_field_keys)
         for app_label, model_name, added_field_name in newly_added_fields:
             added_field = self.to_state.models[app_label, model_name].get_field(
