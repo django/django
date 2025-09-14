@@ -260,10 +260,11 @@ class MigrationAutodetector:
         self.generate_altered_constraints()
         self.generate_altered_db_table()
 
+        self._sort_migrations()
+
         # xxx
         self.generate_3rd_party_operations()
 
-        self._sort_migrations()
         self._build_migration_list(graph)
         self._optimize_migrations()
 
