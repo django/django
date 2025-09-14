@@ -6,7 +6,7 @@ from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
@@ -61,7 +61,7 @@ class InspectDbTests(TestCase):
 @modify_settings(
     INSTALLED_APPS={"append": "django.contrib.gis"},
 )
-class OGRInspectTest(SimpleTestCase):
+class OGRInspectTest(TestCase):
     maxDiff = 1024
 
     def test_poly(self):
