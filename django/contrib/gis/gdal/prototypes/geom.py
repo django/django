@@ -16,20 +16,6 @@ from django.contrib.gis.gdal.prototypes.generation import (
 from django.utils.functional import cached_property
 
 
-class LazyGeomFunction:
-    """A wrapper that lazily creates geometry functions based on GDAL version."""
-
-    def __init__(self, func):
-        self._func = func
-
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
-
-    @cached_property
-    def func(self):
-        return self._func()
-
-
 # ### Generation routines specific to this module ###
 class EnvFunc(GDALFuncFactory):
     """For getting OGREnvelopes."""
@@ -74,24 +60,29 @@ getm = PntFunc("OGR_G_GetM")
 
 
 # Geometry creation routines.
-def _from_wkb():
-    from django.contrib.gis.gdal.libgdal import GDAL_VERSION
+class _FromWkb:
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
 
-    if GDAL_VERSION >= (3, 3):
-        return GeomOutput(
-            "OGR_G_CreateFromWkbEx",
-            argtypes=[c_char_p, c_void_p, POINTER(c_void_p), c_int],
-            offset=-2,
-        )
-    else:
-        return GeomOutput(
-            "OGR_G_CreateFromWkb",
-            argtypes=[c_char_p, c_void_p, POINTER(c_void_p), c_int],
-            offset=-2,
-        )
+    @cached_property
+    def func(self):
+        from django.contrib.gis.gdal.libgdal import GDAL_VERSION
+
+        if GDAL_VERSION >= (3, 3):
+            return GeomOutput(
+                "OGR_G_CreateFromWkbEx",
+                argtypes=[c_char_p, c_void_p, POINTER(c_void_p), c_int],
+                offset=-2,
+            )
+        else:
+            return GeomOutput(
+                "OGR_G_CreateFromWkb",
+                argtypes=[c_char_p, c_void_p, POINTER(c_void_p), c_int],
+                offset=-2,
+            )
 
 
-from_wkb = LazyGeomFunction(_from_wkb)
+from_wkb = _FromWkb()
 from_wkt = GeomOutput(
     "OGR_G_CreateFromWkt",
     argtypes=[POINTER(c_char_p), c_void_p, POINTER(c_void_p)],
@@ -144,16 +135,21 @@ to_gml = StringOutput(
 )
 
 
-def _get_wkbsize():
-    from django.contrib.gis.gdal.libgdal import GDAL_VERSION
+class _GetWkbSize:
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
 
-    if GDAL_VERSION >= (3, 3):
-        return IntOutput("OGR_G_WkbSizeEx", argtypes=[c_void_p])
-    else:
-        return IntOutput("OGR_G_WkbSize", argtypes=[c_void_p])
+    @cached_property
+    def func(self):
+        from django.contrib.gis.gdal.libgdal import GDAL_VERSION
+
+        if GDAL_VERSION >= (3, 3):
+            return IntOutput("OGR_G_WkbSizeEx", argtypes=[c_void_p])
+        else:
+            return IntOutput("OGR_G_WkbSize", argtypes=[c_void_p])
 
 
-get_wkbsize = LazyGeomFunction(_get_wkbsize)
+get_wkbsize = _GetWkbSize()
 
 # Geometry spatial-reference related routines.
 assign_srs = VoidOutput(
