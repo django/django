@@ -52,7 +52,7 @@ class DatabaseCache(BaseDatabaseCache):
     def get(self, key, default=None, version=None):
         return self.get_many([key], version).get(key, default)
 
-    def get_many(self, keys, version=None):
+    def get_many_rows(self, keys, version=None):
         if not keys:
             return {}
 
@@ -80,12 +80,19 @@ class DatabaseCache(BaseDatabaseCache):
             )
             rows = cursor.fetchall()
 
+        return rows, connection, key_map
+
+    def get_many(self, keys, version=None):
+
+        rows, connection, key_map = self.get_many_rows(keys, version)
+
         result = {}
         expired_keys = []
         expression = models.Expression(output_field=models.DateTimeField())
         converters = connection.ops.get_db_converters(
             expression
         ) + expression.get_db_converters(connection)
+
         for key, value, expires in rows:
             for converter in converters:
                 expires = converter(expires, expression, connection)
@@ -110,7 +117,11 @@ class DatabaseCache(BaseDatabaseCache):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("touch", key, None, timeout)
 
-    def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
+    def _base_set(self, mode, key, value, timeout='no_timeout'):
+        no_timeout = timeout == 'no_timeout'
+        if no_timeout:
+            timeout = DEFAULT_TIMEOUT
+
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
@@ -171,9 +182,17 @@ class DatabaseCache(BaseDatabaseCache):
                             % (table, quote_name("expires"), quote_name("cache_key")),
                             [exp, key],
                         )
-                    elif result and (
-                        mode == "set" or (mode == "add" and current_expires < now)
-                    ):
+                    elif result and (mode == "set"):
+                        cursor.execute(
+                            "UPDATE %s SET %s = %%s WHERE %s = %%s"
+                            % (
+                                table,
+                                quote_name("value"),
+                                quote_name("cache_key"),
+                            ),
+                            [b64encoded, key],
+                        )
+                    elif result and mode == "add" and current_expires < now:
                         cursor.execute(
                             "UPDATE %s SET %s = %%s, %s = %%s WHERE %s = %%s"
                             % (

@@ -1295,6 +1295,31 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertIn(connection.ops.quote_name("expires"), sql)
         self.assertIn(connection.ops.quote_name("cache_key"), sql)
 
+    def test_incr_decr_without_timeout(self):
+        """
+        Incrementing or decrementing a key that doesn't have a timeout
+        shouldn't set one if the key is not found otherwise use the existing expiring.
+        """
+        current_time = int(time.time())
+        timeout = 86400  # 1 day
+        cache.set("key", 1, timeout=timeout)
+
+        row = cache.get_many_rows(["key"])[0][0]
+        cache_expire_time = row[2].timestamp()
+        # print(current_time + timeout, cache_expire_time)
+
+        self.assertEqual(cache_expire_time, current_time + timeout)
+
+        cache.incr("key")
+        row = cache.get_many_rows(["key"])[0][0]
+        cache_expire_time = row[2].timestamp()
+        self.assertEqual(cache_expire_time, current_time + timeout)
+
+        cache.decr("key")
+        row = cache.get_many_rows(["key"])[0][0]
+        cache_expire_time = row[2].timestamp()
+        self.assertEqual(cache_expire_time, current_time + timeout)
+
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
