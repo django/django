@@ -36,10 +36,12 @@ class Driver(GDALBase):
 
         # Only check GDAL_VERSION when alias is actually accessed
         if GDAL_VERSION[:2] <= (3, 10):
-            alias.update({
-                "tiger": "TIGER",
-                "tiger/line": "TIGER",
-            })
+            alias.update(
+                {
+                    "tiger": "TIGER",
+                    "tiger/line": "TIGER",
+                }
+            )
 
         return alias
 
