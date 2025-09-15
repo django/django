@@ -15,6 +15,7 @@ from .models import (
     ArticleTag,
     ArticleTranslation,
     Country,
+    CustomerTab,
     Friendship,
     Group,
     Membership,
@@ -767,3 +768,10 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
+
+
+class ForeignObjectModelValidationTests(TestCase):
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_excluding_foreign_object(self):
+        customer_tab = CustomerTab(customer_id=150)
+        customer_tab.validate_constraints(exclude={"customer"})
