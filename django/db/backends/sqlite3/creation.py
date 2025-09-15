@@ -56,20 +56,41 @@ class DatabaseCreation(BaseDatabaseCreation):
         source_database_name = orig_settings_dict["NAME"] or ":memory:"
 
         if not self.is_in_memory_db(source_database_name):
-            root, ext = os.path.splitext(source_database_name)
-            return {**orig_settings_dict, "NAME": f"{root}_{suffix}{ext}"}
+            if source_database_name.startswith("file:"):
+                if "?" in source_database_name:
+                    base, query = source_database_name.split("?", 1)
+                    return {
+                        **orig_settings_dict,
+                        "NAME": f"{base}_{suffix}?{query}",
+                    }
+                else:
+                    return {
+                        **orig_settings_dict,
+                        "NAME": f"{source_database_name}_{suffix}",
+                    }
+            else:
+                root, ext = os.path.splitext(source_database_name)
+                clone_name = f"{root}_{suffix}{ext}"
+                clone_dir = os.path.dirname(clone_name)
+                if clone_dir:
+                    os.makedirs(clone_dir, exist_ok=True)
+                return {
+                    **orig_settings_dict,
+                    "NAME": clone_name,
+                }
 
         start_method = multiprocessing.get_start_method()
         if start_method == "fork":
             return orig_settings_dict
-        if start_method in {"forkserver", "spawn"}:
+        elif start_method in {"forkserver", "spawn"}:
             return {
                 **orig_settings_dict,
                 "NAME": f"{self.connection.alias}_{suffix}.sqlite3",
             }
-        raise NotSupportedError(
-            f"Cloning with start method {start_method!r} is not supported."
-        )
+        else:
+            raise NotSupportedError(
+                f"Cloning with start method {start_method!r} is not supported."
+            )
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict["NAME"]
@@ -93,6 +114,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                 except Exception as e:
                     self.log("Got an error deleting the old test database: %s" % e)
                     sys.exit(2)
+            target_dir = os.path.dirname(str(target_database_name))
+            if target_dir:
+                os.makedirs(target_dir, exist_ok=True)
+
             try:
                 shutil.copy(source_database_name, target_database_name)
             except Exception as e:
@@ -102,7 +127,15 @@ class DatabaseCreation(BaseDatabaseCreation):
         # Forkserver and spawn require migrating to disk which will be
         # re-opened in setup_worker_connection.
         elif multiprocessing.get_start_method() in {"forkserver", "spawn"}:
-            ondisk_db = sqlite3.connect(target_database_name, uri=True)
+            target_dir = os.path.dirname(str(target_database_name))
+            if target_dir:
+                os.makedirs(target_dir, exist_ok=True)
+            # Open on-disk database using a proper URI.
+            if str(target_database_name).startswith("file:"):
+                ondisk_uri = str(target_database_name)
+            else:
+                ondisk_uri = f"file:{target_database_name}"
+            ondisk_db = sqlite3.connect(ondisk_uri, uri=True)
             self.connection.connection.backup(ondisk_db)
             ondisk_db.close()
 
@@ -142,9 +175,17 @@ class DatabaseCreation(BaseDatabaseCreation):
             connection_str = (
                 f"file:memorydb_{alias}_{_worker_id}?mode=memory&cache=shared"
             )
-            source_db = self.connection.Database.connect(
-                f"file:{alias}_{_worker_id}.sqlite3?mode=ro", uri=True
-            )
+            source_name = str(settings_dict["NAME"])
+            if source_name.startswith("file:"):
+                # Ensure read-only mode is set on URI.
+                source_uri = (
+                    f"{source_name}&mode=ro"
+                    if "?" in source_name
+                    else f"{source_name}?mode=ro"
+                )
+            else:
+                source_uri = f"file:{source_name}?mode=ro"
+            source_db = self.connection.Database.connect(source_uri, uri=True)
             target_db = sqlite3.connect(connection_str, uri=True)
             source_db.backup(target_db)
             source_db.close()
