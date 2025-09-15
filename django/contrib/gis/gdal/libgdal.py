@@ -14,50 +14,86 @@ logger = logging.getLogger("django.contrib.gis")
 # Set library error handling so as errors are logged
 CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
 
-if lib_path:
-    lib_names = None
-elif os.name == "nt":
-    # Windows NT shared libraries
-    lib_names = [
-        "gdal311",
-        "gdal310",
-        "gdal309",
-        "gdal308",
-        "gdal307",
-        "gdal306",
-        "gdal305",
-        "gdal304",
-        "gdal303",
-        "gdal302",
-        "gdal301",
-    ]
-elif os.name == "posix":
-    # *NIX library names.
-    lib_names = [
-        "gdal",
-        "GDAL",
-        "gdal3.11.0",
-        "gdal3.10.0",
-        "gdal3.9.0",
-        "gdal3.8.0",
-        "gdal3.7.0",
-        "gdal3.6.0",
-        "gdal3.5.0",
-        "gdal3.4.0",
-        "gdal3.3.0",
-        "gdal3.2.0",
-        "gdal3.1.0",
-    ]
-else:
-    raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
 
-# Using the ctypes `find_library` utility to find the
-# path to the GDAL library from the list of library names.
-if lib_names:
-    for lib_name in lib_names:
-        lib_path = find_library(lib_name)
-        if lib_path is not None:
-            break
+def err_handler(error_class, error_number, message):
+    logger.error("GDAL_ERROR %d: %s", error_number, message)
+
+
+err_handler = CPLErrorHandler(err_handler)
+
+
+def load_gdal():
+    # Custom library path set?
+    try:
+        from django.conf import settings
+
+        lib_path = settings.GDAL_LIBRARY_PATH
+    except (AttributeError, ImportError, ImproperlyConfigured, OSError):
+        lib_path = None
+
+    if lib_path:
+        lib_names = None
+    elif os.name == "nt":
+        # Windows NT shared libraries
+        lib_names = [
+            "gdal311",
+            "gdal310",
+            "gdal309",
+            "gdal308",
+            "gdal307",
+            "gdal306",
+            "gdal305",
+            "gdal304",
+            "gdal303",
+            "gdal302",
+            "gdal301",
+        ]
+    elif os.name == "posix":
+        # *NIX library names.
+        lib_names = [
+            "gdal",
+            "GDAL",
+            "gdal3.11.0",
+            "gdal3.10.0",
+            "gdal3.9.0",
+            "gdal3.8.0",
+            "gdal3.7.0",
+            "gdal3.6.0",
+            "gdal3.5.0",
+            "gdal3.4.0",
+            "gdal3.3.0",
+            "gdal3.2.0",
+            "gdal3.1.0",
+        ]
+    else:
+        raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
+
+    # Using the ctypes `find_library` utility  to find the
+    # path to the GDAL library from the list of library names.
+    if lib_names:
+        for lib_name in lib_names:
+            lib_path = find_library(lib_name)
+            if lib_path is not None:
+                break
+
+    if lib_path is None:
+        raise ImproperlyConfigured(
+            'Could not find the GDAL library (tried "%s"). Is GDAL installed? '
+            "If it is, try setting GDAL_LIBRARY_PATH in your settings."
+            % '", "'.join(lib_names)
+        )
+
+    # Load the library
+    lib = CDLL(lib_path)
+
+    # Set up error handler after library is loaded
+    # We do this directly here to avoid circular dependency
+    set_error_handler_func = lib["CPLSetErrorHandler"]
+    set_error_handler_func.argtypes = [CPLErrorHandler]
+    set_error_handler_func.restype = CPLErrorHandler
+    set_error_handler_func(err_handler)
+
+    return lib
 
 
 # This loads the GDAL/OGR C library
