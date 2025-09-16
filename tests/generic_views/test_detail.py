@@ -7,7 +7,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
 
-from .models import Artist, Author, Book, Page
+from .models import Artist, Author, Book, Item, Page
 
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
@@ -35,6 +35,7 @@ class DetailViewTest(TestCase):
             content="I was once bitten by a moose.",
             template="generic_views/page_template.html",
         )
+        cls.item1 = Item.objects.create(order_id=10, product_id=5)
 
     def test_simple_object(self):
         res = self.client.get("/detail/obj/")
@@ -219,3 +220,12 @@ class DetailViewTest(TestCase):
         res = self.client.get("/detail/nonmodel/1/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["object"].id, "non_model_1")
+
+    def test_detail_composite_primary_key(self):
+        res = self.client.get("/detail/item/10,5/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context["object"], self.item1)
+
+    def test_detail_composite_primary_key_not_found(self):
+        res = self.client.get("/detail/item/999,5/")
+        self.assertEqual(res.status_code, 404)

@@ -265,7 +265,8 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.views.generic.detail.SingleObjectMixin` now supports models
+  with :class:`~django.db.models.CompositePrimaryKey`.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
