@@ -92,6 +92,7 @@ LANGUAGES = [
     ("hi", gettext_noop("Hindi")),
     ("hr", gettext_noop("Croatian")),
     ("hsb", gettext_noop("Upper Sorbian")),
+    ("ht", gettext_noop("Haitian Creole")),
     ("hu", gettext_noop("Hungarian")),
     ("hy", gettext_noop("Armenian")),
     ("ia", gettext_noop("Interlingua")),
@@ -672,3 +673,8 @@ SECURE_CSP_REPORT_ONLY = {}
 # HTTPS as the default protocol in urlize and urlizetrunc when no protocol is
 # provided. Set to True to assume HTTPS during the Django 6.x release cycle.
 URLIZE_ASSUME_HTTPS = False
+
+#########
+# TASKS #
+#########
+TASKS = {"default": {"BACKEND": "django.tasks.backends.immediate.ImmediateBackend"}}

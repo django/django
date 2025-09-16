@@ -37,7 +37,7 @@ caused the error.
    documentation </ref/settings>` for a full list of email-related
    settings.
 
-By default, Django will send email from root@localhost. However, some mail
+By default, Django will send email from ``root@localhost``. However, some mail
 providers reject all email from this address. To use a different sender
 address, modify the :setting:`SERVER_EMAIL` setting.
 
@@ -284,10 +284,6 @@ following attributes and methods:
             import re
 
             re.compile(r"API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
-
-        .. versionchanged:: 5.2
-
-            The term ``AUTH`` was added.
 
     .. method:: is_active(request)
 

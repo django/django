@@ -137,7 +137,7 @@ Imports
 
   .. console::
 
-      $ python -m pip install "isort >= 5.1.0"
+      $ python -m pip install "isort >= 7.0.0"
       $ isort .
 
   This runs ``isort`` recursively from your current directory, modifying any
@@ -150,8 +150,9 @@ Imports
   other Django components, local Django component, try/excepts. Sort lines in
   each group alphabetically by the full module name. Place all
   ``import module`` statements before ``from module import objects`` in each
-  section. Use absolute imports for other Django components and relative
-  imports for local components.
+  section. Use absolute imports for other Django components and a one-dot
+  relative import (``from .foo import Bar``) for local components. Avoid
+  multi-dot relative imports.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lowercase items.

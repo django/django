@@ -2,12 +2,12 @@ aiosmtpd >= 1.4.5
 asgiref >= 3.9.1
 argon2-cffi >= 23.1.0
 bcrypt >= 4.1.1
-black >= 25.1.0
+black >= 25.9.0
 docutils >= 0.19
 geoip2 >= 4.8.0
 jinja2 >= 2.11.0
 numpy >= 1.26.0
-Pillow >= 10.1.0; sys.platform != 'win32' or python_version < '3.14'
+Pillow >= 10.1.0
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys_platform != 'win32'
 pymemcache >= 3.4.0

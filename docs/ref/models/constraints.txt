@@ -273,7 +273,7 @@ creates a unique constraint that only allows one row to store a ``NULL`` value
 in the ``ordering`` column.
 
 Unique constraints with ``nulls_distinct`` are ignored for databases besides
-PostgreSQL 15+.
+PostgreSQL.
 
 ``violation_error_code``
 ------------------------
@@ -293,13 +293,6 @@ If :attr:`.UniqueConstraint.fields` is set without a
 code when there are multiple fields, and to the :attr:`.Field.unique` error
 code when there is a single field.
 
-.. versionchanged:: 5.2
-
-    In older versions, the provided
-    :attr:`.UniqueConstraint.violation_error_code` was not used when
-    :attr:`.UniqueConstraint.fields` was set without a
-    :attr:`.UniqueConstraint.condition`.
-
 ``violation_error_message``
 ---------------------------
 
@@ -317,10 +310,3 @@ If :attr:`.UniqueConstraint.fields` is set without a
 :attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
 message when there are multiple fields, and to the :attr:`.Field.unique` error
 message when there is a single field.
-
-.. versionchanged:: 5.2
-
-    In older versions, the provided
-    :attr:`.UniqueConstraint.violation_error_message` was not used when
-    :attr:`.UniqueConstraint.fields` was set without a
-    :attr:`.UniqueConstraint.condition`.

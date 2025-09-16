@@ -180,10 +180,10 @@ update, you could write a test similar to this::
         obj.refresh_from_db()
         self.assertEqual(obj.val, 2)
 
-Note that when deferred fields are accessed, the loading of the deferred
-field's value happens through this method. Thus it is possible to customize
-the way deferred loading happens. The example below shows how one can reload
-all of the instance's fields when a deferred field is reloaded::
+When a deferred field is loaded on-demand for a single model instance, the
+loading happens through this method. Thus it is possible to customize the way
+this loading happens. The example below shows how one can reload all of the
+instance's fields when a deferred field is loaded on-demand::
 
     class ExampleModel(models.Model):
         def refresh_from_db(self, using=None, fields=None, **kwargs):
@@ -464,11 +464,6 @@ like a normal attribute on the model, but is actually an alias for whichever
 field or fields compose the primary key for the model. You can read and set
 this value, just as you would for any other attribute, and it will update the
 correct fields in the model.
-
-.. versionchanged:: 5.2
-
-    Support for the primary key to be composed of multiple fields was added via
-    ``CompositePrimaryKey``.
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -982,8 +977,6 @@ Other attributes
 ----------------
 
 .. method:: Model._is_pk_set()
-
-.. versionadded:: 5.2
 
 The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
 It abstracts the model's primary key definition, ensuring consistent behavior

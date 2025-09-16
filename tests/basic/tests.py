@@ -215,6 +215,14 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithFalseyDbDefault().save()
 
+    def test_auto_field_with_value_refreshed(self):
+        """
+        An auto field must be refreshed by Model.save() even when a value is
+        set because the database may return a value of a different type.
+        """
+        a = Article.objects.create(pk="123456", pub_date=datetime(2025, 9, 16))
+        self.assertEqual(a.pk, 123456)
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
@@ -281,6 +289,13 @@ class ModelTest(TestCase):
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
         self.assertEqual(Article.objects.get(headline="Article 10"), a10)
+
+    def test_create_method_propagates_fetch_mode(self):
+        article = Article.objects.fetch_mode(models.FETCH_PEERS).create(
+            headline="Article 10",
+            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+        )
+        self.assertEqual(article._state.fetch_mode, models.FETCH_PEERS)
 
     def test_year_lookup_edge_case(self):
         # Edge-case test: A year lookup should retrieve all objects in
@@ -799,6 +814,7 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
+        "fetch_mode",
     ]
 
     def test_manager_methods(self):

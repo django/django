@@ -182,8 +182,8 @@ Slicing ``F()`` expressions
 
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
-array-slicing syntax. The indices are 0-based and the ``step`` argument to
-``slice`` is not supported. For example:
+array-slicing syntax. The indices are 0-based. The ``step`` argument to
+``slice`` and negative indexing are not supported. For example:
 
 .. code-block:: pycon
 
@@ -1095,8 +1095,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: set_returning
 
-        .. versionadded:: 5.2
-
         Tells Django that this expression contains a set-returning function,
         enforcing subquery evaluation. It's used, for example, to allow some
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
@@ -1104,8 +1102,6 @@ calling the appropriate methods on the wrapped expression.
         annotations spawn rows themselves. Defaults to ``False``.
 
     .. attribute:: allows_composite_expressions
-
-        .. versionadded:: 5.2
 
         Tells Django that this expression allows composite expressions, for
         example, to support :ref:`composite primary keys

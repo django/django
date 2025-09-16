@@ -42,8 +42,6 @@ General-purpose aggregation functions
 
     .. attribute:: order_by
 
-        .. versionadded:: 5.2
-
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
@@ -55,11 +53,6 @@ General-purpose aggregation functions
 
             ArrayAgg("a_field", order_by="-some_field")
             ArrayAgg("a_field", order_by=F("some_field").desc())
-
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`ArrayAgg.order_by` instead.
 
 ``BitAnd``
 ----------
@@ -83,7 +76,7 @@ General-purpose aggregation functions
 .. class:: BitXor(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
-    ``default`` if all values are null. It requires PostgreSQL 14+.
+    ``default`` if all values are null.
 
 ``BoolAnd``
 -----------
@@ -149,8 +142,6 @@ General-purpose aggregation functions
 
     .. attribute:: order_by
 
-        .. versionadded:: 5.2
-
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
@@ -184,11 +175,6 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`JSONBAgg.order_by` instead.
-
 ``StringAgg``
 -------------
 
@@ -209,8 +195,6 @@ General-purpose aggregation functions
         will be distinct. Defaults to ``False``.
 
     .. attribute:: order_by
-
-        .. versionadded:: 5.2
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
@@ -247,11 +231,6 @@ General-purpose aggregation functions
         <QuerySet [{
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
-
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`StringAgg.order_by` instead.
 
 Aggregate functions for statistics
 ==================================

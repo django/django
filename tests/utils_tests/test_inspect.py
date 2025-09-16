@@ -1,5 +1,7 @@
+import subprocess
 import unittest
 
+from django.shortcuts import aget_object_or_404
 from django.utils import inspect
 
 
@@ -100,3 +102,50 @@ class TestInspectMethods(unittest.TestCase):
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
         self.assertIs(inspect.func_accepts_kwargs(Person.all_kinds), True)
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
+
+
+class IsModuleLevelFunctionTestCase(unittest.TestCase):
+    @classmethod
+    def _class_method(cls) -> None:
+        return None
+
+    @staticmethod
+    def _static_method() -> None:
+        return None
+
+    def test_builtin(self):
+        self.assertIs(inspect.is_module_level_function(any), False)
+        self.assertIs(inspect.is_module_level_function(isinstance), False)
+
+    def test_from_module(self):
+        self.assertIs(inspect.is_module_level_function(subprocess.run), True)
+        self.assertIs(inspect.is_module_level_function(subprocess.check_output), True)
+        self.assertIs(
+            inspect.is_module_level_function(inspect.is_module_level_function), True
+        )
+
+    def test_private_function(self):
+        def private_function():
+            pass
+
+        self.assertIs(inspect.is_module_level_function(private_function), False)
+
+    def test_coroutine(self):
+        self.assertIs(inspect.is_module_level_function(aget_object_or_404), True)
+
+    def test_method(self):
+        self.assertIs(inspect.is_module_level_function(self.test_method), False)
+        self.assertIs(inspect.is_module_level_function(self.setUp), False)
+
+    def test_unbound_method(self):
+        self.assertIs(
+            inspect.is_module_level_function(self.__class__.test_unbound_method), True
+        )
+        self.assertIs(inspect.is_module_level_function(self.__class__.setUp), True)
+
+    def test_lambda(self):
+        self.assertIs(inspect.is_module_level_function(lambda: True), False)
+
+    def test_class_and_static_method(self):
+        self.assertIs(inspect.is_module_level_function(self._static_method), True)
+        self.assertIs(inspect.is_module_level_function(self._class_method), False)

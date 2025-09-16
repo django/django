@@ -205,10 +205,6 @@ MySQL       ``MBRCoveredBy(poly, geom)``
 SpatiaLite  ``CoveredBy(poly, geom)``
 ==========  =============================
 
-.. versionchanged:: 5.2
-
-    MySQL support was added.
-
 .. versionchanged:: 6.0
 
     MariaDB 12.0.1+ support was added.
@@ -236,10 +232,6 @@ Oracle      ``SDO_COVERS(poly, geom)``
 MySQL       ``MBRCovers(poly, geom)``
 SpatiaLite  ``Covers(poly, geom)``
 ==========  ==========================
-
-.. versionchanged:: 5.2
-
-    MySQL support was added.
 
 .. fieldlookup:: crosses
 
@@ -369,13 +361,18 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isempty``
 -----------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__,
+SpatiaLite
 
 Tests if the geometry is empty.
 
 Example::
 
     Zipcode.objects.filter(poly__isempty=True)
+
+.. versionchanged:: 6.1
+
+    SpatiaLite support was added.
 
 .. fieldlookup:: isvalid
 

@@ -399,8 +399,6 @@ template, see also :ref:`overriding-built-in-field-templates`.
 
 .. attribute:: Field.bound_field_class
 
-.. versionadded:: 5.2
-
 The ``bound_field_class`` attribute allows a per-field override of
 :attr:`.Form.bound_field_class`.
 

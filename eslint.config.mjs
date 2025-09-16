@@ -1,8 +1,8 @@
-import globals from "globals";
-import js from "@eslint/js";
+import globals from "./globals.js";
+import recommended from "./eslint-recommended.js";
 
 export default [
-    js.configs.recommended,
+    recommended,
     {
         files: ["**/*.js"],
         rules: {

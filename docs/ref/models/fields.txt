@@ -564,10 +564,6 @@ alongside the old one.
 The primary key field is set to ``None`` when
 :meth:`deleting <django.db.models.Model.delete>` an object.
 
-.. versionchanged:: 5.2
-
-    The ``CompositePrimaryKey`` field was added.
-
 ``unique``
 ----------
 
@@ -716,8 +712,6 @@ isn't defined.
 ``CompositePrimaryKey``
 -----------------------
 
-.. versionadded:: 5.2
-
 .. class:: CompositePrimaryKey(*field_names, **options)
 
 A virtual field used for defining a composite primary key.
@@ -757,10 +751,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
-
-    .. versionchanged:: 5.2
-
-       Support for unlimited ``VARCHAR`` columns was added on SQLite.
 
 .. attribute:: CharField.db_collation
 
@@ -1312,8 +1302,8 @@ materialized view.
     real column. If ``False``, the column acts as a virtual column and does
     not occupy database storage space.
 
-    PostgreSQL only supports persisted columns. Oracle only supports virtual
-    columns.
+    PostgreSQL < 18 only supports persisted columns. Oracle only supports
+    virtual columns.
 
 .. admonition:: Database limitations
 
@@ -1730,8 +1720,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: CASCADE
 
-    Cascade deletes. Django emulates the behavior of the SQL constraint ON
-    DELETE CASCADE and also deletes the object containing the ForeignKey.
+    Cascade deletes. Django emulates the behavior of the SQL constraint ``ON
+    DELETE CASCADE`` and also deletes the object containing the
+    :class:`ForeignKey`.
 
     :meth:`.Model.delete` isn't called on related models, but the
     :data:`~django.db.models.signals.pre_delete` and
@@ -1950,9 +1941,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Setting it to ``False`` does not mean you can reference a swappable model
     even if it is swapped out - ``False`` means that the migrations made
-    with this ForeignKey will always reference the exact model you specify
-    (so it will fail hard if the user tries to run with a User model you don't
-    support, for example).
+    with this :class:`ForeignKey` will always reference the exact model you
+    specify (so it will fail hard if the user tries to run with a ``User``
+    model you don't support, for example).
 
     If in doubt, leave it to its default of ``True``.
 
