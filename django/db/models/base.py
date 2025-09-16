@@ -1154,8 +1154,6 @@ class Model(AltersData, metaclass=ModelBase):
                 )
                 if hasattr(value, "resolve_expression"):
                     returning_fields.append(field)
-                elif field.db_returning:
-                    returning_fields.remove(field)
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
             )
