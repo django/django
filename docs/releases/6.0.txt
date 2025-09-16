@@ -163,6 +163,8 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
+* The GDAL library and its functions are now loaded lazily.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -560,6 +562,12 @@ Miscellaneous
 * The :option:`collectstatic --clear` command now reports only a summary of
   deleted files when ``--verbosity`` is 1. To see the details for each file
   deleted, set the ``--verbosity`` flag to 2 or higher.
+
+* The undocumented factory functions in
+  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
+  class-based factories following a naming pattern where lowercase snake_case
+  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
+  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 .. _deprecated-features-6.0:
 
