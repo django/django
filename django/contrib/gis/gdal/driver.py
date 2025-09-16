@@ -22,6 +22,8 @@ class Driver(GDALBase):
     # https://gdal.org/drivers/raster/
     @cached_property
     def _alias(self):
+        # use cached_property to still allow for lazy loading
+        # while still allowing check for GDAL_VERSION
         alias = {
             # vector
             "esri": "ESRI Shapefile",
@@ -34,7 +36,6 @@ class Driver(GDALBase):
             "jpg": "JPEG",
         }
 
-        # Only check GDAL_VERSION when alias is actually accessed
         if GDAL_VERSION[:2] <= (3, 10):
             alias.update(
                 {
