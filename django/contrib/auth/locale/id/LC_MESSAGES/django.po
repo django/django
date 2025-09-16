@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021,2023-2024
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
@@ -12,9 +12,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, "
-"2015-2016,2018,2020-2021,2023-2024\n"
+"2015-2016,2018,2020-2021,2023-2025\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -268,7 +268,7 @@ msgstr "pengguna"
 msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
 "This password is too short. It must contain at least %d characters."
-msgstr[0] ""
+msgstr[0] "Kata sandi terlalu pendek. Harus mengandung setidaknya %d karakter."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

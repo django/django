@@ -338,8 +338,6 @@ compatibility
 ``Stylesheet``
 --------------
 
-.. versionadded:: 5.2
-
 .. class:: Stylesheet(url, mimetype="", media="screen")
 
     Represents an RSS stylesheet.
@@ -383,10 +381,6 @@ compatibility
         * ``stylesheets`` should be a sequence of either strings or
           :class:`Stylesheet` instances.
 
-        .. versionchanged:: 5.2
-
-            The ``stylesheets`` argument was added.
-
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
         Adds an item to the feed. All args are expected to be strings except
@@ -407,8 +401,6 @@ compatibility
         Called from ``write()``.
 
     .. method:: add_stylesheets(self, handler)
-
-        .. versionadded:: 5.2
 
         Add stylesheet information to the document.
         Called from ``write()``.
@@ -719,10 +711,6 @@ escaping HTML.
             '<li data-id="{id}">{id} {title}</li>',
             ({"id": b.id, "title": b.title} for b in books),
         )
-
-    .. versionchanged:: 5.2
-
-        Support for mappings in ``args_generator`` was added.
 
 .. function:: json_script(value, element_id=None, encoder=None)
 

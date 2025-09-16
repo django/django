@@ -995,10 +995,6 @@ They share this interface:
     XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
 
-    .. versionchanged:: 5.2
-
-        The ``stylesheets`` argument was added.
-
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
 
@@ -1130,8 +1126,6 @@ above example should demonstrate the basic idea.
 
 Feed stylesheets
 ----------------
-
-.. versionadded:: 5.2
 
 If you wish to have your RSS feed render nicely in a browser, you will need to
 provide styling information for the XML file, typically in XSLT_ or CSS

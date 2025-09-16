@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # edgars <edgars.jekabsons@gmail.com>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
@@ -18,8 +19,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -315,7 +316,7 @@ msgid "Urdu"
 msgstr "urdu"
 
 msgid "Uzbek"
-msgstr "Uzbeku"
+msgstr "uzbeku"
 
 msgid "Vietnamese"
 msgstr "vjetnamiešu"
@@ -330,10 +331,10 @@ msgid "Messages"
 msgstr "Ziņojumi"
 
 msgid "Site Maps"
-msgstr "Lapas kartes"
+msgstr "Vietnes kartes"
 
 msgid "Static Files"
-msgstr "Statiski faili"
+msgstr "Nemainīgas datnes"
 
 msgid "Syndication"
 msgstr "Sindikācija"
@@ -344,46 +345,46 @@ msgid "…"
 msgstr "…"
 
 msgid "That page number is not an integer"
-msgstr "Lapas numurs nav cipars"
+msgstr "Lapas numurs nav vesels skaitlis"
 
 msgid "That page number is less than 1"
 msgstr "Lapas numurs ir mazāks par 1"
 
 msgid "That page contains no results"
-msgstr "Lapa nesatur rezultātu"
+msgstr "Tajā lapā nav nekāda iznākuma"
 
 msgid "Enter a valid value."
-msgstr "Ievadiet korektu vērtību."
+msgstr "Jāievada derīga vērtība."
 
 msgid "Enter a valid domain name."
-msgstr "Ievadiet derīgu domēna vārdu."
+msgstr "Jāievada derīgs domēna vārds."
 
 msgid "Enter a valid URL."
-msgstr "Ievadiet korektu URL adresi."
+msgstr "Jāievada derīgs URL."
 
 msgid "Enter a valid integer."
-msgstr "Ievadiet veselu skaitli."
+msgstr "Jāievada derīgs vesels skaitlis."
 
 msgid "Enter a valid email address."
-msgstr "Ievadiet korektu e-pasta adresi"
+msgstr "Jāievada derīga e-pasta adrese."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Ievadiet korektu \"identifikatora\" vērtību, kas satur tikai burtus, "
-"ciparus, apakšsvītras vai defises."
+"Jāievada derīga \"identifikatora\" vērtība, kas satur tikai burtus, ciparus, "
+"apakšsvītras vai defises."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Ievadiet korektu \"identifikatora\" vērtību, kas satur tikai Unikoda burtus, "
+"Jāievada derīga \"identifikatora\" vērtība, kas satur tikai Unikoda burtus, "
 "ciparus, apakšsvītras vai defises."
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
-msgstr "Ievadiet derīgu %(protocol)s adresi."
+msgstr "Jāievada derīga %(protocol)s adrese."
 
 msgid "IPv4"
 msgstr "IPv4"
@@ -395,11 +396,11 @@ msgid "IPv4 or IPv6"
 msgstr "IPv4 vai IPv6"
 
 msgid "Enter only digits separated by commas."
-msgstr "Ievadiet tikai numurus, atdalītus ar komatiem."
+msgstr "Jāievada tikai ar komatu atdalīti cipari."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "Nodrošiniet, ka vērtība ir %(limit_value)s (tā satur %(show_value)s)."
+msgstr "Jānodrošina, ka vērtība ir %(limit_value)s (tā satur %(show_value)s)."
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
@@ -418,8 +419,8 @@ msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
-"Pārliecinieties, ka šī vērtība ir soļa lieluma %(limit_value)s reizinājums, "
-"sākot no %(offset)s, piem. %(offset)s, %(valid_value1)s, %(valid_value2)s, "
+"Jāpārliecinās, ka šī vērtība ir soļa lieluma %(limit_value)s reizinājums, "
+"sākot no %(offset)s, piem., %(offset)s, %(valid_value1)s, %(valid_value2)s "
 "un tā tālāk."
 
 #, python-format
@@ -430,11 +431,14 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Vērtībai jābūt vismaz %(limit_value)d zīmēm (tai ir %(show_value)d)."
+"Jānodrošina, ka šajā vērtībā ir vismaz %(limit_value)d rakstzīmju (tajā ir "
+"%(show_value)d)."
 msgstr[1] ""
-"Vērtībai jābūt vismaz %(limit_value)d zīmei (tai ir %(show_value)d)."
+"Jānodrošina, ka šajā vērtībā ir vismaz %(limit_value)d rakstzīme (tajā ir "
+"%(show_value)d)."
 msgstr[2] ""
-"Vērtībai jābūt vismaz %(limit_value)d zīmēm (tai ir %(show_value)d)."
+"Jānodrošina, ka šajā vērtībā ir vismaz %(limit_value)d rakstzīmes (tajā ir "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -444,21 +448,22 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Vērtībai jābūt ne vairāk kā %(limit_value)d zīmēm (tai ir %(show_value)d)."
+"Vērtībai jābūt ne vairāk kā %(limit_value)d zīmēm (tajā ir %(show_value)d)."
 msgstr[1] ""
-"Vērtībai jābūt ne vairāk kā %(limit_value)d zīmei (tai ir %(show_value)d)."
+"Vērtībai jābūt ne vairāk kā %(limit_value)d zīmei (tajā ir %(show_value)d)."
 msgstr[2] ""
-"Vērtībai jābūt ne vairāk kā %(limit_value)d zīmēm (tai ir %(show_value)d)."
+"Jānodrošina, ka šajā vērtībā ir ne vairāk kā %(limit_value)d rakstzīmes "
+"(tajā ir %(show_value)d)."
 
 msgid "Enter a number."
-msgstr "Ievadiet skaitli."
+msgstr "Jāievada skaitlis."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Pārliecinieties, ka kopā nav vairāk par %(max)s ciparu."
 msgstr[1] "Pārliecinieties, ka kopā nav vairāk par %(max)s cipariem."
-msgstr[2] "Pārliecinieties, ka kopā nav vairāk par %(max)s cipariem."
+msgstr[2] "Jānodrošina, ka nav vairāk par %(max)s cipariem."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -467,8 +472,7 @@ msgstr[0] ""
 "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s ciparu."
 msgstr[1] ""
 "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s cipariem."
-msgstr[2] ""
-"Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %(max)s cipariem."
+msgstr[2] "Jānodrošina, ka aiz komata nav vairāk par %(max)s cipariem."
 
 #, python-format
 msgid ""
@@ -479,15 +483,14 @@ msgstr[0] ""
 "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s ciparu."
 msgstr[1] ""
 "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s cipariem."
-msgstr[2] ""
-"Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %(max)s cipariem."
+msgstr[2] "Jānodrošina, ka pirms komata nav vairāk par %(max)s cipariem."
 
 #, python-format
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
-"Faila paplašinājums “%(extension)s” nav atļauts. Atļautie paplašinājumi ir: "
+"Datnes paplašinājums “%(extension)s” nav atļauts. Atļautie paplašinājumi ir: "
 "%(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
@@ -498,36 +501,37 @@ msgstr "un"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr "%(model_name)s ar šādu lauka %(field_labels)s vērtību jau eksistē."
+msgstr "Jau pastāv %(model_name)s ar šādu %(field_labels)s."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr "Ierobežojums “%(name)s” ir pārkāpts."
+msgstr "Nav ievērots ierobežojums “%(name)s”."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vērtība %(value)r nav derīga izvēle."
 
 msgid "This field cannot be null."
-msgstr "Šis lauks nevar būt tukšs, null."
+msgstr "Šis lauks nevar būt ar tukšu vērtību (null)."
 
 msgid "This field cannot be blank."
 msgstr "Šis lauks nevar būt tukšs"
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s ar šādu lauka %(field_label)s vērtību jau eksistē."
+msgstr "Jau pastāv %(model_name)s ar šādu %(field_label)s."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or
 #. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-msgstr "%(field_label)s jābūt unikālam %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"%(field_label)s jābūt neatkārtojamam %(date_field_label)s %(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr "Lauks ar tipu: %(field_type)s"
+msgstr "Lauks ar veidu: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
@@ -542,10 +546,10 @@ msgstr "Boolean (vai nu True, vai False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "Simbolu virkne (līdz pat %(max_length)s)"
+msgstr "Virkne (līdz %(max_length)s)"
 
 msgid "String (unlimited)"
-msgstr "Simbolu virkne (neierobežota)"
+msgstr "Virkne (neierobežota)"
 
 msgid "Comma-separated integers"
 msgstr "Ar komatu atdalīti veselie skaitļi"
@@ -555,14 +559,14 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"“%(value)s” vērtība ir nepareizā formātā. Tai ir jābūt YYYY-MM-DD formātā."
+"“%(value)s” vērtībā ir nederīgs datuma pieraksts. Tai ir jābūt YYYY-MM-DD."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"“%(value)s” vērtība ir pareizā formātā (YYYY-MM-DD), bet tas nav derīgs "
+"“%(value)s” vērtībai ir pareizs pieraksts (YYYY-MM-DD), bet tas ir nederīgs "
 "datums."
 
 msgid "Date (without time)"
@@ -573,16 +577,16 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” vērtība ir nepareizā formātā. Tai ir jābūt YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] formātā."
+"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt YYYY-MM-DD HH:MM[:"
+"ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"“%(value)s” vērtība ir pareizā formātā (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
-"bet tas nav derīgs datums/laiks."
+"“%(value)s” vērtībai ir pareizs pieraksts (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]), bet tas ir nederīgs datums/laiks."
 
 msgid "Date (with time)"
 msgstr "Datums (ar laiku)"
@@ -599,8 +603,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"“%(value)s” vērtība ir nepareizā formātā. Tai ir jābūt [DD] [[HH:]MM:]ss[."
-"uuuuuu] formātā."
+"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt [DD] [[HH:]MM:]ss[."
+"uuuuuu]."
 
 msgid "Duration"
 msgstr "Ilgums"
@@ -609,7 +613,7 @@ msgid "Email address"
 msgstr "E-pasta adrese"
 
 msgid "File path"
-msgstr "Faila ceļš"
+msgstr "Datnes ceļš"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
@@ -648,7 +652,7 @@ msgid "Positive big integer"
 msgstr "Liels pozitīvs vesels skaitlis"
 
 msgid "Positive integer"
-msgstr "Naturāls skaitlis"
+msgstr "Pozitīvs vesels skaitlis"
 
 msgid "Positive small integer"
 msgstr "Mazs pozitīvs vesels skaitlis"
@@ -665,16 +669,16 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” vērtība ir nepareizā formātā. Tai ir jābūt HH:MM[:ss[.uuuuuu]] "
-"formātā."
+"“%(value)s” vērtībai ir nepareizs pieraksts. Tai ir jābūt HH:MM[:ss[."
+"uuuuuu]]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"“%(value)s” vērtība ir pareizā formātā (HH:MM[:ss[.uuuuuu]]), bet tas nav "
-"derīgs laiks."
+"“%(value)s” vērtībai ir pareizs pieraksts (HH:MM[:ss[.uuuuuu]]), bet tas ir "
+"nederīgs laiks."
 
 msgid "Time"
 msgstr "Laiks"
@@ -690,10 +694,10 @@ msgid "“%(value)s” is not a valid UUID."
 msgstr "“%(value)s” nav derīgs UUID."
 
 msgid "Universally unique identifier"
-msgstr "Universāli unikāls identifikators"
+msgstr "Vispārēji neatkārtojams identifikators"
 
 msgid "File"
-msgstr "Fails"
+msgstr "Datne"
 
 msgid "Image"
 msgstr "Attēls"
@@ -709,21 +713,21 @@ msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr "%(model)s instance ar %(field)s %(value)r nav derīga izvēle."
 
 msgid "Foreign Key (type determined by related field)"
-msgstr "Ārējā atslēga (tipu nosaka lauks uz kuru attiecas)"
+msgstr "Ārējā atslēga (veidu nosaka pēc saistītā lauka)"
 
 msgid "One-to-one relationship"
-msgstr "Attiecība viens pret vienu"
+msgstr "Viens pret vienu saikne"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr "%(from)s-%(to)s attiecība"
+msgstr "%(from)s-%(to)s saikne"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "%(from)s-%(to)s attiecības"
+msgstr "%(from)s-%(to)s saiknes"
 
 msgid "Many-to-many relationship"
-msgstr "Attiecība daudzi pret daudziem"
+msgstr "Daudzi pret daudziem saikne"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
@@ -732,73 +736,77 @@ msgid ":?.!"
 msgstr ":?.!"
 
 msgid "This field is required."
-msgstr "Šis lauks ir obligāts."
+msgstr "Šis lauks ir nepieciešams."
 
 msgid "Enter a whole number."
-msgstr "Ievadiet veselu skaitli."
+msgstr "Jāievada vesels skaitlis."
 
 msgid "Enter a valid date."
-msgstr "Ievadiet korektu datumu."
+msgstr "Jāievada derīgs datums."
 
 msgid "Enter a valid time."
-msgstr "Ievadiet korektu laiku."
+msgstr "Jāievada derīgs laiks."
 
 msgid "Enter a valid date/time."
-msgstr "Ievadiet korektu datumu/laiku."
+msgstr "Jāievada derīgs datums/laiks."
 
 msgid "Enter a valid duration."
-msgstr "Ievadiet korektu ilgumu."
+msgstr "Jāievada derīgs ilgums."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
 msgstr "Dienu skaitam jābūt no {min_days} līdz {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Nav nosūtīts fails. Pārbaudiet formas kodējuma tipu."
+msgstr "Netika iesniegta neviena datne. Jāpārbauda veidlapas šifrēšanas veids."
 
 msgid "No file was submitted."
-msgstr "Netika nosūtīts fails."
+msgstr "Netika nosūtīta neviena datne."
 
 msgid "The submitted file is empty."
-msgstr "Jūsu nosūtītais fails ir tukšs."
+msgstr "Iesniegtā datne ir tukša."
 
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Faila nosaukuma garumam jābūt ne vairāk kā %(max)d zīmēm (tas ir %(length)d)."
+"Jānodrošina, ka datnes nosaukums nav garāks par %(max)d rakstzīmēm (tajā ir "
+"%(length)d)."
 msgstr[1] ""
-"Faila nosaukuma garumam jābūt ne vairāk kā %(max)d zīmei (tas ir %(length)d)."
+"Jānodrošina, ka datnes nosaukums nav garāks par %(max)d rakstzīmi (tajā ir "
+"%(length)d)."
 msgstr[2] ""
-"Faila nosaukuma garumam jābūt ne vairāk kā %(max)d zīmēm (tas ir %(length)d)."
+"Jānodrošina, ka datnes nosaukums nav garāks par %(max)d rakstzīmēm (tajā ir "
+"%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"Vai nu iesniedziet failu, vai atzīmējiet tukšo izvēles rūtiņu, bet ne abus."
+"Lūgums vai nu iesniegt datni, vai atzīmēt iztīrīšanas izvēles rūtiņu, ne "
+"abus."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Augšupielādējiet korektu attēlu. Fails, ko augšupielādējāt, vai nu nav "
-"attēls, vai arī ir bojāts."
+"Jāaugšupielādē derīgs attēls. Augšupielādētā datne vai nu nav attēls, vai "
+"arī tas ir bojāts."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Izvēlieties korektu izvēli. %(value)s nav pieejamo izvēļu sarakstā."
+msgstr "Jāatlasa derīga izvēle. %(value)s nav neviena no pieejamajām izvēlēm."
 
 msgid "Enter a list of values."
-msgstr "Ievadiet sarakstu ar vērtībām."
+msgstr "Jāievada vērtību saraksts."
 
 msgid "Enter a complete value."
-msgstr "Ievadiet pilnu vērtību."
+msgstr "Jāievada pilnīga vērtība."
 
 msgid "Enter a valid UUID."
-msgstr "Ievadiet derīgu UUID."
+msgstr "Jāievada derīgs UUID."
 
 msgid "Enter a valid JSON."
-msgstr "Ievadiet korektu JSON."
+msgstr "Jāievada derīgs JSON."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -814,53 +822,55 @@ msgid ""
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
 "ManagementForm trūkst datu vai tie ir mainīti. Trūkstošie lauki: "
-"%(field_names)s. Paziņojiet par kļūdu, ja problēma atkārtojas."
+"%(field_names)s. Var būt nepieciešams ziņot par kļūdu, ja sarežģījums "
+"atkārtojas."
 
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
-msgstr[1] "Lūdzu iesniedziet ne vairāk par %(num)d formu."
-msgstr[2] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
+msgstr[0] "Lūgums iesniegt ne vairāk par %(num)d veidlapām."
+msgstr[1] "Lūgums iesniegt ne vairāk par %(num)d veidlapu."
+msgstr[2] "Lūgums iesniegt ne vairāk par %(num)d veidlapām."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] "Lūdzu iesniedziet vismaz %(num)d formas."
-msgstr[1] "Lūdzu iesniedziet vismaz %(num)d formu."
-msgstr[2] "Lūdzu iesniedziet vismaz %(num)d formas."
+msgstr[0] "Lūgums iesniegt vismaz %(num)d veidlapas."
+msgstr[1] "Lūgums iesniegt vismaz %(num)d veidlapu."
+msgstr[2] "Lūgums iesniegt vismaz %(num)d veidlapas."
 
 msgid "Order"
 msgstr "Kārtība"
 
 msgid "Delete"
-msgstr "Dzēst"
+msgstr "Izdzēst"
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Lūdzu izlabojiet dublicētos datus priekš %(field)s."
+msgstr "Lūgums izlabot atkārtojošos %(field)s datus."
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
-"Lūdzu izlabojiet dublicētos datus laukam %(field)s, kam jābūt unikālam."
+"Lūgums izlabot atkārtojošos datus laukam “%(field)s”, kam jābūt "
+"neatkārtojamam."
 
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Lūdzu izlabojiet dublicētos datus laukam %(field_name)s, kam jābūt unikālam "
-"priekš %(lookup)s iekš %(date_field)s."
+"Lūgums izlabot atkārtojošos datus laukam “%(field_name)s”, kam jābūt "
+"neatkārtojamam priekš %(lookup)s laukā “%(date_field)s”."
 
 msgid "Please correct the duplicate values below."
-msgstr "Lūdzu izlabojiet dublicētās vērtības zemāk."
+msgstr "Lūgums zemāk izlabot atkārtojošās vērtības."
 
 msgid "The inline value did not match the parent instance."
 msgstr "Iekļautā vērtība nesakrita ar vecāka instanci."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Izvēlieties pareizu izvēli. Jūsu izvēle neietilpst pieejamo sarakstā."
+msgstr "Jāatlasa derīga izvēle. Tā izvēle nav neviena no pieejamajām."
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
@@ -871,8 +881,8 @@ msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s vērtība nevar tikt attēlota %(current_timezone)s laika zonā; tā "
-"var būt neskaidra vai neeksistē."
+"%(datetime)s nevarēja attēlot laika joslā %(current_timezone)s; tā var būt "
+"neskaidra vai nepastāv."
 
 msgid "Clear"
 msgstr "Notīrīt"
@@ -899,9 +909,9 @@ msgstr "jā,nē,varbūt"
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] "%(size)d baits"
-msgstr[1] "%(size)d baiti"
-msgstr[2] "%(size)d baitu"
+msgstr[0] "%(size)d baitu"
+msgstr[1] "%(size)d baits"
+msgstr[2] "%(size)d baiti"
 
 #, python-format
 msgid "%s KB"
@@ -924,16 +934,16 @@ msgid "%s PB"
 msgstr "%s PB"
 
 msgid "p.m."
-msgstr "p.m."
+msgstr "pēcpusdienā"
 
 msgid "a.m."
-msgstr "a.m."
+msgstr "priekšpusdienā"
 
 msgid "PM"
-msgstr "PM"
+msgstr "pēcpusdienā"
 
 msgid "AM"
-msgstr "AM"
+msgstr "priekšpusdienā"
 
 msgid "midnight"
 msgstr "pusnakts"
@@ -1169,42 +1179,42 @@ msgstr ", "
 #, python-format
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
-msgstr[0] "%(num)d gadi"
+msgstr[0] "%(num)d gadu"
 msgstr[1] "%(num)d gads"
 msgstr[2] "%(num)d gadi"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] "%(num)d mēneši"
+msgstr[0] "%(num)d mēnešu"
 msgstr[1] "%(num)d mēnesis"
 msgstr[2] "%(num)d mēneši"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] "%(num)d nedēļas"
+msgstr[0] "%(num)d nedēļu"
 msgstr[1] "%(num)d nedēļa"
 msgstr[2] "%(num)d nedēļas"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] "%(num)d dienas"
+msgstr[0] "%(num)d dienu"
 msgstr[1] "%(num)d diena"
 msgstr[2] "%(num)d dienas"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] "%(num)d stundas"
+msgstr[0] "%(num)d stundu"
 msgstr[1] "%(num)d stunda"
-msgstr[2] "%(num)d stubdas"
+msgstr[2] "%(num)d stundas"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] "%(num)d minūtes"
+msgstr[0] "%(num)d minūšu"
 msgstr[1] "%(num)d minūte"
 msgstr[2] "%(num)d minūtes"
 
@@ -1220,19 +1230,18 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Jūs redzat šo paziņojumu, jo jūsu pārlūkprogrammai ir jānosūta “Referer "
-"header” šai HTTPS vietnei, taču tā netika nosūtīta. Šī galvene ir "
-"nepieciešama drošības apsvērumu dēļ, lai pārliecinātos, ka jūsu "
-"pārlūkprogrammas komunikācijas datus nepārtver trešās puses."
+"Tu redzi šo ziņojumu, jo šī HTTPS vietne pieprasa pārlūkam nosūtīt \"Referer "
+"header\", bet tā netika nosūtīta. Šī galvene ir nepieciešama drošības "
+"apsvērumu dēļ, lai nodrošinātu, ka pārlūku neietekmē trešās puses."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Ja esat konfigurējis savu pārlūkprogrammu, lai atspējotu “Referer” headerus, "
-"lūdzu, atkārtoti iespējojiet tos vismaz šai vietnei, HTTPS savienojumiem vai "
-"“same-origin” pieprasījumiem."
+"Ja pārlūks ir konfigurēts, lai atspējotu “Referer” galvenes, lūgums tās "
+"iespējot no jauna vismaz šai vietnei, HTTPS savienojumiem vai “same-origin” "
+"pieprasījumiem."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
@@ -1241,38 +1250,36 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Ja jūs izmantojat <meta name=\"referrer\" content=\"no-referrer\"> tagu vai "
-"iekļaujat “Referrer-Policy: no-referrer” headeri, lūdzu noņemiet tos. CSRF "
-"aizsardzībai ir nepieciešams, lai “Referer” headerī tiktu veikta strikta "
-"pārvirzītāja pārbaude. Ja jūs domājat par privātumu, tad izmantojiet tādas "
-"alternatīvas kā <a rel=\"noreferrer\" …> priekš saitēm uz trešo pušu vietnēm."
+"Ja izmanto <meta name=\"referrer\" content=\"no-referrer\"> tagu vai iekļauj "
+"galveni “Referrer-Policy: no-referrer”, lūgums noņemt tos. CSRF aizsardzībai "
+"ir nepieciešams, lai galvenē “Referer” tiktu veikta stingra norvirzītāja "
+"pārbaude. Ja raizējies par privātumu, tad jāizmanto tādas iespējas kā <a "
+"rel=\"noreferrer\" …> saitēm, kas ved uz trešo pušu vietnēm."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Jūs redzat šo ziņojumu, jo, iesniedzot veidlapas, šai vietnei ir "
-"nepieciešams CSRF sīkfails. Šis sīkfails ir vajadzīgs drošības apsvērumu "
-"dēļ, lai pārliecinātos, ka trešās personas nepārņems kontroli pār jūsu "
-"pārlūkprogrammu."
+"Tu redzi šo ziņojumu, jo šī vietne pieprasa CSRF sīkdatni, kad tiek "
+"iesniegtas veidlapas. Šī sīkdatne ir nepieciešama drošības apsvērumu dēļ, "
+"lai nodrošinātu, ka pārlūku neietekmē trešās puses."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Ja esat konfigurējis pārlūkprogrammu, lai atspējotu sīkdatnes, lūdzu, "
-"atkārtoti iespējojiet tās vismaz šai vietnei vai “same-origin” "
-"pieprasījumiem."
+"Ja pārlūks ir konfigurēts, lai atspējotu sīkdatnes, lūgums tās iespējot "
+"vismaz šai vietnei vai “same-origin” pieprasījumiem."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Vairāk informācijas ir pieejams ar DEBUG=True"
+msgstr "Vairāk informācijas ir pieejama ar DEBUG=True"
 
 msgid "No year specified"
 msgstr "Nav norādīts gads"
 
 msgid "Date out of range"
-msgstr "Datums ir ārpus diapazona"
+msgstr "Datums ir ārpus apgabala"
 
 msgid "No month specified"
 msgstr "Nav norādīts mēnesis"
@@ -1297,18 +1304,19 @@ msgstr ""
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-msgstr "Nepareiza datuma rinda “%(datestr)s” norādītajā formātā “%(format)s”"
+msgstr ""
+"Nepareiza datuma virkne “%(datestr)s” norādītajā pierakstā “%(format)s”"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Neviens %(verbose_name)s netika atrasts"
 
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr "Lapa nav “pēdējā”, kā arī tā nevar tikt konvertēta par ciparu."
+msgstr "Lapa nav ne “pēdējā”, ne arī to var pārveidot par veselu skaitli."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr "Nepareiza lapa (%(page_number)s): %(message)s"
+msgstr "Nederīga lapa (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
@@ -1319,14 +1327,14 @@ msgstr "Direktoriju indeksi nav atļauti."
 
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr "\"%(path)s\" neeksistē"
+msgstr "\"%(path)s\" nepastāv"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s saturs"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr "Instalācija veiksmīga! Apsveicam!"
+msgstr "Uzstādīšana darbojās sekmīgi. Apsveicam!"
 
 #, python-format
 msgid ""
@@ -1343,25 +1351,24 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Jūs redziet šo lapu, jo <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> ir iestatījumu failā un Jūs neesiet "
-"konfigurējis nevienu saiti."
+"Tu redzi šo lapu, jo iestatījumu datnē ir <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> un nav konfigurēts neviens URL."
 
 msgid "Django Documentation"
-msgstr "Django Dokumentācija"
+msgstr "Django dokumentācija"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr "Tēmas, atsauces, &amp; how-to"
+msgstr "Tēmas, atsauces un padomi"
 
 msgid "Tutorial: A Polling App"
-msgstr "Apmācība: Balsošanas aplikācija"
+msgstr "Pamācība: balsošanas lietotne"
 
 msgid "Get started with Django"
-msgstr "Sāciet ar Django"
+msgstr "Uzsākt ar Django"
 
 msgid "Django Community"
-msgstr "Django Komūna"
+msgstr "Django kopiena"
 
 msgid "Connect, get help, or contribute"
-msgstr "Sazinieties, saņemiet palīdzību vai sniedziet ieguldījumu"
+msgstr "Sazinies, saņem palīdzību vai līdzdarbojies"

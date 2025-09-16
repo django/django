@@ -465,11 +465,6 @@ field or fields compose the primary key for the model. You can read and set
 this value, just as you would for any other attribute, and it will update the
 correct fields in the model.
 
-.. versionchanged:: 5.2
-
-    Support for the primary key to be composed of multiple fields was added via
-    ``CompositePrimaryKey``.
-
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -982,8 +977,6 @@ Other attributes
 ----------------
 
 .. method:: Model._is_pk_set()
-
-.. versionadded:: 5.2
 
 The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
 It abstracts the model's primary key definition, ensuring consistent behavior

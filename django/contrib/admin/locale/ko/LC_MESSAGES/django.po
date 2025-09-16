@@ -10,6 +10,7 @@
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015,2019
 # Jaehong Kim <mixe@korea.com>, 2011
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
@@ -29,8 +30,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Lee Dogeon <dev.moreal@gmail.com>, 2025\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Jamie Seol, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,7 +67,7 @@ msgid "No"
 msgstr "아니오"
 
 msgid "Unknown"
-msgstr "알 수 없습니다."
+msgstr "알 수 없음"
 
 msgid "Any date"
 msgstr "언제나"
@@ -111,7 +112,7 @@ msgid "Add another %(verbose_name)s"
 msgstr "%(verbose_name)s 더 추가하기"
 
 msgid "Remove"
-msgstr "삭제하기"
+msgstr "삭제"
 
 msgid "Addition"
 msgstr "추가"
@@ -153,15 +154,15 @@ msgstr "로그 엔트리"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "\"%(object)s\"이/가 추가되었습니다."
+msgstr "\"%(object)s\" 추가됨."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
-msgstr "\"%(object)s\"이/가 \"%(changes)s\"(으)로 변경되었습니다."
+msgstr "\"%(object)s\" 변경됨 — \"%(changes)s\""
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr "%(object)s를 삭제했습니다."
+msgstr "%(object)s 삭제됨."
 
 msgid "LogEntry Object"
 msgstr "로그 엔트리 객체"
@@ -371,13 +372,13 @@ msgid "Models in the %(name)s application"
 msgstr "%(name)s 애플리케이션의 모델"
 
 msgid "Model name"
-msgstr ""
+msgstr "모델 이름"
 
 msgid "Add link"
-msgstr ""
+msgstr "링크 추가"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "변경 또는 표시 링크"
 
 msgid "Add"
 msgstr "추가"
@@ -389,10 +390,10 @@ msgid "You don’t have permission to view or edit anything."
 msgstr "독자는 뷰 및 수정 권한이 없습니다."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
-msgstr ""
+msgstr "사용자를 생성한 후에 상세 정보를 편집할 수 있습니다."
 
 msgid "Error:"
-msgstr ""
+msgstr "오류:"
 
 msgid "Change password"
 msgstr "비밀번호 변경"
@@ -456,10 +457,10 @@ msgid "Show counts"
 msgstr "개수 표시"
 
 msgid "Clear all filters"
-msgstr "모든 필터 삭제"
+msgstr "모든 필터 해제"
 
 msgid "Remove from sorting"
-msgstr "정렬에서 "
+msgstr "정렬에서 삭제"
 
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
@@ -586,7 +587,7 @@ msgstr ""
 "른 계정으로 로그인하시겠습니까?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "로그인 인증 정보를 잊으셨나요?"
 
 msgid "Toggle navigation"
 msgstr "토글 메뉴"
@@ -749,7 +750,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "다음 페이지에서 새 비밀번호를 선택하세요."
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "잊으신 경우, 귀하의 사용자 이름은 다음과 같습니다:"
 
 msgid "Thanks for using our site!"
 msgstr "사이트를 이용해 주셔서 고맙습니다."
