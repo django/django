@@ -1153,7 +1153,8 @@ class Model(AltersData, metaclass=ModelBase):
                     getattr(self, field.attname) if raw else field.pre_save(self, False)
                 )
                 if hasattr(value, "resolve_expression"):
-                    returning_fields.append(field)
+                    if field not in returning_fields:
+                        returning_fields.append(field)
                 elif field.db_returning:
                     returning_fields.remove(field)
             results = self._do_insert(
