@@ -1297,7 +1297,8 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def test_incr_decr_without_timeout(self):
         """
-        Increment/decrement a key without timeout shouldn’t set one; if it exists, keep its timeout.
+        Increment/decrement a key without timeout
+        shouldn’t set one; if it exists, keep its timeout.
         """
         current_time = int(time.time())
         timeout = 86400  # 1 day
