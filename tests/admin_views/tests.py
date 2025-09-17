@@ -847,29 +847,29 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, "The First Item", "The Middle Item")
             self.assertContentBefore(response, "The Middle Item", "The Last Item")
 
-    def test_has_related_field_in_list_display_fk(self):
+    def test_get_select_related_fields_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name="Karnataka")
         City.objects.create(state=state, name="Bangalore")
         response = self.client.get(reverse("admin:admin_views_city_changelist"), {})
 
         response.context["cl"].list_display = ["id", "name", "state"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["state"])
 
         response.context["cl"].list_display = ["id", "name", "state_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
-    def test_has_related_field_in_list_display_o2o(self):
+    def test_get_select_related_fields_in_list_display_o2o(self):
         """Joins shouldn't be performed for <O2O>_id fields in list display."""
         media = Media.objects.create(name="Foo")
         Vodcast.objects.create(media=media)
         response = self.client.get(reverse("admin:admin_views_vodcast_changelist"), {})
 
         response.context["cl"].list_display = ["media"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["media"])
 
         response.context["cl"].list_display = ["media_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
     def test_limited_filter(self):
         """

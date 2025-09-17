@@ -318,17 +318,17 @@ class ProxyModelTests(TestCase):
         country = Country.objects.create(name="Australia")
         State.objects.create(name="New South Wales", country=country)
 
-        resp = [s.name for s in State.objects.select_related()]
+        resp = [s.name for s in State.objects.select_related("country")]
         self.assertEqual(resp, ["New South Wales"])
 
-        resp = [s.name for s in StateProxy.objects.select_related()]
+        resp = [s.name for s in StateProxy.objects.select_related("country")]
         self.assertEqual(resp, ["New South Wales"])
 
         self.assertEqual(
             StateProxy.objects.get(name="New South Wales").name, "New South Wales"
         )
 
-        resp = StateProxy.objects.select_related().get(name="New South Wales")
+        resp = StateProxy.objects.select_related("country").get(name="New South Wales")
         self.assertEqual(resp.name, "New South Wales")
 
     def test_filter_proxy_relation_reverse(self):
@@ -367,15 +367,19 @@ class ProxyModelTests(TestCase):
         self.assertEqual(repr(resp), "<ProxyBug: ProxyBug:fix this>")
 
         # Select related + filter on proxy
-        resp = ProxyBug.objects.select_related().get(version__icontains="beta")
+        resp = ProxyBug.objects.select_related("reporter").get(
+            version__icontains="beta"
+        )
         self.assertEqual(repr(resp), "<ProxyBug: ProxyBug:fix this>")
 
         # Proxy of proxy, select_related + filter
-        resp = ProxyProxyBug.objects.select_related().get(version__icontains="beta")
+        resp = ProxyProxyBug.objects.select_related("reporter").get(
+            version__icontains="beta"
+        )
         self.assertEqual(repr(resp), "<ProxyProxyBug: ProxyProxyBug:fix this>")
 
         # Select related + filter on a related proxy field
-        resp = ProxyImprovement.objects.select_related().get(
+        resp = ProxyImprovement.objects.select_related("reporter").get(
             reporter__name__icontains="butor"
         )
         self.assertEqual(
@@ -383,7 +387,7 @@ class ProxyModelTests(TestCase):
         )
 
         # Select related + filter on a related proxy of proxy field
-        resp = ProxyImprovement.objects.select_related().get(
+        resp = ProxyImprovement.objects.select_related("associated_bug").get(
             associated_bug__summary__icontains="fix"
         )
         self.assertEqual(

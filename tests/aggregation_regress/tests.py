@@ -26,7 +26,8 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, Concat
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate
+from django.test.utils import Approximate, ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Alfa,
@@ -852,12 +853,18 @@ class AggregationTests(TestCase):
         )
 
         # Regression for #10127 - Empty select_related() works with annotate
-        qs = (
-            Book.objects.filter(rating__lt=4.5)
-            .select_related()
-            .annotate(Avg("authors__age"))
-            .order_by("name")
-        )
+        # RemovedInDjango70Warning: when the deprecation ends, the below
+        # queryset and assertion can be removed.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            qs = (
+                Book.objects.filter(rating__lt=4.5)
+                .select_related()
+                .annotate(Avg("authors__age"))
+                .order_by("name")
+            )
         self.assertQuerySetEqual(
             qs,
             [

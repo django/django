@@ -2,6 +2,7 @@ import copy
 import enum
 import json
 import re
+import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
@@ -55,6 +56,7 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -670,6 +672,18 @@ class ModelAdmin(BaseModelAdmin):
     actions_selection_counter = True
     checks_class = ModelAdminChecks
 
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        if cls.__dict__.get("list_select_related") is True:
+            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # ValueError.
+            warnings.warn(
+                "Setting ModelAdmin.list_select_related to True is deprecated. "
+                "Use False or a list or tuple of fields to fetch instead.",
+                RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+
     def __init__(self, model, admin_site):
         self.model = model
         self.opts = model._meta
@@ -854,6 +868,17 @@ class ModelAdmin(BaseModelAdmin):
             list_display = ["action_checkbox", *list_display]
         sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
+        list_select_related = self.get_list_select_related(request)
+        if list_select_related is True:
+            # RemovedInDjango70Warning: when the deprecation ends, remove the
+            # below 'if' clause and raise a ValueError here.
+            if self.list_select_related is not True:
+                warnings.warn(
+                    "Returning True from ModelAdmin.get_list_select_related() is "
+                    "deprecated. Return False or a list or tuple of fields to "
+                    "fetch instead.",
+                    RemovedInDjango70Warning,
+                )
         return ChangeList(
             request,
             self.model,
@@ -862,7 +887,7 @@ class ModelAdmin(BaseModelAdmin):
             self.get_list_filter(request),
             self.date_hierarchy,
             self.get_search_fields(request),
-            self.get_list_select_related(request),
+            list_select_related,
             self.list_per_page,
             self.list_max_show_all,
             self.list_editable,
@@ -2252,7 +2277,7 @@ class ModelAdmin(BaseModelAdmin):
                 object_id=unquote(object_id),
                 content_type=get_content_type_for_model(model),
             )
-            .select_related()
+            .select_related("user", "content_type")
             .order_by("action_time")
         )
 

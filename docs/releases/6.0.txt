@@ -159,6 +159,13 @@ Minor features
 
 * The new :attr:`.AdminSite.password_change_form` attribute allows customizing
   the form used in the admin site password change view.
+* When :attr:`.ModelAdmin.list_select_related` is ``False`` (the default),
+  the change list now selects only the foreign key fields specified in
+  :attr:`.ModelAdmin.list_display`, rather than all foreign key fields. This
+  should improve performance for models with many foreign key fields.
+
+* The undocumented ``ChangeList.has_related_field_in_list_display()`` method
+  has been replaced with ``ChangeList.get_select_related_fields()``.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -548,6 +555,14 @@ Miscellaneous
 
 * The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
   ``django.core.mail.message.sanitize_address()`` functions are deprecated.
+
+* Calling :meth:`~django.db.models.query.QuerySet.select_related` with no
+  arguments to select all related fields, is deprecated. Specify the related
+  fields to fetch instead.
+
+* Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
+  ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
+  Specify the related fields to fetch instead.
 
 Features removed in 6.0
 =======================

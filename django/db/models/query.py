@@ -35,7 +35,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -1657,6 +1657,14 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
+            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # TypeError instead.
+            warnings.warn(
+                "Calling select_related() with no arguments is deprecated. "
+                "Specify the fields to fetch instead.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
             obj.query.select_related = True
         return obj
 
