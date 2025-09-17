@@ -226,8 +226,8 @@ both appearing in the "To:"::
         ["john@example.com", "jane@example.com"],
     )
 
-This sends a message to john@example.com and jane@example.com, with them both
-receiving a separate email::
+This sends a message to ``john@example.com`` and ``jane@example.com``, with
+them both receiving a separate email::
 
     datatuple = (
         ("Subject", "Message.", "from@example.com", ["john@example.com"]),
@@ -253,8 +253,8 @@ If a ``message`` contains headers at the start of the string, the headers will
 be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to admin@example.com and redirects to
-"/contact/thanks/" when it's done::
+from the request's POST data, sends that to ``admin@example.com`` and redirects
+to "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail
     from django.http import HttpResponse, HttpResponseRedirect
