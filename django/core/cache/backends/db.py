@@ -117,8 +117,8 @@ class DatabaseCache(BaseDatabaseCache):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("touch", key, None, timeout)
 
-    def _base_set(self, mode, key, value, timeout='no_timeout'):
-        no_timeout = timeout == 'no_timeout'
+    def _base_set(self, mode, key, value, timeout="no_timeout"):
+        no_timeout = timeout == "no_timeout"
         if no_timeout:
             timeout = DEFAULT_TIMEOUT
 
