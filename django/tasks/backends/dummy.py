@@ -1,7 +1,5 @@
 from copy import deepcopy
-from functools import partial
 
-from django.db import transaction
 from django.tasks.base import TaskResult, TaskResultStatus
 from django.tasks.exceptions import TaskResultDoesNotExist
 from django.tasks.signals import task_enqueued
@@ -43,10 +41,7 @@ class DummyBackend(BaseTaskBackend):
             worker_ids=[],
         )
 
-        if self._get_enqueue_on_commit_for_task(task) is not False:
-            transaction.on_commit(partial(self._store_result, result))
-        else:
-            self._store_result(result)
+        self._store_result(result)
 
         # Copy the task to prevent mutation issues.
         return deepcopy(result)

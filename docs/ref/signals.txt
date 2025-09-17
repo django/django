@@ -717,9 +717,7 @@ Signals sent by the :doc:`tasks </ref/tasks>` framework.
 .. data:: django.tasks.signals.task_enqueued
    :module:
 
-Sent once a Task has been enqueued. If
-:attr:`django.tasks.Task.enqueue_on_commit` is set, the signal is only sent
-once the transaction commits successfully.
+Sent once a Task has been enqueued.
 
 Arguments sent with this signal:
 

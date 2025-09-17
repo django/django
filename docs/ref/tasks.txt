@@ -13,7 +13,7 @@ Task definition
 The ``task`` decorator
 ----------------------
 
-.. function:: task(*, priority=0, queue_name="default", backend="default", enqueue_on_commit=None, takes_context=False)
+.. function:: task(*, priority=0, queue_name="default", backend="default", takes_context=False)
 
     The ``@task`` decorator defines a :class:`Task` instance. This has the
     following optional arguments:
@@ -24,8 +24,6 @@ The ``task`` decorator
       Defaults to ``"default"``.
     * ``backend``: Sets the :attr:`~Task.backend` of the ``Task``. Defaults to
       ``"default"``.
-    * ``enqueue_on_commit``: Sets :attr:`~Task.enqueue_on_commit` for the
-      ``Task``. Defaults to ``None``.
     * ``takes_context``: Controls whether the ``Task`` function accepts a
       :class:`TaskContext`. Defaults to ``False``. See :ref:`Task context
       <task-context>` for details.
@@ -76,14 +74,6 @@ The ``task`` decorator
         The backend must have :attr:`.supports_defer` set to ``True`` to use
         this feature. Otherwise,
         :exc:`~django.tasks.exceptions.InvalidTask` is raised.
-
-    .. attribute:: Task.enqueue_on_commit
-
-        Whether the ``Task`` should be enqueued when the transaction commits
-        successfully, or immediately. Defaults to :setting:`ENQUEUE_ON_COMMIT
-        <TASKS-ENQUEUE_ON_COMMIT>` for the backend.
-
-        See :ref:`Task transactions <task-transactions>` for more information.
 
     .. attribute:: Task.name
 
@@ -209,9 +199,6 @@ Task results
     .. attribute:: TaskResult.enqueued_at
 
         The time when the ``Task`` was enqueued.
-
-        If :attr:`Task.enqueue_on_commit` was set, this is the time the
-        transaction committed.
 
     .. attribute:: TaskResult.started_at
 

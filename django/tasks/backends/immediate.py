@@ -1,8 +1,6 @@
 import logging
-from functools import partial
 from traceback import format_exception
 
-from django.db import transaction
 from django.tasks.base import TaskContext, TaskError, TaskResult, TaskResultStatus
 from django.tasks.signals import task_enqueued, task_finished, task_started
 from django.utils import timezone
@@ -92,9 +90,6 @@ class ImmediateBackend(BaseTaskBackend):
             worker_ids=[],
         )
 
-        if self._get_enqueue_on_commit_for_task(task) is not False:
-            transaction.on_commit(partial(self._execute_task, task_result))
-        else:
-            self._execute_task(task_result)
+        self._execute_task(task_result)
 
         return task_result

@@ -48,10 +48,6 @@ class Task:
     queue_name: str
     run_after: Optional[datetime]  # The earliest this Task will run.
 
-    # Whether the Task will be enqueued when the current transaction commits,
-    # immediately, or whatever the backend decides.
-    enqueue_on_commit: Optional[bool]
-
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
 
@@ -140,7 +136,6 @@ def task(
     priority=DEFAULT_TASK_PRIORITY,
     queue_name=DEFAULT_TASK_QUEUE_NAME,
     backend=DEFAULT_TASK_BACKEND_ALIAS,
-    enqueue_on_commit=None,
     takes_context=False,
 ):
     from . import task_backends
@@ -151,7 +146,6 @@ def task(
             func=f,
             queue_name=queue_name,
             backend=backend,
-            enqueue_on_commit=enqueue_on_commit,
             takes_context=takes_context,
             run_after=None,
         )
