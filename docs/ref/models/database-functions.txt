@@ -846,7 +846,7 @@ JSON Functions
 
 .. versionadded:: 5.2
 
-.. class:: JSONArray(*expressions)
+.. class:: JSONArray(*expressions, absent_on_null=False)
 
 Accepts a list of field names or expressions and returns a JSON array
 containing those values.
@@ -863,10 +863,36 @@ Usage example:
     ...         Lower("name"),
     ...         "alias",
     ...         F("age") * 2,
+    ...         "goes_by",
+    ...     )
+    ... ).get()
+    >>> author.json_array
+    ['margaret smith', 'msmith', 50, null]
+
+Set the ``absent_on_null`` parameter to ``True`` to omit null values.
+
+.. versionadded:: 6.0
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F
+    >>> from django.db.models.functions import JSONArray, Lower
+    >>> Author.objects.create(name="Margaret Smith", alias="msmith", age=25)
+    >>> author = Author.objects.annotate(
+    ...     json_array=JSONArray(
+    ...         Lower("name"),
+    ...         "alias",
+    ...         F("age") * 2,
+    ...         "goes_by",
+    ...         absent_on_null=True,
     ...     )
     ... ).get()
     >>> author.json_array
     ['margaret smith', 'msmith', 50]
+
+.. admonition:: SQLite
+
+    SQLite doesn't support ``True`` for the ``absent_on_null`` parameter.
 
 ``JSONObject``
 --------------
