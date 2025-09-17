@@ -67,13 +67,6 @@ To use it, set :setting:`BACKEND <TASKS-BACKEND>` to
 The :class:`.ImmediateBackend` may also be useful in tests, to bypass the need
 to run a real background worker in your tests.
 
-.. admonition:: ``ImmediateBackend`` and ``ENQUEUE_ON_COMMIT``
-
-    When :setting:`ENQUEUE_ON_COMMIT <TASKS-ENQUEUE_ON_COMMIT>` is ``False``,
-    the Task will be executed within the same transaction it was enqueued in.
-
-    See :ref:`Task transactions <task-transactions>` for more information.
-
 .. _dummy-task-backend:
 
 Dummy backend
@@ -182,7 +175,7 @@ decorator arguments::
     from django.tasks import task
 
 
-    @task(priority=2, queue_name="emails", enqueue_on_commit=True)
+    @task(priority=2, queue_name="emails")
     def email_users(emails, subject, message):
         return send_mail(
             subject=subject, message=message, from_email=None, recipient_list=emails
@@ -304,33 +297,35 @@ conversion.
 Transactions
 ------------
 
-By default, Tasks are enqueued after the current database transaction (if there
-is one) commits successfully (using :meth:`transaction.on_commit()
-<django.db.transaction.on_commit>`), rather than enqueueing immediately. For
-most backends, Tasks are run in a separate process, using a different database
-connection. Without waiting for the transaction to commit, workers could start
-to process a Task which uses objects it can't access yet.
-
-This behavior can be changed by changing the :setting:`TASKS-ENQUEUE_ON_COMMIT`
-setting for the backend, or for a specific Task using the ``enqueue_on_commit``
-parameter.
+For most backends, Tasks are run in a separate process, using a different
+database connection. When using a transaction, without waiting for it to
+commit, workers could start to process a Task which uses objects it can't
+access yet.
 
 For example, consider this simplified example::
 
     @task
-    def my_task():
-        Thing.objects.get()
+    def my_task(thing_num):
+        Thing.objects.get(num=thing_num)
 
 
     with transaction.atomic():
-        Thing.objects.create()
-        my_task.enqueue()
+        Thing.objects.create(num=1)
+        my_task.enqueue(thing_num=1)
+
+To prevent the scenario where ``my_task`` runs before the ``Thing`` is
+committed to the database, use :func:`transaction.on_commit()
+<django.db.transaction.on_commit>`, binding all arguments to
+:meth:`~django.tasks.Task.enqueue` via :func:`functools.partial`::
+
+    from functools import partial
+
+    from django.db import transaction
 
 
-If :setting:`ENQUEUE_ON_COMMIT <TASKS-ENQUEUE_ON_COMMIT>` is ``False``, then it
-is possible for ``my_task`` to run before the ``Thing`` is committed to the
-database, and the Task won't be able to see the created object within your
-transaction.
+    with transaction.atomic():
+        Thing.objects.create(num=1)
+        transaction.on_commit(partial(my_task.enqueue, thing_num=1))
 
 .. _task-results:
 

@@ -13,7 +13,6 @@ from . import tasks as test_tasks
         "default": {
             "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
             "QUEUES": [],
-            "ENQUEUE_ON_COMMIT": False,
         }
     }
 )
@@ -203,14 +202,6 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 test_tasks.failing_task_value_error.using(run_after=timezone.now())
             )
 
-    def test_enqueue_on_commit(self):
-        self.assertIs(
-            default_task_backend._get_enqueue_on_commit_for_task(
-                test_tasks.enqueue_on_commit_task
-            ),
-            True,
-        )
-
     def test_enqueue_logs(self):
         with self.assertLogs("django.tasks", level="DEBUG") as captured_logs:
             result = test_tasks.noop_task.enqueue()
@@ -256,7 +247,6 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 "default": {
                     "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
                     "QUEUES": ["queue-1"],
-                    "ENQUEUE_ON_COMMIT": False,
                 }
             }
         ):
@@ -275,7 +265,6 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 "default": {
                     "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
                     "QUEUES": ["queue-1"],
-                    "ENQUEUE_ON_COMMIT": False,
                 }
             }
         ):
@@ -292,96 +281,15 @@ class ImmediateBackendTransactionTestCase(TransactionTestCase):
         TASKS={
             "default": {
                 "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
-                "ENQUEUE_ON_COMMIT": True,
             }
         }
     )
-    def test_wait_until_transaction_commit(self):
-        self.assertIs(default_task_backend.enqueue_on_commit, True)
-        self.assertIs(
-            default_task_backend._get_enqueue_on_commit_for_task(test_tasks.noop_task),
-            True,
-        )
-
-        with transaction.atomic():
-            result = test_tasks.noop_task.enqueue()
-
-            self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.attempts, 0)
-            self.assertEqual(result.status, TaskResultStatus.READY)
-
-        self.assertEqual(result.status, TaskResultStatus.SUCCESSFUL)
-        self.assertIsNotNone(result.enqueued_at)
-        self.assertEqual(result.attempts, 1)
-
-    @override_settings(
-        TASKS={
-            "default": {
-                "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
-                "ENQUEUE_ON_COMMIT": False,
-            }
-        }
-    )
-    def test_doesnt_wait_until_transaction_commit(self):
-        self.assertIs(default_task_backend.enqueue_on_commit, False)
-        self.assertIs(
-            default_task_backend._get_enqueue_on_commit_for_task(test_tasks.noop_task),
-            False,
-        )
-
+    def test_doesnt_wait_until_transaction_commit_by_default(self):
         with transaction.atomic():
             result = test_tasks.noop_task.enqueue()
 
             self.assertIsNotNone(result.enqueued_at)
 
             self.assertEqual(result.status, TaskResultStatus.SUCCESSFUL)
-
-        self.assertEqual(result.status, TaskResultStatus.SUCCESSFUL)
-
-    @override_settings(
-        TASKS={
-            "default": {
-                "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
-            }
-        }
-    )
-    def test_wait_until_transaction_by_default(self):
-        self.assertIs(default_task_backend.enqueue_on_commit, True)
-        self.assertIs(
-            default_task_backend._get_enqueue_on_commit_for_task(test_tasks.noop_task),
-            True,
-        )
-
-        with transaction.atomic():
-            result = test_tasks.noop_task.enqueue()
-
-            self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.status, TaskResultStatus.READY)
-
-        self.assertEqual(result.status, TaskResultStatus.SUCCESSFUL)
-
-    @override_settings(
-        TASKS={
-            "default": {
-                "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
-                "ENQUEUE_ON_COMMIT": False,
-            }
-        }
-    )
-    def test_task_specific_enqueue_on_commit(self):
-        self.assertIs(default_task_backend.enqueue_on_commit, False)
-        self.assertIs(test_tasks.enqueue_on_commit_task.enqueue_on_commit, True)
-        self.assertIs(
-            default_task_backend._get_enqueue_on_commit_for_task(
-                test_tasks.enqueue_on_commit_task
-            ),
-            True,
-        )
-
-        with transaction.atomic():
-            result = test_tasks.enqueue_on_commit_task.enqueue()
-
-            self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.status, TaskResultStatus.READY)
 
         self.assertEqual(result.status, TaskResultStatus.SUCCESSFUL)

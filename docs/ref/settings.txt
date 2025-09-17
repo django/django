@@ -2806,20 +2806,6 @@ You can use a backend that doesn't ship with Django by setting
 :setting:`BACKEND <TASKS-BACKEND>` to a fully-qualified path of a backend
 class (i.e. ``mypackage.backends.whatever.WhateverBackend``).
 
-.. setting:: TASKS-ENQUEUE_ON_COMMIT
-
-``ENQUEUE_ON_COMMIT``
-~~~~~~~~~~~~~~~~~~~~~
-
-Default: ``True``
-
-Whether to enqueue a Task only after the current transaction, if any, commits
-successfully, instead of enqueueing immediately.
-
-This can also be configured on a per-Task basis.
-
-See :ref:`Task transactions <task-transactions>` for more information.
-
 .. setting:: TASKS-QUEUES
 
 ``QUEUES``

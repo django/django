@@ -27,7 +27,6 @@ class CustomBackendNoEnqueue(BaseTaskBackend):
     TASKS={
         "default": {
             "BACKEND": f"{CustomBackend.__module__}.{CustomBackend.__qualname__}",
-            "ENQUEUE_ON_COMMIT": False,
             "OPTIONS": {"prefix": "PREFIX: "},
         },
         "no_enqueue": {

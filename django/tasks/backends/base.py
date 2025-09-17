@@ -4,8 +4,6 @@ from inspect import iscoroutinefunction
 from asgiref.sync import sync_to_async
 
 from django.conf import settings
-from django.core import checks
-from django.db import connections
 from django.tasks import DEFAULT_TASK_QUEUE_NAME
 from django.tasks.base import (
     DEFAULT_TASK_PRIORITY,
@@ -39,15 +37,7 @@ class BaseTaskBackend(metaclass=ABCMeta):
     def __init__(self, alias, params):
         self.alias = alias
         self.queues = set(params.get("QUEUES", [DEFAULT_TASK_QUEUE_NAME]))
-        self.enqueue_on_commit = bool(params.get("ENQUEUE_ON_COMMIT", True))
         self.options = params.get("OPTIONS", {})
-
-    def _get_enqueue_on_commit_for_task(self, task):
-        return (
-            task.enqueue_on_commit
-            if task.enqueue_on_commit is not None
-            else self.enqueue_on_commit
-        )
 
     def validate_task(self, task):
         """
@@ -119,20 +109,4 @@ class BaseTaskBackend(metaclass=ABCMeta):
         )
 
     def check(self, **kwargs):
-        if self.enqueue_on_commit and not connections._settings:
-            yield checks.Error(
-                "ENQUEUE_ON_COMMIT cannot be used when no databases are configured.",
-                hint="Set ENQUEUE_ON_COMMIT to False",
-                id="tasks.E001",
-            )
-
-        elif (
-            self.enqueue_on_commit
-            and not connections["default"].features.supports_transactions
-        ):
-            yield checks.Error(
-                "ENQUEUE_ON_COMMIT cannot be used on a database which doesn't support "
-                "transactions.",
-                hint="Set ENQUEUE_ON_COMMIT to False",
-                id="tasks.E002",
-            )
+        return []
