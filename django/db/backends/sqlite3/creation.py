@@ -82,13 +82,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         start_method = multiprocessing.get_start_method()
         if start_method == "fork":
             return orig_settings_dict
-        elif start_method in {"forkserver", "spawn"}:
+        if start_method in {"forkserver", "spawn"}:
             return {
                 **orig_settings_dict,
                 "NAME": f"{self.connection.alias}_{suffix}.sqlite3",
             }
-        else:
-            raise NotSupportedError(
+        raise NotSupportedError(
                 f"Cloning with start method {start_method!r} is not supported."
             )
 
