@@ -163,21 +163,11 @@ Minor features
 * The new :attr:`.AdminSite.password_change_form` attribute allows customizing
   the form used in the admin site password change view.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,000,000 to 1,200,000.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,11 +192,6 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -228,52 +213,12 @@ Minor features
   parameter. This allows providing database hints to database routers to assist
   them in :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
 
 Email
 ~~~~~
@@ -286,41 +231,6 @@ Email
 * :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` now
   accepts a :class:`~email.message.MIMEPart` object from Python's modern email
   API.
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-Forms
-~~~~~
-
-* ...
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -397,21 +307,6 @@ Requests and Responses
 * Multiple ``Cookie`` headers are now supported for HTTP/2 requests when
   running with ASGI.
 
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -430,21 +325,6 @@ Tests
 
 * The :class:`.DiscoverRunner` now supports parallel test execution on systems
   using the ``forkserver`` :mod:`multiprocessing` start method.
-
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-6.0:
 
