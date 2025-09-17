@@ -1160,6 +1160,12 @@ class TestQuerying(TestCase):
                     True,
                 )
 
+    def test_cast_with_key_text_transform(self):
+        obj = NullableJSONModel.objects.annotate(
+            json_data=Cast(Value({"foo": "bar"}, JSONField()), JSONField())
+        ).get(pk=self.objs[0].pk, json_data__foo__icontains="bar")
+        self.assertEqual(obj, self.objs[0])
+
     @skipUnlessDBFeature("supports_json_field_contains")
     def test_contains_contained_by_with_key_transform(self):
         tests = [
