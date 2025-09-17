@@ -443,6 +443,7 @@ class BasicExtractorTests(ExtractorTests):
                 po_contents,
             )
 
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
     def test_template_comments(self):
         """
         Template comment tags on the same line of other constructs (#19552)
