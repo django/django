@@ -150,6 +150,7 @@ Django only handles task creation and queuing; it does not provide a worker
 mechanism to run tasks. Execution must be managed by external infrastructure,
 such as a separate process or service. See :doc:`/topics/tasks` for an
 overview, and the :doc:`Tasks reference </ref/tasks>` for API details.
+
 Model field fetch modes
 -----------------------
 
