@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # edgars <edgars.jekabsons@gmail.com>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
@@ -15,8 +16,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -32,17 +33,17 @@ msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Veiksmīgi izdzēsti %(count)d %(items)s."
+msgstr "Sekmīgi izdzēsti %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nevar izdzēst %(name)s"
 
 msgid "Delete multiple objects"
-msgstr "Dzēst vairākus objektus"
+msgstr "Izdzēst vairākus objektus"
 
 msgid "Administration"
-msgstr "Administrācija"
+msgstr "Pārvaldīšana"
 
 msgid "All"
 msgstr "Visi"
@@ -88,8 +89,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Lūdzu ievadi korektu %(username)s un paroli personāla kontam. Ņem vērā, ka "
-"abi ievades lauki ir reģistrjutīgi."
+"Lūgums ievadīt pareizu %(username)s un paroli personāla kontam. Jāņem vērā, "
+"ka abi lauki var būt reģistrjutīgi."
 
 msgid "Action:"
 msgstr "Darbība:"
@@ -108,7 +109,7 @@ msgid "Change"
 msgstr "Izmainīt"
 
 msgid "Deletion"
-msgstr "Dzēšana"
+msgstr "Izdzēšana"
 
 msgid "action time"
 msgstr "darbības laiks"
@@ -117,10 +118,10 @@ msgid "user"
 msgstr "lietotājs"
 
 msgid "content type"
-msgstr "satura tips"
+msgstr "satura veids"
 
 msgid "object id"
-msgstr "objekta id"
+msgstr "objekta Id"
 
 #. Translators: 'repr' means representation
 #. (https://docs.python.org/library/functions.html#repr)
@@ -149,7 +150,7 @@ msgstr "Labots “%(object)s” — %(changes)s"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr "Dzēsts “%(object)s.”"
+msgstr "Izdzēsts “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "LogEntry Objekts"
@@ -174,7 +175,7 @@ msgstr "Mainīts {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr "Dzēsts {name} “{object}”."
+msgstr "Izdzēsts {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Neviens lauks nav mainīts."
@@ -184,39 +185,38 @@ msgstr "nekas"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Turiet nospiestu “Control”, vai “Command” uz Mac, lai iezīmētu vairāk par "
-"vienu."
+"Jātur nospiests taustiņš “Control” vai “Command” Mac datorā, lai atlasītu "
+"vairāk par vienu."
 
 msgid "Select this object for an action - {}"
-msgstr "Atzīmējiet šo objektu darbībai - {}"
+msgstr "Atlasīt šo objektu darbībai - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr "{name} “{obj}” veiksmīgi pievienots."
+msgstr "{name} “{obj}” sekmīgi pievienots."
 
 msgid "You may edit it again below."
-msgstr "Jūs varat to atkal labot zemāk. "
+msgstr "Zemāk vari to labot atkal."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
-msgstr "{name} “{obj}” veiksmīgi pievienots. Zemāk varat pievienot vēl {name}."
+msgstr "{name} “{obj}” sekmīgi pievienots. Zemāk var pievienot vēl {name}."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr "{name} “{obj}” tika veiksmīgi mainīts. Zemāk varat to labot vēlreiz."
+msgstr "{name} “{obj}” tika sekmīgi mainīts. Zemāk to var labot vēlreiz."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr ""
-"{name} “{obj}” tika veiksmīgi mainīts. Zemāk varat pievienot vēl {name}."
+msgstr "{name} “{obj}” tika sekmīgi mainīts. Zemāk var pievienot vēl {name}."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr "{name} “{obj}” tika veiksmīgi mainīts."
+msgstr "{name} “{obj}” tika sekmīgi mainīts."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -230,11 +230,11 @@ msgstr "Nav izvēlēta darbība."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr "%(name)s “%(obj)s” veiksmīgi dzēsts."
+msgstr "%(name)s “%(obj)s” sekmīgi izdzēsts."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
-msgstr "%(name)s ar ID “%(key)s” neeksistē. Varbūt tas ir dzēsts?"
+msgstr "%(name)s ar Id “%(key)s” nepastāv. Varbūt tas ir izdzēsts?"
 
 #, python-format
 msgid "Add %s"
@@ -254,23 +254,23 @@ msgstr "Datubāzes kļūda"
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(count)s %(name)s tika veiksmīgi mainīti."
-msgstr[1] "%(count)s %(name)s tika veiksmīgi mainīts."
-msgstr[2] "%(count)s %(name)s tika veiksmīgi mainīti."
+msgstr[0] "%(count)s %(name)s tika sekmīgi mainīti."
+msgstr[1] "%(count)s %(name)s tika sekmīgi mainīts."
+msgstr[2] "%(count)s %(name)s tika sekmīgi mainīti."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s izvēlēti"
-msgstr[1] "%(total_count)s izvēlēts"
-msgstr[2] "%(total_count)s izvēlēti"
+msgstr[0] "Atlasīti visi %(total_count)s"
+msgstr[1] "Atlasīti visi %(total_count)s"
+msgstr[2] "Atlasīti visi %(total_count)s "
 
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "0 no %(cnt)s izvēlēti"
+msgstr "Atlasīti 0 no %(cnt)s"
 
 msgid "Delete"
-msgstr "Dzēst"
+msgstr "Izdzēst"
 
 #, python-format
 msgid "Change history: %s"
@@ -288,30 +288,30 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-"%(class_name)s %(instance)s dzēšanai ir nepieciešams izdzēst sekojošus "
+"%(class_name)s %(instance)s izdzēšanai ir nepieciešams izdzēst sekojošus "
 "aizsargātus saistītos objektus: %(related_objects)s"
 
 msgid "Django site admin"
-msgstr "Django administrācijas lapa"
+msgstr "Django vietnes pārvaldīšana"
 
 msgid "Django administration"
-msgstr "Django administrācija"
+msgstr "Django pārvaldīšana"
 
 msgid "Site administration"
-msgstr "Lapas administrācija"
+msgstr "Vietnes pārvaldīšana"
 
 msgid "Log in"
-msgstr "Pieslēgties"
+msgstr "Pieteikties"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr "%(app)s administrācija"
+msgstr "%(app)s pārvaldīšana"
 
 msgid "Page not found"
 msgstr "Lapa nav atrasta"
 
 msgid "We’re sorry, but the requested page could not be found."
-msgstr "Atvainojiet, pieprasītā lapa neeksistē."
+msgstr "Atvainojamies, pieprasītā lapa nav atrodama."
 
 msgid "Home"
 msgstr "Sākums"
@@ -329,8 +329,8 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Notika kļūda. Lapas administratoriem ir nosūtīts e-pasts un kļūda tuvākajā "
-"laikā tiks novērsta. Paldies par pacietību."
+"Atgadījās kļūda. Lapas pārvaldītājiem ir nosūtīts e-pasta ziņojumus, un "
+"kļūdai tuvākajā laikā vajadzētu būt novērstai. Paldies par pacietību!"
 
 msgid "Run the selected action"
 msgstr "Izpildīt izvēlēto darbību"
@@ -371,12 +371,10 @@ msgid "View"
 msgstr "Apskatīt"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr "Jums nav tiesību neko skatīt vai labot."
+msgstr "Nav tiesību neko apskatīt vai labot."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
-msgstr ""
-"Kad būsiet izveidojis lietotāju, varēsiet rediģēt vairāk lietotāja "
-"uzstādījumus."
+msgstr "Pēc lietotāja izveidošanas varēsi labot vairāk lietotāja uzstādījumu."
 
 msgid "Error:"
 msgstr "Kļūda:"
@@ -391,30 +389,30 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
 msgstr[1] "Lūdzu, izlabojiet zemāk norādīto kļūdu."
-msgstr[2] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
+msgstr[2] "Lūgums izlabot zemāk esošās kļūdas."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Ievadiet jaunu paroli lietotājam <strong>%(username)s</strong>."
+msgstr "Jāievada jauna parole lietotājam <strong>%(username)s</strong>."
 
 msgid ""
 "This action will <strong>enable</strong> password-based authentication for "
 "this user."
 msgstr ""
-"Šī darbība šim lietotājam <strong>iespējos</strong> paroles bāzētu "
-"autentifikāciju."
+"Šī darbība šim lietotājam <strong>iespējos</strong> autentificēšanos ar "
+"paroli."
 
 msgid "Disable password-based authentication"
-msgstr "Atspējot paroles bāzētu autentifikāciju"
+msgstr "Atspējot autentificēšanos ar parol"
 
 msgid "Enable password-based authentication"
-msgstr "Iespējot paroles bāzētu autentifikāciju"
+msgstr "Iespējot autentificēšanos ar paroli"
 
 msgid "Skip to main content"
 msgstr "Pāriet uz galveno saturu"
 
 msgid "Welcome,"
-msgstr "Sveicināti,"
+msgstr "Laipni lūdzam,"
 
 msgid "View site"
 msgstr "Apskatīt lapu"
@@ -458,13 +456,13 @@ msgid "Toggle sorting"
 msgstr "Pārslēgt kārtošanu"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr "Pārslēgt motīvu (pašreizējais motīvs: automātisks)"
+msgstr "Pārslēgt izskatu (pašreizējais izskats: automātisks)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr "Pārslēgt motīvu (pašreizējais motīvs: gaišs)"
+msgstr "Pārslēgt izskatu (pašreizējais izskats: gaišs)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr "Pārslēgt motīvu (pašreizējais motīvs: tumšs)"
+msgstr "Pārslēgt izskatu (pašreizējais izskats: tumšs)"
 
 #, python-format
 msgid ""
@@ -472,8 +470,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Izdzēšot objektu %(object_name)s '%(escaped_object)s', tiks dzēsti visi "
-"saistītie objekti, bet jums nav tiesību dzēst sekojošus objektu tipus:"
+"%(object_name)s '%(escaped_object)s' izdzēšana novedīs pie visu saistīto "
+"objektu izdzēšanas, bet Tavam kontam nav tiesību izdzēst šādus objektu "
+"veidus:"
 
 #, python-format
 msgid ""
@@ -488,8 +487,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Vai esat pārliecināts, ka vēlaties dzēst %(object_name)s "
-"\"%(escaped_object)s\"? Tiks dzēsti arī sekojoši saistītie objekti:"
+"Vai tiešām izdzēst %(object_name)s \"%(escaped_object)s\"? Tiks izdzēsti arī "
+"visi šie saistītie vienumi:"
 
 msgid "Objects"
 msgstr "Objekti"
@@ -506,8 +505,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Izdzēšot izvēlēto %(objects_name)s, tiks dzēsti visi saistītie objekti, bet "
-"jums nav tiesību dzēst sekojošus objektu tipus:"
+"Atlasīto %(objects_name)s izdzēšana novedīs pie visu saistīto objektu "
+"izdzēšanas, bet Tavam kontam nav tiesību izdzēst šādus objektu veidus:"
 
 #, python-format
 msgid ""
@@ -522,11 +521,11 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Vai esat pārliecināts, ka vēlaties dzēst izvēlētos %(objects_name)s "
-"objektus? Visi sekojošie objekti un tiem piesaistītie objekti tiks izdzēsti:"
+"Vai tiešām izdzēst atlasītos %(objects_name)s? Visi šie objekti un ar tiem "
+"saistītie vienumi tiks izdzēsti:"
 
 msgid "Delete?"
-msgstr "Dzēst?"
+msgstr "Izdzēst?"
 
 #, python-format
 msgid " By %(filter_title)s "
@@ -561,31 +560,32 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Problēma ar datubāzes instalāciju. Pārliecinieties, ka attiecīgās tabulas ir "
-"izveidotas un attiecīgajam lietotājam ir tiesības tai piekļūt."
+"Kaut kas nav kārtībā ar datubāzes uzstādīšanu. Jānodrošina, ka attiecīgās "
+"datubāzes tabulas ir izveidotas un attiecīgajam lietotājam tajā ir lasīšanas "
+"tiesības."
 
 #, python-format
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"Jūs esat autentificējies kā %(username)s, bet jums nav tiesību piekļūt šai "
-"lapai. Vai vēlaties pieteikties citā kontā?"
+"Tu autentificējies kā %(username)s, bet Tev nav pilnvaru piekļūt šai lapai. "
+"Vai vēlies pieteikties citā kontā?"
 
 msgid "Forgotten your login credentials?"
-msgstr "Aizmirsāt savus pieteikšanās datus?"
+msgstr "Aizmirsi savus pieteikšanās datus?"
 
 msgid "Toggle navigation"
-msgstr "Pārslēgt navigāciju"
+msgstr "Pārslēgt pāŗvietošanos"
 
 msgid "Sidebar"
 msgstr "Sānjosla"
 
 msgid "Start typing to filter…"
-msgstr "Sāciet rakstīt, lai atlasītu…"
+msgstr "Jāsāk rakstīt, lai atlasītu…"
 
 msgid "Filter navigation items"
-msgstr "Atlasīt navigācijas vienības"
+msgstr "Atlasīt pārvietošanās vienumus"
 
 msgid "Date/time"
 msgstr "Datums/laiks"
@@ -606,8 +606,8 @@ msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Objektam nav izmaiņu vēstures. Tas visdrīzāk netika pievienots, izmantojot "
-"šo administrācijas rīku."
+"Objektam nav izmaiņu vēstures. Visdrīzāk, ka tas netika pievienots šajā "
+"pārvaldīšanas vietnē."
 
 msgid "Show all"
 msgstr "Rādīt visu"
@@ -624,13 +624,13 @@ msgstr "Meklēt"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(counter)s rezultāti"
-msgstr[1] "%(counter)s rezultāts"
-msgstr[2] "%(counter)s rezultāti"
+msgstr[0] "%(counter)s iznākumu"
+msgstr[1] "%(counter)s iznākums"
+msgstr[2] "%(counter)s iznākumi"
 
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr "kopā - %(full_result_count)s"
+msgstr "Pavisam %(full_result_count)s"
 
 msgid "Save as new"
 msgstr "Saglabāt kā jaunu"
@@ -657,7 +657,7 @@ msgstr "Pievienot citu %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr "Dzēst izvēlēto %(model)s"
+msgstr "Izdzēst atlasīto %(model)s"
 
 #, python-format
 msgid "View selected %(model)s"
@@ -667,20 +667,20 @@ msgid "Thanks for spending some quality time with the web site today."
 msgstr "Paldies, ka šodien vietnei veltījāt kvalitatīvu laiku."
 
 msgid "Log in again"
-msgstr "Pieslēgties vēlreiz"
+msgstr "Pieteikties vēlreiz"
 
 msgid "Password change"
 msgstr "Paroles maiņa"
 
 msgid "Your password was changed."
-msgstr "Jūsu parole tika nomainīta."
+msgstr "Tava parole tika nomainīta."
 
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Drošības nolūkos ievadiet veco paroli un pēc tam divreiz jauno paroli, lai "
-"mēs varētu pārbaudīt, ka tā ir ievadīta pareizi."
+"Lūgums drošības nolūkos ievadīt savu veco paroli un pēc tam divreiz savu "
+"jauno paroli, lai mēs varētu apliecināt, ka tā ir ievadīta pareizi."
 
 msgid "Change my password"
 msgstr "Nomainīt manu paroli"
@@ -689,7 +689,7 @@ msgid "Password reset"
 msgstr "Paroles atiestatīšana"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Jūsu parole ir iestatīta. Varat pieslēgties."
+msgstr "Tava parole tika iestatīta. Tagad vari pieteikties."
 
 msgid "Password reset confirmation"
 msgstr "Paroles atiestatīšanas apstiprinājums"
@@ -698,8 +698,8 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Lūdzu ievadiet jauno paroli divreiz, lai varētu pārbaudīt, ka tā ir "
-"uzrakstīta pareizi."
+"Lūgums divreiz ievadīt savu jauno paroli, lai mēs varētu apliecināt, ka tā "
+"ir ievadīta pareizi."
 
 msgid "New password:"
 msgstr "Jaunā parole:"
@@ -711,37 +711,36 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Paroles atiestatīšanas saite bija nekorekta, iespējams, tā jau ir izmantota. "
-"Lūdzu pieprasiet paroles pārstatīšanu vēlreiz."
+"Paroles atiestatīšanas saite bija nederīga, iespējams, ka tāpēc, ka tā jau "
+"ir izmantota. Lūgums no jauna pieprasīt paroles atiestatīšanu."
 
 msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ja sistēmā ir konts ar jūsu e-pasta adresi, tad mēs jums tikko nosūtījām e-"
-"pasta ziņojumu ar paroles iestatīšanas instrukciju. Jums to tūlīt vajadzētu "
-"saņemt."
+"Mēs e-pastā nosūtījām paroles iestatīšanas norādes, ja pastāv konts ar "
+"ievadīto e-pasta adresi. Tās tūlīt vajadzētu saņemt."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Ja nesaņemat e-pastu, lūdzu, pārliecinieties, vai esat ievadījis reģistrētu "
-"adresi un pārbaudiet savu mēstuļu mapi."
+"Ja nesaņēmi e-pasta ziņojumu, lūgums pārliecināties, vai ievadīji adresi, ar "
+"kuru reģistrējies, un pārbaudīt mēstuļu mapi."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Jūs saņemat šo e-pasta ziņojumu, jo pieprasījāt atiestatīt lietotāja konta "
-"paroli vietnē %(site_name)s."
+"Tu saņem šo e-pasta ziņojumu, jo pieprasīji atiestatīt sava %(site_name)s "
+"lietotāja konta paroli."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "Lūdzu apmeklējiet sekojošo lapu un ievadiet jaunu paroli:"
+msgstr "Lūgums doties uz sekojošo lapu un izvēlēties jaunu paroli:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr "Ja aizmirsāt, jūs esat:"
+msgstr "Ja aizmirsi, Tu esi:"
 
 msgid "Thanks for using our site!"
 msgstr "Paldies par mūsu lapas lietošanu!"
@@ -754,8 +753,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Aizmirsāt savu paroli? Ievadiet jūsu e-pasta adresi un jums tiks nosūtīta "
-"instrukcija, kā iestatīt jaunu paroli."
+"Aizmirsi savu paroli? Zemāk ievadi savu e-pasta adresi, un mēs nosūtīsim "
+"jaunas paroles iestatīšanas norādes."
 
 msgid "Email address:"
 msgstr "E-pasta adrese:"
@@ -764,22 +763,22 @@ msgid "Reset my password"
 msgstr "Paroles atiestatīšana"
 
 msgid "Select all objects on this page for an action"
-msgstr "Atlasiet visus šīs lapas objektus darbībai"
+msgstr "Atlasīt visus šīs lapas objektus darbībai"
 
 msgid "All dates"
 msgstr "Visi datumi"
 
 #, python-format
 msgid "Select %s"
-msgstr "Izvēlēties %s"
+msgstr "Atlasīt %s"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "Izvēlēties %s, lai izmainītu"
+msgstr "Atlasīt %s, lai izmainītu"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "Izvēlēties %s, lai apskatītu"
+msgstr "Atlasīt %s, lai apskatītu"
 
 msgid "Date:"
 msgstr "Datums:"
@@ -791,7 +790,7 @@ msgid "Lookup"
 msgstr "Pārlūkot"
 
 msgid "Currently:"
-msgstr "Valūta:"
+msgstr "Pašreiz:"
 
 msgid "Change:"
 msgstr "Izmaiņa:"
