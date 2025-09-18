@@ -535,6 +535,24 @@ class RestartWithReloaderTests(SimpleTestCase):
                 [self.executable, "-Wall", "-m", "django"] + argv[1:],
             )
 
+    @mock.patch.dict(os.environ, {}, clear=True)
+    def test_propagates_unbuffered_from_parent_dash_u(self):
+        with tempfile.TemporaryDirectory() as d:
+            script = Path(d) / "manage.py"
+            script.touch()
+            mock_call = self.patch_autoreload([str(script), "runserver"])
+            with (
+                mock.patch("__main__.__spec__", None),
+                mock.patch.object(
+                    autoreload.sys,
+                    "orig_argv",
+                    [self.executable, "-u", str(script), "runserver"],
+                ),
+            ):
+                autoreload.restart_with_reloader()
+        env = mock_call.call_args.kwargs["env"]
+        self.assertEqual(env.get("PYTHONUNBUFFERED"), "1")
+
 
 class ReloaderTests(SimpleTestCase):
     RELOADER_CLS = None
