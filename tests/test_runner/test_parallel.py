@@ -279,27 +279,20 @@ class ParallelTestSuiteTest(SimpleTestCase):
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
 
+    @classmethod
+    def setupClass(cls):
+        raise RuntimeError("Boo!")
 
-class ParallelBufferTest(DjangoTestCase):
+    def test_pass(self):
+        pass
+
     def test_parallel_buffer(self):
         """
-        Test that ParallelTestSuite.run() properly handles buffered TestResult
-        to prevent AttributeError when setUpTestData raises exceptions.
-        Before the fix, running tests with
-        --parallel --buffer would crash with AttributeError when setUpTestData
-        raised an exception because the main process TestResult had buffer=True
-        but _setupStdout() was never called.
+        ParallelTestSuite.run() with `buffer=True` correctly handles test
+        cases with setUpClass().
         """
 
-        class AbortingTest(DjangoTestCase):
-            @classmethod
-            def setUpTestData(cls):
-                raise RuntimeError("Boo!")
-
-            def test_pass(self):
-                pass
-
-        test = AbortingTest("test_pass")
+        test = ParallelTestSuiteTest("test_pass")
         remote_result = RemoteTestResult()
         suite = TestSuite([test])
         suite.run(remote_result)
@@ -318,4 +311,4 @@ class ParallelBufferTest(DjangoTestCase):
             mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
                 next=fake_next
             )
-            pts.run(test_result)
+            pts.run(test_result) # Does not raise AttributeError.
