@@ -181,7 +181,10 @@ def resolve_url(to, *args, **kwargs):
 
     # Next try a reverse URL resolution.
     try:
-        return reverse(to, args=args, kwargs=kwargs)
+        # Pop 'query' and 'fragment' from kwargs and pass them to reverse()
+        query = kwargs.pop("query", None)
+        fragment = kwargs.pop("fragment", None)
+        return reverse(to, args=args, kwargs=kwargs, query=query, fragment=fragment)
     except NoReverseMatch:
         # If this is a callable, re-raise.
         if callable(to):
