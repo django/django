@@ -6,7 +6,6 @@ from unittest.result import TestResult
 from unittest.suite import TestSuite, _ErrorHolder
 
 from django.test import SimpleTestCase
-from django.test import TestCase as DjangoTestCase
 from django.test.runner import ParallelTestSuite, RemoteTestResult
 
 try:
