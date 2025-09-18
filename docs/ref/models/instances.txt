@@ -180,10 +180,10 @@ update, you could write a test similar to this::
         obj.refresh_from_db()
         self.assertEqual(obj.val, 2)
 
-Note that when deferred fields are accessed, the loading of the deferred
-field's value happens through this method. Thus it is possible to customize
-the way deferred loading happens. The example below shows how one can reload
-all of the instance's fields when a deferred field is reloaded::
+When a deferred field is loaded on-demand for a single model instance, the
+loading happens through this method. Thus it is possible to customize the way
+this loading happens. The example below shows how one can reload all of the
+instance's fields when a deferred field is loaded on-demand::
 
     class ExampleModel(models.Model):
         def refresh_from_db(self, using=None, fields=None, **kwargs):
