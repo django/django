@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019,2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019,2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 22:49+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-09-17 18:32+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,8 +34,7 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: “/"
 "events/search/”."
 msgstr ""
-"Tam jābūt absolūtajam ceļam, atskaitot domēna vārdu. Piemēram: \"/notikumi/"
-"meklet/\"."
+"Tam jābūt absolūtam ceļam bez domēna vārda. Piemēram: \"/notikumi/meklet/\"."
 
 msgid "redirect to"
 msgstr "pārvirzīt(redirect) uz"

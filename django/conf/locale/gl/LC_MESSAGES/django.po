@@ -8,14 +8,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # 948a55bc37dd6d642f1875bb84258fff_07a28cc <c1911c41f2600393098639fceba5dab0_5932>, 2012
-# X Bello <xbello@gmail.com>, 2023-2024
+# X Bello <xbello@gmail.com>, 2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2025\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -699,8 +699,8 @@ msgid "Value must be valid JSON."
 msgstr "O valor ten que ser JSON válido."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "A instancia de %(model)s co %(field)s %(value)r non existe."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s instancia con %(field)s %(value)r non é unha opción válida."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave Foránea (tipo determinado por un campo relacionado)"

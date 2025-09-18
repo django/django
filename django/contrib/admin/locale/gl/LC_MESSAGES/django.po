@@ -9,14 +9,14 @@
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # 948a55bc37dd6d642f1875bb84258fff_07a28cc <c1911c41f2600393098639fceba5dab0_5932>, 2011-2012
 # Pablo, 2015
-# X Bello <xbello@gmail.com>, 2023-2024
+# X Bello <xbello@gmail.com>, 2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2025\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -37,8 +37,8 @@ msgstr "Borrado exitosamente %(count)d %(items)s"
 msgid "Cannot delete %(name)s"
 msgstr "Non foi posíble eliminar %(name)s"
 
-msgid "Are you sure?"
-msgstr "¿Está seguro?"
+msgid "Delete multiple objects"
+msgstr "Eliminar múltiples obxectos"
 
 msgid "Administration"
 msgstr "Administración"
@@ -267,6 +267,9 @@ msgstr[1] "Tódolos %(total_count)s seleccionados."
 msgid "0 of %(cnt)s selected"
 msgstr "0 de %(cnt)s seleccionados."
 
+msgid "Delete"
+msgstr "Eliminar"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de cambios: %s"
@@ -350,6 +353,15 @@ msgstr "Migas de pan"
 msgid "Models in the %(name)s application"
 msgstr "Modelos na aplicación %(name)s"
 
+msgid "Model name"
+msgstr "Nome do modelo"
+
+msgid "Add link"
+msgstr "Engadir enlace"
+
+msgid "Change or view list link"
+msgstr "Cambiar ou ver lista de enlaces"
+
 msgid "Add"
 msgstr "Engadir"
 
@@ -359,15 +371,11 @@ msgstr "Vista"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Non ten permiso para ver ou editar nada."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Primeiro insira un nome de usuario e un contrasinal. Despois poderá editar "
-"máis opcións de usuario."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Cando teña creado un usuario, poderá editar máis opcións do usuario."
 
-msgid "Enter a username and password."
-msgstr "Introduza un nome de usuario e contrasinal."
+msgid "Error:"
+msgstr "Error:"
 
 msgid "Change password"
 msgstr "Cambiar contrasinal"
@@ -454,9 +462,6 @@ msgstr "Escoller tema (tema actual: claro)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Escoller tema (tema actual: escuro)"
 
-msgid "Delete"
-msgstr "Eliminar"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -491,9 +496,6 @@ msgstr "Sí, estou seguro"
 
 msgid "No, take me back"
 msgstr "Non, lévame de volta"
-
-msgid "Delete multiple objects"
-msgstr "Eliminar múltiples obxectos"
 
 #, python-format
 msgid ""
@@ -570,8 +572,8 @@ msgstr ""
 "Está identificado como %(username)s, pero non está autorizado para acceder a "
 "esta páxina. Gustaríalle identificarse con una conta diferente?"
 
-msgid "Forgotten your password or username?"
-msgstr "¿Olvidou o usuario ou contrasinal?"
+msgid "Forgotten your login credentials?"
+msgstr "¿Esquecéu as súas credenciales de logueo?"
 
 msgid "Toggle navigation"
 msgstr "Activar navegación"
@@ -738,8 +740,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor vaia á seguinte páxina e elixa una nova contrasinal:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "No caso de que o esquecese, o seu nome de usuario é:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "No caso de que se esquecera, vostede é:"
 
 msgid "Thanks for using our site!"
 msgstr "Grazas por usar o noso sitio web!"
