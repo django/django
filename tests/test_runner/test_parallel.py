@@ -310,4 +310,4 @@ class ParallelTestSuiteTest(SimpleTestCase):
             mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
                 next=fake_next
             )
-            pts.run(test_result) # Does not raise AttributeError.
+            pts.run(test_result)  # Does not raise AttributeError.
