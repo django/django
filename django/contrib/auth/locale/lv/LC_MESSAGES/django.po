@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -36,16 +37,16 @@ msgstr "Svarīgi datumi"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s objekts ar primāro atslēgu %(key)r neeksistē."
+msgstr "%(name)s objekts ar galveno atslēgu %(key)r nepastāv."
 
 msgid "Conflicting form data submitted. Please try again."
-msgstr "Iesniegti pretrunīgi veidlapas dati. Lūdzu mēģiniet vēlreiz."
+msgstr "Iesniegti pretrunīgi veidlapas dati. Lūgums mēģināt vēlreiz."
 
 msgid "Password changed successfully."
-msgstr "Parole nomainīta sekmīgi."
+msgstr "Parole sekmīgi nomainīta."
 
 msgid "Password-based authentication was disabled."
-msgstr "Paroles bāzēta autentifikācija tika atspējota."
+msgstr "Autentificēšanās ar paroli tika atspējota."
 
 #, python-format
 msgid "Change password: %s"
@@ -56,16 +57,16 @@ msgid "Set password: %s"
 msgstr "Iestatīt paroli: %s"
 
 msgid "Authentication and Authorization"
-msgstr "Autentifikācija un autorizācija"
+msgstr "Autentificēšanās un pilnvarošana"
 
 msgid "password"
 msgstr "parole"
 
 msgid "last login"
-msgstr "pēdējoreiz pieslēdzies"
+msgstr "pēdējā pieteikšanās"
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
+msgstr "Nederīgs paroles formāts vai nezināms jaucējalgoritms."
 
 msgid "No password set."
 msgstr "Nav norādīta parole"
@@ -99,7 +100,7 @@ msgstr ""
 "On) vai LDAP."
 
 msgid "Password-based authentication"
-msgstr "Paroles bāzēta autentifikācija"
+msgstr "Autentificēšanās ar paroli"
 
 msgid "Enabled"
 msgstr "Iespējots"
@@ -116,15 +117,15 @@ msgstr ""
 msgid ""
 "Enable password-based authentication for this user by setting a password."
 msgstr ""
-"Iespējojiet šim lietotājam paroles balstītu autentifikāciju, iestatot paroli."
+"Iespējot šim lietotājam autentificēšanos ar paroli ar paroles iestatīšanu."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Lūdzu ievadiet korektu informāciju laukos %(username)s un parole. Ņemiet "
-"vērā, ka abi ievades lauki ir reģistrjutīgi."
+"Lūgums ievadīt pareizu %(username)s un paroli. Jāņem vērā, ka abi lauki var "
+"būt reģistrjutīgi."
 
 msgid "This account is inactive."
 msgstr "Šis konts nav aktīvs."
@@ -140,7 +141,7 @@ msgstr "Jaunā parole vēlreiz"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"Jūsu iepriekšējā parole netika ievadīta korekti. Lūdzu ievadiet to atkārtoti."
+"Tava iepriekšējā parole tika ievadīta nepareizi. Lūgums ievadīt to vēlreiz."
 
 msgid "Old password"
 msgstr "Vecā parole"
@@ -149,13 +150,13 @@ msgid "algorithm"
 msgstr "algoritms"
 
 msgid "iterations"
-msgstr "iterācijas"
+msgstr "atkārtojumi"
 
 msgid "salt"
-msgstr "salt"
+msgstr "sāls"
 
 msgid "hash"
-msgstr "hash"
+msgstr "jaucējvērtība"
 
 msgid "variety"
 msgstr "dažādība"
@@ -170,7 +171,7 @@ msgid "time cost"
 msgstr "laika izmaksas"
 
 msgid "parallelism"
-msgstr "paralēlisms"
+msgstr "paralelitāte"
 
 msgid "work factor"
 msgstr "darba faktors"
@@ -185,7 +186,7 @@ msgid "name"
 msgstr "nosaukums"
 
 msgid "content type"
-msgstr "satura tips"
+msgstr "satura veids"
 
 msgid "codename"
 msgstr "kods"
@@ -197,10 +198,10 @@ msgid "permissions"
 msgstr "tiesības"
 
 msgid "group"
-msgstr "grupa"
+msgstr "kopa"
 
 msgid "groups"
-msgstr "grupas"
+msgstr "kopas"
 
 msgid "superuser status"
 msgstr "superlietotāja statuss"
@@ -215,23 +216,24 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Grupas, kurām lietotājs pieder. Lietotājam būs visas tiesības, kuras ir "
-"piešķirtas grupām, kurām tas pieder."
+"Kopas, kurās ir lietotājs. Lietotājam būs visas tiesības, kuras ir "
+"piešķirtas katrai no kopām."
 
 msgid "user permissions"
 msgstr "lietotāja tiesības"
 
 msgid "Specific permissions for this user."
-msgstr "Lietotāja specifiskās tiesības."
+msgstr "Noteiktas šī lietotāja tiesības."
 
 msgid "username"
 msgstr "lietotājvārds"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obligāts. 150 vai mazāk zīmes. Tikai burti, cipari un @/./+/-/_ ."
+msgstr ""
+"Nepieciešams. 150 vai mazāk rakstzīmju. Tikai burti, cipari un @/./+/-/_ ."
 
 msgid "A user with that username already exists."
-msgstr "Lietotājs ar šādu lietotāja vārdu jau eksistē."
+msgstr "Jau pastāv lietotājs ar šādu lietotājvārdu."
 
 msgid "first name"
 msgstr "vārds"
@@ -246,8 +248,7 @@ msgid "staff status"
 msgstr "personāla statuss"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Atzīmējiet, ja vēlaties, lai lietotājs var pieslēgties administrācijas lapā."
+msgstr "Nosaka, vai lietotājs var pieteikties šajā pārvaldīšanas vietnē."
 
 msgid "active"
 msgstr "aktīvs"
@@ -256,7 +257,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Nosaka, vai lietotājs ir aktīvs. Lietojiet šo kā alternatīvu kontu dzēšanai."
+"Nosaka, vai lietotāju vajadzētu uztvert kā aktīvu. Atzīmes noņemšana ir "
+"izmantojama kontu izdzēšanas vietā."
 
 msgid "date joined"
 msgstr "datums, kad pievienojies"
@@ -271,29 +273,29 @@ msgstr "lietotāji"
 msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
 "This password is too short. It must contain at least %d characters."
-msgstr[0] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmes garai."
-msgstr[1] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmi garai."
-msgstr[2] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmēm garai."
+msgstr[0] "Šī parole ir pārāk īsa. Tajā ir jābūt vismaz %d rakstzīmēm."
+msgstr[1] "Šī parole ir pārāk īsa. Tajā ir jābūt vismaz %d rakstzīmei."
+msgstr[2] "Šī parole ir pārāk īsa. Tajā ir jābūt vismaz %d rakstzīmēm."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Parolei ir jābūt vismaz %(min_length)d zīmēm garai."
-msgstr[1] "Parolei ir jābūt vismaz %(min_length)d zīmi garai."
-msgstr[2] "Parolei ir jābūt vismaz %(min_length)d zīmēm garai."
+msgstr[0] "Parolē ir jābūt vismaz %(min_length)d rakstzīmēm."
+msgstr[1] "Parolē ir jābūt vismaz %(min_length)d rakstzīmei."
+msgstr[2] "Parolē ir jābūt vismaz %(min_length)d rakstzīmēm."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parole ir pārāk līdzīga %(verbose_name)s."
 
 msgid "Your password can’t be too similar to your other personal information."
-msgstr "Parole nedrīkst būt pārāk līdzīga pārējai personīgajai informācijai."
+msgstr "Parole nevar būt pārāk līdzīga pārējai personīgajai informācijai."
 
 msgid "This password is too common."
-msgstr "Parole ir pārāk bieži lietota."
+msgstr "Parole ir pārāk bieži izmantota."
 
 msgid "Your password can’t be a commonly used password."
-msgstr "Parole nedrīkst būt no bieži lietotu paroļu saraksta."
+msgstr "Parole nedrīkst būt no bieži izmantotu paroļu saraksta."
 
 msgid "This password is entirely numeric."
 msgstr "Parole sastāv tikai no cipariem."
@@ -303,21 +305,21 @@ msgstr "Parole nedrīkst sastāvēt tikai no cipariem."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "Paroles pārstatīšana %(site_name)s"
+msgstr "Paroles atiestatīšana %(site_name)s"
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "
 "and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Ievadi derīgu lietotāja vārdu. Šī vērtība var saturēt tikai mazos a-z un "
-"lielos A-Z burtus bez diakritiskajām zīmēm, ciparus un @/./+/-/_ simbolus."
+"Jāievada derīgs lietotājvārds. Šī vērtība var saturēt tikai mazos a-z un "
+"lielos A-Z burtus bez diakritiskajām zīmēm, ciparus un rakstzīmes @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Ievadi derīgu lietotāja vārdu. Šī vērtība var saturēt tikai burtus, ciparus "
-"un @/./+/-/_ simbolus."
+"Jāievada derīgs lietotājvārds. Šī vērtība var saturēt tikai burtus, ciparus "
+"un rakstzīmes @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Atslēdzies"
@@ -329,7 +331,7 @@ msgid "Password reset sent"
 msgstr "Paroles atiestatīšanas informācija nosūtīta"
 
 msgid "Enter new password"
-msgstr "Ievadiet jauno paroli"
+msgstr "Ievadīt jauno paroli"
 
 msgid "Password reset unsuccessful"
 msgstr "Paroles atiestatīšana nesekmīga"
