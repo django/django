@@ -205,8 +205,6 @@ Minor features
   or their templates, you may need to :ref:`update them
   <geometry-widgets-customization>` to match the new layout.
 
-* The GDAL library and its functions are now loaded lazily.
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -490,12 +488,6 @@ Miscellaneous
 * :meth:`Field.pre_save` may now be called more than once when saving model
   instances, so custom implementations should be idempotent and free of side
   effects.
-
-* The undocumented factory functions in
-  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
-  class-based factories following a naming pattern where lowercase snake_case
-  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
-  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 .. _deprecated-features-6.0:
 
