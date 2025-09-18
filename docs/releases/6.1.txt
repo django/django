@@ -53,7 +53,7 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The GDAL library and its functions are now loaded lazily.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -246,7 +246,11 @@ backends.
 Miscellaneous
 -------------
 
-* ...
+* The undocumented factory functions in
+  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
+  class-based factories following a naming pattern where lowercase snake_case
+  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
+  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 .. _deprecated-features-6.1:
 
