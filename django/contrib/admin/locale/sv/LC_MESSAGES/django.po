@@ -7,15 +7,22 @@
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# d7bcbd5f5cbecdc2b959899620582440, 2011
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Johan Rohdin, 2021
+# Johan Rohdin, 2021
+# Jonathan Lindén, 2014-2015
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # metteludwig <luudde@gmail.com>, 2019
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
+# metteludwig <luudde@gmail.com>, 2019
+# Mikko Hellsing <mikko@aino.se>, 2011
+# nip3o <n@niclasolofsson.se>, 2024
 # nip3o <n@niclasolofsson.se>, 2024
 # Mikko Hellsing <mikko@aino.se>, 2011
 # Thomas Lundqvist, 2013,2016-2017
@@ -24,8 +31,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: nip3o <n@niclasolofsson.se>, 2024\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Mikko Hellsing <mikko@aino.se>, 2011\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +47,7 @@ msgstr "Ta bort markerade %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Tog bort %(count)d %(items)s"
+msgstr "Tog bort %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -202,7 +209,7 @@ msgid "The {name} “{obj}” was added successfully."
 msgstr "Lade till {name} “{obj}”."
 
 msgid "You may edit it again below."
-msgstr "Du kan redigera det igen nedan"
+msgstr "Du kan redigera det igen nedan."
 
 #, python-brace-format
 msgid ""
@@ -359,13 +366,13 @@ msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
 msgid "Model name"
-msgstr ""
+msgstr "Modellens namn"
 
 msgid "Add link"
-msgstr ""
+msgstr "Lägg till länk"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Ändra eller visa listlänk"
 
 msgid "Add"
 msgstr "Lägg till"
@@ -378,9 +385,10 @@ msgstr "Du har inte tillåtelse att se eller ändra någonting."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
+"När du har skapat en användare kan du redigera fler användaralternativ."
 
 msgid "Error:"
-msgstr ""
+msgstr "Fel:"
 
 msgid "Change password"
 msgstr "Ändra lösenord"
@@ -525,7 +533,7 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
-"objekt samt relaterade objekt kommer att tas bort: "
+"objekt samt relaterade objekt kommer att tas bort:"
 
 msgid "Delete?"
 msgstr "Radera?"
@@ -576,7 +584,7 @@ msgstr ""
 "sida. Vill du logga in med ett annat konto?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "Har du glömt dina inloggningsuppgifter?"
 
 msgid "Toggle navigation"
 msgstr "Växla navigering"
@@ -585,7 +593,7 @@ msgid "Sidebar"
 msgstr "Sidopanel"
 
 msgid "Start typing to filter…"
-msgstr "Börja skriv för att filtrera..."
+msgstr "Börja skriv för att filtrera…"
 
 msgid "Filter navigation items"
 msgstr "Filtrera navigeringsobjekt"
@@ -618,7 +626,7 @@ msgid "Save"
 msgstr "Spara"
 
 msgid "Popup closing…"
-msgstr "Popup stängs..."
+msgstr "Popup stängs…"
 
 msgid "Search"
 msgstr "Sök"
@@ -742,7 +750,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Var god gå till följande sida och välj ett nytt lösenord:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Om du har glömt det, du är:"
 
 msgid "Thanks for using our site!"
 msgstr "Tack för att du använder vår webbplats!"

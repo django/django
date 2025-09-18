@@ -7,7 +7,7 @@
 # Fan Xu <xlivevil@aliyun.com>, 2022
 # Ford Guo <agile.guo@gmail.com>, 2022
 # Huanqun Yang, 2022
-# jack yang, 2023
+# sunfkny, 2023
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -17,6 +17,7 @@
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # L., 2024
 # matthew Yip <yymmatthew@gmail.com>, 2020
+# Natalia, 2025
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
 # Lemon Li <leeway1985@gmail.com>, 2013
@@ -42,9 +43,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 06:49+0000\n"
-"Last-Translator: L., 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Natalia, 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -697,8 +698,8 @@ msgid "Value must be valid JSON."
 msgstr "值必须是有效的JSON。"
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "包含%(field)s %(value)r的%(model)s实例不存在。"
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "外键(由相关字段确定)"
@@ -873,7 +874,7 @@ msgstr "否"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "是、否、也许"
+msgstr "是,否,也许"
 
 #, python-format
 msgid "%(size)d byte"

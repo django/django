@@ -4,7 +4,8 @@ Django 5.2.7 release notes
 
 *Expected October 1, 2025*
 
-Django 5.2.7 fixes several bugs in 5.2.6.
+Django 5.2.7 fixes several bugs in 5.2.6. Also, the latest string translations
+from Transifex are incorporated.
 
 Bugfixes
 ========
