@@ -13,6 +13,7 @@ from django.utils.deprecation import (
 class DjangoFilePrefixesTests(SimpleTestCase):
     def setUp(self):
         django_file_prefixes.cache_clear()
+        self.addCleanup(django_file_prefixes.cache_clear)
 
     def test_no_file(self):
         orig_file = django.__file__
