@@ -11,7 +11,7 @@ from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
-from django.urls import resolve
+from django.urls import URLResolver, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
@@ -635,6 +635,20 @@ def technical_404_response(request, exception):
         ):
             return default_urlconf(request)
 
+    patterns_with_debug_info = []
+    for urlpattern in tried or ():
+        patterns = []
+        for inner_pattern in urlpattern:
+            wrapper = {"tried": inner_pattern}
+            if isinstance(inner_pattern, URLResolver):
+                wrapper["debug_key"] = "namespace"
+                wrapper["debug_val"] = inner_pattern.namespace
+            else:
+                wrapper["debug_key"] = "name"
+                wrapper["debug_val"] = inner_pattern.name
+            patterns.append(wrapper)
+        patterns_with_debug_info.append(patterns)
+
     urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
@@ -647,7 +661,8 @@ def technical_404_response(request, exception):
             "urlconf": urlconf,
             "root_urlconf": settings.ROOT_URLCONF,
             "request_path": error_url,
-            "urlpatterns": tried,
+            "urlpatterns": tried,  # Unused, left for compatibility.
+            "urlpatterns_debug": patterns_with_debug_info,
             "resolved": resolved,
             "reason": str(exception),
             "request": request,
