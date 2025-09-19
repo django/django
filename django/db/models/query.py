@@ -725,7 +725,7 @@ class QuerySet(AltersData):
                     "Unique fields that can trigger the upsert must be provided."
                 )
             # Updating primary keys and non-concrete fields is forbidden.
-            if any(not f.concrete or f.many_to_many for f in update_fields):
+            if any(not f.concrete for f in update_fields):
                 raise ValueError(
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
@@ -736,7 +736,7 @@ class QuerySet(AltersData):
                     "update_fields."
                 )
             if unique_fields:
-                if any(not f.concrete or f.many_to_many for f in unique_fields):
+                if any(not f.concrete for f in unique_fields):
                     raise ValueError(
                         "bulk_create() can only be used with concrete fields "
                         "in unique_fields."
@@ -916,7 +916,7 @@ class QuerySet(AltersData):
             raise ValueError("All bulk_update() objects must have a primary key set.")
         opts = self.model._meta
         fields = [opts.get_field(name) for name in fields]
-        if any(not f.concrete or f.many_to_many for f in fields):
+        if any(not f.concrete for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
         all_pk_fields = set(opts.pk_fields)
         for parent in opts.all_parents:
