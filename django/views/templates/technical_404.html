@@ -57,7 +57,7 @@
             {% for pat in pattern %}
               <code>
                 {{ pat.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+                {% if forloop.last and pat.debug_key_val.val %}[{{ pat.debug_key_val.key }}='{{ pat.debug_key_val.val }}']{% endif %}
               </code>
             {% endfor %}
           </li>

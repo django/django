@@ -5,13 +5,14 @@ import re
 import sys
 import types
 import warnings
+from collections import namedtuple
 from pathlib import Path
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
-from django.urls import resolve
+from django.urls import URLResolver, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
@@ -635,6 +636,16 @@ def technical_404_response(request, exception):
         ):
             return default_urlconf(request)
 
+    for inner_tried in itertools.chain(*tried or []):
+        if isinstance(inner_tried, URLResolver):
+            inner_tried.debug_key_val = TriedPatternDebugInfo(
+                key="namespace", val=inner_tried.namespace
+            )
+        else:
+            inner_tried.debug_key_val = TriedPatternDebugInfo(
+                key="name", val=inner_tried.name
+            )
+
     urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
@@ -669,3 +680,6 @@ def default_urlconf(request):
     )
 
     return HttpResponse(t.render(c))
+
+
+TriedPatternDebugInfo = namedtuple("TriedPatternDebugInfo", ["key", "val"])
