@@ -179,6 +179,10 @@ msgid "Upper Sorbian"
 msgstr ""
 
 #: conf/global_settings.py:95
+msgid "Haitian Creole"
+msgstr ""
+
+#: conf/global_settings.py:95
 msgid "Hungarian"
 msgstr ""
 
