@@ -30,7 +30,8 @@ from django.db.models.lookups import (
     LessThanOrEqual,
 )
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps, register_lookup
+from django.test.utils import ignore_warnings, isolate_apps, register_lookup
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Article,
@@ -500,13 +501,19 @@ class LookupTests(TestCase):
         self.assertEqual(arts1.slug, "a1")
         self.assertEqual(arts1.headline, "Article 1")
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
     def test_in_bulk_values_list_flat_empty(self):
-        arts = Article.objects.values_list(flat=True).in_bulk([])
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk([])
         self.assertEqual(arts, {})
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
     def test_in_bulk_values_list_flat_all(self):
         Article.objects.exclude(pk__in=[self.a1.pk, self.a2.pk]).delete()
-        arts = Article.objects.values_list(flat=True).in_bulk()
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk()
         self.assertEqual(
             arts,
             {
@@ -515,8 +522,13 @@ class LookupTests(TestCase):
             },
         )
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
     def test_in_bulk_values_list_flat_pks(self):
-        arts = Article.objects.values_list(flat=True).in_bulk([self.a1.pk, self.a2.pk])
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk(
+                [self.a1.pk, self.a2.pk]
+            )
         self.assertEqual(
             arts,
             {
@@ -794,8 +806,12 @@ class LookupTests(TestCase):
                 ),
             ],
         )
+        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # assertion.
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            qs = Article.objects.values_list(flat=True)
         self.assertSequenceEqual(
-            Article.objects.values_list(flat=True),
+            qs,
             [
                 self.a5.id,
                 self.a6.id,
@@ -901,6 +917,22 @@ class LookupTests(TestCase):
         )
         with self.assertRaises(TypeError):
             Article.objects.values_list("id", "headline", flat=True)
+
+    # RemovedInDjango70Warning: When the deprecation ends, replace with:
+    # def test_values_list_flat_empty_error(self):
+    #     msg = (
+    #         "'flat' is not valid when values_list is called with no fields."
+    #     )
+    #     with self.assertRaisesMessage(TypeError, msg):
+    #         Article.objects.values_list(flat=True)
+    def test_values_list_flat_empty_warning(self):
+        msg = (
+            "Calling values_list() with no field name and flat=True "
+            "is deprecated. Pass an explicit field name instead, like "
+            "'pk'."
+        )
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            Article.objects.values_list(flat=True)
 
     def test_get_next_previous_by(self):
         # Every DateField and DateTimeField creates get_next_by_FOO() and
