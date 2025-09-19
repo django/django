@@ -460,6 +460,11 @@ class CompositePKFilterTests(TestCase):
         queryset = User.objects.filter(comments__in=subquery)
         self.assertSequenceEqual(queryset, (self.user_2,))
 
+    def test_filter_comments_by_users_subquery(self):
+        subquery = Comment.objects.filter(id=3).values("user")
+        queryset = Comment.objects.filter(user__in=subquery)
+        self.assertSequenceEqual(queryset, (self.comment_3,))
+
     def test_cannot_cast_pk(self):
         msg = "Cast expression does not support composite primary keys."
         with self.assertRaisesMessage(ValueError, msg):
