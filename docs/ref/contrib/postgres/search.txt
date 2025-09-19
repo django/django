@@ -96,7 +96,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
     >>> SearchQuery("red tomato")  # two keywords
     >>> SearchQuery("tomato red")  # same results as above
     >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
@@ -105,6 +105,7 @@ Examples:
     >>> SearchQuery(
     ...     "'tomato' ('red' OR 'green')", search_type="websearch"
     ... )  # websearch operators
+    >>> SearchQuery(Lexeme("tomato") & (Lexeme("red") | Lexeme("green")))  # Lexeme objects
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility:
 
@@ -117,6 +118,10 @@ Examples:
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
+
+.. versionchanged:: 6.0
+
+    :class:`Lexeme` objects were added.
 
 ``SearchRank``
 ==============
@@ -275,6 +280,53 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
 
     >>> rank = SearchRank(vector, query, weights=[0.2, 0.4, 0.6, 0.8])
     >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by("-rank")
+
+``Lexeme``
+==========
+
+.. versionadded:: 6.0
+
+.. class:: Lexeme(value, output_field=None, *, invert=False, prefix=False, weight=None)
+
+``Lexeme`` objects allow search operators to be safely used with strings from
+an untrusted source. The content of each lexeme is escaped so that any
+operators that may exist in the string itself will not be interpreted.
+
+You can combine lexemes with other lexemes using the ``&`` and ``|`` operators
+and also negate them with the ``~`` operator. For example:
+
+.. code-block:: pycon
+
+    >>> from django.contrib.postgres.search import SearchQuery, SearchVector, Lexeme
+    >>> vector = SearchVector("body_text", "blog__tagline")
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("fruit") & Lexeme("dessert"))
+    ... )
+    <QuerySet [<Entry: Apple Crumble Recipes>, <Entry: Banana Split Recipes>]>
+
+.. code-block:: pycon
+
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("fruit") & Lexeme("dessert") & ~Lexeme("banana"))
+    ... )
+    <QuerySet [<Entry: Apple Crumble Recipes>]>
+
+Lexeme objects also support term weighting and prefixes:
+
+.. code-block:: pycon
+
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("Pizza") | Lexeme("Cheese"))
+    ... )
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("Pizza") | Lexeme("Cheese", weight="A"))
+    ... )
+    <QuerySet [<Entry: Pizza recipes>]>
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("za", prefix=True))
+    ... )
+    <QuerySet []>
 
 Performance
 ===========

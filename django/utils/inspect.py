@@ -74,3 +74,13 @@ def method_has_no_args(meth):
 
 def func_supports_parameter(func, name):
     return any(param.name == name for param in _get_callable_parameters(func))
+
+
+def is_module_level_function(func):
+    if not inspect.isfunction(func) or inspect.isbuiltin(func):
+        return False
+
+    if "<locals>" in func.__qualname__:
+        return False
+
+    return True

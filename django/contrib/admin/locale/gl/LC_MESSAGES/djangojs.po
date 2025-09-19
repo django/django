@@ -5,14 +5,14 @@
 # fonso <fonzzo@gmail.com>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
-# X Bello <xbello@gmail.com>, 2023
+# X Bello <xbello@gmail.com>, 2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023,2025\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,10 @@ msgstr "%s dispoñíbeis"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Esta é unha lista de %s dispoñíbeis. Pode escoller algúns seleccionándoos na "
-"caixa inferior e a continuación facendo clic na frecha \"Escoller\" situada "
-"entre as dúas caixas."
+"Elixa %s seleccionándoos e despóis seleccionando o botón \"Escoller\" ca "
+"flecha."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -41,18 +39,17 @@ msgstr "Escriba nesta caixa para filtrar a lista de %s dispoñíbeis."
 msgid "Filter"
 msgstr "Filtro"
 
-msgid "Choose all"
-msgstr "Escoller todo"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Escoller tódolos %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Prema para escoller todos/as os/as '%s' dunha vez."
+msgid "Choose selected %s"
+msgstr "Escoller os %s seleccionados"
 
-msgid "Choose"
-msgstr "Escoller"
-
-msgid "Remove"
-msgstr "Retirar"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Eliminar os %s seleccionados"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,23 +57,21 @@ msgstr "%s escollido/a(s)"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Esta é a lista de %s escollidos/as. Pode eliminar algúns seleccionándoos na "
-"caixa inferior e a continuación facendo clic na frecha \"Eliminar\" situada "
-"entre as dúas caixas."
+"Eliminar %s seleccionándoos e despóis seleccionando o botón \"Eliminar\" ca "
+"flecha."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Escriba nesta caixa para filtrar a lista de %s seleccionados."
 
-msgid "Remove all"
-msgstr "Retirar todos"
+msgid "(click to clear)"
+msgstr "(pulse para limpar)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Faga clic para eliminar da lista todos/as os/as '%s' escollidos/as."
+msgid "Remove all %s"
+msgstr "Eliminar tódolos %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -321,9 +316,3 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Amosar"
-
-msgid "Hide"
-msgstr "Esconder"

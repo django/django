@@ -429,8 +429,6 @@ Methods
 
 .. method:: HttpRequest.get_preferred_type(media_types)
 
-    .. versionadded:: 5.2
-
     Returns the preferred mime type from ``media_types``, based on the
     ``Accept`` header, or ``None`` if the client does not accept any of the
     provided types.
@@ -882,8 +880,6 @@ Attributes
 
 .. attribute:: HttpResponse.text
 
-    .. versionadded:: 5.2
-
     A string representation of :attr:`HttpResponse.content`, decoded using the
     response's :attr:`HttpResponse.charset` (defaulting to ``UTF-8`` if empty).
 
@@ -1130,19 +1126,11 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
 
-    .. versionchanged:: 5.2
-
-        The ``preserve_request`` argument was added.
-
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
     When ``preserve_request=True``, the response's status code is 308.
-
-    .. versionchanged:: 5.2
-
-        The ``preserve_request`` argument was added.
 
 .. class:: HttpResponseNotModified
 

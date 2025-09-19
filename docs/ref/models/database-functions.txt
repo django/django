@@ -844,8 +844,6 @@ JSON Functions
 ``JSONArray``
 -------------
 
-.. versionadded:: 5.2
-
 .. class:: JSONArray(*expressions)
 
 Accepts a list of field names or expressions and returns a JSON array

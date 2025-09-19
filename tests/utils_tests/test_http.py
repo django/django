@@ -442,7 +442,7 @@ class ParseHeaderParameterTests(unittest.TestCase):
     def test_basic(self):
         tests = [
             ("", ("", {})),
-            (None, ("none", {})),
+            (None, ("", {})),
             ("text/plain", ("text/plain", {})),
             ("text/vnd.just.made.this.up ; ", ("text/vnd.just.made.this.up", {})),
             ("text/plain;charset=us-ascii", ("text/plain", {"charset": "us-ascii"})),
@@ -507,13 +507,12 @@ class ParseHeaderParameterTests(unittest.TestCase):
         """
         Test wrongly formatted RFC 2231 headers (missing double single quotes).
         Parsing should not crash (#24209).
-        But stdlib email still decodes (#35440).
         """
         test_data = (
             (
                 "Content-Type: application/x-stuff; "
                 "title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
-                "'This is ***fun***",
+                "'This%20is%20%2A%2A%2Afun%2A%2A%2A",
             ),
             ("Content-Type: application/x-stuff; title*='foo.html", "'foo.html"),
             ("Content-Type: application/x-stuff; title*=bar.html", "bar.html"),

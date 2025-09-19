@@ -4,13 +4,14 @@
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
 # JunGu Kang <chr0m3.kr@gmail.com>, 2017
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
-# darjeeling <darjeeling@gmail.com>, 2024
+# KwonHan <darjeeling@gmail.com>, 2024
 # DONGHO JEONG <nearermg@gmail.com>, 2020
 # Park Hyunwoo <ez.amiryo@gmail.com>, 2017
 # Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # hoseung2 <ghyutjik123@gmail.com>, 2017
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
@@ -33,8 +34,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: 김영빈, 2025\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Jamie Seol, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -701,6 +702,8 @@ msgstr "올바른 JSON 형식이여야 합니다."
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr ""
+"%(field)s 필드의 값이 %(value)r인 %(model)s 인스턴스는 유효한 선택이 아닙니"
+"다."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "외래 키 (연관 필드에 의해 형식 결정)"
@@ -764,7 +767,7 @@ msgstr[0] "파일이름의 길이가 최대 %(max)d 자인지 확인하세요(%(
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"파일 업로드 또는 삭제 체크박스를 선택하세요. 동시에 둘 다 할 수는 없습니다."
+"파일 업로드 또는 비우기 체크박스를 선택하세요. 동시에 둘 다 할 수는 없습니다."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -859,7 +862,7 @@ msgstr ""
 "가 모호하거나 존재하지 않을 수 있습니다."
 
 msgid "Clear"
-msgstr "취소"
+msgstr "비우기"
 
 msgid "Currently"
 msgstr "현재"
@@ -1210,11 +1213,11 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"<meta name=\"referrer\" content=\"no-referrer\">태그나  'Referrer-Policy: no-"
-"referrer' 헤더를 포함하고 있다면, 제거해주시기 바랍니다. CSRF 방지를 위한 리"
-"퍼러 검사를 위해 'Referer' 헤더가 필요합니다. 개인 정보에 대해 우려가 있는 경"
-"우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" …>와 같은 대안을 사"
-"용할 수 있습니다."
+"<meta name=\"referrer\" content=\"no-referrer\"> 태그나 \"Referrer-Policy: "
+"no-referrer\" 헤더를 포함하고 있다면, 삭제해주시기 바랍니다. CSRF 방지를 위"
+"한 리퍼러 검사를 위해 \"Referer\" 헤더가 필요합니다. 개인 정보에 대해 우려가 "
+"있는 경우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" …>와 같은 대"
+"안을 사용할 수 있습니다."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "

@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "January 15, 2025" "5.2" "Django"
+.TH "DJANGO-ADMIN" "1" "September 17, 2025" "6.0" "Django"
 .SH NAME
 django-admin \- Utility script for the Django web framework
 .sp
@@ -83,8 +83,8 @@ Run \fBdjango\-admin help <command>\fP to display a description of the given
 command and a list of its available options.
 .SS App names
 .sp
-Many commands take a list of \(dqapp names.\(dq An \(dqapp name\(dq is the basename of
-the package containing your models. For example, if your \fI\%INSTALLED_APPS\fP
+Many commands take a list of \(dqapp names.\(dq An \(dqapp name\(dq is the basename of the
+package containing your models. For example, if your \fI\%INSTALLED_APPS\fP
 contains the string \fB\(aqmysite.blog\(aq\fP, the app name is \fBblog\fP\&.
 .SS Determining the version
 .INDENT 0.0
@@ -173,13 +173,14 @@ Lists all available tags.
 .B \-\-deploy
 .UNINDENT
 .sp
-Activates some additional checks that are only relevant in a deployment setting.
+Activates some additional checks that are only relevant in a deployment
+setting.
 .sp
 You can use this option in your local development environment, but since your
-local development settings module may not have many of your production settings,
-you will probably want to point the \fBcheck\fP command at a different settings
-module, either by setting the \fI\%DJANGO_SETTINGS_MODULE\fP environment
-variable, or by passing the \fB\-\-settings\fP option:
+local development settings module may not have many of your production
+settings, you will probably want to point the \fBcheck\fP command at a different
+settings module, either by setting the \fI\%DJANGO_SETTINGS_MODULE\fP
+environment variable, or by passing the \fB\-\-settings\fP option:
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -414,8 +415,8 @@ When result of \fBdumpdata\fP is saved as a file, it can serve as a
 .sp
 Note that \fBdumpdata\fP uses the default manager on the model for selecting the
 records to dump. If you\(aqre using a \fI\%custom manager\fP as
-the default manager and it filters some of the available records, not all of the
-objects will be dumped.
+the default manager and it filters some of the available records, not all of
+the objects will be dumped.
 .INDENT 0.0
 .TP
 .B \-\-all, \-a
@@ -586,12 +587,12 @@ Django doesn\(aqt create database defaults when a
 Similarly, database defaults aren\(aqt translated to model field defaults or
 detected in any fashion by \fBinspectdb\fP\&.
 .sp
-By default, \fBinspectdb\fP creates unmanaged models. That is, \fBmanaged = False\fP
-in the model\(aqs \fBMeta\fP class tells Django not to manage each table\(aqs creation,
-modification, and deletion. If you do want to allow Django to manage the
-table\(aqs lifecycle, you\(aqll need to change the
-\fI\%managed\fP option to \fBTrue\fP (or remove
-it because \fBTrue\fP is its default value).
+By default, \fBinspectdb\fP creates unmanaged models. That is, \fBmanaged =
+False\fP in the model\(aqs \fBMeta\fP class tells Django not to manage each table\(aqs
+creation, modification, and deletion. If you do want to allow Django to manage
+the table\(aqs lifecycle, you\(aqll need to change the
+\fI\%managed\fP option to \fBTrue\fP (or remove it
+because \fBTrue\fP is its default value).
 .SS Database\-specific notes
 .SS Oracle
 .INDENT 0.0
@@ -1108,8 +1109,8 @@ optimized.
 .UNINDENT
 .sp
 Starts a lightweight development web server on the local machine. By default,
-the server runs on port 8000 on the IP address \fB127.0.0.1\fP\&. You can pass in an
-IP address and port number explicitly.
+the server runs on port 8000 on the IP address \fB127.0.0.1\fP\&. You can pass in
+an IP address and port number explicitly.
 .sp
 If you run this script as a user with normal privileges (recommended), you
 might not have access to start a port on a low port number. Low port numbers
@@ -1212,7 +1213,7 @@ Uses IPv6 for the development server. This changes the default IP address from
 \fB127.0.0.1\fP to \fB::1\fP\&.
 .INDENT 0.0
 .TP
-.B HIDE_PRODUCTION_WARNING
+.B DJANGO_RUNSERVER_HIDE_WARNING
 .UNINDENT
 .sp
 
@@ -1375,13 +1376,29 @@ Starts the Python interactive interpreter.
 .sp
 All models from installed apps are automatically imported into the shell
 environment. Models from apps listed earlier in \fI\%INSTALLED_APPS\fP take
-precedence. For a \fB\-\-verbosity\fP of 2 or higher, the automatically imported
-objects will be listed. To disable automatic importing entirely, use the
-\fB\-\-no\-imports\fP flag.
+precedence. The following common utilities are also imported:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+from django.db import connection, reset_queries, models
+from django.conf import settings
+from django.utils import timezone
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+For a \fB\-\-verbosity\fP of 2 or higher, the automatically imported objects will
+be listed. To disable automatic importing entirely, use the \fB\-\-no\-imports\fP
+flag.
 .sp
 See the guide on \fI\%customizing this behavior\fP to add or remove automatic imports.
 .sp
 Automatic models import was added.
+
+.sp
+Automatic imports of common utilities, such as \fBdjango.conf.settings\fP,
+were added.
 
 .INDENT 0.0
 .TP
@@ -1429,6 +1446,14 @@ django\-admin shell \-i python
 Disables reading the startup script for the \(dqplain\(dq Python interpreter. By
 default, the script pointed to by the \X'tty: link https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP'\fI\%PYTHONSTARTUP\fP\X'tty: link' environment
 variable or the \fB~/.pythonrc.py\fP script is read.
+.INDENT 0.0
+.TP
+.B \-\-no\-imports
+.UNINDENT
+.sp
+
+.sp
+Disables the automatic import of models from \fI\%INSTALLED_APPS\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-command COMMAND, \-c COMMAND
@@ -1560,10 +1585,10 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 .B django\-admin squashmigrations app_label [start_migration_name] migration_name
 .UNINDENT
 .sp
-Squashes the migrations for \fBapp_label\fP up to and including \fBmigration_name\fP
-down into fewer migrations, if possible. The resulting squashed migrations
-can live alongside the unsquashed ones safely. For more information,
-please read \fI\%Squashing migrations\fP\&.
+Squashes the migrations for \fBapp_label\fP up to and including
+\fBmigration_name\fP down into fewer migrations, if possible. The resulting
+squashed migrations can live alongside the unsquashed ones safely. For more
+information, please read \fI\%Squashing migrations\fP\&.
 .sp
 When \fBstart_migration_name\fP is given, Django will only include migrations
 starting from and including this migration. This helps to mitigate the
@@ -1611,9 +1636,12 @@ By default, \X'tty: link https://github.com/django/django/blob/main/django/conf/
 \fBmodels.py\fP file and other app template files. If only the app name is given,
 the app directory will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
-directory rather than creating a new one. You can use \(aq.\(aq to denote the current
-working directory.
+If the optional destination is provided, Django will use that name instead. If
+the directory with the given name doesn\(aqt exist, it will be created. You can
+use \(aq.\(aq to denote the current working directory.
+.sp
+Automatic creation of the destination directory was added.
+
 .sp
 For example:
 .INDENT 0.0
@@ -1657,6 +1685,18 @@ zip files, you can use a URL like:
 .EX
 django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/main.zip myapp
 .EE
+.UNINDENT
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+Templates provided via \fB\-\-template\fP are used as is. Malicious or poorly
+constructed templates may introduce security weaknesses or unintended
+behavior. Compressed archives may also consume excessive resources during
+extraction, potentially causing crashes or hangs.
+.sp
+Contents of templates should be carefully inspected before use.
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1750,9 +1790,13 @@ If only the project name is given, both the project directory and project
 package will be named \fB<projectname>\fP and the project directory
 will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
-directory as the project directory, and create \fBmanage.py\fP and the project
-package within it. Use \(aq.\(aq to denote the current working directory.
+If the optional destination is provided, Django will use that name as the
+project directory, and create \fBmanage.py\fP and the project package within it.
+If the directory with the given name doesn\(aqt exist, it will be created. Use \(aq.\(aq
+to denote the current working directory.
+.sp
+Automatic creation of the destination directory was added.
+
 .sp
 For example:
 .INDENT 0.0
@@ -1769,7 +1813,10 @@ django\-admin startproject myproject /Users/jezdez/Code/myproject_repo
 .UNINDENT
 .sp
 Specifies a directory, file path, or URL of a custom project template. See the
-\fI\%startapp \-\-template\fP documentation for examples and usage.
+\fI\%startapp \-\-template\fP documentation for examples and usage. The same
+\fBsecurity considerations\fP described for \fBstartapp\fP templates apply here:
+malicious or poorly constructed templates may introduce weaknesses or consume
+excessive resources, and templates should be carefully inspected before use.
 .INDENT 0.0
 .TP
 .B \-\-extension EXTENSIONS, \-e EXTENSIONS
@@ -2023,13 +2070,6 @@ Outputs timings, including database setup and total run time.
 .UNINDENT
 .sp
 Shows the N slowest test cases (N=0 for all).
-.INDENT 0.0
-.INDENT 3.5
-.IP "Python 3.12 and later"
-.sp
-This feature is only available for Python 3.12 and later.
-.UNINDENT
-.UNINDENT
 .SS \fBtestserver\fP
 .INDENT 0.0
 .TP
@@ -2064,15 +2104,15 @@ this newly created test database instead of your production database.
 This is useful in a number of ways:
 .INDENT 0.0
 .IP \(bu 2
-When you\(aqre writing \fI\%unit tests\fP of how your views
-act with certain fixture data, you can use \fBtestserver\fP to interact with
-the views in a web browser, manually.
+When you\(aqre writing \fI\%unit tests\fP of how your
+views act with certain fixture data, you can use \fBtestserver\fP to interact
+with the views in a web browser, manually.
 .IP \(bu 2
 Let\(aqs say you\(aqre developing your Django application and have a \(dqpristine\(dq
 copy of a database that you\(aqd like to interact with. You can dump your
 database to a \fI\%fixture\fP (using the
 \fI\%dumpdata\fP command, explained above), then use \fBtestserver\fP to run
-your web application with that data.  With this arrangement, you have the
+your web application with that data. With this arrangement, you have the
 flexibility of messing up your data in any way, knowing that whatever data
 changes you\(aqre making are only being made to a test database.
 .UNINDENT
@@ -2213,10 +2253,10 @@ it when running interactively.
 .sp
 Specifies the database into which the superuser object will be saved.
 .sp
-You can subclass the management command and override \fBget_input_data()\fP if you
-want to customize data input and validation. Consult the source code for
-details on the existing implementation and the method\(aqs parameters. For example,
-it could be useful if you have a \fBForeignKey\fP in
+You can subclass the management command and override \fBget_input_data()\fP if
+you want to customize data input and validation. Consult the source code for
+details on the existing implementation and the method\(aqs parameters. For
+example, it could be useful if you have a \fBForeignKey\fP in
 \fI\%REQUIRED_FIELDS\fP and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
@@ -2273,7 +2313,8 @@ Please refer to its \fI\%description\fP in the
 .sp
 This command is only available if the \fI\%static files application\fP (\fBdjango.contrib.staticfiles\fP) is installed.
 .sp
-Please refer to its \fI\%description\fP in the \fI\%staticfiles\fP documentation.
+Please refer to its \fI\%description\fP in the
+\fI\%staticfiles\fP documentation.
 .SH DEFAULT OPTIONS
 .sp
 Although some commands may allow their own custom options, every command
@@ -2375,7 +2416,7 @@ django\-admin migrate \-\-verbosity 2
 .B \-\-no\-color
 .UNINDENT
 .sp
-Disables colorized command output.  Some commands format their output to be
+Disables colorized command output. Some commands format their output to be
 colorized. For example, errors will be printed to the console in red and SQL
 statements will be syntax highlighted.
 .sp
@@ -2609,8 +2650,8 @@ overridden as specified.
 .SS Bash completion
 .sp
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in \X'tty: link https://github.com/django/django/blob/main/extras/django_bash_completion'\fI\%extras/django_bash_completion\fP\X'tty: link' in the Django source
-distribution. It enables tab\-completion of \fBdjango\-admin\fP and
+script, which lives in \X'tty: link https://github.com/django/django/blob/main/extras/django_bash_completion'\fI\%extras/django_bash_completion\fP\X'tty: link' in the Django
+source distribution. It enables tab\-completion of \fBdjango\-admin\fP and
 \fBmanage.py\fP commands, so you can, for instance...
 .INDENT 0.0
 .IP \(bu 2
@@ -2690,7 +2731,8 @@ management.call_command(loaddata.Command(), \(dqtest_data\(dq, verbosity=0)
 .UNINDENT
 .sp
 Note that command options that take no arguments are passed as keywords
-with \fBTrue\fP or \fBFalse\fP, as you can see with the \fBinteractive\fP option above.
+with \fBTrue\fP or \fBFalse\fP, as you can see with the \fBinteractive\fP option
+above.
 .sp
 Named arguments can be passed by using either one of the following syntaxes:
 .INDENT 0.0

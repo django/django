@@ -205,10 +205,6 @@ MySQL       ``MBRCoveredBy(poly, geom)``
 SpatiaLite  ``CoveredBy(poly, geom)``
 ==========  =============================
 
-.. versionchanged:: 5.2
-
-    MySQL support was added.
-
 .. versionchanged:: 6.0
 
     MariaDB 12.0.1+ support was added.
@@ -236,10 +232,6 @@ Oracle      ``SDO_COVERS(poly, geom)``
 MySQL       ``MBRCovers(poly, geom)``
 SpatiaLite  ``Covers(poly, geom)``
 ==========  ==========================
-
-.. versionchanged:: 5.2
-
-    MySQL support was added.
 
 .. fieldlookup:: crosses
 

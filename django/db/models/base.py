@@ -1142,22 +1142,30 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
-            fields = [
+            insert_fields = [
                 f
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
             returning_fields = list(meta.db_returning_fields)
-            for field in fields:
+            can_return_columns_from_insert = connections[
+                using
+            ].features.can_return_columns_from_insert
+            for field in insert_fields:
                 value = (
                     getattr(self, field.attname) if raw else field.pre_save(self, False)
                 )
                 if hasattr(value, "resolve_expression"):
-                    returning_fields.append(field)
-                elif field.db_returning:
+                    if field not in returning_fields:
+                        returning_fields.append(field)
+                elif (
+                    field.db_returning
+                    and not can_return_columns_from_insert
+                    and not (pk_set and field is meta.auto_field)
+                ):
                     returning_fields.remove(field)
             results = self._do_insert(
-                cls._base_manager, using, fields, returning_fields, raw
+                cls._base_manager, using, insert_fields, returning_fields, raw
             )
             if results:
                 self._assign_returned_values(results[0], returning_fields)
@@ -1357,7 +1365,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = meta or self._meta
         field_map = {}
         generated_fields = []
-        for field in meta.local_concrete_fields:
+        for field in meta.local_fields:
             if field.name in exclude:
                 continue
             if field.generated:
@@ -1368,7 +1376,19 @@ class Model(AltersData, metaclass=ModelBase):
                     continue
                 generated_fields.append(field)
                 continue
-            value = getattr(self, field.attname)
+            if (
+                isinstance(field.remote_field, ForeignObjectRel)
+                and field not in meta.local_concrete_fields
+            ):
+                value = tuple(
+                    getattr(self, from_field) for from_field in field.from_fields
+                )
+                if len(value) == 1:
+                    value = value[0]
+            elif field.concrete:
+                value = getattr(self, field.attname)
+            else:
+                continue
             if not value or not hasattr(value, "resolve_expression"):
                 value = Value(value, field)
             field_map[field.name] = value
