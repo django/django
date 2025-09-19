@@ -171,6 +171,56 @@ class AggregationTests(TestCase):
         for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
+    def test_count_preserve_group_by(self):
+        # new release of the same book
+        Book.objects.create(
+            isbn="113235613",
+            name=self.b4.name,
+            pages=self.b4.pages,
+            rating=4.0,
+            price=Decimal("39.69"),
+            contact=self.a5,
+            publisher=self.p3,
+            pubdate=datetime.date(2018, 11, 3),
+        )
+        qs = Book.objects.values("contact__name", "publisher__name").annotate(
+            publications=Count("id")
+        )
+        self.assertEqual(qs.count(), 6)
+        self.assertEqual(qs.count(), len(qs))
+        # before ticket 26434 had been solved .count() was returning also 6
+        self.assertEqual(qs.order_by("id").count(), 7)
+        # before ticket 26434 had been solved .count() was not equal to len(qs)
+        self.assertEqual(qs.order_by("id").count(), len(qs.order_by("id")))
+
+    def test_aggregate_preserve_group_by(self):
+        # new release of the same book
+        Book.objects.create(
+            isbn="113235613",
+            name=self.b4.name,
+            pages=self.b4.pages,
+            rating=4.0,
+            price=Decimal("39.69"),
+            contact=self.a5,
+            publisher=self.p3,
+            pubdate=datetime.date(2018, 11, 3),
+        )
+        qs = Book.objects.values("contact__name", "publisher__name").annotate(
+            publications=Count("id")
+        )
+        self.assertEqual(qs.count(), 6)
+        self.assertEqual(
+            qs.aggregate(Avg("rating"))["rating__avg"], (12.5 + 3 * 4.0) / 6
+        )
+        # before ticket 26434 had been solved .count() was returning also 6
+        self.assertEqual(qs.order_by("id").count(), 7)
+        # before ticket 26434 had been solved .aggregate(Avg(...))
+        # was returning also (12.5 + 3 * 4.0) / 6)
+        self.assertEqual(
+            qs.order_by("id").aggregate(Avg("rating"))["rating__avg"],
+            (12.5 + 4 * 4.0) / 7,
+        )
+
     def test_annotation_with_value(self):
         values = (
             Book.objects.filter(
