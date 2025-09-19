@@ -212,10 +212,7 @@ class BaseHandler:
                 # Complain if the template response middleware returned None
                 # (a common error).
                 self.check_response(
-                    response,
-                    middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    response, middleware_method, name=middleware_method.__qualname__
                 )
             try:
                 response = response.render()
