@@ -262,7 +262,9 @@ Features deprecated in 6.1
 Miscellaneous
 -------------
 
-* ...
+* Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
+  is deprecated. Pass an explicit field name, like
+  ``values_list("pk", flat=True)``.
 
 Features removed in 6.1
 =======================
