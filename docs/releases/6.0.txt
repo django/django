@@ -295,6 +295,10 @@ Models
   don't support it (MySQL and MariaDB), the fields are marked as deferred to
   trigger a refresh on subsequent accesses.
 
+* Using a :ref:`ForeignObject <cpk-and-relations>` with multiple
+  ``from_fields`` in Model indexes, constraints, or :attr:`unique_together
+  <django.db.models.Options.unique_together>` now emits a system check error.
+
 Pagination
 ~~~~~~~~~~
 
