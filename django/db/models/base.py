@@ -2220,6 +2220,20 @@ class Model(AltersData, metaclass=ModelBase):
                             id="models.E048",
                         )
                     )
+                elif (
+                    isinstance(field.remote_field, ForeignObjectRel)
+                    and field not in cls._meta.local_concrete_fields
+                    and len(field.from_fields) > 1
+                ):
+                    errors.append(
+                        checks.Error(
+                            f"{option!r} refers to a ForeignObject {field_name!r} with "
+                            "multiple 'from_fields', which is not supported for that "
+                            "option.",
+                            obj=cls,
+                            id="models.E049",
+                        )
+                    )
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
