@@ -3,8 +3,10 @@ import datetime
 import pickle
 from operator import attrgetter
 
+from django.core.checks import Error
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
+from django.db.models import Q
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
@@ -771,6 +773,14 @@ class TestCachedPathInfo(TestCase):
 
 
 class ForeignObjectModelValidationTests(TestCase):
+    def setUp(self):
+        CustomerTab._meta.constraints = [
+            models.CheckConstraint(
+                condition=Q(customer__lt=1000),
+                name="customer_id_limit",
+            )
+        ]
+
     @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_constraints_with_foreign_object(self):
         customer_tab = CustomerTab(customer_id=1500)
@@ -798,3 +808,32 @@ class ForeignObjectModelValidationTests(TestCase):
     def test_validate_constraints_excluding_foreign_object_member(self):
         customer_tab = CustomerTab(customer_id=150)
         customer_tab.validate_constraints(exclude={"customer_id"})
+
+    @isolate_apps("foreign_object")
+    def test_system_check_error(self):
+        class Reference(models.Model):
+            reference_id = models.IntegerField(unique=True)
+
+        class ReferenceTab(models.Model):
+            reference_id = models.IntegerField()
+            reference = models.ForeignObject(
+                "foreign_object.Reference",
+                from_fields=["reference_id"],
+                to_fields=["reference_id"],
+                on_delete=models.CASCADE,
+            )
+
+            class Meta:
+                unique_together = [["reference"]]
+
+        self.assertEqual(
+            ReferenceTab.check(),
+            [
+                Error(
+                    "'unique_together' refers to a ForeignObject 'reference', but "
+                    "ForeignObjects are not permitted in 'unique_together'.",
+                    obj=ReferenceTab,
+                    id="models.E049",
+                ),
+            ],
+        )

@@ -443,6 +443,9 @@ Models
 * **models.E048**: ``constraints/indexes/unique_together`` refers to a
   ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
   not supported for that option.
+* **models.E049**: ``constraints/indexes/unique_together`` refers to a
+  ``ForeignObject`` ``<field name>``, but ``ForeignObject``\s are not permitted
+  in ``constraints/indexes/unique_together``.
 
 Management Commands
 -------------------
