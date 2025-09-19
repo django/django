@@ -282,3 +282,37 @@ class ParallelTestSuiteTest(SimpleTestCase):
 
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
+
+    @classmethod
+    def setupClass(cls):
+        raise RuntimeError("Boo!")
+
+    def test_pass(self):
+        pass
+
+    def test_parallel_buffer(self):
+        """
+        ParallelTestSuite.run() with `buffer=True` correctly handles test
+        cases with setUpClass().
+        """
+
+        test = ParallelTestSuiteTest("test_pass")
+        remote_result = RemoteTestResult()
+        suite = TestSuite([test])
+        suite.run(remote_result)
+
+        pts = ParallelTestSuite([suite], processes=2, buffer=True)
+        pts.serialized_aliases = set()
+        test_result = TestResult()
+        test_result.buffer = True
+
+        with unittest.mock.patch("multiprocessing.Pool") as mock_pool:
+
+            def fake_next(*args, **kwargs):
+                test_result.shouldStop = True
+                return (0, remote_result.events)
+
+            mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
+                next=fake_next
+            )
+            pts.run(test_result)  # Does not raise AttributeError.
