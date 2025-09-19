@@ -12,8 +12,4 @@ Bugfixes
 * Fixed a regression in Django 5.2 that reduced the color contrast of
   the chosen label of ``filter_horizontal`` and ``filter_vertical`` widgets
   within a ``TabularInline`` (:ticket:`36601`).
-* ``BaseDatabaseCache`` subclasses that implement a specialized
-  ``get_many()``\, ``set_many()``\, or ``delete_many()`` method should also
-  implement a specialized async version of that method, instead of inheriting
-  from ``BaseCache`` (:ticket:`36590`).
 * ...

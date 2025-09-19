@@ -1167,14 +1167,33 @@ class BaseCacheTests:
 
     def test_async_impl(self):
         # Assert that the inherited method matches the BaseCache
-        # implementation. Object IDs will not necessarily match,
-        # so we need another basis of comparison.
+        # implementation.
         methods = ["aget_many", "aset_many", "adelete_many"]
         if isinstance(cache, BaseCache):
             for m in methods:
                 cache_m = getattr(cache, m)
                 bcache_m = getattr(BaseCache, m)
-                self.assertEqual(pickle.dumps(cache_m), pickle.dumps(bcache_m))
+                self.assertEqual(cache_m.__func__, bcache_m.__func__)
+
+    def test_subclass_not_overridden(self):
+        # BaseCache async methods call the sync method using sync_to_async.
+        # Assert that subclasses use the correct implementation of async
+        # methods.
+
+        class TestCacheSubclass(BaseCache):
+
+            def set(self, key, default=None, version=None):
+                return "custom set method"
+
+            async def aset(self, key, default=None, version=None):
+                return "custom aset method"
+
+            def get(self, key, value, timeout=0, version=None):
+                return "custom get method"
+
+        self.assertNotEqual(TestCacheSubclass.get, BaseCache.get)
+        self.assertEqual(TestCacheSubclass.aget, BaseCache.aget)
+        self.assertNotEqual(TestCacheSubclass.aset, BaseCache.aset)
 
     async def test_async_calls_sync(self):
         getp = mock.patch.object(cache, "get_many")
