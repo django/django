@@ -43,6 +43,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
+    supports_generated_columns_as_pk = False
     test_collations = {
         "ci": "nocase",
         "cs": "binary",
