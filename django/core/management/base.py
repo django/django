@@ -15,6 +15,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.version import PY314
 
 ALL_CHECKS = "__all__"
 
@@ -301,11 +302,18 @@ class BaseCommand:
         parse the arguments to this command.
         """
         kwargs.setdefault("formatter_class", DjangoHelpFormatter)
+        # argparse's color defaults to True on Python 3.14+.
+        # Respect DJANGO_COLORS=nocolor by explicitly passing color=False.
+        if PY314:
+            color_kwargs = {"color": os.environ.get("DJANGO_COLORS") != "nocolor"}
+        else:
+            color_kwargs = {}
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
             missing_args_message=getattr(self, "missing_args_message", None),
             called_from_command_line=getattr(self, "_called_from_command_line", None),
+            **color_kwargs,
             **kwargs,
         )
         self.add_base_argument(
