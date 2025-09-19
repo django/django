@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
+from django.db.models import Q
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
@@ -15,7 +16,6 @@ from .models import (
     ArticleTag,
     ArticleTranslation,
     Country,
-    CustomerTab,
     Friendship,
     Group,
     Membership,
@@ -770,16 +770,39 @@ class TestCachedPathInfo(TestCase):
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
 
 
-class ForeignObjectModelValidationTests(TestCase):
-    @skipUnlessDBFeature("supports_table_check_constraints")
+@isolate_apps("foreign_object")
+@skipUnlessDBFeature("supports_table_check_constraints")
+class ForeignObjectConstraintTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        class CustomerTab(models.Model):
+            customer_id = models.IntegerField()
+            customer = models.ForeignObject(
+                "Customer",
+                from_fields=["customer_id"],
+                to_fields=["id"],
+                on_delete=models.CASCADE,
+            )
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        condition=Q(customer__lt=1000),
+                        name="customer_id_limit",
+                    ),
+                ]
+
+        cls.CustomerTab = CustomerTab
+
     def test_validate_constraints_with_foreign_object(self):
-        customer_tab = CustomerTab(customer_id=1500)
+        customer_tab = self.CustomerTab(customer_id=1500)
         with self.assertRaisesMessage(ValidationError, "customer_id_limit"):
             customer_tab.validate_constraints()
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_constraints_success_case_single_query(self):
-        customer_tab = CustomerTab(customer_id=500)
+        customer_tab = self.CustomerTab(customer_id=500)
         with CaptureQueriesContext(connection) as ctx:
             customer_tab.validate_constraints()
         select_queries = [
@@ -789,12 +812,10 @@ class ForeignObjectModelValidationTests(TestCase):
         ]
         self.assertEqual(len(select_queries), 1)
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_constraints_excluding_foreign_object(self):
-        customer_tab = CustomerTab(customer_id=150)
+        customer_tab = self.CustomerTab(customer_id=150)
         customer_tab.validate_constraints(exclude={"customer"})
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_constraints_excluding_foreign_object_member(self):
-        customer_tab = CustomerTab(customer_id=150)
+        customer_tab = self.CustomerTab(customer_id=150)
         customer_tab.validate_constraints(exclude={"customer_id"})
