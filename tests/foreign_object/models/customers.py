@@ -49,12 +49,3 @@ class CustomerTab(models.Model):
         to_fields=["id"],
         on_delete=models.CASCADE,
     )
-
-    class Meta:
-        required_db_features = {"supports_table_check_constraints"}
-        constraints = [
-            models.CheckConstraint(
-                condition=models.Q(customer__lt=1000),
-                name="customer_id_limit",
-            ),
-        ]
