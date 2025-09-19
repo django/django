@@ -406,7 +406,8 @@ class UniqueConstraint(BaseConstraint):
             errors.append(
                 checks.Warning(
                     f"{connection.display_name} does not support unique constraints "
-                    "with nulls distinct.",
+                    "with nulls distinct. They are ignored for databases besides "
+                    "PostgreSQL 15+.",
                     hint=(
                         "A constraint won't be created. Silence this warning if you "
                         "don't care about it."
