@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
@@ -252,7 +253,10 @@ class RedirectView(View):
 
         args = self.request.META.get("QUERY_STRING", "")
         if args and self.query_string:
-            url = "%s?%s" % (url, args)
+            if urlparse(url).query:
+                url = f"{url}&{args}"
+            else:
+                url = f"{url}?{args}"
         return url
 
     def get(self, request, *args, **kwargs):
