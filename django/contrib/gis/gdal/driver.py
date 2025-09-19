@@ -20,8 +20,8 @@ class Driver(GDALBase):
     # For a complete list of original driver names see
     # https://gdal.org/drivers/vector/
     # https://gdal.org/drivers/raster/
-    @cached_property
-    def _alias(self):
+    @classproperty
+    def _alias(cls):
         # lazily use cached_property so that the check for
         # GDAL_VERSION doesn't trigger the library to load
         alias = {
