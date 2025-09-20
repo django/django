@@ -1,11 +1,13 @@
 import shutil
 import tempfile
+import unittest
 from pathlib import Path
 
-from django.db import connections
+from django.db import connection, connections
 from django.test import TestCase
 
 
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 class SQLiteParallelCloneTests(TestCase):
     """
     Tests that cloned SQLite test databases respect the original

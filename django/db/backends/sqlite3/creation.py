@@ -88,8 +88,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                 "NAME": f"{self.connection.alias}_{suffix}.sqlite3",
             }
         raise NotSupportedError(
-                f"Cloning with start method {start_method!r} is not supported."
-            )
+            f"Cloning with start method {start_method!r} is not supported."
+        )
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict["NAME"]
