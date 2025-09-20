@@ -475,6 +475,11 @@ Miscellaneous
   deleted files when ``--verbosity`` is 1. To see the details for each file
   deleted, set the ``--verbosity`` flag to 2 or higher.
 
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now match JSON ``null``,
+  to match the behavior of :lookup:`exact=None <exact>` on key transforms.
+  Previously, it was interpreted as an :lookup:`isnull` lookup.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
