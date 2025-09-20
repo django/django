@@ -215,6 +215,10 @@ class Transform(RegisterLookupMixin, Func):
     def lhs(self):
         return self.get_source_expressions()[0]
 
+    def process_lhs(self, compiler, connection, lhs=None):
+        lhs = lhs or self.lhs
+        return compiler.compile(lhs)
+
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, "get_bilateral_transforms"):
             bilateral_transforms = self.lhs.get_bilateral_transforms()
