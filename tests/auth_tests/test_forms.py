@@ -16,6 +16,7 @@ from django.contrib.auth.forms import (
     ReadOnlyPasswordHashWidget,
     SetPasswordForm,
     SetPasswordMixin,
+    SetUnusablePasswordMixin,
     UserChangeForm,
     UserCreationForm,
     UsernameField,
@@ -1762,3 +1763,12 @@ class SensitiveVariablesTest(TestDataMixin, TestCase):
                 self.assertContains(
                     response, password2_fragment, html=True, status_code=500
                 )
+
+
+class GenericAuthFormTest(TestCase):
+
+    def test_password_mixin_getitem(self):
+        self.assertIs(SetPasswordMixin["MyCustomUser"], SetPasswordMixin)
+        self.assertIs(
+            SetUnusablePasswordMixin["MyCustomUser"], SetUnusablePasswordMixin
+        )
