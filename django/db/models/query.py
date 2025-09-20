@@ -287,21 +287,19 @@ class QuerySet(AltersData):
         self._hints = hints or {}
         self._query = query or sql.Query(self.model)
         self._result_cache = None
-        self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
-        self._defer_next_filter = False
         self._deferred_filter = None
 
     @property
     def query(self):
         if self._deferred_filter:
-            negate, args, kwargs = self._deferred_filter
-            self._filter_or_exclude_inplace(negate, args, kwargs)
+            self._query.add_q(self._deferred_filter)
+            self._query.filter_is_sticky = True
             self._deferred_filter = None
         return self._query
 
@@ -422,7 +420,7 @@ class QuerySet(AltersData):
             return self._result_cache[k]
 
         if isinstance(k, slice):
-            qs = self._chain()
+            qs = self._clone()
             if k.start is not None:
                 start = int(k.start)
             else:
@@ -434,7 +432,7 @@ class QuerySet(AltersData):
             qs.query.set_limits(start, stop)
             return list(qs)[:: k.step] if k.step else qs
 
-        qs = self._chain()
+        qs = self._clone()
         qs.query.set_limits(k, k + 1)
         qs._fetch_all()
         return qs._result_cache[0]
@@ -449,7 +447,7 @@ class QuerySet(AltersData):
             return other
         if isinstance(self, EmptyQuerySet):
             return self
-        combined = self._chain()
+        combined = self._clone()
         combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.AND)
         return combined
@@ -466,7 +464,7 @@ class QuerySet(AltersData):
             if self.query.can_filter()
             else self.model._base_manager.filter(pk__in=self.values("pk"))
         )
-        combined = query._chain()
+        combined = query._clone()
         combined._merge_known_related_objects(other)
         if not other.query.can_filter():
             other = other.model._base_manager.filter(pk__in=other.values("pk"))
@@ -485,7 +483,7 @@ class QuerySet(AltersData):
             if self.query.can_filter()
             else self.model._base_manager.filter(pk__in=self.values("pk"))
         )
-        combined = query._chain()
+        combined = query._clone()
         combined._merge_known_related_objects(other)
         if not other.query.can_filter():
             other = other.model._base_manager.filter(pk__in=other.values("pk"))
@@ -589,7 +587,7 @@ class QuerySet(AltersData):
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        return self.query.chain().get_aggregation(self.db, kwargs)
+        return self.query.clone().get_aggregation(self.db, kwargs)
 
     async def aaggregate(self, *args, **kwargs):
         return await sync_to_async(self.aggregate)(*args, **kwargs)
@@ -620,7 +618,7 @@ class QuerySet(AltersData):
                 "Calling QuerySet.get(...) with filters after %s() is not "
                 "supported." % self.query.combinator
             )
-        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        clone = self._clone() if self.query.combinator else self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
         limit = None
@@ -1107,7 +1105,7 @@ class QuerySet(AltersData):
                 "earliest() and latest() require either fields as positional "
                 "arguments or 'get_latest_by' in the model's Meta."
             )
-        obj = self._chain()
+        obj = self._clone()
         obj.query.set_limits(high=1)
         obj.query.clear_ordering(force=True)
         obj.query.add_ordering(*order_by)
@@ -1200,7 +1198,7 @@ class QuerySet(AltersData):
             else:
                 qs = self.filter(**{filter_key: id_list})
         else:
-            qs = self._chain()
+            qs = self._clone()
         return {getattr(obj, field_name): obj for obj in qs}
 
     async def ain_bulk(self, id_list=None, *, field_name="pk"):
@@ -1219,7 +1217,7 @@ class QuerySet(AltersData):
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
 
-        del_query = self._chain()
+        del_query = self._clone()
 
         # The delete is actually 2 queries - one to find related objects,
         # and one to delete. Make sure that the discovery of related
@@ -1253,8 +1251,7 @@ class QuerySet(AltersData):
         Delete objects found from the given queryset in single direct SQL
         query. No signals are sent and there is no protection for cascades.
         """
-        query = self.query.clone()
-        query.__class__ = sql.DeleteQuery
+        query = self.query.clone(klass=sql.DeleteQuery)
         return query.get_compiler(using).execute_sql(ROW_COUNT)
 
     _raw_delete.alters_data = True
@@ -1268,7 +1265,7 @@ class QuerySet(AltersData):
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
         self._for_write = True
-        query = self.query.chain(sql.UpdateQuery)
+        query = self.query.clone(klass=sql.UpdateQuery)
         query.add_update_values(kwargs)
 
         # Inline annotations in order_by(), if possible.
@@ -1315,7 +1312,7 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
-        query = self.query.chain(sql.UpdateQuery)
+        query = self.query.clone(klass=sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
@@ -1395,7 +1392,7 @@ class QuerySet(AltersData):
         return qs
 
     def _values(self, *fields, **expressions):
-        clone = self._chain()
+        clone = self._clone()
         if expressions:
             # RemovedInDjango70Warning: When the deprecation ends, deindent as:
             # clone = clone.annotate(**expressions)
@@ -1516,7 +1513,7 @@ class QuerySet(AltersData):
 
     def none(self):
         """Return an empty QuerySet."""
-        clone = self._chain()
+        clone = self._clone()
         clone.query.set_empty()
         return clone
 
@@ -1529,7 +1526,7 @@ class QuerySet(AltersData):
         Return a new QuerySet that is a copy of the current one. This allows a
         QuerySet to proxy for a model manager in some cases.
         """
-        return self._chain()
+        return self._clone()
 
     def filter(self, *args, **kwargs):
         """
@@ -1537,7 +1534,7 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("filter")
-        return self._filter_or_exclude(False, args, kwargs)
+        return self._filter_q(Q(*args, **kwargs))
 
     def exclude(self, *args, **kwargs):
         """
@@ -1545,45 +1542,21 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("exclude")
-        return self._filter_or_exclude(True, args, kwargs)
+        return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_or_exclude(self, negate, args, kwargs):
-        if (args or kwargs) and self.query.is_sliced:
+    def _filter_q(self, q, *, defer=False):
+        if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
-        clone = self._chain()
-        if self._defer_next_filter:
-            self._defer_next_filter = False
-            clone._deferred_filter = negate, args, kwargs
+        clone = self._clone()
+        if defer:
+            clone._deferred_filter = q
         else:
-            clone._filter_or_exclude_inplace(negate, args, kwargs)
+            clone.query.add_q(q)
         return clone
-
-    def _filter_or_exclude_inplace(self, negate, args, kwargs):
-        if negate:
-            self._query.add_q(~Q(*args, **kwargs))
-        else:
-            self._query.add_q(Q(*args, **kwargs))
-
-    def complex_filter(self, filter_obj):
-        """
-        Return a new QuerySet instance with filter_obj added to the filters.
-
-        filter_obj can be a Q object or a dictionary of keyword lookup
-        arguments.
-
-        This exists to support framework features such as 'limit_choices_to',
-        and usually it will be more natural to use other methods.
-        """
-        if isinstance(filter_obj, Q):
-            clone = self._chain()
-            clone.query.add_q(filter_obj)
-            return clone
-        else:
-            return self._filter_or_exclude(False, args=(), kwargs=filter_obj)
 
     def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
-        clone = self._chain()
+        clone = self._clone()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
@@ -1627,7 +1600,7 @@ class QuerySet(AltersData):
         """
         if nowait and skip_locked:
             raise ValueError("The nowait option cannot be used with skip_locked.")
-        obj = self._chain()
+        obj = self._clone()
         obj._for_write = True
         obj.query.select_for_update = True
         obj.query.select_for_update_nowait = nowait
@@ -1651,7 +1624,7 @@ class QuerySet(AltersData):
                 "Cannot call select_related() after .values() or .values_list()"
             )
 
-        obj = self._chain()
+        obj = self._clone()
         if fields == (None,):
             obj.query.select_related = False
         elif fields:
@@ -1670,7 +1643,7 @@ class QuerySet(AltersData):
         prefetch lookups. If prefetch_related(None) is called, clear the list.
         """
         self._not_support_combined_queries("prefetch_related")
-        clone = self._chain()
+        clone = self._clone()
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
         else:
@@ -1720,7 +1693,7 @@ class QuerySet(AltersData):
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
 
-        clone = self._chain()
+        clone = self._clone()
         names = self._fields
         if names is None:
             names = set(
@@ -1762,7 +1735,7 @@ class QuerySet(AltersData):
         """Return a new QuerySet instance with the ordering changed."""
         if self.query.is_sliced:
             raise TypeError("Cannot reorder a query once a slice has been taken.")
-        obj = self._chain()
+        obj = self._clone()
         obj.query.clear_ordering(force=True, clear_default=False)
         obj.query.add_ordering(*field_names)
         return obj
@@ -1776,7 +1749,7 @@ class QuerySet(AltersData):
             raise TypeError(
                 "Cannot create distinct fields once a slice has been taken."
             )
-        obj = self._chain()
+        obj = self._clone()
         obj.query.add_distinct_fields(*field_names)
         return obj
 
@@ -1793,7 +1766,7 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("extra")
         if self.query.is_sliced:
             raise TypeError("Cannot change a query once a slice has been taken.")
-        clone = self._chain()
+        clone = self._clone()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
 
@@ -1801,7 +1774,7 @@ class QuerySet(AltersData):
         """Reverse the ordering of the QuerySet."""
         if self.query.is_sliced:
             raise TypeError("Cannot reverse a query once a slice has been taken.")
-        clone = self._chain()
+        clone = self._clone()
         clone.query.standard_ordering = not clone.query.standard_ordering
         return clone
 
@@ -1815,7 +1788,7 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("defer")
         if self._fields is not None:
             raise TypeError("Cannot call defer() after .values() or .values_list()")
-        clone = self._chain()
+        clone = self._clone()
         if fields == (None,):
             clone.query.clear_deferred_loading()
         else:
@@ -1839,13 +1812,13 @@ class QuerySet(AltersData):
             field = field.split(LOOKUP_SEP, 1)[0]
             if field in self.query._filtered_relations:
                 raise ValueError("only() is not supported with FilteredRelation.")
-        clone = self._chain()
+        clone = self._clone()
         clone.query.add_immediate_loading(fields)
         return clone
 
     def using(self, alias):
         """Select which database this QuerySet should execute against."""
-        clone = self._chain()
+        clone = self._clone()
         clone._db = alias
         return clone
 
@@ -1960,17 +1933,6 @@ class QuerySet(AltersData):
                 )
         return inserted_rows
 
-    def _chain(self):
-        """
-        Return a copy of the current QuerySet that's ready for another
-        operation.
-        """
-        obj = self._clone()
-        if obj._sticky_filter:
-            obj.query.filter_is_sticky = True
-            obj._sticky_filter = False
-        return obj
-
     def _clone(self):
         """
         Return a copy of the current QuerySet. A lightweight alternative
@@ -1978,11 +1940,10 @@ class QuerySet(AltersData):
         """
         c = self.__class__(
             model=self.model,
-            query=self.query.chain(),
+            query=self.query.clone(),
             using=self._db,
             hints=self._hints,
         )
-        c._sticky_filter = self._sticky_filter
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c._known_related_objects = self._known_related_objects
@@ -1995,20 +1956,6 @@ class QuerySet(AltersData):
             self._result_cache = list(self._iterable_class(self))
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
-
-    def _next_is_sticky(self):
-        """
-        Indicate that the next filter call and the one following that should
-        be treated as a single filter. This is only important when it comes to
-        determining when to reuse tables for many-to-many filters. Required so
-        that we can filter naturally on the results of related managers.
-
-        This doesn't return a clone of the current QuerySet (it returns
-        "self"). The method is only used internally and should be immediately
-        followed by a filter() that does create a clone.
-        """
-        self._sticky_filter = True
-        return self
 
     def _merge_sanity_check(self, other):
         """Check that two QuerySet classes may be merged."""
@@ -2221,7 +2168,7 @@ class RawQuerySet:
         return RawQuerySet(
             self.raw_query,
             model=self.model,
-            query=self.query.chain(using=alias),
+            query=self.query.clone(using=alias),
             params=self.params,
             translations=self.translations,
             using=alias,
@@ -2285,7 +2232,7 @@ class Prefetch:
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
         if self.queryset is not None:
-            queryset = self.queryset._chain()
+            queryset = self.queryset._clone()
             # Prevent the QuerySet from being evaluated
             queryset._result_cache = []
             queryset._prefetch_done = True

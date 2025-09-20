@@ -890,7 +890,7 @@ class Queries1Tests(TestCase):
             self.assertSequenceEqual(q.all(), [])
             self.assertSequenceEqual(q.filter(meal="m"), [])
             self.assertSequenceEqual(q.exclude(meal="m"), [])
-            self.assertSequenceEqual(q.complex_filter({"pk": 1}), [])
+            self.assertSequenceEqual(q.filter(pk=1), [])
             self.assertSequenceEqual(q.select_related("food"), [])
             self.assertSequenceEqual(q.annotate(Count("food")), [])
             self.assertSequenceEqual(q.order_by("meal", "food"), [])

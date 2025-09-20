@@ -761,7 +761,6 @@ class ManagerTest(SimpleTestCase):
         "aggregate",
         "annotate",
         "alias",
-        "complex_filter",
         "exclude",
         "in_bulk",
         "iterator",
