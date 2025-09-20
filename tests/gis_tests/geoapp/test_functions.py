@@ -27,6 +27,7 @@ from .models import (
     Feature,
     ManyPointModel,
     State,
+    Town,
     Track,
 )
 
@@ -431,7 +432,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 self.assertIs(c.inter.empty, True)
 
     @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
-    def test_isempty(self):
+    def test_isempty_geometry_empty(self):
         empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
         City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
         self.assertSequenceEqual(
@@ -441,6 +442,32 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             [empty],
         )
         self.assertSequenceEqual(City.objects.filter(point__isempty=True), [empty])
+
+    @skipUnlessDBFeature("has_IsEmpty_function")
+    def test_isempty_geometry_null(self):
+        nowhere = Town.objects.create(name="Nowhere", point=None)
+        somewhere = Town.objects.create(
+            name="Somewhere", point=Point(6.825, 47.1, srid=4326)
+        )
+        self.assertSequenceEqual(
+            Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=None
+            ),
+            [nowhere],
+        )
+        self.assertSequenceEqual(
+            Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=False
+            ),
+            [somewhere],
+        )
+        self.assertSequenceEqual(
+            Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=True
+            ),
+            [],
+        )
+        self.assertSequenceEqual(Town.objects.filter(point__isempty=True), [])
 
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):

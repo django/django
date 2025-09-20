@@ -621,10 +621,15 @@ Miscellaneous
 
 .. class:: IsEmpty(expr)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__,
+SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is an empty
 geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
+
+.. versionchanged:: 6.1
+
+    SpatiaLite support was added.
 
 ``IsValid``
 -----------

@@ -363,7 +363,7 @@ Lookup Type                        PostGIS    Oracle    MariaDB      MySQL [#]_ 
 :lookup:`exact <same_as>`          X          X         X            X            X          B
 :lookup:`geom_type`                X          X (≥ 23c) X            X            X
 :lookup:`intersects`               X          X         X            X            X          B
-:lookup:`isempty`                  X
+:lookup:`isempty`                  X                                              X
 :lookup:`isvalid`                  X          X         X (≥ 12.0.1) X            X
 :lookup:`overlaps`                 X          X         X            X            X          B
 :lookup:`relate`                   X          X         X                         X          C
@@ -414,7 +414,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`GeometryDistance`             X
 :class:`GeometryType`                 X        X (≥ 23c)      X            X           X
 :class:`Intersection`                 X        X              X            X           X
-:class:`IsEmpty`                      X
+:class:`IsEmpty`                      X                                                X
 :class:`IsValid`                      X        X              X (≥ 12.0.1) X           X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X

@@ -361,7 +361,8 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isempty``
 -----------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__,
+SpatiaLite
 
 Tests if the geometry is empty.
 
@@ -370,6 +371,10 @@ Example::
     Zipcode.objects.filter(poly__isempty=True)
 
 .. fieldlookup:: isvalid
+
+.. versionchanged:: 5.2
+
+    SpatiaLite support was added.
 
 ``isvalid``
 -----------
