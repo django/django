@@ -375,10 +375,3 @@ class Trim(Transform):
 class Upper(Transform):
     function = "UPPER"
     lookup_name = "upper"
-
-    def as_sql(self, compiler, connection, **extra_context):
-        lhs_sql, params = self.process_lhs(compiler, connection)
-        sql, sql_params = super().as_sql(
-            compiler, connection, **{**extra_context, "lhs": lhs_sql}
-        )
-        return sql, (*params, *sql_params)
