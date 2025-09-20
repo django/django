@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db import router
 from django.db.transaction import atomic
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.module_loading import import_string
 
 # The prefix to put on the default database name when creating
@@ -103,7 +103,7 @@ class BaseDatabaseCreation:
                 "DatabaseCreation.create_test_db(serialize) is deprecated. Call "
                 "DatabaseCreation.serialize_test_db() once all test databases are set "
                 "up instead if you need fixtures persistence between tests.",
-                stacklevel=2,
+                skip_file_prefixes=django_file_prefixes(),
                 category=RemovedInDjango70Warning,
             )
             if serialize:

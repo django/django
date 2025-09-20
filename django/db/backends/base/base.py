@@ -19,6 +19,7 @@ from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
+from django.utils.deprecation import django_file_prefixes
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
@@ -176,7 +177,7 @@ class BaseDatabaseWrapper:
             warnings.warn(
                 "Limit for query logging exceeded, only the last {} queries "
                 "will be returned.".format(self.queries_log.maxlen),
-                stacklevel=2,
+                skip_file_prefixes=django_file_prefixes(),
             )
         return list(self.queries_log)
 

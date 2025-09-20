@@ -5,7 +5,7 @@ from math import ceil
 
 from asgiref.sync import iscoroutinefunction, sync_to_async
 
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
@@ -67,7 +67,11 @@ class BasePaginator:
                 "per_page argument is deprecated. This will raise a ValueError in "
                 "Django 7.0."
             )
-            warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
+            warnings.warn(
+                msg,
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
 
     def _check_object_list_is_ordered(self):
         """
@@ -86,7 +90,7 @@ class BasePaginator:
                 "Pagination may yield inconsistent results with an unordered "
                 "object_list: {}.".format(obj_list_repr),
                 UnorderedObjectListWarning,
-                stacklevel=3,
+                skip_file_prefixes=django_file_prefixes(),
             )
 
     def _get_elided_page_range(

@@ -11,7 +11,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import DomainNameValidator, EmailValidator
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
@@ -369,7 +369,7 @@ class Urlizer:
                         "transitional setting to True to opt into using HTTPS as the "
                         "new default protocol.",
                         RemovedInDjango70Warning,
-                        stacklevel=2,
+                        skip_file_prefixes=django_file_prefixes(),
                     )
                 url = smart_urlquote(f"{protocol}://{unescaped_middle}")
             elif ":" not in middle and self.is_email_simple(middle):

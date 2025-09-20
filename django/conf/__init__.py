@@ -16,6 +16,7 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import django_file_prefixes
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -145,7 +146,7 @@ class LazySettings(LazyObject):
         # LazyObject __getattribute__(), -4 the caller.
         filename, _, _, _ = stack[-4]
         if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(message, category, stacklevel=2)
+            warnings.warn(message, category, skip_file_prefixes=django_file_prefixes())
 
 
 class Settings:

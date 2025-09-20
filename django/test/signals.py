@@ -11,6 +11,7 @@ from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import Signal, receiver
 from django.utils import timezone
+from django.utils.deprecation import django_file_prefixes
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
@@ -167,7 +168,7 @@ def complex_setting_changed(*, enter, setting, **kwargs):
         # this stacklevel shows the line containing the override_settings call.
         warnings.warn(
             f"Overriding setting {setting} can lead to unexpected behavior.",
-            stacklevel=5,
+            skip_file_prefixes=django_file_prefixes(),
         )
 
 
