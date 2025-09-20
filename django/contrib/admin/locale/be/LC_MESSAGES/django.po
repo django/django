@@ -2,15 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2024
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
-"2016-2017,2019-2021,2023-2024\n"
+"2016-2017,2019-2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -33,8 +33,8 @@ msgstr "Выдалілі %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не ўдаецца выдаліць %(name)s"
 
-msgid "Are you sure?"
-msgstr "Ці ўпэўненыя вы?"
+msgid "Delete multiple objects"
+msgstr "Выдаліць некалькі аб’ектаў"
 
 msgid "Administration"
 msgstr "Адміністрацыя"
@@ -265,6 +265,9 @@ msgstr[3] "Абралі ўсе %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Абралі 0 аб’ектаў з %(cnt)s"
 
+msgid "Delete"
+msgstr "Выдаліць"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Гісторыя зьменаў: %s"
@@ -349,6 +352,15 @@ msgstr "Навігацыйны ланцужок"
 msgid "Models in the %(name)s application"
 msgstr "Мадэлі ў %(name)s праграме"
 
+msgid "Model name"
+msgstr "Назва мадэлі"
+
+msgid "Add link"
+msgstr "Дадаць спасылку"
+
+msgid "Change or view list link"
+msgstr "Змяніць ці праглядзець спіс спасылак"
+
 msgid "Add"
 msgstr "Дадаць"
 
@@ -358,15 +370,13 @@ msgstr "Праглядзець"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Спачатку пазначце імя карыстальніка ды пароль. Потым можна будзе наставіць "
-"іншыя можнасьці."
+"Пасля стварэння карыстальніка вы зможаце рэдагаваць дадатковыя параметры "
+"карыстальніка."
 
-msgid "Enter a username and password."
-msgstr "Пазначце імя карыстальніка ды пароль."
+msgid "Error:"
+msgstr "Памылка:"
 
 msgid "Change password"
 msgstr "Зьмяніць пароль"
@@ -454,9 +464,6 @@ msgstr "Пераключыць тэму (бягучая тэма: светлая
 msgid "Toggle theme (current theme: dark)"
 msgstr "Пераключыць тэму (бягучая тэма: цёмная)"
 
-msgid "Delete"
-msgstr "Выдаліць"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -490,9 +497,6 @@ msgstr "Так, я ўпэўнены"
 
 msgid "No, take me back"
 msgstr "Не, вярнуцца назад"
-
-msgid "Delete multiple objects"
-msgstr "Выдаліць некалькі аб’ектаў"
 
 #, python-format
 msgid ""
@@ -566,8 +570,8 @@ msgstr ""
 "Вы апазнаны як %(username)s але не аўтарызаваны для доступу гэтай бачыны. Не "
 "жадаеце лі вы ўвайсці пад іншым карыстальнікам?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыліся на імя ці пароль?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыліся на імя?"
 
 msgid "Toggle navigation"
 msgstr "Пераключыць навігацыю"
@@ -734,8 +738,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Перайдзіце да наступнае бачыны ды абярыце новы пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Імя карыстальніка, калі раптам вы забыліся:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Калі вы забыліся, то вы:"
 
 msgid "Thanks for using our site!"
 msgstr "Дзякуем, што карыстаецеся нашаю пляцоўкаю!"

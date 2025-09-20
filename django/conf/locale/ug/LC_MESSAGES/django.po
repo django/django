@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
 "Last-Translator: Natalia, 2025\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
@@ -887,7 +887,7 @@ msgstr "ياق"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "ھەئە، ياق، بەلكىىم"
+msgstr "ھەئە, ياق, بەلكىىم"
 
 #, python-format
 msgid "%(size)d byte"

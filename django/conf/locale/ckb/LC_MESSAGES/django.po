@@ -5,14 +5,15 @@
 # Bawar Jalal, 2020-2021
 # Bawar Jalal, 2020
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020-2021
+# Natalia, 2025
 # Swara <swara09@gmail.com>, 2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Natalia, 2025\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -682,8 +683,8 @@ msgid "Value must be valid JSON."
 msgstr "بەها پێویستە JSONی دروست بێت."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s هاوشێوەیە لەگەڵ %(field)s %(value)r نیە."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "کلیلی دەرەکی(جۆر بەپێی خانەی پەیوەندیدار دیاری دەکرێت)"
@@ -867,7 +868,7 @@ msgstr "نەخێر"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "بەڵێ،نەخێر،لەوانەیە"
+msgstr "بەڵێ,نەخێر,لەوانەیە"
 
 #, python-format
 msgid "%(size)d byte"

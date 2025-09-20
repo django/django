@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -102,7 +102,7 @@ msgid "Addition"
 msgstr "Əlavə olunma"
 
 msgid "Change"
-msgstr "Dəyişiklik"
+msgstr "Düzəliş et"
 
 msgid "Deletion"
 msgstr "Silinmə"
@@ -404,10 +404,10 @@ msgstr ""
 "edəcək</strong>."
 
 msgid "Disable password-based authentication"
-msgstr "Şifrə əsaslı autentifikasiyanı ləğv elə."
+msgstr "Şifrə əsaslı autentifikasiyanı ləğv et"
 
 msgid "Enable password-based authentication"
-msgstr "Şifrə əsaslı autentifikasiyanı aktivləşdir."
+msgstr "Şifrə əsaslı autentifikasiyanı aktivləşdir"
 
 msgid "Skip to main content"
 msgstr "Əsas məzmuna keç"
@@ -419,7 +419,7 @@ msgid "View site"
 msgstr "Sayta bax"
 
 msgid "Documentation"
-msgstr "Dokumentasiya"
+msgstr "Sənədləşmə"
 
 msgid "Log out"
 msgstr "Çıx"
@@ -444,7 +444,7 @@ msgid "Show counts"
 msgstr "Sayı göstər"
 
 msgid "Clear all filters"
-msgstr "Bütün filterləri təmizlə"
+msgstr "Bütün süzgəcləri təmizlə"
 
 msgid "Remove from sorting"
 msgstr "Sıralamadan çıxar"
@@ -531,7 +531,7 @@ msgstr "Silinsin?"
 
 #, python-format
 msgid " By %(filter_title)s "
-msgstr "\"%(filter_title)s\" filtrına görə "
+msgstr "\"%(filter_title)s\" dəyərinə görə"
 
 msgid "Summary"
 msgstr "İcmal"
@@ -584,10 +584,10 @@ msgid "Sidebar"
 msgstr "Yan panel"
 
 msgid "Start typing to filter…"
-msgstr "Filterləmək üçün yazın..."
+msgstr "Süzmək üçün yazın..."
 
 msgid "Filter navigation items"
-msgstr "Naviqasiya elementlərini filterlə"
+msgstr "Naviqasiya elementlərini süz"
 
 msgid "Date/time"
 msgstr "Tarix/vaxt"
@@ -670,16 +670,16 @@ msgid "Log in again"
 msgstr "Yenidən daxil ol"
 
 msgid "Password change"
-msgstr "Şifrəni dəyişmək"
+msgstr "Şifrəni dəyiş"
 
 msgid "Your password was changed."
-msgstr "Sizin şifrəniz dəyişdirildi."
+msgstr "Şifrəniz dəyişdirildi."
 
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Zəhmət olmasa təhlükəsizlik naminə köhnə şifrənizi daxil edin və sonra yeni "
+"Zəhmət olmasa, təhlükəsizlik naminə köhnə şifrənizi daxil edin və sonra yeni "
 "şifrənizi iki dəfə daxil edin ki, düzgün daxil yazdığınızı yoxlaya bilək."
 
 msgid "Change my password"
@@ -777,7 +777,7 @@ msgstr "%s dəyişmək üçün seç"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "Görmək üçün %s seçin"
+msgstr "Baxmaq üçün %s seçin"
 
 msgid "Date:"
 msgstr "Tarix:"

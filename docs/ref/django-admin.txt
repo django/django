@@ -950,8 +950,6 @@ Uses IPv6 for the development server. This changes the default IP address from
 
 .. envvar:: DJANGO_RUNSERVER_HIDE_WARNING
 
-.. versionadded:: 5.2
-
 By default, a warning is printed to the console that ``runserver`` is not
 suitable for production:
 
@@ -1052,12 +1050,12 @@ together:
 .. django-admin-option:: --managers
 
 Mails the email addresses specified in :setting:`MANAGERS` using
-:meth:`~django.core.mail.mail_managers`.
+:func:`~django.core.mail.mail_managers`.
 
 .. django-admin-option:: --admins
 
 Mails the email addresses specified in :setting:`ADMINS` using
-:meth:`~django.core.mail.mail_admins`.
+:func:`~django.core.mail.mail_admins`.
 
 ``shell``
 ---------
@@ -1080,10 +1078,6 @@ flag.
 
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
-
-.. versionchanged:: 5.2
-
-    Automatic models import was added.
 
 .. versionchanged:: 6.0
 
@@ -1124,8 +1118,6 @@ default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
 
 .. django-admin-option:: --no-imports
-
-.. versionadded:: 5.2
 
 Disables the automatic import of models from :setting:`INSTALLED_APPS`.
 

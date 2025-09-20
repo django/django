@@ -2656,7 +2656,7 @@ protocol.
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail`
+    regular email messages sent with :func:`~django.core.mail.send_mail`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT
@@ -2765,6 +2765,68 @@ backend definition in :setting:`STORAGES`.
 
     Defining this setting overrides the default value and is *not* merged with
     it.
+
+.. setting:: TASKS
+
+``TASKS``
+---------
+
+.. versionadded:: 6.0
+
+Default::
+
+    {
+        "default": {
+            "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
+        }
+    }
+
+A dictionary containing the settings for all Task backends to be used with
+Django. It is a nested dictionary whose contents maps backend aliases to a
+dictionary containing the options for each backend.
+
+The :setting:`TASKS` setting must configure a ``default`` backend; any number
+of additional backends may also be specified. Depending on which backend is
+used, other options may be required. The following options are available as
+standard.
+
+.. setting:: TASKS-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: ``''`` (Empty string)
+
+The Tasks backend to use. The built-in backends are:
+
+* ``'django.tasks.backends.dummy.DummyBackend'``
+* ``'django.tasks.backends.immediate.ImmediateBackend'``
+
+You can use a backend that doesn't ship with Django by setting
+:setting:`BACKEND <TASKS-BACKEND>` to a fully-qualified path of a backend
+class (i.e. ``mypackage.backends.whatever.WhateverBackend``).
+
+.. setting:: TASKS-QUEUES
+
+``QUEUES``
+~~~~~~~~~~
+
+Default: ``["default"]``
+
+Specify the queue names supported by the backend. This can be used to ensure
+Tasks aren't enqueued to queues which do not exist.
+
+To disable queue name validation, set to an empty list (``[]``).
+
+.. setting:: TASKS-OPTIONS
+
+``OPTIONS``
+~~~~~~~~~~~
+
+Default: ``{}``
+
+Extra parameters to pass to the Task backend. Available parameters vary
+depending on the Task backend.
 
 .. setting:: TEMPLATES
 

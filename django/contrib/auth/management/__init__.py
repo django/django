@@ -126,10 +126,10 @@ class RenamePermission(migrations.RunPython):
         from django.contrib.auth.models import Permission
 
         db = schema_editor.connection.alias
-        ctypes = ContentType.objects.filter(
+        ctypes = ContentType.objects.using(db).filter(
             app_label=self.app_label, model__icontains=old_model.lower()
         )
-        for permission in Permission.objects.filter(
+        for permission in Permission.objects.using(db).filter(
             content_type_id__in=ctypes.values("id")
         ):
             prefix = permission.codename.split("_")[0]

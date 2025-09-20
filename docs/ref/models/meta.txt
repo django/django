@@ -123,8 +123,6 @@ Retrieving all field instances of a model
 Retrieving fields composing the primary key of a model
 ------------------------------------------------------
 
-.. versionadded:: 5.2
-
 .. attribute:: Options.pk_fields
 
     Returns a list of the fields composing the primary key of a model.

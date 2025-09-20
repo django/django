@@ -1094,12 +1094,33 @@ class Model(AltersData, metaclass=ModelBase):
             ]
             forced_update = update_fields or force_update
             pk_val = self._get_pk_val(meta)
-            updated = self._do_update(
-                base_qs, using, pk_val, values, update_fields, forced_update
+            returning_fields = [
+                f
+                for f in meta.local_concrete_fields
+                if (
+                    f.generated
+                    and f.referenced_fields.intersection(non_pks_non_generated)
+                )
+            ]
+            for field, _model, value in values:
+                if (update_fields is None or field.name in update_fields) and hasattr(
+                    value, "resolve_expression"
+                ):
+                    returning_fields.append(field)
+            results = self._do_update(
+                base_qs,
+                using,
+                pk_val,
+                values,
+                update_fields,
+                forced_update,
+                returning_fields,
             )
-            if force_update and not updated:
+            if updated := bool(results):
+                self._assign_returned_values(results[0], returning_fields)
+            elif force_update:
                 raise self.NotUpdated("Forced update did not affect any rows.")
-            if update_fields and not updated:
+            elif update_fields:
                 raise self.NotUpdated(
                     "Save with update_fields did not affect any rows."
                 )
@@ -1121,21 +1142,45 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
-            fields = [
+            insert_fields = [
                 f
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            returning_fields = meta.db_returning_fields
+            returning_fields = list(meta.db_returning_fields)
+            can_return_columns_from_insert = connections[
+                using
+            ].features.can_return_columns_from_insert
+            for field in insert_fields:
+                value = (
+                    getattr(self, field.attname) if raw else field.pre_save(self, False)
+                )
+                if hasattr(value, "resolve_expression"):
+                    if field not in returning_fields:
+                        returning_fields.append(field)
+                elif (
+                    field.db_returning
+                    and not can_return_columns_from_insert
+                    and not (pk_set and field is meta.auto_field)
+                ):
+                    returning_fields.remove(field)
             results = self._do_insert(
-                cls._base_manager, using, fields, returning_fields, raw
+                cls._base_manager, using, insert_fields, returning_fields, raw
             )
             if results:
-                for value, field in zip(results[0], returning_fields):
-                    setattr(self, field.attname, value)
+                self._assign_returned_values(results[0], returning_fields)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
+    def _do_update(
+        self,
+        base_qs,
+        using,
+        pk_val,
+        values,
+        update_fields,
+        forced_update,
+        returning_fields,
+    ):
         """
         Try to update the model. Return True if the model was updated (if an
         update query was done and a matching row was found in the DB).
@@ -1147,22 +1192,23 @@ class Model(AltersData, metaclass=ModelBase):
             # case we just say the update succeeded. Another case ending up
             # here is a model with just PK - in that case check that the PK
             # still exists.
-            return update_fields is not None or filtered.exists()
+            if update_fields is not None or filtered.exists():
+                return [()]
+            return []
         if self._meta.select_on_save and not forced_update:
-            return (
-                filtered.exists()
-                and
-                # It may happen that the object is deleted from the DB right
-                # after this check, causing the subsequent UPDATE to return
-                # zero matching rows. The same result can occur in some rare
-                # cases when the database returns zero despite the UPDATE being
-                # executed successfully (a row is matched and updated). In
-                # order to distinguish these two cases, the object's existence
-                # in the database is again checked for if the UPDATE query
-                # returns 0.
-                (filtered._update(values) > 0 or filtered.exists())
-            )
-        return filtered._update(values) > 0
+            # It may happen that the object is deleted from the DB right after
+            # this check, causing the subsequent UPDATE to return zero matching
+            # rows. The same result can occur in some rare cases when the
+            # database returns zero despite the UPDATE being executed
+            # successfully (a row is matched and updated). In order to
+            # distinguish these two cases, the object's existence in the
+            # database is again checked for if the UPDATE query returns 0.
+            if not filtered.exists():
+                return []
+            if results := filtered._update(values, returning_fields):
+                return results
+            return [()] if filtered.exists() else []
+        return filtered._update(values, returning_fields)
 
     def _do_insert(self, manager, using, fields, returning_fields, raw):
         """
@@ -1176,6 +1222,15 @@ class Model(AltersData, metaclass=ModelBase):
             using=using,
             raw=raw,
         )
+
+    def _assign_returned_values(self, returned_values, returning_fields):
+        returning_fields_iter = iter(returning_fields)
+        for value, field in zip(returned_values, returning_fields_iter):
+            setattr(self, field.attname, value)
+        # Defer all fields that were meant to be updated with their database
+        # resolved values but couldn't as they are effectively stale.
+        for field in returning_fields_iter:
+            self.__dict__.pop(field.attname, None)
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to
@@ -1310,7 +1365,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = meta or self._meta
         field_map = {}
         generated_fields = []
-        for field in meta.local_concrete_fields:
+        for field in meta.local_fields:
             if field.name in exclude:
                 continue
             if field.generated:
@@ -1321,7 +1376,19 @@ class Model(AltersData, metaclass=ModelBase):
                     continue
                 generated_fields.append(field)
                 continue
-            value = getattr(self, field.attname)
+            if (
+                isinstance(field.remote_field, ForeignObjectRel)
+                and field not in meta.local_concrete_fields
+            ):
+                value = tuple(
+                    getattr(self, from_field) for from_field in field.from_fields
+                )
+                if len(value) == 1:
+                    value = value[0]
+            elif field.concrete:
+                value = getattr(self, field.attname)
+            else:
+                continue
             if not value or not hasattr(value, "resolve_expression"):
                 value = Value(value, field)
             field_map[field.name] = value

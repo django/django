@@ -878,7 +878,7 @@ of an SMTPConnection::
     messages = get_notification_email()
     connection.send_messages(messages)
 
-...should now call :meth:`~django.core.mail.get_connection` to
+...should now call :func:`~django.core.mail.get_connection` to
 instantiate a generic email connection::
 
     from django.core.mail import get_connection
@@ -900,7 +900,7 @@ SMTP connection::
 
 If your call to construct an instance of ``SMTPConnection`` required
 additional arguments, those arguments can be passed to the
-:meth:`~django.core.mail.get_connection` call::
+:func:`~django.core.mail.get_connection` call::
 
     connection = get_connection(
         "django.core.mail.backends.smtp.EmailBackend", hostname="localhost", port=1234

@@ -25,9 +25,9 @@ jobs:
     name: spelling
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
           cache: 'pip'
@@ -43,9 +43,9 @@ jobs:
     name: blacken-docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - run: python -m pip install blacken-docs
@@ -64,9 +64,9 @@ jobs:
     name: lint-docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - run: python -m pip install sphinx-lint

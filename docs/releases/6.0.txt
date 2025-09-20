@@ -18,13 +18,13 @@ project.
 Python compatibility
 ====================
 
-Django 6.0 supports Python 3.12 and 3.13. We **highly recommend** and only
-officially support the latest release of each series.
+Django 6.0 supports Python 3.12 and 3.13. We **highly recommend**, and only
+officially support, the latest release of each series.
 
 The Django 5.2.x series is the last to support Python 3.10 and 3.11.
 
-Third-party library support for older version of Django
-=======================================================
+Third-party library support for older versions of Django
+========================================================
 
 Following the release of Django 6.0, we suggest that third-party app authors
 drop support for all versions of Django prior to 5.2. At that time, you should
@@ -75,6 +75,62 @@ guidance, see the :ref:`CSP security overview <security-csp>` and the
 :doc:`reference docs </ref/csp>`, which include details about decorators to
 override or disable policies on a per-view basis.
 
+Template Partials
+-----------------
+
+The :ref:`Django Template Language <template-language-intro>` now supports
+:ref:`template partials <template-partials>`, making it easier to encapsulate
+and reuse small named fragments within a template file. The new tags
+:ttag:`{% partialdef %} <partialdef>` and :ttag:`{% partial %} <partial>`
+define a partial and render it, respectively.
+
+Partials can also be referenced using the ``template_name#partial_name`` syntax
+with :func:`~django.template.Engine.get_template`,
+:func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
+template-loading tools, enabling more modular and maintainable templates
+without needing to split components into separate files.
+
+A `migration guide`_ is available if you're updating from the
+:pypi:`django-template-partials` third-party package.
+
+.. _migration guide: https://github.com/carltongibson/django-template-partials/blob/main/Migration.md
+
+Background Tasks
+----------------
+
+Django now includes a built-in Tasks framework for running code outside the
+HTTP request–response cycle. This enables offloading work, such as sending
+emails or processing data, to background workers.
+
+Tasks are defined using the :func:`~django.tasks.task` decorator::
+
+    from django.core.mail import send_mail
+    from django.tasks import task
+
+
+    @task
+    def email_users(emails, subject, message):
+        return send_mail(subject, message, None, emails)
+
+Once defined, tasks can be enqueued through a configured backend::
+
+    email_users.enqueue(
+        emails=["user@example.com"],
+        subject="You have a message",
+        message="Hello there!",
+    )
+
+Backends are configured via the :setting:`TASKS` setting. The :ref:`two
+built-in backends <task-available-backends>` included in this release are
+primarily intended for development and testing.
+
+Django handles task creation and queuing but does not provide a worker
+mechanism to run tasks. Execution must be managed by external infrastructure,
+such as a separate process or service.
+
+See :doc:`/topics/tasks` for an overview and the :doc:`Tasks reference
+</ref/tasks>` for API details.
+
 Adoption of Python's modern email API
 -------------------------------------
 
@@ -92,26 +148,6 @@ Notably, the return type of the :meth:`EmailMessage.message()
 previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
 instance of those now-deprecated classes.
 
-Template Partials
------------------
-
-The :ref:`Django Template Language <template-language-intro>` now supports
-:ref:`template partials <template-partials>` , making it easier to encapsulate
-and reuse small named fragments within a template file. The new tags
-:ttag:`{% partialdef %} <partialdef>` and :ttag:`{% partial %} <partial>`
-define a partial and render it, respectively.
-
-Partials can also be referenced using the ``template_name#partial_name`` syntax
-with :func:`~django.template.Engine.get_template`,
-:func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
-template-loading tools, enabling more modular and maintainable templates
-without needing to split components into separate files.
-
-A `migration guide`_ is available if you're updating from the
-:pypi:`django-template-partials` third-party package.
-
-.. _migration guide: https://github.com/carltongibson/django-template-partials/blob/main/Migration.md
-
 Minor features
 --------------
 
@@ -124,21 +160,11 @@ Minor features
 * The new :attr:`.AdminSite.password_change_form` attribute allows customizing
   the form used in the admin site password change view.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,000,000 to 1,200,000.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,13 +189,14 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :class:`Lexeme <django.contrib.postgres.search.Lexeme>` expression
+  for full text search provides fine-grained control over search terms.
+  ``Lexeme`` objects automatically escape their input and support logical
+  combination operators (``&``, ``|``, ``~``), prefix matching, and term
+  weighting.
 
 * Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
   now include system checks to verify that ``django.contrib.postgres`` is an
@@ -183,52 +210,12 @@ Minor features
   parameter. This allows providing database hints to database routers to assist
   them in :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
 
 Email
 ~~~~~
@@ -241,41 +228,6 @@ Email
 * :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` now
   accepts a :class:`~email.message.MIMEPart` object from Python's modern email
   API.
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-Forms
-~~~~~
-
-* ...
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -331,6 +283,13 @@ Models
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
 
+* :class:`~django.db.models.GeneratedField`\s and :ref:`fields assigned
+  expressions <avoiding-race-conditions-using-f>` are now refreshed from the
+  database after :meth:`~django.db.models.Model.save` on backends that support
+  the ``RETURNING`` clause (SQLite, PostgreSQL, and Oracle). On backends that
+  don't support it (MySQL and MariaDB), the fields are marked as deferred to
+  trigger a refresh on subsequent accesses.
+
 Pagination
 ~~~~~~~~~~
 
@@ -344,21 +303,6 @@ Requests and Responses
 
 * Multiple ``Cookie`` headers are now supported for HTTP/2 requests when
   running with ASGI.
-
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
@@ -379,21 +323,6 @@ Tests
 * The :class:`.DiscoverRunner` now supports parallel test execution on systems
   using the ``forkserver`` :mod:`multiprocessing` start method.
 
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
-
 .. _backwards-incompatible-6.0:
 
 Backwards incompatible changes in 6.0
@@ -411,14 +340,17 @@ backends.
 * ``DatabaseOperations.return_insert_columns()`` and
   ``DatabaseOperations.fetch_returned_insert_rows()`` methods are renamed to
   ``returning_columns()`` and ``fetch_returned_rows()``, respectively, to
-  denote they can be used in the context ``UPDATE … RETURNING`` statements as
-  well as ``INSERT … RETURNING``.
+  denote they can be used in the context of ``UPDATE … RETURNING`` statements
+  as well as ``INSERT … RETURNING``.
 
 * The ``DatabaseOperations.fetch_returned_insert_columns()`` method is removed
   and the ``fetch_returned_rows()`` method replacing
   ``fetch_returned_insert_rows()`` expects both a ``cursor`` and
-  ``returning_params`` to be provided just like
+  ``returning_params`` to be provided, just like
   ``fetch_returned_insert_columns()`` did.
+
+* If the database supports ``UPDATE … RETURNING`` statements, backends can set
+  ``DatabaseFeatures.can_return_rows_from_update=True``.
 
 Dropped support for MariaDB 10.5
 --------------------------------
@@ -467,7 +399,7 @@ Email
 ``DEFAULT_AUTO_FIELD`` setting now defaults to ``BigAutoField``
 ---------------------------------------------------------------
 
-Since Django 3.2 when the :setting:`DEFAULT_AUTO_FIELD` setting was added,
+Since Django 3.2, when the :setting:`DEFAULT_AUTO_FIELD` setting was added,
 the default :djadmin:`startproject` template's ``settings.py`` contained::
 
     DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -483,11 +415,9 @@ In Django 6.0, :setting:`DEFAULT_AUTO_FIELD` now defaults to
 :class:`django.db.models.BigAutoField` and the aforementioned lines in the
 project and app templates are removed.
 
-Most projects shouldn't be affected since there has been a system check warning
-since Django 3.2 if a project doesn't set :setting:`DEFAULT_AUTO_FIELD`:
-
-    **models.W042**: Auto-created primary key used when not defining a primary
-    key type, by default ``django.db.models.AutoField``.
+Most projects shouldn't be affected, since Django 3.2 has raised the system
+check warning **models.W042** for projects that don't set
+:setting:`DEFAULT_AUTO_FIELD`.
 
 If you haven't dealt with this warning by now, add
 ``DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'`` to your project's
@@ -560,7 +490,7 @@ used parameters. Using positional arguments for these now emits a deprecation
 warning and will raise a :exc:`TypeError` when the deprecation period ends.
 
 * All *optional* parameters (``fail_silently`` and later) must be passed as
-  keyword arguments to :func:`get_connection`,  :func:`mail_admins`,
+  keyword arguments to :func:`get_connection`, :func:`mail_admins`,
   :func:`mail_managers`, :func:`send_mail`, and :func:`send_mass_mail`.
 
 * All parameters must be passed as keyword arguments when creating an
@@ -646,7 +576,7 @@ to remove usage of these features.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is removed.
 
-* The ``django.db.models.sql.datastructures.Join`` no longer fallback to
+* The ``django.db.models.sql.datastructures.Join`` no longer falls back to
   ``get_joining_columns()``.
 
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
@@ -664,8 +594,8 @@ to remove usage of these features.
 * The ``get_prefetch_queryset()`` method of related managers and descriptors is
   removed.
 
-* ``get_prefetcher()`` and ``prefetch_related_objects()`` no longer fallback to
-  ``get_prefetch_queryset()``.
+* ``get_prefetcher()`` and ``prefetch_related_objects()`` no longer fall back
+  to ``get_prefetch_queryset()``.
 
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
@@ -677,7 +607,7 @@ to remove usage of these features.
   methods are removed.
 
 * The undocumented ``django.utils.itercompat.is_iterable()`` function and the
-  ``django.utils.itercompat`` module is removed.
+  ``django.utils.itercompat`` module are removed.
 
 * The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is removed.
 

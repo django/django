@@ -1306,7 +1306,7 @@ class QuerySet(AltersData):
 
     aupdate.alters_data = True
 
-    def _update(self, values):
+    def _update(self, values, returning_fields=None):
         """
         A version of update() that accepts field objects instead of field
         names. Used primarily for model saving and not intended for use by
@@ -1320,7 +1320,9 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        if returning_fields is None:
+            return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        return query.get_compiler(self.db).execute_returning_sql(returning_fields)
 
     _update.alters_data = True
     _update.queryset_only = False
@@ -1414,11 +1416,14 @@ class QuerySet(AltersData):
     def values_list(self, *fields, flat=False, named=False):
         if flat and named:
             raise TypeError("'flat' and 'named' can't be used together.")
-        if flat and len(fields) > 1:
-            raise TypeError(
-                "'flat' is not valid when values_list is called with more than one "
-                "field."
-            )
+        if flat:
+            if len(fields) > 1:
+                raise TypeError(
+                    "'flat' is not valid when values_list is called with more than one "
+                    "field."
+                )
+            elif not fields:
+                fields = [self.model._meta.concrete_fields[0].attname]
 
         field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
@@ -2331,8 +2336,8 @@ def normalize_prefetch_lookups(lookups, prefix=None):
 
 def prefetch_related_objects(model_instances, *related_lookups):
     """
-    Populate prefetched object caches for a list of model instances based on
-    the lookups/Prefetch instances given.
+    Populate prefetched object caches for an iterable of model instances based
+    on the lookups/Prefetch instances given.
     """
     if not model_instances:
         return  # nothing to do
@@ -2400,7 +2405,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # We assume that objects retrieved are homogeneous (which is the
             # premise of prefetch_related), so what applies to first object
             # applies to all.
-            first_obj = obj_list[0]
+            first_obj = next(iter(obj_list))
             to_attr = lookup.get_current_to_attr(level)[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
                 first_obj, through_attr, to_attr

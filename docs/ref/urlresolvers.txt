@@ -90,10 +90,6 @@ For example:
    >>> reverse("admin:index", fragment="no encoding is done")
    '/admin/#no encoding is done'
 
-.. versionchanged:: 5.2
-
-    The ``query`` and ``fragment`` arguments were added.
-
 .. note::
 
     The string returned by ``reverse()`` is already
@@ -146,10 +142,6 @@ URLConf is loaded. Some common cases where this function is necessary are:
 
 * providing a reversed URL as a default value for a parameter in a function's
   signature.
-
-.. versionchanged:: 5.2
-
-    The ``query`` and ``fragment`` arguments were added.
 
 ``resolve()``
 =============

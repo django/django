@@ -439,7 +439,7 @@ def _init_worker(
     used_aliases=None,
 ):
     """
-    Switch to databases dedicated to this worker.
+    Switch to databases dedicated to this worker and run system checks.
 
     This helper lives at module-level because of the multiprocessing module's
     requirements.
@@ -463,6 +463,9 @@ def _init_worker(
             process_setup(*process_setup_args)
         django.setup()
         setup_test_environment(debug=debug_mode)
+        call_command(
+            "check", stdout=io.StringIO(), stderr=io.StringIO(), databases=used_aliases
+        )
 
     db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:

@@ -6,8 +6,6 @@ from django.db.models import StringAgg as _StringAgg
 from django.db.models import Value
 from django.utils.deprecation import RemovedInDjango70Warning
 
-from .mixins import _DeprecatedOrdering
-
 __all__ = [
     "ArrayAgg",
     "BitAnd",
@@ -20,9 +18,7 @@ __all__ = [
 ]
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class ArrayAgg(Aggregate):
-class ArrayAgg(_DeprecatedOrdering, Aggregate):
+class ArrayAgg(Aggregate):
     function = "ARRAY_AGG"
     allow_distinct = True
     allow_order_by = True
@@ -54,19 +50,15 @@ class BoolOr(Aggregate):
     output_field = BooleanField()
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class JSONBAgg(Aggregate):
-class JSONBAgg(_DeprecatedOrdering, Aggregate):
+class JSONBAgg(Aggregate):
     function = "JSONB_AGG"
     allow_distinct = True
     allow_order_by = True
     output_field = JSONField()
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class StringAgg(_StringAgg):
 # RemovedInDjango70Warning: When the deprecation ends, remove completely.
-class StringAgg(_DeprecatedOrdering, _StringAgg):
+class StringAgg(_StringAgg):
 
     def __init__(self, expression, delimiter, **extra):
         if isinstance(delimiter, str):

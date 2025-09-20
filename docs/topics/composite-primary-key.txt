@@ -2,8 +2,6 @@
 Composite primary keys
 ======================
 
-.. versionadded:: 5.2
-
 In Django, each model has a primary key. By default, this primary key consists
 of a single field.
 
