@@ -608,6 +608,9 @@ END;
 
         return Oracle_datetime.from_datetime(value)
 
+    def adapt_durationfield_value(self, value):
+        return value
+
     def adapt_timefield_value(self, value):
         if value is None:
             return None

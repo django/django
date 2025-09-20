@@ -241,7 +241,9 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The ``DatabaseOperations.adapt_durationfield_value()`` hook is added. If the
+  database has native support for ``DurationField``, override this method to
+  simply return the value.
 
 Miscellaneous
 -------------
