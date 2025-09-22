@@ -991,6 +991,38 @@ class QuerySet(AltersData):
 
     abulk_update.alters_data = True
 
+    def _clear_stale_reverse_one_to_one_caches(self, params):
+        # When a related object is passed as a lookup, a failed create() (or
+        # a caller-built unsaved instance) can leave an unsaved object in that
+        # related object's reverse one-to-one cache. Once an existing row has
+        # been found, drop the cache if it still holds an unsaved value so the
+        # reverse accessor resolves to the real row instead of the stale
+        # instance.
+        get_field = self.model._meta.get_field
+        for field_name, value in params.items():
+            try:
+                field = get_field(field_name)
+            except exceptions.FieldDoesNotExist:
+                continue
+            # Only concrete forward OneToOneFields hold a reverse one-to-one
+            # cache on the related object. Reverse accessors (OneToOneRel) also
+            # report one_to_one=True, but they're not concrete and their cache
+            # is legitimate in-flight forward state that must not be cleared.
+            # Compare against the concrete model so a field targeting a proxy
+            # model still matches a concrete instance passed as the lookup.
+            if (
+                not field.concrete
+                or not field.one_to_one
+                or not isinstance(value, field.related_model._meta.concrete_model)
+            ):
+                continue
+            remote_field = field.remote_field
+            if not remote_field.is_cached(value):
+                continue
+            cached = remote_field.get_cached_value(value)
+            if cached is None or cached._state.adding:
+                remote_field.delete_cached_value(value)
+
     def get_or_create(self, defaults=None, **kwargs):
         """
         Look up an object with the given kwargs, creating one if necessary.
@@ -1001,7 +1033,9 @@ class QuerySet(AltersData):
         # to avoid potential transaction consistency problems.
         self._for_write = True
         try:
-            return self.get(**kwargs), False
+            obj = self.get(**kwargs)
+            self._clear_stale_reverse_one_to_one_caches(kwargs)
+            return obj, False
         except self.model.DoesNotExist:
             params = self._extract_model_params(defaults, **kwargs)
             # Try to create an object using passed params.
@@ -1010,6 +1044,13 @@ class QuerySet(AltersData):
                     params = dict(resolve_callables(params))
                     return self.create(**params), True
             except IntegrityError:
+                # The create() that lost the race already populated the
+                # reverse one-to-one cache with its unsaved instance; clear
+                # it before the retry so a successful get() (or a re-raise)
+                # can't leave it behind. Use params (defaults plus kwargs)
+                # since create() may have been passed a related object via
+                # defaults, not just the lookup kwargs.
+                self._clear_stale_reverse_one_to_one_caches(params)
                 try:
                     return self.get(**kwargs), False
                 except self.model.DoesNotExist:
