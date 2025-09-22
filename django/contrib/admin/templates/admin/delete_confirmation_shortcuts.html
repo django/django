@@ -1,0 +1,16 @@
+{% extends "admin/shortcuts.html" %}
+{% load i18n %}
+
+{% block extra_shortcuts %}
+{{ block.super }}
+<section>
+  <h3>{% translate "Delete Confirmation" %}</h3>
+  <dl>
+    <dt class="shortcut-description">{% translate "Confirm deletion" %}</dt>
+    <dd class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>y</kbd></dd>
+
+    <dt class="shortcut-description">{% translate "Cancel deletion" %}</dt>
+    <dd class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>n</kbd></dd>
+  </dl>
+</section>
+{% endblock %}
