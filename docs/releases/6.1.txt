@@ -293,6 +293,14 @@ Validators
 
 * ...
 
+Bugfixes
+========
+
+* Fixed a bug in Django 5.2+ where concurrent ``get_or_create()`` and
+  ``update_or_create()`` calls on a ``OneToOneField`` could leave an unsaved
+  instance cached on the reverse relation (e.g. ``parent.child`` with
+  ``pk=None``) (:ticket:`36489`).
+
 .. _backwards-incompatible-6.1:
 
 Backwards incompatible changes in 6.1
