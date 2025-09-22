@@ -244,6 +244,8 @@ kwargs
 Kyrgyz
 latin
 lawrence
+lexeme
+lexemes
 Libera
 lifecycle
 lifecycles
@@ -428,6 +430,7 @@ reverter
 roadmap
 Roald
 rss
+runnable
 Sandvik
 savepoint
 savepoints
@@ -529,6 +532,7 @@ unapplied
 unapplying
 uncategorized
 unclaim
+unclosed
 uncopyable
 unencoded
 unencrypted
