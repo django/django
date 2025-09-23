@@ -488,20 +488,18 @@ Features deprecated in 6.0
 Positional arguments in ``django.core.mail`` APIs
 -------------------------------------------------
 
-.. currentmodule:: django.core.mail
-
 :mod:`django.core.mail` APIs now require keyword arguments for less commonly
 used parameters. Using positional arguments for these now emits a deprecation
 warning and will raise a :exc:`TypeError` when the deprecation period ends:
 
 * All *optional* parameters (``fail_silently`` and later) must be passed as
-  keyword arguments to :func:`get_connection`, :func:`mail_admins`,
-  :func:`mail_managers`, :func:`send_mail`, and :func:`send_mass_mail`.
+  keyword arguments to :func:`.get_connection`, :func:`.mail_admins`,
+  :func:`.mail_managers`, :func:`.send_mail`, and :func:`.send_mass_mail`.
 
 * All parameters must be passed as keyword arguments when creating an
-  :class:`EmailMessage` or :class:`EmailMultiAlternatives` instance, except for
-  the first four (``subject``, ``body``, ``from_email``, and ``to``), which may
-  still be passed either as positional or keyword arguments.
+  :class:`.EmailMessage` or :class:`.EmailMultiAlternatives` instance, except
+  for the first four (``subject``, ``body``, ``from_email``, and ``to``), which
+  may still be passed either as positional or keyword arguments.
 
 Miscellaneous
 -------------
