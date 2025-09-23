@@ -5,7 +5,7 @@ import pickle
 from datetime import UTC, datetime
 
 from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, NO_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils.timezone import now as tz_now
 
@@ -98,19 +98,23 @@ class DatabaseCache(BaseDatabaseCache):
         self._base_delete_many(expired_keys)
         return result
 
-    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def set(self, key, value, timeout=NO_TIMEOUT, version=None):
         key = self.make_and_validate_key(key, version=version)
         self._base_set("set", key, value, timeout)
 
-    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def add(self, key, value, timeout=NO_TIMEOUT, version=None):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("add", key, value, timeout)
 
-    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+    def touch(self, key, timeout=NO_TIMEOUT, version=None):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("touch", key, None, timeout)
 
-    def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
+    def _base_set(self, mode, key, value, timeout=NO_TIMEOUT):
+        no_timeout = timeout == NO_TIMEOUT
+        if no_timeout:
+            timeout = DEFAULT_TIMEOUT
+
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
@@ -171,8 +175,13 @@ class DatabaseCache(BaseDatabaseCache):
                             % (table, quote_name("expires"), quote_name("cache_key")),
                             [exp, key],
                         )
-                    elif result and (
-                        mode == "set" or (mode == "add" and current_expires < now)
+                    elif (
+                        result
+                        and mode in ("add", "set")
+                        and (
+                            current_expires < now
+                            or (not no_timeout and timeout is not None)
+                        )
                     ):
                         cursor.execute(
                             "UPDATE %s SET %s = %%s, %s = %%s WHERE %s = %%s"
@@ -183,6 +192,16 @@ class DatabaseCache(BaseDatabaseCache):
                                 quote_name("cache_key"),
                             ),
                             [b64encoded, exp, key],
+                        )
+                    elif result and (mode == "set") and no_timeout:
+                        cursor.execute(
+                            "UPDATE %s SET %s = %%s WHERE %s = %%s"
+                            % (
+                                table,
+                                quote_name("value"),
+                                quote_name("cache_key"),
+                            ),
+                            [b64encoded, key],
                         )
                     elif mode != "touch":
                         cursor.execute(

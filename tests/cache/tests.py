@@ -1295,6 +1295,23 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertIn(connection.ops.quote_name("expires"), sql)
         self.assertIn(connection.ops.quote_name("cache_key"), sql)
 
+    def test_incr_decr_timeout(self):
+        """
+        Increment/decrement a key without timeout
+        shouldn’t set one; if it exists, keep its timeout.
+        """
+        timeout = 2
+        cache.set("key", 1, timeout=timeout)
+        self.assertEqual(cache.incr("key"), 2)
+        time.sleep(timeout)
+        self.assertIs(cache.has_key("key"), False)
+
+        cache.set("key", 2, timeout=timeout)
+        self.assertIs(cache.has_key("key"), True)
+        self.assertEqual(cache.decr("key"), 1)
+        time.sleep(timeout)
+        self.assertIs(cache.has_key("key"), False)
+
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
@@ -1815,6 +1832,23 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             mock.patch("cache.tests.time", new=mocked_time),
         ):
             super().test_touch()
+
+    def test_incr_decr_timeout(self):
+        """
+        Increment/decrement a key without timeout
+        shouldn’t set one; if it exists, keep its timeout.
+        """
+        timeout = 2
+        cache.set("key", 1, timeout=timeout)
+        self.assertEqual(cache.incr("key"), 2)
+        time.sleep(timeout)
+        self.assertIs(cache.has_key("key"), False)
+
+        cache.set("key", 2, timeout=timeout)
+        self.assertIs(cache.has_key("key"), True)
+        self.assertEqual(cache.decr("key"), 1)
+        time.sleep(timeout)
+        self.assertIs(cache.has_key("key"), False)
 
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
