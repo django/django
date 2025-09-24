@@ -1714,10 +1714,10 @@ aria-describedby="id_birthday_error">
         class FooForm(Form):
             the_field = CharField(max_length=100)
 
-        exc = ValidationError({"the_field": "Something is wrong with the field."})
+        exc = ValidationError({"the_field": "This field has an error."})
         form = FooForm()
         form.add_error("the_field", exc)
-        self.assertEqual(form.errors, {"the_field": ["Something is wrong with the field."]})
+        self.assertEqual(form.errors, {"the_field": ["This field has an error."]})
 
     def test_add_error_validation_error_dict_multiple_fields(self):
         class FooForm(Form):
