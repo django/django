@@ -652,11 +652,11 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     for example::
 
         class MyDateInput(forms.DateInput):
-            input_type = 'date'
+            input_type = "date"
 
     Alternatively, you can specify the widget ``attrs`` directly::
 
-        DateInput(attrs={'type': 'date'})
+        DateInput(attrs={"type": "date"})
 
     .. warning::
 
