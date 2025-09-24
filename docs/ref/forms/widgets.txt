@@ -650,18 +650,22 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     with ``type="text"``. If you are targeting browsers which support the
     `HTML5 "date" input type`_, you may override the ``input_type`` attribute,
     for example::
+
         class MyDateInput(forms.DateInput):
             input_type = 'date'
-            
-    Alternatively, you can specify the widget `attrs` directly::
-    
+
+    Alternatively, you can specify the widget ``attrs`` directly::
+
         DateInput(attrs={'type': 'date'})
-        
+
     .. warning::
-    
-        Native date inputs (i.e., ``type="date"``) are rendered by the browser and cannot be formatted by Django. This means Django does not use them by default, as it cannot control their localization or formatting. See tickets #16630 and #34853 for background.
-        
-        .. _HTML5 "date" input type: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date 
+
+        Native date inputs (i.e., ``type="date"``) are rendered by the browser
+        and cannot be formatted by Django. This means Django does not use them
+        by default, as it cannot control their localization or formatting. See
+        tickets #16630 and #34853 for background.
+
+        .. _HTML5 "date" input type: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date
 
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
