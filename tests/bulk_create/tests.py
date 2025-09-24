@@ -852,7 +852,6 @@ class BulkCreateTests(TestCase):
             ],
         )
 
-
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_db_default_field_excluded(self):
         # created_at is excluded when no db_default override is provided.

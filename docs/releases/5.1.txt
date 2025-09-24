@@ -276,13 +276,6 @@ Models
   :meth:`.Model.arefresh_from_db`  allows customizing the queryset used to
   reload a model's value. This can be used to lock the row before reloading or
   to select related objects.
-* :meth:`.QuerySet.bulk_create` and :meth:`.QuerySet.abulk_create` 
-  methods now set the ``condition`` parameter, which allows for specifying 
-  conditional SQL WHERE clauses in bulk insert operations that involve conflict 
-  resolution. This functionality is currently supported by PostgreSQL and SQLite 
-  (from SQLite version 3.42.0 forward). The ``condition`` parameter can use ``F``, 
-  ``Q``, and the newly introduced ``Excluded`` expressions, offering more flexibility 
-  for complex conditions during bulk insert operations.
 
 * The new :attr:`.Expression.constraint_validation_compatible` attribute allows
   specifying that the expression should be ignored during a constraint
@@ -335,23 +328,6 @@ Validators
 
 Backwards incompatible changes in 5.1
 =====================================
-
-Database backend API
---------------------
-
-This section describes changes that may be needed in third-party database
-backends.
-
-* The new flag ``supports_update_conflicts_with_condition`` has been added to the database
-  backend features. This flag indicates whether a database backend supports
-  conditional updates in bulk operations like ``bulk_create``. By default, this
-  is set to ``False``. Backends that support this feature should override this
-  flag in their respective ``features.py`` file.
-
-* A new feature flag ``supports_excluded_expression`` has been added. This flag indicates whether
-  the backend supports the ``Excluded`` class during an ``bulk_create`` operation.
-  
-* ...
 
 :mod:`django.contrib.gis`
 -------------------------

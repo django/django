@@ -308,7 +308,7 @@ companies::
 .. _excluded-expressions:
 
 ``Excluded()`` expressions
--------------------------
+----------------------------
 
 .. class:: Excluded(name)
 
@@ -356,8 +356,8 @@ PostgreSQL and SQLite. On other backends, using :class:`Excluded` raises
 
 The corresponding backend feature flags are:
 
-* :attr:`~django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition`
-* :attr:`~django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression`
+* ``django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition``
+* ``django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression``
 
 See also
 ~~~~~~~~
