@@ -285,7 +285,11 @@ class BaseForm(RenderableFormMixin):
             error = ValidationError(error)
 
         if hasattr(error, "error_dict"):
-            if field is not None:
+            if field is None:
+                error = error.error_dict
+            # Raise an error if the ValidationError contains more than one
+            # item or if the only item's key doesn't match the form field.
+            elif len(error.error_dict) != 1 or field not in error.error_dict:
                 raise TypeError(
                     "The argument `field` must be `None` when the `error` "
                     "argument contains errors for multiple fields."
@@ -312,7 +316,7 @@ class BaseForm(RenderableFormMixin):
                         field_id=self[field].auto_id,
                     )
             self._errors[field].extend(error_list)
-            if field in self.cleaned_data:
+            if hasattr(self, "cleaned_data") and field in self.cleaned_data:
                 del self.cleaned_data[field]
 
     def has_error(self, field, code=None):
