@@ -11,7 +11,6 @@
   "devDependencies": {
     "eslint": "^9.36.0",
     "puppeteer": "^24.22.0",
-    "globals": "^16.4.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-qunit": "^10.1.1",
