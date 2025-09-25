@@ -412,6 +412,14 @@ body.popup .submit-row {
     border-right-color: var(--darkened-bg);
 }
 
+.inline-related:not(.tabular) h3 > div {
+    width: 100%;
+}
+
+.inline-related:not(.tabular) h3 div.inline-links {
+    margin: 0.4rem 0;
+}
+
 .inline-related h3 span.delete {
     float: right;
 }

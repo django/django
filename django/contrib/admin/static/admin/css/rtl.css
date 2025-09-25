@@ -285,6 +285,10 @@ form .form-row p.datetime {
     right: 0;
 }
 
+.inline-group .tabular tr.has_original td p {
+    padding-left: 10px;
+}
+
 .selector .selector-chooser {
     margin: 0;
 }
