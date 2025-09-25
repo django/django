@@ -2465,10 +2465,10 @@ each model instance (if the database normally supports it).
 
    Added the ``condition`` parameter to support conditional updates during
    ``bulk_create(..., update_conflicts=True)``. ``condition`` accepts Django
-   conditional expressions ( :class:`~django.db.models.Q`, :class:`~django.db.models.F`,
-   and :class:`~django.db.models.Excluded`; see :ref:`excluded-expressions`)
-   and is supported on PostgreSQL and SQLite.
-
+   conditional expressions (:class:`~django.db.models.Q`,
+   :class:`~django.db.models.F`, and
+   :class:`~django.db.models.Excluded`).
+   See :ref:`excluded-expressions`. It is supported on PostgreSQL and SQLite.
 
 .. warning::
 

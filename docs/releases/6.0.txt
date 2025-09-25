@@ -295,14 +295,15 @@ Models
   don't support it (MySQL and MariaDB), the fields are marked as deferred to
   trigger a refresh on subsequent accesses.
 
-* :meth:`.QuerySet.bulk_create` and :meth:`.QuerySet.abulk_create`
-  gained a ``condition=`` parameter to add a conditional ``WHERE`` clause
-  to ``ON CONFLICT DO UPDATE``. Supported on PostgreSQL and SQLite (>= 3.42).
+* :meth:`.QuerySet.bulk_create` and :meth:`.QuerySet.abulk_create` gained a
+  ``condition`` parameter to add a conditional ``WHERE`` clause to
+  ``ON CONFLICT DO UPDATE``. Supported on PostgreSQL and SQLite (>= 3.42).
   The condition accepts Django expressions (``Q``, ``F``, and
   :class:`~django.db.models.Excluded`; see :ref:`excluded-expressions`).
 
 * Added the :class:`~django.db.models.Excluded` expression to reference
-  proposed values in ``ON CONFLICT DO UPDATE`` clauses on PostgreSQL and SQLite.
+  proposed values in ``ON CONFLICT DO UPDATE`` clauses on PostgreSQL and
+  SQLite.
 
 
 Pagination
@@ -367,11 +368,14 @@ backends.
 * If the database supports ``UPDATE … RETURNING`` statements, backends can set
   ``DatabaseFeatures.can_return_rows_from_update=True``.
 
-* Added ``django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition``
-  to indicate backend support for conditional updates on conflict.
+* Added the ``supports_update_conflicts_with_condition`` feature flag on
+  :class:`~django.db.backends.base.features.BaseDatabaseFeatures` to indicate
+  backend support for conditional updates on conflict.
 
-* Added ``django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression``
-  to indicate support for the :class:`~django.db.models.Excluded` expression.
+* Added the ``supports_excluded_expression`` feature flag on
+  :class:`~django.db.backends.base.features.BaseDatabaseFeatures` to indicate
+  support for the :class:`~django.db.models.Excluded` expression.
+
 
 
 Dropped support for MariaDB 10.5

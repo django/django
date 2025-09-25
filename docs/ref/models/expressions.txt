@@ -314,10 +314,10 @@ companies::
 
 .. versionadded:: 6.0
 
-An :class:`~django.db.models.Excluded` expression refers to the values **proposed for
-insertion** during an ``INSERT ... ON CONFLICT DO UPDATE`` (i.e., the row
-that caused the conflict). On PostgreSQL and SQLite this maps to the SQL
-pseudo-table ``EXCLUDED``.
+An :class:`~django.db.models.Excluded` expression refers to the values
+**proposed for insertion** during an ``INSERT ... ON CONFLICT DO UPDATE``
+(i.e., the row that caused the conflict). On PostgreSQL and SQLite this maps
+to the SQL pseudo-table ``EXCLUDED``.
 
 ``Excluded`` is a subclass of :class:`F`, so it supports arithmetic and can
 be combined with :class:`Q` and other expressions:
@@ -359,10 +359,12 @@ The corresponding backend feature flags are:
 * ``django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition``
 * ``django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression``
 
+
 See also
 ~~~~~~~~
 
-* :meth:`~django.db.models.query.QuerySet.bulk_create` (``condition=`` parameter)
+* :meth:`~django.db.models.query.QuerySet.bulk_create`
+(``condition=`` parameter)
 
 .. _func-expressions:
 
