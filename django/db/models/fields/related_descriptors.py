@@ -703,8 +703,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
-            queryset._defer_next_filter = True
-            queryset = queryset.filter(**self.core_filters)
+            queryset = queryset._filter_q(Q(**self.core_filters), defer=True)
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
                 if val is None or (val == "" and empty_strings_as_null):
@@ -1104,8 +1103,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
-            queryset._defer_next_filter = True
-            return queryset._next_is_sticky().filter(**self.core_filters)
+            return queryset._filter_q(Q(**self.core_filters), defer=True)
 
         def get_prefetch_cache(self):
             # Walk up the ancestor-chain (if cached) to try and find a prefetch

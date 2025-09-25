@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.contrib.admin.exceptions import NotRegistered
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
+from django.db.models import Q
 from django.http import Http404, JsonResponse
 from django.views.generic.list import BaseListView
 
@@ -55,8 +56,10 @@ class AutocompleteJsonView(BaseListView):
 
     def get_queryset(self):
         """Return queryset based on ModelAdmin.get_search_results()."""
-        qs = self.model_admin.get_queryset(self.request)
-        qs = qs.complex_filter(self.source_field.get_limit_choices_to())
+        limit_choices_to = self.source_field.get_limit_choices_to()
+        if not isinstance(limit_choices_to, Q):
+            limit_choices_to = Q(**limit_choices_to)
+        qs = self.model_admin.get_queryset(self.request).filter(limit_choices_to)
         qs, search_use_distinct = self.model_admin.get_search_results(
             self.request, qs, self.term
         )

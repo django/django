@@ -2004,8 +2004,7 @@ class SQLDeleteCompiler(SQLCompiler):
             or not self.contains_self_reference_subquery
         ):
             return self._as_sql(self.query)
-        innerq = self.query.clone()
-        innerq.__class__ = Query
+        innerq = self.query.clone(klass=Query)
         innerq.clear_select_clause()
         pk = self.query.model._meta.pk
         innerq.select = [pk.get_col(self.query.get_initial_alias())]
@@ -2169,7 +2168,7 @@ class SQLUpdateCompiler(SQLCompiler):
         count = self.query.count_active_tables()
         if not self.query.related_updates and count == 1:
             return
-        query = self.query.chain(klass=Query)
+        query = self.query.clone(klass=Query)
         query.select_related = False
         query.clear_ordering(force=True)
         query.extra = {}

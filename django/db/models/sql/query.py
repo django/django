@@ -162,9 +162,6 @@ class RawQuery:
         self.extra_select = {}
         self.annotation_select = {}
 
-    def chain(self, using):
-        return self.clone(using)
-
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
 
@@ -379,10 +376,12 @@ class Query(BaseExpression):
         if self.model:
             return self.model._meta
 
-    def clone(self):
+    def clone(self, *, klass=None):
         """
         Return a copy of the current Query. A lightweight alternative to
         deepcopy().
+
+        The klass argument changes the type of the Query, e.g. UpdateQuery.
         """
         obj = Empty()
         obj.__class__ = self.__class__
@@ -418,25 +417,21 @@ class Query(BaseExpression):
             obj.select_related = copy.deepcopy(obj.select_related)
         if "subq_aliases" in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
-        obj.used_aliases = self.used_aliases.copy()
         obj._filtered_relations = self._filtered_relations.copy()
         # Clear the cached_property, if it exists.
         obj.__dict__.pop("base_table", None)
-        return obj
 
-    def chain(self, klass=None):
-        """
-        Return a copy of the current Query that's ready for another operation.
-        The klass argument changes the type of the Query, e.g. UpdateQuery.
-        """
-        obj = self.clone()
+        if obj.filter_is_sticky:
+            obj.filter_is_sticky = False
+            obj.used_aliases = self.used_aliases.copy()
+        else:
+            obj.used_aliases = set()
+
         if klass and obj.__class__ != klass:
             obj.__class__ = klass
-        if not obj.filter_is_sticky:
-            obj.used_aliases = set()
-        obj.filter_is_sticky = False
         if hasattr(obj, "_setup_query"):
             obj._setup_query()
+
         return obj
 
     def relabeled_clone(self, change_map):
@@ -1521,7 +1516,7 @@ class Query(BaseExpression):
                 filter_expr,
                 branch_negated=branch_negated,
                 current_negated=current_negated,
-                used_aliases=can_reuse,
+                can_reuse=can_reuse,
                 allow_joins=allow_joins,
                 split_subq=split_subq,
                 check_filterable=check_filterable,
@@ -1674,7 +1669,7 @@ class Query(BaseExpression):
     def _add_q(
         self,
         q_object,
-        used_aliases,
+        can_reuse,
         branch_negated=False,
         current_negated=False,
         allow_joins=True,
@@ -1694,7 +1689,7 @@ class Query(BaseExpression):
         for child in q_object.children:
             child_clause, needed_inner = self.build_filter(
                 child,
-                can_reuse=used_aliases,
+                can_reuse=can_reuse,
                 branch_negated=branch_negated,
                 current_negated=current_negated,
                 allow_joins=allow_joins,
