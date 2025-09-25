@@ -2445,8 +2445,8 @@ This has a number of caveats though:
         Entry.objects.bulk_create(batch, batch_size)
 
 The ``batch_size`` parameter controls how many objects are created in a single
-query. The default is to create all objects in one batch, except for SQLite
-where the default is such that at most 999 variables per query are used.
+query. The default is to create as many objects in one batch as the database
+will allow. (SQLite and Oracle limit the number of parameters in a query.)
 
 On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
