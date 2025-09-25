@@ -2570,3 +2570,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
         self.assertTrue(m2m_widget.is_displayed())
         self.take_screenshot("tabular")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_long_title_with_tabular_inline_layout(self):
+        from selenium.webdriver.common.by import By
+
+        person = Person.objects.create(firstname="Lee")
+        Author.objects.create(name="very " + "long " * 30 + "title", person=person)
+        self.admin_login(username="super", password="secret")
+        url = reverse("admin:admin_inlines_person_change", args=(person.pk,))
+        self.selenium.get(self.live_server_url + url)
+
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original p"
+        )
+        links = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original a"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertGreater(len(object_str.text), 100)
+        self.assertEqual(len(links), 2)
+        self.take_screenshot("tabular")

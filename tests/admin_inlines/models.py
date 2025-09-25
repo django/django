@@ -45,9 +45,15 @@ class Book(models.Model):
 
 
 class Author(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=1000)
     books = models.ManyToManyField(Book)
     person = models.OneToOneField("Person", models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return "/author/"
 
 
 class NonAutoPKBook(models.Model):

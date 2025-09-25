@@ -449,8 +449,21 @@ body.popup .submit-row {
 }
 
 .inline-group .tabular tr td.original {
-    padding: 2px 0 0 0;
-    width: 0;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    left: 0;
+    height: 2em;
+    padding: 2px 9px;
+    overflow: hidden;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: var(--body-quiet-color);
+    border-bottom: 0;
+}
+
+.inline-group .tabular tr td.original:has(p) {
+    width: 100%;
 }
 
 .inline-group .tabular th.original {
@@ -463,14 +476,13 @@ body.popup .submit-row {
 }
 
 .inline-group .tabular td.original p {
-    position: absolute;
-    left: 0;
-    height: 1.2em;
-    padding: 2px 9px;
+    display: inline-block;
+    max-width: 80%;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 0.875rem;
     font-weight: bold;
-    color: var(--body-quiet-color);
 }
 
 .inline-group div.add-row,
@@ -489,6 +501,17 @@ body.popup .submit-row {
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
     font-size: 0.75rem;
+}
+
+.inline-group a.viewsitelink {
+    display: inline-block;
+    float: none;
+    line-height: 1rem;
+    white-space: nowrap;
+}
+
+.inline-group:has(a.inlinechangelink) a.viewsitelink {
+    margin: 0 0.75rem;
 }
 
 .empty-form {

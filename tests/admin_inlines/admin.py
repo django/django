@@ -397,6 +397,7 @@ class TeacherAdmin(admin.ModelAdmin):
 
 class AuthorTabularInline(admin.TabularInline):
     model = Author
+    show_change_link = True
 
 
 class FashonistaStackedInline(admin.StackedInline):
