@@ -400,6 +400,11 @@ class AuthorTabularInline(admin.TabularInline):
     show_change_link = True
 
 
+class AuthorStackedInline(admin.StackedInline):
+    model = Author
+    show_change_link = True
+
+
 class FashonistaStackedInline(admin.StackedInline):
     model = Fashionista
 
@@ -538,3 +543,6 @@ site3 = admin.AdminSite(name="stacked_inline_hidden_field_in_group_admin")
 site3.register(SomeParentModel, inlines=[ChildHiddenFieldInFieldsGroupStackedInline])
 site4 = admin.AdminSite(name="stacked_inline_hidden_field_on_single_line_admin")
 site4.register(SomeParentModel, inlines=[ChildHiddenFieldOnSingleLineStackedInline])
+site5 = admin.AdminSite(name="admin5")
+site5.register(Person, inlines=[AuthorStackedInline])
+site5.register(Author, AuthorAdmin)

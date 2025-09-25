@@ -2572,7 +2572,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("tabular")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
-    def test_long_title_with_tabular_inline_layout(self):
+    def test_long_title_with_inlines_layout(self):
         from selenium.webdriver.common.by import By
 
         person = Person.objects.create(firstname="Lee")
@@ -2591,3 +2591,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertGreater(len(object_str.text), 100)
         self.assertEqual(len(links), 2)
         self.take_screenshot("tabular")
+
+        url = reverse("admin5:admin_inlines_person_change", args=(person.pk,))
+        self.selenium.get(self.live_server_url + url)
+
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module div.inline-related h3 div"
+        )
+        links = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module div.inline-related div.inline-links a"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertGreater(len(object_str.text), 100)
+        self.assertEqual(len(links), 2)
+        self.take_screenshot("stacked")
