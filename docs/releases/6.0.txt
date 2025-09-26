@@ -154,10 +154,11 @@ Minor features
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* It is now possible to perform asynchronous raw SQL queries using an async cursor.
+* It is now possible to perform asynchronous raw SQL queries using an async
+  cursor.
   This is only possible on backends that support async-native connections.
-  Currently only supported in PostreSQL with the ``django.db.backends.postgresql``
-  backend.
+  Currently only supported in PostreSQL with the
+  ``django.db.backends.postgresql`` backend.
 * It is now possible to perform asynchronous raw SQL queries using an async
   cursor, if the backend supports async-native connections. This is only
   supported on PostgreSQL with ``psycopg`` 3.1.8+. See

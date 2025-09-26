@@ -992,7 +992,9 @@ class BaseDatabaseWrapper:
         if it opened one, closes it to avoid leaving a dangling connection.
         This is useful for operations outside of the request-response cycle.
 
-        Provide a cursor: async with self.atemporary_connection() as cursor: ...
+        Provide a cursor::
+            async with self.atemporary_connection() as cursor:
+                ...
         """
         # unused
 

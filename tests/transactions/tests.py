@@ -650,8 +650,8 @@ class AsyncTransactionTestCase(TransactionTestCase):
                     result = await cursor2.afetchmany()
                     assert len(result) == 1
 
-                # Outermost connection doesn't see what the innermost did, because the
-                # innermost connection hasn't exited yet.
+                # Outermost connection doesn't see what the innermost did,
+                # because the innermost connection hasn't exited yet.
                 async with connection.acursor() as cursor:
                     await cursor.aexecute("SELECT * FROM transactions_reporter")
                     result = await cursor.afetchmany()
