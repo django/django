@@ -112,7 +112,7 @@
             } else {
                 // Otherwise, just insert the remove button as the
                 // last child element of the form's container:
-                row.children(":first").append('<span><a role="button" class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></span>");
+                row.find('h3 > div').append('<span><a role="button" class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></span>");
             }
             // Add delete handler for each row.
             row.find("a." + options.deleteCssClass).on('click', inlineDeleteHandler.bind(this));
