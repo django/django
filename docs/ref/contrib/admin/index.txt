@@ -1308,6 +1308,17 @@ subclass::
     a full count on the table which can be expensive if the table contains a
     large number of rows.
 
+.. attribute:: ModelAdmin.estimated_count
+
+    .. versionadded:: 6.0
+
+    Set ``estimated_count`` to ``True`` to display an approximate number of
+    rows in the change list. When enabled, the count is retrieved using
+    low-cost database specific queries (for example ``pg_class.reltuples`` on
+    PostgreSQL or ``SHOW TABLE STATUS`` on MySQL). Unsupported databases fall
+    back to the exact ``COUNT(*)`` query. The estimated value is used only for
+    pagination display and may not reflect the precise row count.
+
 .. attribute:: ModelAdmin.sortable_by
 
     By default, the change list page allows sorting by all model fields (and
@@ -3535,9 +3546,10 @@ The ``staff_member_required`` decorator
       ``/admin/login/?next=/admin/polls/question/3/``.
 
     Example usage::
+    
+    .. code-block:: python
 
         from django.contrib.admin.views.decorators import staff_member_required
-
 
         @staff_member_required
         def my_view(request): ...
