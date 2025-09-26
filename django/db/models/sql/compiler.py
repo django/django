@@ -1794,14 +1794,12 @@ class SQLInsertCompiler(SQLCompiler):
             return None, []
         if not getattr(self.query.condition, "conditional", False):
             raise ValueError(
-                "The 'condition' parameter of bulk_create must be a conditional "
-                "expression, an instance of Q, F, or Excluded."
+                "bulk_create(condition=...) must be a conditional expression"
             )
         query = Query(self.query.model)
         query.add_q(self.query.condition)
-        compiler = query.get_compiler(connection=self.connection)
-        node = query.where
-        sql, params = compiler.compile(node)
+        compiler = query.get_compiler(self.using, self.connection)
+        sql, params = compiler.compile(query.where)
         return sql, params
 
     def as_sql(self):

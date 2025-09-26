@@ -1084,3 +1084,44 @@ class BulkCreateTransactionTests(TransactionTestCase):
             UpsertConflict.objects.bulk_create(
                 [UpsertConflict(number=1, rank=1, name="Steve")], **bulk_create_kwargs
             )
+
+    @skipUnlessDBFeature("supports_update_conflicts_with_condition")
+    def test_bulk_create_condition_must_be_conditional(self):
+        """
+        Passing a non-conditional expression (e.g. bare F())
+        to condition= should error.
+        """
+        UpsertConflict.objects.bulk_create(
+            [UpsertConflict(number=1, rank=1, name="John")]
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "bulk_create(condition=...) must be a conditional expression",
+        ):
+            UpsertConflict.objects.bulk_create(
+                [UpsertConflict(number=1, rank=2, name="Steve")],
+                update_conflicts=True,
+                update_fields=["rank", "name"],
+                unique_fields=["number"],
+                condition=F("rank"),
+            )
+
+    @skipUnlessDBFeature("supports_update_conflicts_with_condition")
+    def test_bulk_create_with_condition_single_row_params(self):
+        """
+        Condition params must be wired for single-row bulk_create as well.
+        """
+        UpsertConflict.objects.bulk_create(
+            [UpsertConflict(number=1, rank=2, name="John")]
+        )
+        UpsertConflict.objects.bulk_create(
+            [UpsertConflict(number=1, rank=4, name="Steve")],
+            update_conflicts=True,
+            update_fields=["rank", "name"],
+            unique_fields=["number"],
+            condition=Q(rank__lt=3),
+        )
+        self.assertEqual(
+            UpsertConflict.objects.get(number=1).name,
+            "Steve",
+        )

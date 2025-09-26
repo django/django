@@ -312,7 +312,7 @@ companies::
 
 .. class:: Excluded(name)
 
-.. versionadded:: 6.0
+.. versionadded:: 6.1
 
 An :class:`~django.db.models.Excluded` expression refers to the values
 **proposed for insertion** during an ``INSERT ... ON CONFLICT DO UPDATE``
@@ -359,12 +359,10 @@ The corresponding backend feature flags are:
 * ``django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition``
 * ``django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression``
 
-
 See also
 ~~~~~~~~
 
-* :meth:`~django.db.models.query.QuerySet.bulk_create`
-(``condition=`` parameter)
+* :meth:`~django.db.models.query.QuerySet.bulk_create` (``condition=`` parameter)
 
 .. _func-expressions:
 
@@ -533,7 +531,7 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: allow_order_by
 
-        .. versionadded:: 6.0
+        .. versionadded:: 6.1
 
         A class attribute determining whether or not this aggregate function
         allows passing a ``order_by`` keyword argument. If set to ``False``

@@ -2461,14 +2461,17 @@ be in conflict must be provided.
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
 
-.. versionchanged:: 6.0
+.. versionchanged:: 6.1
 
    Added the ``condition`` parameter to support conditional updates during
-   ``bulk_create(..., update_conflicts=True)``. ``condition`` accepts Django
-   conditional expressions (:class:`~django.db.models.Q`,
-   :class:`~django.db.models.F`, and
-   :class:`~django.db.models.Excluded`).
+   ``bulk_create(..., update_conflicts=True)``. ``condition`` must be a Django
+   *conditional expression* (a :class:`~django.db.models.Q` object). You can
+   reference :class:`~django.db.models.F` and
+   :class:`~django.db.models.Excluded` **inside** ``Q(...)`` lookups, e.g.
+   ``Q(rank__lt=F("number") + 1)`` or ``Q(rank__lt=Excluded("rank"))``.
    See :ref:`excluded-expressions`. It is supported on PostgreSQL and SQLite.
+
+
 
 .. warning::
 
