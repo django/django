@@ -2598,6 +2598,11 @@ Example:
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
+.. versionchanged:: 6.1
+
+    Support for chaining ``in_bulk()`` after :meth:`values` or
+    :meth:`values_list` was added.
+
 ``iterator()``
 ~~~~~~~~~~~~~~
 
