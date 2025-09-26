@@ -2471,8 +2471,6 @@ each model instance (if the database normally supports it).
    ``Q(rank__lt=F("number") + 1)`` or ``Q(rank__lt=Excluded("rank"))``.
    See :ref:`excluded-expressions`. It is supported on PostgreSQL and SQLite.
 
-
-
 .. warning::
 
     On MySQL and MariaDB, setting the ``ignore_conflicts`` parameter to
@@ -2599,11 +2597,6 @@ Example:
     {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
-
-.. versionchanged:: 6.1
-
-    Support for chaining ``in_bulk()`` after :meth:`values` or
-    :meth:`values_list` was added.
 
 ``iterator()``
 ~~~~~~~~~~~~~~

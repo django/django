@@ -362,7 +362,7 @@ The corresponding backend feature flags are:
 See also
 ~~~~~~~~
 
-* :meth:`~django.db.models.query.QuerySet.bulk_create` (``condition=`` parameter)
+* :meth:`.QuerySet.bulk_create` (``condition=`` parameter)
 
 .. _func-expressions:
 
