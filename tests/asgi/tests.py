@@ -231,7 +231,6 @@ class ASGITest(SimpleTestCase):
 
         # Request class that always fails creation with RequestDataTooBig.
         class TestASGIRequest(ASGIRequest):
-
             def __init__(self, scope, body_file):
                 super().__init__(scope, body_file)
                 raise RequestDataTooBig()
@@ -763,3 +762,61 @@ class ASGITest(SimpleTestCase):
                 request = ASGIRequest(scope, None)
                 self.assertEqual(request.META["HTTP_COOKIE"], "a=abc; b=def; c=ghi")
                 self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
+
+    async def test_streaming_response_ends_with_more_body_false(self):
+        """
+        Test that streaming responses end with an explicit more_body=False signal.
+
+        This ensures compatibility with ASGI servers like Vercel's that require
+        explicit signaling to finalize responses.
+        """
+
+        async def streaming_generator():
+            yield b"chunk1"
+            yield b"chunk2"
+
+        async def streaming_view(request):
+            return StreamingHttpResponse(streaming_generator())
+
+        # Create a custom request class for testing
+        class TestASGIRequest(ASGIRequest):
+            urlconf = (path("stream/", streaming_view),)
+
+        # Handler to use request class
+        class TestASGIHandler(ASGIHandler):
+            request_class = TestASGIRequest
+
+        application = TestASGIHandler()
+        scope = self.async_request_factory._base_scope(path="/stream/")
+        communicator = ApplicationCommunicator(application, scope)
+
+        await communicator.send_input({"type": "http.request"})
+
+        # Collect all messages
+        messages = []
+        while True:
+            try:
+                message = await communicator.receive_output(timeout=1)
+                messages.append(message)
+                if message["type"] == "http.response.body":
+                    # If this message doesn't have more_body=True, it should be the final one
+                    if not message.get("more_body", False):
+                        break
+            except asyncio.TimeoutError:
+                break
+
+        # Verify we got the expected messages
+        self.assertGreater(len(messages), 0)
+
+        # The final message should explicitly have more_body=False
+        final_body_messages = [
+            msg for msg in messages if msg["type"] == "http.response.body"
+        ]
+        self.assertTrue(len(final_body_messages) >= 3)  # start + 2 chunks + final
+
+        final_message = final_body_messages[-1]
+        self.assertFalse(final_message.get("more_body", True))
+        # The final message may or may not have a body field
+        self.assertIn(final_message.get("body"), [b"", None])
+
+        await communicator.wait()
