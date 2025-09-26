@@ -751,7 +751,7 @@ class Field(RegisterLookupMixin):
         something else than None, then the returned value is used when saving
         the new instance.
         """
-        if self.default:
+        if self.has_default():
             return self.get_default()
         return None
 
