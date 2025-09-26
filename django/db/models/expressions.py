@@ -1046,6 +1046,47 @@ class Sliced(F):
         return resolved.output_field.slice_expression(expr, self.start, self.length)
 
 
+class Excluded(F):
+    def resolve_expression(self, *args, **kwargs):
+        super().resolve_expression(*args, **kwargs)
+        self.output_field = None
+        return self
+
+    def as_sql(self, compiler, connection):
+        if not connection.features.supports_excluded_expression:
+            raise NotSupportedError(
+                f"{connection.vendor} doesn't support partial updating rows on "
+                "conflicts during INSERT"
+            )
+        quoted_field_name = compiler.quote_name_unless_alias(self.name)
+        sql = f"EXCLUDED.{quoted_field_name}"
+        return sql, []
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name})"
+
+    @cached_property
+    def output_field(self):
+        """Return the output type of this expressions."""
+        output_field = self._resolve_output_field()
+        if output_field is None:
+            self._output_field_resolved_to_none = True
+            raise FieldError("Cannot resolve expression type, unknown output_field")
+        return output_field
+
+    @cached_property
+    def _output_field_or_none(self):
+        """
+        Return the output field of this expression, or None if
+        _resolve_output_field() didn't return an output type.
+        """
+        try:
+            return self.output_field
+        except FieldError:
+            if not self._output_field_resolved_to_none:
+                raise
+
+
 @deconstructible(path="django.db.models.Func")
 class Func(SQLiteNumericMixin, Expression):
     """An SQL function call."""

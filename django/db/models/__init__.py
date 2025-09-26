@@ -19,6 +19,7 @@ from django.db.models.enums import *  # NOQA
 from django.db.models.enums import __all__ as enums_all
 from django.db.models.expressions import (
     Case,
+    Excluded,
     Exists,
     Expression,
     ExpressionList,
@@ -84,6 +85,7 @@ __all__ += [
     "RestrictedError",
     "Case",
     "CompositePrimaryKey",
+    "Excluded",
     "Exists",
     "Expression",
     "ExpressionList",

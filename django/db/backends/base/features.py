@@ -312,6 +312,14 @@ class BaseDatabaseFeatures:
     supports_update_conflicts = False
     supports_update_conflicts_with_target = False
 
+    # Does the backend support partial updating rows on conflicts during
+    # INSERT?
+    supports_update_conflicts_with_condition = False
+
+    # Does the backend support the special "excluded" table used to reference
+    # the values originally proposed for insertion in ON CONFLICT DO UPDATE?
+    supports_excluded_expression = False
+
     # Does this backend require casting the results of CASE expressions used
     # in UPDATE statements to ensure the expression has the correct type?
     requires_casted_case_in_updates = False

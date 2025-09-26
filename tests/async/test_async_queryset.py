@@ -5,10 +5,10 @@ from datetime import datetime
 from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, Sum
+from django.db.models import Excluded, F, Prefetch, Q, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import RelatedModel, SimpleModel
+from .models import RelatedModel, SimpleModel, UpsertConflict
 
 
 class AsyncQuerySetTest(TestCase):
@@ -121,6 +121,37 @@ class AsyncQuerySetTest(TestCase):
         instances = [SimpleModel(field=i) for i in range(10)]
         qs = await SimpleModel.objects.abulk_create(instances)
         self.assertEqual(len(qs), 10)
+
+    @skipUnlessDBFeature(
+        "supports_excluded_expression",
+        "supports_update_conflicts_with_condition",
+    )
+    @async_to_sync
+    async def test_abulk_create_with_complex_excluded_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=3, name="John"),
+            UpsertConflict(number=2, rank=5, name="Mary"),
+            UpsertConflict(number=3, rank=4, name="EmmaAlice"),
+        ]
+        await UpsertConflict.objects.abulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=5, name="Steve"),
+            UpsertConflict(number=2, rank=4, name="Olivia"),
+            UpsertConflict(number=3, rank=6, name="Emma"),
+        ]
+        await UpsertConflict.objects.abulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=(
+                Q(rank__gt=F("number") + 1) & Q(rank__lt=Excluded("rank"))
+                | Q(name__startswith=Excluded("name"))
+            ),
+        )
+        self.assertEqual((await UpsertConflict.objects.aget(number=1)).name, "Steve")
+        self.assertEqual((await UpsertConflict.objects.aget(number=2)).name, "Mary")
+        self.assertEqual((await UpsertConflict.objects.aget(number=3)).name, "Emma")
 
     @skipUnlessDBFeature("has_bulk_insert", "supports_update_conflicts")
     @skipIfDBFeature("supports_update_conflicts_with_target")
