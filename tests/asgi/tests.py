@@ -765,9 +765,9 @@ class ASGITest(SimpleTestCase):
 
     async def test_streaming_response_ends_with_more_body_false(self):
         """
-        Test that streaming responses end with an explicit more_body=False signal.
+        Test that streaming responses end with explicit more_body=False signal.
 
-        This ensures compatibility with ASGI servers like Vercel's that require
+        Ensures compatibility with ASGI servers like Vercel that require
         explicit signaling to finalize responses.
         """
 
@@ -799,7 +799,7 @@ class ASGITest(SimpleTestCase):
                 message = await communicator.receive_output(timeout=1)
                 messages.append(message)
                 if message["type"] == "http.response.body":
-                    # If this message doesn't have more_body=True, it should be the final one
+                    # If message lacks more_body=True, it should be the final one
                     if not message.get("more_body", False):
                         break
             except asyncio.TimeoutError:
