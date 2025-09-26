@@ -891,6 +891,98 @@ Usage example:
     >>> author.json_object
     {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
 
+``JSONSet``
+-----------
+
+.. class:: JSONSet(expression, output_field=None, **fields)
+
+Inserts or updates specific keys within a :class:`~django.db.models.JSONField`
+in the database. Accepts an expression representing the
+:class:`~django.db.models.JSONField`, an optional ``output_field`` that
+defines the data type of the resulting expression, and key-value pairs
+specifying the keys and their corresponding values within the JSON structure.
+If a specified key exists, it will be updated; if not, it will be inserted.
+
+Given the following model::
+
+    class UserPreferences(models.Model):
+        settings = models.JSONField()
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONSet
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={
+    ...         "font": {"name": "Arial", "size": 10},
+    ...         "notifications": True,
+    ...     }
+    ... )
+    >>> UserPreferences.objects.update(
+    ...     settings=JSONSet("settings", font__size=20, notifications=False, theme="dark")
+    ... )
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> user_preferences.settings
+    {'font': {'name': 'Arial', 'size': 20}, 'notifications': False, 'theme': 'dark'}
+
+.. warning::
+
+    In PostgreSQL, MySQL, MariaDB, and Oracle, ``JSONSet`` does not support
+    inserting or updating nested keys if the key path does not exist
+    previously. If you attempt to update or insert nested keys that don't
+    exist, they will not be created:
+
+    .. code-block:: pycon
+
+        >>> from django.db.models.functions import JSONSet
+        >>> user_preferences = UserPreferences.objects.create(
+        ...     settings={
+        ...         "font": {"name": "Arial", "size": 10},
+        ...         "notifications": True,
+        ...     }
+        ... )
+        >>> UserPreferences.objects.update(
+        ...     settings=JSONSet("settings", font__color="white", theme__type="dark")
+        ... )
+        1
+        >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        >>> user_preferences.settings
+        {'font': {'name': 'Arial', 'size': 10, 'color': 'white'}, 'notifications': True}  # theme__type will not be added
+
+``JSONRemove``
+--------------
+
+.. class:: JSONRemove(expression, *paths, **kwargs)
+
+Removes specified paths from a :class:`~django.db.models.JSONField` in the
+database. Accepts an expression identifying the
+:class:`~django.db.models.JSONField` and a variable number of paths defining
+the keys to be deleted from the JSON structure.
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONRemove
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={
+    ...         "font": {"name": "Arial", "size": 10},
+    ...         "notifications": True,
+    ...     }
+    ... )
+    >>> UserPreferences.objects.update(
+    ...     settings=JSONRemove("settings", "font__size", "notifications")
+    ... )
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'font': {'name': 'Arial'}}
+
+For more information on how to use the ``JSONSet`` and ``JSONRemove``
+functions, see :ref:`updating-jsonfield`.
+
 .. _math-functions:
 
 Math Functions

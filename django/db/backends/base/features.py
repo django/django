@@ -357,6 +357,15 @@ class BaseDatabaseFeatures:
     has_json_object_function = True
     # Does the backend support negative JSON array indexing?
     supports_json_negative_indexing = True
+    # Does the backend support partial updates to JSONField?
+    supports_partial_json_update = True
+    # Does JSONSet only append to an array if the index equals to the array length?
+    json_set_array_append_requires_length_as_index = False
+    # Does JSONSet wrap an existing non-array value into an array when the path is an
+    # array index?
+    json_set_wraps_non_array_to_array = False
+    # Does JSONSet create missing parent path when it does not exist?
+    json_set_creates_missing_parent_path = False
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
