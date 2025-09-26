@@ -141,7 +141,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [16, 17]
+        version: [16, 17, 18]
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
     name: PostgreSQL Versions
