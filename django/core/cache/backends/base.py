@@ -207,13 +207,7 @@ class BaseCache:
         return d
 
     async def aget_many(self, keys, version=None):
-        """See get_many()."""
-        d = {}
-        for k in keys:
-            val = await self.aget(k, self._missing_key, version=version)
-            if val is not self._missing_key:
-                d[k] = val
-        return d
+        return await sync_to_async(self.get_many)(keys, version=version)
 
     def get_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -255,10 +249,7 @@ class BaseCache:
         )
 
     async def ahas_key(self, key, version=None):
-        return (
-            await self.aget(key, self._missing_key, version=version)
-            is not self._missing_key
-        )
+        return await sync_to_async(self.has_key)(key, version=version)
 
     def incr(self, key, delta=1, version=None):
         """
@@ -274,12 +265,7 @@ class BaseCache:
 
     async def aincr(self, key, delta=1, version=None):
         """See incr()."""
-        value = await self.aget(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-        new_value = value + delta
-        await self.aset(key, new_value, version=version)
-        return new_value
+        return await sync_to_async(self.incr)(key, delta=delta, version=version)
 
     def decr(self, key, delta=1, version=None):
         """
@@ -289,7 +275,7 @@ class BaseCache:
         return self.incr(key, -delta, version=version)
 
     async def adecr(self, key, delta=1, version=None):
-        return await self.aincr(key, -delta, version=version)
+        return await sync_to_async(self.decr)(key, delta=delta, version=version)
 
     def __contains__(self, key):
         """
@@ -317,9 +303,9 @@ class BaseCache:
         return []
 
     async def aset_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        for key, value in data.items():
-            await self.aset(key, value, timeout=timeout, version=version)
-        return []
+        return await sync_to_async(self.set_many)(
+            data, timeout=timeout, version=version
+        )
 
     def delete_many(self, keys, version=None):
         """
@@ -331,8 +317,7 @@ class BaseCache:
             self.delete(key, version=version)
 
     async def adelete_many(self, keys, version=None):
-        for key in keys:
-            await self.adelete(key, version=version)
+        return await sync_to_async(self.delete_many)(keys, version=version)
 
     def clear(self):
         """Remove *all* values from the cache at once."""
@@ -361,16 +346,7 @@ class BaseCache:
 
     async def aincr_version(self, key, delta=1, version=None):
         """See incr_version()."""
-        if version is None:
-            version = self.version
-
-        value = await self.aget(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-
-        await self.aset(key, value, version=version + delta)
-        await self.adelete(key, version=version)
-        return version + delta
+        return await sync_to_async(self.incr_version)(key, delta=delta, version=version)
 
     def decr_version(self, key, delta=1, version=None):
         """
@@ -380,14 +356,14 @@ class BaseCache:
         return self.incr_version(key, -delta, version)
 
     async def adecr_version(self, key, delta=1, version=None):
-        return await self.aincr_version(key, -delta, version)
+        return await sync_to_async(self.decr_version)(key, delta=delta, version=version)
 
     def close(self, **kwargs):
         """Close the cache connection"""
         pass
 
     async def aclose(self, **kwargs):
-        pass
+        return await sync_to_async(self.close)(**kwargs)
 
 
 memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")
