@@ -531,7 +531,7 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: allow_order_by
 
-        .. versionadded:: 6.1
+        .. versionadded:: 6.0
 
         A class attribute determining whether or not this aggregate function
         allows passing a ``order_by`` keyword argument. If set to ``False``
