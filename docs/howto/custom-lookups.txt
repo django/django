@@ -122,6 +122,14 @@ SQL function ``ABS()`` to transform the value before comparison::
       lookup_name = "abs"
       function = "ABS"
 
+      def as_sql(self, compiler, connection):
+          lhs, lhs_params = self.process_lhs(compiler, connection)
+          return "%s(%s)" % (self.function, lhs), lhs_params
+
+This override uses ``process_lhs()`` to safely compile the left-hand side of
+the expression. This is recommended when customizing SQL generation in
+``Transform.as_sql()`` methods.
+
 Next, let's register it for ``IntegerField``::
 
   from django.db.models import IntegerField

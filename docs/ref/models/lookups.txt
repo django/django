@@ -237,6 +237,8 @@ the following methods:
         can be used for compiling vendor specific SQL. If ``lhs`` is not
         ``None``, use it as the processed ``lhs`` instead of ``self.lhs``.
 
+        .. versionadded:: 6.1
+
     .. method:: process_rhs(compiler, connection)
 
         Behaves the same way as :meth:`process_lhs`, for the right-hand side.
