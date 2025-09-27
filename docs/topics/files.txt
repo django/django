@@ -298,7 +298,7 @@ make this work, connect to the
 :data:`~django.test.signals.setting_changed` signal and reset storages when
 ``STORAGES`` is overridden::
 
-    from django.core.files.storage import storages
+    from django.core.files.storage import default_storage, staticfiles_storage
     from django.core.signals import setting_changed
     from django.dispatch import receiver
 
@@ -306,13 +306,14 @@ make this work, connect to the
     @receiver(setting_changed)
     def update_filefield_storage(setting, **kwargs):
         if setting == "STORAGES":
-            storages._storages.clear()
+            default_storage._wrapped = empty
+            staticfiles_storage._wrapped = empty
 
 And in your tests::
 
     @override_settings(
         STORAGES={
-            "mystorage": {
+            "default": {
                 "BACKEND": "django.core.files.storage.InMemoryStorage",
             }
         }
