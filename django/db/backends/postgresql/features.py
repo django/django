@@ -67,7 +67,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
     supports_stored_generated_columns = True
-    supports_virtual_generated_columns = False
     can_rename_index = True
     test_collations = {
         "deterministic": "C",
@@ -168,9 +167,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_17(self):
         return self.connection.pg_version >= 170000
 
+    @cached_property
+    def is_postgresql_18(self):
+        return self.connection.pg_version >= 180000
+
     supports_unlimited_charfield = True
     supports_nulls_distinct_unique_constraints = property(
         operator.attrgetter("is_postgresql_15")
     )
 
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
+    supports_virtual_generated_columns = property(
+        operator.attrgetter("is_postgresql_18")
+    )

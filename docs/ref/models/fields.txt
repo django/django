@@ -1302,8 +1302,8 @@ materialized view.
     real column. If ``False``, the column acts as a virtual column and does
     not occupy database storage space.
 
-    PostgreSQL only supports persisted columns. Oracle only supports virtual
-    columns.
+    PostgreSQL < 18 only supports persisted columns. Oracle only supports
+    virtual columns.
 
 .. admonition:: Database limitations
 
