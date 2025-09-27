@@ -6,6 +6,7 @@ Each filter subclass knows how to display a filter for a field that passes a
 certain test -- e.g. being a DateField or ForeignKey.
 """
 
+import ast
 import datetime
 
 from django.contrib.admin.exceptions import NotRegistered
@@ -634,6 +635,22 @@ class AllValuesFieldListFilter(FieldListFilter):
                 "display": empty_title,
             }
 
+
+class BinaryFieldListFilter(AllValuesFieldListFilter):
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        super().__init__(field, request, params, model, model_admin, field_path)
+        self.lookup_choices = (
+            i.tobytes() if isinstance(i, memoryview) else i for i in self.lookup_choices
+        )
+        if self.used_parameters and self.lookup_kwarg in self.used_parameters:
+            self.used_parameters[self.lookup_kwarg] = (
+                ast.literal_eval(i) for i in self.used_parameters[self.lookup_kwarg]
+            )
+
+
+FieldListFilter.register(
+    lambda f: isinstance(f, models.BinaryField), BinaryFieldListFilter
+)
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 
