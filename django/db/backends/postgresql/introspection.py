@@ -216,7 +216,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "primary_key": kind == "p",
                 "unique": kind in ["p", "u"],
                 "foreign_key": tuple(used_cols.split(".", 1)) if kind == "f" else None,
-                "check": kind == "c",
+                "check": kind in ["c", "n"],
                 "index": False,
                 "definition": None,
                 "options": options,

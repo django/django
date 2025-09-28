@@ -393,8 +393,8 @@ class IntrospectionTests(TransactionTestCase):
                 )
                 field_constraints.add(name)
             elif details["check"]:
-                # Some databases (e.g. Oracle) include additional check
-                # constraints.
+                # Some databases (e.g. Oracle or PostgreSQL 18+) include
+                # additional check constraints.
                 field_constraints.add(name)
         # All constraints are accounted for.
         self.assertEqual(
