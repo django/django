@@ -168,6 +168,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_17(self):
         return self.connection.pg_version >= 170000
 
+    @cached_property
+    def is_postgresql_18(self):
+        return self.connection.pg_version >= 180000
+
     supports_unlimited_charfield = True
     supports_nulls_distinct_unique_constraints = property(
         operator.attrgetter("is_postgresql_15")

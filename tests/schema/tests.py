@@ -4826,16 +4826,20 @@ class SchemaTests(TransactionTestCase):
     def test_add_indexed_charfield(self):
         field = CharField(max_length=255, db_index=True)
         field.set_attributes_from_name("nom_de_plume")
+        expected_constraints = [
+            "schema_author_nom_de_plume_7570a851",
+            "schema_author_nom_de_plume_7570a851_like",
+        ]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_constraints.append("schema_author_nom_de_plume_not_null")
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.add_field(Author, field)
         # Should create two indexes; one for like operator.
         self.assertEqual(
             self.get_constraints_for_column(Author, "nom_de_plume"),
-            [
-                "schema_author_nom_de_plume_7570a851",
-                "schema_author_nom_de_plume_7570a851_like",
-            ],
+            expected_constraints,
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
@@ -4845,13 +4849,17 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.add_field(Author, field)
+        expected_constraints = [
+            "schema_author_nom_de_plume_7570a851_like",
+            "schema_author_nom_de_plume_key",
+        ]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_constraints.append("schema_author_nom_de_plume_not_null")
         # Should create two indexes; one for like operator.
         self.assertEqual(
             self.get_constraints_for_column(Author, "nom_de_plume"),
-            [
-                "schema_author_nom_de_plume_7570a851_like",
-                "schema_author_nom_de_plume_key",
-            ],
+            expected_constraints,
         )
 
     @skipUnlessDBFeature("supports_comments")
@@ -5074,7 +5082,14 @@ class SchemaTests(TransactionTestCase):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        self.assertEqual(self.get_constraints_for_column(Author, "name"), [])
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints = ["schema_author_name_not_null"]
+        else:
+            expected_base_constraints = []
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"), expected_base_constraints
+        )
         # Alter to add db_index=True and create 2 indexes.
         old_field = Author._meta.get_field("name")
         new_field = CharField(max_length=255, db_index=True)
@@ -5083,19 +5098,32 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Author, "name"),
-            ["schema_author_name_1fbc5617", "schema_author_name_1fbc5617_like"],
+            [
+                "schema_author_name_1fbc5617",
+                "schema_author_name_1fbc5617_like",
+                *expected_base_constraints,
+            ],
         )
         # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
-        self.assertEqual(self.get_constraints_for_column(Author, "name"), [])
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"), expected_base_constraints
+        )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_alter_field_add_unique_to_charfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        self.assertEqual(self.get_constraints_for_column(Author, "name"), [])
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints = ["schema_author_name_not_null"]
+        else:
+            expected_base_constraints = []
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"), expected_base_constraints
+        )
         # Alter to add unique=True and create 2 indexes.
         old_field = Author._meta.get_field("name")
         new_field = CharField(max_length=255, unique=True)
@@ -5104,19 +5132,32 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Author, "name"),
-            ["schema_author_name_1fbc5617_like", "schema_author_name_1fbc5617_uniq"],
+            [
+                "schema_author_name_1fbc5617_like",
+                "schema_author_name_1fbc5617_uniq",
+                *expected_base_constraints,
+            ],
         )
         # Remove unique=True to drop both indexes.
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
-        self.assertEqual(self.get_constraints_for_column(Author, "name"), [])
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"), expected_base_constraints
+        )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_alter_field_add_index_to_textfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Note)
-        self.assertEqual(self.get_constraints_for_column(Note, "info"), [])
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints = ["schema_note_info_not_null"]
+        else:
+            expected_base_constraints = []
+        self.assertEqual(
+            self.get_constraints_for_column(Note, "info"), expected_base_constraints
+        )
         # Alter to add db_index=True and create 2 indexes.
         old_field = Note._meta.get_field("info")
         new_field = TextField(db_index=True)
@@ -5125,21 +5166,31 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Note, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Note, "info"),
-            ["schema_note_info_4b0ea695", "schema_note_info_4b0ea695_like"],
+            [
+                "schema_note_info_4b0ea695",
+                "schema_note_info_4b0ea695_like",
+                *expected_base_constraints,
+            ],
         )
         # Remove db_index=True to drop both indexes.
         with connection.schema_editor() as editor:
             editor.alter_field(Note, new_field, old_field, strict=True)
-        self.assertEqual(self.get_constraints_for_column(Note, "info"), [])
+        self.assertEqual(
+            self.get_constraints_for_column(Note, "info"), expected_base_constraints
+        )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_alter_field_add_unique_to_charfield_with_db_index(self):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(BookWithoutAuthor)
+        expected_base_constraints = ["schema_book_title_2dfb2dff_like"]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints.append("schema_book_title_not_null")
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
+            ["schema_book_title_2dfb2dff", *expected_base_constraints],
         )
         # Alter to add unique=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field("title")
@@ -5149,7 +5200,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff_like", "schema_book_title_2dfb2dff_uniq"],
+            sorted([*expected_base_constraints, "schema_book_title_2dfb2dff_uniq"]),
         )
         # Alter to remove unique=True (should drop unique index)
         new_field2 = CharField(max_length=100, db_index=True)
@@ -5158,7 +5209,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
+            ["schema_book_title_2dfb2dff", *expected_base_constraints],
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
@@ -5166,9 +5217,18 @@ class SchemaTests(TransactionTestCase):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(BookWithoutAuthor)
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints = ["schema_book_title_not_null"]
+        else:
+            expected_base_constraints = []
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
+            [
+                "schema_book_title_2dfb2dff",
+                "schema_book_title_2dfb2dff_like",
+                *expected_base_constraints,
+            ],
         )
         # Alter to add unique=True (should replace the index)
         old_field = BookWithoutAuthor._meta.get_field("title")
@@ -5178,7 +5238,11 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff_like", "schema_book_title_2dfb2dff_uniq"],
+            [
+                "schema_book_title_2dfb2dff_like",
+                "schema_book_title_2dfb2dff_uniq",
+                *expected_base_constraints,
+            ],
         )
         # Alter to remove both unique=True and db_index=True (should drop all
         # indexes)
@@ -5187,7 +5251,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(
-            self.get_constraints_for_column(BookWithoutAuthor, "title"), []
+            self.get_constraints_for_column(BookWithoutAuthor, "title"),
+            expected_base_constraints,
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
@@ -5195,9 +5260,13 @@ class SchemaTests(TransactionTestCase):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(BookWithoutAuthor)
+        expected_base_constraints = ["schema_book_title_2dfb2dff_like"]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_base_constraints.append("schema_book_title_not_null")
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
+            ["schema_book_title_2dfb2dff", *expected_base_constraints],
         )
         # Alter to set unique=True and remove db_index=True (should replace the
         # index)
@@ -5208,7 +5277,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff_like", "schema_book_title_2dfb2dff_uniq"],
+            sorted(["schema_book_title_2dfb2dff_uniq", *expected_base_constraints]),
         )
         # Alter to set db_index=True and remove unique=True (should restore
         # index)
@@ -5218,7 +5287,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
-            ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
+            ["schema_book_title_2dfb2dff", *expected_base_constraints],
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
@@ -5226,9 +5295,13 @@ class SchemaTests(TransactionTestCase):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
+        expected_constraints = ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_constraints.append("schema_tag_slug_not_null")
         self.assertEqual(
             self.get_constraints_for_column(Tag, "slug"),
-            ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
+            expected_constraints,
         )
         # Alter to add db_index=True
         old_field = Tag._meta.get_field("slug")
@@ -5238,7 +5311,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Tag, old_field, new_field, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Tag, "slug"),
-            ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
+            expected_constraints,
         )
         # Alter to remove db_index=True
         new_field2 = SlugField(unique=True)
@@ -5247,7 +5320,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Tag, new_field, new_field2, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(Tag, "slug"),
-            ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
+            expected_constraints,
         )
 
     @isolate_apps("schema")
@@ -5261,12 +5334,16 @@ class SchemaTests(TransactionTestCase):
 
         with connection.schema_editor() as editor:
             editor.create_model(SimpleModel)
+        expected_constraints = [
+            "schema_simplemodel_field1_f07a3d6a",
+            "schema_simplemodel_field1_f07a3d6a_like",
+        ]
+        if connection.features.is_postgresql_18:
+            # PostgreSQL 18+ returns NOT NULL constraints.
+            expected_constraints.append("schema_simplemodel_field1_not_null")
         self.assertEqual(
             self.get_constraints_for_column(SimpleModel, "field1"),
-            [
-                "schema_simplemodel_field1_f07a3d6a",
-                "schema_simplemodel_field1_f07a3d6a_like",
-            ],
+            expected_constraints,
         )
         # Change to TextField.
         old_field1 = SimpleModel._meta.get_field("field1")
@@ -5276,10 +5353,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(SimpleModel, old_field1, new_field1, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(SimpleModel, "field1"),
-            [
-                "schema_simplemodel_field1_f07a3d6a",
-                "schema_simplemodel_field1_f07a3d6a_like",
-            ],
+            expected_constraints,
         )
         # Change back to CharField.
         old_field1 = SimpleModel._meta.get_field("field1")
@@ -5289,10 +5363,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(SimpleModel, old_field1, new_field1, strict=True)
         self.assertEqual(
             self.get_constraints_for_column(SimpleModel, "field1"),
-            [
-                "schema_simplemodel_field1_f07a3d6a",
-                "schema_simplemodel_field1_f07a3d6a_like",
-            ],
+            expected_constraints,
         )
 
     def test_alter_field_add_index_to_integerfield(self):
