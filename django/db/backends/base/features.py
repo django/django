@@ -373,6 +373,7 @@ class BaseDatabaseFeatures:
     supports_stored_generated_columns = False
     # Does the backend support virtual generated columns?
     supports_virtual_generated_columns = False
+    supports_generated_columns_as_pk = False
 
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
