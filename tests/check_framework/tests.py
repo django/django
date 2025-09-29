@@ -92,6 +92,21 @@ class SystemCheckFrameworkTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             registry.run_checks()
 
+    def test_run_checks_database_exclusion(self):
+        registry = CheckRegistry()
+
+        database_errors = [checks.Warning("Database Check")]
+
+        @registry.register(Tags.database)
+        def database_system_check(**kwargs):
+            return database_errors
+
+        errors = registry.run_checks()
+        self.assertEqual(errors, [])
+
+        errors = registry.run_checks(databases=["default"])
+        self.assertEqual(errors, database_errors)
+
 
 class MessageTests(SimpleTestCase):
     def test_printing(self):
@@ -190,10 +205,12 @@ class CheckCommandTests(SimpleTestCase):
     def test_simple_call(self):
         call_command("check")
         self.assertEqual(
-            simple_system_check.kwargs, {"app_configs": None, "databases": None}
+            simple_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -203,11 +220,17 @@ class CheckCommandTests(SimpleTestCase):
         admin_config = apps.get_app_config("admin")
         self.assertEqual(
             simple_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
         self.assertEqual(
             tagged_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -215,7 +238,8 @@ class CheckCommandTests(SimpleTestCase):
         call_command("check", tags=["simpletag"])
         self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -273,8 +297,7 @@ class CheckCommandTests(SimpleTestCase):
 
         with override_system_checks([database_check]):
             call_command("check")
-            database_check.assert_called_once_with(app_configs=None, databases=None)
-            database_check.reset_mock()
+            database_check.assert_not_called()
             call_command("check", databases=["default"])
             database_check.assert_called_once_with(
                 app_configs=None, databases=["default"]
