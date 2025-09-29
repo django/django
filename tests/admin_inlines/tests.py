@@ -1846,8 +1846,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
             for y, inline_admin_form in enumerate(inline_admin_formset):
                 y_plus_one = y + 1
                 form_heading = (
-                    f'<h3><div><b>Photo:</b> <span class="inline_label">#{y_plus_one}'
-                    "</span></div></h3>"
+                    f'<h3><span class="inline_label">#{y_plus_one}</span></h3>'
                 )
                 self.assertContains(response, form_heading, html=True)
 
@@ -2596,7 +2595,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + url)
 
         object_str = self.selenium.find_element(
-            By.CSS_SELECTOR, "fieldset.module div.inline-related h3 div"
+            By.CSS_SELECTOR, "fieldset.module div.inline-related h3 span"
         )
         links = self.selenium.find_elements(
             By.CSS_SELECTOR, "fieldset.module div.inline-related div.inline-links a"
