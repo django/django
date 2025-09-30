@@ -157,3 +157,24 @@ class DbDefaultPrimaryKey(models.Model):
 
     class Meta:
         required_db_features = {"supports_expression_defaults"}
+
+
+class MTIParent(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class MTIChild(MTIParent):
+    bval = models.IntegerField(default=0)
+
+
+class MTIGrandChild(MTIChild):
+    cval = models.IntegerField(default=0)
+
+
+class UUIDParent(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=50, blank=True)
+
+
+class UUIDChild(UUIDParent):
+    score = models.IntegerField(default=0)

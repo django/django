@@ -178,6 +178,16 @@ Models
 * :meth:`.QuerySet.in_bulk` now supports chaining after
   :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
+* :meth:`.QuerySet.bulk_create` now supports child models in multi-table
+  inheritance (MTI). On PostgreSQL and SQLite ≥ 3.35, calling
+  ``bulk_create()`` on a child model automatically inserts the full MTI chain
+  (top-most parent(s) then child) while preserving primary key alignment.
+  On backends without support for returning rows from bulk insert (e.g.,
+  MariaDB/MySQL, Oracle), MTI is supported when each child’s parent pointer
+  (primary key) is pre-set (create parents first, then children with
+  ``id=parent.pk``). Conflict handling (``ignore_conflicts`` /
+  ``update_conflicts``) remains unsupported for MTI.
+
 Pagination
 ~~~~~~~~~~
 

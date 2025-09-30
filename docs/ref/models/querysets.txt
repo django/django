@@ -2421,7 +2421,8 @@ This has a number of caveats though:
 
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
-* It does not work with child models in a multi-table inheritance scenario.
+* Child models in a multi-table inheritance (MTI) scenario are supported in
+  limited cases (see *Multi-table inheritance* below).
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
   a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
   is ``False``, the primary key attribute can only be retrieved on certain
@@ -2460,6 +2461,52 @@ be in conflict must be provided.
 
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
+
+Multi-table inheritance
+-----------------------
+
+``bulk_create()`` supports child models in multi-table inheritance (MTI) in
+two cases:
+
+* **Backends that can return rows from bulk inserts** (currently PostgreSQL and
+  SQLite ≥ 3.35): calling ``bulk_create()`` on the *child* model will insert the
+  top-most parent rows, any intermediate MTI levels, and then the child rows,
+  preserving primary key alignment across the hierarchy.
+
+* **Backends without RETURNING** (for example, MariaDB/MySQL, Oracle): MTI is
+  supported only if each child instance has its parent pointer pre-set (i.e.,
+  the child primary key equals the parent primary key). In practice, first
+  bulk-create the parents, then bulk-create the children while setting
+  ``id=parent.pk`` (or the appropriate parent pointer field).
+
+Example (preset parent pointer pattern):
+
+.. code-block:: python
+
+    # Create parents first
+    parents = [ArticleParent(title=f"title {i}") for i in range(3)]
+    ArticleParent.objects.bulk_create(parents)
+
+    # Then create children with the same PKs as their parents
+    children = [
+        ArticleChild(id=p.pk, body=f"body {i}")  # id equals parent.pk
+        for i, p in enumerate(parents)
+    ]
+    ArticleChild.objects.bulk_create(children)
+
+Notes and limitations (MTI):
+
+* Conflict handling is **not supported** for MTI: passing
+  ``ignore_conflicts=True`` or ``update_conflicts=True`` raises
+  :class:`~django.db.NotSupportedError`.
+
+* Multi-level MTI (grandchild, etc.) is supported only on backends that can
+  return rows from bulk inserts.
+
+* UUID primary keys are supported (same patterns as above).
+
+* As with non-MTI models, ``save()`` isn’t called and the ``pre_save`` /
+  ``post_save`` signals aren’t sent.
 
 .. warning::
 

@@ -744,65 +744,6 @@ class QuerySet(AltersData):
             return OnConflict.UPDATE
         return None
 
-    def _prepare_parent_obj(self, obj, parent_model):
-        parent_obj = None
-        if not hasattr(obj, "_mt_processed"):
-            print(
-                f"Préparation de l'objet parent pour le modèle"
-                f" {parent_model} et l'objet {obj}"
-            )
-            parent_obj = parent_model()
-            for field in parent_model._meta.local_fields:
-                if hasattr(obj, field.name):
-                    setattr(parent_obj, field.name, getattr(obj, field.name))
-                    print(
-                        f"Préparation de l'objet parent pour le modèle {parent_model} "
-                        f"et l'objet {obj}"
-                    )
-
-            # obj._mt_processed = True
-        return parent_obj
-
-    def _associate_and_prepare_child_objs(
-        self, objs, inserted_parents_dict, parent_models
-    ):
-        print("Association et préparation des objets enfants")
-        from django.db import models
-
-        child_objs = []
-        for obj_index, obj in enumerate(objs):
-            # Éviter de traiter à nouveau les objets déjà marqués
-            if hasattr(obj, "_mt_processed"):
-                print(f"L'objet {obj} a déjà été traité")
-                continue
-
-            for parent_model in parent_models:
-                parent_obj = inserted_parents_dict[parent_model][
-                    obj_index
-                ]  # Récupérer l'objet parent correspondant
-                print(
-                    f"Association de l'objet parent {parent_obj} "
-                    f"au modèle {parent_model}"
-                )
-                for field in obj._meta.fields:
-                    # Gérer l'association pour chaque type de champ parent potentiel
-                    if (
-                        isinstance(field, models.OneToOneField)
-                        and field.remote_field.model == parent_model
-                    ):
-                        setattr(obj, field.name, parent_obj)
-                        print(
-                            f"Champ {field.name} associé à {parent_obj} "
-                            f"pour l'objet {obj}"
-                        )
-                        break
-
-            obj._mt_processed = (
-                True  # Marquer l'objet pour éviter le traitement récursif
-            )
-            child_objs.append(obj)
-        return child_objs
-
     def _bulk_create_multi_table(
         self,
         objs,
@@ -812,52 +753,193 @@ class QuerySet(AltersData):
         update_fields=None,
         unique_fields=None,
     ):
-        print("Début de la création en masse multi-table")
-        # connection = connections[self.db]
-        # can_return_ids = connection.features.can_return_rows_from_bulk_insert
+        if not objs:
+            return []
 
-        parent_models = set()
-        for obj in objs:
-            for parent in obj._meta.get_parent_list():
-                parent_models.add(parent._meta.concrete_model)
-
-        if not parent_models:
-            raise ValueError("No parent model found")
-
-        # Préparer et insérer les objets parents pour chaque modèle parent
-        inserted_parents_dict = {}
-        for parent_model in parent_models:
-            parent_objs = [
-                self._prepare_parent_obj(obj, parent_model)
-                for obj in objs
-                if self._prepare_parent_obj(obj, parent_model) is not None
-            ]
-            print("parent_objs=", parent_objs)
-            inserted_parents = parent_model.objects.bulk_create(
-                parent_objs, batch_size, ignore_conflicts
-            )
-            inserted_parents_dict[parent_model] = inserted_parents
-            print(
-                f"Objets parents insérés pour le modèle "
-                f"{parent_model}: {inserted_parents}"
+        if ignore_conflicts or update_conflicts or update_fields or unique_fields:
+            raise NotSupportedError(
+                "bulk_create() with multi-table inheritance doesn't support conflict "
+                "handling (ignore/update) yet."
             )
 
-        # Associer les objets parents aux objets enfants et insérer les enfants
-        child_objs = self._associate_and_prepare_child_objs(
-            objs, inserted_parents_dict, parent_models
-        )
-        if child_objs:
-            ch = self.model.objects.bulk_create(
-                child_objs,
+        using = self.db
+        connection = connections[using]
+        model = self.model
+        opts = model._meta
+
+        def _local_fields_for_insert(meta, include_parent_link=None):
+            fields = []
+            for f in meta.local_concrete_fields:
+                if getattr(f, "many_to_many", False):
+                    continue
+                if f.auto_created:
+                    continue
+                if getattr(f, "generated", False):
+                    continue
+                fields.append(f)
+            if include_parent_link is not None and include_parent_link not in fields:
+                fields = [include_parent_link] + fields
+            return fields
+
+        def _parent_link_of(meta):
+            for f in meta.parents.values():
+                if f is not None:
+                    return f
+            return None
+
+        chain = []
+        cur_opts = opts
+        while cur_opts.parents:
+            parent_model, parent_link_from_child = next(
+                ((p, f) for p, f in cur_opts.parents.items() if f is not None),
+                (None, None),
+            )
+            if parent_model is None:
+                break
+            chain.append((parent_model, parent_link_from_child))
+            cur_opts = parent_model._meta
+        chain.reverse()
+
+        if not chain:
+            raise AssertionError(
+                "MTI path called without any concrete parent link. "
+                "Check has_mti_links detection in bulk_create()."
+            )
+
+        if len(chain) == 1:
+            direct_parent, parent_link_on_child = chain[0]
+            parent_pk_att = direct_parent._meta.pk.attname
+
+            def has_preset_ptr(o):
+                if getattr(o, parent_link_on_child.attname, None) is not None:
+                    return True
+                if getattr(o, "pk", None) is not None:
+                    return True
+                return getattr(o, parent_pk_att, None) is not None
+
+            if all(has_preset_ptr(o) for o in objs):
+                for o in objs:
+                    if getattr(o, parent_link_on_child.attname, None) is None:
+                        val = getattr(o, parent_pk_att, None) or getattr(o, "pk", None)
+                        setattr(o, parent_link_on_child.attname, val)
+
+                child_fields = _local_fields_for_insert(
+                    opts, include_parent_link=parent_link_on_child
+                )
+                self._handle_order_with_respect_to(objs)
+                returned_columns = self._batched_insert(
+                    objs,
+                    child_fields,
+                    batch_size,
+                    on_conflict=None,
+                    update_fields=None,
+                    unique_fields=None,
+                )
+                for obj, results in zip(objs, returned_columns):
+                    for result, field in zip(results, opts.db_returning_fields):
+                        setattr(obj, field.attname, result)
+                for obj in objs:
+                    obj._state.adding = False
+                    obj._state.db = using
+                return objs
+
+        if not connection.features.can_return_rows_from_bulk_insert:
+            raise NotSupportedError(
+                "bulk_create() on multi-table inheritance requires the database to "
+                "return rows from bulk insert (e.g., PostgreSQL, SQLite ≥ 3.35), "
+                "or preset parent_ptr on all objects."
+            )
+
+        with transaction.atomic(using=using, savepoint=False):
+            self._handle_order_with_respect_to(objs)
+
+            top_parent, _ = chain[0]
+            top_meta = top_parent._meta
+            top_fields = _local_fields_for_insert(top_meta)
+            top_objs = []
+            for src in objs:
+                data = {}
+                for f in top_fields:
+                    data[f.attname] = getattr(src, f.attname, None)
+                top_objs.append(top_parent(**data))
+
+            top_qs = top_parent._base_manager.using(using)
+            returned_columns = top_qs._batched_insert(
+                top_objs,
+                top_fields,
                 batch_size,
-                ignore_conflicts,
-                update_conflicts,
-                update_fields,
-                unique_fields,
+                on_conflict=None,
+                update_fields=None,
+                unique_fields=None,
             )
-            print(f"Objets enfants insérées: {ch}")
-        else:
-            print("Aucun objet enfant à insérer")
+            for pobj, results in zip(top_objs, returned_columns):
+                for result, field in zip(results, top_meta.db_returning_fields):
+                    setattr(pobj, field.attname, result)
+                pobj._state.adding = False
+                pobj._state.db = using
+            prev_level_pks = [getattr(p, top_meta.pk.attname) for p in top_objs]
+
+            for i in range(1, len(chain)):
+                current_model, _link_from_child_below = chain[i]
+                current_meta = current_model._meta
+                current_parent_link = _parent_link_of(current_meta)
+                assert (
+                    current_parent_link is not None
+                ), "Expected parent link on intermediate MTI model"
+
+                level_fields = _local_fields_for_insert(
+                    current_meta,
+                    include_parent_link=current_parent_link,
+                )
+
+                level_objs = []
+                for idx, src in enumerate(objs):
+                    data = {current_parent_link.attname: prev_level_pks[idx]}
+                    for f in level_fields:
+                        if f is current_parent_link:
+                            continue
+                        data[f.attname] = getattr(src, f.attname, None)
+                    level_objs.append(current_model(**data))
+
+                level_qs = current_model._base_manager.using(using)
+                _ = level_qs._batched_insert(
+                    level_objs,
+                    level_fields,
+                    batch_size,
+                    on_conflict=None,
+                    update_fields=None,
+                    unique_fields=None,
+                )
+                for lo in level_objs:
+                    lo._state.adding = False
+                    lo._state.db = using
+                prev_level_pks = [
+                    getattr(lo, current_meta.pk.attname) for lo in level_objs
+                ]
+
+            direct_parent, parent_link_on_child = chain[-1]
+            child_fields = _local_fields_for_insert(
+                opts, include_parent_link=parent_link_on_child
+            )
+            for idx, o in enumerate(objs):
+                setattr(o, parent_link_on_child.attname, prev_level_pks[idx])
+
+            returned_columns = self._batched_insert(
+                objs,
+                child_fields,
+                batch_size,
+                on_conflict=None,
+                update_fields=None,
+                unique_fields=None,
+            )
+            for obj, results in zip(objs, returned_columns):
+                for result, field in zip(results, opts.db_returning_fields):
+                    setattr(obj, field.attname, result)
+            for obj in objs:
+                obj._state.adding = False
+                obj._state.db = using
+
+        return objs
 
     def bulk_create(
         self,
@@ -869,40 +951,52 @@ class QuerySet(AltersData):
         unique_fields=None,
     ):
         """
-        Insert each of the instances into the database. Do *not* call
-        save() on each of the instances, do not send any pre/post_save
-        signals, and do not set the primary key attribute if it is an
-        autoincrement field (except if
-        features.can_return_rows_from_bulk_insert=True).
-        Multi-table models are not supported.
+        Insert each of the instances into the database. Do *not* call save()
+        on each instance, do not send pre/post_save signals. For autoincrement
+        or db_default primary keys, the PK attribute is only populated on
+        backends that can return rows from bulk inserts (e.g. PostgreSQL,
+        SQLite ≥ 3.35).
+
+        Multi-table inheritance (MTI) child models are supported in two cases:
+
+        * Backends with features.can_return_rows_from_bulk_insert: the
+        top-most parent rows are inserted first and their PKs are propagated
+        through any intermediate MTI levels; then child rows are inserted so
+        that PKs line up with their parents.
+
+        * Backends without RETURNING: a single MTI level is supported when the
+        parent pointer is preset on each child instance (i.e. child.pk equals
+        parent.pk). In practice: bulk-create parents first, then bulk-create
+        children with id=parent.pk.
+
+        Conflict handling (ignore_conflicts/update_conflicts) is not supported
+        for MTI. Many-to-many relations are never handled by bulk_create().
         """
-        # When you bulk insert you don't get the primary keys back (if it's an
-        # autoincrement, except if can_return_rows_from_bulk_insert=True), so
-        # you can't insert into the child tables which references this. There
-        # are two workarounds:
-        # 1) This could be implemented if you didn't have an autoincrement pk
-        # 2) You could do it by doing O(n) normal inserts into the parent
-        #    tables to get the primary keys back and then doing a single bulk
-        #    insert into the childmost table.
-        # We currently set the primary keys on the objects when using
-        # PostgreSQL via the RETURNING ID clause. It should be possible for
-        # Oracle as well, but the semantics for extracting the primary keys is
-        # trickier so it's not done yet.
+        # Historically bulk inserts couldn't support MTI because parent PKs
+        # weren't known at child insert time. The code below detects MTI and
+        # delegates to _bulk_create_multi_table(), which uses RETURNING when
+        # available, and falls back to the “preset parent pointer” fast path
+        # otherwise. Non-MTI behavior (including conflict handling) remains
+        # unchanged.
         if batch_size is not None and batch_size <= 0:
             raise ValueError("Batch size must be a positive integer.")
-        # Check that the parents share the same concrete model with the our
-        # model to detect the inheritance pattern ConcreteGrandParent ->
-        # MultiTableParent -> ProxyChild. Simply checking
-        # self.model._meta.proxy would not identify that case as involving
-        # multiple tables.
-        for parent in self.model._meta.all_parents:
-            if parent._meta.concrete_model is not self.model._meta.concrete_model:
-                raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:
             return objs
+
         opts = self.model._meta
+
+        has_mti_links = any(link is not None for link in opts.parents.values())
+        if has_mti_links:
+            return self._bulk_create_multi_table(
+                objs,
+                batch_size=batch_size,
+                ignore_conflicts=ignore_conflicts,
+                update_conflicts=update_conflicts,
+                update_fields=update_fields,
+                unique_fields=unique_fields,
+            )
+
         if unique_fields:
-            # Primary key is allowed in unique_fields.
             unique_fields = [
                 self.model._meta.get_field(opts.pk.name if name == "pk" else name)
                 for name in unique_fields
