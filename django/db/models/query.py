@@ -764,7 +764,7 @@ class QuerySet(AltersData):
 
         using = self.db
         connection = connections[using]
-        model = self.model
+        model = self.model._meta.concrete_model
         opts = model._meta
 
         def _local_fields_for_insert(meta, include_parent_link=None):
@@ -983,9 +983,10 @@ class QuerySet(AltersData):
         if not objs:
             return objs
 
+        concrete_opts = self.model._meta.concrete_model._meta
         opts = self.model._meta
 
-        has_mti_links = any(link is not None for link in opts.parents.values())
+        has_mti_links = any(link is not None for link in concrete_opts.parents.values())
         if has_mti_links:
             return self._bulk_create_multi_table(
                 objs,

@@ -178,3 +178,13 @@ class UUIDParent(models.Model):
 
 class UUIDChild(UUIDParent):
     score = models.IntegerField(default=0)
+
+
+class ProxyMTIChild(MTIChild):
+    class Meta:
+        proxy = True
+
+
+class DoubleProxyMTIChild(ProxyMTIChild):
+    class Meta:
+        proxy = True

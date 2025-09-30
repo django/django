@@ -26,6 +26,7 @@ from .models import (
     Country,
     DbDefaultModel,
     DbDefaultPrimaryKey,
+    DoubleProxyMTIChild,
     FieldsWithDbColumns,
     MTIChild,
     MTIGrandChild,
@@ -33,6 +34,7 @@ from .models import (
     NoFields,
     NullableFields,
     ProxyCountry,
+    ProxyMTIChild,
     ProxyProxyCountry,
     RelatedModel,
     Restaurant,
@@ -1032,3 +1034,37 @@ class BulkCreateMTITests(TestCase):
         (ch,) = MTIChild.objects.bulk_create([MTIChild(name="s", bval=1)])
         self.assertFalse(ch._state.adding)
         self.assertEqual(ch._state.db, connection.alias)
+
+    def test_mti_preset_ptr_via_proxy_leaf_all_backends(self):
+        """
+        bulk_create() on a proxy over an MTI leaf should work on all backends
+        when the parent pointer is preset (child.pk == parent.pk).
+        """
+        parents = [MTIParent(name=f"p{i}") for i in range(3)]
+        MTIParent.objects.bulk_create(parents)
+
+        children = [ProxyMTIChild(id=p.pk, bval=10 + i) for i, p in enumerate(parents)]
+        ProxyMTIChild.objects.bulk_create(children)
+
+        self.assertEqual(MTIParent.objects.count(), 3)
+        self.assertEqual(MTIChild.objects.count(), 3)
+        for i, ch in enumerate(MTIChild.objects.order_by("id")):
+            self.assertEqual(ch.bval, 10 + i)
+            self.assertTrue(MTIParent.objects.filter(pk=ch.pk).exists())
+
+    def test_mti_preset_ptr_via_double_proxy_leaf_all_backends(self):
+        """
+        bulk_create() on a double proxy over an MTI leaf should also work
+        when the parent pointer is preset.
+        """
+        parents = [MTIParent(name=f"q{i}") for i in range(2)]
+        MTIParent.objects.bulk_create(parents)
+
+        leaves = [
+            DoubleProxyMTIChild(id=p.pk, bval=99 + i) for i, p in enumerate(parents)
+        ]
+        DoubleProxyMTIChild.objects.bulk_create(leaves)
+
+        self.assertEqual(MTIChild.objects.count(), 2)
+        vals = list(MTIChild.objects.order_by("id").values_list("bval", flat=True))
+        self.assertEqual(vals, [99, 100])
