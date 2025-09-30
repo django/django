@@ -2465,48 +2465,46 @@ each model instance (if the database normally supports it).
 Multi-table inheritance
 -----------------------
 
-``bulk_create()`` supports child models in multi-table inheritance (MTI) in
-two cases:
+``bulk_create()`` supports child models in multi-table inheritance in two
+cases:
 
-* **Backends that can return rows from bulk inserts** (currently PostgreSQL and
-  SQLite ≥ 3.35): calling ``bulk_create()`` on the *child* model will insert the
-  top-most parent rows, any intermediate MTI levels, and then the child rows,
+* Backends that can return rows from bulk inserts (currently PostgreSQL and
+  SQLite >= 3.35): calling ``bulk_create()`` on the child model inserts the
+  top-most parent rows, any intermediate levels, and then the child rows,
   preserving primary key alignment across the hierarchy.
 
-* **Backends without RETURNING** (for example, MariaDB/MySQL, Oracle): MTI is
-  supported only if each child instance has its parent pointer pre-set (i.e.,
-  the child primary key equals the parent primary key). In practice, first
-  bulk-create the parents, then bulk-create the children while setting
-  ``id=parent.pk`` (or the appropriate parent pointer field).
+* Backends without RETURNING (for example, MariaDB/MySQL, Oracle): support is
+  limited to a single inheritance level if each child instance has its parent
+  pointer pre-set. In practice, first bulk-create the parents, then
+  bulk-create the children while setting ``id=parent.pk`` (or the appropriate
+  parent link field).
 
 Example (preset parent pointer pattern):
 
 .. code-block:: python
 
-    # Create parents first
+    # Create parents first.
     parents = [ArticleParent(title=f"title {i}") for i in range(3)]
     ArticleParent.objects.bulk_create(parents)
 
-    # Then create children with the same PKs as their parents
+    # Then create children with the same PKs as their parents.
     children = [
         ArticleChild(id=p.pk, body=f"body {i}")  # id equals parent.pk
         for i, p in enumerate(parents)
     ]
     ArticleChild.objects.bulk_create(children)
 
-Notes and limitations (MTI):
+Notes and limitations:
 
-* Conflict handling is **not supported** for MTI: passing
+* Conflict handling is **not supported** for multi-table inheritance: passing
   ``ignore_conflicts=True`` or ``update_conflicts=True`` raises
-  :class:`~django.db.NotSupportedError`.
+  ``NotSupportedError``.
 
-* Multi-level MTI (grandchild, etc.) is supported only on backends that can
-  return rows from bulk inserts.
+* Multi-level inheritance (grandchild, etc.) is supported only on backends
+  that can return rows from bulk inserts.
 
-* UUID primary keys are supported (same patterns as above).
-
-* As with non-MTI models, ``save()`` isn’t called and the ``pre_save`` /
-  ``post_save`` signals aren’t sent.
+* As with other models, ``save()`` is not called and the ``pre_save`` /
+  ``post_save`` signals are not sent.
 
 .. warning::
 
