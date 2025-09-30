@@ -5,8 +5,8 @@ Django 5.2.7 release notes
 *October 1, 2025*
 
 Django 5.2.7 fixes one security issue with severity "high", one security issue
-with severity "low", and several bugs in 5.2.6. Also, the latest string
-translations from Transifex are incorporated.
+with severity "low", and one bug in 5.2.6. Also, the latest string translations
+from Transifex are incorporated.
 
 Bugfixes
 ========
