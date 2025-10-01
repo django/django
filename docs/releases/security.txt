@@ -36,6 +36,30 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+October 1, 2025 - :cve:`2025-59681`
+-----------------------------------
+
+Potential SQL injection in ``QuerySet.annotate()``, ``alias()``, ``aggregate()``, and ``extra()`` on MySQL and MariaDB.
+`Full description
+<https://www.djangoproject.com/weblog/2025/oct/01/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <4ceaaee7e04b416fc465e838a6ef43ca0ccffafe>`
+* Django 5.2 :commit:`(patch) <52fbae0a4dbbe5faa59827f8f05694a0065cc135>`
+* Django 5.1 :commit:`(patch) <01d2d770e22bffe53c7f1e611e2bbca94cb8a2e7>`
+* Django 4.2 :commit:`(patch) <38d9ef8c7b5cb6ef51b933e51a20e0e0063f33d5>`
+
+October 1, 2025 - :cve:`2025-59682`
+-----------------------------------
+
+Potential partial directory-traversal via ``archive.extract()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/oct/01/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <af067f56c1dd467df4abd0ddd409a700da1f03ba>`
+* Django 5.2 :commit:`(patch) <ed8fc39d77465eddbde1191a054ae965f6a8a584>`
+* Django 5.1 :commit:`(patch) <74fa85c688a87224637155902bcd738bb9e65e11>`
+* Django 4.2 :commit:`(patch) <9504bbaa392c9fe37eee9291f5b4c29eb6037619>`
+
 September 3, 2025 - :cve:`2025-57833`
 -------------------------------------
 
