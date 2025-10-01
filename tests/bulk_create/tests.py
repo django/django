@@ -957,9 +957,12 @@ class BulkCreateMTITests(TestCase):
             self.assertTrue(MTIParent.objects.filter(pk=ch.pk).exists())
 
     def test_mti_single_level_preset_ptr_all_backends(self):
-        parents = [MTIParent(name=f"p{i}") for i in range(3)]
-        MTIParent.objects.bulk_create(parents)
-        children = [MTIChild(id=p.pk, bval=100 + i) for i, p in enumerate(parents)]
+        parents = [MTIParent.objects.create(name=f"p{i}") for i in range(3)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
+        children = [
+            MTIChild(**{attname: p.pk}, bval=100 + i) for i, p in enumerate(parents)
+        ]
         MTIChild.objects.bulk_create(children)
         self.assertEqual(MTIParent.objects.count(), 3)
         self.assertEqual(MTIChild.objects.count(), 3)
@@ -1040,10 +1043,12 @@ class BulkCreateMTITests(TestCase):
         bulk_create() on a proxy over an MTI leaf should work on all backends
         when the parent pointer is preset (child.pk == parent.pk).
         """
-        parents = [MTIParent(name=f"p{i}") for i in range(3)]
-        MTIParent.objects.bulk_create(parents)
-
-        children = [ProxyMTIChild(id=p.pk, bval=10 + i) for i, p in enumerate(parents)]
+        parents = [MTIParent.objects.create(name=f"p{i}") for i in range(3)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
+        children = [
+            ProxyMTIChild(**{attname: p.pk}, bval=10 + i) for i, p in enumerate(parents)
+        ]
         ProxyMTIChild.objects.bulk_create(children)
 
         self.assertEqual(MTIParent.objects.count(), 3)
@@ -1057,11 +1062,12 @@ class BulkCreateMTITests(TestCase):
         bulk_create() on a double proxy over an MTI leaf should also work
         when the parent pointer is preset.
         """
-        parents = [MTIParent(name=f"q{i}") for i in range(2)]
-        MTIParent.objects.bulk_create(parents)
-
+        parents = [MTIParent.objects.create(name=f"q{i}") for i in range(2)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
         leaves = [
-            DoubleProxyMTIChild(id=p.pk, bval=99 + i) for i, p in enumerate(parents)
+            DoubleProxyMTIChild(**{attname: p.pk}, bval=99 + i)
+            for i, p in enumerate(parents)
         ]
         DoubleProxyMTIChild.objects.bulk_create(leaves)
 
