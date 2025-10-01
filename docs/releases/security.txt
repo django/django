@@ -39,8 +39,8 @@ process. These are listed below.
 October 1, 2025 - :cve:`2025-59681`
 -----------------------------------
 
-Potential SQL injection in ``QuerySet.annotate()``, ``alias()``, ``aggregate()``, and ``extra()`` on MySQL and MariaDB.
-`Full description
+Potential SQL injection in ``QuerySet.annotate()``, ``alias()``,
+``aggregate()``, and ``extra()`` on MySQL and MariaDB. `Full description
 <https://www.djangoproject.com/weblog/2025/oct/01/security-releases/>`__
 
 * Django 6.0 :commit:`(patch) <4ceaaee7e04b416fc465e838a6ef43ca0ccffafe>`
