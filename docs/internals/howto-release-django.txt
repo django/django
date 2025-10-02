@@ -606,8 +606,7 @@ Now you're ready to actually put the release out there. To do this:
 
    __ https://djangoci.com/job/confirm-release/
 
-#. Upload the release packages to PyPI (for pre-releases, only upload the wheel
-   file):
+#. Upload the release packages to PyPI:
 
    .. code-block:: shell
 
