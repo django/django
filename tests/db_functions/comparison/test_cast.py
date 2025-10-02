@@ -187,3 +187,13 @@ class CastTests(TestCase):
             ).get(),
             "1",
         )
+
+    def test_cast_to_json_field(self):
+        """
+        Some database backends (e.g. MariaDB, Oracle, and SQLite) do not support
+        explicit cast to JSON. Ensure that our workarounds work on those databases.
+        """
+        json_value = Author.objects.annotate(
+            cast_json=Cast(models.Value('{"age": 20}'), models.JSONField())
+        )
+        self.assertEqual(json_value.get().cast_json, {"age": 20})
