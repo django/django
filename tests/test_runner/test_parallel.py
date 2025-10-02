@@ -283,6 +283,7 @@ class ParallelTestSuiteTest(SimpleTestCase):
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
 
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_buffer_mode_reports_setupclass_failure(self):
         test = SampleErrorTest("dummy_test")
         remote_result = RemoteTestResult()
