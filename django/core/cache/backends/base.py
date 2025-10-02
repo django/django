@@ -208,6 +208,8 @@ class BaseCache:
 
     async def aget_many(self, keys, version=None):
         """See get_many()."""
+        if self.get_many.__func__ is not BaseCache.get_many:
+            return await sync_to_async(self.get_many)(keys, version=version)
         d = {}
         for k in keys:
             val = await self.aget(k, self._missing_key, version=version)
@@ -236,6 +238,8 @@ class BaseCache:
 
     async def aget_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """See get_or_set()."""
+        if self.get_or_set.__func__ is not BaseCache.get_or_set:
+            return await sync_to_async(self.get_or_set)(key, default, timeout=timeout, version=version)
         val = await self.aget(key, self._missing_key, version=version)
         if val is self._missing_key:
             if callable(default):
@@ -255,6 +259,8 @@ class BaseCache:
         )
 
     async def ahas_key(self, key, version=None):
+        if self.has_key.__func__ is not BaseCache.has_key:
+            return await sync_to_async(self.has_key)(key, version=version)
         return (
             await self.aget(key, self._missing_key, version=version)
             is not self._missing_key
@@ -274,6 +280,8 @@ class BaseCache:
 
     async def aincr(self, key, delta=1, version=None):
         """See incr()."""
+        if self.incr.__func__ is not BaseCache.incr:
+             return await sync_to_async(self.incr)(key, delta=delta, version=version)
         value = await self.aget(key, self._missing_key, version=version)
         if value is self._missing_key:
             raise ValueError("Key '%s' not found" % key)
@@ -317,6 +325,10 @@ class BaseCache:
         return []
 
     async def aset_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        if self.set_many.__func__ is not BaseCache.set_many:
+            return await sync_to_async(self.set_many)(
+                data, timeout=timeout, version=version
+            )
         for key, value in data.items():
             await self.aset(key, value, timeout=timeout, version=version)
         return []
@@ -331,6 +343,8 @@ class BaseCache:
             self.delete(key, version=version)
 
     async def adelete_many(self, keys, version=None):
+        if self.delete_many.__func__ is not BaseCache.delete_many:
+            return await sync_to_async(self.delete_many)(keys, version=version)
         for key in keys:
             await self.adelete(key, version=version)
 
@@ -361,6 +375,8 @@ class BaseCache:
 
     async def aincr_version(self, key, delta=1, version=None):
         """See incr_version()."""
+        if self.incr_version.__func__ is not BaseCache.incr_version:
+            return await sync_to_async(self.incr_version)(key, delta-delta, version=version)
         if version is None:
             version = self.version
 

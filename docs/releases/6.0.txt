@@ -217,6 +217,28 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ``BaseCache`` subclasses that implement a specialized ``get_many()``\,
+  ``set_many()``\, or ``delete_many()`` method should use that specialized
+  method to implement the async version (:ticket:`36590`).
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
 Email
 ~~~~~
 
