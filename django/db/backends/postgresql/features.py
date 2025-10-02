@@ -65,6 +65,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     json_key_contains_list_matching_requires_list = True
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
+    supports_update_conflicts_with_condition = True
+    supports_excluded_expression = True
     supports_covering_indexes = True
     supports_stored_generated_columns = True
     can_rename_index = True

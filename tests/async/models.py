@@ -13,3 +13,9 @@ class SimpleModel(models.Model):
 
 class ManyToManyModel(models.Model):
     simples = models.ManyToManyField("SimpleModel")
+
+
+class UpsertConflict(models.Model):
+    number = models.IntegerField(unique=True)
+    rank = models.IntegerField()
+    name = models.CharField(max_length=15)

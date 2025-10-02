@@ -178,6 +178,17 @@ Models
 * :meth:`.QuerySet.in_bulk` now supports chaining after
   :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
+* :meth:`.QuerySet.bulk_create` and :meth:`.QuerySet.abulk_create` gained a
+  ``condition`` parameter to add a conditional ``WHERE`` clause to
+  ``ON CONFLICT DO UPDATE``. Supported on PostgreSQL and SQLite (>= 3.42).
+  The condition accepts Django expressions (``Q``, ``F``, and
+  :class:`~django.db.models.Excluded`; see :ref:`excluded-expressions`).
+
+* Added the :class:`~django.db.models.Excluded` expression to reference
+  proposed values in ``ON CONFLICT DO UPDATE`` clauses on PostgreSQL and
+  SQLite.
+
+
 Pagination
 ~~~~~~~~~~
 
@@ -247,6 +258,15 @@ backends.
 * The ``DatabaseOperations.adapt_durationfield_value()`` hook is added. If the
   database has native support for ``DurationField``, override this method to
   simply return the value.
+
+* Added the ``supports_update_conflicts_with_condition`` feature flag on
+  ``django.db.backends.base.features.BaseDatabaseFeatures`` to indicate
+  backend support for conditional updates on conflict.
+
+* Added the ``supports_excluded_expression`` feature flag on
+  ``django.db.backends.base.features.BaseDatabaseFeatures`` to indicate
+  support for the :class:`~django.db.models.Excluded` expression.
+
 
 Miscellaneous
 -------------
