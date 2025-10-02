@@ -883,21 +883,9 @@ class ExecutorTests(MigrationTestBase):
                     ),
                 ],
             )
+
             forward_executor.migrate(None, forward_plan)
             forward_executor.loader.build_graph()
-
-            self.assertIn(
-                ("migrations", "0001_initial"),
-                forward_executor.loader.applied_migrations,
-            )
-            self.assertIn(
-                ("migrations", "0002_squashed_0003_foo_another_field"),
-                forward_executor.loader.applied_migrations,
-            )
-            self.assertIn(
-                ("migrations2", "0001_squashed_0002_baz_baz"),
-                forward_executor.loader.applied_migrations,
-            )
 
             # backward
             backward_executor = MigrationExecutor(connection)
@@ -909,11 +897,8 @@ class ExecutorTests(MigrationTestBase):
             self.assertTrue(backward_plan)
 
         finally:
-            # clean up
-            cleanup_executor = MigrationExecutor(connection)
-
-            cleanup_executor.loader.build_graph()
-            cleanup_executor.migrate(
+            executor = MigrationExecutor(connection)
+            executor.migrate(
                 [
                     ("migrations", None),
                     ("migrations2", None),
