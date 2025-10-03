@@ -130,7 +130,8 @@ a:not(
     #header a,
     #nav-sidebar a,
     #content-main.app-list a,
-    .object-tools a
+    .object-tools a,
+    a.viewsitelink
 ) {
     text-decoration: underline;
 }
@@ -824,11 +825,11 @@ a.deletelink:focus, a.deletelink:hover {
     margin-left: 15px;
 }
 
-.object-tools a {
+.object-tools a, a.viewsitelink {
     border-radius: 15px;
 }
 
-.object-tools a:link, .object-tools a:visited {
+.object-tools a:link, .object-tools a:visited, a.viewsitelink {
     display: block;
     float: left;
     padding: 3px 12px;
@@ -840,7 +841,10 @@ a.deletelink:focus, a.deletelink:hover {
     letter-spacing: 0.5px;
 }
 
-.object-tools a:focus, .object-tools a:hover {
+.object-tools a:focus,
+.object-tools a:hover,
+a.viewsitelink:focus,
+a.viewsitelink:hover {
     background-color: var(--object-tools-hover-bg);
 }
 
@@ -848,13 +852,15 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
-.object-tools a.viewsitelink, .object-tools a.addlink {
+.object-tools a.viewsitelink,
+.object-tools a.addlink,
+a.viewsitelink {
     background-repeat: no-repeat;
     background-position: right 7px center;
     padding-right: 26px;
 }
 
-.object-tools a.viewsitelink {
+.object-tools a.viewsitelink, a.viewsitelink {
     background-image: url(../img/tooltag-arrowright.svg);
 }
 
