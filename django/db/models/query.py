@@ -35,7 +35,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -350,13 +350,13 @@ class QuerySet(AltersData):
                     "match the current version %s."
                     % (pickled_version, django.__version__),
                     RuntimeWarning,
-                    stacklevel=2,
+                    skip_file_prefixes=django_file_prefixes(),
                 )
         else:
             warnings.warn(
                 "Pickled queryset instance's Django version is not specified.",
                 RuntimeWarning,
-                stacklevel=2,
+                skip_file_prefixes=django_file_prefixes(),
             )
         self.__dict__.update(state)
 
