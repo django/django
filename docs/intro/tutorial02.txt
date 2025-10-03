@@ -442,7 +442,11 @@ you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
 Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again:
+``python manage.py shell`` again.
+If you are currently in the shell with a three-chevron prompt (>>>),
+you need to exit the current shell using ``exit()`` (or ``quit()``) and then
+run ``python manage.py shell`` again to reload the shell with the new models.
+Note : from Python 3.13 onward, the parentheses are not required.
 
 .. code-block:: pycon
 
