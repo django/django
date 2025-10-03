@@ -29,9 +29,9 @@ def builtin_template_path(name):
 
 def set_language(request):
     """
-    Redirect to a given URL while setting the chosen language in the session
-    (if enabled) and in a cookie. The URL and the language code need to be
-    specified in the request parameters.
+    Redirect to a given URL while setting the chosen language in the language
+    cookie. The URL and the language code need to be specified in the request
+    parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
