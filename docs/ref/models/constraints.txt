@@ -273,7 +273,7 @@ creates a unique constraint that only allows one row to store a ``NULL`` value
 in the ``ordering`` column.
 
 Unique constraints with ``nulls_distinct`` are ignored for databases besides
-PostgreSQL 15+.
+PostgreSQL.
 
 ``violation_error_code``
 ------------------------

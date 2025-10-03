@@ -248,6 +248,17 @@ backends.
   database has native support for ``DurationField``, override this method to
   simply return the value.
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.1 is removed.
+
+Dropped support for PostgreSQL 14
+---------------------------------
+
+Upstream support for PostgreSQL 14 ends in November 2026. Django 6.1 supports
+PostgreSQL 15 and higher.
+
 Miscellaneous
 -------------
 
