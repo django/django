@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (14,)
+    minimum_database_version = (15,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
@@ -67,6 +67,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
     supports_stored_generated_columns = True
+    supports_nulls_distinct_unique_constraints = True
     can_rename_index = True
     test_collations = {
         "deterministic": "C",
@@ -156,10 +157,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_15(self):
-        return self.connection.pg_version >= 150000
-
-    @cached_property
     def is_postgresql_16(self):
         return self.connection.pg_version >= 160000
 
@@ -172,10 +169,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.pg_version >= 180000
 
     supports_unlimited_charfield = True
-    supports_nulls_distinct_unique_constraints = property(
-        operator.attrgetter("is_postgresql_15")
-    )
-
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
     supports_virtual_generated_columns = property(
         operator.attrgetter("is_postgresql_18")
