@@ -88,7 +88,7 @@ class KeyTransform(Transform):
         self.key_name = key_name
 
     def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         return "(%s -> %%s)" % lhs, (*params, self.key_name)
 
 

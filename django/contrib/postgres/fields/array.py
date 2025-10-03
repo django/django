@@ -296,7 +296,7 @@ class ArrayLenTransform(Transform):
     output_field = IntegerField()
 
     def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         # Distinguish NULL and empty arrays
         return (
             "CASE WHEN %(lhs)s IS NULL THEN NULL ELSE "
@@ -328,7 +328,7 @@ class IndexTransform(Transform):
         self.base_field = base_field
 
     def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         if not lhs.endswith("]"):
             lhs = "(%s)" % lhs
         return "%s[%%s]" % lhs, (*params, self.index)
@@ -354,7 +354,7 @@ class SliceTransform(Transform):
         self.end = end
 
     def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         # self.start is set to 1 if slice start is not provided.
         if self.end is None:
             return f"({lhs})[%s:]", (*params, self.start)
