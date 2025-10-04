@@ -281,7 +281,10 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Subclasses of models defining the ``natural_key()`` method can now opt out of
+  natural key serialization by overriding the method to return an empty tuple:
+  ``()``. This ensures primary keys are serialized when using
+  :option:`dumpdata --natural-primary`.
 
 Signals
 ~~~~~~~
