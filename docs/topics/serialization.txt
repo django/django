@@ -638,15 +638,12 @@ command line flags to generate natural keys.
 
 .. versionchanged:: 6.1
 
-    To ensure the primary key is correctly included
-    when serializing models that inherit
-    :meth:`django.contrib.auth.base_user.AbstractBaseUser.natural_key`
-    (or other base models defining the method), subclasses must now explicitly
-    signal the intent to opt out of natural key serialization.
-
-    The existence of the inherited method would previously cause the primary
-    key to be inadvertently omitted when ``use_natural_primary_keys=True`` was
-    used.
+    The serialization framework was updated to allow models inheriting
+    the ``natural_key()`` method
+    to explicitly opt out of natural key serialization by returning ``None``.
+    Previously, the existence of the inherited
+    method would cause the primary key to be omitted
+    when ``use_natural_primary_keys=True`` was used.
 
     To explicitly opt out and revert to standard primary key serialization,
     override the method to return a signal value.

@@ -197,11 +197,11 @@ Serialization
 ~~~~~~~~~~~~~
 
 * Fixed a regression where models inheriting
-  :meth:`django.contrib.auth.base_user.AbstractBaseUser.natural_key` could not
+  the ``natural_key()`` method could not
   opt out of natural key serialization (Trac #35729), leading to the omission
   of the primary key when ``--natural-primary`` was used. Subclasses can now
   explicitly opt out by implementing
-  :meth:`django.contrib.auth.base_user.AbstractBaseUser.natural_key`
+  the ``natural_key()`` method
   to return ``None``.
 
 Signals
