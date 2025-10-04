@@ -11,10 +11,10 @@ from .models import (
     NaturalKeyAnchor,
     NaturalKeyThing,
     NaturalPKWithDefault,
-    PKTupleOptOutUser,
-    PostToPKTupleUser,
     NoneOptOutUser,
-    PostToNoneUser
+    PKTupleOptOutUser,
+    PostToNoneUser,
+    PostToPKTupleUser,
 )
 from .tests import register_tests
 
@@ -259,41 +259,41 @@ def fk_as_pk_natural_key_not_called(self, format):
 def natural_key_opt_out_test(self, format):
     # Refs #35729
     """
-    Tests natural key opt-out scenarios for models inheriting from AbstractBaseUser.
+    Tests natural key opt-out scenarios for models inheriting
+    from AbstractBaseUser.
 
     Verifies that when natural_key() returns None or (self.pk,):
     """
 
     user1 = PKTupleOptOutUser.objects.create(email="user1@example.com")
-    post1 = PostToPKTupleUser.objects.create(author=user1,
-                                                title="Post 1 (PK Opt-out)")
+    post1 = PostToPKTupleUser.objects.create(author=user1, title="Post 1 (PK Opt-out)")
 
     user2 = NoneOptOutUser.objects.create(email="user2@example.com")
-    post2 = PostToNoneUser.objects.create(author=user2,
-                                                 title="Post 2 (None Opt-out)")
+    post2 = PostToNoneUser.objects.create(author=user2, title="Post 2 (None Opt-out)")
     scenarios = [
         (user1, post1),
         (user2, post2),
     ]
 
-    is_json = (format == 'json')
+    is_json = format == "json"
 
     for user, post in scenarios:
         user_pk = user.pk
 
         user_data_str = serializers.serialize(
-            format,
-            [user],
-            indent=2,
-            use_natural_primary_keys=True
+            format, [user], indent=2, use_natural_primary_keys=True
         )
 
         if is_json:
             user_data = json.loads(user_data_str)
             serialized_user = user_data[0]
 
-            self.assertEqual(serialized_user.get('pk'), user_pk,
-                             f"[{user.__class__.__name__}] PK must be included in the primary object after patch.")
+            self.assertEqual(
+                serialized_user.get("pk"),
+                user_pk,
+                f"[{user.__class__.__name__}] PK must be included "
+                f"in the primary object after patch.",
+            )
 
         post_data_str = serializers.serialize(
             format,
@@ -306,20 +306,26 @@ def natural_key_opt_out_test(self, format):
             post_data = json.loads(post_data_str)
             serialized_post = post_data[0]
 
-            self.assertEqual(serialized_post['fields']['author'], user_pk,
-                             f"[{user.__class__.__name__}] FK must be serialized as PK integer, not a natural key list.")
+            self.assertEqual(
+                serialized_post["fields"]["author"],
+                user_pk,
+                f"[{user.__class__.__name__}] FK must be serialized as PK integer"
+                f", not a natural key list.",
+            )
 
         try:
             list(serializers.deserialize(format, user_data_str))
         except Exception as e:
             self.fail(
-                f"Deserialization of {user.__class__.__name__} failed in {format}: {e}")
+                f"Deserialization of {user.__class__.__name__} failed in {format}: {e}"
+            )
 
         try:
             list(serializers.deserialize(format, post_data_str))
         except Exception as e:
             self.fail(
-                f"Deserialization of {post.__class__.__name__} failed in {format}: {e}")
+                f"Deserialization of {post.__class__.__name__} failed in {format}: {e}"
+            )
 
 
 # Dynamically register tests for each serializer

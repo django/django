@@ -84,7 +84,8 @@ class Serializer(base.Serializer):
                 natural_key_value = related.natural_key()
 
                 is_opt_out = (natural_key_value is None) or (
-                        natural_key_value == (related.pk,))
+                    natural_key_value == (related.pk,)
+                )
 
                 if is_opt_out:
                     value = self._value_from_field(obj, field)

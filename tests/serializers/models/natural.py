@@ -2,8 +2,9 @@
 
 import uuid
 
-from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.db import models
+
 
 class NaturalKeyAnchorManager(models.Manager):
     def get_by_natural_key(self, data):
@@ -78,7 +79,7 @@ class FKAsPKNoNaturalKey(models.Model):
 
 class PKTupleOptOutUser(AbstractBaseUser):
     email = models.EmailField(unique=False, null=True, blank=True)
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     class Manager(models.Manager):
@@ -88,12 +89,12 @@ class PKTupleOptOutUser(AbstractBaseUser):
     objects = Manager()
 
     def natural_key(self):
-        return (self.pk, )
+        return (self.pk,)
 
 
 class NoneOptOutUser(AbstractBaseUser):
     email = models.EmailField(unique=False, null=True, blank=True)
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     class Manager(models.Manager):
