@@ -1,4 +1,6 @@
+from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
+from django.db.models import FETCH_PEERS, RAISE
 from django.test import TestCase
 
 from .models import (
@@ -619,3 +621,77 @@ class OneToOneTests(TestCase):
                 instances=places,
                 querysets=[Bar.objects.all(), Bar.objects.all()],
             )
+
+    def test_fetch_mode_fetch_peers_forward(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        r1, r2 = Restaurant.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            r1.place
+        with self.assertNumQueries(0):
+            r2.place
+
+    def test_fetch_mode_fetch_peers_reverse(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        p1, p2 = Place.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            p1.restaurant
+        with self.assertNumQueries(0):
+            p2.restaurant
+
+    def test_fetch_mode_raise_forward(self):
+        r = Restaurant.objects.fetch_mode(RAISE).get(pk=self.r1.pk)
+        msg = "Fetching of Restaurant.place blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            r.place
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_raise_reverse(self):
+        p = Place.objects.fetch_mode(RAISE).get(pk=self.p1.pk)
+        msg = "Fetching of Place.restaurant blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p.restaurant
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        r1 = Restaurant.objects.fetch_mode(FETCH_PEERS).get(pk=self.r1.pk)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            r1.place._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        r1, r2 = Restaurant.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            r1.place._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        p1 = Place.objects.fetch_mode(FETCH_PEERS).get(pk=self.p1.pk)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            p1.restaurant._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        p1, p2 = Place.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            p1.restaurant._state.fetch_mode,
+            FETCH_PEERS,
+        )
