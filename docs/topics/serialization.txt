@@ -637,8 +637,10 @@ command line flags to generate natural keys.
     key values, just don't define the ``get_by_natural_key()`` method.
 
 .. versionchanged:: 6.1
-    To ensure the primary key is correctly included when serializing models
-    that inherit :meth:`~django.contrib.auth.base_user.AbstractBaseUser.natural_key`
+
+    To ensure the primary key is correctly included
+    when serializing models that inherit
+    :meth:`django.contrib.auth.base_user.AbstractBaseUser.natural_key`
     (or other base models defining the method), subclasses must now explicitly
     signal the intent to opt out of natural key serialization.
 
@@ -647,7 +649,8 @@ command line flags to generate natural keys.
     used.
 
     To explicitly opt out and revert to standard primary key serialization,
-    override the method to return a signal value. The preferred signal is ``None``:
+    override the method to return a signal value.
+    The preferred signal is ``None``:
 
     .. code-block:: python
 
@@ -655,7 +658,8 @@ command line flags to generate natural keys.
             # Explicitly signals opt-out to the serializer.
             return None
 
-    Returning an empty tuple (``()``) or the primary key as a tuple (``(self.pk,)``)
+    Returning an empty tuple (``()``)
+    or the primary key as a tuple (``(self.pk,)``)
     will also be interpreted as an opt-out signal by the serializers.
 
 .. _natural-keys-and-forward-references:
