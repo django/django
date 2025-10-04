@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from contextlib import nullcontext
 from functools import reduce
 from itertools import chain, islice
 
@@ -34,6 +35,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -723,7 +725,7 @@ class QuerySet(AltersData):
                     "Unique fields that can trigger the upsert must be provided."
                 )
             # Updating primary keys and non-concrete fields is forbidden.
-            if any(not f.concrete or f.many_to_many for f in update_fields):
+            if any(not f.concrete for f in update_fields):
                 raise ValueError(
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
@@ -734,7 +736,7 @@ class QuerySet(AltersData):
                     "update_fields."
                 )
             if unique_fields:
-                if any(not f.concrete or f.many_to_many for f in unique_fields):
+                if any(not f.concrete for f in unique_fields):
                     raise ValueError(
                         "bulk_create() can only be used with concrete fields "
                         "in unique_fields."
@@ -802,7 +804,11 @@ class QuerySet(AltersData):
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
-        with transaction.atomic(using=self.db, savepoint=False):
+        if objs_with_pk and objs_without_pk:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
             self._handle_order_with_respect_to(objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
@@ -910,7 +916,7 @@ class QuerySet(AltersData):
             raise ValueError("All bulk_update() objects must have a primary key set.")
         opts = self.model._meta
         fields = [opts.get_field(name) for name in fields]
-        if any(not f.concrete or f.many_to_many for f in fields):
+        if any(not f.concrete for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
         all_pk_fields = set(opts.pk_fields)
         for parent in opts.all_parents:
@@ -1160,8 +1166,8 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
-        if not issubclass(self._iterable_class, ModelIterable):
-            raise TypeError("in_bulk() cannot be used with values() or values_list().")
+        if id_list is not None and not id_list:
+            return {}
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
@@ -1178,26 +1184,76 @@ class QuerySet(AltersData):
                 "in_bulk()'s field_name must be a unique field but %r isn't."
                 % field_name
             )
+
+        qs = self
+
+        def get_obj(obj):
+            return obj
+
+        if issubclass(self._iterable_class, ModelIterable):
+            # Raise an AttributeError if field_name is deferred.
+            get_key = operator.attrgetter(field_name)
+
+        elif issubclass(self._iterable_class, ValuesIterable):
+            if field_name not in self.query.values_select:
+                qs = qs.values(field_name, *self.query.values_select)
+
+                def get_obj(obj):  # noqa: F811
+                    # We can safely mutate the dictionaries returned by
+                    # ValuesIterable here, since they are limited to the scope
+                    # of this function, and get_key runs before get_obj.
+                    del obj[field_name]
+                    return obj
+
+            get_key = operator.itemgetter(field_name)
+
+        elif issubclass(self._iterable_class, ValuesListIterable):
+            try:
+                field_index = self.query.values_select.index(field_name)
+            except ValueError:
+                # field_name is missing from values_select, so add it.
+                field_index = 0
+                if issubclass(self._iterable_class, NamedValuesListIterable):
+                    kwargs = {"named": True}
+                else:
+                    kwargs = {}
+                    get_obj = operator.itemgetter(slice(1, None))
+                qs = qs.values_list(field_name, *self.query.values_select, **kwargs)
+
+            get_key = operator.itemgetter(field_index)
+
+        elif issubclass(self._iterable_class, FlatValuesListIterable):
+            if self.query.values_select == (field_name,):
+                # Mapping field_name to itself.
+                get_key = get_obj
+            else:
+                # Transform it back into a non-flat values_list().
+                qs = qs.values_list(field_name, *self.query.values_select)
+                get_key = operator.itemgetter(0)
+                get_obj = operator.itemgetter(1)
+
+        else:
+            raise TypeError(
+                f"in_bulk() cannot be used with {self._iterable_class.__name__}."
+            )
+
         if id_list is not None:
-            if not id_list:
-                return {}
             filter_key = "{}__in".format(field_name)
-            max_params = connections[self.db].features.max_query_params or 0
-            num_fields = len(opts.pk_fields) if field_name == "pk" else 1
-            batch_size = max_params // num_fields
             id_list = tuple(id_list)
+            batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
             if batch_size and batch_size < len(id_list):
-                qs = ()
+                results = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset : offset + batch_size]
-                    qs += tuple(self.filter(**{filter_key: batch}))
+                    results += tuple(qs.filter(**{filter_key: batch}))
+                qs = results
             else:
-                qs = self.filter(**{filter_key: id_list})
+                qs = qs.filter(**{filter_key: id_list})
         else:
-            qs = self._chain()
-        return {getattr(obj, field_name): obj for obj in qs}
+            qs = qs._chain()
+        return {get_key(obj): get_obj(obj) for obj in qs}
 
     async def ain_bulk(self, id_list=None, *, field_name="pk"):
         return await sync_to_async(self.in_bulk)(
@@ -1302,7 +1358,7 @@ class QuerySet(AltersData):
 
     aupdate.alters_data = True
 
-    def _update(self, values):
+    def _update(self, values, returning_fields=None):
         """
         A version of update() that accepts field objects instead of field
         names. Used primarily for model saving and not intended for use by
@@ -1316,7 +1372,9 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        if returning_fields is None:
+            return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        return query.get_compiler(self.db).execute_returning_sql(returning_fields)
 
     _update.alters_data = True
     _update.queryset_only = False
@@ -1391,7 +1449,12 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            clone = clone.annotate(**expressions)
+            # RemovedInDjango70Warning: When the deprecation ends, deindent as:
+            # clone = clone.annotate(**expressions)
+            with warnings.catch_warnings(
+                action="ignore", category=RemovedInDjango70Warning
+            ):
+                clone = clone.annotate(**expressions)
         clone._fields = fields
         clone.query.set_values(fields)
         return clone
@@ -1405,11 +1468,26 @@ class QuerySet(AltersData):
     def values_list(self, *fields, flat=False, named=False):
         if flat and named:
             raise TypeError("'flat' and 'named' can't be used together.")
-        if flat and len(fields) > 1:
-            raise TypeError(
-                "'flat' is not valid when values_list is called with more than one "
-                "field."
-            )
+        if flat:
+            if len(fields) > 1:
+                raise TypeError(
+                    "'flat' is not valid when values_list is called with more than one "
+                    "field."
+                )
+            elif not fields:
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
+                # raise TypeError(
+                #     "'flat' is not valid when values_list is called with no "
+                #     "fields."
+                # )
+                warnings.warn(
+                    "Calling values_list() with no field name and flat=True "
+                    "is deprecated. Pass an explicit field name instead, like "
+                    "'pk'.",
+                    RemovedInDjango70Warning,
+                )
+                fields = [self.model._meta.concrete_fields[0].attname]
 
         field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
@@ -1918,11 +1996,21 @@ class QuerySet(AltersData):
         max_batch_size = max(ops.bulk_batch_size(fields, objs), 1)
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         inserted_rows = []
-        bulk_return = connection.features.can_return_rows_from_bulk_insert
-        for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and (
-                on_conflict is None or on_conflict == OnConflict.UPDATE
-            ):
+        returning_fields = (
+            self.model._meta.db_returning_fields
+            if (
+                connection.features.can_return_rows_from_bulk_insert
+                and (on_conflict is None or on_conflict == OnConflict.UPDATE)
+            )
+            else None
+        )
+        batches = [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]
+        if len(batches) > 1:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
+            for item in batches:
                 inserted_rows.extend(
                     self._insert(
                         item,
@@ -1931,17 +2019,8 @@ class QuerySet(AltersData):
                         on_conflict=on_conflict,
                         update_fields=update_fields,
                         unique_fields=unique_fields,
-                        returning_fields=self.model._meta.db_returning_fields,
+                        returning_fields=returning_fields,
                     )
-                )
-            else:
-                self._insert(
-                    item,
-                    fields=fields,
-                    using=self.db,
-                    on_conflict=on_conflict,
-                    update_fields=update_fields,
-                    unique_fields=unique_fields,
                 )
         return inserted_rows
 
@@ -2321,8 +2400,8 @@ def normalize_prefetch_lookups(lookups, prefix=None):
 
 def prefetch_related_objects(model_instances, *related_lookups):
     """
-    Populate prefetched object caches for a list of model instances based on
-    the lookups/Prefetch instances given.
+    Populate prefetched object caches for an iterable of model instances based
+    on the lookups/Prefetch instances given.
     """
     if not model_instances:
         return  # nothing to do
@@ -2390,7 +2469,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # We assume that objects retrieved are homogeneous (which is the
             # premise of prefetch_related), so what applies to first object
             # applies to all.
-            first_obj = obj_list[0]
+            first_obj = next(iter(obj_list))
             to_attr = lookup.get_current_to_attr(level)[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
                 first_obj, through_attr, to_attr

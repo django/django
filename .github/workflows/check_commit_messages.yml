@@ -13,7 +13,7 @@ jobs:
     if: startsWith(github.event.pull_request.base.ref, 'stable/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Calculate commit prefix
         id: vars

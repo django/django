@@ -47,14 +47,15 @@ Keep old patches up-to-date
 Oftentimes the codebase will change between a patch being submitted and the
 time it gets reviewed. Make sure it still applies cleanly and functions as
 expected. Updating a patch is both useful and important! See more on
-:doc:`writing-code/submitting-patches`.
+:ref:`patch-review-checklist`.
 
 Write some documentation
 ------------------------
 
 Django's documentation is great but it can always be improved. Did you find a
 typo? Do you think that something should be clarified? Go ahead and suggest a
-documentation patch! See also the guide on :doc:`writing-documentation`.
+documentation patch! See also the guide on
+:doc:`/internals/contributing/writing-documentation`.
 
 .. note::
 

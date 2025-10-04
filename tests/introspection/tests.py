@@ -113,7 +113,7 @@ class IntrospectionTests(TransactionTestCase):
             [
                 connection.features.introspected_field_types[field]
                 for field in (
-                    "AutoField",
+                    "BigAutoField",
                     "CharField",
                     "CharField",
                     "CharField",

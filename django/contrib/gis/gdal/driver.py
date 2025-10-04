@@ -2,6 +2,7 @@ from ctypes import c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
 
@@ -23,14 +24,20 @@ class Driver(GDALBase):
         "esri": "ESRI Shapefile",
         "shp": "ESRI Shapefile",
         "shape": "ESRI Shapefile",
-        "tiger": "TIGER",
-        "tiger/line": "TIGER",
         # raster
         "tiff": "GTiff",
         "tif": "GTiff",
         "jpeg": "JPEG",
         "jpg": "JPEG",
     }
+
+    if GDAL_VERSION[:2] <= (3, 10):
+        _alias.update(
+            {
+                "tiger": "TIGER",
+                "tiger/line": "TIGER",
+            }
+        )
 
     def __init__(self, dr_input):
         """

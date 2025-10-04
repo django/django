@@ -103,16 +103,18 @@ implementation, though:
   method does not take a ``request`` argument. The current request is available
   in ``self.request``.
 
-* The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
-  does not take a ``user`` argument. The current user is available in
-  ``self.request.user``.
+* The custom ``test_func()`` of
+  :class:`~django.contrib.auth.mixins.UserPassesTestMixin` does not take a
+  ``user`` argument. The current user is available in ``self.request.user``.
 
-* The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
+* The
+  :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
   attribute supports a string (defining one permission) or a list/tuple of
   strings (defining multiple permissions) that need to be fulfilled to grant
   access.
 
-* The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
+* The new
+  :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
   attribute allows passing a message to the ``PermissionDenied`` exception.
 
 .. _django-braces: https://django-braces.readthedocs.io/en/latest/index.html
@@ -207,10 +209,11 @@ Minor features
   Django 1.9).
 
 * The permission argument of
-  :func:`~django.contrib.auth.decorators.permission_required()` accepts all
+  :func:`~django.contrib.auth.decorators.permission_required` accepts all
   kinds of iterables, not only list and tuples.
 
-* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+* The new
+  :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
@@ -357,14 +360,14 @@ Forms
 
 * :class:`~django.forms.CharField` now accepts a
   :attr:`~django.forms.CharField.strip` argument to strip input data of leading
-  and trailing whitespace.  As this defaults to ``True`` this is different
+  and trailing whitespace. As this defaults to ``True`` this is different
   behavior from previous releases.
 
 * Form fields now support the :attr:`~django.forms.Field.disabled` argument,
   allowing the field widget to be displayed disabled by browsers.
 
 * It's now possible to customize bound fields by overriding a field's
-  :meth:`~django.forms.Field.get_bound_field()` method.
+  :meth:`~django.forms.Field.get_bound_field` method.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -642,10 +645,10 @@ Tests
 * Added the :meth:`json() <django.test.Response.json>` method to test client
   responses to give access to the response body as JSON.
 
-* Added the :meth:`~django.test.Client.force_login()` method to the test
+* Added the :meth:`~django.test.Client.force_login` method to the test
   client. Use this method to simulate the effect of a user logging into the
   site while skipping the authentication and verification steps of
-  :meth:`~django.test.Client.login()`.
+  :meth:`~django.test.Client.login`.
 
 URLs
 ~~~~
@@ -767,8 +770,9 @@ behavior.
 Filesystem-based template loaders catch more specific exceptions
 ----------------------------------------------------------------
 
-When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
-or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+When using the
+:class:`filesystem.Loader <django.template.loaders.filesystem.Loader>` or
+:class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
 template loaders, earlier versions of Django raised a
 :exc:`~django.template.TemplateDoesNotExist` error if a template source existed
 but was unreadable. This could happen under many circumstances, such as if
@@ -935,8 +939,8 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 ``simple_tag`` now wraps tag output in ``conditional_escape``
 -------------------------------------------------------------
 
-In general, template tags do not autoescape their contents, and this behavior is
-:ref:`documented <tags-auto-escaping>`. For tags like
+In general, template tags do not autoescape their contents, and this behavior
+is :ref:`documented <tags-auto-escaping>`. For tags like
 :class:`~django.template.Library.inclusion_tag`, this is not a problem because
 the included template will perform autoescaping. For ``assignment_tag()``,
 the output will be escaped when it is used as a variable in the template.
@@ -1135,7 +1139,8 @@ Miscellaneous
 
 * The ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``
   as it's unused by the application. If your project or a third-party app makes
-  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it back.
+  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it
+  back.
 
 * The return value of
   :meth:`~django.test.runner.DiscoverRunner.setup_databases` and the first
@@ -1349,8 +1354,8 @@ Miscellaneous
 
 * The ``check_aggregate_support()`` method of
   ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
-  will be removed in Django 2.0. The more general ``check_expression_support()``
-  should be used instead.
+  will be removed in Django 2.0. The more general
+  ``check_expression_support()`` should be used instead.
 
 * ``django.forms.extras`` is deprecated. You can find
   :class:`~django.forms.SelectDateWidget` in ``django.forms.widgets``

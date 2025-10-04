@@ -1,8 +1,7 @@
-import warnings
 from functools import partial
 from urllib.parse import urlsplit
 
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 from django.conf import settings
 from django.contrib import auth
@@ -11,7 +10,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import resolve_url
-from django.utils.deprecation import MiddlewareMixin, RemovedInDjango61Warning
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -51,10 +50,10 @@ class LoginRequiredMiddleware(MiddlewareMixin):
     redirect_field_name = REDIRECT_FIELD_NAME
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if request.user.is_authenticated:
+        if not getattr(view_func, "login_required", True):
             return None
 
-        if not getattr(view_func, "login_required", True):
+        if request.user.is_authenticated:
             return None
 
         return self.handle_no_permission(request, view_func)
@@ -172,20 +171,6 @@ class RemoteUserMiddleware:
             auth.login(request, user)
 
     async def __acall__(self, request):
-        # RemovedInDjango61Warning.
-        if (
-            self.__class__.process_request is not RemoteUserMiddleware.process_request
-            and self.__class__.aprocess_request is RemoteUserMiddleware.aprocess_request
-        ):
-            warnings.warn(
-                "Support for subclasses of RemoteUserMiddleware that override "
-                "process_request() without overriding aprocess_request() is "
-                "deprecated.",
-                category=RemovedInDjango61Warning,
-                stacklevel=2,
-            )
-            await sync_to_async(self.process_request, thread_sensitive=True)(request)
-            return await self.get_response(request)
         await self.aprocess_request(request)
         return await self.get_response(request)
 

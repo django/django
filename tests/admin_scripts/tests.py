@@ -75,7 +75,6 @@ class AdminScriptTestCase(SimpleTestCase):
                 settings_file.write("%s\n" % extra)
             exports = [
                 "DATABASES",
-                "DEFAULT_AUTO_FIELD",
                 "ROOT_URLCONF",
                 "SECRET_KEY",
                 "USE_TZ",
@@ -3127,11 +3126,6 @@ class StartApp(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class NewAppConfig(AppConfig)", content)
-            if HAS_BLACK:
-                test_str = 'default_auto_field = "django.db.models.BigAutoField"'
-            else:
-                test_str = "default_auto_field = 'django.db.models.BigAutoField'"
-            self.assertIn(test_str, content)
             self.assertIn(
                 'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
                 content,

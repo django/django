@@ -215,7 +215,7 @@ class GEOSGeometryBase(GEOSBase):
 
     @property
     def num_points(self):
-        "Return the number points, or coordinates, in the Geometry."
+        "Return the number of points, or coordinates, in the Geometry."
         return self.num_coords
 
     @property

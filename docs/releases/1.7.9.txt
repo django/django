@@ -46,10 +46,10 @@ unexpected newlines.
 :func:`~django.core.validators.validate_ipv4_address`,
 :func:`~django.core.validators.validate_slug`, and
 :class:`~django.core.validators.URLValidator` are also affected, however, as
-of Django 1.6 the ``GenericIPAddresseField``, ``IPAddressField``, ``SlugField``,
-and ``URLField`` form fields which use these validators all strip the input, so
-the possibility of newlines entering your data only exists if you are using
-these validators outside of the form fields.
+of Django 1.6 the ``GenericIPAddresseField``, ``IPAddressField``,
+``SlugField``, and ``URLField`` form fields which use these validators all
+strip the input, so the possibility of newlines entering your data only exists
+if you are using these validators outside of the form fields.
 
 The undocumented, internally unused ``validate_integer()`` function is now
 stricter as it validates using a regular expression instead of simply casting

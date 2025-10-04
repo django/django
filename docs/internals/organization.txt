@@ -72,9 +72,9 @@ to make the role of Merger sustainable.
 
 The following restrictions apply to the role of Merger:
 
-- A person must not simultaneously serve as a member of the steering council. If
-  a Merger is elected to the steering council, they shall cease to be a Merger
-  immediately upon taking up membership in the steering council.
+- A person must not simultaneously serve as a member of the steering council.
+  If a Merger is elected to the steering council, they shall cease to be a
+  Merger immediately upon taking up membership in the steering council.
 - A person may serve in the roles of Releaser and Merger simultaneously.
 
 The selection process, when a vacancy occurs or when the steering council deems
@@ -122,10 +122,10 @@ upload them to the :pypi:`Python Package Index <Django>` and to the
 Membership
 ----------
 
-`The steering council`_ selects Releasers_ as necessary to maintain their number
-at a minimum of three, in order to spread the workload and avoid over-burdening
-or burning out any individual Releaser. There is no upper limit to the number
-of Releasers.
+`The steering council`_ selects Releasers_ as necessary to maintain their
+number at a minimum of three, in order to spread the workload and avoid
+over-burdening or burning out any individual Releaser. There is no upper limit
+to the number of Releasers.
 
 It's not a requirement that a Releaser is also a Django Fellow, but the Django
 Software Foundation has the power to use funding of Fellow positions as a way
@@ -223,13 +223,14 @@ who demonstrate:
   years must still demonstrate an understanding of Django's changes and
   direction within those three years.
 
-A new council is elected after each release cycle of Django. The election process
-works as follows:
+A new council is elected after each release cycle of Django. The election
+process works as follows:
 
-#. The steering council directs one of its members to notify the Secretary of the
-   Django Software Foundation, in writing, of the triggering of the election,
-   and the condition which triggered it. The Secretary post to the appropriate
-   venue -- the `Django Forum`_ to announce the election and its timeline.
+#. The steering council directs one of its members to notify the Secretary of
+   the Django Software Foundation, in writing, of the triggering of the
+   election, and the condition which triggered it. The Secretary post to the
+   appropriate venue -- the `Django Forum`_ to announce the election and its
+   timeline.
 #. As soon as the election is announced, the `DSF Board`_ begin a period of
    voter registration. All `individual members of the DSF`_ are automatically
    registered and need not explicitly register. All other persons who believe
@@ -267,12 +268,12 @@ A member of the steering council may be removed by:
 - Becoming disqualified due to actions taken by the Code of Conduct committee
   of the Django Software Foundation.
 - Determining that they did not possess the qualifications of a member of the
-  steering council. This determination must be made jointly by the other members
-  of the steering council, and the `DSF Board`_. A valid determination of
-  ineligibility requires that all other members of the steering council and all
-  members of the DSF Board vote who can vote on the issue (the affected person,
-  if a DSF Board member, must not vote) vote "yes" on a motion that the person
-  in question is ineligible.
+  steering council. This determination must be made jointly by the other
+  members of the steering council, and the `DSF Board`_. A valid determination
+  of ineligibility requires that all other members of the steering council and
+  all members of the DSF Board vote who can vote on the issue (the affected
+  person, if a DSF Board member, must not vote) vote "yes" on a motion that the
+  person in question is ineligible.
 
 .. _`Django Forum`: https://forum.djangoproject.com/
 .. _`Django Git repository`: https://github.com/django/django/

@@ -137,7 +137,7 @@ this:
         </tr>
     {% endfor %}
 
-Variables included in the cycle will be escaped.  You can disable auto-escaping
+Variables included in the cycle will be escaped. You can disable auto-escaping
 with:
 
 .. code-block:: html+django
@@ -957,6 +957,80 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
+.. templatetag:: partial
+
+``partial``
+-----------
+
+.. versionadded:: 6.0
+
+Renders a template fragment that was defined with :ttag:`partialdef`, inserting
+the matching partial at this location.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partial partial_name %}
+
+The ``partial_name`` argument is the name of the template fragment to render.
+
+In the following example, a partial named ``button`` is defined and then
+rendered three times:
+
+.. code-block:: html+django
+
+    {% partialdef button %}
+        <button>Submit</button>
+    {% endpartialdef %}
+
+    {% partial button %}
+    {% partial button %}
+    {% partial button %}
+
+.. templatetag:: partialdef
+
+``partialdef``
+--------------
+
+.. versionadded:: 6.0
+
+Defines a reusable template fragment that can be rendered multiple times within
+the same template or accessed directly via :ref:`template loading or inclusion
+<template-partials-direct-access>`.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partialdef partial_name %}
+        {# Reusable content. #}
+    {% endpartialdef %}
+
+The ``partial_name`` argument is required and must be a valid template
+identifier.
+
+In the following example, a new fragment named ``card`` is defined:
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef %}
+
+This partial can then be rendered using the :ttag:`partial` tag:
+
+.. code-block:: html+django
+
+    {% partial card %}
+    {% partial card %}
+
+To :ref:`render a fragment immediately in place  <template-partials-inline>`,
+use the ``inline`` option. The partial is still stored and can be reused later.
+
 .. templatetag:: querystring
 
 ``querystring``
@@ -1151,14 +1225,14 @@ attribute and calling the result ``country_list``.
 
 ``{% regroup %}`` produces a list (in this case, ``country_list``) of
 **group objects**. Group objects are instances of
-:py:func:`~collections.namedtuple` with two fields:
+:func:`~collections.namedtuple` with two fields:
 
 * ``grouper`` -- the item that was grouped by (e.g., the string "India" or
   "Japan").
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
 
-Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
+Because ``{% regroup %}`` produces :func:`~collections.namedtuple` objects,
 you can also write the previous example as:
 
 .. code-block:: html+django
@@ -1177,11 +1251,11 @@ you can also write the previous example as:
     {% endfor %}
     </ul>
 
-Note that ``{% regroup %}`` does not order its input! Our example relies on
-the fact that the ``cities`` list was ordered by ``country`` in the first place.
-If the ``cities`` list did *not* order its members by ``country``, the
-regrouping would naively display more than one group for a single country. For
-example, say the ``cities`` list was set to this (note that the countries are not
+Note that ``{% regroup %}`` does not order its input! Our example relies on the
+fact that the ``cities`` list was ordered by ``country`` in the first place. If
+the ``cities`` list did *not* order its members by ``country``, the regrouping
+would naively display more than one group for a single country. For example,
+say the ``cities`` list was set to this (note that the countries are not
 grouped together):
 
 .. code-block:: python
@@ -1514,7 +1588,8 @@ image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
 In some cases you might want to capture the result of ``widthratio`` in a
-variable. It can be useful, for instance, in a :ttag:`blocktranslate` like this:
+variable. It can be useful, for instance, in a :ttag:`blocktranslate` like
+this:
 
 .. code-block:: html+django
 
@@ -1666,7 +1741,8 @@ differences.
 
 .. note::
     These format characters are not used in Django outside of templates. They
-    were designed to be compatible with PHP to ease transitioning for designers.
+    were designed to be compatible with PHP to ease transitioning for
+    designers.
 
 .. _date-and-time-formatting-specifiers:
 
@@ -1763,7 +1839,7 @@ For example:
 
     {{ value|date:"D d M Y" }}
 
-If ``value`` is a :py:class:`~datetime.datetime` object (e.g., the result of
+If ``value`` is a :class:`~datetime.datetime` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
@@ -2445,8 +2521,8 @@ Example:
 If ``num_messages`` is ``1``, the output will be ``You have 1 message.``
 If ``num_messages`` is ``2``  the output will be ``You have 2 messages.``
 
-For words that require a suffix other than ``'s'``, you can provide an alternate
-suffix as a parameter to the filter.
+For words that require a suffix other than ``'s'``, you can provide an
+alternate suffix as a parameter to the filter.
 
 Example:
 
@@ -2660,7 +2736,7 @@ specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date. If you need to format a ``date``
 value, use the :tfilter:`date` filter instead (or along with :tfilter:`time` if
-you need to render a full :py:class:`~datetime.datetime` value).
+you need to render a full :class:`~datetime.datetime` value).
 
 There is one exception the above rule: When passed a ``datetime`` value with
 attached timezone information (a :ref:`time-zone-aware

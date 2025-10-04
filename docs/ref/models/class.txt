@@ -77,5 +77,5 @@ Attributes
             # Add manager with another name
             people = models.Manager()
 
-    For more details on model managers see :doc:`Managers </topics/db/managers>`
-    and :ref:`Retrieving objects <retrieving-objects>`.
+    For more details on model managers see :doc:`Managers
+    </topics/db/managers>` and :ref:`Retrieving objects <retrieving-objects>`.

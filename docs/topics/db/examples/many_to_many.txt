@@ -161,8 +161,8 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     >>> Article.objects.filter(publications__in=[p1, p2]).distinct()
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
 
-Reverse m2m queries are supported (i.e., starting at the table that doesn't have
-a :class:`~django.db.models.ManyToManyField`):
+Reverse m2m queries are supported (i.e., starting at the table that doesn't
+have a :class:`~django.db.models.ManyToManyField`):
 
 .. code-block:: pycon
 

@@ -1849,6 +1849,10 @@ class ManyToManyField(RelatedField):
             )
         return name, path, args, kwargs
 
+    def get_attname_column(self):
+        attname, _ = super().get_attname_column()
+        return attname, None
+
     def _get_path_info(self, direct=False, filtered_relation=None):
         """Called by both direct and indirect m2m traversal."""
         int_model = self.remote_field.through

@@ -2,7 +2,7 @@
 Django 5.2.5 release notes
 ==========================
 
-*Expected August 6, 2025*
+*August 6, 2025*
 
 Django 5.2.5 fixes several bugs in 5.2.4.
 

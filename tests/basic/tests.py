@@ -1,5 +1,6 @@
 import inspect
 import threading
+import time
 from datetime import datetime, timedelta
 from unittest import mock
 
@@ -12,6 +13,7 @@ from django.db import (
     models,
     transaction,
 )
+from django.db.models.functions import Now
 from django.db.models.manager import BaseManager
 from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
@@ -212,6 +214,14 @@ class ModelInstanceCreationTests(TestCase):
     def test_save_primary_with_falsey_db_default(self):
         with self.assertNumQueries(1):
             PrimaryKeyWithFalseyDbDefault().save()
+
+    def test_auto_field_with_value_refreshed(self):
+        """
+        An auto field must be refreshed by Model.save() even when a value is
+        set because the database may return a value of a different type.
+        """
+        a = Article.objects.create(pk="123456", pub_date=datetime(2025, 9, 16))
+        self.assertEqual(a.pk, 123456)
 
 
 class ModelTest(TestCase):
@@ -557,6 +567,26 @@ class ModelTest(TestCase):
         for case in cases:
             with self.subTest(case=case):
                 self.assertIs(case._is_pk_set(), True)
+
+    def test_save_expressions(self):
+        article = Article(pub_date=Now())
+        article.save()
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            article_pub_date = article.pub_date
+        self.assertIsInstance(article_pub_date, datetime)
+        # Sleep slightly to ensure a different database level NOW().
+        time.sleep(0.1)
+        article.pub_date = Now()
+        article.save()
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertIsInstance(article.pub_date, datetime)
+        self.assertGreater(article.pub_date, article_pub_date)
 
 
 class ModelLookupTest(TestCase):

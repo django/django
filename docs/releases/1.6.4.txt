@@ -14,7 +14,7 @@ Bugfixes
   1.4 (:ticket:`22426`).
 
 * Restored the ability to ``reverse()`` views created using
-  :func:`functools.partial()` (:ticket:`22486`).
+  :func:`functools.partial` (:ticket:`22486`).
 
 * Fixed the ``object_id`` of the ``LogEntry`` that's created after a user
   password change in the admin (:ticket:`22515`).

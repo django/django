@@ -46,18 +46,18 @@
   </header>
 
   <main id="info">
-    {% if urlpatterns %}
+    {% if urlpatterns_debug %}
       <p>
       Using the URLconf defined in <code>{{ urlconf }}</code>,
       Django tried these URL patterns, in this order:
       </p>
       <ol>
-        {% for pattern in urlpatterns %}
+        {% for pattern in urlpatterns_debug %}
           <li>
             {% for pat in pattern %}
               <code>
-                {{ pat.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+                {{ pat.tried.pattern }}
+                {% if forloop.last and pat.debug_val %}[{{ pat.debug_key }}='{{ pat.debug_val }}']{% endif %}
               </code>
             {% endfor %}
           </li>

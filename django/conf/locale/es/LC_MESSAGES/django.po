@@ -19,6 +19,7 @@
 # Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
 # Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
+# Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -47,9 +48,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Jorge Andres Bravo Meza, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -742,8 +743,9 @@ msgid "Value must be valid JSON."
 msgstr "El valor debe ser un objeto JSON válido."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "La instancia de %(model)s con %(field)s %(value)r no existe."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
+"La instancia de %(model)s con %(field)s %(value)r no es una opción válida."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave foránea (tipo determinado por el campo relacionado)"

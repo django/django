@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# Edgars Andersons, 2025
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019,2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 22:44+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-09-17 20:19+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +23,7 @@ msgstr ""
 "2);\n"
 
 msgid "Administrative Documentation"
-msgstr "Administrācijas dokumentācija"
+msgstr "Pārvaldīšanas dokumentācija"
 
 msgid "Home"
 msgstr "Sākums"
@@ -31,7 +32,7 @@ msgid "Documentation"
 msgstr "Dokumentācija"
 
 msgid "Bookmarklets"
-msgstr "Grāmatzīmes"
+msgstr "Grāmatzīmju sīklietotnes"
 
 msgid "Documentation bookmarklets"
 msgstr "Dokumentācijas grāmatzīmes"
@@ -41,25 +42,25 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Lai instalētu bukmarkletu, velciet saiti uz grāmatzīmju rīkjoslu, vai ar "
-"peles labo pogu noklikšķiniet uz saites un pievienojiet to savām "
-"grāmatzīmēm. Tagad jūs varat izvēlēties bukmarkletu no jebkuras vietnes "
-"lapas."
+"Lai uzstādītu grāmatzīmju sīklietotni, saiti jāievelk grāmatzīmju rīkjoslā "
+"vai ar peles labo pogu jāklikšķina uz saites un jāpievieno tā savām "
+"grāmatzīmēm. Tagad vari izvēlēties grāmatzīmju sīklietotni jebkurā vietnes "
+"lapā."
 
 msgid "Documentation for this page"
-msgstr "Dokumentācija šai lapai"
+msgstr "Šīs lapas dokumentācija"
 
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Pārvieto no jebkuras lapas uz tā skata dokumentāciju, kas ģenerē šo lapu."
+"Pārlec no jebkuras lapas uz tā skata, kas izveido šo lapu, dokumentāciju."
 
 msgid "Tags"
 msgstr "Tagi"
 
 msgid "List of all the template tags and their functions."
-msgstr "Visu šablonu tagu un to funkciju saraksts."
+msgstr "Visu veidņu tagu un to funkciju saraksts."
 
 msgid "Filters"
 msgstr "Filtri"
@@ -68,8 +69,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
-"Filtri ir darbības, kuras var tikt pielietotas šablona mainīgajiem, lai "
-"mainītu izvades rezultātu."
+"Filtri ir darbības, kuras var tikt pielietotas veidnes mainīgajiem, lai "
+"izmainītu izvades iznākumu."
 
 msgid "Models"
 msgstr "Modeļi"
@@ -80,7 +81,7 @@ msgid ""
 "template variables"
 msgstr ""
 "Modeļi ir visu sistēmas objektu un to saistīto lauku apraksti. Katram "
-"modelim ir saraksts ar laukiem, kuriem var piekļūt kā šablonu mainīgajiem"
+"modelim ir saraksts ar laukiem, kuriem var piekļūt kā veidnes mainīgajiem"
 
 msgid "Views"
 msgstr "Skati"
@@ -90,29 +91,28 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
-"Katru lapu publiskajā vietnē ģenerē skats. Skats nosaka, kuru šablonu "
-"izmanto lapas ģenerēšanai un kādi objekti ir pieejami šim šablonam."
+"Katru lapu publiskajā vietnē izveido skats. Skats nosaka, kuru veidni "
+"izmanto lapas izveidošanai un kuri objekti ir pieejami attiecīgajai veidnei."
 
 msgid "Tools for your browser to quickly access admin functionality."
-msgstr ""
-"Rīki Jūsu pārlūkprogrammai, lai ātri piekļūtu administratora "
-"funkcionalitātei."
+msgstr "Rīki pārlūkam, lai ātri piekļūtu pārvaldīšanas iespējām."
 
 msgid "Please install docutils"
-msgstr "Lūdzu instalējiet 'docutils'"
+msgstr "Lūgums uzstādīt 'docutils'"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python’s <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
-"Administratora dokumentācijas sistēmai ir nepieciešama Python <a href="
-"\"%(link)s\">docutils</a> bibliotēka."
+"Pārvaldīšanas dokumentācijas sistēmai ir nepieciešama Python <a "
+"href=\"%(link)s\">docutils</a> bibliotēka."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr "Palūdziet administratoram instalēt <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Lūgums vaicāt savam pārvaldītājam uzstādīt <a href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid "Model: %(name)s"
@@ -125,7 +125,7 @@ msgid "Field"
 msgstr "Lauks"
 
 msgid "Type"
-msgstr "Tips"
+msgstr "Veids"
 
 msgid "Description"
 msgstr "Apraksts"
@@ -140,41 +140,41 @@ msgid "Arguments"
 msgstr "Parametrs"
 
 msgid "Back to Model documentation"
-msgstr "Atpakaļ uz Modeļu dokumentāciju"
+msgstr "Atpakaļ uz modeļu dokumentāciju"
 
 msgid "Model documentation"
 msgstr "Modeļu dokumentācija"
 
 msgid "Model groups"
-msgstr "Modeļu grupas"
+msgstr "Modeļu kopas"
 
 msgid "Templates"
-msgstr "Šabloni"
+msgstr "Veidnes"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr "Šablons: %(name)s"
+msgstr "Veidne: %(name)s"
 
 #, python-format
 msgid "Template: <q>%(name)s</q>"
-msgstr "Šablons: <q>%(name)s</q>"
+msgstr "Veidne: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template <q>%(name)s</q>:"
-msgstr "Šablona <q>%(name)s</q> ceļš:"
+msgstr "Veidnes <q>%(name)s</q> ceļš:"
 
 msgid "(does not exist)"
-msgstr "(neeksistē)"
+msgstr "(nepastāv)"
 
 msgid "Back to Documentation"
-msgstr "Atpakaļ pie Dokumentācijas"
+msgstr "Atpakaļ uz dokumentāciju"
 
 msgid "Template filters"
-msgstr "Šablona filtri"
+msgstr "Veidnes filtri"
 
 msgid "Template filter documentation"
-msgstr "Šablona filtru dokumentācija"
+msgstr "Veidņu filtru dokumentācija"
 
 msgid "Built-in filters"
 msgstr "Iebūvētie filtri"
@@ -184,14 +184,14 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
-"Lai izmantotu šos filtrus, ievietojiet <code>%(code)s</code> šablonā pirms "
+"Lai izmantotu šos filtrus, veidnē jāievieto <code>%(code)s</code> pirms "
 "filtra izmantošanas."
 
 msgid "Template tags"
-msgstr "Šablonu tagi"
+msgstr "Veidņu tagi"
 
 msgid "Template tag documentation"
-msgstr "Šablonu tagu dokumentācija"
+msgstr "Veidņu tagu dokumentācija"
 
 msgid "Built-in tags"
 msgstr "Iebūvētie tagi"
@@ -201,8 +201,8 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
-"Lai izmantotu šos tagus, ievietojiet <code>%(code)s</code> šablonā pirms "
-"taga izmantošanas."
+"Lai izmantotu šos tagus, veidnē jāieviet <code>%(code)s</code> pirms taga "
+"izmantošanas."
 
 #, python-format
 msgid "View: %(name)s"
@@ -212,26 +212,26 @@ msgid "Context:"
 msgstr "Konteksts:"
 
 msgid "Templates:"
-msgstr "Šabloni:"
+msgstr "Veidnes:"
 
 msgid "Back to View documentation"
-msgstr "Atpakaļ pie Skatu dokumentācijas"
+msgstr "Atpakaļ uz skatu dokumentācijas"
 
 msgid "View documentation"
 msgstr "Skatu dokumentācija"
 
 msgid "Jump to namespace"
-msgstr "Pāriet uz vārdtelpu"
+msgstr "Pārlēkt uz nosaukumu telpu"
 
 msgid "Empty namespace"
-msgstr "Tukša vārdtelpa"
+msgstr "Tukša nosaukumu telpa"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr "Skati pēc vārdtelpas %(name)s"
+msgstr "Skati pēc nosaukumu telpas %(name)s"
 
 msgid "Views by empty namespace"
-msgstr "Skati pēc tukšas vārdtelpas"
+msgstr "Skati pēc tukšas nosaukumu telpas"
 
 #, python-format
 msgid ""
@@ -240,8 +240,8 @@ msgid ""
 "code>.\n"
 msgstr ""
 "\n"
-"    Skata funkcija: <code>%(full_name)s</code>. Nosaukums: <code>"
-"%(url_name)s</code>.\n"
+"    Skata funkcija: <code>%(full_name)s</code>. Nosaukums: "
+"<code>%(url_name)s</code>.\n"
 
 msgid "tag:"
 msgstr "tags:"
@@ -281,4 +281,4 @@ msgstr "%s skaits"
 
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s nav urlpattern objekts"
+msgstr "neizskatās, ka%s ir urlpattern objekts"

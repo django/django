@@ -40,8 +40,9 @@ For more advanced usage, please read the `Uvicorn documentation <Uvicorn_>`_.
 Deploying Django using Uvicorn and Gunicorn
 ===========================================
 
-Gunicorn_ is a robust web server that implements process monitoring and automatic
-restarts. This can be useful when running Uvicorn in a production environment.
+Gunicorn_ is a robust web server that implements process monitoring and
+automatic restarts. This can be useful when running Uvicorn in a production
+environment.
 
 To install Uvicorn and Gunicorn, use the following:
 

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME, alogin, alogout
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware,
     LoginRequiredMiddleware,
@@ -16,6 +16,9 @@ class TestAuthenticationMiddleware(TestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create_user(
             "test_user", "test@example.com", "test_password"
+        )
+        cls.user2 = User.objects.create_user(
+            "test_user2", "test2@example.com", "test_password2"
         )
 
     def setUp(self):
@@ -56,6 +59,22 @@ class TestAuthenticationMiddleware(TestCase):
         self.assertEqual(auser, self.user)
         auser_second = await self.request.auser()
         self.assertIs(auser, auser_second)
+
+    async def test_auser_after_alogin(self):
+        self.middleware(self.request)
+        auser = await self.request.auser()
+        self.assertEqual(auser, self.user)
+        await alogin(self.request, self.user2)
+        auser_second = await self.request.auser()
+        self.assertEqual(auser_second, self.user2)
+
+    async def test_auser_after_alogout(self):
+        self.middleware(self.request)
+        auser = await self.request.auser()
+        self.assertEqual(auser, self.user)
+        await alogout(self.request)
+        auser_second = await self.request.auser()
+        self.assertTrue(auser_second.is_anonymous)
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
@@ -187,3 +206,21 @@ class TestLoginRequiredMiddleware(TestCase):
     def test_get_redirect_field_name_default(self):
         redirect_field_name = self.middleware.get_redirect_field_name(lambda: None)
         self.assertEqual(redirect_field_name, REDIRECT_FIELD_NAME)
+
+    def test_public_view_logged_in_performance(self):
+        """
+        Public views don't trigger fetching the user from the database.
+        """
+        self.client.force_login(self.user)
+        with self.assertNumQueries(0):
+            response = self.client.get("/public_view/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_protected_view_logged_in_performance(self):
+        """
+        Protected views do trigger fetching the user from the database.
+        """
+        self.client.force_login(self.user)
+        with self.assertNumQueries(2):  # session and user
+            response = self.client.get("/protected_view/")
+        self.assertEqual(response.status_code, 200)

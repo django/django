@@ -1,0 +1,21 @@
+==========================
+Django 5.2.6 release notes
+==========================
+
+*September 3, 2025*
+
+Django 5.2.6 fixes a security issue with severity "high" and one bug in 5.2.5.
+
+CVE-2025-57833: Potential SQL injection in ``FilteredRelation`` column aliases
+==============================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases,
+using a suitably crafted dictionary, with dictionary expansion, as the
+``**kwargs`` passed to :meth:`.QuerySet.annotate` or :meth:`.QuerySet.alias`.
+
+Bugfixes
+========
+
+* Fixed a bug where using ``QuerySet.values()`` or ``values_list()`` with a
+  ``ForeignObject`` composed of multiple fields returned incorrect results
+  instead of tuples of the referenced fields (:ticket:`36431`).

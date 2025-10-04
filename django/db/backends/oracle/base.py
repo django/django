@@ -135,7 +135,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "BigIntegerField": "NUMBER(19)",
         "IPAddressField": "VARCHAR2(15)",
         "GenericIPAddressField": "VARCHAR2(39)",
-        "OneToOneField": "NUMBER(11)",
         "PositiveBigIntegerField": "NUMBER(19)",
         "PositiveIntegerField": "NUMBER(11)",
         "PositiveSmallIntegerField": "NUMBER(11)",
@@ -244,6 +243,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             "use_returning_into", True
         )
         self.features.can_return_columns_from_insert = use_returning_into
+        self.features.can_return_rows_from_update = use_returning_into
 
     @property
     def is_pool(self):

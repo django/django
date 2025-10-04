@@ -19,10 +19,10 @@ a black box, with exactly known inputs, testing for specific outputs.
 The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
-* It only has access to the HTTP methods :meth:`~Client.get()`,
-  :meth:`~Client.post()`, :meth:`~Client.put()`,
-  :meth:`~Client.delete()`, :meth:`~Client.head()`,
-  :meth:`~Client.options()`, and :meth:`~Client.trace()`.
+* It only has access to the HTTP methods :meth:`~Client.get`,
+  :meth:`~Client.post`, :meth:`~Client.put`,
+  :meth:`~Client.delete`, :meth:`~Client.head`,
+  :meth:`~Client.options`, and :meth:`~Client.trace`.
 
 * These methods accept all the same arguments *except* for
   ``follow``. Since this is just a factory for producing
@@ -158,8 +158,8 @@ and the settings file includes a list of the domains supported by the project::
     ALLOWED_HOSTS = ["www.djangoproject.dev", "docs.djangoproject.dev", ...]
 
 Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
-:meth:`~django.test.override_settings()` or
-:attr:`~django.test.SimpleTestCase.modify_settings()`. This option may be
+:meth:`~django.test.override_settings` or
+:attr:`~django.test.SimpleTestCase.modify_settings`. This option may be
 preferable in standalone apps that can't package their own settings file or
 for projects where the list of domains is not static (e.g., subdomains for
 multitenancy). For example, you could write a test for the domain
@@ -560,7 +560,7 @@ and tear down the test suite.
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
 
-    ``parallel`` specifies the number of processes.  If ``parallel`` is greater
+    ``parallel`` specifies the number of processes. If ``parallel`` is greater
     than ``1``, the test suite will run in ``parallel`` processes. If there are
     fewer test case classes than configured processes, Django will reduce the
     number of processes accordingly. Each process gets its own database. This
@@ -587,7 +587,7 @@ and tear down the test suite.
 
     If ``buffer`` is ``True``, outputs from passing tests will be discarded.
 
-    If ``enable_faulthandler`` is ``True``, :py:mod:`faulthandler` will be
+    If ``enable_faulthandler`` is ``True``, :mod:`faulthandler` will be
     enabled.
 
     If ``timing`` is ``True``, test timings, including database setup and total
@@ -601,7 +601,7 @@ and tear down the test suite.
     :ref:`Grouping by test class <order-of-tests>` is preserved when using this
     option.
 
-    ``logger`` can be used to pass a Python :py:ref:`Logger object <logger>`.
+    ``logger`` can be used to pass a Python :ref:`Logger object <logger>`.
     If provided, the logger will be used to log messages instead of printing to
     the console. The logger object will respect its logging level rather than
     the ``verbosity``.
@@ -661,7 +661,7 @@ Methods
 
     Override this class method to add custom arguments accepted by the
     :djadmin:`test` management command. See
-    :py:meth:`argparse.ArgumentParser.add_argument()` for details about adding
+    :meth:`argparse.ArgumentParser.add_argument` for details about adding
     arguments to a parser.
 
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)

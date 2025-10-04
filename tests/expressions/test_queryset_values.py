@@ -1,5 +1,6 @@
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Company, Employee, JSONFieldModel
 
@@ -34,11 +35,17 @@ class ValuesExpressionsTests(TestCase):
             [{"salary": 10}, {"salary": 20}, {"salary": 30}],
         )
 
+    def test_values_expression_containing_percent_sign_deprecation_warns_once(self):
+        msg = "Using percent signs in a column alias is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as cm:
+            Company.objects.values(**{"alias%": F("id")})
+        self.assertEqual(len(cm.warnings), 1)
+
     def test_values_expression_alias_sql_injection(self):
         crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Company.objects.values(**{crafted_alias: F("ceo__salary")})
@@ -47,8 +54,8 @@ class ValuesExpressionsTests(TestCase):
     def test_values_expression_alias_sql_injection_json_field(self):
         crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             JSONFieldModel.objects.values(f"data__{crafted_alias}")

@@ -2501,6 +2501,16 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+        # The table does not overflow the content section.
+        content = self.selenium.find_element(By.ID, "content-main")
+        tabular_wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.tabular.inline-related div.wrapper"
+        )
+        self.assertGreater(
+            tabular_wrapper.find_element(By.TAG_NAME, "table").size["width"],
+            tabular_wrapper.size["width"],
+        )
+        self.assertLessEqual(tabular_wrapper.size["width"], content.size["width"])
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_tabular_inline_delete_layout(self):
@@ -2532,3 +2542,31 @@ class SeleniumTests(AdminSeleniumTestCase):
             delete.get_attribute("innerHTML"),
         )
         self.take_screenshot("loaded")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_object_with_show_change_link(self):
+        from selenium.webdriver.common.by import By
+
+        et = ExtraTerrestrial.objects.create(name="test")
+        Sighting.objects.create(et=et, place="Desert")
+        self.admin_login(username="super", password="secret")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(et.pk,))
+        self.selenium.get(self.live_server_url + url)
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original p"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertIn("Desert", object_str.text)
+        self.take_screenshot("tabular")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_with_filter_horizontal(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_courseproxy2_add")
+        )
+        m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
+        self.assertTrue(m2m_widget.is_displayed())
+        self.take_screenshot("tabular")

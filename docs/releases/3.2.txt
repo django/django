@@ -380,7 +380,7 @@ Migrations
 Models
 ~~~~~~
 
-* The new ``no_key`` parameter for :meth:`.QuerySet.select_for_update()`,
+* The new ``no_key`` parameter for :meth:`.QuerySet.select_for_update`,
   supported on PostgreSQL, allows acquiring weaker locks that don't block the
   creation of rows that reference locked rows through a foreign key.
 
@@ -400,17 +400,17 @@ Models
 * :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
   nested relations.
 
-* The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
+* The ``of`` argument of :meth:`.QuerySet.select_for_update` is now allowed
   on MySQL 8.0.1+.
 
 * :class:`Value() <django.db.models.Value>` expression now
   automatically resolves its ``output_field`` to the appropriate
   :class:`Field <django.db.models.Field>` subclass based on the type of
-  its provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
-  :py:class:`float`, :py:class:`int`, :py:class:`str`,
-  :py:class:`datetime.date`, :py:class:`datetime.datetime`,
-  :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
-  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances. As a
+  its provided ``value`` for :class:`bool`, :class:`bytes`,
+  :class:`float`, :class:`int`, :class:`str`,
+  :class:`datetime.date`, :class:`datetime.datetime`,
+  :class:`datetime.time`, :class:`datetime.timedelta`,
+  :class:`decimal.Decimal`, and :class:`uuid.UUID` instances. As a
   consequence, resolving an ``output_field`` for database functions and
   combined expressions may now crash with mixed types when using ``Value()``.
   You will need to explicitly set the ``output_field`` in such cases.
@@ -422,7 +422,7 @@ Models
 * The new :class:`~django.db.models.functions.Collate` function allows
   filtering and ordering by specified database collations.
 
-* The ``field_name`` argument of :meth:`.QuerySet.in_bulk()` now accepts
+* The ``field_name`` argument of :meth:`.QuerySet.in_bulk` now accepts
   distinct fields if there's only one field specified in
   :meth:`.QuerySet.distinct`.
 
@@ -519,11 +519,11 @@ Tests
 
 * Objects assigned to class attributes in :meth:`.TestCase.setUpTestData` are
   now isolated for each test method. Such objects are now required to support
-  creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
+  creating deep copies with :func:`copy.deepcopy`. Assigning objects which
   don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
 
 * :class:`~django.test.runner.DiscoverRunner` now enables
-  :py:mod:`faulthandler` by default. This can be disabled by using the
+  :mod:`faulthandler` by default. This can be disabled by using the
   :option:`test --no-faulthandler` option.
 
 * :class:`~django.test.runner.DiscoverRunner` and the
@@ -703,8 +703,8 @@ Miscellaneous
   removed. Please use :func:`urllib.parse.parse_qsl` instead.
 
 * ``django.test.utils.TestContextDecorator`` now uses
-  :py:meth:`~unittest.TestCase.addCleanup` so that cleanups registered in the
-  :py:meth:`~unittest.TestCase.setUp` method are called before
+  :meth:`~unittest.TestCase.addCleanup` so that cleanups registered in the
+  :meth:`~unittest.TestCase.setUp` method are called before
   ``TestContextDecorator.disable()``.
 
 * ``SessionMiddleware`` now raises a
@@ -758,7 +758,7 @@ Miscellaneous
 -------------
 
 * Assigning objects which don't support creating deep copies with
-  :py:func:`copy.deepcopy` to class attributes in
+  :func:`copy.deepcopy` to class attributes in
   :meth:`.TestCase.setUpTestData` is deprecated.
 
 * Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is

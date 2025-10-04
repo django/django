@@ -28,9 +28,10 @@ in different ways, depending on the formats for their current locale.
 Locale aware input in forms
 ===========================
 
-When formatting is enabled, Django can use localized formats when parsing dates,
-times and numbers in forms. That means it tries different formats for different
-locales when guessing the format used by the user when inputting data on forms.
+When formatting is enabled, Django can use localized formats when parsing
+dates, times and numbers in forms. That means it tries different formats for
+different locales when guessing the format used by the user when inputting data
+on forms.
 
 .. note::
     Django uses different formats for displaying data to those it uses for
@@ -92,8 +93,8 @@ To activate or deactivate localization for a template block, use:
 When localization is disabled, the :ref:`localization settings <settings-l10n>`
 formats are applied.
 
-See :tfilter:`localize` and :tfilter:`unlocalize` for template filters that will
-do the same job on a per-variable basis.
+See :tfilter:`localize` and :tfilter:`unlocalize` for template filters that
+will do the same job on a per-variable basis.
 
 Template filters
 ----------------
@@ -113,9 +114,9 @@ For example:
 
     {{ value|localize }}
 
-To disable localization on a single value, use :tfilter:`unlocalize`. To control
-localization over a large section of a template, use the :ttag:`localize` template
-tag.
+To disable localization on a single value, use :tfilter:`unlocalize`. To
+control localization over a large section of a template, use the
+:ttag:`localize` template tag.
 
 .. templatefilter:: unlocalize
 
@@ -150,7 +151,7 @@ want to create your own, because a format file doesn't exist for your locale,
 or because you want to overwrite some of the values.
 
 To use custom formats, specify the path where you'll place format files
-first.  To do that, set your :setting:`FORMAT_MODULE_PATH` setting to the
+first. To do that, set your :setting:`FORMAT_MODULE_PATH` setting to the
 package where format files will exist, for instance::
 
     FORMAT_MODULE_PATH = [

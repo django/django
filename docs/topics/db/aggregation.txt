@@ -4,12 +4,12 @@ Aggregation
 
 .. currentmodule:: django.db.models
 
-The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
-described the way that you can use Django queries that create,
-retrieve, update and delete individual objects. However, sometimes you will
-need to retrieve values that are derived by summarizing or *aggregating* a
-collection of objects. This topic guide describes the ways that aggregate values
-can be generated and returned using Django queries.
+The topic guide on :doc:`Django's database-abstraction API
+</topics/db/queries>` described the way that you can use Django queries that
+create, retrieve, update and delete individual objects. However, sometimes you
+will need to retrieve values that are derived by summarizing or *aggregating* a
+collection of objects. This topic guide describes the ways that aggregate
+values can be generated and returned using Django queries.
 
 Throughout this guide, we'll refer to the following models. These models are
 used to track the inventory for a series of online bookstores:
@@ -322,12 +322,14 @@ We can also ask for the oldest book of any of those managed by every publisher:
     >>> Publisher.objects.aggregate(oldest_pubdate=Min("book__pubdate"))
 
 (The resulting dictionary will have a key called ``'oldest_pubdate'``. If no
-such alias were specified, it would be the rather long ``'book__pubdate__min'``.)
+such alias were specified, it would be the rather long
+``'book__pubdate__min'``.)
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
-number of pages considering all the books the author has (co-)authored (note how we
-use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop):
+number of pages considering all the books the author has (co-)authored (note
+how we use ``'book'`` to specify the ``Author`` -> ``Book`` reverse
+many-to-many hop):
 
 .. code-block:: pycon
 
@@ -345,7 +347,8 @@ file:
     >>> Author.objects.aggregate(average_rating=Avg("book__rating"))
 
 (The resulting dictionary will have a key called ``'average_rating'``. If no
-such alias were specified, it would be the rather long ``'book__rating__avg'``.)
+such alias were specified, it would be the rather long
+``'book__rating__avg'``.)
 
 Aggregations and other ``QuerySet`` clauses
 ===========================================
@@ -527,7 +530,8 @@ rating of books written by each author:
 This will return one result for each author in the database, annotated with
 their average book rating.
 
-However, the result will be slightly different if you use a ``values()`` clause:
+However, the result will be slightly different if you use a ``values()``
+clause:
 
 .. code-block:: pycon
 

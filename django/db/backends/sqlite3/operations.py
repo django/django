@@ -32,9 +32,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
         (reflected in max_query_params).
-
-        If there's only a single field to insert, the limit is 500
-        (SQLITE_MAX_COMPOUND_SELECT).
         """
         fields = list(
             chain.from_iterable(
@@ -46,9 +43,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 for field in fields
             )
         )
-        if len(fields) == 1:
-            return 500
-        elif len(fields) > 1:
+        if fields:
             return self.connection.features.max_query_params // len(fields)
         else:
             return len(objs)
@@ -88,13 +83,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
-
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the list of returned data.
-        """
-        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -403,20 +391,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         if on_conflict == OnConflict.IGNORE:
             return "INSERT OR IGNORE INTO"
         return super().insert_statement(on_conflict=on_conflict)
-
-    def return_insert_columns(self, fields):
-        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if (

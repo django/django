@@ -29,7 +29,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
 ---------
 
 The ``route`` argument should be a string or
-:func:`~django.utils.translation.gettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy` (see
 :ref:`translating-urlpatterns`) that contains a URL pattern. The string
 may contain angle brackets (like ``<username>`` above) to capture part of the
 URL and send it as a keyword argument to the view. The angle brackets may
@@ -93,9 +93,9 @@ Returns an element for inclusion in ``urlpatterns``. For example::
     ]
 
 The ``route`` argument should be a string or
-:func:`~django.utils.translation.gettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy` (see
 :ref:`translating-urlpatterns`) that contains a regular expression compatible
-with Python's :py:mod:`re` module. Strings typically use raw string syntax
+with Python's :mod:`re` module. Strings typically use raw string syntax
 (``r''``) so that they can contain sequences like ``\d`` without the need to
 escape the backslash with another backslash. When a match is made, captured
 groups from the regular expression are passed to the view -- as named arguments
@@ -104,10 +104,10 @@ passed as strings, without any type conversion.
 
 When a ``route`` ends with ``$`` the whole requested URL, matching against
 :attr:`~django.http.HttpRequest.path_info`, must match the regular expression
-pattern (:py:func:`re.fullmatch` is used).
+pattern (:func:`re.fullmatch` is used).
 
 The ``view``, ``kwargs`` and ``name`` arguments are the same as for
-:func:`~django.urls.path()`.
+:func:`~django.urls.path`.
 
 ``include()``
 =============
@@ -118,8 +118,8 @@ The ``view``, ``kwargs`` and ``name`` arguments are the same as for
 
     A function that takes a full Python import path to another URLconf module
     that should be "included" in this place. Optionally, the :term:`application
-    namespace` and :term:`instance namespace` where the entries will be included
-    into can also be specified.
+    namespace` and :term:`instance namespace` where the entries will be
+    included into can also be specified.
 
     Usually, the application namespace should be specified by the included
     module. If an application namespace is set, the ``namespace`` argument
@@ -132,8 +132,10 @@ The ``view``, ``kwargs`` and ``name`` arguments are the same as for
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: str
-    :arg pattern_list: Iterable of :func:`~django.urls.path` and/or :func:`~django.urls.re_path` instances.
-    :arg app_namespace: Application namespace for the URL entries being included
+    :arg pattern_list: Iterable of :func:`~django.urls.path`
+        and/or :func:`~django.urls.re_path` instances.
+    :arg app_namespace: Application namespace for the URL entries being
+        included
     :type app_namespace: str
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
@@ -143,7 +145,7 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
 .. function:: register_converter(converter, type_name)
 
-The function for registering a converter for use in :func:`~django.urls.path()`
+The function for registering a converter for use in :func:`~django.urls.path`
 ``route``\s.
 
 The ``converter`` argument is a converter class, and ``type_name`` is the
@@ -176,8 +178,8 @@ Helper function to return a URL pattern for serving files in debug mode::
 .. data:: handler400
 
 A callable, or a string representing the full Python import path to the view
-that should be called if the HTTP client has sent a request that caused an error
-condition and a response with a status code of 400.
+that should be called if the HTTP client has sent a request that caused an
+error condition and a response with a status code of 400.
 
 By default, this is :func:`django.views.defaults.bad_request`. If you
 implement a custom view, be sure it accepts ``request`` and ``exception``

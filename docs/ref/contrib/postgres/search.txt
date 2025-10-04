@@ -27,7 +27,7 @@ single column in the database. For example:
 .. code-block:: pycon
 
     >>> Entry.objects.filter(body_text__search="Cheese")
-    [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]>
 
 This creates a ``to_tsvector`` in the database from the ``body_text`` field
 and a ``plainto_tsquery`` from the search term ``'Cheese'``, both using the
@@ -52,7 +52,7 @@ To query against both fields, use a ``SearchVector``:
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", "blog__tagline"),
     ... ).filter(search="Cheese")
-    [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]>
 
 The arguments to ``SearchVector`` can be any
 :class:`~django.db.models.Expression` or the name of a field. Multiple
@@ -67,7 +67,7 @@ For example:
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text") + SearchVector("blog__tagline"),
     ... ).filter(search="Cheese")
-    [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]>
 
 See :ref:`postgresql-fts-search-configuration` and
 :ref:`postgresql-fts-weighting-queries` for an explanation of the ``config``
@@ -96,7 +96,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
     >>> SearchQuery("red tomato")  # two keywords
     >>> SearchQuery("tomato red")  # same results as above
     >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
@@ -105,6 +105,7 @@ Examples:
     >>> SearchQuery(
     ...     "'tomato' ('red' OR 'green')", search_type="websearch"
     ... )  # websearch operators
+    >>> SearchQuery(Lexeme("tomato") & (Lexeme("red") | Lexeme("green")))  # Lexeme objects
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility:
 
@@ -117,6 +118,10 @@ Examples:
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
+
+.. versionchanged:: 6.0
+
+    :class:`Lexeme` objects were added.
 
 ``SearchRank``
 ==============
@@ -137,7 +142,7 @@ order by relevancy:
     >>> vector = SearchVector("body_text")
     >>> query = SearchQuery("cheese")
     >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by("-rank")
-    [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
 
 See :ref:`postgresql-fts-weighting-queries` for an explanation of the
 ``weights`` parameter.
@@ -235,7 +240,7 @@ different language parsers and dictionaries as defined by the database:
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", config="french"),
     ... ).filter(search=SearchQuery("œuf", config="french"))
-    [<Entry: Pain perdu>]
+    <QuerySet [<Entry: Pain perdu>]>
 
 The value of ``config`` could also be stored in another column:
 
@@ -245,7 +250,7 @@ The value of ``config`` could also be stored in another column:
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", config=F("blog__language")),
     ... ).filter(search=SearchQuery("œuf", config=F("blog__language")))
-    [<Entry: Pain perdu>]
+    <QuerySet [<Entry: Pain perdu>]>
 
 .. _postgresql-fts-weighting-queries:
 
@@ -276,6 +281,53 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
     >>> rank = SearchRank(vector, query, weights=[0.2, 0.4, 0.6, 0.8])
     >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by("-rank")
 
+``Lexeme``
+==========
+
+.. versionadded:: 6.0
+
+.. class:: Lexeme(value, output_field=None, *, invert=False, prefix=False, weight=None)
+
+``Lexeme`` objects allow search operators to be safely used with strings from
+an untrusted source. The content of each lexeme is escaped so that any
+operators that may exist in the string itself will not be interpreted.
+
+You can combine lexemes with other lexemes using the ``&`` and ``|`` operators
+and also negate them with the ``~`` operator. For example:
+
+.. code-block:: pycon
+
+    >>> from django.contrib.postgres.search import SearchQuery, SearchVector, Lexeme
+    >>> vector = SearchVector("body_text", "blog__tagline")
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("fruit") & Lexeme("dessert"))
+    ... )
+    <QuerySet [<Entry: Apple Crumble Recipes>, <Entry: Banana Split Recipes>]>
+
+.. code-block:: pycon
+
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("fruit") & Lexeme("dessert") & ~Lexeme("banana"))
+    ... )
+    <QuerySet [<Entry: Apple Crumble Recipes>]>
+
+Lexeme objects also support term weighting and prefixes:
+
+.. code-block:: pycon
+
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("Pizza") | Lexeme("Cheese"))
+    ... )
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("Pizza") | Lexeme("Cheese", weight="A"))
+    ... )
+    <QuerySet [<Entry: Pizza recipes>]>
+    >>> Entry.objects.annotate(search=vector).filter(
+    ...     search=SearchQuery(Lexeme("za", prefix=True))
+    ... )
+    <QuerySet []>
+
 Performance
 ===========
 
@@ -295,8 +347,7 @@ the search vector you wish to use. For example::
         name="search_vector_idx",
     )
 
-The PostgreSQL documentation has details on
-`creating indexes for full text search
+The PostgreSQL docs has details on `creating indexes for full text search
 <https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``
@@ -313,7 +364,7 @@ if it were an annotated ``SearchVector``:
 
     >>> Entry.objects.update(search_vector=SearchVector("body_text"))
     >>> Entry.objects.filter(search_vector="cheese")
-    [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
 
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
@@ -352,7 +403,7 @@ Usage example:
     ... ).filter(
     ...     similarity__gt=0.3
     ... ).order_by("-similarity")
-    [<Author: Katy Stevens>, <Author: Stephen Keats>]
+    <QuerySet [<Author: Katy Stevens>, <Author: Stephen Keats>]>
 
 ``TrigramWordSimilarity``
 -------------------------
@@ -375,7 +426,7 @@ Usage example:
     ... ).filter(
     ...     similarity__gt=0.3
     ... ).order_by("-similarity")
-    [<Author: Katy Stevens>]
+    <QuerySet [<Author: Katy Stevens>]>
 
 ``TrigramStrictWordSimilarity``
 -------------------------------
@@ -408,7 +459,7 @@ Usage example:
     ... ).filter(
     ...     distance__lte=0.7
     ... ).order_by("distance")
-    [<Author: Katy Stevens>, <Author: Stephen Keats>]
+    <QuerySet [<Author: Katy Stevens>, <Author: Stephen Keats>]>
 
 ``TrigramWordDistance``
 -----------------------
@@ -431,7 +482,7 @@ Usage example:
     ... ).filter(
     ...     distance__lte=0.7
     ... ).order_by("distance")
-    [<Author: Katy Stevens>]
+    <QuerySet [<Author: Katy Stevens>]>
 
 ``TrigramStrictWordDistance``
 -----------------------------

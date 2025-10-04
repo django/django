@@ -93,7 +93,8 @@ class SQLiteOperationsTests(TestCase):
         first_name_field = Person._meta.get_field("first_name")
         last_name_field = Person._meta.get_field("last_name")
         self.assertEqual(
-            connection.ops.bulk_batch_size([first_name_field], [Person()]), 500
+            connection.ops.bulk_batch_size([first_name_field], [Person()]),
+            connection.features.max_query_params,
         )
         self.assertEqual(
             connection.ops.bulk_batch_size(

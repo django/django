@@ -88,7 +88,8 @@ can be chained with other lookup functions. To use it, you need to add
 ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS` and activate
 the `unaccent extension on PostgreSQL`_. The
 :class:`~django.contrib.postgres.operations.UnaccentExtension` migration
-operation is available if you want to perform this activation using migrations).
+operation is available if you want to perform this activation using
+migrations).
 
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
@@ -105,7 +106,7 @@ The ``unaccent`` lookup can be used on
 
 .. warning::
 
-    ``unaccent`` lookups should perform fine in most use cases. However, queries
-    using this filter will generally perform full table scans, which can be slow
-    on large tables. In those cases, using dedicated full text indexing tools
-    might be appropriate.
+    ``unaccent`` lookups should perform fine in most use cases. However,
+    queries using this filter will generally perform full table scans, which
+    can be slow on large tables. In those cases, using dedicated full text
+    indexing tools might be appropriate.

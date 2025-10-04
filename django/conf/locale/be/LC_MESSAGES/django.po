@@ -2,16 +2,16 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2024
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2025
 # Bobsans <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
-"2016-2017,2019-2021,2023-2024\n"
+"2016-2017,2019-2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -712,8 +712,9 @@ msgid "Value must be valid JSON."
 msgstr "Значэньне павінна быць сапраўдным JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Экземпляр %(model)s з %(field)s %(value)r не iснуе."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
+"Экземпляр %(model)s з %(field)s %(value)r не з'яўляецца правільным выбарам."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Вонкавы ключ (від вызначаецца паводле зьвязанага поля)"

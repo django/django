@@ -1697,7 +1697,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         self.assertForeignKeyExists(Book, "author_id", "schema_author")
         # Alter the FK
@@ -1709,7 +1709,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         self.assertForeignKeyExists(Book, "author_id", "schema_author")
 
@@ -1761,7 +1761,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(BookWithO2O)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         # Ensure the field is unique
         author = Author.objects.create(name="Joe")
@@ -1783,7 +1783,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         # Ensure the field is not unique anymore
         Book.objects.create(
@@ -1807,7 +1807,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         # Ensure the field is not unique
         author = Author.objects.create(name="Joe")
@@ -1828,7 +1828,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(BookWithO2O)
         self.assertEqual(
             columns["author_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         # Ensure the field is unique now
         BookWithO2O.objects.create(
@@ -1901,7 +1901,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         field_type, _ = columns["note_ptr_id"]
         self.assertEqual(
-            field_type, connection.features.introspected_field_types["IntegerField"]
+            field_type, connection.features.introspected_field_types["BigIntegerField"]
         )
 
     def test_alter_field_fk_keeps_index(self):
@@ -2506,7 +2506,7 @@ class SchemaTests(TransactionTestCase):
         )
         self.assertEqual(
             columns["tagm2mtest_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
 
     def test_m2m_create(self):
@@ -2551,11 +2551,11 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(LocalTagThrough)
         self.assertEqual(
             columns["book_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
         self.assertEqual(
             columns["tag_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
 
     def test_m2m_create_through(self):
@@ -2651,7 +2651,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(new_field.remote_field.through)
         self.assertEqual(
             columns["tagm2mtest_id"][0],
-            connection.features.introspected_field_types["IntegerField"],
+            connection.features.introspected_field_types["BigIntegerField"],
         )
 
         # "Alter" the field. This should not rename the DB table to itself.
@@ -4537,7 +4537,7 @@ class SchemaTests(TransactionTestCase):
         letters.
         """
 
-        def get_field(*args, field_class=IntegerField, **kwargs):
+        def get_field(*args, field_class=BigIntegerField, **kwargs):
             kwargs["db_column"] = "CamelCase"
             field = field_class(*args, **kwargs)
             field.set_attributes_from_name("CamelCase")

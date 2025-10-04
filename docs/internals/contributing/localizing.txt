@@ -61,8 +61,8 @@ the date, time and numbers formatting particularities of your locale. See
 The format files aren't managed by the use of Transifex. To change them, you
 must:
 
-* :doc:`Create a pull request<writing-code/submitting-patches>` against the
-  Django Git ``main`` branch, as for any code change.
+* :ref:`Create a pull request <patch-review-checklist>` against the Django Git
+  ``main`` branch, as for any code change.
 
 * Open a ticket in Django's ticket system, set its ``Component`` field to
   ``Translations``, set the "has patch" flag, and include the link to the pull

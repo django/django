@@ -5,6 +5,8 @@ GEOS API
 .. module:: django.contrib.gis.geos
     :synopsis: GeoDjango's high-level interface to the GEOS library.
 
+.. _geos-overview:
+
 Background
 ==========
 
@@ -12,7 +14,7 @@ What is GEOS?
 -------------
 
 `GEOS`__ stands for **Geometry Engine - Open Source**,
-and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS
+and is a C++ library, ported from the  `Java Topology Suite`__. GEOS
 implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
@@ -30,8 +32,8 @@ features include:
 
 * A BSD-licensed interface to the GEOS geometry routines, implemented purely
   in Python using ``ctypes``.
-* Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
-  may be used outside of a Django project/application.  In other words,
+* Loosely-coupled to GeoDjango. For example, :class:`GEOSGeometry` objects
+  may be used outside of a Django project/application. In other words,
   no need to have :envvar:`DJANGO_SETTINGS_MODULE` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
 * Cross-platform tested.
@@ -47,7 +49,7 @@ This section contains a brief introduction and tutorial to using
 Creating a Geometry
 -------------------
 
-:class:`GEOSGeometry` objects may be created in a few ways.  The first is
+:class:`GEOSGeometry` objects may be created in a few ways. The first is
 to simply instantiate the object on some spatial input -- the following
 are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
 
@@ -66,7 +68,7 @@ are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
     ... )  # GeoJSON
 
 Another option is to use the constructor for the specific geometry type
-that you wish to create.  For example, a :class:`Point` object may be
+that you wish to create. For example, a :class:`Point` object may be
 created by passing in the X and Y coordinates into its constructor:
 
 .. code-block:: pycon
@@ -101,10 +103,10 @@ Finally, there is the :func:`fromfile` factory method which returns a
 
     You find many ``TypeError`` or ``AttributeError`` exceptions filling your
     web server's log files. This generally means that you are creating GEOS
-    objects at the top level of some of your Python modules. Then, due to a race
-    condition in the garbage collector, your module is garbage collected before
-    the GEOS object. To prevent this, create :class:`GEOSGeometry` objects
-    inside the local scope of your functions/methods.
+    objects at the top level of some of your Python modules. Then, due to a
+    race condition in the garbage collector, your module is garbage collected
+    before the GEOS object. To prevent this, create :class:`GEOSGeometry`
+    objects inside the local scope of your functions/methods.
 
 Geometries are Pythonic
 -----------------------
@@ -127,8 +129,8 @@ may be used to get the geometry coordinates as a Python tuple:
     (5.0, 23.0)
 
 You can get/set geometry components using standard Python indexing
-techniques.  However, what is returned depends on the geometry type
-of the object.  For example, indexing on a :class:`LineString`
+techniques. However, what is returned depends on the geometry type
+of the object. For example, indexing on a :class:`LineString`
 returns a coordinate tuple:
 
 .. code-block:: pycon
@@ -212,7 +214,7 @@ Geometry Objects
     :param srid: spatial reference identifier
     :type srid: int
 
-This is the base class for all GEOS geometry objects.  It initializes on the
+This is the base class for all GEOS geometry objects. It initializes on the
 given ``geo_input`` argument, and then assumes the proper geometry subclass
 (e.g., ``GEOSGeometry('POINT(1 1)')`` will create a :class:`Point` object).
 
@@ -275,7 +277,7 @@ Properties
 
 .. attribute:: GEOSGeometry.geom_type
 
-    Returns a string corresponding to the type of geometry.  For example:
+    Returns a string corresponding to the type of geometry. For example:
 
     .. code-block:: pycon
 
@@ -285,7 +287,7 @@ Properties
 
 .. attribute:: GEOSGeometry.geom_typeid
 
-    Returns the GEOS geometry type identification number.  The following table
+    Returns the GEOS geometry type identification number. The following table
     shows the value for each geometry type:
 
     ===========================  ========
@@ -307,7 +309,7 @@ Properties
 
 .. attribute:: GEOSGeometry.num_geom
 
-    Returns the number of geometries in this geometry.  In other words, will
+    Returns the number of geometries in this geometry. In other words, will
     return 1 on anything but geometry collections.
 
 .. attribute:: GEOSGeometry.hasz
@@ -329,7 +331,7 @@ Properties
 
     Returns a boolean indicating whether the geometry is 'simple'. A geometry
     is simple if and only if it does not intersect itself (except at boundary
-    points).  For example, a :class:`LineString` object is not simple if it
+    points). For example, a :class:`LineString` object is not simple if it
     intersects itself. Thus, :class:`LinearRing` and :class:`Polygon` objects
     are always simple because they cannot intersect themselves, by definition.
 
@@ -344,7 +346,7 @@ Properties
 .. attribute:: GEOSGeometry.srid
 
     Property that may be used to retrieve or set the SRID associated with the
-    geometry.  For example:
+    geometry. For example:
 
     .. code-block:: pycon
 
@@ -359,12 +361,12 @@ Output Properties
 ~~~~~~~~~~~~~~~~~
 
 The properties in this section export the :class:`GEOSGeometry` object into
-a different.  This output may be in the form of a string, buffer, or even
+a different. This output may be in the form of a string, buffer, or even
 another object.
 
 .. attribute:: GEOSGeometry.ewkt
 
-    Returns the "extended" Well-Known Text of the geometry.  This representation
+    Returns the "extended" Well-Known Text of the geometry. This representation
     is specific to PostGIS and is a superset of the OGC WKT standard. [#fnogc]_
     Essentially the SRID is prepended to the WKT representation, for example
     ``SRID=4326;POINT(5 23)``.
@@ -376,14 +378,14 @@ another object.
 
 .. attribute:: GEOSGeometry.hex
 
-    Returns the WKB of this Geometry in hexadecimal form.  Please note
+    Returns the WKB of this Geometry in hexadecimal form. Please note
     that the SRID value is not included in this representation
     because it is not a part of the OGC specification (use the
     :attr:`GEOSGeometry.hexewkb` property instead).
 
 .. attribute:: GEOSGeometry.hexewkb
 
-    Returns the EWKB of this Geometry in hexadecimal form.  This is an
+    Returns the EWKB of this Geometry in hexadecimal form. This is an
     extension of the WKB specification that includes the SRID value
     that are a part of this geometry.
 
@@ -400,7 +402,7 @@ another object.
 .. attribute:: GEOSGeometry.kml
 
     Returns a `KML`__ (Keyhole Markup Language) representation of the
-    geometry.  This should only be used for geometries with an SRID of
+    geometry. This should only be used for geometries with an SRID of
     4326 (WGS84), but this restriction is not enforced.
 
 .. attribute:: GEOSGeometry.ogr
@@ -413,7 +415,7 @@ another object.
 .. attribute:: GEOSGeometry.wkb
 
     Returns the WKB (Well-Known Binary) representation of this Geometry
-    as a Python buffer.  SRID value is not included, use the
+    as a Python buffer. SRID value is not included, use the
     :attr:`GEOSGeometry.ewkb` property instead.
 
 .. _ewkb:
@@ -439,8 +441,8 @@ return a boolean.
 
 .. method:: GEOSGeometry.contains(other)
 
-    Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>` returns
-    ``True``.
+    Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>`
+    returns ``True``.
 
 .. method:: GEOSGeometry.covers(other)
 
@@ -456,8 +458,8 @@ return a boolean.
 
     This predicate is similar to :meth:`GEOSGeometry.contains`, but is more
     inclusive (i.e. returns ``True`` for more cases). In particular, unlike
-    :meth:`~GEOSGeometry.contains` it does not distinguish between points in the
-    boundary and in the interior of geometries. For most situations,
+    :meth:`~GEOSGeometry.contains` it does not distinguish between points in
+    the boundary and in the interior of geometries. For most situations,
     ``covers()`` should be preferred to :meth:`~GEOSGeometry.contains`. As an
     added benefit, ``covers()`` is more amenable to optimization and hence
     should outperform :meth:`~GEOSGeometry.contains`.
@@ -483,7 +485,7 @@ return a boolean.
 .. method:: GEOSGeometry.equals_exact(other, tolerance=0)
 
     Returns true if the two geometries are exactly equal, up to a
-    specified tolerance.  The ``tolerance`` value should be a floating
+    specified tolerance. The ``tolerance`` value should be a floating
     point number representing the error tolerance in the comparison, e.g.,
     ``poly1.equals_exact(poly2, 0.001)`` will compare equality to within
     one thousandth of a unit.
@@ -507,9 +509,9 @@ return a boolean.
 
 .. method:: GEOSGeometry.relate_pattern(other, pattern)
 
-    Returns ``True`` if the elements in the DE-9IM intersection matrix
-    for this geometry and the other matches the given ``pattern`` --
-    a string of nine characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
+    Returns ``True`` if the elements in the DE-9IM intersection matrix for this
+    geometry and the other matches the given ``pattern`` -- a string of nine
+    characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
 
 .. method:: GEOSGeometry.touches(other)
 
@@ -548,9 +550,9 @@ Topological Methods
 .. method:: GEOSGeometry.interpolate_normalized(distance)
 
     Given a distance (float), returns the point (or closest point) within the
-    geometry (:class:`LineString` or :class:`MultiLineString`) at that distance.
-    The normalized version takes the distance as a float between 0 (origin) and
-    1 (endpoint).
+    geometry (:class:`LineString` or :class:`MultiLineString`) at that
+    distance. The normalized version takes the distance as a float between 0
+    (origin) and 1 (endpoint).
 
     Reverse of :meth:`GEOSGeometry.project`.
 
@@ -583,10 +585,10 @@ Topological Methods
 
     By default, this function does not preserve topology. For example,
     :class:`Polygon` objects can be split, be collapsed into lines, or
-    disappear. :class:`Polygon` holes can be created or disappear, and lines may
-    cross. By specifying ``preserve_topology=True``, the result will have the
-    same dimension and number of components as the input; this is significantly
-    slower, however.
+    disappear. :class:`Polygon` holes can be created or disappear, and lines
+    may cross. By specifying ``preserve_topology=True``, the result will have
+    the same dimension and number of components as the input; this is
+    significantly slower, however.
 
 .. method:: GEOSGeometry.sym_difference(other)
 
@@ -608,7 +610,7 @@ Topological Properties
 .. attribute:: GEOSGeometry.centroid
 
     Returns a :class:`Point` object representing the geometric center of
-    the geometry.  The point is not guaranteed to be on the interior
+    the geometry. The point is not guaranteed to be on the interior
     of the geometry.
 
 .. attribute:: GEOSGeometry.convex_hull
@@ -633,13 +635,13 @@ Topological Properties
 
     The result obeys the following contract:
 
-    * Unioning a set of :class:`LineString`\s has the effect of fully noding and
-      dissolving the linework.
+    * Unioning a set of :class:`LineString`\s has the effect of fully noding
+      and dissolving the linework.
 
-    * Unioning a set of :class:`Polygon`\s will always return a :class:`Polygon`
-      or :class:`MultiPolygon` geometry (unlike :meth:`GEOSGeometry.union`,
-      which may return geometries of lower dimension if a topology collapse
-      occurs).
+    * Unioning a set of :class:`Polygon`\s will always return a
+      :class:`Polygon` or :class:`MultiPolygon` geometry (unlike
+      :meth:`GEOSGeometry.union`, which may return geometries of lower
+      dimension if a topology collapse occurs).
 
 Other Properties & Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -655,7 +657,8 @@ Other Properties & Methods
 
 .. method:: GEOSGeometry.clone()
 
-    This method returns a :class:`GEOSGeometry` that is a clone of the original.
+    This method returns a :class:`GEOSGeometry` that is a clone of the
+    original.
 
 .. method:: GEOSGeometry.distance(geom)
 
@@ -678,8 +681,8 @@ Other Properties & Methods
 
     Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
     ``PreparedGeometry`` objects are optimized for the contains, intersects,
-    covers, crosses, disjoint, overlaps, touches and within operations. Refer to
-    the :ref:`prepared-geometries` documentation for more information.
+    covers, crosses, disjoint, overlaps, touches and within operations. Refer
+    to the :ref:`prepared-geometries` documentation for more information.
 
 .. attribute:: GEOSGeometry.srs
 
@@ -809,9 +812,9 @@ Other Properties & Methods
 .. class:: Polygon(*args, **kwargs)
 
     ``Polygon`` objects may be instantiated by passing in parameters that
-    represent the rings of the polygon.  The parameters must either be
-    :class:`LinearRing` instances, or a sequence that may be used to construct a
-    :class:`LinearRing`:
+    represent the rings of the polygon. The parameters must either be
+    :class:`LinearRing` instances, or a sequence that may be used to construct
+    a :class:`LinearRing`:
 
     .. code-block:: pycon
 
@@ -922,12 +925,13 @@ Prepared Geometries
 ===================
 
 In order to obtain a prepared geometry, access the
-:attr:`GEOSGeometry.prepared` property.  Once you have a
-``PreparedGeometry`` instance its spatial predicate methods, listed below,
-may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
-geometry can be orders of magnitude faster -- the more complex the geometry
-that is prepared, the larger the speedup in the operation.  For more information,
-please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+:attr:`GEOSGeometry.prepared` property. Once you have a ``PreparedGeometry``
+instance its spatial predicate methods, listed below, may be used with other
+``GEOSGeometry`` objects. An operation with a prepared geometry can be orders
+of magnitude faster -- the more complex the geometry that is prepared, the
+larger the speedup in the operation. For more information, please consult the
+`GEOS wiki page on prepared geometries
+<https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
 For example:
 
@@ -972,7 +976,8 @@ Geometry Factories
 
     :param file_h: input file that contains spatial data
     :type file_h: a Python ``file`` object or a string path to the file
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+        file
 
     Example:
 
@@ -987,7 +992,8 @@ Geometry Factories
     :type string: str
     :param srid: spatial reference identifier
     :type srid: int
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+            string
 
     ``fromstr(string, srid)`` is equivalent to
     :class:`GEOSGeometry(string, srid) <GEOSGeometry>`.
@@ -1034,14 +1040,14 @@ Writer Objects
 --------------
 
 All writer objects have a ``write(geom)`` method that returns either the
-WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
+WKB or WKT of the given geometry. In addition, :class:`WKBWriter` objects
 also have properties that may be used to change the byte order, and or
 include the SRID value (in other words, EWKB).
 
 .. class:: WKBWriter(dim=2)
 
-    ``WKBWriter`` provides the most control over its output.  By default it
-    returns OGC-compliant WKB when its ``write`` method is called.  However,
+    ``WKBWriter`` provides the most control over its output. By default it
+    returns OGC-compliant WKB when its ``write`` method is called. However,
     it has properties that allow for the creation of EWKB, a superset of the
     WKB standard that includes additional information. See the
     :attr:`WKBWriter.outdim` documentation for more details about the ``dim``
@@ -1062,7 +1068,7 @@ include the SRID value (in other words, EWKB).
 
     .. method:: WKBWriter.write_hex(geom)
 
-    Returns WKB of the geometry in hexadecimal.  Example:
+    Returns WKB of the geometry in hexadecimal. Example:
 
     .. code-block:: pycon
 
@@ -1099,7 +1105,7 @@ include the SRID value (in other words, EWKB).
     .. attribute:: WKBWriter.outdim
 
     This property may be set to change the output dimension of the geometry
-    representation.  In other words, if you have a 3D geometry then set to 3
+    representation. In other words, if you have a 3D geometry then set to 3
     so that the Z value is included in the WKB.
 
     ============ ===========================
@@ -1127,7 +1133,7 @@ include the SRID value (in other words, EWKB).
     .. attribute:: WKBWriter.srid
 
     Set this property with a boolean to indicate whether the SRID of the
-    geometry should be included with the WKB representation.  Example:
+    geometry should be included with the WKB representation. Example:
 
     .. code-block:: pycon
 
@@ -1143,8 +1149,8 @@ include the SRID value (in other words, EWKB).
 .. class:: WKTWriter(dim=2, trim=False, precision=None)
 
     This class allows outputting the WKT representation of a geometry. See the
-    :attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes for
-    details about the constructor arguments.
+    :attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes
+    for details about the constructor arguments.
 
     .. method:: WKTWriter.write(geom)
 
@@ -1210,7 +1216,7 @@ Settings
 ``GEOS_LIBRARY_PATH``
 ---------------------
 
-A string specifying the location of the GEOS C library.  Typically,
+A string specifying the location of the GEOS C library. Typically,
 this setting is only used if the GEOS C library is in a non-standard
 location (e.g., ``/home/bob/lib/libgeos_c.so``).
 

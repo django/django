@@ -1,0 +1,15 @@
+{% partialdef test-partial %}
+TEST-PARTIAL-CONTENT
+{% endpartialdef %}
+
+{% block main %}
+BEGINNING
+{% partial test-partial %}
+MIDDLE
+{% partial test-partial %}
+END
+{% endblock main %}
+
+{% partialdef inline-partial inline %}
+INLINE-CONTENT
+{% endpartialdef %}

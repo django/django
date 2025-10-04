@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(ROOT, "templates")
 
 
-def setup(templates, *args, test_once=False):
+def setup(templates, *args, test_once=False, debug_only=False):
     """
     Runs test method multiple times in the following order:
 
@@ -54,11 +54,14 @@ def setup(templates, *args, test_once=False):
             self.engine = Engine(
                 libraries=libraries,
                 loaders=loaders,
+                debug=debug_only,
             )
             func(self)
             if test_once:
                 return
             func(self)
+            if debug_only:
+                return
 
             self.engine = Engine(
                 libraries=libraries,

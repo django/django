@@ -17,7 +17,8 @@ The relationship and history of generic views, class-based views, and class-base
 
 In the beginning there was only the view function contract, Django passed your
 function an :class:`~django.http.HttpRequest` and expected back an
-:class:`~django.http.HttpResponse`. This was the extent of what Django provided.
+:class:`~django.http.HttpResponse`. This was the extent of what Django
+provided.
 
 Early on it was recognized that there were common idioms and patterns found in
 view development. Function-based generic views were introduced to abstract

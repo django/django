@@ -206,7 +206,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+            WHERE cl.relname = %s
+                AND pg_catalog.pg_table_is_visible(cl.oid)
+                AND c.contype != 'n'
         """,
             [table_name],
         )

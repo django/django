@@ -164,7 +164,8 @@ Messages to this logger have the following extra context:
 
 * ``status_code``: The HTTP response code associated with the request.
 
-* ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
+* ``request``: The request object (a :class:`socket.socket`) that generated
+  the logging message.
 
 .. _django-template-logger:
 
@@ -214,27 +215,28 @@ messages during filesystem inspection and event subscription processes.
 ``django.contrib.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Log messages related to :doc:`contrib/auth`, particularly ``ERROR`` messages
-are generated when a :class:`~django.contrib.auth.forms.PasswordResetForm` is
-successfully submitted but the password reset email cannot be delivered due to
-a mail sending exception.
+Log messages related to :doc:`/ref/contrib/auth`, particularly ``ERROR``
+messages are generated when a
+:class:`~django.contrib.auth.forms.PasswordResetForm` is successfully submitted
+but the password reset email cannot be delivered due to a mail sending
+exception.
 
 .. _django-contrib-gis-logger:
 
 ``django.contrib.gis``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Log messages related to :doc:`contrib/gis/index` at various points: during the
-loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when reporting
-errors. Each ``ERROR`` log record includes the caught exception and relevant
-contextual data.
+Log messages related to :doc:`/ref/contrib/gis/index` at various points: during
+the loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when
+reporting errors. Each ``ERROR`` log record includes the caught exception and
+relevant contextual data.
 
 .. _django-dispatch-logger:
 
 ``django.dispatch``
 ~~~~~~~~~~~~~~~~~~~
 
-This logger is used in :doc:`signals`, specifically within the
+This logger is used in :doc:`/ref/signals`, specifically within the
 :mod:`~django.dispatch.Signal` class, to report issues when dispatching a
 signal to a connected receiver. The ``ERROR`` log record includes the caught
 exception as ``exc_info`` and adds the following extra context:
@@ -251,7 +253,7 @@ The security loggers will receive messages on any occurrence of
 :exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
 errors. There is a sub-logger for each subtype of security error, including all
 ``SuspiciousOperation``\s. The level of the log event depends on where the
-exception is handled.  Most occurrences are logged as a warning, while
+exception is handled. Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
 a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
@@ -290,8 +292,8 @@ Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Logs the SQL queries that are executed during schema changes to the database by
-the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+the :doc:`migrations framework </topics/migrations>`. Note that it won't log
+the queries executed by :class:`~django.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
 unlike ``django.db.backends``, not duration). The values have the same meaning
 as explained in :ref:`django-db-logger`.
@@ -453,5 +455,5 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-    This filter is similar to :class:`RequireDebugFalse`, except that records are
-    passed only when :setting:`DEBUG` is ``True``.
+    This filter is similar to :class:`RequireDebugFalse`, except that records
+    are passed only when :setting:`DEBUG` is ``True``.

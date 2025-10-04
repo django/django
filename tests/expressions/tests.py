@@ -420,8 +420,11 @@ class BasicExpressionsTests(TestCase):
         # F expressions can be used to update attributes on single objects
         self.gmbh.num_employees = F("num_employees") + 4
         self.gmbh.save()
-        self.gmbh.refresh_from_db()
-        self.assertEqual(self.gmbh.num_employees, 36)
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(self.gmbh.num_employees, 36)
 
     def test_new_object_save(self):
         # We should be able to use Funcs when inserting new data
@@ -745,7 +748,7 @@ class BasicExpressionsTests(TestCase):
         subquery_test = Company.objects.filter(pk__in=Subquery(small_companies))
         self.assertCountEqual(subquery_test, [self.foobar_ltd, self.gmbh])
         subquery_test2 = Company.objects.filter(
-            pk=Subquery(small_companies.filter(num_employees=3))
+            pk=Subquery(small_companies.filter(num_employees=3)[:1])
         )
         self.assertCountEqual(subquery_test2, [self.foobar_ltd])
 
@@ -988,10 +991,23 @@ class BasicExpressionsTests(TestCase):
                 )
                 .order_by("-salary_raise")
                 .values("salary_raise")[:1],
-                output_field=IntegerField(),
             ),
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
+
+    def test_annotation_with_outerref_and_output_field(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef("num_employees") + F("num_employees"),
+                )
+                .order_by("-salary_raise")
+                .values("salary_raise")[:1],
+                output_field=DecimalField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332.0)
+        self.assertIsInstance(gmbh_salary.max_ceo_salary_raise, Decimal)
 
     def test_annotation_with_nested_outerref(self):
         self.gmbh.point_of_contact = Employee.objects.get(lastname="Meyer")
@@ -1631,8 +1647,11 @@ class ExpressionsNumericTests(TestCase):
         n = Number.objects.create(integer=1, decimal_value=Decimal("0.5"))
         n.decimal_value = F("decimal_value") - Decimal("0.4")
         n.save()
-        n.refresh_from_db()
-        self.assertEqual(n.decimal_value, Decimal("0.1"))
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(n.decimal_value, Decimal("0.1"))
 
 
 class ExpressionOperatorTests(TestCase):
@@ -2539,6 +2558,15 @@ class ExistsTests(TestCase):
         qs = Manager.objects.annotate(exists=Exists(Manager.objects.none())).filter(
             pk=manager.pk, exists=False
         )
+        self.assertSequenceEqual(qs, [manager])
+        self.assertIs(qs.get().exists, False)
+
+    def test_annotate_by_empty_custom_exists(self):
+        class CustomExists(Exists):
+            template = Subquery.template
+
+        manager = Manager.objects.create()
+        qs = Manager.objects.annotate(exists=CustomExists(Manager.objects.none()))
         self.assertSequenceEqual(qs, [manager])
         self.assertIs(qs.get().exists, False)
 
