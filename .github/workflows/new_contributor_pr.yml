@@ -15,13 +15,7 @@ jobs:
       - uses: actions/first-interaction@v3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: To add CI step to run makemigrations --check against test models (ticket_36639)
           pr_message: |
-            Hello! Thank you for your contribution 💪
-
-            As it's your first contribution be sure to check out the [patch review checklist](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/#patch-review-checklist).
-
-            If you're fixing a ticket [from Trac](https://code.djangoproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
-
-            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
-
-            Welcome aboard ⛵️!
+            Done the required changes to add a new CI step to run `makemigrations --check` against test models.
+            Some details or further clarifications in change have been written in comment of PR
