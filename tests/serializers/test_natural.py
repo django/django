@@ -257,6 +257,7 @@ def fk_as_pk_natural_key_not_called(self, format):
 
 
 def natural_key_opt_out_test(self, format):
+    # Refs #35729
     """
     Tests natural key opt-out scenarios for models inheriting from AbstractBaseUser.
 
