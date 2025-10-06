@@ -119,7 +119,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+Django supports PostgreSQL 15 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
 2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
@@ -1104,8 +1104,6 @@ Example of a full DSN string::
 
 Connection pool
 ---------------
-
-.. versionadded:: 5.2
 
 To use a connection pool with `oracledb`_, set ``"pool"`` to ``True`` in the
 :setting:`OPTIONS` part of your database configuration. This uses the driver's

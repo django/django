@@ -8,6 +8,8 @@ from unittest.suite import TestSuite, _ErrorHolder
 from django.test import SimpleTestCase
 from django.test.runner import ParallelTestSuite, RemoteTestResult
 
+from . import models
+
 try:
     import tblib.pickling_support
 except ImportError:
@@ -47,6 +49,9 @@ class ParallelTestRunnerTest(SimpleTestCase):
         for i in range(2):
             with self.subTest(index=i):
                 self.assertEqual(i, i)
+
+    def test_system_checks(self):
+        self.assertEqual(models.Person.system_check_run_count, 1)
 
 
 class SampleFailingSubtest(SimpleTestCase):
@@ -277,3 +282,28 @@ class ParallelTestSuiteTest(SimpleTestCase):
 
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
+
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
+    def test_buffer_mode_reports_setupclass_failure(self):
+        test = SampleErrorTest("dummy_test")
+        remote_result = RemoteTestResult()
+        suite = TestSuite([test])
+        suite.run(remote_result)
+
+        pts = ParallelTestSuite([suite], processes=2, buffer=True)
+        pts.serialized_aliases = set()
+        test_result = TestResult()
+        test_result.buffer = True
+
+        with unittest.mock.patch("multiprocessing.Pool") as mock_pool:
+
+            def fake_next(*args, **kwargs):
+                test_result.shouldStop = True
+                return (0, remote_result.events)
+
+            mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
+                next=fake_next
+            )
+            pts.run(test_result)
+
+        self.assertIn("ValueError: woops", test_result.errors[0][1])

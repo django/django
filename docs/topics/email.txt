@@ -226,8 +226,8 @@ both appearing in the "To:"::
         ["john@example.com", "jane@example.com"],
     )
 
-This sends a message to john@example.com and jane@example.com, with them both
-receiving a separate email::
+This sends a message to ``john@example.com`` and ``jane@example.com``, with
+them both receiving a separate email::
 
     datatuple = (
         ("Subject", "Message.", "from@example.com", ["john@example.com"]),
@@ -253,8 +253,8 @@ If a ``message`` contains headers at the start of the string, the headers will
 be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to admin@example.com and redirects to
-"/contact/thanks/" when it's done::
+from the request's POST data, sends that to ``admin@example.com`` and redirects
+to "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail
     from django.http import HttpResponse, HttpResponseRedirect
@@ -349,11 +349,6 @@ email backend API :ref:`provides an alternative
       be an instance of :class:`~email.message.MIMEPart` or
       :class:`EmailAttachment`, or a tuple with attributes
       ``(filename, content, mimetype)``.
-
-      .. versionchanged:: 5.2
-
-          Support for :class:`EmailAttachment` items of ``attachments`` was
-          added.
 
       .. versionchanged:: 6.0
 
@@ -515,8 +510,6 @@ email backend API :ref:`provides an alternative
 
 .. class:: EmailAttachment
 
-    .. versionadded:: 5.2
-
     A named tuple to store attachments to an email.
 
     The named tuple has the following indexes:
@@ -555,11 +548,6 @@ Django's email library, you can do this using the
         Alternatives should only be added using the :meth:`attach_alternative`
         method, or passed to the constructor.
 
-        .. versionchanged:: 5.2
-
-            In older versions, ``alternatives`` was a list of regular tuples,
-            as opposed to :class:`EmailAlternative` named tuples.
-
     .. method:: attach_alternative(content, mimetype)
 
         Attach an alternative representation of the message body in the email.
@@ -579,8 +567,6 @@ Django's email library, you can do this using the
 
     .. method:: body_contains(text)
 
-        .. versionadded:: 5.2
-
         Returns a boolean indicating whether the provided ``text`` is
         contained in the email ``body`` and in all attached MIME type
         ``text/*`` alternatives.
@@ -598,8 +584,6 @@ Django's email library, you can do this using the
                 self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
 
 .. class:: EmailAlternative
-
-    .. versionadded:: 5.2
 
     A named tuple to store alternative versions of email content.
 

@@ -1,0 +1,13 @@
+==========================
+Django 5.2.8 release notes
+==========================
+
+*Expected November 5, 2025*
+
+Django 5.2.8 fixes several bugs in 5.2.7.
+
+Bugfixes
+========
+
+* ...
+
