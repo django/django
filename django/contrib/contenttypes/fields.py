@@ -10,6 +10,7 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
 from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
+from django.db.models.deletion import DatabaseOnDelete
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
@@ -137,6 +138,16 @@ class GenericForeignKey(FieldCacheMixin, Field):
                         ),
                         obj=self,
                         id="contenttypes.E004",
+                    )
+                ]
+            elif isinstance(field.remote_field.on_delete, DatabaseOnDelete):
+                return [
+                    checks.Error(
+                        f"'{self.model._meta.object_name}.{self.ct_field}' cannot use "
+                        "the database-level on_delete variant.",
+                        hint="Change the on_delete rule to the non-database variant.",
+                        obj=self,
+                        id="contenttypes.E006",
                     )
                 ]
             else:
