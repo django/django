@@ -12,7 +12,7 @@ jobs:
     name: Hello new contributor
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/first-interaction@v3
+      - uses: actions/first-interaction@v3.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           pr_message: |
@@ -25,4 +25,3 @@ jobs:
             If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
 
             Welcome aboard ⛵️!
-          issue_message: 
