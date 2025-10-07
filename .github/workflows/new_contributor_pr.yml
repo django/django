@@ -15,6 +15,10 @@ jobs:
       - uses: actions/first-interaction@v3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
+            Hello! Thank you for your interest in Django 💪
+
+            Django issues are tracked in [Trac](https://code.djangoproject.com/) and not in this repo.
           pr_message: |
             Hello! Thank you for your contribution 💪
 
