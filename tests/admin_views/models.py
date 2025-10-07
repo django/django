@@ -1196,3 +1196,7 @@ class CamelCaseModel(models.Model):
 class CamelCaseRelatedModel(models.Model):
     m2m = models.ManyToManyField(CamelCaseModel, related_name="m2m")
     fk = models.ForeignKey(CamelCaseModel, on_delete=models.CASCADE, related_name="fk")
+    # Add another relation that will not participate in filter_horizontal.
+    fk2 = models.ForeignKey(
+        CamelCaseModel, on_delete=models.CASCADE, related_name="fk2"
+    )
