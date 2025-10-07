@@ -323,6 +323,9 @@ Models
 * The new :attr:`.Expression.allows_composite_expressions` attribute specifies
   that the expression allows composite expressions, for example, to support
   :ref:`composite primary keys <cpk-and-database-functions>`.
+* Added :class:`~django.db.models.functions.JSONSet` and
+  :class:`~django.db.models.functions.JSONRemove` for making partial updates
+  and removing keys in :class:`~django.db.models.JSONField`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
