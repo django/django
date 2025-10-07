@@ -26,7 +26,18 @@ from django.test.utils import isolate_apps
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
-from .models import Article, Car, Count, Event, EventGuide, Location, Site, Vehicle
+from .models import (
+    Article,
+    Car,
+    Cascade,
+    DBCascade,
+    DBRestrict,
+    Event,
+    EventGuide,
+    Location,
+    Site,
+    Vehicle,
+)
 
 
 class NestedObjectsTests(TestCase):
@@ -34,10 +45,12 @@ class NestedObjectsTests(TestCase):
     Tests for ``NestedObject`` utility collection.
     """
 
+    cascade_model = Cascade
+
     @classmethod
     def setUpTestData(cls):
         cls.n = NestedObjects(using=DEFAULT_DB_ALIAS)
-        cls.objs = [Count.objects.create(num=i) for i in range(5)]
+        cls.objs = [cls.cascade_model.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
         self.assertEqual(self.n.nested(lambda obj: obj.num), target)
@@ -101,6 +114,30 @@ class NestedObjectsTests(TestCase):
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()
         n.collect([Vehicle.objects.first()])
+
+
+class DBNestedObjectsTests(NestedObjectsTests):
+    """
+    Exercise NestedObjectsTests but with a model that makes use of DB_CASCADE
+    instead of CASCADE to ensure proper collection of objects takes place.
+    """
+
+    cascade_model = DBCascade
+
+    def test_db_restrict_collected(self):
+        parent = DBRestrict.objects.create()
+        child = DBRestrict.objects.create(restrict_parent=parent)
+        # DBRestrict.restrict_parent protects deletion.
+        collector = NestedObjects(using=DEFAULT_DB_ALIAS)
+        collector.collect([parent])
+        self.assertEqual(collector.protected, {child})
+        # DB_CASCADE collection for DBRestrict.parent lifts
+        # .restrict_parent protection.
+        child.parent = parent
+        child.save()
+        collector = NestedObjects(using=DEFAULT_DB_ALIAS)
+        collector.collect([parent])
+        self.assertEqual(collector.protected, set())
 
 
 class UtilsTests(SimpleTestCase):

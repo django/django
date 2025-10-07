@@ -20,7 +20,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_no_default_null = sql_alter_column_no_default
 
     sql_create_column_inline_fk = (
-        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s"
+        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)"
+        "s%(deferrable)s"
     )
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"

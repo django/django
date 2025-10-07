@@ -26,6 +26,20 @@ only officially support, the latest release of each series.
 What's new in Django 6.1
 ========================
 
+Database-level delete options for ``ForeignKey.on_delete``
+----------------------------------------------------------
+
+:attr:`.ForeignKey.on_delete` now supports database-level delete options:
+
+* :attr:`~django.db.models.DB_CASCADE`
+* :attr:`~django.db.models.DB_RESTRICT`
+* :attr:`~django.db.models.DB_SET_NULL`
+* :attr:`~django.db.models.DB_SET_DEFAULT`
+
+The database variants are more efficient because they avoid fetching related
+objects, but ``pre_delete`` and ``post_delete`` signals won't be sent when
+:attr:`~django.db.models.DB_CASCADE` is used.
+
 Minor features
 --------------
 
