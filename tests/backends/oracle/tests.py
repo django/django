@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, ProgrammingError, connection
 from django.db.models import BooleanField
 from django.test import TestCase, TransactionTestCase
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from ..models import VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
@@ -137,6 +138,23 @@ class Tests(TestCase):
         msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
+    def test_use_returning_into_deprecation(self):
+        settings_dict = copy.deepcopy(connection.settings_dict)
+        settings_dict["OPTIONS"]["use_returning_into"] = False
+        msg = (
+            "The use_returning_into option for the Oracle database backend is "
+            "deprecated. By default, the Oracle backend uses the RETURNING INTO "
+            "clause."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+            # Trigger __init__ by re-initializing the connection wrapper
+            from django.db.backends.oracle.base import DatabaseWrapper
+
+            DatabaseWrapper(settings_dict, alias="test_deprecation")
+        self.assertEqual(ctx.filename, __file__)
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")

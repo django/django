@@ -8,6 +8,7 @@ import datetime
 import decimal
 import os
 import platform
+import warnings
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -16,6 +17,10 @@ from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+)
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
@@ -243,11 +248,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     validation_class = DatabaseValidation
     _connection_pools = {}
 
+    # RemovedInDjango70Warning: When deprecation period ends, remove
+    # __init__().
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get(
             "use_returning_into", True
         )
+        if "use_returning_into" in self.settings_dict["OPTIONS"]:
+            warnings.warn(
+                "The use_returning_into option for the Oracle database backend is "
+                "deprecated. By default, the Oracle backend uses the RETURNING INTO "
+                "clause.",
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         self.features.can_return_columns_from_insert = use_returning_into
         self.features.can_return_rows_from_update = use_returning_into
 
@@ -293,6 +308,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_connection_params(self):
         conn_params = self.settings_dict["OPTIONS"].copy()
+        # RemovedInDjango70Warning: When deprecation period ends, remove.
         if "use_returning_into" in conn_params:
             del conn_params["use_returning_into"]
         return conn_params

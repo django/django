@@ -1141,6 +1141,10 @@ alternatively set ``"pool"`` to be a dict::
 INSERT ... RETURNING INTO
 -------------------------
 
+.. deprecated:: 6.1
+
+    The ``use_returning_into`` option is deprecated.
+
 By default, the Oracle backend uses a ``RETURNING INTO`` clause to efficiently
 retrieve the value of an ``AutoField`` when inserting new rows. This behavior
 may result in a ``DatabaseError`` in certain unusual setups, such as when
