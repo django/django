@@ -72,6 +72,12 @@ class MigrationExecutor:
                         applied[migration] = self.loader.graph.nodes[migration]
         return plan
 
+    def _is_squashed_migration(self, migration):
+        """
+        Return True if migration replaces other migrations.
+        """
+        return bool(getattr(migration, "replaces", None))
+
     def _create_project_state(self, with_applied_migrations=False):
         """
         Create a project state including all the applications without
@@ -88,8 +94,14 @@ class MigrationExecutor:
                 for key in self.loader.applied_migrations
                 if key in self.loader.graph.nodes
             }
+
             for migration, _ in full_plan:
                 if migration in applied_migrations:
+                    if self._is_squashed_migration(migration):
+                        # Skip squashed migrations;
+                        # replacements are still in the plan.
+                        continue
+
                     migration.mutate_state(state, preserve=False)
         return state
 
@@ -192,6 +204,7 @@ class MigrationExecutor:
             for key in self.loader.applied_migrations
             if key in self.loader.graph.nodes
         }
+
         if self.progress_callback:
             self.progress_callback("render_start")
         for migration, _ in full_plan:
@@ -213,7 +226,14 @@ class MigrationExecutor:
                 # Only mutate the state if the migration is actually applied
                 # to make sure the resulting state doesn't include changes
                 # from unrelated migrations.
+
+                if self._is_squashed_migration(migration):
+                    # Skip squashed migrations;
+                    # replacements are still in the plan.
+                    continue
+
                 migration.mutate_state(state, preserve=False)
+
         if self.progress_callback:
             self.progress_callback("render_success")
 
