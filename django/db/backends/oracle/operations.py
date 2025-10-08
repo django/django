@@ -273,12 +273,12 @@ END;
         return value
 
     def convert_datefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.date()
         return value
 
     def convert_timefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.time()
         return value
 

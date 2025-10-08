@@ -9,5 +9,4 @@ Django 5.2.8 fixes several bugs in 5.2.7.
 Bugfixes
 ========
 
-* ...
-
+* Added compatibility for ``oracledb`` 3.4.0 (:ticket:`36646`).
