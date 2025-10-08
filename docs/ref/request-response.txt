@@ -550,6 +550,13 @@ The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
 when accessed in a normal request/response cycle. To get a mutable version you
 need to use :meth:`QueryDict.copy`.
 
+.. versionadded:: 6.1
+
+  Mutable ``QueryDict``\s gained support for |the |= update operator|__.
+
+  .. |the |= update operator| replace:: the ``|=`` update operator
+  __ https://docs.python.org/3/library/stdtypes.html#dict:~:text=d%20%7C%3D%20other
+
 Methods
 -------
 

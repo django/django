@@ -186,7 +186,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Mutable :class:`.QueryDict`\s now support the ``|=`` update operator for
+  updating with the contents of a mapping or key/value iterable.
 
 Security
 ~~~~~~~~
