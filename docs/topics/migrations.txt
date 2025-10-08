@@ -144,9 +144,8 @@ developers (or your production servers) check out the code, they'll
 get both the changes to your models and the accompanying migration at the
 same time.
 
-If you’d like to see the SQL that will be executed behind the scenes, you can
-use the command :djadmin:`sqlmigrate`. For more details, see the section
-:ref:`executing-sqlmigrate`.
+To see the SQL that will be executed behind the scenes, run
+:djadmin:`sqlmigrate` - see :ref:`executing-sqlmigrate`, below.
 
 If you want to give the migration(s) a meaningful name instead of a generated
 one, you can use the :option:`makemigrations --name` option:
@@ -937,9 +936,15 @@ Executing ``sqlmigrate``
 See what SQL a migration would run. The :djadmin:`sqlmigrate` command takes
 migration names and returns their SQL:
 
-.. console::
+.. code-block:: shell
 
     $ python manage.py sqlmigrate polls 0001
+
+The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
+database - instead, it prints it to the screen so that you can see what SQL
+Django thinks is required. It's useful for checking what Django is going to
+do or if you have database administrators who require SQL scripts for
+changes.
 
 You should see something similar to the following (we've reformatted it for
 readability):
@@ -997,8 +1002,3 @@ Note the following:
   are handled for you automatically. Same goes for the quoting of field names
   -- e.g., using double quotes or single quotes.
 
-* The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
-  database - instead, it prints it to the screen so that you can see what SQL
-  Django thinks is required. It's useful for checking what Django is going to
-  do or if you have database administrators who require SQL scripts for
-  changes.
