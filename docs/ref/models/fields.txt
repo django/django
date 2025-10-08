@@ -1727,8 +1727,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: CASCADE
 
-    Cascade deletes. Django emulates the behavior of the SQL constraint ON
-    DELETE CASCADE and also deletes the object containing the ForeignKey.
+    Cascade deletes. Django emulates the behavior of the SQL constraint ``ON
+    DELETE CASCADE`` and also deletes the object containing the
+    :class:`ForeignKey`.
 
     :meth:`.Model.delete` isn't called on related models, but the
     :data:`~django.db.models.signals.pre_delete` and
@@ -1947,9 +1948,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Setting it to ``False`` does not mean you can reference a swappable model
     even if it is swapped out - ``False`` means that the migrations made
-    with this ForeignKey will always reference the exact model you specify
-    (so it will fail hard if the user tries to run with a User model you don't
-    support, for example).
+    with this :class:`ForeignKey` will always reference the exact model you
+    specify (so it will fail hard if the user tries to run with a ``User``
+    model you don't support, for example).
 
     If in doubt, leave it to its default of ``True``.
 
