@@ -426,6 +426,9 @@ Requests and Responses
   the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
   parameter to override the default maximum URL length limit.
 
+* Mutable :class:`.QueryDict`\s now support the ``|=`` update operator for
+  updating with the contents of a mapping or key/value iterable.
+
 Security
 ~~~~~~~~
 
