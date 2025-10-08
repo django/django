@@ -438,7 +438,7 @@ class OracleParam:
                 param = 0
         if hasattr(param, "bind_parameter"):
             self.force_bytes = param.bind_parameter(cursor)
-        elif isinstance(param, (Database.Binary, datetime.timedelta)):
+        elif isinstance(param, (bytes, datetime.timedelta)):
             self.force_bytes = param
         else:
             # To transmit to the database, we need Unicode if supported

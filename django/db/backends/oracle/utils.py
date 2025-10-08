@@ -24,7 +24,7 @@ class InsertVar:
         "BooleanField": int,
         "FloatField": Database.DB_TYPE_BINARY_DOUBLE,
         "DateTimeField": Database.DB_TYPE_TIMESTAMP,
-        "DateField": Database.Date,
+        "DateField": datetime.date,
         "DecimalField": decimal.Decimal,
     }
 
