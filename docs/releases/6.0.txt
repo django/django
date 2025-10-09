@@ -217,6 +217,26 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
 Email
 ~~~~~
 

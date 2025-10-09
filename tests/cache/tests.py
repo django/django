@@ -25,7 +25,7 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1164,6 +1164,16 @@ class BaseCacheTests:
             # default value should be returned.
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
+
+    def test_async_impl(self):
+        # Assert that the inherited method matches the BaseCache
+        # implementation.
+        methods = ["aget_many", "aset_many", "adelete_many"]
+        if isinstance(cache, BaseCache):
+            for m in methods:
+                cache_m = getattr(cache, m)
+                bcache_m = getattr(BaseCache, m)
+                self.assertEqual(cache_m.__func__, bcache_m.__func__)
 
 
 @override_settings(
