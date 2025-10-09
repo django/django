@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgis-version: [latest, "17-3.5-alpine", "17-master"]
+        postgis-version: ["latest", "18-3.6-alpine", "17-master"]
     name: PostGIS ${{ matrix.postgis-version }}
     services:
       postgres:
