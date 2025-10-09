@@ -68,7 +68,7 @@
             }
 
             // Check if warning is already there.
-            if (inp.parentNode.querySelectorAll('.' + warningClass).length) {
+            if (inp.parentNode.parentNode.querySelectorAll('.' + warningClass).length) {
                 return;
             }
 
@@ -96,7 +96,12 @@
             warning.classList.add('help', warningClass);
             warning.id = `${field_id}_timezone_warning_helptext`;
             warning.textContent = message;
-            inp.parentNode.appendChild(warning);
+            const errorList = inp.parentNode.parentNode.querySelector('ul.errorlist');
+            if (errorList) {
+                errorList.before(warning);
+            } else {
+                inp.parentNode.before(warning);
+            }
         },
         // Add clock widget to a given field
         addClock: function(inp) {
