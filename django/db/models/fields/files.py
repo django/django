@@ -248,7 +248,7 @@ class FileField(Field):
     ):
         self._primary_key_set_explicitly = "primary_key" in kwargs
 
-        self.storage = storage or default_storage
+        self.storage = storage if storage is not None else default_storage
         if callable(self.storage):
             # Hold a reference to the callable for deconstruct().
             self._storage_callable = self.storage
