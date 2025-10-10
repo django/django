@@ -29,6 +29,8 @@ class RedisSerializer:
 
 
 class RedisCacheClient:
+    _pools = {}
+
     def __init__(
         self,
         servers,
@@ -41,7 +43,6 @@ class RedisCacheClient:
 
         self._lib = redis
         self._servers = servers
-        self._pools = {}
 
         self._client = self._lib.Redis
 
@@ -70,11 +71,26 @@ class RedisCacheClient:
 
     def _get_connection_pool(self, write):
         index = self._get_connection_pool_index(write)
-        if index not in self._pools:
-            self._pools[index] = self._pool_class.from_url(
+        if index in self._pools:
+            from redis.connection import parse_url
+
+            if self._pools[index].connection_kwargs == {
+                **self._pool_options,
+                **parse_url(self._servers[index]),
+            }:
+                return self._pools[index]
+
+        # setdefault() ensures that multiple threads don't set this in
+        # parallel. Since we do not open the pool during it's init above,
+        # this means that at worst during startup multiple threads generate
+        # pool objects and the first to set it wins.
+        self._pools.setdefault(
+            index,
+            self._pool_class.from_url(
                 self._servers[index],
                 **self._pool_options,
-            )
+            ),
+        )
         return self._pools[index]
 
     def get_client(self, key=None, *, write=False):
