@@ -170,15 +170,15 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         # Use 4 slashes because of RequestFactory behavior.
         request = self.rf.get("////evil.com/security")
-        r = CommonMiddleware(get_response_404).process_request(request)
-        self.assertIsNone(r)
+        res = CommonMiddleware(get_response_404).process_request(request)
+        self.assertIsNone(res)
         response = HttpResponseNotFound()
-        r = CommonMiddleware(get_response_404).process_response(request, response)
-        self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, "/%2Fevil.com/security/")
-        r = CommonMiddleware(get_response_404)(request)
-        self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, "/%2Fevil.com/security/")
+        res = CommonMiddleware(get_response_404).process_response(request, response)
+        self.assertEqual(res.status_code, 301)
+        self.assertEqual(res.url, "/%2Fevil.com/security/")
+        res = CommonMiddleware(get_response_404)(request)
+        self.assertEqual(res.status_code, 301)
+        self.assertEqual(res.url, "/%2Fevil.com/security/")
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www(self):
@@ -408,11 +408,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         """Regression test for #15152"""
         request = self.rf.get("/slash")
         request.META["QUERY_STRING"] = "drink=café"
-        r = CommonMiddleware(get_response_empty).process_request(request)
-        self.assertIsNone(r)
+        res = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertEqual(res.status_code, 301)
         response = HttpResponseNotFound()
-        r = CommonMiddleware(get_response_empty).process_response(request, response)
-        self.assertEqual(r.status_code, 301)
+        res = CommonMiddleware(get_response_empty).process_response(request, response)
+        self.assertEqual(res.status_code, 301)
 
     def test_response_redirect_class(self):
         request = self.rf.get("/slash")
