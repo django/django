@@ -236,7 +236,7 @@
 }
 
 .stacked .selector-chooseall, .stacked .selector-clearall {
-    display: none;
+    display: block;
 }
 
 .stacked .selector-add {
