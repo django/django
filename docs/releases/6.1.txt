@@ -112,6 +112,17 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+* The new ``show_on_change_form`` argument of
+  :func:`~django.contrib.admin.action` allows the action to be available on the
+  admin change form view. Defaults to ``False``.
+
+* The new ``description_plural`` argument of
+  :func:`~django.contrib.admin.action` specifies a human-readable description
+  for actions applied to multiple objects on the admin changelist. Defaults to
+  the ``description`` value. This is useful when ``show_on_change_form`` is
+  set to ``True``, where ``description`` is then used for a single object on
+  the change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
