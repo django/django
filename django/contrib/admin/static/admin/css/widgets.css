@@ -235,9 +235,9 @@
     padding: 3px 3px 3px 5px;
 }
 
-.stacked .selector-chooseall, .stacked .selector-clearall {
+/* .stacked .selector-chooseall, .stacked .selector-clearall {
     display: block;
-}
+} */
 
 .stacked .selector-add {
     background: url(../img/selector-icons.svg) 0 -48px no-repeat;
