@@ -18,10 +18,13 @@ An example: i18n middleware would need to distinguish caches by the
 import time
 from collections import defaultdict
 from hashlib import md5
+from typing import Annotated, Dict, Optional
 
 from django.conf import settings
-from django.core.cache import caches
+from django.core.cache import cache, caches
+from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, HttpResponseNotModified
+from django.test import RequestFactory
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
@@ -375,15 +378,17 @@ def _generate_cache_header_key(key_prefix, request):
     return _i18n_cache_key_suffix(request, cache_key)
 
 
-def get_cache_key(request, key_prefix=None, method="GET", cache=None):
+def get_cache_key(
+    request, key_prefix=None, method="GET", cache=None, ignore_headers=False
+):
     """
     Return a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
     account from the global URL registry and uses those to build a cache key
     to check against.
 
-    If there isn't a headerlist stored, return None, indicating that the page
-    needs to be rebuilt.
+    If there isn't a headerlist stored and `ignore_headers` argument is False,
+    return None, indicating that the page needs to be rebuilt.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
@@ -391,8 +396,8 @@ def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key)
-    if headerlist is not None:
-        return _generate_cache_key(request, method, headerlist, key_prefix)
+    if headerlist is not None or ignore_headers:
+        return _generate_cache_key(request, method, headerlist or [], key_prefix)
     else:
         return None
 
@@ -443,3 +448,41 @@ def _to_tuple(s):
     if len(t) == 2:
         return t[0].lower(), t[1]
     return t[0].lower(), True
+
+
+def invalidate_view_cache(
+    path: str = None,
+    request: WSGIRequest = None,
+    vary_headers: Optional[Dict[str, str]] = None,
+    key_prefix: Optional[str] = None,
+) -> Annotated[int, "Number of cache keys deleted"]:
+    """
+    This function first creates a fake WSGIRequest to compute the cache key.
+    The key looks like:
+    views.decorators.cache.cache_page.key_prefix.GET.0fcb3cd9d5b34c8fe83f615913d8509b.c4ca4238a0b923820dcc509a6f75849b.en-us.UTC
+    The first hash corresponds to the full url (including query params),
+    the second to the header values
+
+    vary_headers should be a dict of every header used for this particular view
+    In local environment, we have two defined renderers (default of DRF),
+    thus DRF adds `Accept` to the Vary headers
+
+    either `path` or `request` arguments should be passed;
+    if both are passed `path` will be ignored
+
+    Note: If LocaleMiddleware is used,
+    we'll need to use the same language code as the one in the cached request
+    """
+    if not request:
+        assert path is not None, "either `path` or `request` arguments needed"
+        factory = RequestFactory()
+        request = factory.get(path)
+
+    if vary_headers:
+        request.META.update(vary_headers)
+
+    cache_key = get_cache_key(request, key_prefix=key_prefix, ignore_headers=True)
+    if cache_key is None:
+        return 0
+
+    return cache.delete(cache_key)
