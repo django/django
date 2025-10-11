@@ -1,4 +1,6 @@
+import itertools
 import os
+from concurrent import futures
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -123,19 +125,24 @@ class Command(BaseCommand):
         else:
             handler = self.copy_file
 
-        found_files = {}
+        all_processed_paths = []
         for finder in get_finders():
-            for path, storage in finder.list(self.ignore_patterns):
-                # Prefix the relative path if the source storage contains it
-                if getattr(storage, "prefix", None):
-                    prefixed_path = os.path.join(storage.prefix, path)
-                else:
-                    prefixed_path = path
 
-                if prefixed_path not in found_files:
-                    found_files[prefixed_path] = (storage, path)
-                    handler(path, prefixed_path, storage)
-                else:
+            # 10 is the default urllib3 connectionpool size, so it seems like
+            # a reasonable upper bound
+            with futures.ThreadPoolExecutor(max_workers=10) as executor:
+                processed_paths = executor.map(
+                    self._per_file_collection,
+                    finder.list(self.ignore_patterns),
+                    itertools.repeat(handler),
+                )
+                all_processed_paths.append(processed_paths)
+
+        # list the conflicting files.
+        found_files = {}
+        for paths in all_processed_paths:
+            for prefixed_path, storage, path in paths:
+                if prefixed_path in found_files:
                     self.skipped_files.append(prefixed_path)
                     self.log(
                         "Found another file with the destination path '%s'. It "
@@ -144,6 +151,9 @@ class Command(BaseCommand):
                         "every static file has a unique path." % prefixed_path,
                         level=2,
                     )
+
+                else:
+                    found_files[path] = (storage, path)
 
         # Storage backends may define a post_process() method.
         if self.post_process and hasattr(self.storage, "post_process"):
@@ -171,6 +181,26 @@ class Command(BaseCommand):
             "skipped": self.skipped_files,
             "deleted": self.deleted_files,
         }
+
+    def _per_file_collection(self, item, handler):
+        """
+        Docstring for _per_file_collection
+
+        :param item: a tuple of (path, storage) from finders.list
+        :param handler: the underlying storage handler
+
+        :returns: a mapping of prefixed_path to the storage and path
+        """
+        path, storage = item
+        # Prefix the relative path if the source storage contains it
+        if getattr(storage, "prefix", None):
+            prefixed_path = os.path.join(storage.prefix, path)
+        else:
+            prefixed_path = path
+
+        self.log(f"Running handler for {prefixed_path}")
+        handler(path, prefixed_path, storage)
+        return prefixed_path, storage, path
 
     def handle(self, **options):
         self.set_options(**options)
