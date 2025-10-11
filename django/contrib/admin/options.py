@@ -1695,8 +1695,6 @@ class ModelAdmin(BaseModelAdmin):
 
             response = func(self, request, queryset)
 
-            self.message_user(request, "Action executed successfully", messages.SUCCESS)
-
             # Actions may return an HttpResponse-like object, which will be
             # used as the response from the POST. If not, we'll be a good
             # little HTTP citizen and redirect back to the changelist page.
