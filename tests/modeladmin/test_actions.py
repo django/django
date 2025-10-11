@@ -43,6 +43,11 @@ class AdminActionsTests(TestCase):
 
         ma = BandAdmin(Band, admin.AdminSite())
         mock_request = MockRequest()
+        mock_request.resolver_match = type(
+            "ResolverMatch",
+            (object,),
+            {"app_name": "app test", "url_name": "", "_func_path": ""},
+        )()
         mock_request.GET = {}
         cases = [
             (None, self.viewuser, ["custom_action"]),
