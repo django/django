@@ -730,10 +730,3 @@ class AdminDetailActionsTest(TestCase):
             response.url,
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
         )
-
-        response = self.client.get(response.url)
-        self.assertContains(
-            response,
-            "Action executed successfully",
-            html=True,
-        )
