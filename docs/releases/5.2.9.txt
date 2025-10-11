@@ -15,6 +15,16 @@ using a suitably crafted dictionary, with dictionary expansion, as the
 ``**kwargs`` passed to :meth:`.QuerySet.annotate` or :meth:`.QuerySet.alias` on
 PostgreSQL.
 
+CVE-2025-64460: Potential denial-of-service vulnerability in XML ``Deserializer``
+=================================================================================
+
+:ref:`XML Serialization <serialization-formats-xml>` was subject to a potential
+denial-of-service attack due to quadratic time complexity when deserializing
+crafted documents containing many nested invalid elements. The internal helper
+``django.core.serializers.xml_serializer.getInnerText()`` previously
+accumulated inner text inefficiently during recursion. It now collects text per
+element, avoiding excessive resource usage.
+
 Bugfixes
 ========
 
