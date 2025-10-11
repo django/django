@@ -1015,7 +1015,7 @@ class ModelAdmin(BaseModelAdmin):
             if name in base_action_names:
                 continue
 
-            if is_change_view and func.changelist_only:
+            if is_change_view and not func.show_on_change_form:
                 continue
 
             description = self._get_action_description(func, name, is_change_view)
