@@ -42,6 +42,7 @@ class TemplateCommand(BaseCommand):
         # Allow shipping invalid .py files without byte-compilation.
         (".py-tpl", ".py"),
     )
+    max_template_size_mb = 100 # 100MB
 
     def add_arguments(self, parser):
         parser.add_argument("name", help="Name of the application or project.")
@@ -253,6 +254,15 @@ class TemplateCommand(BaseCommand):
             else:
                 absolute_path = os.path.abspath(expanded_template)
             if os.path.exists(absolute_path):
+                filesize_in_mb = archive.check_size(absolute_path) / 1024 / 1024
+                if filesize_in_mb > self.max_template_size_mb:
+                    response = input(
+                        f"The template is large ({filesize_in_mb:.2f}MB). Are you sure you want to extract it? [y/N]: "
+                    )
+                    if response.lower() != "y":
+                        raise CommandError(
+                            "The template is too large."
+                        )
                 return self.extract(absolute_path)
 
         raise CommandError(
