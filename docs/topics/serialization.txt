@@ -173,6 +173,8 @@ Identifier  Information
 .. _jsonl: https://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
+.. _serialization-formats-xml:
+
 XML
 ---
 
