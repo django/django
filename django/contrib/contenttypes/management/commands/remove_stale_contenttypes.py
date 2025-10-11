@@ -61,7 +61,9 @@ class Command(BaseCommand):
                         ct_info.append(
                             "    - Content type for %s.%s" % (ct.app_label, ct.model)
                         )
-                        collector = NoFastDeleteCollector(using=using, origin=ct)
+                        collector = Collector(
+                            using=using, origin=ct, force_collection=True
+                        )
                         collector.collect([ct])
 
                         for obj_type, objs in collector.data.items():
@@ -103,11 +105,3 @@ class Command(BaseCommand):
                 else:
                     if verbosity >= 2:
                         self.stdout.write("Stale content types remain.")
-
-
-class NoFastDeleteCollector(Collector):
-    def can_fast_delete(self, *args, **kwargs):
-        """
-        Always load related objects to display them when showing confirmation.
-        """
-        return False

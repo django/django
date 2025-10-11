@@ -3059,19 +3059,26 @@ The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.pre_delete` and
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
-(including cascaded deletions).
+(including cascaded deletions). Signals won't be sent when ``DB_CASCADE`` is
+used. Also, ``delete()`` doesn't return information about objects deleted from
+database variants (``DB_*``) of the
+:attr:`~django.db.models.ForeignKey.on_delete` argument, e.g. ``DB_CASCADE``.
 
-Django needs to fetch objects into memory to send signals and handle cascades.
-However, if there are no cascades and no signals, then Django may take a
-fast-path and delete objects without fetching into memory. For large
-deletes this can result in significantly reduced memory usage. The amount of
-executed queries can be reduced, too.
+If ``DB_*`` options are used, Django doesn't need to fetch objects into memory
+to send signals and handle cascades. However, if there are no cascades and no
+signals, then Django may take a fast-path and delete objects without fetching
+into memory. For large deletes this can result in significantly reduced memory
+usage. The amount of executed queries can be reduced, too.
 
 ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 ``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
+
+.. versionchanged:: 6.1
+
+    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
