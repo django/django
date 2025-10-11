@@ -149,23 +149,37 @@ That code will give us an admin change list that looks something like this:
 
 .. image:: _images/adding-actions-to-the-modeladmin.png
 
-Actions are also available in the admin object detail page. We can adjust the
-description to show we are only talking about a single object::
+We can also make an action available in the admin change form by setting
+``show_on_change_form=True``. We should adjust the descriptions for the single
+object and multiple object cases::
 
     @admin.action(
         description="Mark story as published",
         description_plural="Mark selected stories as published",
+        show_on_change_form=True,
     )
     def make_published(modeladmin, request, queryset):
         pass
 
-This will give us an admin object detail page that looks like this:
+The ``show_on_change_form`` argument controls where the action is available
+in the admin interface. When ``show_on_change_form`` is ``False``, the
+action is only available on the admin changelist page. When
+``show_on_change_form`` is ``True``, the action is available on the
+admin changelist and the admin change form. Defaults to ``True``.
+
+When ``show_on_change_form`` is ``True``, ``description`` is used for the
+admin change form, and ``description_plural`` is used for the admin
+changelist page. If ``description_plural`` is not provided, it falls back
+to the ``description`` value.
+
+This will give us an admin change form page that looks like this:
 
 .. image:: _images/adding-actions-to-the-modeladmin-detail-view.png
 
-.. versionchanged:: 6.0
+.. versionchanged:: 6.1
 
-    Actions were added to the admin object detail page by setting ``changelist_only`` to False.
+    The ``show_on_change_form`` and ``description_plural`` arguments of
+    :func:`~django.contrib.admin.action` were added.
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document covers more
@@ -452,7 +466,7 @@ For example::
 The ``action`` decorator
 ========================
 
-.. function:: action(*, permissions=None, description=None, description_plural=None, changelist_only=True)
+.. function:: action(*, permissions=None, description=None, description_plural=None, show_on_change_form=False)
 
     This decorator can be used for setting specific attributes on custom action
     functions that can be used with
