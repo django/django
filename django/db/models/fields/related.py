@@ -12,6 +12,7 @@ from django.db.models import NOT_PROVIDED, Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
+    DB_RESTRICT,
     DB_SET_DEFAULT,
     DB_SET_NULL,
     SET_DEFAULT,
@@ -1105,6 +1106,25 @@ class ForeignKey(ForeignObject):
                             f"{connection.display_name} does not support a "
                             "DB_SET_DEFAULT.",
                             hint="Change the on_delete rule to SET_DEFAULT.",
+                            obj=self,
+                            id="fields.E324",
+                        ),
+                    )
+        elif on_delete == DB_RESTRICT:
+            for db in databases:
+                if not router.allow_migrate_model(db, self.model):
+                    continue
+                connection = connections[db]
+                if not (
+                    "supports_on_delete_db_restrict"
+                    in self.model._meta.required_db_features
+                    or connection.features.supports_on_delete_db_restrict
+                ):
+                    errors.append(
+                        checks.Error(
+                            f"{connection.display_name} does not support a "
+                            "DB_RESTRICT.",
+                            hint="Change the on_delete rule to RESTRICT.",
                             obj=self,
                             id="fields.E324",
                         ),

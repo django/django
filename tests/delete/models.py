@@ -60,6 +60,10 @@ class RelatedDbOption(models.Model):
     db_cascade = models.ForeignKey(
         RelatedDbOptionParent, models.DB_CASCADE, related_name="db_cascade_set"
     )
+
+
+class RestrictDbModel(models.Model):
+    name = models.CharField(max_length=30)
     db_restrict = models.ForeignKey(
         RelatedDbOptionParent,
         models.DB_RESTRICT,
@@ -73,8 +77,11 @@ class RelatedDbOption(models.Model):
         null=True,
     )
 
+    class Meta:
+        required_db_features = {"supports_on_delete_db_restrict"}
 
-class SetDefaultDb(models.Model):
+
+class SetDefaultDbModel(models.Model):
     db_setdefault = models.ForeignKey(
         RelatedDbOptionParent,
         models.DB_SET_DEFAULT,

@@ -390,8 +390,10 @@ class BaseDatabaseFeatures:
     # subqueries?
     supports_tuple_comparison_against_subquery = True
 
-    # Does the backend support default as delete option?
+    # Does the backend support DEFAULT as delete option?
     supports_on_delete_db_default = True
+    # Does the backend support RESTRICT as delete option?
+    supports_on_delete_db_restrict = True
 
     # Collation names for use by the Django test suite.
     test_collations = {

@@ -65,6 +65,9 @@ class DBRestrict(models.Model):
     def __str__(self):
         return str(self.num)
 
+    class Meta:
+        required_db_features = {"supports_on_delete_db_restrict"}
+
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)

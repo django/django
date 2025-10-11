@@ -37,9 +37,10 @@ from .models import (
     RelatedDbOption,
     RelatedDbOptionGrandParent,
     RelatedDbOptionParent,
+    RestrictDbModel,
     RProxy,
     S,
-    SetDefaultDb,
+    SetDefaultDbModel,
     T,
     User,
     create_a,
@@ -100,9 +101,9 @@ class OnDeleteTests(TestCase):
         RelatedDbOptionParent.objects.all().delete()
         r = RelatedDbOptionParent.objects.create(pk=2)
         default_r = RelatedDbOptionParent.objects.create(pk=1)
-        set_default_db_obj = SetDefaultDb.objects.create(db_setdefault=r)
+        set_default_db_obj = SetDefaultDbModel.objects.create(db_setdefault=r)
         set_default_db_obj.db_setdefault.delete()
-        set_default_db_obj = SetDefaultDb.objects.get(pk=set_default_db_obj.pk)
+        set_default_db_obj = SetDefaultDbModel.objects.get(pk=set_default_db_obj.pk)
         self.assertEqual(set_default_db_obj.db_setdefault, default_r)
 
     def test_setdefault_none(self):
@@ -118,11 +119,11 @@ class OnDeleteTests(TestCase):
         RelatedDbOptionParent.objects.all().delete()
         r = RelatedDbOptionParent.objects.create(pk=2)
         default_r = RelatedDbOptionParent.objects.create(pk=1)
-        set_default_db_obj = SetDefaultDb.objects.create(
+        set_default_db_obj = SetDefaultDbModel.objects.create(
             db_setdefault_none=r, db_setdefault=default_r
         )
         set_default_db_obj.db_setdefault_none.delete()
-        set_default_db_obj = SetDefaultDb.objects.get(pk=set_default_db_obj.pk)
+        set_default_db_obj = SetDefaultDbModel.objects.get(pk=set_default_db_obj.pk)
         self.assertIsNone(set_default_db_obj.db_setdefault_none)
 
     def test_cascade(self):
@@ -341,33 +342,28 @@ class OnDeleteTests(TestCase):
         self.assertFalse(GenericB2.objects.exists())
         self.assertFalse(GenericDeleteBottom.objects.exists())
 
+    @skipUnlessDBFeature("supports_on_delete_db_restrict")
     def test_db_restrict(self):
-        a = create_related_db_option("db_restrict")
-        with self.assertRaises(IntegrityError), transaction.atomic():
-            a.db_restrict.delete()
-
-    def test_db_restrict_path_db_cascade_direct(self):
-        a = create_related_db_option("db_restrict")
-        a.db_restrict.p = RelatedDbOptionGrandParent.objects.create()
-        a.db_restrict.save()
-        a.db_cascade_p = a.db_restrict.p
-        a.save()
-        a.db_restrict.p.delete()
-        self.assertFalse(RelatedDbOption.objects.filter(name="db_restrict").exists())
-        self.assertFalse(
-            RelatedDbOptionParent.objects.filter(pk=a.db_restrict_id).exists()
+        r = RelatedDbOptionParent.objects.create()
+        restrict_db_obj = RestrictDbModel.objects.create(
+            db_restrict=r, name="db_restrict"
         )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            restrict_db_obj.db_restrict.delete()
 
-    def test_db_restrict_path_cascade_direct(self):
-        a = create_related_db_option("db_restrict")
-        a.db_restrict.p = RelatedDbOptionGrandParent.objects.create()
-        a.db_restrict.save()
-        a.db_cascade_p = a.db_restrict.p
-        a.save()
-        a.db_restrict.p.delete()
-        self.assertFalse(RelatedDbOption.objects.filter(name="db_restrict").exists())
+    @skipUnlessDBFeature("supports_on_delete_db_restrict")
+    def test_db_restrict_path_db_cascade_direct(self):
+        p = RelatedDbOptionGrandParent.objects.create()
+        r = RelatedDbOptionParent.objects.create(p=p)
+        restrict_db_obj = RestrictDbModel.objects.create(
+            db_restrict=r, db_cascade_p=p, name="db_restrict"
+        )
+        restrict_db_obj.db_restrict.p.delete()
+        self.assertFalse(RestrictDbModel.objects.filter(name="db_restrict").exists())
         self.assertFalse(
-            RelatedDbOptionParent.objects.filter(pk=a.db_restrict_id).exists()
+            RelatedDbOptionParent.objects.filter(
+                pk=restrict_db_obj.db_restrict_id
+            ).exists()
         )
 
 

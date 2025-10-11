@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
@@ -124,6 +124,7 @@ class DBNestedObjectsTests(NestedObjectsTests):
 
     cascade_model = DBCascade
 
+    @skipUnlessDBFeature("supports_on_delete_db_restrict")
     def test_db_restrict_collected(self):
         parent = DBRestrict.objects.create()
         child = DBRestrict.objects.create(restrict_parent=parent)
