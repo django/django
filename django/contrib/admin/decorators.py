@@ -4,15 +4,14 @@ def action(
     permissions=None,
     description=None,
     description_plural=None,
-    changelist_only=True,
+    show_on_change_form=False,
 ):
     """
     Conveniently add attributes to an action function::
 
         @admin.action(
             permissions=['publish'],
-            description='Mark story as published',
-            description_plural='Mark selected stories as published',
+            description='Mark selected stories as published',
         )
         def make_published(self, request, queryset):
             queryset.update(status='p')
@@ -23,10 +22,7 @@ def action(
         def make_published(self, request, queryset):
             queryset.update(status='p')
         make_published.allowed_permissions = ['publish']
-        make_published.short_description = 'Mark story as published'
-        make_published.plural_description = (
-            'Mark selected stories as published'
-        )
+        make_published.short_description = 'Mark selected stories as published'
     """
 
     def decorator(func):
@@ -39,7 +35,7 @@ def action(
         elif description is not None:
             func.plural_description = description
 
-        func.changelist_only = changelist_only
+        func.show_on_change_form = show_on_change_form
 
         return func
 
