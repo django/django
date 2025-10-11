@@ -53,7 +53,32 @@ class Serializer(base.Serializer):
 
         self.indent(1)
         attrs = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
+
+        pk_included = True
+
+        if self.use_natural_primary_keys:
+            natural_key_func = getattr(obj, "natural_key", None)
+
+            if callable(natural_key_func):
+                natural_key_value = None
+                try:
+                    natural_key_value = natural_key_func()
+                except Exception:
+                    pass
+
+                is_pk_tuple = natural_key_value == (obj.pk,)
+
+                is_opt_out = (
+                    natural_key_value is None
+                    or not natural_key_value
+                    or is_pk_tuple
+                    or not isinstance(natural_key_value, tuple)
+                )
+
+                if not is_opt_out:
+                    pk_included = False
+
+        if pk_included:
             obj_pk = obj.pk
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
@@ -113,12 +138,17 @@ class Serializer(base.Serializer):
             ):
                 related = getattr(obj, field.name)
                 # If related object has a natural key, use it
-                related = related.natural_key()
-                # Iterable natural keys are rolled out as subelements
-                for key_value in related:
-                    self.xml.startElement("natural", {})
-                    self.xml.characters(str(key_value))
-                    self.xml.endElement("natural")
+                natural_key_value = related.natural_key()
+                is_pk_tuple = natural_key_value == (related.pk,)
+
+                if natural_key_value is None or is_pk_tuple:
+                    self.xml.characters(str(related_att))
+                else:
+                    # Iterable natural keys are rolled out as subelements
+                    for key_value in natural_key_value:
+                        self.xml.startElement("natural", {})
+                        self.xml.characters(str(key_value))
+                        self.xml.endElement("natural")
             else:
                 self.xml.characters(str(related_att))
         else:
