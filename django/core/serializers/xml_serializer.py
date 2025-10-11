@@ -3,7 +3,8 @@ XML serializer.
 """
 
 import json
-from xml.dom import pulldom
+from contextlib import contextmanager
+from xml.dom import minidom, pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
@@ -13,6 +14,25 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
+
+
+@contextmanager
+def fast_cache_clearing():
+    """Workaround for performance issues in minidom document checks.
+
+    Speeds up repeated DOM operations by skipping unnecessary full traversal
+    of the DOM tree.
+    """
+    module_helper_was_lambda = False
+    if original_fn := getattr(minidom, "_in_document", None):
+        module_helper_was_lambda = original_fn.__name__ == "<lambda>"
+        if not module_helper_was_lambda:
+            minidom._in_document = lambda node: bool(node.ownerDocument)
+    try:
+        yield
+    finally:
+        if original_fn and not module_helper_was_lambda:
+            minidom._in_document = original_fn
 
 
 class Serializer(base.Serializer):
@@ -210,7 +230,8 @@ class Deserializer(base.Deserializer):
     def __next__(self):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
-                self.event_stream.expandNode(node)
+                with fast_cache_clearing():
+                    self.event_stream.expandNode(node)
                 return self._handle_object(node)
         raise StopIteration
 
@@ -394,19 +415,25 @@ class Deserializer(base.Deserializer):
 
 def getInnerText(node):
     """Get all the inner text of a DOM node (recursively)."""
+    inner_text_list = getInnerTextList(node)
+    return "".join(inner_text_list)
+
+
+def getInnerTextList(node):
+    """Return a list of the inner texts of a DOM node (recursively)."""
     # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
-    inner_text = []
+    result = []
     for child in node.childNodes:
         if (
             child.nodeType == child.TEXT_NODE
             or child.nodeType == child.CDATA_SECTION_NODE
         ):
-            inner_text.append(child.data)
+            result.append(child.data)
         elif child.nodeType == child.ELEMENT_NODE:
-            inner_text.extend(getInnerText(child))
+            result.extend(getInnerTextList(child))
         else:
             pass
-    return "".join(inner_text)
+    return result
 
 
 # Below code based on Christian Heimes' defusedxml
