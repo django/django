@@ -893,15 +893,13 @@ class Variable:
                 self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
-            # Check if this looks like an invalid numeric literal with multiple dots
-            # (e.g., "1.1.1" or "1.2.3.4") - see bug #36658
+            # Check if this looks like an invalid numeric literal with
+            # multiple dots (e.g., "1.1.1" or "1.2.3.4") - see bug #36658
             if var and var[0].isdigit() and "." in var:
                 # If it starts with a digit and contains multiple periods,
                 # it's an invalid numeric literal
                 if var.count(".") > 1:
-                    raise TemplateSyntaxError(
-                        "Invalid numeric literal: '%s'" % var
-                    )
+                    raise TemplateSyntaxError("Invalid numeric literal: '%s'" % var)
             if var[0:2] == "_(" and var[-1] == ")":
                 # The result of the lookup should be translated at rendering
                 # time.

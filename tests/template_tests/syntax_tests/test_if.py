@@ -710,10 +710,14 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string("template", {})
         self.assertEqual(output, "no")
 
-    # Tests for bug #36658: Invalid numeric literals should raise TemplateSyntaxError
+    # Tests for bug #36658: Invalid numeric literals should raise
+    # TemplateSyntaxError
     @setup({"if-invalid-numeric-01": "{% if 1.1.1 %}yes{% endif %}"})
     def test_if_invalid_numeric_literal_multiple_dots(self):
-        """Invalid numeric literal with multiple dots should raise TemplateSyntaxError."""
+        """
+        Invalid numeric literal with multiple dots should raise
+        TemplateSyntaxError.
+        """
         with self.assertRaisesMessage(
             TemplateSyntaxError, "Invalid numeric literal: '1.1.1'"
         ):
@@ -737,7 +741,10 @@ class IfTagTests(SimpleTestCase):
 
     @setup({"if-invalid-numeric-04": "{% if 1.1.1 == 2 %}yes{% endif %}"})
     def test_if_invalid_numeric_literal_in_comparison(self):
-        """Invalid numeric literal in comparison should raise TemplateSyntaxError."""
+        """
+        Invalid numeric literal in comparison should raise
+        TemplateSyntaxError.
+        """
         with self.assertRaisesMessage(
             TemplateSyntaxError, "Invalid numeric literal: '1.1.1'"
         ):
