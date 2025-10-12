@@ -2938,6 +2938,7 @@ class DateFieldTimedeltaTests(TestCase):
         self.assertNotIsInstance(result, datetime.datetime)
         self.assertEqual(result, datetime.date(2025, 10, 12))
 
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL only")
     def test_datefield_timedelta_integer_arithmetic(self):
         """Integer arithmetic with DateField returns date type."""
         qs = Experiment.objects.annotate(
