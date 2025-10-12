@@ -841,6 +841,39 @@ Any combination of these options will result in an error.
     instance, removing its time component. This is true for both storage and
     comparison.
 
+.. warning::
+
+    On PostgreSQL and MySQL, arithmetic operations on a ``DateField`` with a
+    :class:`~datetime.timedelta` return a ``datetime`` instead of a ``date``.
+    This occurs because Python's ``timedelta`` is converted to SQL
+    ``INTERVAL``, and the SQL operation ``date +/- interval`` returns a
+    ``timestamp`` on these databases.
+
+    To ensure a ``date`` result, use one of the following approaches. Either
+    explicitly cast the result to a date::
+
+        import datetime
+        from django.db.models import DateField, F
+        from django.db.models.functions import Cast
+
+        qs = MyModel.objects.annotate(
+            previous_day=Cast(
+                F("date_field") - datetime.timedelta(days=1),
+                output_field=DateField(),
+            )
+        )
+
+    Or on PostgreSQL only, use integer arithmetic to represent days::
+
+        from django.db.models import DateField, ExpressionWrapper, F
+
+        qs = MyModel.objects.annotate(
+            previous_day=ExpressionWrapper(
+                F("date_field") - 1,  # Subtract 1 day as integer
+                output_field=DateField(),
+            )
+        )
+
 ``DateTimeField``
 -----------------
 

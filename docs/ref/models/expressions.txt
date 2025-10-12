@@ -37,6 +37,12 @@ determine the result's field type, such as complex expressions that mix field
 types. For example, adding a ``DecimalField()`` and a ``FloatField()`` requires
 an output field, like ``output_field=FloatField()``.
 
+``output_field`` also allows using custom fields that perform type conversions
+outside a specific model field context. For example, if you frequently need to
+perform date arithmetic with ``timedelta``, you can create a custom field that
+handles the conversion, ensuring consistent results across databases. See
+:doc:`/howto/custom-model-fields`.
+
 Some examples
 =============
 
@@ -558,6 +564,12 @@ properties, such as :ref:`output_field<output-field>`, that may not be
 available on other expressions. ``ExpressionWrapper`` is necessary when using
 arithmetic on ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
+
+.. admonition:: Database casting not performed
+
+    ``ExpressionWrapper`` only sets the output field for the ORM and does not
+    perform any database-level casting. To ensure a specific type is returned
+    from the database, use :class:`~django.db.models.functions.Cast` instead.
 
 Conditional expressions
 -----------------------
