@@ -1,4 +1,10 @@
-from django.template import Context, Template, Variable, VariableDoesNotExist
+from django.template import (
+    Context,
+    Template,
+    TemplateSyntaxError,
+    Variable,
+    VariableDoesNotExist,
+)
 from django.template.base import DebugLexer, Lexer, TokenType
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy
@@ -81,3 +87,33 @@ class VariableTests(SimpleTestCase):
         for var in ["inf", "infinity", "iNFiniTy", "nan"]:
             with self.subTest(var=var):
                 self.assertIsNone(Variable(var).literal)
+
+    def test_invalid_numeric_literals(self):
+        """
+        Invalid numeric literals should raise TemplateSyntaxError.
+        Tests for bug #36658.
+        """
+        invalid_literals = [
+            "1.1.1",  # Multiple dots
+            "1.2.3.4",  # IP-like format
+            "10.20.30",  # Version-like format
+            "1.2.3.4.5",  # More than 4 parts
+        ]
+        for var in invalid_literals:
+            with self.subTest(var=var):
+                with self.assertRaisesMessage(
+                    TemplateSyntaxError, f"Invalid numeric literal: '{var}'"
+                ):
+                    Variable(var)
+
+    def test_valid_float_literals(self):
+        """Valid float literals should work correctly."""
+        valid_floats = [
+            ("1.1", 1.1),
+            ("2.0", 2.0),
+            ("0.5", 0.5),
+            ("999.999", 999.999),
+        ]
+        for var, expected in valid_floats:
+            with self.subTest(var=var):
+                self.assertEqual(Variable(var).literal, expected)

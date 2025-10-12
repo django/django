@@ -710,6 +710,63 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string("template", {})
         self.assertEqual(output, "no")
 
+    # Tests for bug #36658: Invalid numeric literals should raise TemplateSyntaxError
+    @setup({"if-invalid-numeric-01": "{% if 1.1.1 %}yes{% endif %}"})
+    def test_if_invalid_numeric_literal_multiple_dots(self):
+        """Invalid numeric literal with multiple dots should raise TemplateSyntaxError."""
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.1.1'"
+        ):
+            self.engine.get_template("if-invalid-numeric-01")
+
+    @setup({"if-invalid-numeric-02": "{% if 1.2.3.4 %}yes{% endif %}"})
+    def test_if_invalid_numeric_literal_ip_like(self):
+        """IP address-like strings should raise TemplateSyntaxError."""
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3.4'"
+        ):
+            self.engine.get_template("if-invalid-numeric-02")
+
+    @setup({"if-invalid-numeric-03": "{% if 10.20.30 %}yes{% endif %}"})
+    def test_if_invalid_numeric_literal_version_like(self):
+        """Version-like strings should raise TemplateSyntaxError."""
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '10.20.30'"
+        ):
+            self.engine.get_template("if-invalid-numeric-03")
+
+    @setup({"if-invalid-numeric-04": "{% if 1.1.1 == 2 %}yes{% endif %}"})
+    def test_if_invalid_numeric_literal_in_comparison(self):
+        """Invalid numeric literal in comparison should raise TemplateSyntaxError."""
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.1.1'"
+        ):
+            self.engine.get_template("if-invalid-numeric-04")
+
+    @setup({"if-valid-numeric-01": "{% if 1.1 %}yes{% else %}no{% endif %}"})
+    def test_if_valid_float_literal(self):
+        """Valid float literals should work correctly."""
+        output = self.engine.render_to_string("if-valid-numeric-01")
+        self.assertEqual(output, "yes")
+
+    @setup({"if-valid-numeric-02": "{% if 1.0 %}yes{% else %}no{% endif %}"})
+    def test_if_valid_float_literal_with_zero(self):
+        """Valid float literals with zero decimal should work."""
+        output = self.engine.render_to_string("if-valid-numeric-02")
+        self.assertEqual(output, "yes")
+
+    @setup({"if-valid-numeric-03": "{% if 0.0 %}yes{% else %}no{% endif %}"})
+    def test_if_valid_float_literal_zero(self):
+        """Float literal 0.0 should be falsy."""
+        output = self.engine.render_to_string("if-valid-numeric-03")
+        self.assertEqual(output, "no")
+
+    @setup({"if-valid-numeric-04": "{% if 1e5 %}yes{% else %}no{% endif %}"})
+    def test_if_valid_scientific_notation(self):
+        """Valid scientific notation should work."""
+        output = self.engine.render_to_string("if-valid-numeric-04")
+        self.assertEqual(output, "yes")
+
 
 class IfNodeTests(SimpleTestCase):
     def test_repr(self):

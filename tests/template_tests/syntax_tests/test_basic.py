@@ -255,45 +255,43 @@ class BasicSyntaxTests(SimpleTestCase):
         else:
             self.assertEqual(output, "")
 
-    # Something that starts like a number but has an extra lookup works
-    # as a lookup.
+    # Bug #36658: Strings that look like invalid numeric literals with
+    # multiple dots now raise TemplateSyntaxError instead of being treated
+    # as variable lookups. This prevents confusing behavior.
     @setup({"basic-syntax30": "{{ 1.2.3 }}"})
     def test_basic_syntax30(self):
-        output = self.engine.render_to_string(
-            "basic-syntax30", {"1": {"2": {"3": "d"}}}
-        )
-        self.assertEqual(output, "d")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+        ):
+            self.engine.get_template("basic-syntax30")
 
     @setup({"basic-syntax31": "{{ 1.2.3 }}"})
     def test_basic_syntax31(self):
-        output = self.engine.render_to_string(
-            "basic-syntax31",
-            {"1": {"2": ("a", "b", "c", "d")}},
-        )
-        self.assertEqual(output, "d")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+        ):
+            self.engine.get_template("basic-syntax31")
 
     @setup({"basic-syntax32": "{{ 1.2.3 }}"})
     def test_basic_syntax32(self):
-        output = self.engine.render_to_string(
-            "basic-syntax32",
-            {"1": (("x", "x", "x", "x"), ("y", "y", "y", "y"), ("a", "b", "c", "d"))},
-        )
-        self.assertEqual(output, "d")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+        ):
+            self.engine.get_template("basic-syntax32")
 
     @setup({"basic-syntax33": "{{ 1.2.3 }}"})
     def test_basic_syntax33(self):
-        output = self.engine.render_to_string(
-            "basic-syntax33",
-            {"1": ("xxxx", "yyyy", "abcd")},
-        )
-        self.assertEqual(output, "d")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+        ):
+            self.engine.get_template("basic-syntax33")
 
     @setup({"basic-syntax34": "{{ 1.2.3 }}"})
     def test_basic_syntax34(self):
-        output = self.engine.render_to_string(
-            "basic-syntax34", {"1": ({"x": "x"}, {"y": "y"}, {"z": "z", "3": "d"})}
-        )
-        self.assertEqual(output, "d")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+        ):
+            self.engine.get_template("basic-syntax34")
 
     # Numbers are numbers even if their digits are in the context.
     @setup({"basic-syntax35": "{{ 1 }}"})
