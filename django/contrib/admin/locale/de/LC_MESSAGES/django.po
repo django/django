@@ -140,7 +140,7 @@ msgstr "Logeinträge"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "„%(object)s“ hinzufügt."
+msgstr "„%(object)s“ hinzugefügt."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
