@@ -20,7 +20,7 @@ jobs:
           - '3.11'
           - '3.12'
           - '3.13'
-          - '3.14-dev'
+          - '3.14'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     continue-on-error: true
     steps:
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: 'pip'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
@@ -146,7 +146,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
@@ -182,7 +182,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
@@ -227,7 +227,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
