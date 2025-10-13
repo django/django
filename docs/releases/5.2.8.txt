@@ -10,3 +10,7 @@ Bugfixes
 ========
 
 * Added compatibility for ``oracledb`` 3.4.0 (:ticket:`36646`).
+
+* Fixed a bug in Django 5.2 where ``QuerySet.first()`` and ``QuerySet.last()``
+  raised an error on querysets performing aggregation that selected all fields
+  of a composite primary key.
