@@ -2917,7 +2917,7 @@ class DateFieldTimedeltaTests(TestCase):
     def setUpTestData(cls):
         cls.test_date = datetime.date(2025, 10, 11)
         cls.experiment = Experiment.objects.create(
-            name='DateField Test',
+            name="DateField Test",
             assigned=cls.test_date,
             start=datetime.datetime(2025, 10, 11, 18, 0, 0),
             end=datetime.datetime(2025, 10, 13, 18, 0, 0),
@@ -2929,7 +2929,7 @@ class DateFieldTimedeltaTests(TestCase):
         """Cast ensures date type when subtracting timedelta from DateField."""
         qs = Experiment.objects.annotate(
             next_day=Cast(
-                F('assigned')+datetime.timedelta(days=1),
+                F("assigned") + datetime.timedelta(days=1),
                 output_field=DateField(),
             )
         )
@@ -2938,12 +2938,12 @@ class DateFieldTimedeltaTests(TestCase):
         self.assertNotIsInstance(result, datetime.datetime)
         self.assertEqual(result, datetime.date(2025, 10, 12))
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL only")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL only")
     def test_datefield_timedelta_integer_arithmetic(self):
         """Integer arithmetic with DateField returns date type."""
         qs = Experiment.objects.annotate(
             previous_day=ExpressionWrapper(
-                F('assigned') - 1,
+                F("assigned") - 1,
                 output_field=DateField(),
             )
         )
