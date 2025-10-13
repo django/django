@@ -20,7 +20,7 @@ from collections import defaultdict
 from hashlib import md5
 
 from django.conf import settings
-from django.core.cache import cache, caches
+from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
 from django.test import RequestFactory
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
@@ -449,10 +449,7 @@ def _to_tuple(s):
 
 
 def invalidate_view_cache(
-    path=None,
-    request=None,
-    vary_headers=None,
-    key_prefix=None,
+    path=None, request=None, vary_headers=None, key_prefix=None, cache=None
 ):
     """
     This function first creates a fake WSGIRequest to compute the cache key.
@@ -479,7 +476,12 @@ def invalidate_view_cache(
     if vary_headers:
         request.META.update(vary_headers)
 
-    cache_key = get_cache_key(request, key_prefix=key_prefix, ignore_headers=True)
+    if cache is None:
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
+
+    cache_key = get_cache_key(
+        request, key_prefix=key_prefix, ignore_headers=True, cache=cache
+    )
     if cache_key is None:
         return 0
 

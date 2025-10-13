@@ -63,6 +63,7 @@ from django.utils.cache import (
     patch_vary_headers,
 )
 from django.views.decorators.cache import cache_control, cache_page
+from django.views.decorators.vary import vary_on_headers
 
 from .models import Poll, expensive_calculation
 
@@ -2631,14 +2632,16 @@ class CacheMiddlewareTest(SimpleTestCase):
         view = cache_page(10)(hello_world_view)
         request = self.factory.get("/view/")
         _ = view(request, "0")
-        cache_key = get_cache_key(request=request, key_prefix="", ignore_headers=True)
+        cache_key = get_cache_key(
+            request=request, key_prefix="", ignore_headers=True, cache=cache
+        )
         cached_response = cache.get(cache_key)
 
         # Verify request.content has been chached
         self.assertEqual(cached_response.content, b"Hello World 0")
 
         # Delete cache key/value
-        invalidate_view_cache(request=request, key_prefix="")
+        invalidate_view_cache(request=request, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Confirm key/value has been deleted from cache
@@ -2650,14 +2653,45 @@ class CacheMiddlewareTest(SimpleTestCase):
         path = "/view/"
         request = self.factory.get(path)
         _ = view(request, "0")
-        cache_key = get_cache_key(request=request, key_prefix="", ignore_headers=True)
+        cache_key = get_cache_key(
+            request=request, key_prefix="", ignore_headers=True, cache=cache
+        )
         cached_response = cache.get(cache_key)
 
         # Verify request.content has been chached
         self.assertEqual(cached_response.content, b"Hello World 0")
 
         # Delete cache key/value
-        invalidate_view_cache(path=path, key_prefix="")
+        invalidate_view_cache(path=path, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
+
+    def test_invalidate_view_decorator_cache_from_path_with_vary_headers(self):
+        """Invalidate cache key/value from path with Vary headers"""
+
+        # Cache view and inject Vary headers to Response object
+        view = cache_page(10, key_prefix="")(
+            vary_on_headers("Accept-Encoding")(hello_world_view)
+        )
+        path = "/view/"
+        request = self.factory.get(path)
+        response = view(request, "0")
+
+        # Check response headers
+        self.assertTrue(response.has_header("Vary"))
+
+        cache_key = get_cache_key(
+            request=request, key_prefix="", ignore_headers=False, cache=cache
+        )
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(path=path, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Confirm key/value has been deleted from cache
