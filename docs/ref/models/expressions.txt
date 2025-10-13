@@ -593,7 +593,7 @@ DateField and timedelta behavior
         # On PostgreSQL/MySQL: returns datetime, not date
         qs = MyModel.objects.annotate(
             previous_day=ExpressionWrapper(
-                F('date_field') - datetime.timedelta(days=1),
+                F("date_field") - datetime.timedelta(days=1),
                 output_field=DateField(),
             )
         )
@@ -613,7 +613,7 @@ The recommended approach is to explicitly cast the result to a date::
 
     qs = MyModel.objects.annotate(
         previous_day=Cast(
-            F('date_field') - datetime.timedelta(days=1),
+            F("date_field") - datetime.timedelta(days=1),
             output_field=DateField(),
         )
     )
@@ -628,7 +628,7 @@ represents days::
 
     qs = MyModel.objects.annotate(
         previous_day=ExpressionWrapper(
-            F('date_field') - 1,  # Subtract 1 day as integer
+            F("date_field") - 1,  # Subtract 1 day as integer
             output_field=DateField(),
         )
     )
