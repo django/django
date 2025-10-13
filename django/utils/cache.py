@@ -18,11 +18,9 @@ An example: i18n middleware would need to distinguish caches by the
 import time
 from collections import defaultdict
 from hashlib import md5
-from typing import Annotated, Dict, Optional
 
 from django.conf import settings
 from django.core.cache import cache, caches
-from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, HttpResponseNotModified
 from django.test import RequestFactory
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
@@ -451,11 +449,11 @@ def _to_tuple(s):
 
 
 def invalidate_view_cache(
-    path: str = None,
-    request: WSGIRequest = None,
-    vary_headers: Optional[Dict[str, str]] = None,
-    key_prefix: Optional[str] = None,
-) -> Annotated[int, "Number of cache keys deleted"]:
+    path=None,
+    request=None,
+    vary_headers=None,
+    key_prefix=None,
+):
     """
     This function first creates a fake WSGIRequest to compute the cache key.
     The key looks like:
