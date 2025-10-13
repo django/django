@@ -621,7 +621,7 @@ The recommended approach is to explicitly cast the result to a date::
 Use integer arithmetic
 ^^^^^^^^^^^^^^^^^^^^^^
 
-PostgreSQL supports``date +/- integer`` operations where the integer
+PostgreSQL supports ``date +/- integer`` operations where the integer
 represents days::
 
     from django.db.models import DateField, ExpressionWrapper, F
