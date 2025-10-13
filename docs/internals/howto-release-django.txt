@@ -355,11 +355,15 @@ Feature freeze tasks
    ``django_next_version`` to ``'6.0'`` on the new stable branch
    (:commit:`example commit <1eb62e5b622ef7fd6e0123d8bbf6662d893d5d08>`).
 
-#. Go to the `Add release page in the admin`__, create a ``Release`` object for
-   the *final* release, ensuring that the *is active* field is unset, thus
-   marking it as *unreleased*. For example, when creating ``stable/5.2.x``,
-   create ``5.2`` with the active field unset. If the release is part of
-   an LTS branch, mark it so.
+#. Create ``Release`` entries for the next version in the `admin`__ on
+   ``djangoproject.com``. Add one for each milestone (alpha, beta, rc, and
+   final), leaving *is active* unset to mark them as unreleased. Set target
+   dates per the agreed schedule, and set the LTS flag if applicable. The
+   ``X.Y`` roadmap page will be available at ``/download/X.Y/roadmap/``.
+
+   For example, when creating ``stable/5.2.x``, add ``Release`` entries for
+   ``6.0a1``, ``6.0b1``, ``6.0rc1``, and ``6.0``. The ``6.0`` roadmap can be
+   then reviewed at https://www.djangoproject.com/download/6.0/roadmap/.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -379,12 +383,6 @@ Feature freeze tasks
 #. `Create a PR on PyPI proposing the new Trove classifier
    <https://github.com/pypa/trove-classifiers/pulls?q=is%3Apr+django+trove+classifier>`_.
    For example ``Framework :: Django :: 5.2``.
-
-#. Create a `roadmap page
-   <https://code.djangoproject.com/wiki/Version6.0Roadmap>`_ for the next
-   release on Trac. To create a new page on the Wiki, navigate to the URL of
-   where you wish to create the page and a "Create this page" button will be
-   available.
 
 #. Update the current branch under active development and add pre-release
    branch in the `Django release process
