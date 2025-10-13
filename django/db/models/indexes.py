@@ -112,16 +112,18 @@ class Index:
                 references.update(
                     ref[0] for ref in model._get_expr_references(expression)
                 )
-        errors.extend(
-            model._check_local_fields(
-                {
-                    *[field for field, _ in self.fields_orders],
-                    *self.include,
-                    *references,
-                },
-                "indexes",
-            )
-        )
+        # Position: Line 117, inside def check(self, model, connection):
+                errors.extend(
+                    model._check_local_fields(
+                        {
+                            *[field for field, _ in self.fields_orders],
+                            *self.include,
+                            *references,
+                        },
+                        "indexes",
+                    )
+                )
+
         # Database-feature checks:
         required_db_features = model._meta.required_db_features
         if not (
