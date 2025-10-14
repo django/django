@@ -569,8 +569,11 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     issues.
 
     This hasher does not first hash the password which means it is subject to
-    bcrypt's 72 bytes password truncation. Most use cases should prefer the
-    BCryptSHA256PasswordHasher.
+    bcrypt's 72 byte limit. With bcrypt version 5 or newer, a `ValueError`
+    will be raised if the password exceeds 72 bytes. On older versions, the
+    password is silently truncated to 72 characters.
+
+    The BCryptSHA256PasswordHasher won't raise exceptions on longer passwords.
     """
 
     algorithm = "bcrypt"
