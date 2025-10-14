@@ -357,7 +357,7 @@ body.popup .submit-row {
     width: 48em;
 }
 
-.flatpages-flatpage #id_content {
+.app-flatpages.model-flatpage #id_content {
     height: 40.2em;
 }
 
