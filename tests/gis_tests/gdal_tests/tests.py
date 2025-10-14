@@ -21,9 +21,14 @@ class GDALTest(unittest.TestCase):
         self.assertTrue(full_version.startswith(b"GDAL"))
 
     def test_gdal_not_available(self):
-        with mock.patch.object(ctypes.util, "find_library", return_value=None):
+        with mock.patch.object(ctypes.util, "find_library", return_value=None) as mock_find_library:
             # Does not raise ImproperlyConfigured
-            reimport_module("django.contrib.gis.gdal.libgdal")
+            module = reimport_module("django.contrib.gis.gdal.libgdal")
+            # Verify module has the `lgdal` and that `reimport_module` worked
+            self.assertTrue(hasattr(module, 'lgdal'))
+            # finally verify that lazy loading works and that `find_library` isn't
+            # called on module import
+            mock_find_library.assert_not_called()
 
 
 def reimport_module(name):
