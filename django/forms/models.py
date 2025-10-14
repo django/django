@@ -4,7 +4,6 @@ and database field objects.
 """
 
 from itertools import chain
-from typing import Any
 
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
@@ -1162,8 +1161,8 @@ class ModelFormSetMeta(FormSetMeta):
 class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
     """Base class for which can be used to create modelformset classes."""
 
-    form: Any = None
-    model: Any = None
+    form = None
+    model = None
 
     def __init__(
         self,
@@ -1482,9 +1481,9 @@ class InlineFormSetMeta(ModelFormSetMeta):
 class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta):
     """Base class for which can be used to create inlineformset classes."""
 
-    form: Any = None
-    model: Any = None
-    parent_model: Any = None
+    form = None
+    model = None
+    parent_model = None
 
     def __init__(
         self,

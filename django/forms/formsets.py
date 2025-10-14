@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.core.exceptions import ValidationError
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.forms import Form
@@ -638,7 +636,7 @@ class FormSet(BaseFormSet, metaclass=FormSetMeta):
     Base class for which can be used to create formset classes
     """
 
-    form: Any = None
+    form = None
 
     def __init__(
         self,
