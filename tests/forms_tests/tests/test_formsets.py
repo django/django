@@ -2221,7 +2221,9 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
     def test_no_form_argument_error(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaisesMessage(
+            TypeError, "FormSet() missing 1 required positional argument: 'form'."
+        ):
 
             class DeclarativeInvalid(FormSet):
                 extra = 1
