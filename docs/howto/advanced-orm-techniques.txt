@@ -4,9 +4,9 @@ Advanced ORM Techniques: A Practical Guide
 
 .. currentmodule:: django.db.models
 
-This guide shows you how to build complex database queries using Django's ORM,
-reducing the need for raw SQL. We'll progress from simple to advanced techniques,
-showing you that the ORM can handle almost anything you need.
+This guide shows you how to build complex database queries using Django's
+ORM, reducing the need for raw SQL. We'll progress from simple to advanced
+techniques, showing you that the ORM can handle almost anything you need.
 
 Many developers reach for raw SQL because they don't realize Django provides
 tools for building complex queries. This guide demonstrates custom database
@@ -23,23 +23,26 @@ Sample Models
 Throughout this guide, we'll use these blog models::
 
     from django.db import models
-    
+
+
     class Author(models.Model):
         name = models.CharField(max_length=100)
         email = models.EmailField()
         bio = models.TextField()
         joined_date = models.DateTimeField(auto_now_add=True)
-        
+
         def __str__(self):
             return self.name
-    
+
+
     class Category(models.Model):
         name = models.CharField(max_length=50)
         slug = models.SlugField()
-        
+
         def __str__(self):
             return self.name
-    
+
+
     class Article(models.Model):
         title = models.CharField(max_length=200)
         slug = models.SlugField(unique=True)
@@ -48,17 +51,20 @@ Throughout this guide, we'll use these blog models::
         category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
         published_date = models.DateTimeField(null=True, blank=True)
         view_count = models.IntegerField(default=0)
-        
+
         def __str__(self):
             return self.title
-    
+
+
     class Comment(models.Model):
-        article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+        article = models.ForeignKey(
+            Article, on_delete=models.CASCADE, related_name="comments"
+        )
         author_name = models.CharField(max_length=100)
         content = models.TextField()
         created_date = models.DateTimeField(auto_now_add=True)
         is_approved = models.BooleanField(default=False)
-        
+
         def __str__(self):
             return f"Comment by {self.author_name}"
 
@@ -69,12 +75,14 @@ Let's start with a simple custom function. Suppose we want to calculate the
 reading time for articles (words divided by 200 words per minute)::
 
     from django.db.models import Func, IntegerField
-    
+
+
     class ReadingTime(Func):
         """Calculate approximate reading time in minutes."""
-        function = 'LENGTH'
+
+        function = "LENGTH"
         output_field = IntegerField()
-        
+
         def as_sql(self, compiler, connection):
             # Get the SQL for the field we're operating on
             sql, params = compiler.compile(self.source_expressions[0])
@@ -84,18 +92,19 @@ reading time for articles (words divided by 200 words per minute)::
 Usage::
 
     from django.db.models import F
-    
+
     # Annotate articles with reading time
-    articles = Article.objects.annotate(
-        reading_time=ReadingTime(F('content'))
-    ).filter(reading_time__lte=5)
-    
+    articles = Article.objects.annotate(reading_time=ReadingTime(F("content"))).filter(
+        reading_time__lte=5
+    )
+
     # Find articles that take 5 minutes or less to read
     for article in articles:
         print(f"{article.title}: {article.reading_time} minutes")
 
-**When to use this:** When you need a database-level calculation that's not
-provided by Django's :doc:`built-in database functions</ref/models/database-functions>`.
+**When to use this:** When you need a database-level calculation that's
+not provided by Django's :doc:`built-in database
+functions</ref/models/database-functions>`.
 
 Example 2: Basic Custom Lookup
 ===============================
@@ -105,14 +114,15 @@ Let's create a lookup to find articles published within the last N days::
     from django.db.models import Lookup
     from django.utils import timezone
     from datetime import timedelta
-    
+
+
     class WithinDaysLookup(Lookup):
-        lookup_name = 'within_days'
-        
+        lookup_name = "within_days"
+
         def as_sql(self, compiler, connection):
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
-            
+
             # Calculate the date N days ago
             params = lhs_params + rhs_params
             return f"{lhs} >= CURRENT_DATE - INTERVAL '{rhs}' DAY", params
@@ -120,13 +130,14 @@ Let's create a lookup to find articles published within the last N days::
 Register it::
 
     from django.db.models import DateTimeField
+
     DateTimeField.register_lookup(WithinDaysLookup)
 
 Usage::
 
     # Find articles published within last 7 days
     recent = Article.objects.filter(published_date__within_days=7)
-    
+
     # Find articles published within last 30 days
     monthly = Article.objects.filter(published_date__within_days=30)
 
@@ -140,18 +151,19 @@ Transforms modify field values before lookups. Let's create a transform to get
 the first N characters of a text field::
 
     from django.db.models import Transform, CharField
-    
+
+
     class FirstChars(Transform):
-        lookup_name = 'first_chars'
-        
+        lookup_name = "first_chars"
+
         def __init__(self, expression, length, **extra):
             super().__init__(expression, **extra)
             self.length = length
-        
+
         def as_sql(self, compiler, connection):
             lhs, params = compiler.compile(self.lhs)
             return f"SUBSTR({lhs}, 1, {self.length})", params
-        
+
         @property
         def output_field(self):
             return CharField()
@@ -159,15 +171,16 @@ the first N characters of a text field::
 Register it::
 
     from django.db.models import TextField
+
     TextField.register_lookup(FirstChars)
 
 Usage::
 
     # Find articles whose titles start with "How"
-    Article.objects.filter(title__first_chars__startswith='How')
-    
+    Article.objects.filter(title__first_chars__startswith="How")
+
     # More readable than:
-    Article.objects.filter(title__startswith='How')
+    Article.objects.filter(title__startswith="How")
 
 Example 4: Custom Aggregate Function
 =====================================
@@ -175,20 +188,20 @@ Example 4: Custom Aggregate Function
 Create a custom aggregate to calculate the median::
 
     from django.db.models import Aggregate
-    
+
+
     class Median(Aggregate):
-        function = 'PERCENTILE_CONT'
-        template = '%(function)s(0.5) WITHIN GROUP (ORDER BY %(expressions)s)'
+        function = "PERCENTILE_CONT"
+        template = "%(function)s(0.5) WITHIN GROUP (ORDER BY %(expressions)s)"
         output_field = models.FloatField()
 
 Usage::
 
     from django.db.models import Avg
-    
+
     # Compare average vs median view count
     stats = Article.objects.aggregate(
-        avg_views=Avg('view_count'),
-        median_views=Median('view_count')
+        avg_views=Avg("view_count"), median_views=Median("view_count")
     )
     print(f"Average: {stats['avg_views']}, Median: {stats['median_views']}")
 
@@ -202,29 +215,27 @@ Transforms can be chained together. Let's create a transform to get the last
 word of a text field::
 
     class LastWord(Transform):
-        lookup_name = 'last_word'
-        
+        lookup_name = "last_word"
+
         def as_sql(self, compiler, connection):
             lhs, params = compiler.compile(self.lhs)
             # Get everything after the last space
-            return (
-                f"SUBSTR({lhs}, INSTR({lhs}, ' ') + 1, LENGTH({lhs}))",
-                params
-            )
-        
+            return (f"SUBSTR({lhs}, INSTR({lhs}, ' ') + 1, LENGTH({lhs}))", params)
+
         @property
         def output_field(self):
             return CharField()
-    
+
+
     TextField.register_lookup(LastWord)
 
 Now chain it::
 
     # Find authors whose last name starts with 'S'
-    Author.objects.filter(name__last_word__startswith='S')
-    
+    Author.objects.filter(name__last_word__startswith="S")
+
     # Chain with lower() transform
-    Author.objects.filter(name__lower__last_word__exact='smith')
+    Author.objects.filter(name__lower__last_word__exact="smith")
 
 Example 6: Complex Lookup with Multiple Conditions
 ===================================================
@@ -232,25 +243,26 @@ Example 6: Complex Lookup with Multiple Conditions
 Create a lookup that checks if a date is within a date range::
 
     class BetweenDates(Lookup):
-        lookup_name = 'between_dates'
-        
+        lookup_name = "between_dates"
+
         def as_sql(self, compiler, connection):
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
-            
+
             # Expecting rhs to be a tuple of (start_date, end_date)
             return f"{lhs} BETWEEN %s AND %s", lhs_params + rhs_params
-    
+
+
     DateTimeField.register_lookup(BetweenDates)
 
 Usage::
 
     from datetime import date
-    
+
     # Find articles published in a specific date range
     start = date(2024, 1, 1)
     end = date(2024, 12, 31)
-    
+
     Article.objects.filter(published_date__between_dates=(start, end))
 
 Example 7: Database-Specific Functions
@@ -260,14 +272,20 @@ Create a function that works differently on different databases::
 
     class FullTextSearch(Func):
         function = None  # Set dynamically
-        
+
         def as_sql(self, compiler, connection):
-            if connection.vendor == 'postgresql':
+            if connection.vendor == "postgresql":
                 # PostgreSQL full-text search
-                return "to_tsvector(%s) @@ plainto_tsquery(%s)", self.get_source_expressions()
-            elif connection.vendor == 'mysql':
+                return (
+                    "to_tsvector(%s) @@ plainto_tsquery(%s)",
+                    self.get_source_expressions(),
+                )
+            elif connection.vendor == "mysql":
                 # MySQL MATCH AGAINST
-                return "MATCH(%s) AGAINST(%s IN NATURAL LANGUAGE MODE)", self.get_source_expressions()
+                return (
+                    "MATCH(%s) AGAINST(%s IN NATURAL LANGUAGE MODE)",
+                    self.get_source_expressions(),
+                )
             else:
                 # Fallback to LIKE
                 sql, params = compiler.compile(self.source_expressions[0])
@@ -277,7 +295,7 @@ Usage::
 
     # Full-text search across articles
     Article.objects.annotate(
-        relevance=FullTextSearch(F('content'), Value('django orm'))
+        relevance=FullTextSearch(F("content"), Value("django orm"))
     ).filter(relevance__gt=0)
 
 Example 8: Custom Function with Multiple Arguments
@@ -287,22 +305,23 @@ Create a function to calculate distance between two points::
 
     from django.db.models import Func, FloatField, Value
     from math import radians
-    
+
+
     class HaversineDistance(Func):
         """Calculate distance in kilometers between two lat/lon points."""
-        function = ''
+
+        function = ""
         output_field = FloatField()
-        
+
         def __init__(self, lat1, lon1, lat2, lon2, **extra):
             expressions = [lat1, lon1, lat2, lon2]
             super().__init__(*expressions, **extra)
-        
+
         def as_sql(self, compiler, connection):
             lat1, lon1, lat2, lon2 = [
-                compiler.compile(expr)[0] 
-                for expr in self.source_expressions
+                compiler.compile(expr)[0] for expr in self.source_expressions
             ]
-            
+
             # Haversine formula
             sql = f"""
                 6371 * 2 * ASIN(SQRT(
@@ -311,12 +330,12 @@ Create a function to calculate distance between two points::
                     POWER(SIN((RADIANS({lon2}) - RADIANS({lon1})) / 2), 2)
                 ))
             """
-            
+
             params = []
             for expr in self.source_expressions:
                 _, expr_params = compiler.compile(expr)
                 params.extend(expr_params)
-            
+
             return sql, params
 
 Usage (if your models had coordinates)::
@@ -324,10 +343,10 @@ Usage (if your models had coordinates)::
     # Find articles written by authors within 50km
     nearby = Article.objects.annotate(
         distance=HaversineDistance(
-            F('author__latitude'),
-            F('author__longitude'),
+            F("author__latitude"),
+            F("author__longitude"),
             Value(44.9778),  # Your latitude
-            Value(-93.2650)  # Your longitude
+            Value(-93.2650),  # Your longitude
         )
     ).filter(distance__lte=50)
 
@@ -337,26 +356,25 @@ Example 9: Subquery with Custom Logic
 Use subqueries to solve complex problems::
 
     from django.db.models import Subquery, OuterRef, Count, Q
-    
+
     # Find authors with more approved comments than rejected
-    approved_count = Comment.objects.filter(
-        article__author=OuterRef('pk'),
-        is_approved=True
-    ).values('article__author').annotate(
-        count=Count('id')
-    ).values('count')
-    
-    rejected_count = Comment.objects.filter(
-        article__author=OuterRef('pk'),
-        is_approved=False
-    ).values('article__author').annotate(
-        count=Count('id')
-    ).values('count')
-    
+    approved_count = (
+        Comment.objects.filter(article__author=OuterRef("pk"), is_approved=True)
+        .values("article__author")
+        .annotate(count=Count("id"))
+        .values("count")
+    )
+
+    rejected_count = (
+        Comment.objects.filter(article__author=OuterRef("pk"), is_approved=False)
+        .values("article__author")
+        .annotate(count=Count("id"))
+        .values("count")
+    )
+
     authors = Author.objects.annotate(
-        approved=Subquery(approved_count),
-        rejected=Subquery(rejected_count)
-    ).filter(approved__gt=F('rejected'))
+        approved=Subquery(approved_count), rejected=Subquery(rejected_count)
+    ).filter(approved__gt=F("rejected"))
 
 Example 10: Complex Annotation with Func
 =========================================
@@ -367,22 +385,22 @@ Combine multiple techniques for complex calculations::
     from django.db.models.functions import Cast, Coalesce
     from django.utils import timezone
     from datetime import timedelta
-    
+
     # Calculate engagement score: (comments * 2 + views) / days_since_publish
     articles = Article.objects.annotate(
-        comment_count=Count('comments'),
+        comment_count=Count("comments"),
         days_old=Cast(
-            (timezone.now() - F('published_date')) / timedelta(days=1),
-            FloatField()
+            (timezone.now() - F("published_date")) / timedelta(days=1), FloatField()
         ),
         engagement_score=Case(
-            When(days_old__gt=0, then=(
-                (F('comment_count') * 2 + F('view_count')) / F('days_old')
-            )),
+            When(
+                days_old__gt=0,
+                then=((F("comment_count") * 2 + F("view_count")) / F("days_old")),
+            ),
             default=Value(0),
-            output_field=FloatField()
-        )
-    ).order_by('-engagement_score')
+            output_field=FloatField(),
+        ),
+    ).order_by("-engagement_score")
 
 Example 11: Conditional Aggregation
 ====================================
@@ -391,20 +409,20 @@ Use Case/When for conditional counting::
 
     from django.db.models import Count, Q, Case, When, IntegerField, F, Value, FloatField
     from django.db.models.functions import Cast
-    
+
     # Count comments by approval status
     article_stats = Article.objects.annotate(
-        total_comments=Count('comments'),
-        approved_comments=Count('comments', filter=Q(comments__is_approved=True)),
-        pending_comments=Count('comments', filter=Q(comments__is_approved=False)),
+        total_comments=Count("comments"),
+        approved_comments=Count("comments", filter=Q(comments__is_approved=True)),
+        pending_comments=Count("comments", filter=Q(comments__is_approved=False)),
         approval_rate=Case(
             When(
                 total_comments__gt=0,
-                then=Cast(F('approved_comments'), FloatField()) / F('total_comments') * 100
+                then=Cast(F("approved_comments"), FloatField()) / F("total_comments") * 100,
             ),
             default=Value(0),
-            output_field=FloatField()
-        )
+            output_field=FloatField(),
+        ),
     )
 
 Example 12: Full Complex Query
@@ -413,43 +431,54 @@ Example 12: Full Complex Query
 Putting it all together - a real-world reporting query::
 
     from django.db.models import (
-        Count, Sum, Avg, F, Q, Value, CharField,
-        Case, When, OuterRef, Subquery, Exists
+        Count,
+        Sum,
+        Avg,
+        F,
+        Q,
+        Value,
+        CharField,
+        Case,
+        When,
+        OuterRef,
+        Subquery,
+        Exists,
     )
     from django.db.models.functions import Coalesce, TruncMonth
-    
+
     # Monthly article report with engagement metrics
-    
+
     # Subquery: Has any viral comments (>100 characters)
     has_viral_comments = Comment.objects.filter(
-        article=OuterRef('pk'),
-        content__length__gte=100,
-        is_approved=True
+        article=OuterRef("pk"), content__length__gte=100, is_approved=True
     )
-    
-    monthly_report = Article.objects.annotate(
-        month=TruncMonth('published_date'),
-        comment_count=Count('comments'),
-        approved_count=Count('comments', filter=Q(comments__is_approved=True)),
-        avg_comment_length=Avg('comments__content__length'),
-        has_viral_content=Exists(has_viral_comments),
-        engagement_score=(F('view_count') + F('comment_count') * 10) / 100,
-        status=Case(
-            When(engagement_score__gte=10, then=Value('Hot')),
-            When(engagement_score__gte=5, then=Value('Warm')),
-            default=Value('Cold'),
-            output_field=CharField()
-        )
-    ).values(
-        'month', 'author__name', 'category__name'
-    ).annotate(
-        article_count=Count('id'),
-        total_views=Sum('view_count'),
-        avg_engagement=Avg('engagement_score')
-    ).order_by('-month', '-total_views')
 
-This single ORM query replaces what would be complex raw SQL with JOIN operations,
-subqueries, and conditional logic!
+    monthly_report = (
+        Article.objects.annotate(
+            month=TruncMonth("published_date"),
+            comment_count=Count("comments"),
+            approved_count=Count("comments", filter=Q(comments__is_approved=True)),
+            avg_comment_length=Avg("comments__content__length"),
+            has_viral_content=Exists(has_viral_comments),
+            engagement_score=(F("view_count") + F("comment_count") * 10) / 100,
+            status=Case(
+                When(engagement_score__gte=10, then=Value("Hot")),
+                When(engagement_score__gte=5, then=Value("Warm")),
+                default=Value("Cold"),
+                output_field=CharField(),
+            ),
+        )
+        .values("month", "author__name", "category__name")
+        .annotate(
+            article_count=Count("id"),
+            total_views=Sum("view_count"),
+            avg_engagement=Avg("engagement_score"),
+        )
+        .order_by("-month", "-total_views")
+    )
+
+This single ORM query replaces what would be complex raw SQL with JOIN
+operations, subqueries, and conditional logic!
 
 When to Use Custom Functions, Lookups, and Transforms
 ======================================================
@@ -512,9 +541,7 @@ Instead of::
 Do this::
 
     # GOOD: Single query with annotation
-    articles = Article.objects.annotate(
-        comment_count=Count('comments')
-    )
+    articles = Article.objects.annotate(comment_count=Count("comments"))
     for article in articles:
         print(article.comment_count)  # No additional query
 
@@ -529,14 +556,12 @@ Instead of raw SQL::
 Do this::
 
     from django.db.models import Q, F
-    
+
     # Complex Q objects and F expressions
     Article.objects.filter(
-        Q(view_count__gt=F('comment_count') * 10) |
-        (Q(category__name='Tutorial') & Q(view_count__gte=1000))
-    ).exclude(
-        published_date__isnull=True
-    )
+        Q(view_count__gt=F("comment_count") * 10)
+        | (Q(category__name="Tutorial") & Q(view_count__gte=1000))
+    ).exclude(published_date__isnull=True)
 
 Pattern 3: Window Functions
 ----------------------------
@@ -545,15 +570,15 @@ For ranking and running totals::
 
     from django.db.models import Window, F
     from django.db.models.functions import RowNumber, Rank, DenseRank
-    
+
     # Rank articles by view count within each category
     articles = Article.objects.annotate(
         rank=Window(
-            expression=Rank(),
-            partition_by=[F('category')],
-            order_by=F('view_count').desc()
+            expression=Rank(), partition_by=[F("category")], order_by=F("view_count").desc()
         )
-    ).filter(rank__lte=3)  # Top 3 in each category
+    ).filter(
+        rank__lte=3
+    )  # Top 3 in each category
 
 Next Steps
 ==========

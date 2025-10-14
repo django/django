@@ -26,7 +26,7 @@ iexact
 
 Case-insensitive exact match::
 
-    Author.objects.filter(name__iexact='john smith')
+    Author.objects.filter(name__iexact="john smith")
 
 Matches "John Smith", "JOHN SMITH", "john smith", etc.
 
@@ -76,7 +76,7 @@ contains
 
 Case-sensitive containment test::
 
-    Article.objects.filter(title__contains='Django')
+    Article.objects.filter(title__contains="Django")
 
 Matches titles containing "Django" but not "django".
 
@@ -87,7 +87,7 @@ icontains
 
 Case-insensitive containment test::
 
-    Article.objects.filter(title__icontains='django')
+    Article.objects.filter(title__icontains="django")
 
 Matches "Django", "DJANGO", "django", etc.
 
@@ -98,7 +98,7 @@ startswith
 
 Case-sensitive starts-with::
 
-    Article.objects.filter(title__startswith='How to')
+    Article.objects.filter(title__startswith="How to")
 
 **SQL equivalent:** ``WHERE title LIKE 'How to%'``
 
@@ -107,7 +107,7 @@ istartswith
 
 Case-insensitive starts-with::
 
-    Article.objects.filter(title__istartswith='how to')
+    Article.objects.filter(title__istartswith="how to")
 
 **SQL equivalent:** ``WHERE UPPER(title) LIKE UPPER('how to%')``
 
@@ -116,7 +116,7 @@ endswith
 
 Case-sensitive ends-with::
 
-    Article.objects.filter(title__endswith='Guide')
+    Article.objects.filter(title__endswith="Guide")
 
 **SQL equivalent:** ``WHERE title LIKE '%Guide'``
 
@@ -125,7 +125,7 @@ iendswith
 
 Case-insensitive ends-with::
 
-    Article.objects.filter(title__iendswith='guide')
+    Article.objects.filter(title__iendswith="guide")
 
 **SQL equivalent:** ``WHERE UPPER(title) LIKE UPPER('%guide')``
 
@@ -134,7 +134,7 @@ regex
 
 Case-sensitive regular expression match::
 
-    Article.objects.filter(title__regex=r'^(An?|The) ')
+    Article.objects.filter(title__regex=r"^(An?|The) ")
 
 Matches titles starting with "A ", "An ", or "The ".
 
@@ -145,7 +145,7 @@ iregex
 
 Case-insensitive regular expression match::
 
-    Article.objects.filter(title__iregex=r'^(an?|the) ')
+    Article.objects.filter(title__iregex=r"^(an?|the) ")
 
 Collection Lookups
 ==================
@@ -166,12 +166,14 @@ range
 Range test (inclusive)::
 
     from datetime import date
+
     start_date = date(2024, 1, 1)
     end_date = date(2024, 12, 31)
-    
+
     Article.objects.filter(published_date__range=(start_date, end_date))
 
-**SQL equivalent:** ``WHERE published_date BETWEEN '2024-01-01' AND '2024-12-31'``
+**SQL equivalent:** ``WHERE published_date BETWEEN '2024-01-01' AND
+'2024-12-31'``
 
 Null Lookups
 ============
@@ -256,6 +258,7 @@ time
 For datetime fields, casts the value as time::
 
     from datetime import time
+
     Article.objects.filter(published_date__time=time(14, 30))
 
 hour
@@ -293,12 +296,12 @@ Lookups and transforms can be chained together::
 
     # Published in December 2024
     Article.objects.filter(published_date__year=2024, published_date__month=12)
-    
+
     # Title contains "django" (case-insensitive)
-    Article.objects.filter(title__icontains='django')
-    
+    Article.objects.filter(title__icontains="django")
+
     # Chain multiple transforms
-    Article.objects.filter(title__lower__startswith='how')
+    Article.objects.filter(title__lower__startswith="how")
 
 See Also
 ========

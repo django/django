@@ -17,11 +17,10 @@ lower
 
 Converts text to lowercase::
 
-    Author.objects.filter(name__lower='john smith')
-    
+    Author.objects.filter(name__lower="john smith")
 Equivalent to::
 
-    Author.objects.filter(name__iexact='john smith')
+    Author.objects.filter(name__iexact="john smith")
 
 **Use case:** Case-insensitive filtering with exact match.
 
@@ -30,7 +29,7 @@ upper
 
 Converts text to uppercase::
 
-    Author.objects.filter(name__upper='JOHN SMITH')
+    Author.objects.filter(name__upper="JOHN SMITH")
 
 Date and Time Transforms
 =========================
@@ -135,6 +134,7 @@ date
 For datetime fields, converts to date::
 
     from datetime import date
+
     Article.objects.filter(published_date__date=date(2024, 12, 25))
 
 **Output type:** Date
@@ -145,6 +145,7 @@ time
 For datetime fields, converts to time::
 
     from datetime import time
+
     Article.objects.filter(published_date__time=time(14, 30))
 
 **Output type:** Time
@@ -164,14 +165,11 @@ Chaining Transforms
 Transforms can be chained with other transforms and lookups::
 
     # Published in year 2024, in December
-    Article.objects.filter(
-        published_date__year=2024,
-        published_date__month=12
-    )
-    
+    Article.objects.filter(published_date__year=2024, published_date__month=12)
+
     # Case-insensitive name search
-    Author.objects.filter(name__lower__startswith='john')
-    
+    Author.objects.filter(name__lower__startswith="john")
+
     # Extract year, then check if greater than 2020
     Article.objects.filter(published_date__year__gt=2020)
 
@@ -181,22 +179,18 @@ Using Transforms in Annotations
 Transforms are powerful in annotations::
 
     from django.db.models import Count, Q
-    
+
     # Count articles by publication year
-    articles_by_year = Article.objects.values(
-        'published_date__year'
-    ).annotate(
-        total=Count('id')
-    ).order_by('-published_date__year')
-    
+    articles_by_year = (
+        Article.objects.values("published_date__year")
+        .annotate(total=Count("id"))
+        .order_by("-published_date__year")
+    )
+
     # Group by quarter
     quarterly = Article.objects.values(
-        'published_date__year',
-        'published_date__quarter'
-    ).annotate(
-        articles=Count('id'),
-        total_views=Sum('view_count')
-    )
+        "published_date__year", "published_date__quarter"
+    ).annotate(articles=Count("id"), total_views=Sum("view_count"))
 
 Performance Considerations
 ==========================
@@ -205,12 +199,13 @@ Transforms are evaluated in the database, making them efficient::
 
     # GOOD: Database does the work
     Article.objects.filter(published_date__year=2024)
-    
+
     # BAD: Python does the work (slow!)
     [a for a in Article.objects.all() if a.published_date.year == 2024]
 
-The first query generates SQL like ``WHERE EXTRACT(YEAR FROM published_date) = 2024``,
-which can use indexes if configured. The second loads ALL articles into memory.
+The first query generates SQL like ``WHERE EXTRACT(YEAR FROM
+published_date) = 2024``, which can use indexes if configured. The second
+loads ALL articles into memory.
 
 See Also
 ========
