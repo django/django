@@ -1164,14 +1164,10 @@ class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
     form = None
     model = None
 
-    def __init__(
-        self,
-        queryset=None,
-    ):
+    def __init__(self, queryset=None):
         """Initialize ModelFormSet."""
-        super().__init__(
-            queryset,
-        )
+        super().__init__(queryset=queryset)
+
 
 
 # InlineFormSets #############################################################
@@ -1443,7 +1439,6 @@ class InlineFormSetMeta(ModelFormSetMeta):
     """Meta class for creating inlineformset using Declarative Syntax."""
 
     def __new__(cls, name, bases, attrs):
-        """Initialize the attributes given to the InlineFormSet class."""
         if "parent_model" not in set(attrs):
             raise TypeError(
                 "InlineFormSet() missing 1 required positional argument: 'parent_model'"
