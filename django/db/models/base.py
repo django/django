@@ -1182,8 +1182,9 @@ class Model(AltersData, metaclass=ModelBase):
         returning_fields,
     ):
         """
-        Try to update the model. Return True if the model was updated (if an
-        update query was done and a matching row was found in the DB).
+        Try to update the model. Return a list of updated fields if the model
+        was updated (if an update query was done and a matching row was
+        found in the DB).
         """
         filtered = base_qs.filter(pk=pk_val)
         if not values:
