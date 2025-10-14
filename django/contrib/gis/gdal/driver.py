@@ -5,7 +5,7 @@ from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
+from django.utils.functional import classproperty
 
 
 class Driver(GDALBase):
