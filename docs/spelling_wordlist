@@ -133,6 +133,7 @@ Dimensionally
 dimensioned
 discoverable
 Disqus
+discoverability
 distro
 django
 djangoproject
@@ -207,6 +208,7 @@ Homebrew
 hostname
 hostnames
 hstore
+Haversine
 html
 https
 Hypercorn
