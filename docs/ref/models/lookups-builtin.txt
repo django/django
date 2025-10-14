@@ -1,0 +1,311 @@
+==========================
+Built-in Lookups Reference
+==========================
+
+.. currentmodule:: django.db.models
+
+This page lists all built-in lookups available in Django. For information on
+creating custom lookups, see :doc:`/howto/custom-lookups` and
+:doc:`/howto/advanced-orm-techniques`.
+
+Comparison Lookups
+==================
+
+exact
+-----
+
+Exact match. This is the default lookup if no lookup is specified::
+
+    Article.objects.filter(id__exact=14)
+    Article.objects.filter(id=14)  # Same as above
+
+**SQL equivalent:** ``WHERE id = 14``
+
+iexact
+------
+
+Case-insensitive exact match::
+
+    Author.objects.filter(name__iexact='john smith')
+
+Matches "John Smith", "JOHN SMITH", "john smith", etc.
+
+**SQL equivalent:** ``WHERE UPPER(name) = UPPER('john smith')``
+
+gt
+--
+
+Greater than::
+
+    Article.objects.filter(view_count__gt=1000)
+
+**SQL equivalent:** ``WHERE view_count > 1000``
+
+gte
+---
+
+Greater than or equal to::
+
+    Article.objects.filter(view_count__gte=1000)
+
+**SQL equivalent:** ``WHERE view_count >= 1000``
+
+lt
+--
+
+Less than::
+
+    Article.objects.filter(view_count__lt=100)
+
+**SQL equivalent:** ``WHERE view_count < 100``
+
+lte
+---
+
+Less than or equal to::
+
+    Article.objects.filter(view_count__lte=100)
+
+**SQL equivalent:** ``WHERE view_count <= 100``
+
+String Lookups
+==============
+
+contains
+--------
+
+Case-sensitive containment test::
+
+    Article.objects.filter(title__contains='Django')
+
+Matches titles containing "Django" but not "django".
+
+**SQL equivalent:** ``WHERE title LIKE '%Django%'``
+
+icontains
+---------
+
+Case-insensitive containment test::
+
+    Article.objects.filter(title__icontains='django')
+
+Matches "Django", "DJANGO", "django", etc.
+
+**SQL equivalent:** ``WHERE UPPER(title) LIKE UPPER('%django%')``
+
+startswith
+----------
+
+Case-sensitive starts-with::
+
+    Article.objects.filter(title__startswith='How to')
+
+**SQL equivalent:** ``WHERE title LIKE 'How to%'``
+
+istartswith
+-----------
+
+Case-insensitive starts-with::
+
+    Article.objects.filter(title__istartswith='how to')
+
+**SQL equivalent:** ``WHERE UPPER(title) LIKE UPPER('how to%')``
+
+endswith
+--------
+
+Case-sensitive ends-with::
+
+    Article.objects.filter(title__endswith='Guide')
+
+**SQL equivalent:** ``WHERE title LIKE '%Guide'``
+
+iendswith
+---------
+
+Case-insensitive ends-with::
+
+    Article.objects.filter(title__iendswith='guide')
+
+**SQL equivalent:** ``WHERE UPPER(title) LIKE UPPER('%guide')``
+
+regex
+-----
+
+Case-sensitive regular expression match::
+
+    Article.objects.filter(title__regex=r'^(An?|The) ')
+
+Matches titles starting with "A ", "An ", or "The ".
+
+**Note:** Regex syntax varies by database backend.
+
+iregex
+------
+
+Case-insensitive regular expression match::
+
+    Article.objects.filter(title__iregex=r'^(an?|the) ')
+
+Collection Lookups
+==================
+
+in
+--
+
+In a given iterable; often a list, tuple, or queryset::
+
+    Article.objects.filter(id__in=[1, 3, 4])
+    Article.objects.filter(id__in=Article.objects.filter(view_count__gt=1000))
+
+**SQL equivalent:** ``WHERE id IN (1, 3, 4)``
+
+range
+-----
+
+Range test (inclusive)::
+
+    from datetime import date
+    start_date = date(2024, 1, 1)
+    end_date = date(2024, 12, 31)
+    
+    Article.objects.filter(published_date__range=(start_date, end_date))
+
+**SQL equivalent:** ``WHERE published_date BETWEEN '2024-01-01' AND '2024-12-31'``
+
+Null Lookups
+============
+
+isnull
+------
+
+Takes either ``True`` or ``False``::
+
+    Article.objects.filter(published_date__isnull=True)
+    Article.objects.filter(published_date__isnull=False)
+
+**SQL equivalent:** ``WHERE published_date IS NULL`` or ``IS NOT NULL``
+
+Date and Time Lookups
+=====================
+
+These lookups work on :class:`~django.db.models.DateField`,
+:class:`~django.db.models.DateTimeField`, and :class:`~django.db.models.TimeField`.
+
+date
+----
+
+For datetime fields, casts the value as date::
+
+    Article.objects.filter(published_date__date=date(2024, 1, 1))
+
+year
+----
+
+For date and datetime fields, exact year match::
+
+    Article.objects.filter(published_date__year=2024)
+
+month
+-----
+
+For date and datetime fields, exact month match::
+
+    Article.objects.filter(published_date__month=12)
+
+day
+---
+
+For date and datetime fields, exact day of month::
+
+    Article.objects.filter(published_date__day=25)
+
+week
+----
+
+For date and datetime fields, week number (1-52/53)::
+
+    Article.objects.filter(published_date__week=52)
+
+week_day
+--------
+
+For date and datetime fields, day of week (1=Sunday, 7=Saturday)::
+
+    # Articles published on Monday (2)
+    Article.objects.filter(published_date__week_day=2)
+
+iso_week_day
+------------
+
+ISO-8601 week day (1=Monday, 7=Sunday)::
+
+    # Articles published on Monday (1)
+    Article.objects.filter(published_date__iso_week_day=1)
+
+quarter
+-------
+
+For date and datetime fields, quarter of year (1-4)::
+
+    Article.objects.filter(published_date__quarter=4)
+
+time
+----
+
+For datetime fields, casts the value as time::
+
+    from datetime import time
+    Article.objects.filter(published_date__time=time(14, 30))
+
+hour
+----
+
+For datetime and time fields, exact hour::
+
+    Article.objects.filter(published_date__hour=14)
+
+minute
+------
+
+For datetime and time fields, exact minute::
+
+    Article.objects.filter(published_date__minute=30)
+
+second
+------
+
+For datetime and time fields, exact second::
+
+    Article.objects.filter(published_date__second=15)
+
+iso_year
+--------
+
+ISO-8601 week-numbering year::
+
+    Article.objects.filter(published_date__iso_year=2024)
+
+Chaining Lookups
+================
+
+Lookups and transforms can be chained together::
+
+    # Published in December 2024
+    Article.objects.filter(published_date__year=2024, published_date__month=12)
+    
+    # Title contains "django" (case-insensitive)
+    Article.objects.filter(title__icontains='django')
+    
+    # Chain multiple transforms
+    Article.objects.filter(title__lower__startswith='how')
+
+See Also
+========
+
+* :doc:`/howto/custom-lookups` - How to create custom lookups
+* :doc:`/howto/advanced-orm-techniques` - Advanced ORM patterns
+* :doc:`/ref/models/database-functions` - Built-in database functions
+* :doc:`/ref/models/querysets` - QuerySet API reference
+* :doc:`/topics/db/queries` - Making queries
+

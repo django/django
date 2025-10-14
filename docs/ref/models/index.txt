@@ -17,6 +17,8 @@ Model API reference. For introductory material, see :doc:`/topics/db/models`.
    instances
    querysets
    lookups
+   lookups-builtin
+   transforms-builtin
    expressions
    conditional-expressions
    database-functions

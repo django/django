@@ -15,6 +15,7 @@ Models, data and databases
    custom-model-fields
    writing-migrations
    custom-lookups
+   advanced-orm-techniques
 
 Templates and output
 ====================

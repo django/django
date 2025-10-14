@@ -10,7 +10,12 @@ Lookup API reference
 This document has the API references of lookups, the Django API for building
 the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
 :doc:`/topics/db/queries`; to learn how to *create* new lookups, see
-:doc:`/howto/custom-lookups`.
+:doc:`/howto/custom-lookups` and :doc:`/howto/advanced-orm-techniques`.
+
+For a complete list of built-in lookups and transforms, see:
+
+* :doc:`/ref/models/lookups-builtin` - All built-in lookups
+* :doc:`/ref/models/transforms-builtin` - All built-in transforms
 
 The lookup API has two components: a :class:`~lookups.RegisterLookupMixin`
 class that registers lookups, and the :ref:`Query Expression API

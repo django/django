@@ -1,0 +1,223 @@
+=============================
+Built-in Transforms Reference
+=============================
+
+.. currentmodule:: django.db.models
+
+This page lists all built-in transforms available in Django. Transforms modify
+field values before applying lookups. For information on creating custom
+transforms, see :doc:`/howto/custom-lookups` and
+:doc:`/howto/advanced-orm-techniques`.
+
+Text Transforms
+===============
+
+lower
+-----
+
+Converts text to lowercase::
+
+    Author.objects.filter(name__lower='john smith')
+    
+Equivalent to::
+
+    Author.objects.filter(name__iexact='john smith')
+
+**Use case:** Case-insensitive filtering with exact match.
+
+upper
+-----
+
+Converts text to uppercase::
+
+    Author.objects.filter(name__upper='JOHN SMITH')
+
+Date and Time Transforms
+=========================
+
+These transforms extract components from date/datetime fields.
+
+year
+----
+
+Extracts the year as an integer::
+
+    Article.objects.filter(published_date__year=2024)
+
+**Output type:** Integer
+
+month
+-----
+
+Extracts the month (1-12)::
+
+    Article.objects.filter(published_date__month=12)
+
+**Output type:** Integer
+
+day
+---
+
+Extracts the day of month (1-31)::
+
+    Article.objects.filter(published_date__day=25)
+
+**Output type:** Integer
+
+week
+----
+
+Extracts the week number (1-52/53)::
+
+    Article.objects.filter(published_date__week=52)
+
+**Output type:** Integer
+
+week_day
+--------
+
+Extracts day of week (1=Sunday through 7=Saturday)::
+
+    # Monday is 2
+    Article.objects.filter(published_date__week_day=2)
+
+**Output type:** Integer
+
+iso_week_day
+------------
+
+Extracts ISO-8601 day of week (1=Monday through 7=Sunday)::
+
+    # Monday is 1
+    Article.objects.filter(published_date__iso_week_day=1)
+
+**Output type:** Integer
+
+quarter
+-------
+
+Extracts the quarter (1-4)::
+
+    Article.objects.filter(published_date__quarter=4)
+
+**Output type:** Integer
+
+hour
+----
+
+Extracts the hour (0-23)::
+
+    Article.objects.filter(published_date__hour=14)
+
+**Output type:** Integer
+
+minute
+------
+
+Extracts the minute (0-59)::
+
+    Article.objects.filter(published_date__minute=30)
+
+**Output type:** Integer
+
+second
+------
+
+Extracts the second (0-59)::
+
+    Article.objects.filter(published_date__second=15)
+
+**Output type:** Integer
+
+date
+----
+
+For datetime fields, converts to date::
+
+    from datetime import date
+    Article.objects.filter(published_date__date=date(2024, 12, 25))
+
+**Output type:** Date
+
+time
+----
+
+For datetime fields, converts to time::
+
+    from datetime import time
+    Article.objects.filter(published_date__time=time(14, 30))
+
+**Output type:** Time
+
+iso_year
+--------
+
+Extracts ISO-8601 week-numbering year::
+
+    Article.objects.filter(published_date__iso_year=2024)
+
+**Output type:** Integer
+
+Chaining Transforms
+===================
+
+Transforms can be chained with other transforms and lookups::
+
+    # Published in year 2024, in December
+    Article.objects.filter(
+        published_date__year=2024,
+        published_date__month=12
+    )
+    
+    # Case-insensitive name search
+    Author.objects.filter(name__lower__startswith='john')
+    
+    # Extract year, then check if greater than 2020
+    Article.objects.filter(published_date__year__gt=2020)
+
+Using Transforms in Annotations
+================================
+
+Transforms are powerful in annotations::
+
+    from django.db.models import Count, Q
+    
+    # Count articles by publication year
+    articles_by_year = Article.objects.values(
+        'published_date__year'
+    ).annotate(
+        total=Count('id')
+    ).order_by('-published_date__year')
+    
+    # Group by quarter
+    quarterly = Article.objects.values(
+        'published_date__year',
+        'published_date__quarter'
+    ).annotate(
+        articles=Count('id'),
+        total_views=Sum('view_count')
+    )
+
+Performance Considerations
+==========================
+
+Transforms are evaluated in the database, making them efficient::
+
+    # GOOD: Database does the work
+    Article.objects.filter(published_date__year=2024)
+    
+    # BAD: Python does the work (slow!)
+    [a for a in Article.objects.all() if a.published_date.year == 2024]
+
+The first query generates SQL like ``WHERE EXTRACT(YEAR FROM published_date) = 2024``,
+which can use indexes if configured. The second loads ALL articles into memory.
+
+See Also
+========
+
+* :doc:`/ref/models/lookups` - Lookup API reference
+* :doc:`/ref/models/lookups-builtin` - Built-in lookups list
+* :doc:`/howto/custom-lookups` - Creating custom lookups
+* :doc:`/howto/advanced-orm-techniques` - Advanced ORM patterns
+* :doc:`/ref/models/database-functions` - Database functions
+
