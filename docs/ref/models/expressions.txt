@@ -575,7 +575,7 @@ arithmetic on ``F()`` expressions with different types as described in
 
 .. _expression-wrapper-datefield-timedelta:
 
-DateField and timedelta behavior
+DateField and `timedelta` behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. warning::
