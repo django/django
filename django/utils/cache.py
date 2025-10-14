@@ -376,17 +376,15 @@ def _generate_cache_header_key(key_prefix, request):
     return _i18n_cache_key_suffix(request, cache_key)
 
 
-def get_cache_key(
-    request, key_prefix=None, method="GET", cache=None, ignore_headers=False
-):
+def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     """
     Return a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
     account from the global URL registry and uses those to build a cache key
     to check against.
 
-    If there isn't a headerlist stored and `ignore_headers` argument is False,
-    return None, indicating that the page needs to be rebuilt.
+    If there is no headerlist stored, the page needs to be rebuilt, so this
+    function returns ``None``.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
@@ -394,8 +392,8 @@ def get_cache_key(
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key)
-    if headerlist is not None or ignore_headers:
-        return _generate_cache_key(request, method, headerlist or [], key_prefix)
+    if headerlist is not None:
+        return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
         return None
 
@@ -448,40 +446,32 @@ def _to_tuple(s):
     return t[0].lower(), True
 
 
-def invalidate_view_cache(
-    path=None, request=None, vary_headers=None, key_prefix=None, cache=None
-):
+def invalidate_view_cache(path=None, request=None, key_prefix=None, cache=None):
     """
-    This function first creates a fake WSGIRequest to compute the cache key.
-    The key looks like:
-    views.decorators.cache.cache_page.key_prefix.GET.0fcb3cd9d5b34c8fe83f615913d8509b.c4ca4238a0b923820dcc509a6f75849b.en-us.UTC
-    The first hash corresponds to the full url (including query params),
-    the second to the header values
+    Delete a view cache key based on either a relative URL (``path``)
+    or a request object (``request``).
 
-    vary_headers should be a dict of every header used for this particular view
-    In local environment, we have two defined renderers (default of DRF),
-    thus DRF adds `Accept` to the Vary headers
+    The cache key is reconstructed in two steps:
+        1. A headers cache key is built using the absolute URL,
+            key prefix, and locale code.
+        2. A response cache key is then built using the absolute URL,
+            key prefix, HTTP method, and recovered headers.
 
-    either `path` or `request` arguments should be passed;
-    if both are passed `path` will be ignored
+    The ``key_prefix`` must match the value used in the ``cache_page``
+    decorator for the corresponding view.
 
-    Note: If LocaleMiddleware is used,
-    we'll need to use the same language code as the one in the cached request
+    Either the ``path`` or ``request`` parameter must be provided.
+    If both are given, ``path`` takes precedence.
     """
     if not request:
         assert path is not None, "either `path` or `request` arguments needed"
         factory = RequestFactory()
         request = factory.get(path)
 
-    if vary_headers:
-        request.META.update(vary_headers)
-
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
 
-    cache_key = get_cache_key(
-        request, key_prefix=key_prefix, ignore_headers=True, cache=cache
-    )
+    cache_key = get_cache_key(request, key_prefix=key_prefix, cache=cache)
     if cache_key is None:
         return 0
 

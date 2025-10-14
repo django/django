@@ -2632,9 +2632,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         view = cache_page(10)(hello_world_view)
         request = self.factory.get("/view/")
         _ = view(request, "0")
-        cache_key = get_cache_key(
-            request=request, key_prefix="", ignore_headers=True, cache=cache
-        )
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Verify request.content has been chached
@@ -2653,9 +2651,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         path = "/view/"
         request = self.factory.get(path)
         _ = view(request, "0")
-        cache_key = get_cache_key(
-            request=request, key_prefix="", ignore_headers=True, cache=cache
-        )
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Verify request.content has been chached
@@ -2673,7 +2669,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         # Cache view and inject Vary headers to Response object
         view = cache_page(10, key_prefix="")(
-            vary_on_headers("Accept-Encoding")(hello_world_view)
+            vary_on_headers("Accept-Encoding", "Accept")(hello_world_view)
         )
         path = "/view/"
         request = self.factory.get(path)
@@ -2682,9 +2678,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         # Check response headers
         self.assertTrue(response.has_header("Vary"))
 
-        cache_key = get_cache_key(
-            request=request, key_prefix="", ignore_headers=False, cache=cache
-        )
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Verify request.content has been chached
@@ -2696,6 +2690,32 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         # Confirm key/value has been deleted from cache
         self.assertIsNone(cached_response)
+
+    def test_cache_key_prefix_missmatch(self):
+        # Wrap the view with the cache_page decorator (no key_prefix specified)
+        view = cache_page(10)(hello_world_view)
+        path = "/view/"
+        request = self.factory.get(path)
+        _ = view(request, "0")
+
+        # Attempt to retrieve the cache key without specifying key_prefix
+        cache_key = get_cache_key(request=request, cache=cache)
+
+        # Because get_cache_key defaults to using
+        # settings.CACHE_MIDDLEWARE_KEY_PREFIX when key_prefix is None,
+        # this should not match the cached key
+        self.assertIsNone(cache_key)
+
+        # Try again, explicitly passing the default cache_page key_prefix
+        # (empty string)
+        cache_key = get_cache_key(request=request, cache=cache, key_prefix="")
+
+        # The key should now be found
+        self.assertIsNotNone(cache_key)
+
+        # Confirm that the cached response content matches the view output
+        cached_response = cache.get(cache_key)
+        self.assertEqual(cached_response.content, b"Hello World 0")
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
