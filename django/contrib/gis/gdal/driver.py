@@ -22,8 +22,8 @@ class Driver(GDALBase):
     # https://gdal.org/drivers/raster/
     @classproperty
     def _alias(cls):
-        # lazily use cached_property so that the check for
-        # GDAL_VERSION doesn't trigger the library to load
+        # use `classproperty` so that the check for `GDAL_VERSION`
+        # is lazy and doesn't trigger the library to load
         alias = {
             # vector
             "esri": "ESRI Shapefile",
