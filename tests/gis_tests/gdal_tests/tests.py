@@ -28,8 +28,8 @@ class GDALTest(unittest.TestCase):
             module = reimport_module("django.contrib.gis.gdal.libgdal")
             # Verify module has the `lgdal` and that `reimport_module` worked
             self.assertTrue(hasattr(module, "lgdal"))
-            # finally verify that lazy loading works and that `find_library` isn't
-            # called on module import
+            # finally verify that lazy loading works and that `find_library`
+            # isn't called on module import
             mock_find_library.assert_not_called()
 
 
