@@ -12,6 +12,7 @@ from django.core.paginator import (
     InvalidPage,
     PageNotAnInteger,
     Paginator,
+    UnorderedObjectListError,
     UnorderedObjectListWarning,
 )
 from django.test import SimpleTestCase, TestCase
@@ -508,7 +509,7 @@ class PaginationTests(SimpleTestCase):
         with self.assertRaises(EmptyPage):
             paginator.get_page(1)
 
-    async def test_aget_page_empty_obj_list_and_allow_empty_first_page_false_async(
+    async def test_aget_page_empty_obj_list_and_allow_empty_first_page_false(
         self,
     ):
         """
@@ -990,3 +991,211 @@ class ModelPaginationTests(TestCase):
         # It returns the same list that was converted on the first call.
         second_called_objs = await p.aget_object_list()
         self.assertEqual(id(first_called_objs), id(second_called_objs))
+
+
+class UnorderedPaginatorTests(SimpleTestCase):
+    """
+    Tests for the new unordered queryset handling functionality.
+    """
+
+    def test_enforce_ordered_false_default(self):
+        class MockQuerySet:
+            def __init__(self, ordered=False):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        unordered_qs = MockQuerySet(ordered=False)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = Paginator(unordered_qs, per_page=3)
+
+            self.assertEqual(len(w), 1)
+            self.assertIs(w[0].category, UnorderedObjectListWarning)
+            self.assertIn("unordered", str(w[0].message).lower())
+
+            self.assertEqual(paginator.count, 10)
+            self.assertEqual(paginator.num_pages, 4)
+
+    def test_enforce_ordered_false_explicit(self):
+        class MockQuerySet:
+            def __init__(self, ordered=False):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        unordered_qs = MockQuerySet(ordered=False)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = Paginator(unordered_qs, per_page=3, enforce_ordered=False)
+
+            self.assertEqual(len(w), 1)
+            self.assertIs(w[0].category, UnorderedObjectListWarning)
+
+            self.assertEqual(paginator.count, 10)
+
+    def test_enforce_ordered_true_raises_exception(self):
+        class MockQuerySet:
+            def __init__(self, ordered=False):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        unordered_qs = MockQuerySet(ordered=False)
+
+        with self.assertRaises(UnorderedObjectListError) as cm:
+            Paginator(unordered_qs, per_page=3, enforce_ordered=True)
+
+        self.assertIn("unordered", str(cm.exception).lower())
+        self.assertIn("order_by", str(cm.exception).lower())
+
+    def test_enforce_ordered_true_allows_ordered_queryset(self):
+        class MockQuerySet:
+            def __init__(self, ordered=True):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        ordered_qs = MockQuerySet(ordered=True)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = Paginator(ordered_qs, per_page=3, enforce_ordered=True)
+
+            self.assertEqual(len(w), 0)
+
+            self.assertEqual(paginator.count, 10)
+            self.assertEqual(paginator.num_pages, 4)
+
+    def test_enforce_ordered_true_with_regular_list(self):
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = Paginator(data, per_page=3, enforce_ordered=True)
+
+            self.assertEqual(len(w), 0)
+
+            self.assertEqual(paginator.count, 10)
+            self.assertEqual(paginator.num_pages, 4)
+
+    def test_validate_pagination_consistency_ordered(self):
+        class MockQuerySet:
+            def __init__(self, ordered=True):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        ordered_qs = MockQuerySet(ordered=True)
+        paginator = Paginator(ordered_qs, per_page=3)
+
+        self.assertTrue(paginator._validate_pagination_consistency())
+
+    def test_validate_pagination_consistency_unordered(self):
+        class MockQuerySet:
+            def __init__(self, ordered=False):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        unordered_qs = MockQuerySet(ordered=False)
+        paginator = Paginator(unordered_qs, per_page=3)
+
+        self.assertFalse(paginator._validate_pagination_consistency())
+
+    def test_validate_pagination_consistency_regular_list(self):
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        paginator = Paginator(data, per_page=3)
+
+        self.assertTrue(paginator._validate_pagination_consistency())
+
+    async def test_async_paginator_enforce_ordered(self):
+        class MockQuerySet:
+            def __init__(self, ordered=False):
+                self.ordered = ordered
+                self.model = "MockModel"
+
+            def __len__(self):
+                return 10
+
+            def __getitem__(self, key):
+                return list(range(10))[key]
+
+            def count(self):
+                return 10
+
+        unordered_qs = MockQuerySet(ordered=False)
+
+        with self.assertRaises(UnorderedObjectListError):
+            AsyncPaginator(unordered_qs, per_page=3, enforce_ordered=True)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = AsyncPaginator(unordered_qs, per_page=3, enforce_ordered=False)
+
+            self.assertEqual(len(w), 1)
+            self.assertIs(w[0].category, UnorderedObjectListWarning)
+
+            self.assertEqual(await paginator.acount(), 10)
+            self.assertEqual(await paginator.anum_pages(), 4)
+
+        ordered_qs = MockQuerySet(ordered=True)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            paginator = AsyncPaginator(ordered_qs, per_page=3, enforce_ordered=True)
+
+            self.assertEqual(len(w), 0)
+
+            self.assertEqual(await paginator.acount(), 10)
+            self.assertEqual(await paginator.anum_pages(), 4)

@@ -80,6 +80,57 @@ accessing the items for each page:
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+.. _pagination-ordering:
+
+Working with unordered QuerySets
+
+When paginating ``QuerySet`` objects, it's important to ensure that the data is
+ordered to get consistent results. Unordered querysets may produce different
+results between requests, potentially causing duplicate or missing items across
+pages.
+
+Django provides several ways to handle this:
+
+**1. Order your QuerySets**
+
+Always order your querysets using :meth:`~django.db.models.query.QuerySet.order_by`
+or set a default :attr:`~django.db.models.Options.ordering` on the model:
+
+.. code-block:: pycon
+
+    >>> from django.core.paginator import Paginator
+    >>> from myapp.models import Contact
+    >>> # Good: Ordered queryset
+    >>> contacts = Contact.objects.all().order_by("name")
+    >>> paginator = Paginator(contacts, 25)
+
+**2. Use the enforce_ordered parameter**
+
+You can set ``enforce_ordered=True`` to prevent pagination of unordered querysets:
+
+.. code-block:: pycon
+
+    >>> # This will raise UnorderedObjectListError if queryset is unordered
+    >>> paginator = Paginator(unordered_queryset, 25, enforce_ordered=True)
+
+**3. Check pagination consistency**
+
+Use the ``_validate_pagination_consistency()`` method to check if pagination
+will be consistent:
+
+.. code-block:: pycon
+
+    >>> paginator = Paginator(queryset, 25)
+    >>> if paginator._validate_pagination_consistency():
+    ...     print("Pagination will be consistent")
+    ... else:
+    ...     print("Warning: Pagination may be inconsistent")
+    ...
+
+By default, ``enforce_ordered=False`` and Django will issue a warning when
+paginating unordered querysets, but allow pagination to continue for backward
+compatibility.
+
 .. _paginating-a-list-view:
 
 Paginating a ``ListView``

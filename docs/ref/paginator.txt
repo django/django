@@ -14,7 +14,7 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
 ``Paginator`` class
 ===================
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None, enforce_ordered=False)
 
     A paginator acts like a sequence of :class:`Page` when using ``len()`` or
     iterating it directly.
@@ -94,6 +94,23 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
           ...
         EmptyPage: Page does not exist
 
+.. attribute:: Paginator.enforce_ordered
+
+    Optional. Whether to enforce ordering validation for ``QuerySet`` objects.
+    If ``True``, raises :class:`UnorderedObjectListError` when paginating an
+    unordered ``QuerySet`` to prevent inconsistent pagination results.
+    If ``False`` (default), issues a warning but allows pagination to continue.
+
+    .. versionadded:: 4.2.1
+
+    .. admonition:: Unordered QuerySet pagination
+
+        When paginating ``QuerySet`` objects that are not ordered, the results
+        may be inconsistent between requests, potentially causing duplicate or
+        missing items across pages. It's recommended to always order ``QuerySet``\s
+        using :meth:`~django.db.models.query.QuerySet.order_by` or set
+        ``enforce_ordered=True`` to prevent this issue.
+
 Methods
 -------
 
@@ -137,6 +154,18 @@ Methods
 
     Raises :exc:`InvalidPage` if the given page number doesn't exist.
 
+.. method:: Paginator._validate_pagination_consistency()
+
+    Returns ``True`` if the ``object_list`` is ordered and will produce consistent
+    pagination results, ``False`` otherwise. For ``QuerySet`` objects, this
+    checks if the queryset has ordering. For other objects, this always returns
+    ``True``.
+
+    This method can be used to programmatically check if pagination will be
+    consistent before creating a paginator.
+
+    .. versionadded:: 4.2.1
+
 Attributes
 ----------
 
@@ -172,7 +201,7 @@ Attributes
 
 .. versionadded:: 6.0
 
-.. class:: AsyncPaginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
+.. class:: AsyncPaginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None, enforce_ordered=False)
 
     Asynchronous version of :class:`Paginator`.
 
@@ -299,6 +328,12 @@ you can catch either of the following exceptions:
 
     Raised when :meth:`~Paginator.page` is given a valid value but no objects
     exist on that page.
+
+.. exception:: UnorderedObjectListError
+
+    Raised when attempting to paginate an unordered ``QuerySet`` when
+    ``enforce_ordered=True``. This exception is raised to prevent inconsistent
+    pagination results that can occur when paginating unordered data.
 
 Both of the exceptions are subclasses of :exc:`InvalidPage`, so you can handle
 them both with ``except InvalidPage``.

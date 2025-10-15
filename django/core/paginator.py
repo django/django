@@ -15,6 +15,10 @@ class UnorderedObjectListWarning(RuntimeWarning):
     pass
 
 
+class UnorderedObjectListError(ValueError):
+    pass
+
+
 class InvalidPage(Exception):
     pass
 
@@ -44,9 +48,10 @@ class BasePaginator:
         orphans=0,
         allow_empty_first_page=True,
         error_messages=None,
+        enforce_ordered=False,
     ):
         self.object_list = object_list
-        self._check_object_list_is_ordered()
+        self._check_object_list_is_ordered(enforce_ordered)
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -69,9 +74,13 @@ class BasePaginator:
             )
             warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
 
-    def _check_object_list_is_ordered(self):
+    def _check_object_list_is_ordered(self, enforce_ordered=False):
         """
-        Warn if self.object_list is unordered (typically a QuerySet).
+        Check if self.object_list is ordered (typically a QuerySet).
+
+        Args:
+            enforce_ordered: If True, raise UnorderedObjectListError for
+                unordered querysets. If False, only issue a warning.
         """
         ordered = getattr(self.object_list, "ordered", None)
         if ordered is not None and not ordered:
@@ -82,9 +91,17 @@ class BasePaginator:
                 if hasattr(self.object_list, "model")
                 else "{!r}".format(self.object_list)
             )
+
+            if enforce_ordered:
+                raise UnorderedObjectListError(
+                    "Pagination cannot be performed on an unordered object_list: {}. "
+                    "Use order_by() to ensure consistent results.".format(obj_list_repr)
+                )
+
             warnings.warn(
                 "Pagination may yield inconsistent results with an unordered "
-                "object_list: {}.".format(obj_list_repr),
+                "object_list: {}. Consider using order_by() to ensure consistent "
+                "pagination.".format(obj_list_repr),
                 UnorderedObjectListWarning,
                 stacklevel=3,
             )
@@ -149,6 +166,24 @@ class BasePaginator:
         if number > num_pages:
             raise EmptyPage(self.error_messages["no_results"])
         return number
+
+    def _validate_pagination_consistency(self):
+        """
+        Validate that pagination will be consistent across requests.
+
+        This method checks for common issues that can cause inconsistent
+        pagination results, particularly with unordered QuerySets.
+        """
+        if hasattr(self.object_list, "ordered"):
+            return self.object_list.ordered
+
+        if hasattr(self.object_list, "query"):
+            query = self.object_list.query
+            if not query.order_by:
+                return False
+
+        # For other types (lists, tuples, etc.), assume consistent
+        return True
 
 
 class Paginator(BasePaginator):
@@ -220,9 +255,15 @@ class AsyncPaginator(BasePaginator):
         orphans=0,
         allow_empty_first_page=True,
         error_messages=None,
+        enforce_ordered=False,
     ):
         super().__init__(
-            object_list, per_page, orphans, allow_empty_first_page, error_messages
+            object_list,
+            per_page,
+            orphans,
+            allow_empty_first_page,
+            error_messages,
+            enforce_ordered,
         )
         self._cache_acount = None
         self._cache_anum_pages = None
