@@ -14,6 +14,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import IntegerField, Sum, Value
@@ -920,7 +921,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             Feature(name="Point", geom=Point(0, 0)),
             Feature(name="LineString", geom=LineString((0, 0), (1, 1))),
             Feature(name="Polygon", geom=Polygon(((0, 0), (1, 0), (1, 1), (0, 0)))),
-            Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1))),
             Feature(
                 name="MultiLineString",
                 geom=MultiLineString(
@@ -939,10 +939,19 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ("POINT", Point),
             ("LINESTRING", LineString),
             ("POLYGON", Polygon),
-            ("MULTIPOINT", MultiPoint),
             ("MULTILINESTRING", MultiLineString),
             ("MULTIPOLYGON", MultiPolygon),
         ]
+        # GEOSWKTWriter_write() behavior was changed in GEOS 3.12+ to include
+        # parentheses for sub-members. MariaDB doesn't accept WKT
+        # representations with additional parentheses for MultiPoint. This is
+        # an accepted bug (MDEV-36166) in MariaDB that should be fixed in the
+        # future.
+        if not connection.ops.mariadb or geos_version_tuple() < (3, 12):
+            test_features.append(
+                Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1)))
+            )
+            expected_results.append(("MULTIPOINT", MultiPoint))
         for test_feature, (geom_type, geom_class) in zip(
             test_features, expected_results, strict=True
         ):
