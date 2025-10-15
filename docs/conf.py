@@ -46,6 +46,7 @@ needs_sphinx = "4.5.0"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "djangodocs",
+    "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
