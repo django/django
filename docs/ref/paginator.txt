@@ -101,8 +101,6 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
     unordered ``QuerySet`` to prevent inconsistent pagination results.
     If ``False`` (default), issues a warning but allows pagination to continue.
 
-    .. versionadded:: 4.2.1
-
     .. admonition:: Unordered QuerySet pagination
 
         When paginating ``QuerySet`` objects that are not ordered, the results
@@ -164,7 +162,6 @@ Methods
     This method can be used to programmatically check if pagination will be
     consistent before creating a paginator.
 
-    .. versionadded:: 4.2.1
 
 Attributes
 ----------
