@@ -1149,7 +1149,9 @@ class UnorderedPaginatorTests(SimpleTestCase):
                 return 10
 
         unordered_qs = MockQuerySet(ordered=False)
-        paginator = Paginator(unordered_qs, per_page=3)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            paginator = Paginator(unordered_qs, per_page=3)
 
         self.assertFalse(paginator._validate_pagination_consistency())
 
