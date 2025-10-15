@@ -105,7 +105,8 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
 
         When paginating ``QuerySet`` objects that are not ordered, the results
         may be inconsistent between requests, potentially causing duplicate or
-        missing items across pages. It's recommended to always order ``QuerySet``\s
+        missing items across pages.
+        It's recommended to always order ``QuerySet``\s
         using :meth:`~django.db.models.query.QuerySet.order_by` or set
         ``enforce_ordered=True`` to prevent this issue.
 
@@ -154,10 +155,10 @@ Methods
 
 .. method:: Paginator._validate_pagination_consistency()
 
-    Returns ``True`` if the ``object_list`` is ordered and will produce consistent
-    pagination results, ``False`` otherwise. For ``QuerySet`` objects, this
-    checks if the queryset has ordering. For other objects, this always returns
-    ``True``.
+    Returns ``True`` if the ``object_list`` is ordered and will produce
+    consistent pagination results, ``False`` otherwise.
+    For ``QuerySet`` objects, this checks if the queryset has ordering.
+    For other objects, this always returns ``True``.
 
     This method can be used to programmatically check if pagination will be
     consistent before creating a paginator.

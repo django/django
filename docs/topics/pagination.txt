@@ -93,7 +93,8 @@ Django provides several ways to handle this:
 
 **1. Order your QuerySets**
 
-Always order your querysets using :meth:`~django.db.models.query.QuerySet.order_by`
+Always order your querysets using
+:meth:`~django.db.models.query.QuerySet.order_by`
 or set a default :attr:`~django.db.models.Options.ordering` on the model:
 
 .. code-block:: pycon
@@ -106,7 +107,8 @@ or set a default :attr:`~django.db.models.Options.ordering` on the model:
 
 **2. Use the enforce_ordered parameter**
 
-You can set ``enforce_ordered=True`` to prevent pagination of unordered querysets:
+You can set ``enforce_ordered=True`` to prevent pagination
+of unordered querysets:
 
 .. code-block:: pycon
 
