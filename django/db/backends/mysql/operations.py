@@ -266,7 +266,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return "NULL"
 
-    def combine_expression(self, connector, sub_expressions):
+    def combine_expression(self, connector, sub_expressions, output_field=None):
         if connector == "^":
             return "POW(%s)" % ",".join(sub_expressions)
         # Convert the result to a signed integer since MySQL's binary operators
@@ -277,7 +277,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif connector == ">>":
             lhs, rhs = sub_expressions
             return "FLOOR(%(lhs)s / POW(2, %(rhs)s))" % {"lhs": lhs, "rhs": rhs}
-        return super().combine_expression(connector, sub_expressions)
+        return super().combine_expression(
+            connector, sub_expressions, output_field=output_field
+        )
 
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
