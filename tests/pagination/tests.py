@@ -509,7 +509,7 @@ class PaginationTests(SimpleTestCase):
         with self.assertRaises(EmptyPage):
             paginator.get_page(1)
 
-    async def test_aget_page_empty_obj_list_and_allow_empty_first_page_false(
+    async def test_aget_page_empty_obj_list_and_allow_empty_first_page_false_async(
         self,
     ):
         """
