@@ -59,6 +59,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_virtual_generated_columns = True
 
     supports_json_negative_indexing = False
+    json_set_wraps_non_array_to_array = True
 
     @cached_property
     def minimum_database_version(self):

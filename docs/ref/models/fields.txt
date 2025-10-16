@@ -1443,7 +1443,8 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
 
     Defaults to ``json.JSONDecoder``.
 
-To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
+To query and update ``JSONField`` in the database, see :ref:`querying-jsonfield`
+and :ref:`updating-jsonfield`.
 
 .. admonition:: Default value
 

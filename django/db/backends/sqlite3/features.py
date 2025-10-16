@@ -57,6 +57,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
+    json_set_array_append_requires_length_as_index = True
+    json_set_creates_missing_parent_path = True
 
     @cached_property
     def django_test_skips(self):
@@ -126,6 +128,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "notation": {
                         "model_fields.test_jsonfield.TestQuerying."
                         "test_lookups_special_chars_double_quotes",
+                        "db_functions.json.test_json_set.JSONSetTests."
+                        "test_set_special_chars_double_quotes",
+                        "db_functions.json.test_json_remove.JSONRemoveTests."
+                        "test_remove_special_chars_double_quotes",
                     },
                 }
             )
