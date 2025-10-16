@@ -8,7 +8,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
 
-from .models import (
+from .models import (  # isort:skip
     Article,
     Author,
     FooWithBrokenAbsoluteUrl,
@@ -17,9 +17,9 @@ from .models import (
     ModelWithM2MToSite,
     ModelWithNullFKToSite,
     SchemeIncludedURL,
+    Site as MockSite,
+    UUIDModel,
 )
-from .models import Site as MockSite
-from .models import UUIDModel
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")

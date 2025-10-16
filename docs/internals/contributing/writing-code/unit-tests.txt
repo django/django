@@ -83,7 +83,7 @@ environments can be seen as follows:
     blacken-docs
     flake8>=3.7.0
     docs
-    isort>=5.1.0
+    isort>=7.0.0
     lint-docs
 
 Testing other Python versions and database backends
