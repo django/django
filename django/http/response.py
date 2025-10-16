@@ -21,7 +21,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
-from django.utils.http import content_disposition_header, http_date
+from django.utils.http import MAX_URL_LENGTH, content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
 _charset_from_content_type_re = _lazy_re_compile(
@@ -614,7 +614,12 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
-        parsed = urlparse(str(redirect_to))
+        redirect_to_str = str(redirect_to)
+        if len(redirect_to_str) > MAX_URL_LENGTH:
+            raise DisallowedRedirect(
+                f"Unsafe redirect exceeding {MAX_URL_LENGTH} characters"
+            )
+        parsed = urlparse(redirect_to_str)
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme

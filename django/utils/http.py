@@ -47,6 +47,7 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
+MAX_URL_LENGTH = 2048
 
 # TODO: Remove when dropping support for PY38.
 # Unsafe bytes to be removed per WHATWG spec.
