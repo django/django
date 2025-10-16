@@ -21,7 +21,7 @@ from hashlib import md5
 
 from django.conf import settings
 from django.core.cache import caches
-from django.http import HttpResponse, HttpResponseNotModified
+from django.http import HttpRequest, HttpResponse, HttpResponseNotModified
 from django.test import RequestFactory
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
@@ -383,8 +383,8 @@ def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     account from the global URL registry and uses those to build a cache key
     to check against.
 
-    If there is no headerlist stored, the page needs to be rebuilt, so this
-    function returns ``None``.
+    If there isn't a headerlist stored, return None, indicating that the page
+    needs to be rebuilt.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
@@ -446,10 +446,10 @@ def _to_tuple(s):
     return t[0].lower(), True
 
 
-def invalidate_view_cache(path=None, request=None, key_prefix=None, cache=None):
+def invalidate_view_cache(request, key_prefix=None, cache=None):
     """
-    Delete a view cache key based on either a relative URL (``path``)
-    or a request object (``request``).
+    Delete a cached page based on either a relative URL (type: any)
+    or a request object (type: django.http.HttpRequest).
 
     The cache key is reconstructed in two steps:
         1. A headers cache key is built using the absolute URL,
@@ -459,14 +459,10 @@ def invalidate_view_cache(path=None, request=None, key_prefix=None, cache=None):
 
     The ``key_prefix`` must match the value used in the ``cache_page``
     decorator for the corresponding view.
-
-    Either the ``path`` or ``request`` parameter must be provided.
-    If both are given, ``path`` takes precedence.
     """
-    if not request:
-        assert path is not None, "either `path` or `request` arguments needed"
+    if not isinstance(request, HttpRequest):
         factory = RequestFactory()
-        request = factory.get(path)
+        request = factory.get(request)
 
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
