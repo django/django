@@ -8,6 +8,16 @@ Django 5.2.8 fixes one security issue with severity "high", one security issue
 with severity "moderate", and several bugs in 5.2.7. It also adds compatibility
 with Python 3.14.
 
+CVE-2025-64458: Potential denial-of-service vulnerability in ``HttpResponseRedirect`` and ``HttpResponsePermanentRedirect`` on Windows
+======================================================================================================================================
+
+Python's :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
+Windows. As a consequence, :class:`~django.http.HttpResponseRedirect`,
+:class:`~django.http.HttpResponsePermanentRedirect`, and the shortcut
+:func:`redirect() <django.shortcuts.redirect>` were subject to a potential
+denial-of-service attack via certain inputs with a very large number of Unicode
+characters (follow up to :cve:`2025-27556`).
+
 Bugfixes
 ========
 
