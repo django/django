@@ -145,13 +145,13 @@ class CompositePKAggregateTests(TestCase):
     def test_first_from_unordered_queryset_aggregation_pk_selected(self):
         self.assertEqual(
             Comment.objects.values("pk").annotate(max=Max("id")).first(),
-            {"pk": (1, 1), "max": 1},
+            {"pk": (self.comment_1.tenant_id, 1), "max": 1},
         )
 
     def test_first_from_unordered_queryset_aggregation_pk_selected_separately(self):
         self.assertEqual(
             Comment.objects.values("tenant", "id").annotate(max=Max("id")).first(),
-            {"tenant": 1, "id": 1, "max": 1},
+            {"tenant": self.comment_1.tenant_id, "id": 1, "max": 1},
         )
 
     def test_first_from_unordered_queryset_aggregation_pk_incomplete(self):
