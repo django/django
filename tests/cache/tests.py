@@ -46,6 +46,7 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
+    AsyncRequestFactory,
     RequestFactory,
     SimpleTestCase,
     TestCase,
@@ -2536,6 +2537,7 @@ def csrf_view(request):
 )
 class CacheMiddlewareTest(SimpleTestCase):
     factory = RequestFactory()
+    async_factory = AsyncRequestFactory()
 
     def setUp(self):
         self.default_cache = caches["default"]
@@ -2639,7 +2641,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(cached_response.content, b"Hello World 0")
 
         # Delete cache key/value
-        invalidate_view_cache(request=request, key_prefix="", cache=cache)
+        invalidate_view_cache(request, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Confirm key/value has been deleted from cache
@@ -2658,7 +2660,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(cached_response.content, b"Hello World 0")
 
         # Delete cache key/value
-        invalidate_view_cache(path=path, key_prefix="", cache=cache)
+        invalidate_view_cache(path, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Confirm key/value has been deleted from cache
@@ -2685,7 +2687,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(cached_response.content, b"Hello World 0")
 
         # Delete cache key/value
-        invalidate_view_cache(path=path, key_prefix="", cache=cache)
+        invalidate_view_cache(path, key_prefix="", cache=cache)
         cached_response = cache.get(cache_key)
 
         # Confirm key/value has been deleted from cache
@@ -2716,6 +2718,24 @@ class CacheMiddlewareTest(SimpleTestCase):
         # Confirm that the cached response content matches the view output
         cached_response = cache.get(cache_key)
         self.assertEqual(cached_response.content, b"Hello World 0")
+
+    def test_invalidate_view_decorator_cache_from_async_request(self):
+        """Invalidate cache key/value from async request object"""
+        view = cache_page(10)(hello_world_view)
+        async_request = self.async_factory.get("/view/")
+        _ = view(async_request, "0")
+        cache_key = get_cache_key(request=async_request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(async_request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
