@@ -13,7 +13,7 @@ repos:
         files: 'docs/.*\.txt$'
         args: ["--rst-literal-block"]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
