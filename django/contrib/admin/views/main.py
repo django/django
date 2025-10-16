@@ -184,7 +184,7 @@ class ChangeList:
         for list_filter in self.list_filter:
             lookup_params_count = len(lookup_params)
             if callable(list_filter):
-                # This is simply a custom list filter class.
+                # This is a custom list filter class.
                 spec = list_filter(request, lookup_params, self.model, self.model_admin)
             else:
                 field_path = None
@@ -192,7 +192,7 @@ class ChangeList:
                     # This is a custom FieldListFilter class for a given field.
                     field, field_list_filter_class = list_filter
                 else:
-                    # This is simply a field name, so use the default
+                    # This is a field name, so use the default
                     # FieldListFilter class that has been registered for the
                     # type of the given field.
                     field, field_list_filter_class = list_filter, FieldListFilter.create

@@ -777,7 +777,7 @@ class QuerySet(AltersData):
             raise ValueError("Batch size must be a positive integer.")
         # Check that the parents share the same concrete model with the our
         # model to detect the inheritance pattern ConcreteGrandParent ->
-        # MultiTableParent -> ProxyChild. Simply checking
+        # MultiTableParent -> ProxyChild. checking
         # self.model._meta.proxy would not identify that case as involving
         # multiple tables.
         for parent in self.model._meta.all_parents:

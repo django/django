@@ -347,7 +347,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
     $ python manage.py shell
 
-We're using this instead of simply typing "python", because :file:`manage.py`
+We're using this instead of typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
 By default, the :djadmin:`shell` command automatically imports the models from

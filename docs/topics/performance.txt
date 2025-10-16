@@ -130,7 +130,7 @@ one that it is comfortable to code for.
 
 .. note::
 
-    The example above is merely illustrative.
+    The example above is only illustrative.
 
     Firstly, in a real-life case you need to consider what is happening before
     and after your count to work out what's an optimal way of doing it *in that
