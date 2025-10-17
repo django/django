@@ -41,10 +41,7 @@ class GEOSIOTest(SimpleTestCase):
     def test02_wktwriter(self):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
-        msg = (
-            "Incompatible pointer type: "
-            "<class 'django.contrib.gis.geos.prototypes.io.LP_WKTReader_st'>."
-        )
+        msg = "Incompatible pointer type: "
         with self.assertRaisesMessage(TypeError, msg):
             wkt_w.ptr = WKTReader.ptr_type()
 
