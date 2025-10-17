@@ -83,7 +83,7 @@ environments can be seen as follows:
     blacken-docs
     flake8>=3.7.0
     docs
-    isort>=5.1.0
+    isort>=7.0.0
     lint-docs
 
 Testing other Python versions and database backends
@@ -325,7 +325,6 @@ dependencies:
 * :pypi:`PyYAML` 6.0.2+
 * :pypi:`pywatchman`
 * :pypi:`redis` 5.1.0+
-* :pypi:`setuptools`
 * :pypi:`pymemcache`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_

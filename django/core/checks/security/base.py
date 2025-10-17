@@ -1,7 +1,6 @@
 from django.conf import settings
+from django.core.checks import Error, Tags, Warning, register
 from django.core.exceptions import ImproperlyConfigured
-
-from .. import Error, Tags, Warning, register
 
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     "same-origin",

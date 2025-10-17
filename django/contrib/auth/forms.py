@@ -134,6 +134,9 @@ class SetPasswordMixin:
             user.save()
         return user
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
 
 class SetUnusablePasswordMixin:
     """

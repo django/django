@@ -36,6 +36,7 @@ from django.db.models.expressions import (
     WindowFrame,
     WindowFrameExclusion,
 )
+from django.db.models.fetch_modes import FETCH_ONE, FETCH_PEERS, RAISE
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
 from django.db.models.fields.composite import CompositePrimaryKey
@@ -105,6 +106,9 @@ __all__ += [
     "GeneratedField",
     "JSONField",
     "OrderWrt",
+    "FETCH_ONE",
+    "FETCH_PEERS",
+    "RAISE",
     "Lookup",
     "Transform",
     "Manager",

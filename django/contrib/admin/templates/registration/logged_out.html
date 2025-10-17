@@ -1,7 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></div>{% endblock %}
+{% block breadcrumbs %}
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li aria-current="page">{% translate 'Logout' %}</li>
+</ol>
+{% endblock %}
 
 {% block nav-sidebar %}{% endblock %}
 

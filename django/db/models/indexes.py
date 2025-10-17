@@ -114,7 +114,12 @@ class Index:
                 )
         errors.extend(
             model._check_local_fields(
-                {*self.fields, *self.include, *references}, "indexes"
+                {
+                    *[field for field, _ in self.fields_orders],
+                    *self.include,
+                    *references,
+                },
+                "indexes",
             )
         )
         # Database-feature checks:

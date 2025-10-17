@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
+from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
@@ -601,6 +602,42 @@ class MultiColumnFKTests(TestCase):
         self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=False),
             [m4],
+        )
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        person = Person.objects.fetch_mode(FETCH_PEERS).get(pk=self.bob.pk)
+        self.assertEqual(person._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            person.person_country._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        people = list(Person.objects.fetch_mode(FETCH_PEERS))
+        person = people[0]
+        self.assertEqual(person._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            person.person_country._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        country = Country.objects.fetch_mode(FETCH_PEERS).get(pk=self.usa.pk)
+        self.assertEqual(country._state.fetch_mode, FETCH_PEERS)
+        person = country.person_set.get(pk=self.bob.pk)
+        self.assertEqual(
+            person._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        countries = list(Country.objects.fetch_mode(FETCH_PEERS))
+        country = countries[0]
+        self.assertEqual(country._state.fetch_mode, FETCH_PEERS)
+        person = country.person_set.earliest("pk")
+        self.assertEqual(
+            person._state.fetch_mode,
+            FETCH_PEERS,
         )
 
 
