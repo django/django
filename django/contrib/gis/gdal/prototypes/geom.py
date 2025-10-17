@@ -1,7 +1,7 @@
 from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import GDALFuncFactory, GDAL_VERSION
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION, GDALFuncFactory
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (
     BoolOutput,
