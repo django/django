@@ -464,6 +464,12 @@ backends.
 
 * Support for GDAL 3.1 and 3.2 is removed.
 
+* The undocumented factory functions in
+  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
+  class-based factories following a naming pattern where lowercase snake_case
+  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
+  ``const_string_output`` is now ``ConstStringOutput``, etc.).
+
 :mod:`django.contrib.postgres`
 ------------------------------
 
@@ -600,12 +606,6 @@ Miscellaneous
   are unaffected, as they are always valid Base64. However, existing cache
   entries containing non-standard or corrupted Base64 data may no longer be
   readable.
-
-* The undocumented factory functions in
-  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
-  class-based factories following a naming pattern where lowercase snake_case
-  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
-  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 .. _deprecated-features-6.1:
 
