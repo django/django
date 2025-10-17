@@ -189,11 +189,6 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
