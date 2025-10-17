@@ -182,8 +182,8 @@ Slicing ``F()`` expressions
 
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
-array-slicing syntax. The indices are 0-based and the ``step`` argument to
-``slice`` is not supported. For example:
+array-slicing syntax. The indices are 0-based. The ``step`` argument to
+``slice`` and negative indexing are not supported. For example:
 
 .. code-block:: pycon
 
