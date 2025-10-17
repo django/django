@@ -300,6 +300,12 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+* The undocumented factory functions in
+  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
+  class-based factories following a naming pattern where lowercase snake_case
+  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
+  ``const_string_output`` is now ``ConstStringOutput``, etc.).
+
 Dropped support for PostgreSQL 14
 ---------------------------------
 
@@ -311,12 +317,6 @@ Miscellaneous
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
-
-* The undocumented factory functions in
-  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
-  class-based factories following a naming pattern where lowercase snake_case
-  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
-  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 .. _deprecated-features-6.1:
 
