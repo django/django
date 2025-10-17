@@ -103,7 +103,7 @@ need to distinguish caches by the ``Accept-language`` header.
     cache, this means that we have to build the response once to get at the
     Vary header and so at the list of headers to use for the cache key.
 
-.. function:: invalidate_view_cache(request=None, key_prefix=None, cache=None):
+.. function:: invalidate_view_cache(request, key_prefix=None, cache=None):
     Delete a cached page based on either a relative URL (type: ``any``)
     or a request object (type: ``django.http.HttpRequest``).
 
