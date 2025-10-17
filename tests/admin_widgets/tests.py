@@ -1810,6 +1810,21 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             school.alumni.all().order_by("name"), [self.lisa, self.peter]
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_vertical_arrow_buttons_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+        buttons = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.selector.stacked ul.selector-chooser"
+        )
+        self.assertTrue(buttons.is_displayed())
+        self.take_screenshot("arrow_buttons")
+
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
