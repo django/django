@@ -1610,8 +1610,8 @@ class ModelFormsetTestMixin:
         )
 
     def test_model_formset_with_custom_pk(self):
-        # a formset for a Model that has a custom primary key that still needs to be
-        # added to the formset automatically
+        # a formset for a Model that has a custom primary key that still
+        # needs to be added to the formset automatically
         self.assertEqual(
             sorted(self.classy_mexican_formset().forms[0].fields),
             ["tacos_are_yummy", "the_restaurant"],
@@ -2194,7 +2194,9 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         self.assertTrue(formset.is_valid())
 
     def test_no_model_argument_error(self):
-        """Test that modelformset can not be created without a model argument."""
+        """
+        Test that modelformset can not be created without a model argument.
+        """
         msg = "modelformset_factory() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
             modelformset_factory(fields="__all__")
@@ -2217,15 +2219,21 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
             modelformset_factory(model=Post)
 
     def test_no_parent_model_inline_argument_error(self):
-        """Test that inlineformset can not be created without a parent_model."""
+        """
+        Test that inlineformset can not be created without a parent_model.
+        """
         msg = "inlineformset_factory() missing 1 required positional "
         "argument: 'parent_model'"
         with self.assertRaisesMessage(TypeError, msg):
             inlineformset_factory(model=Poem, form=PoemFormSave)
 
     def test_no_model_inline_argument_error(self):
-        """Test that inlineformset can not be created without a model argument."""
-        msg = "inlineformset_factory() missing 1 required positional argument: 'model'"
+        """
+        Test that inlineformset can not be created without a model argument.
+        """
+        msg = (
+            "inlineformset_factory() missing 1 required positional " "argument: 'model'"
+        )
         with self.assertRaisesMessage(TypeError, msg):
             inlineformset_factory(parent_model=Poet, form=PoemFormSave)
 
@@ -2686,7 +2694,9 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         self.assertTrue(formset.is_valid())
 
     def test_no_model_argument_error(self):
-        """Test that modelformset can not be created without a model argument."""
+        """
+        Test that modelformset can not be created without a model argument.
+        """
         msg = "ModelFormSet() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
 
@@ -2715,8 +2725,12 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
                 model = Post
 
     def test_no_parent_model_inline_argument_error(self):
-        """Test that inlineformset can not be created without a parent_model."""
-        msg = "InlineFormSet() missing 1 required positional argument: 'parent_model'"
+        """
+        Test that inlineformset can not be created without a parent_model.
+        """
+        msg = (
+            "InlineFormSet() missing 1 required positional argument: " "'parent_model'"
+        )
         with self.assertRaisesMessage(TypeError, msg):
 
             class DeclarativeInvalidInlineFormSet(InlineFormSet):
@@ -2724,7 +2738,9 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
                 form = PoemFormSave
 
     def test_no_model_inline_argument_error(self):
-        """Test that inlineformset can not be created without a model argument."""
+        """
+        Test that inlineformset can not be created without a model argument.
+        """
         msg = "InlineFormSet() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
 

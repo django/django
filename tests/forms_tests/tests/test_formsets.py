@@ -372,8 +372,8 @@ class FormsetTestMixin:
 
     def test_displaying_more_than_one_blank_form(self):
         """
-        More than 1 empty form can be displayed using formset's (factory or declarative)
-        `extra` argument.
+        More than 1 empty form can be displayed using
+        formset's (factory or declarative) `extra` argument.
         """
         formset = self.choice_extra3_formset(auto_id=False, prefix="choices")
         self.assertHTMLEqual(
@@ -659,8 +659,9 @@ class FormsetTestMixin:
     def test_formset_with_deletion(self):
         """
         formset's (factory or declarative) can_delete argument
-        adds a boolean "delete" field to each form. When that boolean field is True,
-        the form will be in formset.deleted_forms.
+        adds a boolean "delete" field to each form. When that
+        boolean field is True, the form will be in
+        formset.deleted_forms.
         """
         initial = [
             {"choice": "Calexico", "votes": 100},
@@ -1219,7 +1220,8 @@ class FormsetTestMixin:
 
         reverse_formset = self.choice_reverse_formset()
         # __iter__() modifies the rendering order.
-        # Compare forms from "reverse" formset with forms from original formset
+        # Compare forms from "reverse" formset with
+        # forms from original formset
         self.assertEqual(str(reverse_formset[0]), str(forms[-1]))
         self.assertEqual(str(reverse_formset[1]), str(forms[-2]))
         self.assertEqual(len(reverse_formset), len(forms))
@@ -1231,7 +1233,9 @@ class FormsetTestMixin:
         self.assertTrue(formset)
 
     def test_formset_splitdatetimefield(self):
-        """Formset works with SplitDateTimeField(initial=datetime.datetime.now)."""
+        """
+        Formset works with SplitDateTimeField(initial=datetime.datetime.now).
+        """
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",

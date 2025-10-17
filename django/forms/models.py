@@ -1169,7 +1169,6 @@ class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
         super().__init__(queryset=queryset)
 
 
-
 # InlineFormSets #############################################################
 
 
