@@ -1,7 +1,7 @@
 from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import GDALFuncFactory
+from django.contrib.gis.gdal.libgdal import GDALFuncFactory, GDAL_VERSION
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (
     BoolOutput,
@@ -66,8 +66,6 @@ class _FromWkb:
 
     @cached_property
     def func(self):
-        from django.contrib.gis.gdal.libgdal import GDAL_VERSION
-
         if GDAL_VERSION >= (3, 3):
             return GeomOutput(
                 "OGR_G_CreateFromWkbEx",
@@ -141,8 +139,6 @@ class _GetWkbSize:
 
     @cached_property
     def func(self):
-        from django.contrib.gis.gdal.libgdal import GDAL_VERSION
-
         if GDAL_VERSION >= (3, 3):
             return IntOutput("OGR_G_WkbSizeEx", argtypes=[c_void_p])
         else:
