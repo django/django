@@ -174,6 +174,9 @@ class AdminField:
         self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
         self.is_readonly = False
         self.is_fieldset = self.field.field.widget.use_fieldset
+        bound_field = self.field.field
+        if bound_field.required:
+            bound_field.widget.attrs["required"] = True
 
     def label_tag(self):
         classes = []
