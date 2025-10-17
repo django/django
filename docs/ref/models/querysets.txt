@@ -2439,8 +2439,8 @@ This has a number of caveats though:
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
   a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
   is ``False``, the primary key attribute can only be retrieved on certain
-  databases (currently PostgreSQL, MariaDB, and SQLite 3.35+). On other
-  databases, it will not be set.
+  databases (currently PostgreSQL, MariaDB, and SQLite). On other databases, it
+  will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
