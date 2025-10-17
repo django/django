@@ -150,6 +150,31 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+* **mysql.W004**: MySQL does not support DECIMAL/NUMERIC with more than 65 total digits.
+
+PostgreSQL
+~~~~~~~~~~
+
+If you're using PostgreSQL, the following checks will be performed:
+
+* **postgresql.W001**: PostgreSQL does not support NUMERIC with more than 131072 digits before the decimal point.
+* **postgresql.W002**: PostgreSQL does not support NUMERIC with more than 16383 digits after the decimal point.
+
+Oracle
+~~~~~~
+
+If you're using Oracle, the following checks will be performed:
+
+* **oracle.W001**: Oracle NUMBER type supports precision from 1 to 38. Values with max_digits > 38 may cause errors.
+* **oracle.W002**: Oracle NUMBER type supports scale from -84 to 127. Values with decimal_places > 127 may cause errors.
+
+SQLite
+~~~~~~
+
+If you're using SQLite, the following checks will be performed:
+
+* **sqlite.W001**: SQLite stores only 15 significant digits for decimal values. Values with max_digits > 15 may lose precision and be stored as floating-point numbers.
+* **sqlite.W002**: SQLite stores only 15 significant digits for decimal values. Values with decimal_places > 15 may lose precision and be stored as floating-point numbers.
 
 Managing files
 --------------
