@@ -443,7 +443,7 @@ trade-off between convenience and security. If you wish to store more advanced
 data types including ``datetime`` and ``Decimal`` in JSON backed sessions, you
 will need to write a custom serializer (or convert such values to a JSON
 serializable object before storing them in ``request.session``). While
-serializing these values is often straightforward
+serializing these values is often simple
 (:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that

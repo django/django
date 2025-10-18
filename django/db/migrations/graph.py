@@ -66,7 +66,7 @@ class MigrationGraph:
 
     Each migration is a node, and each dependency is an edge. There are
     no implicit dependencies between numbered migrations - the numbering is
-    merely a convention to aid file listing. Every new numbered migration
+    only a convention to aid file listing. Every new numbered migration
     has a declared dependency to the previous number, meaning that VCS
     branch merges can be detected and resolved.
 

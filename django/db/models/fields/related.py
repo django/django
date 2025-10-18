@@ -944,7 +944,7 @@ class ForeignObject(RelatedField):
                 related.accessor_name,
                 self.related_accessor_class(related),
             )
-            # While 'limit_choices_to' might be a callable, simply pass
+            # While 'limit_choices_to' might be a callable, pass
             # it along for later - this is too early because it's still
             # model load time.
             if self.remote_field.limit_choices_to:

@@ -187,7 +187,7 @@ class FileDescriptor(DeferredAttribute):
         file = super().__get__(instance, cls)
 
         # If this value is a string (instance.file = "path/to/file") or None
-        # then we simply wrap it with the appropriate attribute class according
+        # then we wrap it with the appropriate attribute class according
         # to the file field. [This is FieldFile for FileFields and
         # ImageFieldFile for ImageFields; it's also conceivable that user
         # subclasses might also want to subclass the attribute class]. This

@@ -215,7 +215,7 @@ class Field:
         bound form, given the submitted POST data for the field and the initial
         data, if any.
 
-        For most fields, this will simply be data; FileFields need to handle it
+        For most fields, this will be data; FileFields need to handle it
         a bit differently.
         """
         if self.disabled:

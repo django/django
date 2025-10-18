@@ -170,7 +170,7 @@ In the example above, you created two commits, the "Fixed ticket_xxxxx" commit
 and "Added two more tests" commit.
 
 We do not want to have the entire history of your working process in your
-repository. Your commit "Added two more tests" would be unhelpful noise.
+repository. Your commit "Added two more tests" would be unnecessary noise.
 Instead, we would rather only have one commit containing all your work.
 
 To rework the history of your branch you can squash the commits into one by
@@ -185,8 +185,8 @@ will open an editor showing the two commits, prefixed with the word "pick".
 
 Change "pick" on the second line to "squash" instead. This will keep the
 first commit, and squash the second commit into the first one. Save and quit
-the editor. A second editor window should open, so you can reword the
-commit message for the commit now that it includes both your steps.
+the editor. A second editor window should open, so you can update the commit
+message to describe both changes together.
 
 You can also use the "edit" option in rebase. This way you can change a single
 commit, for example to fix a typo in a docstring:
