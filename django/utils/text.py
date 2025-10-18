@@ -393,6 +393,22 @@ def compress_sequence(sequence, *, max_random_bytes=None):
     yield buf.read()
 
 
+async def acompress_sequence(sequence, *, max_random_bytes=None):
+    buf = StreamingBuffer()
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
+        # Output headers...
+        yield buf.read()
+        async for item in sequence:
+            zfile.write(item)
+            data = buf.read()
+            if data:
+                yield data
+    yield buf.read()
+
+
 # Expression to match some_token and some_token="with spaces" (and similarly
 # for single-quoted strings).
 smart_split_re = _lazy_re_compile(
