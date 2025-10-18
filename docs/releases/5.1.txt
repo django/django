@@ -232,6 +232,35 @@ Forms
   fieldsets with their help text, the form fieldset now includes the
   ``aria-describedby`` HTML attribute.
 
+* The new :class:`formsets.Formset<django.forms.formsets.FormSet>` enables
+  formsets to be made using the declarative syntax, directly as a class, 
+  similar to how you declare models, and can be used to replace the 
+  :meth:`forms.formsets.formset_factory()
+  <django.forms.formsets.formset_factory>`.
+
+* The new :class:`forms.models.ModelFormSet<django.forms.models.ModelFormSet>`
+  and :class:`forms.models.InlineFormSet<django.forms.models.InlineFormSet>`
+  classes provide a declarative syntax approach for using the model formsets
+  and can be used to replace the :meth:`forms.models.modelformset_factory()
+  <django.forms.models.modelformset_factory>` and
+  :meth:`forms.models.inlineformset_factory()
+  <django.forms.models.inlineformset_factory>` respectively.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
