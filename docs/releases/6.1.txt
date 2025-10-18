@@ -71,6 +71,21 @@ queries:
 
 See :doc:`fetch modes </topics/db/fetch-modes>` for more details.
 
+Database-level delete options for ``ForeignKey.on_delete``
+----------------------------------------------------------
+
+:attr:`.ForeignKey.on_delete` now supports database-level delete options:
+
+* :attr:`~django.db.models.DB_CASCADE`
+* :attr:`~django.db.models.DB_SET_NULL`
+* :attr:`~django.db.models.DB_SET_DEFAULT`
+
+These options handle deletion logic entirely within the database, using the SQL
+``ON DELETE`` clause. They are thus more efficient than the existing
+Python-level options, as Django does not need to load objects before deleting
+them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
+not trigger the ``pre_delete`` or ``post_delete`` signals.
+
 Minor features
 --------------
 

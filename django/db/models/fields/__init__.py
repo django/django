@@ -155,8 +155,6 @@ class Field(RegisterLookupMixin):
         "error_messages",
         "help_text",
         "limit_choices_to",
-        # Database-level options are not supported, see #21961.
-        "on_delete",
         "related_name",
         "related_query_name",
         "validators",
