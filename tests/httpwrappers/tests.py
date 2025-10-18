@@ -298,6 +298,37 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(TypeError):
             QueryDict.fromkeys(0)
 
+    def test_update_operator_immutable(self):
+        q = QueryDict("color=red&q=tacos")
+        msg = "This QueryDict instance is immutable"
+        with self.assertRaisesMessage(AttributeError, msg):
+            q |= {"color": "yellow"}
+        self.assertEqual(q, QueryDict("color=red&q=tacos"))
+
+    def test_update_operator_dict(self):
+        q = QueryDict("color=red&q=tacos", mutable=True)
+        q |= {"color": "yellow"}
+        self.assertTrue(q._mutable)
+        self.assertEqual(q, QueryDict("color=red&color=yellow&q=tacos"))
+
+    def test_update_operator_querydict(self):
+        q = QueryDict("color=red&q=tacos", mutable=True)
+        q2 = QueryDict("color=yellow")
+        q |= q2
+        self.assertEqual(q, QueryDict("color=red&color=yellow&q=tacos"))
+
+    def test_update_operator_querydict_list(self):
+        q = QueryDict("color=red&q=tacos", mutable=True)
+        q2 = QueryDict("color=yellow&color=blue")
+        q |= q2
+        self.assertEqual(q, QueryDict("color=red&color=yellow&color=blue&q=tacos"))
+
+    def test_update_operator_nondict(self):
+        q = QueryDict("color=red&q=tacos", mutable=True)
+        msg = "'int' object is not iterable"
+        with self.assertRaisesMessage(TypeError, msg):
+            q |= 42
+
 
 class HttpResponseTests(SimpleTestCase):
     def test_headers_type(self):
