@@ -169,7 +169,7 @@ def normalize_eols(raw_contents):
     return "\n".join(lines_list)
 
 
-def write_pot_file(potfile, msgs):
+def write_pot_file(potfile, msgs, locale):
     """
     Write the `potfile` with the `msgs` contents, making sure its format is
     valid.
@@ -181,6 +181,7 @@ def write_pot_file(potfile, msgs):
     else:
         lines = []
         found, header_read = False, False
+        lang_set = False
         for line in pot_lines:
             if not found and not header_read:
                 if "charset=CHARSET" in line:
@@ -188,6 +189,15 @@ def write_pot_file(potfile, msgs):
                     line = line.replace("charset=CHARSET", "charset=UTF-8")
             if not line and not found:
                 header_read = True
+                
+            # check if language is set correctly.
+            if line.startswith('"Language:') and not lang_set:
+                line_content = line[1:-3].replace("Language: ", "") 
+                if not line_content:
+                    process = line[:-3] + locale[0] + line[11:]
+                    line = process
+                    lang_set = True
+                    
             lines.append(line)
     msgs = "\n".join(lines)
     # Force newlines of POT files to '\n' to work around
@@ -315,6 +325,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        global locale
         locale = options["locale"]
         exclude = options["exclude"]
         self.domain = options["domain"]
@@ -694,7 +705,7 @@ class Command(BaseCommand):
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
             potfile = os.path.join(locale_dir, "%s.pot" % self.domain)
-            write_pot_file(potfile, msgs)
+            write_pot_file(potfile, msgs, locale)
 
         for build_file in build_files:
             build_file.cleanup()
