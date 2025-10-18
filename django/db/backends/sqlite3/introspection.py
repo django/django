@@ -342,8 +342,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             "PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name)
         )
         for row in cursor.fetchall():
-            # SQLite 3.8.9+ has 5 columns, however older versions only give 3
-            # columns. Discard last 2 columns if there.
+            # Discard last 2 columns.
             number, index, unique = row[:3]
             cursor.execute(
                 "SELECT sql FROM sqlite_master WHERE type='index' AND name=%s",

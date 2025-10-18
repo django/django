@@ -325,6 +325,8 @@ Miscellaneous
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
+* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1

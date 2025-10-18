@@ -10,7 +10,7 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (3, 31)
+    minimum_database_version = (3, 37)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
@@ -26,8 +26,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     time_cast_precision = 3
     can_release_savepoints = True
     has_case_insensitive_like = True
-    # Is "ALTER TABLE ... DROP COLUMN" supported?
-    can_alter_table_drop_column = Database.sqlite_version_info >= (3, 35, 5)
     supports_parentheses_in_compound = False
     can_defer_constraint_checks = True
     supports_over_clause = True
@@ -57,6 +55,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
+    can_return_columns_from_insert = True
+    can_return_rows_from_bulk_insert = True
+    can_return_rows_from_update = True
 
     @cached_property
     def django_test_skips(self):
@@ -146,8 +147,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         """
         SQLite has a variable limit per query. The limit can be changed using
         the SQLITE_MAX_VARIABLE_NUMBER compile-time option (which defaults to
-        999 in versions < 3.32.0 or 32766 in newer versions) or lowered per
-        connection at run-time with setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
+        32766) or lowered per connection at run-time with
+        setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
         """
         return self.connection.connection.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
 
@@ -163,15 +164,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
     has_json_object_function = property(operator.attrgetter("supports_json_field"))
-
-    @cached_property
-    def can_return_columns_from_insert(self):
-        return Database.sqlite_version_info >= (3, 35)
-
-    can_return_rows_from_bulk_insert = property(
-        operator.attrgetter("can_return_columns_from_insert")
-    )
-
-    can_return_rows_from_update = property(
-        operator.attrgetter("can_return_columns_from_insert")
-    )

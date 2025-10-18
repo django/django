@@ -339,10 +339,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.delete_model(field.remote_field.through)
             # For explicit "through" M2M fields, do nothing
         elif (
-            self.connection.features.can_alter_table_drop_column
             # Primary keys, unique fields, indexed fields, and foreign keys are
             # not supported in ALTER TABLE DROP COLUMN.
-            and not field.primary_key
+            not field.primary_key
             and not field.unique
             and not field.db_index
             and not (field.remote_field and field.db_constraint)
