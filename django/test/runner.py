@@ -1043,70 +1043,71 @@ class DiscoverRunner:
     def run_checks(self, databases):
         """
         Run system checks after database creation.
-        
+
         If a logger is configured, capture check command output and log it.
         Otherwise, create a default logger to maintain consistent logging behavior.
         """
         # Checks are run after database creation since some checks require
         # database access.
-        
+
         # Get or create logger for check output
         logger = self._get_or_create_check_logger()
-        
+
         # Capture stdout and stderr from check command
         stdout_capture = StringIO()
         stderr_capture = StringIO()
-        
+
         # Redirect output to StringIO
         with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
             call_command("check", verbosity=self.verbosity, databases=databases)
-        
+
         # Get captured output
         stdout_output = stdout_capture.getvalue().strip()
         stderr_output = stderr_capture.getvalue().strip()
-        
+
         # Log output
         if stdout_output:
             logger.info(stdout_output)
-        
+
         if stderr_output:
             logger.error(stderr_output)
-    
+
     def _get_or_create_check_logger(self):
         """
         Get the configured logger or create a default one.
-        
+
         This ensures check output always goes through logging system
         instead of directly to stdout.
-        
+
         Returns:
             logging.Logger: Logger instance for check command output
         """
         if self.logger is not None:
             return self.logger
-        
+
         # Create a default logger for check command output
-        logger = logging.getLogger('django.test.check')
+        logger = logging.getLogger("django.test.check")
         logger.setLevel(logging.INFO)
         logger.propagate = False  # Don't propagate to avoid duplicate output
-        
+
         # Only configure if not already configured
         if not logger.handlers:
             # Create handler that writes to stdout
             handler = logging.StreamHandler(sys.stdout)
-            
+
             # Use simple formatter that just shows the message
             # (no timestamp, no level name for INFO)
             class CheckFormatter(logging.Formatter):
                 """Formatter that only adds level prefix for errors/warnings."""
+
                 def format(self, record):
                     if record.levelno >= logging.WARNING:
                         return f"[{record.levelname}] {record.getMessage()}"
                     return record.getMessage()
-            
+
             handler.setFormatter(CheckFormatter())
             logger.addHandler(handler)
-        
+
         # Store the logger for future use
         self.logger = logger
         return logger
