@@ -1045,7 +1045,8 @@ class DiscoverRunner:
         Run system checks after database creation.
 
         If a logger is configured, capture check command output and log it.
-        Otherwise, create a default logger to maintain consistent logging behavior.
+        Otherwise, create a default logger to maintain 
+        consistent logging behavior.
         """
         # Checks are run after database creation since some checks require
         # database access.
