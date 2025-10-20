@@ -16,6 +16,7 @@ from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
+from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
 from django.utils.version import get_docs_version
 
@@ -69,6 +70,12 @@ class BaseSimpleSerializer(BaseSerializer):
 class ChoicesSerializer(BaseSerializer):
     def serialize(self):
         return serializer_factory(self.value.value).serialize()
+
+
+class DatabaseOnDeleteSerializer(BaseSerializer):
+    def serialize(self):
+        path = self.value.__class__.__module__
+        return f"{path}.{self.value.__name__}", {f"import {path}"}
 
 
 class DateTimeSerializer(BaseSerializer):
@@ -363,6 +370,7 @@ class Serializer:
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
         zoneinfo.ZoneInfo: ZoneInfoSerializer,
+        DatabaseOnDelete: DatabaseOnDeleteSerializer,
     }
 
     @classmethod

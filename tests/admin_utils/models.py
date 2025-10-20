@@ -40,9 +40,17 @@ class ArticleProxy(Article):
         proxy = True
 
 
-class Count(models.Model):
+class Cascade(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey("self", models.CASCADE, null=True)
+
+    def __str__(self):
+        return str(self.num)
+
+
+class DBCascade(models.Model):
+    num = models.PositiveSmallIntegerField()
+    parent = models.ForeignKey("self", models.DB_CASCADE, null=True)
 
     def __str__(self):
         return str(self.num)

@@ -78,6 +78,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_json_negative_indexing = False
     supports_collation_on_textfield = False
+    supports_on_delete_db_default = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).

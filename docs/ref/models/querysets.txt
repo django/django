@@ -1022,15 +1022,38 @@ Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 
 See :meth:`union` for some restrictions.
 
+``fetch_mode()``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+.. method:: fetch_mode(mode)
+
+Returns a ``QuerySet`` that sets the given fetch mode for all model instances
+created by this ``QuerySet``. The fetch mode controls on-demand loading of
+fields when they are accessed, such as for foreign keys and deferred fields.
+For example, to use the :attr:`~django.db.models.FETCH_PEERS` mode to
+batch-load all related objects on first access:
+
+.. code-block:: python
+
+    from django.db import models
+
+    books = Book.objects.fetch_mode(models.FETCH_PEERS)
+
+See more in the :doc:`fetch mode topic guide </topics/db/fetch-modes>`.
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
 .. method:: select_related(*fields)
 
-Returns a ``QuerySet`` that will "follow" foreign-key relationships, selecting
-additional related-object data when it executes its query. This is a
-performance booster which results in a single more complex query but means
-later use of foreign-key relationships won't require database queries.
+Returns a ``QuerySet`` that will join in the named foreign-key relationships,
+selecting additional related objects when it executes its query. This method
+can be a performance booster, fetching data ahead of time rather than
+triggering on-demand loading through the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`, at the cost of a more complex
+initial query.
 
 The following examples illustrate the difference between plain lookups and
 ``select_related()`` lookups. Here's standard lookup::
@@ -1050,20 +1073,8 @@ And here's ``select_related`` lookup::
     # in the previous query.
     b = e.blog
 
-You can use ``select_related()`` with any queryset of objects::
-
-    from django.utils import timezone
-
-    # Find all the blogs with entries scheduled to be published in the future.
-    blogs = set()
-
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog"):
-        # Without select_related(), this would make a database query for each
-        # loop iteration in order to fetch the related blog for each entry.
-        blogs.add(e.blog)
-
-The order of ``filter()`` and ``select_related()`` chaining isn't important.
-These querysets are equivalent::
+You can use ``select_related()`` with any queryset. The order of chaining with
+other methods isn't important. For example, these querysets are equivalent::
 
     Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog")
     Entry.objects.select_related("blog").filter(pub_date__gt=timezone.now())
@@ -1141,12 +1152,15 @@ that is that ``select_related('foo', 'bar')`` is equivalent to
 
 .. method:: prefetch_related(*lookups)
 
-Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
-related objects for each of the specified lookups.
+Returns a ``QuerySet`` that will automatically retrieve the given lookups, each
+in one extra batch query. Prefetching is a way to optimize database access
+when you know you'll be accessing related objects later, so you can avoid
+triggering the on-demand loading behavior of the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`.
 
-This has a similar purpose to ``select_related``, in that both are designed to
-stop the deluge of database queries that is caused by accessing related
-objects, but the strategy is quite different.
+This method has a similar purpose to :meth:`select_related`, in that both are
+designed to eagerly fetch related objects. However, they work in different
+ways.
 
 ``select_related`` works by creating an SQL join and including the fields of
 the related object in the ``SELECT`` statement. For this reason,
@@ -2425,8 +2439,8 @@ This has a number of caveats though:
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
   a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
   is ``False``, the primary key attribute can only be retrieved on certain
-  databases (currently PostgreSQL, MariaDB, and SQLite 3.35+). On other
-  databases, it will not be set.
+  databases (currently PostgreSQL, MariaDB, and SQLite). On other databases, it
+  will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -3022,7 +3036,11 @@ unique field in the order that is specified without conflicts. For example::
 
 Performs an SQL delete query on all rows in the :class:`.QuerySet` and
 returns the number of objects deleted and a dictionary with the number of
-deletions per object type.
+deletions per object type. The return value will count instances from related
+models if Django is emulating cascade behavior via Python
+:attr:`~django.db.models.ForeignKey.on_delete` variants. Otherwise, for
+database variants such as :attr:`~django.db.models.DB_CASCADE`, the return
+value will report only instances of the :class:`.QuerySet`'s model.
 
 The ``delete()`` is applied instantly. You cannot call ``delete()`` on a
 :class:`.QuerySet` that has had a slice taken or can otherwise no longer be
@@ -3059,19 +3077,30 @@ The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.pre_delete` and
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
-(including cascaded deletions).
+(including cascaded deletions). Signals won't be sent when ``DB_CASCADE`` is
+used. Also, ``delete()`` doesn't return information about objects deleted from
+database variants (``DB_*``) of the
+:attr:`~django.db.models.ForeignKey.on_delete` argument, e.g. ``DB_CASCADE``.
 
-Django needs to fetch objects into memory to send signals and handle cascades.
-However, if there are no cascades and no signals, then Django may take a
-fast-path and delete objects without fetching into memory. For large
-deletes this can result in significantly reduced memory usage. The amount of
-executed queries can be reduced, too.
+Django won’t need to fetch objects into memory when deleting them in the
+following cases:
+
+#. If related fields use ``DB_*`` options.
+#. If there are no cascades and no delete signal receivers.
+
+In these cases, Django may take a fast path and delete objects without fetching
+them, which can result in significantly reduced memory usage and fewer executed
+queries.
 
 ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 ``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
+
+.. versionchanged:: 6.1
+
+    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 ``as_manager()``
 ~~~~~~~~~~~~~~~~

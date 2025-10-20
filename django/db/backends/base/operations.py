@@ -254,6 +254,16 @@ class BaseDatabaseOperations:
             if sql
         )
 
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement.
+        """
+        if operation in ["CASCADE", "SET NULL", "SET DEFAULT"]:
+            return f" ON DELETE {operation}"
+        if operation == "":
+            return ""
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
+
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
         values_sql = ", ".join([f"({sql})" for sql in placeholder_rows_sql])

@@ -18,8 +18,8 @@ project.
 Python compatibility
 ====================
 
-Django 6.0 supports Python 3.12 and 3.13. We **highly recommend**, and only
-officially support, the latest release of each series.
+Django 6.0 supports Python 3.12, 3.13, and 3.14. We **highly recommend**, and
+only officially support, the latest release of each series.
 
 The Django 5.2.x series is the last to support Python 3.10 and 3.11.
 
@@ -377,6 +377,7 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``aiosmtpd`` 1.4.5
 * ``argon2-cffi`` 23.1.0
 * ``bcrypt`` 4.1.1
+* ``docutils`` 0.22
 * ``geoip2`` 4.8.0
 * ``Pillow`` 10.1.0
 * ``mysqlclient`` 2.2.1
