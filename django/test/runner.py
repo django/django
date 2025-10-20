@@ -1099,8 +1099,8 @@ class DiscoverRunner:
             # Use simple formatter that just shows the message
             # (no timestamp, no level name for INFO)
             class CheckFormatter(logging.Formatter):
-                """Formatter that only adds level 
-                   prefix for errors/warnings."""
+                """Formatter that only adds level
+                prefix for errors/warnings."""
 
                 def format(self, record):
                     if record.levelno >= logging.WARNING:
