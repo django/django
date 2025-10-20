@@ -259,14 +259,16 @@ Declarative ``ModelFormSet``
 
 .. class:: ModelFormSet
 
-    A BaseModelFormSet subclass that allows declarative declaration of model formsets.
+    A BaseModelFormSet subclass that allows declarative declaration of
+    model formsets.
 
     .. versionadded:: 5.1
 
     Returns a ``ModelFormSet`` class for the given ``model`` class.
 
-    The same arguments that can be passed to the ``modelformset_factory``
-    function can also be passed to the declarative syntax.
+    The same arguments that can be passed to the
+    ``modelformset_factory`` function can also be passed to the
+    declarative syntax.
 
     See the following example which shows how to create AuthorFormSet from
     ``Author`` model::
@@ -333,15 +335,16 @@ Declarative ``InlineFormSet``
 
 .. class:: InlineFormSet
 
-    A BaseInlineFormSet subclass that allows declarative declaration of model formsets.
+    A BaseInlineFormSet subclass that allows declarative declaration of
+    model formsets.
 
     .. versionadded:: 5.1
 
     Returns a ``InlineFormSet`` class for the given ``parent_model`` and
     ``model`` class.
 
-    The Declarative ``InlineFormSet`` class takes the same arguments as the
-    :func:`inlineformset_factory` function.
+    The Declarative ``InlineFormSet`` class takes the same arguments as
+    the :func:`inlineformset_factory` function.
 
     .. code-block:: pycon
 

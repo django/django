@@ -506,12 +506,14 @@ number of forms should use custom formset validation.
 
 If ``validate_max=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
-that the number of forms in the data set, minus those marked for deletion, is
-less than or equal to ``max_num``.
+that the number of forms in the data set, minus those marked for deletion,
+is less than or equal to ``max_num``.
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
-    >>> ArticleFormSet = formset_factory(ArticleForm, max_num=1, validate_max=True)
+    >>> ArticleFormSet = formset_factory(
+    ...     ArticleForm, max_num=1, validate_max=True
+    ... )
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',
@@ -549,12 +551,14 @@ to the :ref:`formsets-error-messages` argument.
 
 If ``validate_min=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
-that the number of forms in the data set, minus those marked for deletion, is
-greater than or equal to ``min_num``.
+that the number of forms in the data set, minus those marked for deletion,
+is greater than or equal to ``min_num``.
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
-    >>> ArticleFormSet = formset_factory(ArticleForm, min_num=3, validate_min=True)
+    >>> ArticleFormSet = formset_factory(
+    ...     ArticleForm, min_num=3, validate_min=True
+    ... )
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',

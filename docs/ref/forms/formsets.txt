@@ -19,7 +19,8 @@ Creating Formsets
     It is the base class from which every FormSet class is derived.
 
     Following attributes and methods are available in this class
-    see the :doc:`topics</topics/forms/formsets>` page for examples on how to use them
+    see the :doc:`topics</topics/forms/formsets>` page for examples on
+    how to use them
 
 There are two ways to create formsets in Django:
 
@@ -90,5 +91,4 @@ Declarative ``FormSet``
         ...     can_delete_extra = False
         ...     renderer = None
         ...
-   
 
