@@ -38,22 +38,24 @@ Method 2: Using ``FormSet`` class
     ...     form = ArticleForm
     ...
 
-Using the declarative syntax, you're able to define the formset directly as a class, 
-similar to how you declare models.
+Using the declarative syntax, you're able to define the formset directly as a
+class, similar to how you declare models.
 
 .. note::
 
-    When creating formsets, you have the flexibility to customize their behavior by 
-    overriding methods. This can be done on either ``BaseFormSet`` or ``FormSet``, 
-    depending on the method you choose to use.
-    It's important to note that both approaches end up giving you the same end results, 
-    and remember that it's necessary to provide the ``form`` argument when defining 
-    the ``Formset`` class, just like with ``formset_factory``.
+    When creating formsets, you have the flexibility to customize their
+    behavior by overriding methods. This can be done on either
+    ``BaseFormSet`` or ``FormSet``, depending on the method you choose to
+    use. It's important to note that both approaches end up giving you the
+    same end results, and remember that it's necessary to provide the
+    ``form`` argument when defining the ``Formset`` class, just like with
+    ``formset_factory``.
 
 
-Regardless of which option you choose, you have now created a formset class 
-named ``ArticleFormSet``. Instantiating the formset gives you the ability to iterate 
-over the forms in the formset and display them as you would with a regular form:
+Regardless of which option you choose, you have now created a formset class
+named ``ArticleFormSet``. Instantiating the formset gives you the ability to
+iterate over the forms in the formset and display them as you would with a
+regular form:
 
 .. code-block:: pycon
 
@@ -444,9 +446,10 @@ help distinguish them from form-specific errors. For example,
 Method 2: Using FormSet Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Instead of using ```formset_factory`` you can use the ``FormSet`` Class to make
-your formset, and then you can directly define a method inside the class this will
-override the default ``clean`` method and will have the similar results as above.::
+Instead of using ```formset_factory`` you can use the ``FormSet`` Class to
+make your formset, and then you can directly define a method inside the class
+this will override the default ``clean`` method and will have the similar
+results as above.::
 
 .. code-block:: pycon
 
@@ -503,8 +506,8 @@ number of forms should use custom formset validation.
 
 If ``validate_max=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
-that the number of forms in the data set, minus those marked for
-deletion, is less than or equal to ``max_num``.
+that the number of forms in the data set, minus those marked for deletion, is
+less than or equal to ``max_num``.
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -546,8 +549,8 @@ to the :ref:`formsets-error-messages` argument.
 
 If ``validate_min=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
-that the number of forms in the data set, minus those marked for
-deletion, is greater than or equal to ``min_num``.
+that the number of forms in the data set, minus those marked for deletion, is
+greater than or equal to ``min_num``.
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -880,7 +883,8 @@ Method 2: Using the Formset Class
 ---------------------------------
 
 Additional fields can also be easily added while using the ``FormSet`` class.
-Similar to the above method you just have to override the default ``add_fields`` method::
+Similar to the above method you just have to override the default
+``add_fields`` method::
 
 .. code-block:: pycon
 

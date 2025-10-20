@@ -815,7 +815,7 @@ Model formsets
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes to make working with Django models more
-convenient. To create a model formset out of the ``Author`` model from above, 
+convenient. To create a model formset out of the ``Author`` model from above,
 you have two options:
 
 Method 1: Using ``modelformset_factory``
@@ -840,15 +840,16 @@ Method 2: Using ``ModelFormSet`` class
     ...     fields = ("name", "title")
     ...
 
-Using the declarative syntax, you're able to define the formset directly as a class, 
-similar to how you declare models.
+Using the declarative syntax, you're able to define the formset directly as a
+class, similar to how you declare models.
 
 .. note::
 
-    When creating model formsets, you have the flexibility to customize their 
-    behavior by overriding methods. This can be done on either ``BaseModelFormSet`` 
-    or ``ModelFormSet``, depending on the method you choose to use.
-    It's important to note that both approaches end up giving you the same end results.
+    When creating model formsets, you have the flexibility to customize their
+    behavior by overriding methods. This can be done on either
+    ``BaseModelFormSet`` or ``ModelFormSet``, depending on the method you
+    choose to use. It's important to note that both approaches end up giving
+    you the same end results.
 
 
 Using ``fields`` restricts the formset to use only the given fields.
@@ -1319,15 +1320,16 @@ Method 2: Using ``InlineFormSet`` class
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
-Using the declarative syntax, you're able to define the formset directly as a class, 
-similar to how you declare models.
+Using the declarative syntax, you're able to define the formset directly as a
+class, similar to how you declare models.
 
 .. note::
 
-    When creating inline formsets, you have the flexibility to customize their 
-    behavior by overriding methods. This can be done on either ``BaseInlineFormSet`` 
-    or ``InlineFormSet``, depending on the method you choose to use.
-    It's important to note that both approaches end up giving you the same end results.
+    When creating inline formsets, you have the flexibility to customize
+    their behavior by overriding methods. This can be done on either
+    ``BaseInlineFormSet`` or ``InlineFormSet``, depending on the method you
+    choose to use. It's important to note that both approaches end up giving
+    you the same end results.
 
 
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``

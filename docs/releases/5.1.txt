@@ -233,8 +233,8 @@ Forms
   ``aria-describedby`` HTML attribute.
 
 * The new :class:`formsets.Formset<django.forms.formsets.FormSet>` enables
-  formsets to be made using the declarative syntax, directly as a class, 
-  similar to how you declare models, and can be used to replace the 
+  formsets to be made using the declarative syntax, directly as a class,
+  similar to how you declare models, and can be used to replace the
   :meth:`forms.formsets.formset_factory()
   <django.forms.formsets.formset_factory>`.
 

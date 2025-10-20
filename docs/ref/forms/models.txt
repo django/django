@@ -265,9 +265,9 @@ Declarative ``ModelFormSet``
 
     Returns a ``ModelFormSet`` class for the given ``model`` class.
 
-    The same arguments that can be passed to the ``modelformset_factory`` function 
-    can also be passed to the declarative syntax.
-    
+    The same arguments that can be passed to the ``modelformset_factory``
+    function can also be passed to the declarative syntax.
+
     See the following example which shows how to create AuthorFormSet from
     ``Author`` model::
 
@@ -292,12 +292,12 @@ Declarative ``ModelFormSet``
         ...     widgets = {"field1": TextInput(), "field2": Textarea()}
         ...
 
-    The same arguments that can be passed to the ``modelformset_factory`` function 
-    can also be passed to the declarative syntax.
+    The same arguments that can be passed to the ``modelformset_factory``
+    function can also be passed to the declarative syntax.
 
-    You can also create your model formset without explicitly specifying the model 
-    and fields, as they can be inferred from the form class. As shown in the 
-    example below:
+    You can also create your model formset without explicitly specifying the
+    model and fields, as they can be inferred from the form class. As shown
+    in the example below:
 
     .. code-block:: pycon
 
@@ -337,9 +337,10 @@ Declarative ``InlineFormSet``
 
     .. versionadded:: 5.1
 
-    Returns a ``InlineFormSet`` class for the given ``parent_model`` and ``model`` class.
+    Returns a ``InlineFormSet`` class for the given ``parent_model`` and
+    ``model`` class.
 
-    The Declarative ``InlineFormSet`` class takes the same arguments as the 
+    The Declarative ``InlineFormSet`` class takes the same arguments as the
     :func:`inlineformset_factory` function.
 
     .. code-block:: pycon
