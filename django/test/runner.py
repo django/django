@@ -463,9 +463,6 @@ def _init_worker(
             process_setup(*process_setup_args)
         django.setup()
         setup_test_environment(debug=debug_mode)
-        call_command(
-            "check", stdout=io.StringIO(), stderr=io.StringIO(), databases=used_aliases
-        )
 
     db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:
@@ -476,6 +473,11 @@ def _init_worker(
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
+
+    if is_spawn_or_forkserver:
+        call_command(
+            "check", stdout=io.StringIO(), stderr=io.StringIO(), databases=used_aliases
+        )
 
 
 def _run_subsuite(args):
