@@ -6,8 +6,8 @@ black >= 25.9.0
 docutils >= 0.22
 geoip2 >= 4.8.0
 jinja2 >= 2.11.0
-numpy >= 1.26.0
-Pillow >= 10.1.0
+numpy >= 1.26.0; sys.platform != 'win32' or python_version < '3.15'
+Pillow >= 10.1.0; sys.platform != 'win32' or python_version < '3.15'
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys_platform != 'win32'
 pymemcache >= 3.4.0
