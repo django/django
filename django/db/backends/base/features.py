@@ -339,6 +339,8 @@ class BaseDatabaseFeatures:
 
     # Does the backend support JSONField?
     supports_json_field = True
+    # Does the backend implement support for ABSENT ON NULL clause?
+    supports_json_absent_on_null = True
     # Can the backend introspect a JSONField?
     can_introspect_json_field = True
     # Does the backend support primitives in JSONField?

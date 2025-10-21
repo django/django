@@ -20,6 +20,7 @@ from django.db.models.functions.mixins import (
     FixDurationInputMixin,
     NumericOutputFieldMixin,
 )
+from django.db.models.lookups import IsNull
 
 __all__ = [
     "Aggregate",
@@ -407,10 +408,19 @@ class JSONArrayAgg(Aggregate):
     allow_order_by = True
     arity = 1
 
+    def __init__(self, *expressions, absent_on_null=False, **extra):
+        self.absent_on_null = absent_on_null
+        super().__init__(*expressions, **extra)
+
     def as_sql(self, compiler, connection, **extra_context):
         if self.filter and not connection.features.supports_aggregate_filter_clause:
             raise NotSupportedError(
                 "JSONArrayAgg(filter) is not supported on this database backend."
+            )
+        if self.absent_on_null and not connection.features.supports_json_absent_on_null:
+            raise NotSupportedError(
+                "JSONArrayAgg(absent_on_null) is not supported on this database "
+                "backend."
             )
         return super().as_sql(compiler, connection, **extra_context)
 
@@ -444,21 +454,60 @@ class JSONArrayAgg(Aggregate):
         sql = f"(CASE WHEN {count_sql} > 0 THEN {sql}{default_sql} END)"
         return sql, count_params + params + default_params
 
+    def as_native(self, compiler, connection, *, returning=None, **extra_context):
+        # Oracle and PostgreSQL 16+ default to removing SQL null values from
+        # the returned array. This adds the NULL ON NULL clause to preserve
+        # the null values in the array as default behaviour Similar to that
+        # of SQLite, also removes the null values from the array when
+        # specified via ABSENT ON NULL.
+        if len(self.get_source_expressions()) == 0:
+            on_null_clause = ""
+        elif self.absent_on_null:
+            on_null_clause = "ABSENT ON NULL"
+        else:
+            on_null_clause = "NULL ON NULL"
+        if returning:
+            extra_context.setdefault(
+                "template",
+                "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+                f"{on_null_clause} RETURNING {returning}) %(filter)s",
+            )
+        else:
+            extra_context.setdefault(
+                "template",
+                "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+                f"{on_null_clause}) %(filter)s",
+            )
+        return self.as_sql(compiler, connection, **extra_context)
+
     def as_postgresql(self, compiler, connection, **extra_context):
         if not connection.features.is_postgresql_16:
-            sql, params = super().as_sql(
+            sql, params = self.as_sql(
                 compiler,
                 connection,
                 function="ARRAY_AGG",
                 **extra_context,
             )
-            return f"TO_JSONB({sql})", params
-        extra_context.setdefault(
-            "template",
-            "%(function)s(%(distinct)s%(expressions)s%(order_by)s RETURNING JSONB)\
-            %(filter)s",
-        )
-        return self.as_sql(compiler, connection, **extra_context)
+            # Use a filter to cleanly remove null values from the array to
+            # match the behaviour of ABSENT ON NULL on Oracle and
+            # PostgreSQL 16+.
+            if self.absent_on_null:
+                expression = self.get_source_expressions()[0]
+                if self.filter:
+                    not_null_condition = IsNull(expression, False)
+                    copy = self.copy()
+                    copy.filter.source_expressions[0].children += [not_null_condition]
+                    sql, params = copy.as_sql(
+                        compiler, connection, function="ARRAY_AGG", **extra_context
+                    )
+                    return f"TO_JSONB({sql})", params
+                else:
+                    expr, _ = compiler.compile(expression)
+                    filter_sql = f"FILTER (WHERE {expr} IS NOT NULL)"
+                    return f"TO_JSONB({sql} {filter_sql})", params
+            else:
+                return f"TO_JSONB({sql})", params
+        return self.as_native(compiler, connection, returning="JSONB", **extra_context)
 
     def as_oracle(self, compiler, connection, **extra_context):
         # Oracle turns DATE columns into ISO 8601 timestamp including T00:00:00
@@ -474,5 +523,5 @@ class JSONArrayAgg(Aggregate):
                     *source_expressions[1:],
                 ]
             )
-            return clone.as_sql(compiler, connection, **extra_context)
-        return self.as_sql(compiler, connection, **extra_context)
+            return clone.as_native(compiler, connection, **extra_context)
+        return self.as_native(compiler, connection, **extra_context)

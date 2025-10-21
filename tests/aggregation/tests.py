@@ -2737,7 +2737,7 @@ class AggregateAnnotationPruningTests(TestCase):
 class JSONArrayAggTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.a1 = Author.objects.create(name="Adrian Holovaty", age=34)
+        cls.a1 = Author.objects.create(name="Adrian Holovaty", age=34, rating=1.5)
         cls.a2 = Author.objects.create(name="Jacob Kaplan-Moss", age=45)
         cls.a3 = Author.objects.create(name="Brad Dayley", age=40)
         cls.p1 = Publisher.objects.create(num_awards=3)
@@ -2799,6 +2799,17 @@ class JSONArrayAggTests(TestCase):
         vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pages"))
         self.assertEqual(vals, {"jsonarrayagg": [447, 528, 300]})
 
+    def test_null_on_null(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("rating"))
+        self.assertEqual(vals, {"jsonarrayagg": [1.5, None, None]})
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null(self):
+        vals = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("rating", absent_on_null=True)
+        )
+        self.assertEqual(vals, {"jsonarrayagg": [1.5]})
+
     @skipUnlessDBFeature("supports_aggregate_filter_clause")
     def test_filter(self):
         vals = Book.objects.aggregate(
@@ -2841,6 +2852,14 @@ class JSONArrayAggTests(TestCase):
         msg = "JSONArrayAgg(order_by) is not supported on this database backend."
         with self.assertRaisesMessage(NotSupportedError, msg):
             Author.objects.aggregate(arrayagg=JSONArrayAgg("age", order_by="-name"))
+
+    @skipIfDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null_not_supported(self):
+        msg = "JSONArrayAgg(absent_on_null) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(
+                arrayagg=JSONArrayAgg("rating", absent_on_null=True)
+            )
 
     def test_distinct_true(self):
         msg = "JSONArrayAgg does not allow distinct."
