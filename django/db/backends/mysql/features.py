@@ -60,6 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_virtual_generated_columns = True
 
     supports_json_negative_indexing = False
+    supports_json_absent_on_null = False
 
     @cached_property
     def minimum_database_version(self):
