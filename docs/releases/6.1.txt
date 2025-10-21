@@ -319,6 +319,15 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+:mod:`django.contrib.postgres`
+------------------------------
+
+* Top-level elements set to ``None`` in an
+  :class:`~django.contrib.postgres.fields.ArrayField` with a
+  :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
+  instead of the JSON ``null`` primitive. This matches the behavior of a
+  standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
 Dropped support for PostgreSQL 14
 ---------------------------------
 
