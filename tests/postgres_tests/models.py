@@ -79,7 +79,7 @@ class OtherTypesArrayModel(PostgreSQLModel):
         models.DecimalField(max_digits=5, decimal_places=2), default=list
     )
     tags = ArrayField(TagField(), blank=True, null=True)
-    json = ArrayField(models.JSONField(default=dict), default=list)
+    json = ArrayField(models.JSONField(default=dict), default=list, null=True)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
     bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
 

@@ -1577,3 +1577,20 @@ class TestAdminUtils(PostgreSQLTestCase):
             self.empty_value,
         )
         self.assertEqual(display_value, self.empty_value)
+
+
+class TestJSONFieldQuerying(PostgreSQLTestCase):
+    def test_saving_and_querying_for_sql_null(self):
+        obj = OtherTypesArrayModel.objects.create(json=[None, None])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__isnull=True), [obj]
+        )
+
+    def test_saving_and_querying_for_nested_none(self):
+        obj = OtherTypesArrayModel.objects.create(json=[[None], [None]])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0=None), [obj]
+        )
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
+        )

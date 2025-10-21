@@ -135,6 +135,11 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
             ]
         return value
 
+    def get_db_prep_save(self, value, connection):
+        if isinstance(value, (list, tuple)):
+            return [self.base_field.get_db_prep_save(i, connection) for i in value]
+        return value
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         if path == "django.contrib.postgres.fields.array.ArrayField":
