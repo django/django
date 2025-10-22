@@ -22,6 +22,7 @@ from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
+from django.conf.locale import LANG_INFO
 
 plural_forms_re = _lazy_re_compile(
     r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL
@@ -152,6 +153,7 @@ class BuildFile:
             # removing either of those two removes both.
             if os.path.exists(self.work_path):
                 os.unlink(self.work_path)
+
 
 
 def normalize_eols(raw_contents):
@@ -424,43 +426,52 @@ class Command(BaseCommand):
             # Build po files for each selected locale
             for locale in locales:
                 if not is_valid_locale(locale):
-                    # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and
-                    # nl_NL-x-informal
+                    # Try to find a valid locale by normalizing the input.
+                    # Handles BCP 47 casing and private subtags like "-x-informal".
+                    proposed_locale = None
 
-                    # Search for characters followed by a non character (i.e.
-                    # separator)
-                    match = re.match(
-                        r"^(?P<language>[a-zA-Z]+)"
-                        r"(?P<separator>[^a-zA-Z])"
-                        r"(?P<territory>.+)$",
-                        locale,
-                    )
-                    if match:
-                        locale_parts = match.groupdict()
-                        language = locale_parts["language"].lower()
-                        territory = (
-                            locale_parts["territory"][:2].upper()
-                            + locale_parts["territory"][2:]
-                        )
-                        proposed_locale = f"{language}_{territory}"
-                    else:
-                        # It could be a language in uppercase
-                        proposed_locale = locale.lower()
+                    base_locale, _, private_subtag = locale.partition("-x-")
+                    private_subtag = f"-x-{private_subtag}" if private_subtag else ""
 
-                    # Recheck if the proposed locale is valid
-                    if is_valid_locale(proposed_locale):
-                        self.stdout.write(
-                            "invalid locale %s, did you mean %s?"
-                            % (
-                                locale,
-                                proposed_locale,
-                            ),
-                        )
+                    # Normalize separators (e.g., en-US → en_US)
+                    normalized_locale = base_locale.replace("-", "_").replace("+", "_")
+
+                    # Try case-insensitive lookup in Django's LANG_INFO
+                    locale_lower = normalized_locale.lower()
+                    for valid_locale in LANG_INFO.keys():
+                        valid_base = valid_locale.split("-x-")[0] if "-x-" in valid_locale else valid_locale
+                        if valid_base.lower() == locale_lower:
+                            proposed_locale = valid_base + private_subtag if private_subtag else valid_locale
+                            break
+
+                    # Attempt reconstruction if not matched
+                    if not proposed_locale:
+                        parts = normalized_locale.split("_")
+                        if len(parts) >= 2:
+                            reconstructed = [parts[0].lower()]
+                            for part in parts[1:]:
+                                if len(part) == 4 and part.isalpha():
+                                    reconstructed.append(part.capitalize())
+                                elif len(part) == 2 and part.isalpha():
+                                    reconstructed.append(part.upper())
+                                else:
+                                    reconstructed.append(part)
+                            test_locale = "_".join(reconstructed) + private_subtag
+                            if is_valid_locale(test_locale):
+                                proposed_locale = test_locale
+                        else:
+                            test_locale = normalized_locale.lower() + private_subtag
+                            if is_valid_locale(test_locale):
+                                proposed_locale = test_locale
+
+                    # Output suggestions
+                    if proposed_locale:
+                        self.stdout.write(f"invalid locale {locale}, did you mean {proposed_locale}?")
                     else:
-                        self.stdout.write("invalid locale %s" % locale)
+                        self.stdout.write(f"invalid locale {locale}")
 
                     continue
+                    
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s" % locale)
                 for potfile in potfiles:
@@ -468,7 +479,7 @@ class Command(BaseCommand):
         finally:
             if not self.keep_pot:
                 self.remove_potfiles()
-
+                
     @cached_property
     def gettext_version(self):
         # Gettext tools will output system-encoded bytestrings instead of
