@@ -8,6 +8,7 @@ from pathlib import Path
 
 import django
 from django.conf import settings
+from django.conf.locale import LANG_INFO
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand, CommandError
@@ -152,7 +153,7 @@ class BuildFile:
             # removing either of those two removes both.
             if os.path.exists(self.work_path):
                 os.unlink(self.work_path)
-
+                
 
 def normalize_eols(raw_contents):
     """
@@ -297,7 +298,7 @@ class Command(BaseCommand):
             nargs="?",
             help=(
                 "Controls '#: filename:line' lines. If the option is 'full' "
-                "(the default if not given), the lines  include both file name "
+                "(the default if not given), the lines include both file name "
                 "and line number. If it's 'file', the line number is omitted. If "
                 "it's 'never', the lines are suppressed (same as --no-location). "
                 "--add-location requires gettext 0.19 or newer."
@@ -382,10 +383,15 @@ class Command(BaseCommand):
             self.invoked_for_django = True
         else:
             if self.settings_available:
-                self.locale_paths.extend(settings.LOCALE_PATHS)
+                for path in settings.LOCALE_PATHS:
+                    locale_path = os.path.abspath(path)
+                    if locale_path not in self.locale_paths:
+                        self.locale_paths.append(locale_path)
             # Allow to run makemessages inside an app dir
             if os.path.isdir("locale"):
-                self.locale_paths.append(os.path.abspath("locale"))
+                locale_path = os.path.abspath("locale")
+                if locale_path not in self.locale_paths:
+                    self.locale_paths.append(locale_path)
             if self.locale_paths:
                 self.default_locale_path = self.locale_paths[0]
                 os.makedirs(self.default_locale_path, exist_ok=True)
@@ -419,41 +425,62 @@ class Command(BaseCommand):
             # Build po files for each selected locale
             for locale in locales:
                 if not is_valid_locale(locale):
-                    # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
+                    # Try to find a valid locale by normalizing the input.
+                    # Handles BCP 47 casing and private subtags like "-x-informal".
+                    proposed_locale = None
 
-                    # Search for characters followed by a non character (i.e. separator)
-                    match = re.match(
-                        r"^(?P<language>[a-zA-Z]+)"
-                        r"(?P<separator>[^a-zA-Z])"
-                        r"(?P<territory>.+)$",
-                        locale,
-                    )
-                    if match:
-                        locale_parts = match.groupdict()
-                        language = locale_parts["language"].lower()
-                        territory = (
-                            locale_parts["territory"][:2].upper()
-                            + locale_parts["territory"][2:]
+                    base_locale, _, private_subtag = locale.partition("-x-")
+                    private_subtag = f"-x-{private_subtag}" if private_subtag else ""
+
+                    # Normalize separators (e.g., en-US → en_US)
+                    normalized_locale = base_locale.replace("-", "_").replace("+", "_")
+
+                    # Try case-insensitive lookup in Django's LANG_INFO
+                    locale_lower = normalized_locale.lower()
+                    for valid_locale in LANG_INFO.keys():
+                        valid_base = (
+                            valid_locale.split("-x-")[0]
+                            if "-x-" in valid_locale
+                            else valid_locale
                         )
-                        proposed_locale = f"{language}_{territory}"
-                    else:
-                        # It could be a language in uppercase
-                        proposed_locale = locale.lower()
+                        if valid_base.lower() == locale_lower:
+                            proposed_locale = (
+                                valid_base + private_subtag
+                                if private_subtag
+                                else valid_locale
+                            )
+                            break
 
-                    # Recheck if the proposed locale is valid
-                    if is_valid_locale(proposed_locale):
+                    # Attempt reconstruction if not matched
+                    if not proposed_locale:
+                        parts = normalized_locale.split("_")
+                        if len(parts) >= 2:
+                            reconstructed = [parts[0].lower()]
+                            for part in parts[1:]:
+                                if len(part) == 4 and part.isalpha():
+                                    reconstructed.append(part.capitalize())
+                                elif len(part) == 2 and part.isalpha():
+                                    reconstructed.append(part.upper())
+                                else:
+                                    reconstructed.append(part)
+                            test_locale = "_".join(reconstructed) + private_subtag
+                            if is_valid_locale(test_locale):
+                                proposed_locale = test_locale
+                        else:
+                            test_locale = normalized_locale.lower() + private_subtag
+                            if is_valid_locale(test_locale):
+                                proposed_locale = test_locale
+
+                    # Output suggestions
+                    if proposed_locale:
                         self.stdout.write(
-                            "invalid locale %s, did you mean %s?"
-                            % (
-                                locale,
-                                proposed_locale,
-                            ),
+                            f"invalid locale {locale}, did you mean {proposed_locale}?"
                         )
                     else:
-                        self.stdout.write("invalid locale %s" % locale)
+                        self.stdout.write(f"invalid locale {locale}")
 
                     continue
+
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s" % locale)
                 for potfile in potfiles:

@@ -1069,3 +1069,37 @@ class UnchangedPoExtractionTests(ExtractorTests):
             "This is a hitherto undiscovered translatable string.",
             po_contents,
         )
+
+class InvalidLocaleExtractionTests(ExtractorTests):
+
+    def setUp(self):
+        super().setUp()
+        # Ensure locale directory exists
+        Path("locale").mkdir(exist_ok=True)
+
+    def test_invalid_locale_script_code(self):
+        """
+        Test that script codes (like Hans in zh_Hans) are correctly capitalized
+        in locale suggestions. Regression test for #36642.
+        """
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["zh-hans"], stdout=out, verbosity=1
+        )
+        self.assertIn("invalid locale zh-hans, did you mean zh_Hans?", out.getvalue())
+        self.assertNotIn("processing locale zh-hans", out.getvalue())
+        self.assertIs(Path("locale/zh-hans/LC_MESSAGES/django.po").exists(), False)
+
+    def test_invalid_locale_script_code_latn(self):
+        """
+        Test script code suggestion for shi_Latn_MA with hyphens.
+        """
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["shi-latn-ma"], stdout=out, verbosity=1
+        )
+        self.assertIn(
+            "invalid locale shi-latn-ma, did you mean shi_Latn_MA?", out.getvalue()
+        )
+        self.assertNotIn("processing locale shi-latn-ma", out.getvalue())
+        self.assertIs(Path("locale/shi-latn-ma/LC_MESSAGES/django.po").exists(), False)
