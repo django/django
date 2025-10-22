@@ -124,7 +124,7 @@ Backends are configured via the :setting:`TASKS` setting. The :ref:`two
 built-in backends <task-available-backends>` included in this release are
 primarily intended for development and testing.
 
-Django handles task creation and queuing but does not provide a worker
+Django handles task creation and queuing, but does not provide a worker
 mechanism to run tasks. Execution must be managed by external infrastructure,
 such as a separate process or service.
 
@@ -575,7 +575,7 @@ to remove usage of these features.
 * Support for calling ``format_html()`` without passing args or kwargs is
   removed.
 
-* The default scheme for ``forms.URLField`` changed from ``"http"`` to
+* The default scheme for ``forms.URLField`` has changed from ``"http"`` to
   ``"https"``.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is removed.
