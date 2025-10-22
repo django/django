@@ -19,9 +19,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_alter_column_no_default_null = sql_alter_column_no_default
 
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = (
-        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s"
+        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)"
+        "s%(deferrable)s"
     )
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
@@ -137,7 +137,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             elif new_internal_type == "DateTimeField":
                 new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
             elif new_internal_type == "TimeField":
-                # TimeField are stored as TIMESTAMP with a 1900-01-01 date part.
+                # TimeField are stored as TIMESTAMP with a 1900-01-01 date
+                # part.
                 new_value = "CONCAT('1900-01-01 ', %s)" % new_value
                 new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
         # Transfer values across
@@ -211,6 +212,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return create_index
 
     def _is_identity_column(self, table_name, column_name):
+        if not column_name:
+            return False
         with self.connection.cursor() as cursor:
             cursor.execute(
                 """

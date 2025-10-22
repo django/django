@@ -1,12 +1,19 @@
 import datetime
 import uuid
 from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
-from django.db import DatabaseError, NotSupportedError
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
+from django.db.models import (
+    AutoField,
+    CompositePrimaryKey,
+    Exists,
+    ExpressionWrapper,
+    Lookup,
+)
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
@@ -15,7 +22,7 @@ from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
-from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
+from .utils import BoundVar, BulkInsertMapper, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -266,12 +273,12 @@ END;
         return value
 
     def convert_datefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.date()
         return value
 
     def convert_timefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.time()
         return value
 
@@ -291,21 +298,27 @@ END;
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        columns = []
-        for param in returning_params:
-            value = param.get_value()
-            # Can be removed when cx_Oracle is no longer supported and
-            # python-oracle 2.1.2 becomes the minimum supported version.
-            if value == []:
-                raise DatabaseError(
-                    "The database did not return a new row id. Probably "
-                    '"ORA-1403: no data found" was raised internally but was '
-                    "hidden by the Oracle OCI library (see "
-                    "https://code.djangoproject.com/ticket/28859)."
+    def returning_columns(self, fields):
+        if not fields:
+            return "", ()
+        field_names = []
+        params = []
+        for field in fields:
+            field_names.append(
+                "%s.%s"
+                % (
+                    self.quote_name(field.model._meta.db_table),
+                    self.quote_name(field.column),
                 )
-            columns.append(value[0])
-        return tuple(columns)
+            )
+            params.append(BoundVar(field))
+        return "RETURNING %s INTO %s" % (
+            ", ".join(field_names),
+            ", ".join(["%s"] * len(params)),
+        ), tuple(params)
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        return list(zip(*(param.get_value() for param in returning_params)))
 
     def no_limit_value(self):
         return None
@@ -328,7 +341,7 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, oracledb's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if params:
+        if statement and params:
             if isinstance(params, (tuple, list)):
                 params = {
                     f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))
@@ -374,15 +387,15 @@ END;
         return value.read()
 
     def quote_name(self, name):
-        # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+        # SQL92 requires delimited (quoted) names to be case-sensitive. When
         # not quoted, Oracle has case-insensitive behavior for identifiers, but
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % truncate_name(name, self.max_name_length())
-        # Oracle puts the query text into a (query % args) construct, so % signs
-        # in names need to be escaped. The '%%' will be collapsed back to '%' at
-        # that stage so we aren't really making the name longer here.
+        # Oracle puts the query text into a (query % args) construct, so %
+        # signs in names need to be escaped. The '%%' will be collapsed back to
+        # '%' at that stage so we aren't really making the name longer here.
         name = name.replace("%", "%%")
         return name.upper()
 
@@ -392,25 +405,6 @@ END;
         else:
             match_option = "'i'"
         return "REGEXP_LIKE(%%s, %%s, %s)" % match_option
-
-    def return_insert_columns(self, fields):
-        if not fields:
-            return "", ()
-        field_names = []
-        params = []
-        for field in fields:
-            field_names.append(
-                "%s.%s"
-                % (
-                    self.quote_name(field.model._meta.db_table),
-                    self.quote_name(field.column),
-                )
-            )
-            params.append(InsertVar(field))
-        return "RETURNING %s INTO %s" % (
-            ", ".join(field_names),
-            ", ".join(["%s"] * len(params)),
-        ), tuple(params)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
@@ -591,8 +585,8 @@ END;
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
 
         If naive datetime is passed assumes that is in UTC. Normally Django
         models.DateTimeField makes sure that if USE_TZ is True passed datetime
@@ -614,6 +608,9 @@ END;
 
         return Oracle_datetime.from_datetime(value)
 
+    def adapt_durationfield_value(self, value):
+        return value
+
     def adapt_timefield_value(self, value):
         if value is None:
             return None
@@ -628,9 +625,6 @@ END;
         return Oracle_datetime(
             1900, 1, 1, value.hour, value.minute, value.second, value.microsecond
         )
-
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
 
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
@@ -711,6 +705,12 @@ END;
 
     def bulk_batch_size(self, fields, objs):
         """Oracle restricts the number of parameters in a query."""
+        fields = list(
+            chain.from_iterable(
+                field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                for field in fields
+            )
+        )
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)

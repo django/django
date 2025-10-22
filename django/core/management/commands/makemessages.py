@@ -41,7 +41,7 @@ def check_programs(*programs):
 
 
 def is_valid_locale(locale):
-    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z].*$", locale)
+    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z0-9].*$", locale)
 
 
 @total_ordering
@@ -482,8 +482,9 @@ class Command(BaseCommand):
                 
     @cached_property
     def gettext_version(self):
-        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
-        # when looking up the version. It's especially a problem on Windows.
+        # Gettext tools will output system-encoded bytestrings instead of
+        # UTF-8, when looking up the version. It's especially a problem on
+        # Windows.
         out, err, status = popen_wrapper(
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
@@ -516,7 +517,7 @@ class Command(BaseCommand):
             potfile = os.path.join(path, "%s.pot" % self.domain)
             if not os.path.exists(potfile):
                 continue
-            args = ["msguniq"] + self.msguniq_options + [potfile]
+            args = ["msguniq", *self.msguniq_options, potfile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -566,9 +567,10 @@ class Command(BaseCommand):
                         self.stdout.write("ignoring directory %s" % dirname)
                 elif dirname == "locale":
                     dirnames.remove(dirname)
-                    self.locale_paths.insert(
-                        0, os.path.join(os.path.abspath(dirpath), dirname)
-                    )
+                    locale_dir = os.path.join(os.path.abspath(dirpath), dirname)
+                    if locale_dir in self.locale_paths:
+                        self.locale_paths.remove(locale_dir)
+                    self.locale_paths.insert(0, locale_dir)
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
@@ -720,7 +722,7 @@ class Command(BaseCommand):
         pofile = os.path.join(basedir, "%s.po" % self.domain)
 
         if os.path.exists(pofile):
-            args = ["msgmerge"] + self.msgmerge_options + [pofile, potfile]
+            args = ["msgmerge", *self.msgmerge_options, pofile, potfile]
             _, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -743,7 +745,7 @@ class Command(BaseCommand):
             fp.write(msgs)
 
         if self.no_obsolete:
-            args = ["msgattrib"] + self.msgattrib_options + ["-o", pofile, pofile]
+            args = ["msgattrib", *self.msgattrib_options, "-o", pofile, pofile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:

@@ -7,10 +7,11 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (14,)
+    minimum_database_version = (15,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
+    can_return_rows_from_update = True
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
@@ -52,18 +53,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     requires_casted_case_in_updates = True
     supports_over_clause = True
     supports_frame_exclusion = True
     only_supports_unbounded_with_preceding_and_following = True
     supports_aggregate_filter_clause = True
+    supports_aggregate_order_by_clause = True
     supported_explain_formats = {"JSON", "TEXT", "XML", "YAML"}
     supports_deferrable_unique_constraints = True
     has_json_operators = True
@@ -72,7 +67,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
     supports_stored_generated_columns = True
-    supports_virtual_generated_columns = False
+    supports_nulls_distinct_unique_constraints = True
     can_rename_index = True
     test_collations = {
         "deterministic": "C",
@@ -129,6 +124,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "test_group_by_nested_expression_with_params",
                 }
             )
+        if not is_psycopg3:
+            expected_failures.update(
+                {
+                    # operator does not exist: bigint[] = integer[]
+                    "postgres_tests.test_array.TestQuerying.test_gt",
+                    "postgres_tests.test_array.TestQuerying.test_in",
+                    "postgres_tests.test_array.TestQuerying.test_lt",
+                }
+            )
         return expected_failures
 
     @cached_property
@@ -153,14 +157,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_15(self):
-        return self.connection.pg_version >= 150000
-
-    @cached_property
     def is_postgresql_16(self):
         return self.connection.pg_version >= 160000
 
+    @cached_property
+    def is_postgresql_17(self):
+        return self.connection.pg_version >= 170000
+
+    @cached_property
+    def is_postgresql_18(self):
+        return self.connection.pg_version >= 180000
+
     supports_unlimited_charfield = True
-    supports_nulls_distinct_unique_constraints = property(
-        operator.attrgetter("is_postgresql_15")
+    supports_any_value = property(operator.attrgetter("is_postgresql_16"))
+    supports_virtual_generated_columns = property(
+        operator.attrgetter("is_postgresql_18")
     )

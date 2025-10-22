@@ -5,14 +5,15 @@ Porting your apps from Django 0.96 to 1.0
 Django 1.0 breaks compatibility with 0.96 in some areas.
 
 This guide will help you port 0.96 projects and apps to 1.0. The first part of
-this document includes the common changes needed to run with 1.0. If after going
-through the first part your code still breaks, check the section `Less-common
-Changes`_ for a list of a bunch of less-common compatibility issues.
+this document includes the common changes needed to run with 1.0. If after
+going through the first part your code still breaks, check the section
+`Less-common Changes`_ for a list of a bunch of less-common compatibility
+issues.
 
 .. seealso::
 
-    The :doc:`1.0 release notes </releases/1.0>`. That document explains the new
-    features in 1.0 more deeply; the porting guide is more concerned with
+    The :doc:`1.0 release notes </releases/1.0>`. That document explains the
+    new features in 1.0 more deeply; the porting guide is more concerned with
     helping you quickly update your code.
 
 Common changes
@@ -83,7 +84,8 @@ see `the admin`_ below for more details.
 Example
 ~~~~~~~
 
-Below is an example ``models.py`` file with all the changes you'll need to make:
+Below is an example ``models.py`` file with all the changes you'll need to
+make:
 
 Old (0.96) ``models.py``::
 
@@ -127,14 +129,14 @@ The Admin
 One of the biggest changes in 1.0 is the new admin. The Django administrative
 interface (``django.contrib.admin``) has been completely refactored; admin
 definitions are now completely decoupled from model definitions, the framework
-has been rewritten to use Django's new form-handling library and redesigned with
-extensibility and customization in mind.
+has been rewritten to use Django's new form-handling library and redesigned
+with extensibility and customization in mind.
 
 Practically, this means you'll need to rewrite all of your ``class Admin``
-declarations. You've already seen in `models`_ above how to replace your ``class
-Admin`` with an ``admin.site.register()`` call in an ``admin.py`` file. Below are
-some more details on how to rewrite that ``Admin`` declaration into the new
-syntax.
+declarations. You've already seen in `models`_ above how to replace your
+``class Admin`` with an ``admin.site.register()`` call in an ``admin.py`` file.
+Below are some more details on how to rewrite that ``Admin`` declaration into
+the new syntax.
 
 Use new inline syntax
 ~~~~~~~~~~~~~~~~~~~~~
@@ -210,8 +212,8 @@ New (1.0)::
     * More detailed information about the changes and the reasons behind them
       can be found on the `NewformsAdminBranch wiki page`__
 
-    * The new admin comes with a ton of new features; you can read about them in
-      the :doc:`admin documentation </ref/contrib/admin/index>`.
+    * The new admin comes with a ton of new features; you can read about them
+      in the :doc:`admin documentation </ref/contrib/admin/index>`.
 
     __ https://code.djangoproject.com/wiki/NewformsAdminBranch
 
@@ -301,10 +303,10 @@ Old (0.96)            New (1.0)
 Work with file fields using the new API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The internal implementation of :class:`django.db.models.FileField` have changed.
-A visible result of this is that the way you access special attributes (URL,
-filename, image size, etc.) of these model fields has changed. You will need to
-make the following changes, assuming your model's
+The internal implementation of :class:`django.db.models.FileField` have
+changed. A visible result of this is that the way you access special attributes
+(URL, filename, image size, etc.) of these model fields has changed. You will
+need to make the following changes, assuming your model's
 :class:`~django.db.models.FileField` is called ``myfile``:
 
 =================================== ========================
@@ -358,8 +360,8 @@ Less-common changes
 ===================
 
 The following changes are smaller, more localized changes. They should only
-affect more advanced users, but it's probably worth reading through the list and
-checking your code for these things.
+affect more advanced users, but it's probably worth reading through the list
+and checking your code for these things.
 
 Signals
 -------
@@ -370,8 +372,8 @@ Signals
   :class:`~django.dispatch.Signal` object instead of through module methods in
   ``django.dispatch.dispatcher``.
 
-* Remove any use of the ``Anonymous`` and ``Any`` sender options; they no longer
-  exist. You can still receive signals sent by any sender by using
+* Remove any use of the ``Anonymous`` and ``Any`` sender options; they no
+  longer exist. You can still receive signals sent by any sender by using
   ``sender=None``
 
 * Make any custom signals you've declared into instances of
@@ -502,7 +504,8 @@ New (1.0)::
 The ``LazyDate`` helper class no longer exists.
 
 Default field values and query arguments can both be callable objects, so
-instances of ``LazyDate`` can be replaced with a reference to ``datetime.datetime.now``:
+instances of ``LazyDate`` can be replaced with a reference to
+``datetime.datetime.now``:
 
 Old (0.96)::
 
@@ -631,7 +634,8 @@ Accessing ``HTTPResponse`` headers
 
 ``django.http.HttpResponse.headers`` has been renamed to ``_headers`` and
 :class:`~django.http.HttpResponse` now supports containment checking directly.
-So use ``if header in response:`` instead of ``if header in response.headers:``.
+So use ``if header in response:`` instead of ``if header in
+response.headers:``.
 
 Generic relations
 -----------------

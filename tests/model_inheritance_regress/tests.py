@@ -7,6 +7,7 @@ from operator import attrgetter
 from unittest import expectedFailure
 
 from django import forms
+from django.db.models import FETCH_PEERS
 from django.test import TestCase
 
 from .models import (
@@ -439,7 +440,8 @@ class ModelInheritanceTest(TestCase):
 
     def test_concrete_abstract_concrete_pk(self):
         """
-        Primary key set correctly with concrete->abstract->concrete inheritance.
+        Primary key set correctly with concrete->abstract->concrete
+        inheritance.
         """
         # Regression test for #13987: Primary key is incorrectly determined
         # when more than one model has a concrete->abstract->concrete
@@ -598,6 +600,22 @@ class ModelInheritanceTest(TestCase):
             restaurant = italian_restaurant.restaurant_ptr
             self.assertEqual(restaurant.place_ptr.restaurant, restaurant)
             self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+    def test_parent_access_copies_fetch_mode(self):
+        italian_restaurant = ItalianRestaurant.objects.create(
+            name="Mom's Spaghetti",
+            address="2131 Woodward Ave",
+            serves_hot_dogs=False,
+            serves_pizza=False,
+            serves_gnocchi=True,
+        )
+
+        # No queries are made when accessing the parent objects.
+        italian_restaurant = ItalianRestaurant.objects.fetch_mode(FETCH_PEERS).get(
+            pk=italian_restaurant.pk
+        )
+        restaurant = italian_restaurant.restaurant_ptr
+        self.assertEqual(restaurant._state.fetch_mode, FETCH_PEERS)
 
     def test_id_field_update_on_ancestor_change(self):
         place1 = Place.objects.create(name="House of Pasta", address="944 Fullerton")

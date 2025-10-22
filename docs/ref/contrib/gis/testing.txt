@@ -15,7 +15,8 @@ Settings
 
 .. note::
 
-    The settings below have sensible defaults, and shouldn't require manual setting.
+    The settings below have sensible defaults, and shouldn't require manual
+    setting.
 
 .. setting:: POSTGIS_VERSION
 

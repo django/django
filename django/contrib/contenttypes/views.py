@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import gettext as _
 
@@ -19,7 +19,7 @@ def shortcut(request, content_type_id, object_id):
                 % {"ct_id": content_type_id}
             )
         obj = content_type.get_object_for_this_type(pk=object_id)
-    except (ObjectDoesNotExist, ValueError):
+    except (ObjectDoesNotExist, ValueError, ValidationError):
         raise Http404(
             _("Content type %(ct_id)s object %(obj_id)s doesn’t exist")
             % {"ct_id": content_type_id, "obj_id": object_id}

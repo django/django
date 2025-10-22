@@ -1,0 +1,13 @@
+===========================
+Django 5.0.13 release notes
+===========================
+
+*March 6, 2025*
+
+Django 5.0.13 fixes a security issue with severity "moderate" in 5.0.12.
+
+CVE-2025-26699: Potential denial-of-service vulnerability in ``django.utils.text.wrap()``
+=========================================================================================
+
+The ``wrap()`` and :tfilter:`wordwrap` template filter were subject to a
+potential denial-of-service attack when used with very long strings.

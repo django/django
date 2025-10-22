@@ -90,13 +90,24 @@ class ExplainTests(TestCase):
         ]
         if connection.features.is_postgresql_16:
             test_options.append({"generic_plan": True})
+        if connection.features.is_postgresql_17:
+            test_options.append({"memory": True})
+            test_options.append({"serialize": "TEXT", "analyze": True})
+            test_options.append({"serialize": "text", "analyze": True})
+            test_options.append({"serialize": "BINARY", "analyze": True})
+            test_options.append({"serialize": "binary", "analyze": True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
                     qs.explain(format="text", **options)
                 self.assertEqual(len(captured_queries), 1)
                 for name, value in options.items():
-                    option = "{} {}".format(name.upper(), "true" if value else "false")
+                    if isinstance(value, str):
+                        option = "{} {}".format(name.upper(), value.upper())
+                    else:
+                        option = "{} {}".format(
+                            name.upper(), "true" if value else "false"
+                        )
                     self.assertIn(option, captured_queries[0]["sql"])
 
     @skipUnlessDBFeature("supports_select_union")

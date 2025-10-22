@@ -1,27 +1,8 @@
 import enum
-import warnings
+from enum import EnumType, IntEnum, StrEnum
+from enum import property as enum_property
 
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import Promise
-from django.utils.version import PY311, PY312
-
-if PY311:
-    from enum import EnumType, IntEnum, StrEnum
-    from enum import property as enum_property
-else:
-    from enum import EnumMeta as EnumType
-    from types import DynamicClassAttribute as enum_property
-
-    class ReprEnum(enum.Enum):
-        def __str__(self):
-            return str(self.value)
-
-    class IntEnum(int, ReprEnum):
-        pass
-
-    class StrEnum(str, ReprEnum):
-        pass
-
 
 __all__ = ["Choices", "IntegerChoices", "TextChoices"]
 
@@ -51,14 +32,6 @@ class ChoicesType(EnumType):
             member._label_ = label
         return enum.unique(cls)
 
-    if not PY312:
-
-        def __contains__(cls, member):
-            if not isinstance(member, enum.Enum):
-                # Allow non-enums to match against member values.
-                return any(x.value == member for x in cls)
-            return super().__contains__(member)
-
     @property
     def names(cls):
         empty = ["__empty__"] if hasattr(cls, "__empty__") else []
@@ -81,13 +54,7 @@ class ChoicesType(EnumType):
 class Choices(enum.Enum, metaclass=ChoicesType):
     """Class for creating enumerated choices."""
 
-    if PY311:
-        do_not_call_in_templates = enum.nonmember(True)
-    else:
-
-        @property
-        def do_not_call_in_templates(self):
-            return True
+    do_not_call_in_templates = enum.nonmember(True)
 
     @enum_property
     def label(self):
@@ -110,14 +77,3 @@ class TextChoices(Choices, StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         return name
-
-
-def __getattr__(name):
-    if name == "ChoicesMeta":
-        warnings.warn(
-            "ChoicesMeta is deprecated in favor of ChoicesType.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return ChoicesType
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

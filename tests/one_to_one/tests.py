@@ -1,6 +1,7 @@
+from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
+from django.db.models import FETCH_PEERS, RAISE
 from django.test import TestCase
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Bar,
@@ -67,7 +68,8 @@ class OneToOneTests(TestCase):
         self.assertEqual(repr(r.place), "<Place: Demon Dogs the place>")
 
     def test_manager_all(self):
-        # Restaurant.objects.all() just returns the Restaurants, not the Places.
+        # Restaurant.objects.all() just returns the Restaurants, not the
+        # Places.
         self.assertSequenceEqual(Restaurant.objects.all(), [self.r1])
         # Place.objects.all() returns all Places, regardless of whether they
         # have Restaurants.
@@ -266,9 +268,10 @@ class OneToOneTests(TestCase):
         del p._state.fields_cache["restaurant"]
         self.assertIsNot(p.restaurant, r)
 
-        # Reassigning the Restaurant object results in an immediate cache update
-        # We can't use a new Restaurant because that'll violate one-to-one, but
-        # with a new *instance* the is test below will fail if #6886 regresses.
+        # Reassigning the Restaurant object results in an immediate cache
+        # update We can't use a new Restaurant because that'll violate
+        # one-to-one, but with a new *instance* the is test below will fail if
+        # #6886 regresses.
         r2 = Restaurant.objects.get(pk=r.pk)
         p.restaurant = r2
         self.assertIs(p.restaurant, r2)
@@ -299,8 +302,8 @@ class OneToOneTests(TestCase):
         r = Restaurant(place=p)
         self.assertIs(r.place, p)
 
-        # Creation using attname keyword argument and an id will cause the related
-        # object to be fetched.
+        # Creation using attname keyword argument and an id will cause the
+        # related object to be fetched.
         p = Place.objects.get(name="Demon Dogs")
         r = Restaurant(place_id=p.id)
         self.assertIsNot(r.place, p)
@@ -484,10 +487,12 @@ class OneToOneTests(TestCase):
         private_school = School.objects.create(is_public=False)
         private_director = Director.objects.create(school=private_school, is_temp=True)
 
-        # Only one school is available via all() due to the custom default manager.
+        # Only one school is available via all() due to the custom default
+        # manager.
         self.assertSequenceEqual(School.objects.all(), [public_school])
 
-        # Only one director is available via all() due to the custom default manager.
+        # Only one director is available via all() due to the custom default
+        # manager.
         self.assertSequenceEqual(Director.objects.all(), [public_director])
 
         self.assertEqual(public_director.school, public_school)
@@ -498,9 +503,9 @@ class OneToOneTests(TestCase):
         # allow it.
         self.assertEqual(private_director.school, private_school)
 
-        # Make sure the base manager is used so that an student can still access
-        # its related school even if the default manager doesn't normally
-        # allow it.
+        # Make sure the base manager is used so that an student can still
+        # access its related school even if the default manager doesn't
+        # normally allow it.
         self.assertEqual(private_school.director, private_director)
 
         School._meta.base_manager_name = "objects"
@@ -606,16 +611,6 @@ class OneToOneTests(TestCase):
         self.b1.save()
         self.assertEqual(self.b1.place, self.p2)
 
-    def test_get_prefetch_queryset_warning(self):
-        places = Place.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Place.bar.get_prefetch_queryset(places)
-        self.assertEqual(ctx.filename, __file__)
-
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         places = Place.objects.all()
         msg = (
@@ -626,3 +621,77 @@ class OneToOneTests(TestCase):
                 instances=places,
                 querysets=[Bar.objects.all(), Bar.objects.all()],
             )
+
+    def test_fetch_mode_fetch_peers_forward(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        r1, r2 = Restaurant.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            r1.place
+        with self.assertNumQueries(0):
+            r2.place
+
+    def test_fetch_mode_fetch_peers_reverse(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        p1, p2 = Place.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            p1.restaurant
+        with self.assertNumQueries(0):
+            p2.restaurant
+
+    def test_fetch_mode_raise_forward(self):
+        r = Restaurant.objects.fetch_mode(RAISE).get(pk=self.r1.pk)
+        msg = "Fetching of Restaurant.place blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            r.place
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_raise_reverse(self):
+        p = Place.objects.fetch_mode(RAISE).get(pk=self.p1.pk)
+        msg = "Fetching of Place.restaurant blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p.restaurant
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        r1 = Restaurant.objects.fetch_mode(FETCH_PEERS).get(pk=self.r1.pk)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            r1.place._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        r1, r2 = Restaurant.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            r1.place._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        p1 = Place.objects.fetch_mode(FETCH_PEERS).get(pk=self.p1.pk)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            p1.restaurant._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        p1, p2 = Place.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            p1.restaurant._state.fetch_mode,
+            FETCH_PEERS,
+        )

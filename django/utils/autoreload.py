@@ -82,7 +82,6 @@ def check_errors(fn):
 
 
 def raise_last_exception():
-    global _exception
     if _exception is not None:
         raise _exception[1]
 
@@ -194,7 +193,7 @@ def common_roots(paths):
     # Turn the tree into a list of Path instances.
     def _walk(node, path):
         for prefix, child in node.items():
-            yield from _walk(child, path + (prefix,))
+            yield from _walk(child, [*path, prefix])
         if not node:
             yield Path(*path)
 
@@ -269,6 +268,19 @@ def trigger_reload(filename):
 
 def restart_with_reloader():
     new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: "true"}
+    orig = getattr(sys, "orig_argv", ())
+    if any(
+        (arg == "-u")
+        or (
+            arg.startswith("-")
+            and not arg.startswith(("--", "-X", "-W"))
+            and len(arg) > 2
+            and arg[1:].isalpha()
+            and "u" in arg
+        )
+        for arg in orig[1:]
+    ):
+        new_environ.setdefault("PYTHONUNBUFFERED", "1")
     args = get_child_arguments()
     while True:
         p = subprocess.run(args, env=new_environ, close_fds=False)
@@ -469,8 +481,9 @@ class WatchmanReloader(BaseReloader):
 
     def _subscribe(self, directory, name, expression):
         root, rel_path = self._watch_root(directory)
-        # Only receive notifications of files changing, filtering out other types
-        # like special files: https://facebook.github.io/watchman/docs/type
+        # Only receive notifications of files changing, filtering out other
+        # types like special files:
+        # https://facebook.github.io/watchman/docs/type
         only_files_expression = [
             "allof",
             ["anyof", ["type", "f"], ["type", "l"]],

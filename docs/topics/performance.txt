@@ -72,10 +72,7 @@ in effect simulating the experience of an actual user.
 
 These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
-adequately measured from within Django environment. Examples include:
-
-* `Yahoo's Yslow <https://yslow.org/>`_
-* `Google PageSpeed <https://developers.google.com/speed/>`_
+adequately measured from within Django environment.
 
 There are also several paid-for services that perform a similar analysis,
 including some that are Django-aware and can integrate with your codebase to
@@ -137,7 +134,7 @@ one that it is comfortable to code for.
 
     Firstly, in a real-life case you need to consider what is happening before
     and after your count to work out what's an optimal way of doing it *in that
-    particular context*. The database optimization documents describes :ref:`a
+    particular context*. The database optimization document describes :ref:`a
     case where counting in the template would be better
     <overuse_of_count_and_exists>`.
 
@@ -207,7 +204,7 @@ therefore have performance implications, and the more expensive the work
 concerned, the more there is to gain through laziness.
 
 Python provides a number of tools for lazy evaluation, particularly through the
-:py:term:`generator` and :py:term:`generator expression` constructs. It's worth
+:term:`generator` and :term:`generator expression` constructs. It's worth
 reading up on laziness in Python to discover opportunities for making use of
 lazy patterns in your code.
 
@@ -215,11 +212,12 @@ Laziness in Django
 ------------------
 
 Django is itself quite lazy. A good example of this can be found in the
-evaluation of ``QuerySets``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
+evaluation of a ``QuerySet``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
 Thus a ``QuerySet`` can be created, passed around and combined with other
-``QuerySets``, without actually incurring any trips to the database to fetch
-the items it describes. What gets passed around is the ``QuerySet`` object, not
-the collection of items that - eventually - will be required from the database.
+``QuerySet`` instances, without actually incurring any trips to the database
+to fetch the items it describes. What gets passed around is the ``QuerySet``
+object, not the collection of items that - eventually - will be required from
+the database.
 
 On the other hand, :ref:`certain operations will force the evaluation of a
 QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
@@ -250,7 +248,8 @@ Other database-related tips
 Enabling :ref:`persistent-database-connections` can speed up connections to the
 database accounts for a significant part of the request processing time.
 
-This helps a lot on virtualized hosts with limited network performance, for example.
+This helps a lot on virtualized hosts with limited network performance, for
+example.
 
 HTTP performance
 ================
@@ -274,7 +273,8 @@ needed.
 Compresses responses for all modern browsers, saving bandwidth and transfer
 time. Note that GZipMiddleware is currently considered a security risk, and is
 vulnerable to attacks that nullify the protection provided by TLS/SSL. See the
-warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
+warning in :class:`~django.middleware.gzip.GZipMiddleware` for more
+information.
 
 Sessions
 --------
@@ -299,8 +299,8 @@ optimization gains.
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
-content-dependent tag to the filenames of :doc:`static files
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends
+a content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the
 tag, so browsers will reload the asset automatically.
@@ -422,7 +422,8 @@ performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
 <https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.
-Django is compatible, but you will need to check the compatibility of other
+Django is compatible with versions of PyPy corresponding to the supported
+Python versions, but you will need to check the compatibility of other
 libraries you rely on.
 
 C implementations of Python libraries

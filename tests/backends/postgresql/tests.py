@@ -373,7 +373,8 @@ class Tests(TestCase):
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
-            # Check the level on the psycopg connection, not the Django wrapper.
+            # Check the level on the psycopg connection, not the Django
+            # wrapper.
             self.assertEqual(
                 new_connection.connection.isolation_level,
                 IsolationLevel.SERIALIZABLE,
@@ -548,12 +549,12 @@ class Tests(TestCase):
 
     def test_get_database_version(self):
         new_connection = no_pool_connection()
-        new_connection.pg_version = 140009
-        self.assertEqual(new_connection.get_database_version(), (14, 9))
+        new_connection.pg_version = 150009
+        self.assertEqual(new_connection.get_database_version(), (15, 9))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(13,))
+    @mock.patch.object(connection, "get_database_version", return_value=(14,))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "PostgreSQL 14 or later is required (found 13)."
+        msg = "PostgreSQL 15 or later is required (found 14)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)

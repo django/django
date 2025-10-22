@@ -1,0 +1,22 @@
+==========================
+Django 5.1.3 release notes
+==========================
+
+*November 5, 2024*
+
+Django 5.1.3 fixes several bugs in 5.1.2 and adds compatibility with Python
+3.13.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.1 where
+  :class:`~django.core.validators.DomainNameValidator` accepted any input value
+  that contained a valid domain name, rather than only input values that were a
+  valid domain name (:ticket:`35845`).
+
+* Fixed a regression in Django 5.1 that prevented the use of DB-IP databases
+  with :class:`~django.contrib.gis.geoip2.GeoIP2` (:ticket:`35841`).
+
+* Fixed a regression in Django 5.1 where non-ASCII fieldset names were not
+  displayed when rendering admin fieldsets (:ticket:`35876`).

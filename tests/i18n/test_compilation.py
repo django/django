@@ -1,5 +1,6 @@
 import gettext as gettext_module
 import os
+import re
 import stat
 import unittest
 from io import StringIO
@@ -8,10 +9,12 @@ from subprocess import run
 from unittest import mock
 
 from django.core.management import CommandError, call_command, execute_from_command_line
-from django.core.management.utils import find_command
+from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
+from django.utils.functional import cached_property
 from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
@@ -43,9 +46,9 @@ class PoFileTests(MessageCompilationTests):
     def test_no_write_access(self):
         mo_file_en = Path(self.MO_FILE_EN)
         err_buffer = StringIO()
-        # Put file in read-only mode.
-        old_mode = mo_file_en.stat().st_mode
-        mo_file_en.chmod(stat.S_IREAD)
+        # Put parent directory in read-only mode.
+        old_mode = mo_file_en.parent.stat().st_mode
+        mo_file_en.parent.chmod(stat.S_IRUSR | stat.S_IXUSR)
         # Ensure .po file is more recent than .mo file.
         mo_file_en.with_suffix(".po").touch()
         try:
@@ -57,7 +60,7 @@ class PoFileTests(MessageCompilationTests):
                 )
             self.assertIn("not writable location", err_buffer.getvalue())
         finally:
-            mo_file_en.chmod(old_mode)
+            mo_file_en.parent.chmod(old_mode)
 
     def test_no_compile_when_unneeded(self):
         mo_file_en = Path(self.MO_FILE_EN)
@@ -196,18 +199,18 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 
     def test_no_dirs_accidentally_skipped(self):
         os_walk_results = [
-            # To discover .po filepaths, compilemessages uses with a starting list of
-            # basedirs to inspect, which in this scenario are:
+            # To discover .po filepaths, compilemessages uses with a starting
+            # list of basedirs to inspect, which in this scenario are:
             #   ["conf/locale", "locale"]
-            # Then os.walk is used to discover other locale dirs, ignoring dirs matching
-            # `ignore_patterns`. Mock the results to place an ignored directory directly
-            # before and after a directory named "locale".
+            # Then os.walk is used to discover other locale dirs, ignoring dirs
+            # matching `ignore_patterns`. Mock the results to place an ignored
+            # directory directly before and after a directory named "locale".
             [("somedir", ["ignore", "locale", "ignore"], [])],
             # This will result in three basedirs discovered:
             #   ["conf/locale", "locale", "somedir/locale"]
-            # os.walk is called for each locale in each basedir looking for .po files.
-            # In this scenario, we need to mock os.walk results for "en", "fr", and "it"
-            # locales for each basedir:
+            # os.walk is called for each locale in each basedir looking for .po
+            # files. In this scenario, we need to mock os.walk results for
+            # "en", "fr", and "it" locales for each basedir:
             [("exclude/locale/LC_MESSAGES", [], ["en.po"])],
             [("exclude/locale/LC_MESSAGES", [], ["fr.po"])],
             [("exclude/locale/LC_MESSAGES", [], ["it.po"])],
@@ -254,14 +257,29 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 
 
 class CompilationErrorHandling(MessageCompilationTests):
+    @cached_property
+    def msgfmt_version(self):
+        # Note that msgfmt is installed via GNU gettext tools, hence the msgfmt
+        # version should align to gettext.
+        out, err, status = popen_wrapper(
+            ["msgfmt", "--version"],
+            stdout_encoding=DEFAULT_LOCALE_ENCODING,
+        )
+        m = re.search(r"(\d+)\.(\d+)\.?(\d+)?", out)
+        return tuple(int(d) for d in m.groups() if d is not None)
+
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
         with self.assertRaises(CommandError):
             call_command("compilemessages", locale=["ja"], verbosity=0)
+        # It should still fail a second time.
+        with self.assertRaises(CommandError):
+            call_command("compilemessages", locale=["ja"], verbosity=0)
 
     def test_msgfmt_error_including_non_ascii(self):
-        # po file contains invalid msgstr content (triggers non-ascii error content).
-        # Make sure the output of msgfmt is unaffected by the current locale.
+        # po file contains invalid msgstr content (triggers non-ascii error
+        # content). Make sure the output of msgfmt is unaffected by the current
+        # locale.
         env = os.environ.copy()
         env.update({"LC_ALL": "C"})
         with mock.patch(
@@ -275,7 +293,14 @@ class CompilationErrorHandling(MessageCompilationTests):
                 call_command(
                     "compilemessages", locale=["ko"], stdout=StringIO(), stderr=stderr
                 )
-            self.assertIn("' cannot start a field name", stderr.getvalue())
+            if self.msgfmt_version < (0, 25):
+                error_msg = "' cannot start a field name"
+            else:
+                error_msg = (
+                    "a field name starts with a character that is not alphanumerical "
+                    "or underscore"
+                )
+            self.assertIn(error_msg, stderr.getvalue())
 
 
 class ProjectAndAppTests(MessageCompilationTests):

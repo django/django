@@ -2,11 +2,11 @@
 Writing your first Django app, part 8
 =====================================
 
-This tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>` left off. We've
-built our web-poll application and will now look at third-party packages. One of
-Django's strengths is the rich ecosystem of third-party packages. They're
-community developed packages that can be used to quickly improve the feature set
-of an application.
+This tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>` left off.
+We've built our web-poll application and will now look at third-party packages.
+One of Django's strengths is the rich ecosystem of third-party packages.
+They're community developed packages that can be used to quickly improve the
+feature set of an application.
 
 This tutorial will show how to add :pypi:`Django Debug Toolbar
 <django-debug-toolbar>`, a commonly used third-party package. The Django Debug
@@ -22,10 +22,11 @@ Installing Django Debug Toolbar
 ===============================
 
 Django Debug Toolbar is a useful tool for debugging Django web applications.
-It's a third-party package maintained by the `Jazzband
-<https://jazzband.co>`_ organization. The toolbar helps you understand how your
-application functions and to identify problems. It does so by providing panels
-that provide debug information about the current request and response.
+It's a third-party package that is maintained by the community organization
+`Django Commons <https://github.com/django-commons>`_. The toolbar helps you
+understand how your application functions and to identify problems. It does so
+by providing panels that provide debug information about the current request
+and response.
 
 To install a third-party application like the toolbar, you need to install
 the package by running the below command within an activated virtual
@@ -62,15 +63,15 @@ toolbar may not render. When this happens and you're unable to
 resolve the issue yourself, there are options available to you.
 
 #. If the problem is with a specific package, check if there's a
-   troubleshooting of FAQ in the package's documentation. For example the
+   troubleshooting guide or FAQ in the package's documentation. For example the
    Django Debug Toolbar has a `Tips section
    <https://django-debug-toolbar.readthedocs.io/en/latest/tips.html>`_ that
    outlines troubleshooting options.
 #. Search for similar issues on the package's issue tracker. Django Debug
-   Toolbar’s is `on GitHub <https://github.com/jazzband/django-debug-toolbar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>`_.
+   Toolbar’s is `on GitHub
+   <https://github.com/django-commons/django-debug-toolbar/issues>`_.
 #. Consult the `Django Forum <https://forum.djangoproject.com/>`_.
-#. Join the `Django Discord server <https://discord.gg/xcRH6mN4fa>`_.
-#. Join the #Django IRC channel on `Libera.chat <https://libera.chat/>`_.
+#. Join the `Django Discord server <https://chat.djangoproject.com>`_.
 
 Installing other third-party packages
 =====================================

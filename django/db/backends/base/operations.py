@@ -1,17 +1,15 @@
 import datetime
 import decimal
 import json
-import warnings
 from importlib import import_module
 
 import sqlparse
 
 from django.conf import settings
 from django.db import NotSupportedError, transaction
-from django.db.backends import utils
 from django.db.models.expressions import Col
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
 
 
@@ -61,6 +59,9 @@ class BaseDatabaseOperations:
     def __init__(self, connection):
         self.connection = connection
         self._cache = None
+
+    def __del__(self):
+        del self.connection
 
     def autoinc_sql(self, table, column):
         """
@@ -208,30 +209,6 @@ class BaseDatabaseOperations:
         else:
             return ["DISTINCT"], []
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the newly created data.
-        """
-        return cursor.fetchone()
-
-    def field_cast_sql(self, db_type, internal_type):
-        """
-        Given a column type (e.g. 'BLOB', 'VARCHAR') and an internal type
-        (e.g. 'GenericIPAddressField'), return the SQL to cast it before using
-        it in a WHERE statement. The resulting string should contain a '%s'
-        placeholder for the column being searched against.
-        """
-        warnings.warn(
-            (
-                "DatabaseOperations.field_cast_sql() is deprecated use "
-                "DatabaseOperations.lookup_cast() instead."
-            ),
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return "%s"
-
     def force_group_by(self):
         """
         Return a GROUP BY clause to use with a HAVING clause when no grouping
@@ -276,6 +253,16 @@ class BaseDatabaseOperations:
             )
             if sql
         )
+
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement.
+        """
+        if operation in ["CASCADE", "SET NULL", "SET DEFAULT"]:
+            return f" ON DELETE {operation}"
+        if operation == "":
+            return ""
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
@@ -375,13 +362,31 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_columns(self, fields):
+    def returning_columns(self, fields):
         """
-        For backends that support returning columns as part of an insert query,
-        return the SQL and params to append to the INSERT query. The returned
-        fragment should contain a format string to hold the appropriate column.
+        For backends that support returning columns as part of an insert or
+        update query, return the SQL and params to append to the query.
+        The returned fragment should contain a format string to hold the
+        appropriate column.
         """
-        pass
+        if not fields:
+            return "", ()
+        columns = [
+            "%s.%s"
+            % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            for field in fields
+        ]
+        return "RETURNING %s" % ", ".join(columns), ()
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        """
+        Given a cursor object for a DML query with a RETURNING statement,
+        return the selected returning rows of tuples.
+        """
+        return cursor.fetchall()
 
     def compiler(self, compiler_name):
         """
@@ -563,12 +568,22 @@ class BaseDatabaseOperations:
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
         """
         if value is None:
             return None
         return str(value)
+
+    def adapt_durationfield_value(self, value):
+        """
+        Transform a timedelta value into an object compatible with what is
+        expected by the backend driver for duration columns (by default,
+        an integer of microseconds).
+        """
+        if value is None:
+            return None
+        return duration_microseconds(value)
 
     def adapt_timefield_value(self, value):
         """
@@ -586,7 +601,7 @@ class BaseDatabaseOperations:
         Transform a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
-        return utils.format_number(value, max_digits, decimal_places)
+        return value
 
     def adapt_ipaddressfield_value(self, value):
         """
@@ -805,3 +820,36 @@ class BaseDatabaseOperations:
         rhs_expr = Col(rhs_table, rhs_field)
 
         return lhs_expr, rhs_expr
+
+    def format_debug_sql(self, sql):
+        # Hook for backends (e.g. NoSQL) to customize formatting.
+        return sqlparse.format(sql, reindent=True, keyword_case="upper")
+
+    def format_json_path_numeric_index(self, num):
+        """
+        Hook for backends to customize array indexing in JSON paths.
+        """
+        return "[%s]" % num
+
+    def compile_json_path(self, key_transforms, include_root=True):
+        """
+        Hook for backends to customize all aspects of JSON path construction.
+        """
+        path = ["$"] if include_root else []
+        for key_transform in key_transforms:
+            try:
+                num = int(key_transform)
+            except ValueError:  # Non-integer.
+                path.append(".")
+                path.append(json.dumps(key_transform))
+            else:
+                if (
+                    num < 0
+                    and not self.connection.features.supports_json_negative_indexing
+                ):
+                    raise NotSupportedError(
+                        "Using negative JSON array indices is not supported on this "
+                        "database backend."
+                    )
+                path.append(self.format_json_path_numeric_index(num))
+        return "".join(path)

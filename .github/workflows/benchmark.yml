@@ -13,14 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Benchmark Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: django/django-asv
           path: "."
+      - name: Setup Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: "24.1.2-0"
+          activate-environment: asv-bench
       - name: Install Requirements
         run: pip install -r requirements.txt
       - name: Cache Django
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: Django/*
           key: Django

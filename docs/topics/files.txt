@@ -8,8 +8,8 @@ them for other purposes. If you want to handle "static files" (JS, CSS, etc.),
 see :doc:`/howto/static-files/index`.
 
 By default, Django stores files locally, using the :setting:`MEDIA_ROOT` and
-:setting:`MEDIA_URL` settings. The examples below assume that you're using these
-defaults.
+:setting:`MEDIA_URL` settings. The examples below assume that you're using
+these defaults.
 
 However, Django provides ways to write custom `file storage systems`_ that
 allow you to completely customize where and how Django stores files. The
@@ -21,8 +21,8 @@ Using files in models
 =====================
 
 When you use a :class:`~django.db.models.FileField` or
-:class:`~django.db.models.ImageField`, Django provides a set of APIs you can use
-to deal with that file.
+:class:`~django.db.models.ImageField`, Django provides a set of APIs you can
+use to deal with that file.
 
 Consider the following model, using an :class:`~django.db.models.ImageField` to
 store a photo::
@@ -51,13 +51,13 @@ the details of the attached photo:
     >>> car.photo.url
     'https://media.example.com/cars/chevy.jpg'
 
-This object -- ``car.photo`` in the example -- is a ``File`` object, which means
-it has all the methods and attributes described below.
+This object -- ``car.photo`` in the example -- is a ``File`` object, which
+means it has all the methods and attributes described below.
 
 .. note::
-    The file is saved as part of saving the model in the database, so the actual
-    file name used on disk cannot be relied on until after the model has been
-    saved.
+    The file is saved as part of saving the model in the database, so the
+    actual file name used on disk cannot be relied on until after the model has
+    been saved.
 
 For example, you can change the file name by setting the file's
 :attr:`~django.core.files.File.name` to a path relative to the file storage's
@@ -70,7 +70,7 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> from django.conf import settings
     >>> initial_path = car.photo.path
     >>> car.photo.name = "cars/chevy_ii.jpg"
-    >>> new_path = settings.MEDIA_ROOT + car.photo.name
+    >>> new_path = os.path.join(settings.MEDIA_ROOT, car.photo.name)
     >>> # Move the file on the filesystem
     >>> os.rename(initial_path, new_path)
     >>> car.save()
@@ -168,9 +168,9 @@ may lead to the following error:
 File storage
 ============
 
-Behind the scenes, Django delegates decisions about how and where to store files
-to a file storage system. This is the object that actually understands things
-like file systems, opening and reading files, etc.
+Behind the scenes, Django delegates decisions about how and where to store
+files to a file storage system. This is the object that actually understands
+things like file systems, opening and reading files, etc.
 
 Django's default file storage is
 ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``. If you don't
@@ -184,10 +184,10 @@ storage system.
 Storage objects
 ---------------
 
-Though most of the time you'll want to use a ``File`` object (which delegates to
-the proper storage for that file), you can use file storage systems directly.
-You can create an instance of some custom file storage class, or -- often more
-useful -- you can use the global default storage system:
+Though most of the time you'll want to use a ``File`` object (which delegates
+to the proper storage for that file), you can use file storage systems
+directly. You can create an instance of some custom file storage class, or --
+often more useful -- you can use the global default storage system:
 
 .. code-block:: pycon
 
@@ -272,3 +272,36 @@ use :data:`~django.core.files.storage.storages`::
 
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
+
+Because the callable is evaluated when your models classes are loaded, if you
+need to override the :setting:`STORAGES` setting in tests, you should use a
+``LazyObject`` subclass instead::
+
+    from django.core.files.storage import storages
+    from django.utils.functional import LazyObject
+
+
+    class OtherStorage(LazyObject):
+        def _setup(self):
+            self._wrapped = storages["mystorage"]
+
+
+    my_storage = OtherStorage()
+
+
+    class MyModel(models.Model):
+        upload = models.FileField(storage=my_storage)
+
+The ``LazyObject`` delays the evaluation of the storage until it's actually
+needed, allowing :func:`~django.test.override_settings` to take effect::
+
+    @override_settings(
+        STORAGES={
+            "mystorage": {
+                "BACKEND": "django.core.files.storage.InMemoryStorage",
+            }
+        }
+    )
+    def test_storage():
+        model = MyModel()
+        assert isinstance(model.upload.storage, InMemoryStorage)

@@ -71,7 +71,7 @@ class ResolverMatch:
             self._func_path = func.__module__ + "." + func.__name__
 
         view_path = url_name or self._func_path
-        self.view_name = ":".join(self.namespaces + [view_path])
+        self.view_name = ":".join([*self.namespaces, view_path])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
@@ -170,8 +170,8 @@ class CheckURLMixin:
         Check that the pattern does not begin with a forward slash.
         """
         if not settings.APPEND_SLASH:
-            # Skip check as it can be useful to start a URL pattern with a slash
-            # when APPEND_SLASH=False.
+            # Skip check as it can be useful to start a URL pattern with a
+            # slash when APPEND_SLASH=False.
             return []
         if self._regex.startswith(("/", "^/", "^\\/")) and not self._regex.endswith(
             "/"
@@ -322,17 +322,27 @@ class RoutePattern(CheckURLMixin):
         self.name = name
 
     def match(self, path):
-        match = self.regex.search(path)
-        if match:
-            # RoutePattern doesn't allow non-named groups so args are ignored.
-            kwargs = match.groupdict()
-            for key, value in kwargs.items():
-                converter = self.converters[key]
-                try:
-                    kwargs[key] = converter.to_python(value)
-                except ValueError:
-                    return None
-            return path[match.end() :], (), kwargs
+        # Only use regex overhead if there are converters.
+        if self.converters:
+            if match := self.regex.search(path):
+                # RoutePattern doesn't allow non-named groups so args are
+                # ignored.
+                kwargs = match.groupdict()
+                for key, value in kwargs.items():
+                    converter = self.converters[key]
+                    try:
+                        kwargs[key] = converter.to_python(value)
+                    except ValueError:
+                        return None
+                return path[match.end() :], (), kwargs
+        # If this is an endpoint, the path should be exactly the same as the
+        # route.
+        elif self._is_endpoint:
+            if self._route == path:
+                return "", (), {}
+        # If this isn't an endpoint, the path should start with the route.
+        elif path.startswith(self._route):
+            return path.removeprefix(self._route), (), {}
         return None
 
     def check(self):
@@ -672,11 +682,12 @@ class URLResolver:
                     if sub_match:
                         # Merge captured arguments in match with submatch
                         sub_match_dict = {**kwargs, **self.default_kwargs}
-                        # Update the sub_match_dict with the kwargs from the sub_match.
+                        # Update the sub_match_dict with the kwargs from the
+                        # sub_match.
                         sub_match_dict.update(sub_match.kwargs)
-                        # If there are *any* named groups, ignore all non-named groups.
-                        # Otherwise, pass all non-named arguments as positional
-                        # arguments.
+                        # If there are *any* named groups, ignore all non-named
+                        # groups. Otherwise, pass all non-named arguments as
+                        # positional arguments.
                         sub_match_args = sub_match.args
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args
@@ -691,8 +702,8 @@ class URLResolver:
                             sub_match_args,
                             sub_match_dict,
                             sub_match.url_name,
-                            [self.app_name] + sub_match.app_names,
-                            [self.namespace] + sub_match.namespaces,
+                            [self.app_name, *sub_match.app_names],
+                            [self.namespace, *sub_match.namespaces],
                             self._join_route(current_route, sub_match.route),
                             tried,
                             captured_kwargs=sub_match.captured_kwargs,

@@ -20,7 +20,7 @@ class HTTPSSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_secure_sitemap_section(self):
         "A secure sitemap section can be rendered"
@@ -36,7 +36,7 @@ class HTTPSSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
 
 @override_settings(SECURE_PROXY_SSL_HEADER=False)
@@ -54,7 +54,7 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
             self.base_url.replace("http://", "https://"),
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_section_with_https_request(self):
         "A sitemap section requested in HTTPS is rendered with HTTPS links"
@@ -70,4 +70,4 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
             self.base_url.replace("http://", "https://"),
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)

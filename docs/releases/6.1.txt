@@ -1,0 +1,366 @@
+============================================
+Django 6.1 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected August 2026*
+
+Welcome to Django 6.1!
+
+These release notes cover the :ref:`new features <whats-new-6.1>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-6.1>` you'll
+want to be aware of when upgrading from Django 6.0 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-6.1>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 6.1 supports Python 3.12, 3.13, and 3.14. We **highly recommend**, and
+only officially support, the latest release of each series.
+
+.. _whats-new-6.1:
+
+What's new in Django 6.1
+========================
+
+Model field fetch modes
+-----------------------
+
+The on-demand fetching behavior of model fields is now configurable with
+:doc:`fetch modes </topics/db/fetch-modes>`. These modes allow you to control
+how Django fetches data from the database when an unfetched field is accessed.
+
+Django provides three fetch modes:
+
+1. ``FETCH_ONE``, the default, fetches the missing field for the current
+   instance only. This mode represents Django's existing behavior.
+
+2. ``FETCH_PEERS`` fetches a missing field for all instances that came from
+   the same :class:`~django.db.models.query.QuerySet`.
+
+   This mode works like an on-demand ``prefetch_related()``. It can reduce most
+   cases of the "N+1 queries problem" to two queries without any work to
+   maintain a list of fields to prefetch.
+
+3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+   exception.
+
+   This mode can prevent unintentional queries in performance-critical
+   sections of code.
+
+Use the new method :meth:`.QuerySet.fetch_mode` to set the fetch mode for model
+instances fetched by the ``QuerySet``:
+
+.. code-block:: python
+
+    from django.db import models
+
+    books = Book.objects.fetch_mode(models.FETCH_PEERS)
+    for book in books:
+        print(book.author.name)
+
+Despite the loop accessing the ``author`` foreign key on each instance, the
+``FETCH_PEERS`` fetch mode will make the above example perform only two
+queries:
+
+1. Fetch all books.
+2. Fetch associated authors.
+
+See :doc:`fetch modes </topics/db/fetch-modes>` for more details.
+
+Database-level delete options for ``ForeignKey.on_delete``
+----------------------------------------------------------
+
+:attr:`.ForeignKey.on_delete` now supports database-level delete options:
+
+* :attr:`~django.db.models.DB_CASCADE`
+* :attr:`~django.db.models.DB_SET_NULL`
+* :attr:`~django.db.models.DB_SET_DEFAULT`
+
+These options handle deletion logic entirely within the database, using the SQL
+``ON DELETE`` clause. They are thus more efficient than the existing
+Python-level options, as Django does not need to load objects before deleting
+them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
+not trigger the ``pre_delete`` or ``post_delete`` signals.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  1,200,000 to 1,500,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :lookup:`isempty` lookup and
+  :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
+  database function are now supported on SpatiaLite.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSP
+~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* :meth:`.QuerySet.in_bulk` now supports chaining after
+  :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
+
+Pagination
+~~~~~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Tasks
+~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-6.1:
+
+Backwards incompatible changes in 6.1
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The ``DatabaseOperations.adapt_durationfield_value()`` hook is added. If the
+  database has native support for ``DurationField``, override this method to
+  simply return the value.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.1 is removed.
+
+Dropped support for PostgreSQL 14
+---------------------------------
+
+Upstream support for PostgreSQL 14 ends in November 2026. Django 6.1 supports
+PostgreSQL 15 and higher.
+
+Miscellaneous
+-------------
+
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
+  separate descriptor class: the private ``GenericForeignKeyDescriptor``.
+
+* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+.. _deprecated-features-6.1:
+
+Features deprecated in 6.1
+==========================
+
+Miscellaneous
+-------------
+
+* Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
+  is deprecated. Pass an explicit field name, like
+  ``values_list("pk", flat=True)``.
+
+Features removed in 6.1
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 6.1.
+
+See :ref:`deprecated-features-5.2` for details on these changes, including how
+to remove usage of these features.
+
+* The ``all`` parameter for the ``django.contrib.staticfiles.finders.find()``
+  function is removed in favor of the ``find_all`` parameter.
+
+* Fallbacks to ``request.user`` and ``request.auser()`` when ``user`` is
+  ``None`` in ``django.contrib.auth.login()`` and
+  ``django.contrib.auth.alogin()``, respectively, are removed.
+
+* The ``ordering`` keyword parameter of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` are removed in favor
+  of the ``order_by`` parameter.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` is
+  removed.

@@ -1,0 +1,19 @@
+===========================
+Django 4.2.18 release notes
+===========================
+
+*January 14, 2025*
+
+Django 4.2.18 fixes a security issue with severity "moderate" in 4.2.17.
+
+CVE-2024-56374: Potential denial-of-service vulnerability in IPv6 validation
+============================================================================
+
+Lack of upper bound limit enforcement in strings passed when performing IPv6
+validation could lead to a potential denial-of-service attack. The undocumented
+and private functions ``clean_ipv6_address`` and ``is_valid_ipv6_address`` were
+vulnerable, as was the  :class:`django.forms.GenericIPAddressField` form field,
+which has now been updated to define a ``max_length`` of 39 characters.
+
+The :class:`django.db.models.GenericIPAddressField` model field was not
+affected.

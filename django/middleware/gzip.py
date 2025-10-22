@@ -1,7 +1,7 @@
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.text import compress_sequence, compress_string
+from django.utils.text import acompress_sequence, compress_sequence, compress_string
 
 re_accepts_gzip = _lazy_re_compile(r"\bgzip\b")
 
@@ -32,18 +32,10 @@ class GZipMiddleware(MiddlewareMixin):
 
         if response.streaming:
             if response.is_async:
-                # pull to lexical scope to capture fixed reference in case
-                # streaming_content is set again later.
-                orignal_iterator = response.streaming_content
-
-                async def gzip_wrapper():
-                    async for chunk in orignal_iterator:
-                        yield compress_string(
-                            chunk,
-                            max_random_bytes=self.max_random_bytes,
-                        )
-
-                response.streaming_content = gzip_wrapper()
+                response.streaming_content = acompress_sequence(
+                    response.streaming_content,
+                    max_random_bytes=self.max_random_bytes,
+                )
             else:
                 response.streaming_content = compress_sequence(
                     response.streaming_content,

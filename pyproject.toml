@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=61.0.0,<69.3.0"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "Django"
 dynamic = ["version"]
-requires-python = ">= 3.10"
+requires-python = ">= 3.12"
 dependencies = [
-    "asgiref>=3.8.1",
-    "sqlparse>=0.3.1",
+    "asgiref>=3.9.1",
+    "sqlparse>=0.5.0",
     "tzdata; sys_platform == 'win32'",
 ]
 authors = [
@@ -16,20 +16,20 @@ authors = [
 ]
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 readme = "README.rst"
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "LICENSE.python"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: Web Environment",
     "Framework :: Django",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Internet :: WWW/HTTP :: WSGI",
@@ -38,8 +38,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-argon2 = ["argon2-cffi>=19.1.0"]
-bcrypt = ["bcrypt"]
+argon2 = ["argon2-cffi>=23.1.0"]
+bcrypt = ["bcrypt>=4.1.1"]
 
 [project.scripts]
 django-admin = "django.core.management:execute_from_command_line"
@@ -53,7 +53,7 @@ Source = "https://github.com/django/django"
 Tracker = "https://code.djangoproject.com/"
 
 [tool.black]
-target-version = ["py310"]
+target-version = ["py312"]
 force-exclude = "tests/test_runner_apps/tagged/tests_syntax_error.py"
 
 [tool.isort]

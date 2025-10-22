@@ -10,4 +10,4 @@ Bugfixes
 ========
 
 * Restored the ability to ``reverse()`` views created using
-  :func:`functools.partial()` (:ticket:`22486`).
+  :func:`functools.partial` (:ticket:`22486`).

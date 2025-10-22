@@ -1,0 +1,43 @@
+==========================
+Django 5.1.4 release notes
+==========================
+
+*December 4, 2024*
+
+Django 5.1.4 fixes one security issue with severity "high", one security issue
+with severity "moderate", and several bugs in 5.1.3.
+
+CVE-2024-53907: Denial-of-service possibility in ``strip_tags()``
+=================================================================
+
+:func:`~django.utils.html.strip_tags` would be extremely slow to evaluate
+certain inputs containing large sequences of nested incomplete HTML entities.
+The ``strip_tags()`` method is used to implement the corresponding
+:tfilter:`striptags` template filter, which was thus also vulnerable.
+
+``strip_tags()`` now has an upper limit of recursive calls to ``HTMLParser``
+before raising a :exc:`.SuspiciousOperation` exception.
+
+Remember that absolutely NO guarantee is provided about the results of
+``strip_tags()`` being HTML safe. So NEVER mark safe the result of a
+``strip_tags()`` call without escaping it first, for example with
+:func:`django.utils.html.escape`.
+
+CVE-2024-53908: Potential SQL injection via ``HasKey(lhs, rhs)`` on Oracle
+==========================================================================
+
+Direct usage of the ``django.db.models.fields.json.HasKey`` lookup on Oracle
+was subject to SQL injection if untrusted data was used as a ``lhs`` value.
+
+Applications that use the :lookup:`has_key <jsonfield.has_key>` lookup through
+the ``__`` syntax are unaffected.
+
+Bugfixes
+========
+
+* Fixed a crash in ``createsuperuser`` on Python 3.13+ caused by an unhandled
+  ``OSError`` when the username could not be determined (:ticket:`35942`).
+
+* Fixed a regression in Django 5.1 where relational fields were not updated
+  when calling ``Model.refresh_from_db()`` on instances with deferred fields
+  (:ticket:`35950`).

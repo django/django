@@ -1,4 +1,5 @@
 import copy
+import typing
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import partial
@@ -72,9 +73,10 @@ def get_related_models_recursive(model):
 
     Relationships are either defined by explicit relational fields, like
     ForeignKey, ManyToManyField or OneToOneField, or by inheriting from another
-    model (a superclass is related to its subclasses, but not vice versa). Note,
-    however, that a model inheriting from a concrete model is also related to
-    its superclass through the implicit *_ptr OneToOneField on the subclass.
+    model (a superclass is related to its subclasses, but not vice versa).
+    Note, however, that a model inheriting from a concrete model is also
+    related to its superclass through the implicit *_ptr OneToOneField on the
+    subclass.
     """
     seen = set()
     queue = _get_related_models(model)
@@ -211,6 +213,14 @@ class ProjectState:
         model_state.options[option_name] = [obj for obj in objs if obj.name != obj_name]
         self.reload_model(app_label, model_name, delay=True)
 
+    def _alter_option(self, app_label, model_name, option_name, obj_name, alt_obj):
+        model_state = self.models[app_label, model_name]
+        objs = model_state.options[option_name]
+        model_state.options[option_name] = [
+            obj if obj.name != obj_name else alt_obj for obj in objs
+        ]
+        self.reload_model(app_label, model_name, delay=True)
+
     def add_index(self, app_label, model_name, index):
         self._append_option(app_label, model_name, "indexes", index)
 
@@ -236,6 +246,11 @@ class ProjectState:
 
     def remove_constraint(self, app_label, model_name, constraint_name):
         self._remove_option(app_label, model_name, "constraints", constraint_name)
+
+    def alter_constraint(self, app_label, model_name, constraint_name, constraint):
+        self._alter_option(
+            app_label, model_name, "constraints", constraint_name, constraint
+        )
 
     def add_field(self, app_label, model_name, name, field, preserve_default):
         # If preserve default is off, don't use the default for future state.
@@ -310,13 +325,24 @@ class ProjectState:
                         for from_field_name in from_fields
                     ]
                 )
-        # Fix unique_together to refer to the new field.
+            # Fix field names (e.g. for CompositePrimaryKey) to refer to the
+            # new field.
+            if field_names := getattr(field, "field_names", None):
+                if old_name in field_names:
+                    field.field_names = tuple(
+                        [
+                            new_name if field_name == old_name else field_name
+                            for field_name in field.field_names
+                        ]
+                    )
+        # Fix index/unique_together to refer to the new field.
         options = model_state.options
-        if "unique_together" in options:
-            options["unique_together"] = [
-                [new_name if n == old_name else n for n in together]
-                for together in options["unique_together"]
-            ]
+        for option in ("index_together", "unique_together"):
+            if option in options:
+                options[option] = [
+                    [new_name if n == old_name else n for n in together]
+                    for together in options[option]
+                ]
         # Fix to_fields to refer to the new field.
         delay = True
         references = get_references(self, model_key, (old_name, found))
@@ -735,7 +761,7 @@ class ModelState:
                 raise ValueError(
                     'ModelState.fields cannot be bound to a model - "%s" is.' % name
                 )
-            # Sanity-check that relation fields are NOT referring to a model class.
+            # Ensure that relation fields are NOT referring to a model class.
             if field.is_relation and hasattr(field.related_model, "_meta"):
                 raise ValueError(
                     'Model fields in "ModelState.fields" cannot refer to a model class '
@@ -814,9 +840,6 @@ class ModelState:
                 if name == "unique_together":
                     ut = model._meta.original_attrs["unique_together"]
                     options[name] = set(normalize_together(ut))
-                elif name == "index_together":
-                    it = model._meta.original_attrs["index_together"]
-                    options[name] = set(normalize_together(it))
                 elif name == "indexes":
                     indexes = [idx.clone() for idx in model._meta.indexes]
                     for index in indexes:
@@ -832,7 +855,7 @@ class ModelState:
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
-            for key in ["unique_together", "index_together", "order_with_respect_to"]:
+            for key in ["unique_together", "order_with_respect_to"]:
                 if key in options:
                     del options[key]
         # Private fields are ignored, so remove options that refer to them.
@@ -937,13 +960,18 @@ class ModelState:
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
-        meta_contents = {"app_label": self.app_label, "apps": apps, **self.options}
+        meta_options = {**self.options}
+        # Prune index_together from options as it's no longer an allowed meta
+        # attribute.
+        meta_options.pop("index_together", None)
+        meta_contents = {"app_label": self.app_label, "apps": apps, **meta_options}
         meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:
             bases = tuple(
                 (apps.get_model(base) if isinstance(base, str) else base)
                 for base in self.bases
+                if base != typing.Generic
             )
         except LookupError:
             raise InvalidBasesError(

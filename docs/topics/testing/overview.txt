@@ -11,8 +11,8 @@ Writing and running tests
     reference </topics/testing/tools>`, and the :doc:`advanced testing topics
     </topics/testing/advanced>`.
 
-This document is split into two primary sections. First, we explain how to write
-tests with Django. Then, we explain how to run them.
+This document is split into two primary sections. First, we explain how to
+write tests with Django. Then, we explain how to run them.
 
 Writing tests
 =============
@@ -83,8 +83,8 @@ your project's ``manage.py`` utility:
 
     $ ./manage.py test
 
-Test discovery is based on the unittest module's :py:ref:`built-in test
-discovery <unittest-test-discovery>`.  By default, this will discover tests in
+Test discovery is based on the unittest module's :ref:`built-in test
+discovery <unittest-test-discovery>`. By default, this will discover tests in
 any file named ``test*.py`` under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
@@ -187,12 +187,12 @@ test database is created by the user specified by :setting:`USER`, so you'll
 need to make sure that the given user account has sufficient privileges to
 create a new database on the system.
 
-For fine-grained control over the character encoding of your test
-database, use the :setting:`CHARSET <TEST_CHARSET>` TEST option. If you're using
-MySQL, you can also use the :setting:`COLLATION <TEST_COLLATION>` option to
-control the particular collation used by the test database. See the
-:doc:`settings documentation </ref/settings>` for details of these
-and other advanced settings.
+For fine-grained control over the character encoding of your test database, use
+the :setting:`CHARSET <TEST_CHARSET>` TEST option. If you're using MySQL, you
+can also use the :setting:`COLLATION <TEST_COLLATION>` option to control the
+particular collation used by the test database. See the :doc:`settings
+documentation </ref/settings>` for details of these and other advanced
+settings.
 
 If using an SQLite in-memory database with SQLite, `shared cache
 <https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
@@ -208,11 +208,12 @@ with ability to share the database between threads.
     your code* anyway - rewrite your code so that it doesn't do this.
 
     This also applies to customized implementations of
-    :meth:`~django.apps.AppConfig.ready()`.
+    :meth:`~django.apps.AppConfig.ready`.
 
 .. seealso::
 
-    The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.
+    The :ref:`advanced multi-db testing topics
+    <topics-testing-advanced-multidb>`.
 
 .. _order-of-tests:
 

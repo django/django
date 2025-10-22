@@ -25,14 +25,14 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ("field", ArrayField(models.CharField(max_length=10), size=None)),
+                ("field", ArrayField(models.CharField(max_length=10))),
             ],
             options={
                 "required_db_vendor": "postgresql",
@@ -44,16 +44,16 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ("datetimes", ArrayField(models.DateTimeField(), size=None)),
-                ("dates", ArrayField(models.DateField(), size=None)),
-                ("times", ArrayField(models.TimeField(), size=None)),
+                ("datetimes", ArrayField(models.DateTimeField())),
+                ("dates", ArrayField(models.DateField())),
+                ("times", ArrayField(models.TimeField())),
             ],
             options={
                 "required_db_vendor": "postgresql",
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -94,21 +94,20 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ips",
-                    ArrayField(models.GenericIPAddressField(), size=None, default=list),
+                    ArrayField(models.GenericIPAddressField(), default=list),
                 ),
-                ("uuids", ArrayField(models.UUIDField(), size=None, default=list)),
+                ("uuids", ArrayField(models.UUIDField(), default=list)),
                 (
                     "decimals",
                     ArrayField(
                         models.DecimalField(max_digits=5, decimal_places=2),
-                        size=None,
                         default=list,
                     ),
                 ),
-                ("tags", ArrayField(TagField(), blank=True, null=True, size=None)),
+                ("tags", ArrayField(TagField(), blank=True, null=True)),
                 (
                     "json",
-                    ArrayField(models.JSONField(default=dict), default=list, size=None),
+                    ArrayField(models.JSONField(default=dict), default=list),
                 ),
                 ("int_ranges", ArrayField(IntegerRangeField(), null=True, blank=True)),
                 (
@@ -126,7 +125,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -135,9 +134,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    ArrayField(
-                        models.IntegerField(), blank=True, default=list, size=None
-                    ),
+                    ArrayField(models.BigIntegerField(), blank=True, default=list),
                 ),
             ],
             options={
@@ -150,7 +147,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -159,7 +156,29 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    ArrayField(ArrayField(models.IntegerField(), size=None), size=None),
+                    ArrayField(ArrayField(models.IntegerField())),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name="WithSizeArrayModel",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "field",
+                    ArrayField(models.FloatField(), size=2, null=True, blank=True),
                 ),
             ],
             options={
@@ -172,7 +191,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -181,14 +200,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    ArrayField(models.IntegerField(), size=None, null=True, blank=True),
+                    ArrayField(models.BigIntegerField(), null=True, blank=True),
                 ),
                 (
                     "field_nested",
                     ArrayField(
-                        ArrayField(models.IntegerField(null=True), size=None),
-                        size=None,
-                        null=True,
+                        ArrayField(models.BigIntegerField(null=True)), null=True
                     ),
                 ),
                 ("order", models.IntegerField(null=True)),
@@ -203,7 +220,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -220,7 +237,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -257,7 +274,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -275,7 +292,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -292,7 +309,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -326,7 +343,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -348,7 +365,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -370,7 +387,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -397,7 +414,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -412,7 +429,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -427,7 +444,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -454,7 +471,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -493,7 +510,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -502,7 +519,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "array_of_enums",
-                    ArrayField(EnumField(max_length=20), size=None),
+                    ArrayField(EnumField(max_length=20)),
                 ),
             ],
             options={
@@ -515,7 +532,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,
@@ -530,7 +547,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
+                    models.BigAutoField(
                         verbose_name="ID",
                         serialize=False,
                         auto_created=True,

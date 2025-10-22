@@ -19,6 +19,7 @@ from .models import (
     Child,
     ChildModel1,
     ChildModel2,
+    ExtraTerrestrial,
     Fashionista,
     FootNote,
     Holder,
@@ -240,7 +241,10 @@ class TestInline(TestDataMixin, TestCase):
         )
 
     def test_no_parent_callable_lookup(self):
-        """Admin inline `readonly_field` shouldn't invoke parent ModelAdmin callable"""
+        """
+        Admin inline `readonly_field` shouldn't invoke parent ModelAdmin
+        callable
+        """
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse("admin:admin_inlines_novel_add"))
@@ -323,7 +327,9 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(response, "Label from ModelForm.Meta")
 
     def test_inline_hidden_field_no_column(self):
-        """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
+        """
+        #18263 -- Make sure hidden fields don't get a column in tabular inlines
+        """
         parent = SomeParentModel.objects.create(name="a")
         SomeChildModel.objects.create(name="b", position="0", parent=parent)
         SomeChildModel.objects.create(name="c", position="1", parent=parent)
@@ -349,7 +355,12 @@ class TestInline(TestDataMixin, TestCase):
         )
         response = self.client.get(url)
         self.assertInHTML(
-            '<th class="column-position hidden">Position</th>',
+            '<th class="column-position hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>",
             response.rendered_content,
         )
         self.assertInHTML(
@@ -379,13 +390,15 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">0</div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">1</div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
 
@@ -407,13 +420,17 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">0</div></div></div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">1</div></div></div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
 
@@ -448,7 +465,12 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<thead><tr><th class="original"></th>'
             '<th class="column-name required">Name</th>'
-            '<th class="column-position required hidden">Position</th>'
+            '<th class="column-position required hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>"
             "<th>Delete?</th></tr></thead>",
             response.rendered_content,
         )
@@ -1215,7 +1237,8 @@ class TestInlinePermissions(TestCase):
         )
         self.user.user_permissions.add(permission)
         response = self.client.get(self.holder_change_url)
-        # Change permission on inner2s, so we can change existing but not add new
+        # Change permission on inner2s, so we can change existing but not add
+        # new
         self.assertContains(
             response,
             '<h2 id="inner2_set-heading" class="inline-heading">Inner2s</h2>',
@@ -1437,12 +1460,13 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         response = self.client.get(self.change_url)
         self.assertContains(
             response,
-            '<a href="/admin/admin_inlines/poll/" class="closelink">Close</a>',
+            '<a role="button" href="/admin/admin_inlines/poll/" class="closelink">'
+            "Close</a>",
             html=True,
         )
         delete_link = (
-            '<a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete'
-            "</a>"
+            '<a role="button" href="/admin/admin_inlines/poll/%s/delete/" '
+            'class="deletelink">Delete</a>'
         )
         self.assertNotContains(response, delete_link % self.poll.id, html=True)
         self.assertNotContains(
@@ -1785,7 +1809,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
         # The second and third have the same "Advanced options" name, but the
         # second one has the "collapse" class.
         for x, classes in ((1, ""), (2, "collapse")):
-            heading_id = f"fieldset-0-advanced-options-{x}-heading"
+            heading_id = f"fieldset-0-{x}-heading"
             with self.subTest(heading_id=heading_id):
                 self.assertContains(
                     response,
@@ -1830,7 +1854,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                 # Every fieldset defined for an inline's form.
                 for z, fieldset in enumerate(inline_admin_form):
                     if fieldset.name:
-                        heading_id = f"{prefix}-{y}-details-{z}-heading"
+                        heading_id = f"{prefix}-{y}-{z}-heading"
                         self.assertContains(
                             response,
                             f'<fieldset class="module aligned {fieldset.classes}" '
@@ -2404,31 +2428,43 @@ class SeleniumTests(AdminSeleniumTestCase):
             "admin:admin_inlines_courseproxy1_add",
             "admin:admin_inlines_courseproxy2_add",
         ]
-        css_selector = ".dynamic-class_set#class_set-%s h2"
+        css_available_selector = (
+            ".dynamic-class_set#class_set-%s .selector-available-title"
+        )
+        css_chosen_selector = ".dynamic-class_set#class_set-%s .selector-chosen-title"
 
         for url_name in tests:
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 0
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 0
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 1
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 1
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 2
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 2
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
 
     def test_tabular_inline_layout(self):
         from selenium.webdriver.common.by import By
@@ -2465,3 +2501,72 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+        # The table does not overflow the content section.
+        content = self.selenium.find_element(By.ID, "content-main")
+        tabular_wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.tabular.inline-related div.wrapper"
+        )
+        self.assertGreater(
+            tabular_wrapper.find_element(By.TAG_NAME, "table").size["width"],
+            tabular_wrapper.size["width"],
+        )
+        self.assertLessEqual(tabular_wrapper.size["width"], content.size["width"])
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_delete_layout(self):
+        from selenium.webdriver.common.by import By
+
+        user = User.objects.create_user("testing", password="password", is_staff=True)
+        et_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ExtraTerrestrial),
+        )
+        s_permission = Permission.objects.filter(
+            codename__in=["view_sighting", "add_sighting"],
+            content_type=ContentType.objects.get_for_model(Sighting),
+        )
+        user.user_permissions.add(*et_permission, *s_permission)
+        self.admin_login(username="testing", password="password")
+        cf = ExtraTerrestrial.objects.create(name="test")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(cf.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module thead tr th"
+        )
+        self.assertHTMLEqual(headers[-1].get_attribute("outerHTML"), "<th></th>")
+        delete = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "fieldset.module tbody tr.dynamic-sighting_set:not(.original) td.delete",
+        )
+        self.assertIn(
+            '<a role="button" class="inline-deletelink" href="#">',
+            delete.get_attribute("innerHTML"),
+        )
+        self.take_screenshot("loaded")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_object_with_show_change_link(self):
+        from selenium.webdriver.common.by import By
+
+        et = ExtraTerrestrial.objects.create(name="test")
+        Sighting.objects.create(et=et, place="Desert")
+        self.admin_login(username="super", password="secret")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(et.pk,))
+        self.selenium.get(self.live_server_url + url)
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original p"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertIn("Desert", object_str.text)
+        self.take_screenshot("tabular")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_with_filter_horizontal(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_courseproxy2_add")
+        )
+        m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
+        self.assertTrue(m2m_widget.is_displayed())
+        self.take_screenshot("tabular")

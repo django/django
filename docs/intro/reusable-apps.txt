@@ -6,7 +6,7 @@ This advanced tutorial begins where :doc:`Tutorial 8 </intro/tutorial08>`
 left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
-If you haven't recently completed Tutorials 1–7, we encourage you to review
+If you haven't recently completed Tutorials 1–8, we encourage you to review
 these so that your example project matches the one described below.
 
 Reusability matters
@@ -57,7 +57,7 @@ After the previous tutorials, our project should look like this:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -90,12 +90,12 @@ After the previous tutorials, our project should look like this:
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
-and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
-it is clearer why we chose to have separate template directories for the
-project and application: everything that is part of the polls application is in
-``polls``. It makes the application self-contained and easier to drop into a
-new project.
+You created ``djangotutorial/templates`` in :doc:`Tutorial 7
+</intro/tutorial07>`, and ``polls/templates`` in
+:doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps it is clearer why we chose
+to have separate template directories for the project and application:
+everything that is part of the polls application is in ``polls``. It makes the
+application self-contained and easier to drop into a new project.
 
 The ``polls`` directory could now be copied into a new Django project and
 immediately reused. It's not quite ready to be published though. For that, we
@@ -153,7 +153,6 @@ this. For a small app like polls, this process isn't too difficult.
 
 
        class PollsConfig(AppConfig):
-           default_auto_field = "django.db.models.BigAutoField"
            name = "django_polls"
            label = "polls"
 
@@ -209,7 +208,7 @@ this. For a small app like polls, this process isn't too difficult.
        :caption: ``django-polls/pyproject.toml``
 
        [build-system]
-       requires = ["setuptools>=61.0"]
+       requires = ["setuptools>=77.0.3"]
        build-backend = "setuptools.build_meta"
 
        [project]
@@ -220,7 +219,8 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
-       requires-python = ">= 3.10"
+       license = "BSD-3-Clause"
+       requires-python = ">= 3.12"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
        ]
@@ -229,14 +229,13 @@ this. For a small app like polls, this process isn't too difficult.
            "Framework :: Django",
            "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
            "Intended Audience :: Developers",
-           "License :: OSI Approved :: BSD License",
            "Operating System :: OS Independent",
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
            "Programming Language :: Python :: 3 :: Only",
-           "Programming Language :: Python :: 3.10",
-           "Programming Language :: Python :: 3.11",
            "Programming Language :: Python :: 3.12",
+           "Programming Language :: Python :: 3.13",
+           "Programming Language :: Python :: 3.14",
            "Topic :: Internet :: WWW/HTTP",
            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
        ]
@@ -263,10 +262,30 @@ this. For a small app like polls, this process isn't too difficult.
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
+   Many Python projects, including Django and Python itself, use `Sphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html>`_ to build
+   their documentation. If you choose to use Sphinx you can link back to the
+   Django documentation by configuring `Intersphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html#intersphinx>`_
+   and including a value for Django in your project's ``intersphinx_mapping``
+   value::
+
+        intersphinx_mapping = {
+            # ...
+            "django": (
+                "https://docs.djangoproject.com/en/stable/",
+                None,
+            ),
+        }
+
+   With that in place, you can then cross-link to specific entries, in the
+   same way as in the Django docs, such as
+   "``:attr:`django.test.TransactionTestCase.databases```".
+
 #. Check that the :pypi:`build` package is installed (``python -m pip install
    build``) and try building your package by running ``python -m build`` inside
    ``django-polls``. This creates a directory called ``dist`` and builds your
-   new package into source and binary formats, ``django-polls-0.1.tar.gz`` and
+   new package into source and binary formats, ``django_polls-0.1.tar.gz`` and
    ``django_polls-0.1-py3-none-any.whl``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
@@ -296,7 +315,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
    .. code-block:: shell
 
-      python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+      python -m pip install --user django-polls/dist/django_polls-0.1.tar.gz
 
 #. Update ``mysite/settings.py`` to point to the new module name::
 
@@ -325,8 +344,8 @@ the world! If this wasn't just an example, you could now:
 * Upload the package on your website.
 
 * Post the package on a public repository, such as `the Python Package Index
-  (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
-  tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
+  (PyPI)`_. There is `a good tutorial
+  <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
 Installing Python packages with a virtual environment

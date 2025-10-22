@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django.conf import settings
@@ -54,6 +55,21 @@ class CsrfFunctionTestMixin:
         )
         actual = _unmask_cipher_token(masked_secret)
         self.assertEqual(actual, secret)
+
+    def assertForbiddenReason(
+        self, response, logger_cm, reason, levelno=logging.WARNING
+    ):
+        self.assertEqual(
+            records_len := len(logger_cm.records),
+            1,
+            f"Unexpected number of records for {logger_cm=} in {levelno=} (expected 1, "
+            f"got {records_len}).",
+        )
+        record = logger_cm.records[0]
+        self.assertEqual(record.getMessage(), "Forbidden (%s): " % reason)
+        self.assertEqual(record.levelno, levelno)
+        self.assertEqual(record.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
 
 class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
@@ -322,12 +338,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         If get_token() is not called, the view middleware does not
         add a cookie.
         """
-        # This is important to make pages cacheable.  Pages which do call
+        # This is important to make pages cacheable. Pages which do call
         # get_token(), assuming they use the token, are not cacheable because
         # the token is specific to the user
         req = self._get_request()
         # non_token_view_using_request_processor does not call get_token(), but
-        # does use the csrf request processor.  By using this, we are testing
+        # does use the csrf request processor. By using this, we are testing
         # that the view processor is properly lazy and doesn't call get_token()
         # until needed.
         mw = CsrfViewMiddleware(non_token_view_using_request_processor)
@@ -345,8 +361,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw.process_request(req)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % expected)
+        self.assertForbiddenReason(resp, cm, expected)
 
     def test_no_csrf_cookie(self):
         """
@@ -371,9 +386,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw.process_request(req)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(403, resp.status_code)
         self.assertEqual(resp["Content-Type"], "text/html; charset=utf-8")
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % expected)
+        self.assertForbiddenReason(resp, cm, expected)
 
     def test_csrf_cookie_bad_or_missing_token(self):
         """
@@ -427,7 +441,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
     def test_process_request_csrf_cookie_and_token(self):
         """
-        If both a cookie and a token is present, the middleware lets it through.
+        If both a cookie and a token is present, the middleware lets it
+        through.
         """
         req = self._get_POST_request_with_token()
         mw = CsrfViewMiddleware(post_form_view)
@@ -478,18 +493,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(403, resp.status_code)
-        self.assertEqual(
-            cm.records[0].getMessage(), "Forbidden (%s): " % REASON_NO_CSRF_COOKIE
-        )
+        self.assertForbiddenReason(resp, cm, REASON_NO_CSRF_COOKIE)
 
         req = self._get_request(method="DELETE")
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(403, resp.status_code)
-        self.assertEqual(
-            cm.records[0].getMessage(), "Forbidden (%s): " % REASON_NO_CSRF_COOKIE
-        )
+        self.assertForbiddenReason(resp, cm, REASON_NO_CSRF_COOKIE)
 
     def test_put_and_delete_allowed(self):
         """
@@ -710,14 +719,16 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
         # >>> urlsplit('//example.com/')
-        # SplitResult(scheme='', netloc='example.com', path='/', query='', fragment='')
+        # SplitResult(scheme='', netloc='example.com', path='/', query='',
+        # fragment='')
         req.META["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing netloc
         # >>> urlsplit('https://')
-        # SplitResult(scheme='https', netloc='', path='', query='', fragment='')
+        # SplitResult(scheme='https', netloc='', path='', query='',
+        # fragment='')
         req.META["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -873,11 +884,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw.process_request(req)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(resp.status_code, 403)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            "Forbidden (%s): " % REASON_CSRF_TOKEN_MISSING,
-        )
+        self.assertForbiddenReason(resp, cm, REASON_CSRF_TOKEN_MISSING)
 
     def test_reading_post_data_raises_os_error(self):
         """
@@ -902,9 +909,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_null_origin(self):
@@ -917,9 +923,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_bad_protocol(self):
@@ -933,9 +938,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
 
     @override_settings(
         ALLOWED_HOSTS=["www.example.com"],
@@ -960,9 +964,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertEqual(mw.allowed_origins_exact, {"http://no-match.com"})
         self.assertEqual(
             mw.allowed_origin_subdomains,
@@ -986,9 +989,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_good_origin_insecure(self):
@@ -1481,9 +1483,11 @@ class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
         response = self.client.get("/does not exist/")
         # The error handler returns status code 599.
         self.assertEqual(response.status_code, 599)
-        token1 = response.content.decode("ascii")
+        response.charset = "ascii"
+        token1 = response.text
         response = self.client.get("/does not exist/")
         self.assertEqual(response.status_code, 599)
-        token2 = response.content.decode("ascii")
+        response.charset = "ascii"
+        token2 = response.text
         secret2 = _unmask_cipher_token(token2)
         self.assertMaskedSecretCorrect(token1, secret2)

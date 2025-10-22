@@ -1,7 +1,7 @@
 import unittest
 
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connection, models
 from django.test import TransactionTestCase
 
 from ..models import Person, Tag
@@ -22,13 +22,24 @@ class OperationsTests(TransactionTestCase):
         objects = range(2**16)
         self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
         # Each field is a parameter for each object.
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
         self.assertEqual(
-            connection.ops.bulk_batch_size(["id"], objects),
+            connection.ops.bulk_batch_size([first_name_field], objects),
             connection.features.max_query_params,
         )
         self.assertEqual(
-            connection.ops.bulk_batch_size(["id", "other"], objects),
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field],
+                objects,
+            ),
             connection.features.max_query_params // 2,
+        )
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+        self.assertEqual(
+            connection.ops.bulk_batch_size([composite_pk, first_name_field], objects),
+            connection.features.max_query_params // 3,
         )
 
     def test_sql_flush(self):

@@ -23,7 +23,8 @@ Bugfixes
 
 * Added compatibility for ``cx_Oracle`` 6 (:ticket:`28498`).
 
-* Fixed select widget rendering when option values are tuples (:ticket:`28502`).
+* Fixed select widget rendering when option values are tuples
+  (:ticket:`28502`).
 
 * Django 1.11 inadvertently changed the sequence and trigger naming scheme on
   Oracle. This causes errors on INSERTs for some tables if

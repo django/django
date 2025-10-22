@@ -8,6 +8,7 @@ SPHINXBUILD   ?= sphinx-build
 PAPER         ?=
 BUILDDIR      ?= _build
 LANGUAGE      ?=
+JOBS          ?= auto
 
 # Set the default language.
 ifndef LANGUAGE
@@ -21,7 +22,7 @@ LANGUAGEOPT = $(firstword $(subst _, ,$(LANGUAGE)))
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGEOPT) $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGEOPT) --jobs $(JOBS) $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
@@ -50,6 +51,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  spelling   to check for typos in documentation"
 	@echo "  black      to apply the black formatting to code blocks in documentation"
+	@echo "  lint       to check for linting errors in documentation"
 
 
 clean:
@@ -61,7 +63,7 @@ html:
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 htmlview: html
-	$(PYTHON) -c "import webbrowser; webbrowser.open('_build/html/index.html')"
+	$(PYTHON) -m webbrowser "$(BUILDDIR)/html/index.html"
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
@@ -169,7 +171,16 @@ spelling:
 
 black:
 	@mkdir -p $(BUILDDIR)/black
-	find -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
+	find . -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
 		| xargs blacken-docs --rst-literal-block; echo $$? > "$(BUILDDIR)/black/output.txt"
 	@echo
 	@echo "Code blocks reformatted"
+
+lint:
+	$(PYTHON) lint.py
+	@echo
+	@echo "Documentation lint complete."
+
+check: spelling black lint
+	@echo
+	@echo "Style and spelling checks completed."

@@ -1,7 +1,7 @@
 """
- This module houses the ctypes function prototypes for OGR DataSource
- related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
- OGR_Fld_* routines are relevant here.
+This module houses the ctypes function prototypes for OGR DataSource
+related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
+OGR_Fld_* routines are relevant here.
 """
 
 from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_uint, c_void_p

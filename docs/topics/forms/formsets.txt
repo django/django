@@ -48,13 +48,10 @@ following example will create a formset class to display two blank forms:
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Iterating over a formset will render the forms in the order they were
-created. You can change this order by providing an alternate implementation for
-the ``__iter__()`` method.
-
-Formsets can also be indexed into, which returns the corresponding form. If you
-override ``__iter__``, you will need to also override ``__getitem__`` to have
-matching behavior.
+Formsets can be iterated and indexed, accessing forms in the order they were
+created. You can reorder the forms by overriding the default
+:meth:`iteration <object.__iter__>` and
+:meth:`indexing <object.__getitem__>` behavior if needed.
 
 .. _formsets-initial-data:
 
@@ -142,9 +139,9 @@ A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
 
 By default, ``max_num`` only affects how many forms are displayed and does not
-affect validation.  If ``validate_max=True`` is passed to the
+affect validation. If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
-validation.  See :ref:`validate_max`.
+validation. See :ref:`validate_max`.
 
 .. _formsets-absolute-max:
 
@@ -277,12 +274,13 @@ provide this management data, the formset will be invalid:
     >>> formset.is_valid()
     False
 
-It is used to keep track of how many form instances are being displayed. If
-you are adding new forms via JavaScript, you should increment the count fields
-in this form as well. On the other hand, if you are using JavaScript to allow
+It is used to keep track of how many form instances are being displayed. If you
+are adding new forms via JavaScript, you should increment the count fields in
+this form as well. On the other hand, if you are using JavaScript to allow
 deletion of existing objects, then you need to ensure the ones being removed
 are properly marked for deletion by including ``form-#-DELETE`` in the ``POST``
-data. It is expected that all forms are present in the ``POST`` data regardless.
+data. It is expected that all forms are present in the ``POST`` data
+regardless.
 
 The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
@@ -574,14 +572,12 @@ happen when the user changes these values:
     ...         {"title": "Article #2", "pub_date": datetime.date(2008, 5, 11)},
     ...     ],
     ... )
-    >>> formset.is_valid()
-    True
     >>> for form in formset.ordered_forms:
     ...     print(form.cleaned_data)
     ...
-    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': 'Article #3'}
-    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
-    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
+    {'title': 'Article #3', 'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0}
+    {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1}
+    {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2}
 
 :class:`~django.forms.formsets.BaseFormSet` also provides an
 :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
@@ -693,14 +689,14 @@ delete fields you can access them with ``deleted_forms``:
     ...     ],
     ... )
     >>> [form.cleaned_data for form in formset.deleted_forms]
-    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': 'Article #1'}]
+    [{'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'DELETE': True}]
 
 If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
 ``formset.save()``.
 
 If you call ``formset.save(commit=False)``, objects will not be deleted
-automatically.  You'll need to call ``delete()`` on each of the
+automatically. You'll need to call ``delete()`` on each of the
 :attr:`formset.deleted_objects
 <django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
 them:
@@ -1008,10 +1004,11 @@ deal with the management form:
 The above ends up calling the :meth:`BaseFormSet.render` method on the formset
 class. This renders the formset using the template specified by the
 :attr:`~BaseFormSet.template_name` attribute. Similar to forms, by default the
-formset will be rendered ``as_table``, with other helper methods of ``as_p``
-and ``as_ul`` being available. The rendering of the formset can be customized
-by specifying the ``template_name`` attribute, or more generally by
-:ref:`overriding the default template <overriding-built-in-formset-templates>`.
+formset will be rendered ``as_div``, with other helper methods of ``as_p``,
+``as_ul``, and ``as_table`` being available. The rendering of the formset can
+be customized by specifying the ``template_name`` attribute, or more generally
+by :ref:`overriding the default template
+<overriding-built-in-formset-templates>`.
 
 .. _manually-rendered-can-delete-and-can-order:
 

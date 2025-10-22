@@ -1,6 +1,5 @@
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.utils.functional import cached_property
 
 
@@ -20,8 +19,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_of = True
     select_for_update_of_column = True
     can_return_columns_from_insert = True
+    can_return_rows_from_update = True
     supports_subqueries_in_group_by = False
     ignores_unnecessary_order_by_in_subqueries = False
+    supports_tuple_comparison_against_subquery = False
     supports_transactions = True
     supports_timezones = False
     has_native_duration_field = True
@@ -46,6 +47,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
+    supports_aggregate_order_by_clause = True
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE "TEST_PROCEDURE" AS
             V_I INTEGER;
@@ -60,14 +62,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 NUMBER(11) NOT NULL,
-            column_2 NUMBER(11) NOT NULL,
-            PRIMARY KEY (column_1, column_2)
-        )
-    """
     supports_callproc_kwargs = True
+    supports_any_value = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
@@ -80,7 +76,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
+    supports_json_negative_indexing = False
     supports_collation_on_textfield = False
+    supports_on_delete_db_default = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
@@ -139,15 +137,24 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if is_oracledb and self.connection.oracledb_version >= (2, 1, 2):
+        if self.connection.is_pool:
             skips.update(
                 {
-                    "python-oracledb 2.1.2+ no longer hides 'ORA-1403: no data found' "
-                    "exceptions raised in database triggers.": {
+                    "Pooling does not support persistent connections": {
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled_errors_occurred",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_disabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_set_autocommit_health_checks_enabled",
+                        "servers.tests.LiveServerTestCloseConnectionTest."
+                        "test_closes_connections",
                         "backends.oracle.tests.TransactionalTests."
-                        "test_hidden_no_data_found_exception"
+                        "test_password_with_at_sign",
                     },
-                },
+                }
             )
         return skips
 
@@ -208,3 +215,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+
+    @cached_property
+    def supports_tuple_lookups(self):
+        # Support is known to be missing on 23.2 but available on 23.4.
+        return self.connection.oracle_version >= (23, 4)

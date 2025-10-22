@@ -37,7 +37,7 @@ class Storage:
         # Ensure that the name is valid, before and after having the storage
         # system potentially modifying the name. This duplicates the check made
         # inside `get_available_name` but it's necessary for those cases where
-        # `get_available_name` is overriden and validation is lost.
+        # `get_available_name` is overridden and validation is lost.
         validate_file_name(name, allow_relative_path=True)
 
         # Potentially find a different name depending on storage constraints.
@@ -149,8 +149,8 @@ class Storage:
 
     def exists(self, name):
         """
-        Return True if a file referenced by the given name already exists in the
-        storage system, or False if the name is available for a new file.
+        Return True if a file referenced by the given name already exists in
+        the storage system, or False if the name is available for a new file.
         """
         raise NotImplementedError(
             "subclasses of Storage must provide an exists() method"

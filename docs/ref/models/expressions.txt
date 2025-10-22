@@ -69,8 +69,6 @@ Some examples
 
     # Create a new company using expressions.
     >>> company = Company.objects.create(name="Google", ticker=Upper(Value("goog")))
-    # Be sure to refresh it if you need to access the field.
-    >>> company.refresh_from_db()
     >>> company.ticker
     'GOOG'
 
@@ -157,21 +155,15 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-To access the new value saved this way, the object must be reloaded::
-
-   reporter = Reporters.objects.get(pk=reporter.pk)
-   # Or, more succinctly:
-   reporter.refresh_from_db()
-
 As well as being used in operations on single instances as above, ``F()`` can
-be used on ``QuerySets`` of object instances, with ``update()``. This reduces
-the two queries we were using above - the ``get()`` and the
-:meth:`~Model.save()` - to just one::
+be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
+reduces the two queries we were using above - the ``get()`` and the
+:meth:`~Model.save` - to just one::
 
     reporter = Reporters.objects.filter(name="Tintin")
     reporter.update(stories_filed=F("stories_filed") + 1)
 
-We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
+We can also use :meth:`~django.db.models.query.QuerySet.update` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
@@ -188,12 +180,10 @@ the field value of each one, and saving each one back to the database::
 Slicing ``F()`` expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 5.1
-
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
-array-slicing syntax. The indices are 0-based and the ``step`` argument to
-``slice`` is not supported. For example:
+array-slicing syntax. The indices are 0-based. The ``step`` argument to
+``slice`` and negative indexing are not supported. For example:
 
 .. code-block:: pycon
 
@@ -201,7 +191,6 @@ array-slicing syntax. The indices are 0-based and the ``step`` argument to
     >>> writer = Writers.objects.get(name="Priyansh")
     >>> writer.name = F("name")[1:5]
     >>> writer.save()
-    >>> writer.refresh_from_db()
     >>> writer.name
     'riya'
 
@@ -220,26 +209,30 @@ based on the original value; the work of the first thread will be lost.
 
 If the database is responsible for updating the field, the process is more
 robust: it will only ever update the field based on the value of the field in
-the database when the :meth:`~Model.save()` or ``update()`` is executed, rather
+the database when the :meth:`~Model.save` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
-``F()`` assignments persist after ``Model.save()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``F()`` assignments are refreshed after ``Model.save()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``F()`` objects assigned to model fields persist after saving the model
-instance and will be applied on each :meth:`~Model.save()`. For example::
+``F()`` objects assigned to model fields are refreshed from the database on
+:meth:`~Model.save` on backends that support it without incurring a subsequent
+query (SQLite, PostgreSQL, and Oracle) and deferred otherwise (MySQL or
+MariaDB). For example:
 
-    reporter = Reporters.objects.get(name="Tintin")
-    reporter.stories_filed = F("stories_filed") + 1
-    reporter.save()
+.. code-block:: pycon
 
-    reporter.name = "Tintin Jr."
-    reporter.save()
+    >>> reporter = Reporters.objects.get(name="Tintin")
+    >>> reporter.stories_filed = F("stories_filed") + 1
+    >>> reporter.save()
+    >>> reporter.stories_filed  # This triggers a refresh query on MySQL/MariaDB.
+    14  # Assuming the database value was 13 when the object was saved.
 
-``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``. This persistence can be avoided by reloading the
-model object after saving it, for example, by using
-:meth:`~Model.refresh_from_db()`.
+.. versionchanged:: 6.0
+
+    In previous versions of Django, ``F()`` objects were not refreshed from the
+    database on :meth:`~Model.save` which resulted in them being evaluated and
+    persisted every time the instance was saved.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -263,8 +256,8 @@ different fields with arithmetic::
 
 If the fields that you're combining are of different types you'll need to tell
 Django what kind of field will be returned. Most expressions support
-:ref:`output_field<output-field>` for this case, but since ``F()`` does not, you
-will need to wrap the expression with :class:`ExpressionWrapper`::
+:ref:`output_field<output-field>` for this case, but since ``F()`` does not,
+you will need to wrap the expression with :class:`ExpressionWrapper`::
 
     from django.db.models import DateTimeField, ExpressionWrapper, F
 
@@ -342,7 +335,8 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL:
         ...
         LOWER("db_table"."field") as "field_lower"
 
-See :doc:`database-functions` for a list of built-in database functions.
+See :doc:`/ref/models/database-functions` for a list of built-in database
+functions.
 
 The ``Func`` API is as follows:
 
@@ -406,14 +400,15 @@ The ``Func`` API is as follows:
                     )
 
         To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
-        not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
-        as these values are interpolated into the SQL string rather than passed
-        as query parameters, where the database driver would escape them.
+        not contain untrusted user input
+        <avoiding-sql-injection-in-query-expressions>` as these values are
+        interpolated into the SQL string rather than passed as query
+        parameters, where the database driver would escape them.
 
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
-joined together with ``arg_joiner``, and then interpolated into the ``template``
-as the ``expressions`` placeholder.
+joined together with ``arg_joiner``, and then interpolated into the
+``template`` as the ``expressions`` placeholder.
 
 Positional arguments can be expressions or Python values. Strings are
 assumed to be column references and will be wrapped in ``F()`` expressions
@@ -450,7 +445,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, order_by=None, **extra)
 
     .. attribute:: template
 
@@ -475,6 +470,15 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
+    .. attribute:: allow_order_by
+
+        .. versionadded:: 6.0
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``order_by`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``order_by`` is passed as a value
+        other than ``None``.
+
     .. attribute:: empty_result_set_value
 
         Defaults to ``None`` since most aggregate functions result in ``NULL``
@@ -493,6 +497,12 @@ The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
+The ``order_by`` argument behaves similarly to the ``field_names`` input of the
+:meth:`~.QuerySet.order_by` function, accepting a field name (with an optional
+``"-"`` prefix which indicates descending order) or an expression (or a tuple
+or list of strings and/or expressions) that specifies the ordering of the
+elements in the result.
+
 The ``default`` argument takes a value that will be passed along with the
 aggregate to :class:`~django.db.models.functions.Coalesce`. This is useful for
 specifying a value to be returned other than ``None`` when the queryset (or
@@ -500,6 +510,10 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionchanged:: 6.0
+
+    The ``order_by`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -516,6 +530,7 @@ generated. Here's a brief example::
         function = "SUM"
         template = "%(function)s(%(all_values)s%(expressions)s)"
         allow_distinct = False
+        arity = 1
 
         def __init__(self, expression, all_values=False, **extra):
             super().__init__(expression, all_values="ALL " if all_values else "", **extra)
@@ -544,7 +559,7 @@ values into their corresponding database type.
 
 If no :ref:`output_field<output-field>` is specified, it will be inferred from
 the type of the provided ``value`` for many common types. For example, passing
-an instance of :py:class:`datetime.datetime` as ``value`` defaults
+an instance of :class:`datetime.datetime` as ``value`` defaults
 ``output_field`` to :class:`~django.db.models.DateTimeField`.
 
 ``ExpressionWrapper()`` expressions
@@ -563,7 +578,7 @@ Conditional expressions
 
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
-expressions. For more details see :doc:`conditional-expressions`.
+expressions. For more details see :doc:`/ref/models/conditional-expressions`.
 
 ``Subquery()`` expressions
 --------------------------
@@ -812,7 +827,7 @@ an expression that's compatible in a window clause.
 
 The ``partition_by`` argument accepts an expression or a sequence of
 expressions (column names should be wrapped in an ``F``-object) that control
-the partitioning of the rows.  Partitioning narrows which rows are used to
+the partitioning of the rows. Partitioning narrows which rows are used to
 compute the result set.
 
 The :ref:`output_field<output-field>` is specified either as an argument or by
@@ -919,19 +934,11 @@ ordinary sequence of rows.
     the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
     FOLLOWING``.
 
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
-
 .. class:: RowRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
         This attribute is set to ``'ROWS'``.
-
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
 
 Both classes return SQL with the template:
 
@@ -940,8 +947,6 @@ Both classes return SQL with the template:
     %(frame_type)s BETWEEN %(start)s AND %(end)s
 
 .. class:: WindowFrameExclusion
-
-    .. versionadded:: 5.1
 
     .. attribute:: CURRENT_ROW
 
@@ -1023,11 +1028,6 @@ released between twelve months before and twelve months after each movie:
     ...     ),
     ... )
 
-.. versionchanged:: 5.1
-
-    Support for positive integer ``start`` and negative integer ``end`` was
-    added for ``RowRange``.
-
 .. currentmodule:: django.db.models
 
 Technical Information
@@ -1057,8 +1057,6 @@ calling the appropriate methods on the wrapped expression.
         :attr:`Field.db_default`. Defaults to ``False``.
 
     .. attribute:: constraint_validation_compatible
-
-        .. versionadded:: 5.1
 
         Tells Django that this expression can be used during a constraint
         validation. Expressions with ``constraint_validation_compatible`` set
@@ -1092,18 +1090,22 @@ calling the appropriate methods on the wrapped expression.
 
         Tells Django which value should be returned when the expression is used
         to apply a function over an empty result set. Defaults to
-        :py:data:`NotImplemented` which forces the expression to be computed on
+        :data:`NotImplemented` which forces the expression to be computed on
         the database.
 
     .. attribute:: set_returning
-
-        .. versionadded:: 5.2
 
         Tells Django that this expression contains a set-returning function,
         enforcing subquery evaluation. It's used, for example, to allow some
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
         ``UNNEST``, etc.) to skip optimization and be properly evaluated when
         annotations spawn rows themselves. Defaults to ``False``.
+
+    .. attribute:: allows_composite_expressions
+
+        Tells Django that this expression allows composite expressions, for
+        example, to support :ref:`composite primary keys
+        <cpk-and-database-functions>`. Defaults to ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
@@ -1190,8 +1192,10 @@ calling the appropriate methods on the wrapped expression.
         implementing ``NULLS LAST`` would change its value to be
         ``NULLS FIRST``. Modifications are only required for expressions that
         implement sort order like ``OrderBy``. This method is called when
-        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        :meth:`~django.db.models.query.QuerySet.reverse` is called on a
         queryset.
+
+.. _writing-your-own-query-expressions:
 
 Writing your own Query Expressions
 ----------------------------------
@@ -1207,7 +1211,6 @@ values. It will return the first column or value that isn't ``NULL``.
 We'll start by defining the template to be used for SQL generation and
 an ``__init__()`` method to set some attributes::
 
-  import copy
   from django.db.models import Expression
 
 
@@ -1253,7 +1256,7 @@ Next, we write the method responsible for generating the SQL::
             sql_params.extend(params)
         template = template or self.template
         data = {"expressions": ",".join(sql_expressions)}
-        return template % data, sql_params
+        return template % data, tuple(sql_params)
 
 
     def as_oracle(self, compiler, connection):
@@ -1370,14 +1373,17 @@ class::
 
     Length.as_sqlserver = sqlserver_length
 
-You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
+You can also customize the SQL using the ``template`` parameter of
+``as_sql()``.
 
 We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
 ``sqlserver`` for the backend.
 
 Third-party backends can register their functions in the top level
-``__init__.py`` file of the backend package or in a top level ``expressions.py``
-file (or package) that is imported from the top level ``__init__.py``.
+``__init__.py`` file of the backend package or in a top level
+``expressions.py`` file (or package) that is imported from the top level
+``__init__.py``.
 
 For user projects wishing to patch the backend that they're using, this code
-should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.
+should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>`
+method.

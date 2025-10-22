@@ -1,5 +1,6 @@
 import codecs
 import copy
+import operator
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -89,13 +90,66 @@ class HttpRequest:
 
     @cached_property
     def accepted_types(self):
-        """Return a list of MediaType instances."""
-        return parse_accept_header(self.headers.get("Accept", "*/*"))
+        """
+        Return a list of MediaType instances, in order of preference (quality).
+        """
+        header_value = self.headers.get("Accept", "*/*")
+        return sorted(
+            (
+                media_type
+                for token in header_value.split(",")
+                if token.strip() and (media_type := MediaType(token)).quality != 0
+            ),
+            key=operator.attrgetter("quality", "specificity"),
+            reverse=True,
+        )
+
+    @cached_property
+    def accepted_types_by_precedence(self):
+        """
+        Return a list of MediaType instances, in order of precedence
+        (specificity).
+        """
+        return sorted(
+            self.accepted_types,
+            key=operator.attrgetter("specificity", "quality"),
+            reverse=True,
+        )
+
+    def accepted_type(self, media_type):
+        """
+        Return the MediaType instance which best matches the given media type.
+        """
+        media_type = MediaType(media_type)
+        return next(
+            (
+                accepted_type
+                for accepted_type in self.accepted_types_by_precedence
+                if media_type.match(accepted_type)
+            ),
+            None,
+        )
+
+    def get_preferred_type(self, media_types):
+        """Select the preferred media type from the provided options."""
+        if not media_types or not self.accepted_types:
+            return None
+
+        desired_types = [
+            (accepted_type, media_type)
+            for media_type in media_types
+            if (accepted_type := self.accepted_type(media_type)) is not None
+        ]
+
+        if not desired_types:
+            return None
+
+        # Of the desired media types, select the one which is preferred.
+        return min(desired_types, key=lambda t: self.accepted_types.index(t[0]))[1]
 
     def accepts(self, media_type):
-        return any(
-            accepted_type.match(media_type) for accepted_type in self.accepted_types
-        )
+        """Does the client accept a response in the given media type?"""
+        return self.accepted_type(media_type) is not None
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
@@ -181,7 +235,7 @@ class HttpRequest:
         """
         Attempt to return a signed cookie. If the signature fails or the
         cookie has expired, raise an exception, unless the `default` argument
-        is provided,  in which case return that value.
+        is provided, in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
@@ -296,7 +350,8 @@ class HttpRequest:
     @property
     def upload_handlers(self):
         if not self._upload_handlers:
-            # If there are no upload handlers defined, initialize them from settings.
+            # If there are no upload handlers defined, initialize them from
+            # settings.
             self._initialize_handlers()
         return self._upload_handlers
 
@@ -329,7 +384,8 @@ class HttpRequest:
                     "You cannot access body after reading from request's data stream"
                 )
 
-            # Limit the maximum request data size that will be handled in-memory.
+            # Limit the maximum request data size that will be handled
+            # in-memory.
             if (
                 settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
                 and int(self.META.get("CONTENT_LENGTH") or 0)
@@ -353,7 +409,9 @@ class HttpRequest:
         self._files = MultiValueDict()
 
     def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
+        """
+        Populate self._post and self._files if the content-type is a form type
+        """
         if self.method != "POST":
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -492,8 +550,8 @@ class QueryDict(MultiValueDict):
     By default QueryDicts are immutable, though the copy() method
     will always return a mutable copy.
 
-    Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to str.
+    Both keys and values set on this class are converted from the given
+    encoding (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class
@@ -511,7 +569,8 @@ class QueryDict(MultiValueDict):
             "max_num_fields": settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
         }
         if isinstance(query_string, bytes):
-            # query_string normally contains URL-encoded data, a subset of ASCII.
+            # query_string normally contains URL-encoded data, a subset of
+            # ASCII.
             try:
                 query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
@@ -670,17 +729,67 @@ class MediaType:
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__qualname__, self)
 
-    @property
-    def is_all_types(self):
-        return self.main_type == "*" and self.sub_type == "*"
+    @cached_property
+    def range_params(self):
+        params = self.params.copy()
+        params.pop("q", None)
+        return params
 
     def match(self, other):
-        if self.is_all_types:
-            return True
-        other = MediaType(other)
-        if self.main_type == other.main_type and self.sub_type in {"*", other.sub_type}:
-            return True
-        return False
+        if not other:
+            return False
+
+        if not isinstance(other, MediaType):
+            other = MediaType(other)
+
+        main_types = [self.main_type, other.main_type]
+        sub_types = [self.sub_type, other.sub_type]
+
+        # Main types and sub types must be defined.
+        if not all((*main_types, *sub_types)):
+            return False
+
+        # Main types must match or one be "*", same for sub types.
+        for this_type, other_type in (main_types, sub_types):
+            if this_type != other_type and this_type != "*" and other_type != "*":
+                return False
+
+        if bool(self.range_params) == bool(other.range_params):
+            # If both have params or neither have params, they must be
+            # identical.
+            result = self.range_params == other.range_params
+        else:
+            # If self has params and other does not, it's a match.
+            # If other has params and self does not, don't match.
+            result = bool(self.range_params or not other.range_params)
+        return result
+
+    @cached_property
+    def quality(self):
+        try:
+            quality = float(self.params.get("q", 1))
+        except ValueError:
+            # Discard invalid values.
+            return 1
+
+        # Valid quality values must be between 0 and 1.
+        if quality < 0 or quality > 1:
+            return 1
+
+        return round(quality, 3)
+
+    @property
+    def specificity(self):
+        """
+        Return a value from 0-3 for how specific the media type is.
+        """
+        if self.main_type == "*":
+            return 0
+        elif self.sub_type == "*":
+            return 1
+        elif not self.range_params:
+            return 2
+        return 3
 
 
 # It's neither necessary nor appropriate to use
@@ -732,7 +841,3 @@ def validate_host(host, allowed_hosts):
     return any(
         pattern == "*" or is_same_domain(host, pattern) for pattern in allowed_hosts
     )
-
-
-def parse_accept_header(header):
-    return [MediaType(token) for token in header.split(",") if token.strip()]

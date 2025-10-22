@@ -150,8 +150,8 @@ def make_middleware_decorator(middleware_class):
                         response = middleware.process_template_response(
                             request, response
                         )
-                    # Defer running of process_response until after the template
-                    # has been rendered:
+                    # Defer running of process_response until after the
+                    # template has been rendered:
                     if hasattr(middleware, "process_response"):
 
                         def callback(response):

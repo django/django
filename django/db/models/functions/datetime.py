@@ -96,7 +96,8 @@ class Extract(TimezoneMixin, Transform):
                 "Extract input expression must be DateField, DateTimeField, "
                 "TimeField, or DurationField."
             )
-        # Passing dates to functions expecting datetimes is most likely a mistake.
+        # Passing dates to functions expecting datetimes is most likely a
+        # mistake.
         if type(field) is DateField and copy.lookup_name in (
             "hour",
             "minute",
@@ -355,9 +356,7 @@ class TruncBase(TimezoneMixin, Transform):
                     "zone definitions for your database installed?"
                 )
         elif isinstance(value, datetime):
-            if value is None:
-                pass
-            elif isinstance(self.output_field, DateField):
+            if isinstance(self.output_field, DateField):
                 value = value.date()
             elif isinstance(self.output_field, TimeField):
                 value = value.time()

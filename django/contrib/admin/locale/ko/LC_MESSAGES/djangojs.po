@@ -5,6 +5,7 @@
 # alexhojinpark, 2023
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Jaehong Kim <mixe@korea.com>, 2011
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: alexhojinpark, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Jamie Seol, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,11 +33,8 @@ msgstr "이용 가능한 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"사용 가능한 %s 의 리스트 입니다.  아래의 상자에서 선택하고 두 상자 사이의 "
-"\"선택\" 화살표를 클릭하여 몇 가지를 선택할 수 있습니다."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "%s 선택 후 \"선택\" 화살표 버튼을 누르세요."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -45,18 +43,17 @@ msgstr "사용 가능한 %s 리스트를 필터링하려면 이 상자에 입력
 msgid "Filter"
 msgstr "필터"
 
-msgid "Choose all"
-msgstr "모두 선택"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "모든 %s 선택"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "한번에 모든 %s 를 선택하려면 클릭하세요."
+msgid "Choose selected %s"
+msgstr "선택한 %s 선택"
 
-msgid "Choose"
-msgstr "선택"
-
-msgid "Remove"
-msgstr "삭제"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "선택한 %s 삭제"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -64,22 +61,19 @@ msgstr "선택된 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"선택된 %s 리스트 입니다.  아래의 상자에서 선택하고 두 상자 사이의 \"제거\" 화"
-"살표를 클릭하여 일부를 제거 할 수 있습니다."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "%s 선택 후 \"삭제하기\" 화살표 버튼을 누르세요."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "선택된 %s의 리스트를 필터링 하려면 이 박스에 입력 하세요 ."
 
-msgid "Remove all"
-msgstr "모두 제거"
+msgid "(click to clear)"
+msgstr "(클릭하여 해제)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "한번에 선택된 모든 %s 를 제거하려면 클릭하세요."
+msgid "Remove all %s"
+msgstr "모든 %s 삭제"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -319,9 +313,3 @@ msgstr "금"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "토"
-
-msgid "Show"
-msgstr "보기"
-
-msgid "Hide"
-msgstr "감추기"

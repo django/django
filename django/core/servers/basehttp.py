@@ -18,6 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import LimitedStream
 from django.core.wsgi import get_wsgi_application
 from django.db import connections
+from django.utils.log import log_message
 from django.utils.module_loading import import_string
 
 __all__ = ("WSGIServer", "WSGIRequestHandler")
@@ -182,35 +183,27 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        extra = {
-            "request": self.request,
-            "server_time": self.log_date_time_string(),
-        }
-        if args[1][0] == "4":
+        if args[1][0] == "4" and args[0].startswith("\x16\x03"):
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
-            if args[0].startswith("\x16\x03"):
-                extra["status_code"] = 500
-                logger.error(
-                    "You're accessing the development server over HTTPS, but "
-                    "it only supports HTTP.",
-                    extra=extra,
-                )
-                return
-
-        if args[1].isdigit() and len(args[1]) == 3:
+            format = (
+                "You're accessing the development server over HTTPS, but it only "
+                "supports HTTP."
+            )
+            status_code = 500
+            args = ()
+        elif args[1].isdigit() and len(args[1]) == 3:
             status_code = int(args[1])
-            extra["status_code"] = status_code
-
-            if status_code >= 500:
-                level = logger.error
-            elif status_code >= 400:
-                level = logger.warning
-            else:
-                level = logger.info
         else:
-            level = logger.info
+            status_code = None
 
-        level(format, *args, extra=extra)
+        log_message(
+            logger,
+            format,
+            *args,
+            request=self.request,
+            status_code=status_code,
+            server_time=self.log_date_time_string(),
+        )
 
     def get_environ(self):
         # Strip all headers with underscores in the name before constructing
@@ -234,7 +227,9 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             pass
 
     def handle_one_request(self):
-        """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
+        """
+        Copy of WSGIRequestHandler.handle() but with different ServerHandler
+        """
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
             self.requestline = ""

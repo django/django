@@ -114,7 +114,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_text(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input type="text">.
+        Return a string of HTML for representing this as an
+        <input type="text">.
         """
         return self.as_widget(TextInput(), attrs, **kwargs)
 
@@ -124,7 +125,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_hidden(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input type="hidden">.
+        Return a string of HTML for representing this as an
+        <input type="hidden">.
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
@@ -181,7 +183,8 @@ class BoundField(RenderableFieldMixin):
             )
         # Only add the suffix if the label does not end in punctuation.
         # Translators: If found as last label character, these punctuation
-        # characters will prevent the default label_suffix to be appended to the label
+        # characters will prevent the default label_suffix to be appended to
+        # the label
         if label_suffix and contents and contents[-1] not in _(":?.!"):
             contents = format_html("{}{}", contents, label_suffix)
         widget = self.field.widget
@@ -239,7 +242,8 @@ class BoundField(RenderableFieldMixin):
     def auto_id(self):
         """
         Calculate and return the ID attribute for this BoundField, if the
-        associated Form has specified auto_id. Return an empty string otherwise.
+        associated Form has specified auto_id. Return an empty string
+        otherwise.
         """
         auto_id = self.form.auto_id  # Boolean or string
         if auto_id and "%s" in str(auto_id):
@@ -289,19 +293,25 @@ class BoundField(RenderableFieldMixin):
             attrs["disabled"] = True
         if not widget.is_hidden and self.errors:
             attrs["aria-invalid"] = "true"
-        # If a custom aria-describedby attribute is given (either via the attrs
-        # argument or widget.attrs) and help_text is used, the custom
-        # aria-described by is preserved so user can set the desired order.
-        if (
-            not attrs.get("aria-describedby")
-            and not widget.attrs.get("aria-describedby")
-            and self.field.help_text
-            and not self.use_fieldset
-            and self.auto_id
-            and not self.is_hidden
-        ):
-            attrs["aria-describedby"] = f"{self.auto_id}_helptext"
+        # Preserve aria-describedby provided by the attrs argument so user
+        # can set the desired order.
+        if not attrs.get("aria-describedby") and not self.use_fieldset:
+            if aria_describedby := self.aria_describedby:
+                attrs["aria-describedby"] = aria_describedby
         return attrs
+
+    @property
+    def aria_describedby(self):
+        # Preserve aria-describedby set on the widget.
+        if self.field.widget.attrs.get("aria-describedby"):
+            return None
+        aria_describedby = []
+        if self.auto_id and not self.is_hidden:
+            if self.help_text:
+                aria_describedby.append(f"{self.auto_id}_helptext")
+            if self.errors:
+                aria_describedby.append(f"{self.auto_id}_error")
+        return " ".join(aria_describedby)
 
     @property
     def widget_type(self):

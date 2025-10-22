@@ -3,11 +3,10 @@ Triaging tickets
 ================
 
 Django uses Trac_ for managing the work on the code base. Trac is a
-community-tended garden of the bugs people have found and the features people
-would like to see added. As in any garden, sometimes there are weeds to be
-pulled and sometimes there are flowers and vegetables that need picking. We need
-your help to sort out one from the other, and in the end, we all benefit
-together.
+community-tended garden of the bugs people have found and the features Django
+has decided to add. As in any garden, sometimes there are weeds to be pulled
+and sometimes there are flowers and vegetables that need picking. We need your
+help to sort out one from the other, and in the end, we all benefit together.
 
 Like all gardens, we can aspire to perfection, but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
@@ -24,19 +23,21 @@ mistakes. Trac is "mostly accurate", and we give allowances for the fact that
 sometimes it will be wrong. That's okay. We're perfectionists with deadlines.
 
 We rely on the community to keep participating, keep tickets as accurate as
-possible, and raise issues for discussion on our mailing lists when there is
+possible, and raise issues for discussion on the `Django Forum`_ when there is
 confusion or disagreement.
 
 Django is a community project, and every contribution helps. We can't do this
 without **you**!
 
+.. _triage-workflow:
+
 Triage workflow
 ===============
 
-Unfortunately, not all bug reports and feature requests in the ticket tracker
-provide all the :doc:`required details<bugs-and-features>`. A number of
-tickets have proposed solutions, but those don't necessarily meet all the
-requirements :ref:`adhering to the guidelines for contributing <patch-style>`.
+Unfortunately, not all reports in the ticket tracker provide all the
+:ref:`required details <reporting-bugs>`. A number of tickets have proposed
+solutions, but those don't necessarily meet all the requirements :ref:`adhering
+to the guidelines for contributing <patch-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
 users.
@@ -49,8 +50,8 @@ attribute easily tells us what and who each ticket is waiting on.
 Since a picture is worth a thousand words, let's start there:
 
 .. image:: /internals/_images/triage_process.*
-   :height: 501
-   :width: 400
+   :height: 750
+   :width: 600
    :alt: Django's ticket triage workflow
 
 We've got two roles in this diagram:
@@ -102,8 +103,8 @@ Unreviewed
 ----------
 
 The ticket has not been reviewed by anyone who felt qualified to make a
-judgment about whether the ticket contained a valid issue, a viable feature,
-or ought to be closed for any of the various reasons.
+judgment about whether the ticket contained a valid issue or ought to be closed
+for any of the various reasons.
 
 Accepted
 --------
@@ -118,11 +119,12 @@ Beyond that there are several considerations:
   means you could safely start writing a fix for it. This is generally more
   true for the case of accepted bugs than accepted features. A ticket for a bug
   that has been accepted means that the issue has been verified by at least one
-  triager as a legitimate bug - and should probably be fixed if possible. An
-  accepted new feature may only mean that one triager thought the feature would
-  be good to have, but this alone does not represent a consensus view or imply
-  with any certainty that a patch will be accepted for that feature. Seek more
-  feedback before writing an extensive contribution if you are in doubt.
+  triager as a legitimate bug - and should probably be fixed if possible.
+
+  For new features, accepted tickets should only exist after the idea has gone
+  through the appropriate :ref:`process for suggesting new features
+  <requesting-features>` and received community and :ref:`Steering Council
+  <steering-council>` approval, or been accepted in a DEP.
 
 * **Accepted + Has Patch**
 
@@ -154,12 +156,10 @@ Someday/Maybe
 -------------
 
 This stage isn't shown on the diagram. It's used sparingly to keep track of
-high-level ideas or long-term feature requests.
+long-term changes.
 
 These tickets are uncommon and overall less useful since they don't describe
-concrete actionable issues. They are enhancement requests that we might
-consider adding someday to the framework if an excellent patch is submitted.
-They are not a high priority.
+concrete actionable issues.
 
 Other triage attributes
 =======================
@@ -170,8 +170,8 @@ Has patch
 ---------
 
 This means the ticket has an associated solution. These will be reviewed to
-ensure they adhere to the :doc:`documented guidelines
-<writing-code/submitting-patches>`.
+ensure they adhere to the :ref:`documented guidelines
+<patch-review-checklist>`.
 
 The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.
@@ -236,8 +236,11 @@ majority of tickets have a severity of "Normal".
 Version
 -------
 
-It is possible to use the *version* attribute to indicate in which
-version the reported bug was identified.
+The *version* attribute indicates the earliest version in which the bug was
+reproduced. During triage, this field can be updated, but there is no need to
+make further updates when that version goes out of support. The field should
+not be reset to "dev" to show the issue still exists: instead, the tested
+commit hash can be noted in a comment.
 
 UI/UX
 -----
@@ -308,12 +311,11 @@ A ticket can be resolved in a number of ways:
 * wontfix
       Used when someone decides that the request isn't appropriate for
       consideration in Django. Sometimes a ticket is closed as "wontfix" with a
-      request for the reporter to start a discussion on the `Django Forum`_ or
-      |django-developers| mailing list if they feel differently from the
-      rationale provided by the person who closed the ticket. Other times, a
-      discussion precedes the decision to close a ticket. Always use the forum
-      or mailing list to get a consensus before reopening tickets closed as
-      "wontfix".
+      request for the reporter to start a discussion on the `Django Forum`_ if
+      they feel differently from the rationale provided by the person who
+      closed the ticket. Other times, a discussion precedes the decision to
+      close a ticket. Always use the forum to get a consensus before reopening
+      tickets closed as "wontfix".
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -333,7 +335,7 @@ If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
 Again, please do not reopen tickets that have been marked as "wontfix" and
-bring the issue to the `Django Forum`_ or |django-developers| instead.
+bring the issue to the `Django Forum`_ instead.
 
 .. _how-can-i-help-with-triaging:
 
@@ -353,8 +355,7 @@ Then, you can help out by:
   "wontfix".
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
-  sparse to be actionable, or when they're feature requests requiring a
-  discussion on the `Django Forum`_ or |django-developers|.
+  sparse to be actionable.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"
   flags for tickets where they are incorrectly set.
@@ -372,7 +373,7 @@ Then, you can help out by:
   reports about a particular part of Django, it may indicate we should
   consider refactoring that part of the code. If a trend is emerging,
   you should raise it for discussion (referencing the relevant tickets)
-  on the `Django Forum`_ or |django-developers|.
+  on the `Django Forum`_.
 
 * Verify if solutions submitted by others are correct. If they are correct
   and also contain appropriate documentation and tests then move them to the
@@ -386,7 +387,7 @@ Then, you can help out by:
     several that are useful for triaging tickets and reviewing proposals as
     suggested above.
 
-    You can also find more :doc:`new-contributors`.
+    You can also find more :doc:`/internals/contributing/new-contributors`.
 
     .. _Reports page: https://code.djangoproject.com/wiki/Reports
 
@@ -399,12 +400,12 @@ the ticket database:
   review a patch that you submit.
 
 * Please **don't** reverse a decision without posting a message to the
-  `Django Forum`_ or |django-developers| to find consensus.
+  `Django Forum`_ to find consensus.
 
 * If you're unsure if you should be making a change, don't make the
   change but instead leave a comment with your concerns on the ticket,
-  or post a message to the `Django Forum`_ or |django-developers|. It's okay to
-  be unsure, but your input is still valuable.
+  or post a message to the `Django Forum`_. It's okay to be unsure, but your
+  input is still valuable.
 
 .. _Trac: https://code.djangoproject.com/
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
@@ -441,10 +442,10 @@ Next, we mark the current point in history as being "bad" since the test fails:
 
 Now, we need to find a point in git history before the regression was
 introduced (i.e. a point where the test passes). Use something like
-``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
-in this case). Check if the test fails. If so, mark that point as "bad"
-(``git bisect bad``), then check out an earlier revision and recheck. Once you
-find a revision where your test passes, mark it as "good":
+``git checkout HEAD~100`` to check out an earlier revision (100 commits
+earlier, in this case). Check if the test fails. If so, mark that point as
+"bad" (``git bisect bad``), then check out an earlier revision and recheck.
+Once you find a revision where your test passes, mark it as "good":
 
 .. code-block:: shell
 

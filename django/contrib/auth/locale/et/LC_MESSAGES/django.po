@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2015,2023-2024
+# Martin <martinpajuste@gmail.com>, 2015,2023-2025
 # Martin <martinpajuste@gmail.com>, 2016-2017
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2023-2025\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -37,13 +37,13 @@ msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekt primaarvõtmega %(key)r ei eksisteeri."
 
 msgid "Conflicting form data submitted. Please try again."
-msgstr ""
+msgstr "Esitatud vastuolulised vormiandmed. Palun proovige uuesti."
 
 msgid "Password changed successfully."
 msgstr "Salasõna edukalt muudetud."
 
 msgid "Password-based authentication was disabled."
-msgstr ""
+msgstr "Salasõnapõhine autentimine lülitati välja."
 
 #, python-format
 msgid "Change password: %s"
@@ -62,11 +62,11 @@ msgstr "salasõna"
 msgid "last login"
 msgstr "viimane sisenemine"
 
-msgid "No password set."
-msgstr "Parool on määramata."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Lubamatu parooli formaat või tundmatu räsialgoritm."
+
+msgid "No password set."
+msgstr "Parool on määramata."
 
 msgid "Reset password"
 msgstr "Lähtesta parool"
@@ -76,12 +76,6 @@ msgstr "Määra parool"
 
 msgid "The two password fields didn’t match."
 msgstr "Sisestatud paroolid polnud identsed."
-
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
 
 msgid "Password"
 msgstr "Salasõna"
@@ -93,22 +87,31 @@ msgid "Enter the same password as before, for verification."
 msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
-msgid "Password-based authentication"
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
+"Kas kasutaja saab autentida parooliga või mitte. Kui see on välja lülitatud, "
+"võib ta siiski autentida end teiste taustsüsteemide, näiteks Single Sign-On "
+"või LDAP abil."
+
+msgid "Password-based authentication"
+msgstr "Salasõnapõhine autentimine"
 
 msgid "Enabled"
-msgstr ""
+msgstr "Võimaldatud"
 
 msgid "Disabled"
-msgstr ""
+msgstr "Keelatud"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see the user’s password."
-msgstr ""
+msgstr "Paroole ei salvestata, seega ei ole võimalik kasutaja parooli näha."
 
 msgid ""
 "Enable password-based authentication for this user by setting a password."
-msgstr ""
+msgstr "Lubage selle kasutaja paroolipõhine autentimine, määrates parooli."
 
 #, python-format
 msgid ""
@@ -260,16 +263,11 @@ msgid "users"
 msgstr "kasutajad"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Salasõna on liiga lühike. Selles peab olema vähemalt %(min_length)d täht."
-msgstr[1] ""
-"Salasõna on liiga lühike. Selles peab olema vähemalt %(min_length)d tähte."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Salasõna on liiga lühike. Selles peab olema vähemalt %d täht."
+msgstr[1] "Salasõna on liiga lühike. Selles peab olema vähemalt %d tähte."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

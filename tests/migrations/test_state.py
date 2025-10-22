@@ -183,11 +183,12 @@ class StateTests(SimpleTestCase):
         self.assertTrue(all(isinstance(name, str) for name, mgr in food_state.managers))
         self.assertEqual(food_state.managers[0][1].args, ("a", "b", 1, 2))
 
-        # No explicit managers defined. Migrations will fall back to the default
+        # No explicit managers defined. Migrations will fall back to the
+        # default
         self.assertEqual(food_no_managers_state.managers, [])
 
-        # food_mgr is used in migration but isn't the default mgr, hence add the
-        # default
+        # food_mgr is used in migration but isn't the default mgr, hence add
+        # the default
         self.assertEqual(
             [name for name, mgr in food_no_default_manager_state.managers],
             ["food_no_mgr", "food_mgr"],
@@ -1206,6 +1207,28 @@ class StateTests(SimpleTestCase):
         choices_field = Author._meta.get_field("choice")
         self.assertEqual(list(choices_field.choices), choices)
 
+    def test_composite_pk_state(self):
+        new_apps = Apps(["migrations"])
+
+        class Foo(models.Model):
+            pk = models.CompositePrimaryKey("account_id", "id")
+            account_id = models.SmallIntegerField()
+            id = models.SmallIntegerField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        project_state = ProjectState.from_apps(new_apps)
+        model_state = project_state.models["migrations", "foo"]
+        self.assertEqual(len(model_state.options), 2)
+        self.assertEqual(model_state.options["constraints"], [])
+        self.assertEqual(model_state.options["indexes"], [])
+        self.assertEqual(len(model_state.fields), 3)
+        self.assertIn("pk", model_state.fields)
+        self.assertIn("account_id", model_state.fields)
+        self.assertIn("id", model_state.fields)
+
 
 class StateRelationsTests(SimpleTestCase):
     def get_base_project_state(self):
@@ -1280,7 +1303,8 @@ class StateRelationsTests(SimpleTestCase):
             with self.subTest(method=method):
                 project_state = self.get_base_project_state()
                 getattr(project_state, method)(*args)
-                # ProjectState's `_relations` are populated on `relations` access.
+                # ProjectState's `_relations` are populated on `relations`
+                # access.
                 self.assertIsNone(project_state._relations)
                 self.assertEqual(project_state.relations, project_state._relations)
                 self.assertIsNotNone(project_state._relations)

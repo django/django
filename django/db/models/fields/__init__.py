@@ -30,9 +30,9 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.duration import duration_microseconds, duration_string
+from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
-from django.utils.ipv6 import clean_ipv6_address
+from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
@@ -155,8 +155,6 @@ class Field(RegisterLookupMixin):
         "error_messages",
         "help_text",
         "limit_choices_to",
-        # Database-level options are not supported, see #21961.
-        "on_delete",
         "related_name",
         "related_query_name",
         "validators",
@@ -391,8 +389,11 @@ class Field(RegisterLookupMixin):
         from django.db.models.expressions import Value
 
         if (
-            self.db_default is NOT_PROVIDED
-            or isinstance(self.db_default, Value)
+            not self.has_db_default()
+            or (
+                isinstance(self.db_default, Value)
+                or not hasattr(self.db_default, "resolve_expression")
+            )
             or databases is None
         ):
             return []
@@ -653,6 +654,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.json", "django.db.models")
         elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
+        elif path.startswith("django.db.models.fields.composite"):
+            path = path.replace("django.db.models.fields.composite", "django.db.models")
         elif path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
@@ -927,10 +930,7 @@ class Field(RegisterLookupMixin):
     @property
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
-        return (
-            self.db_default is not NOT_PROVIDED
-            and connection.features.can_return_columns_from_insert
-        )
+        return self.has_db_default()
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
@@ -993,7 +993,8 @@ class Field(RegisterLookupMixin):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         """
-        Return field's value prepared for interacting with the database backend.
+        Return field's value prepared for interacting with the database
+        backend.
 
         Used by the default implementations of get_db_prep_save().
         """
@@ -1011,6 +1012,10 @@ class Field(RegisterLookupMixin):
         """Return a boolean of whether this field has a default value."""
         return self.default is not NOT_PROVIDED
 
+    def has_db_default(self):
+        """Return a boolean of whether this field has a db_default value."""
+        return self.db_default is not NOT_PROVIDED
+
     def get_default(self):
         """Return the default value for this field."""
         return self._get_default()
@@ -1022,7 +1027,7 @@ class Field(RegisterLookupMixin):
                 return self.default
             return lambda: self.default
 
-        if self.db_default is not NOT_PROVIDED:
+        if self.has_db_default():
             from django.db.models.expressions import DatabaseDefault
 
             return lambda: DatabaseDefault(
@@ -1040,9 +1045,7 @@ class Field(RegisterLookupMixin):
     @cached_property
     def _db_default_expression(self):
         db_default = self.db_default
-        if db_default is not NOT_PROVIDED and not hasattr(
-            db_default, "resolve_expression"
-        ):
+        if self.has_db_default() and not hasattr(db_default, "resolve_expression"):
             from django.db.models.expressions import Value
 
             db_default = Value(db_default, self)
@@ -1333,7 +1336,7 @@ class CommaSeparatedIntegerField(CharField):
 
 def _to_naive(value):
     if timezone.is_aware(value):
-        value = timezone.make_naive(value, datetime.timezone.utc)
+        value = timezone.make_naive(value, datetime.UTC)
     return value
 
 
@@ -1782,8 +1785,9 @@ class DecimalField(Field):
 
     @cached_property
     def validators(self):
-        return super().validators + [
-            validators.DecimalValidator(self.max_digits, self.decimal_places)
+        return [
+            *super().validators,
+            validators.DecimalValidator(self.max_digits, self.decimal_places),
         ]
 
     @cached_property
@@ -1823,9 +1827,8 @@ class DecimalField(Field):
             )
         return decimal_value
 
-    def get_db_prep_save(self, value, connection):
-        if hasattr(value, "as_sql"):
-            return value
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super().get_db_prep_value(value, connection, prepared)
         return connection.ops.adapt_decimalfield_value(
             self.to_python(value), self.max_digits, self.decimal_places
         )
@@ -1885,11 +1888,7 @@ class DurationField(Field):
         )
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if connection.features.has_native_duration_field:
-            return value
-        if value is None:
-            return None
-        return duration_microseconds(value)
+        return connection.ops.adapt_durationfield_value(value)
 
     def get_db_converters(self, connection):
         converters = []
@@ -1921,8 +1920,8 @@ class EmailField(CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        # We do not exclude max_length if it matches default as we want to change
-        # the default in future.
+        # We do not exclude max_length if it matches default as we want to
+        # change the default in future.
         return name, path, args, kwargs
 
     def formfield(self, **kwargs):
@@ -2228,7 +2227,7 @@ class GenericIPAddressField(Field):
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
         )
-        kwargs["max_length"] = 39
+        kwargs["max_length"] = MAX_IPV6_ADDRESS_LENGTH
         super().__init__(verbose_name, name, *args, **kwargs)
 
     def check(self, **kwargs):
@@ -2255,7 +2254,7 @@ class GenericIPAddressField(Field):
             kwargs["unpack_ipv4"] = self.unpack_ipv4
         if self.protocol != "both":
             kwargs["protocol"] = self.protocol
-        if kwargs.get("max_length") == 39:
+        if kwargs.get("max_length") == self.max_length:
             del kwargs["max_length"]
         return name, path, args, kwargs
 

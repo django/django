@@ -4,21 +4,20 @@ How to authenticate using ``REMOTE_USER``
 
 This document describes how to make use of external authentication sources
 (where the web server sets the ``REMOTE_USER`` environment variable) in your
-Django applications.  This type of authentication solution is typically seen on
+Django applications. This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
-Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
-`WebAuth`_, `mod_auth_sspi`_, etc.
+Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `WebAuth`_,
+`mod_auth_sspi`_, etc.
 
-.. _mod_authnz_ldap: https://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
+.. _mod_authnz_ldap: https://httpd.apache.org/docs/current/mod/mod_authnz_ldap.html
 .. _CAS: https://www.apereo.org/projects/cas
-.. _Cosign: http://weblogin.org
 .. _WebAuth: https://uit.stanford.edu/service/authentication
 .. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
 When the web server takes care of authentication it typically sets the
-``REMOTE_USER`` environment variable for use in the underlying application.  In
+``REMOTE_USER`` environment variable for use in the underlying application. In
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
-<django.http.HttpRequest.META>` attribute.  Django can be configured to make
+<django.http.HttpRequest.META>` attribute. Django can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
 or ``PersistentRemoteUserMiddleware``, and
 :class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
@@ -77,13 +76,26 @@ regardless of ``AUTHENTICATION_BACKENDS``.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
-``header`` attribute to the desired ``request.META`` key.  For example::
+``header`` attribute to the desired ``request.META`` key. For example:
+
+.. code-block:: python
+   :caption: ``mysite/middleware.py``
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
 
-    class CustomHeaderMiddleware(RemoteUserMiddleware):
+    class CustomHeaderRemoteUserMiddleware(RemoteUserMiddleware):
         header = "HTTP_AUTHUSER"
+
+This custom middleware is then used in the :setting:`MIDDLEWARE` setting
+instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
+
+    MIDDLEWARE = [
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "mysite.middleware.CustomHeaderRemoteUserMiddleware",
+        "...",
+    ]
 
 .. warning::
 

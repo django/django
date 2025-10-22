@@ -430,6 +430,20 @@ class RelatedJSONModel(models.Model):
         required_db_features = {"supports_json_field"}
 
 
+class CustomSerializationJSONModel(models.Model):
+    class StringifiedJSONField(models.JSONField):
+        def get_prep_value(self, value):
+            return json.dumps(value, cls=self.encoder)
+
+    json_field = StringifiedJSONField()
+
+    class Meta:
+        required_db_features = {
+            "supports_json_field",
+            "supports_primitives_in_json_field",
+        }
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()
@@ -522,6 +536,19 @@ class GeneratedModel(models.Model):
         db_persist=True,
     )
     fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelNonAutoPk(models.Model):
+    id = models.IntegerField(primary_key=True)
+    a = models.IntegerField()
+    b = models.GeneratedField(
+        expression=F("a"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}

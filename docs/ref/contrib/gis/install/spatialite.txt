@@ -39,8 +39,8 @@ command line interface and enter the following query:
 
     sqlite> CREATE VIRTUAL TABLE testrtree USING rtree(id,minX,maxX,minY,maxY);
 
-If you obtain an error, you will have to recompile SQLite from source. Otherwise,
-skip this section.
+If you obtain an error, you will have to recompile SQLite from source.
+Otherwise, skip this section.
 
 To install from sources, download the latest amalgamation source archive from
 the `SQLite download page`__, and extract:
@@ -51,8 +51,9 @@ the `SQLite download page`__, and extract:
     $ unzip sqlite-amalgamation-XXX0000.zip
     $ cd sqlite-amalgamation-XXX0000
 
-Next, run the ``configure`` script -- however the ``CFLAGS`` environment variable
-needs to be customized so that SQLite knows to build the R*Tree module:
+Next, run the ``configure`` script -- however the ``CFLAGS`` environment
+variable needs to be customized so that SQLite knows to build the R*Tree
+module:
 
 .. code-block:: shell
 

@@ -1,5 +1,5 @@
 """
-Global Django exception and warning classes.
+Global Django exception classes.
 """
 
 import operator
@@ -23,6 +23,10 @@ class ObjectDoesNotExist(Exception):
     """The requested object does not exist"""
 
     silent_variable_failure = True
+
+
+class ObjectNotUpdated(Exception):
+    """The updated object no longer exists."""
 
 
 class MultipleObjectsReturned(Exception):
@@ -124,6 +128,12 @@ class ImproperlyConfigured(Exception):
 
 class FieldError(Exception):
     """Some kind of problem with a model field."""
+
+    pass
+
+
+class FieldFetchBlocked(FieldError):
+    """On-demand fetching of a model field blocked."""
 
     pass
 

@@ -12,13 +12,30 @@ QUnit.test('init', function(assert) {
     SelectFilter.init('id', 'things', 0);
     assert.equal($('#test').children().first().prop("tagName"), "DIV");
     assert.equal($('#test').children().first().attr("class"), "selector");
-    assert.equal($('.selector-available h2').text().trim(), "Available things");
-    assert.equal($('.selector-chosen h2').text().trim(), "Chosen things");
+    assert.equal($('.selector-available label').text().trim(), "Available things");
+    assert.equal($('.selector-available label').attr("id"), "id_from_label");
+    assert.equal($('.selector-chosen label').text().trim(), "Chosen things");
+    assert.equal($('.selector-chosen label').attr("id"), "id_to_label");
     assert.equal($('.selector-chosen select')[0].getAttribute('multiple'), '');
-    assert.equal($('.selector-chooseall').text(), "Choose all");
-    assert.equal($('.selector-add').text(), "Choose");
-    assert.equal($('.selector-remove').text(), "Remove");
-    assert.equal($('.selector-clearall').text(), "Remove all");
+    assert.equal($('.selector-chooseall').text(), "Choose all things");
+    assert.equal($('.selector-chooseall').prop("tagName"), "BUTTON");
+    assert.equal($('.selector-add').text(), "Choose selected things");
+    assert.equal($('.selector-add').prop("tagName"), "BUTTON");
+    assert.equal($('.selector-remove').text(), "Remove selected things");
+    assert.equal($('.selector-remove').prop("tagName"), "BUTTON");
+    assert.equal($('.selector-clearall').text(), "Remove all things");
+    assert.equal($('.selector-clearall').prop("tagName"), "BUTTON");
+    assert.equal($('.selector-available .filtered').attr("aria-labelledby"), "id_from_label");
+    assert.equal($('.selector-available .filtered').attr("aria-describedby"), "id_helptext id_choose_helptext");
+    assert.equal($('.selector-available .selector-available-title label').text(), "Available things ");
+    assert.equal($('.selector-available .selector-available-title .helptext').text(), 'Choose things by selecting them and then select the "Choose" arrow button.');
+    assert.equal($('.selector-chosen .filtered').attr("aria-labelledby"), "id_to_label");
+    assert.equal($('.selector-chosen .filtered').attr("aria-describedby"), "id_helptext id_remove_helptext");
+    assert.equal($('.selector-chosen .selector-chosen-title label').text(), "Chosen things ");
+    assert.equal($('.selector-chosen .selector-chosen-title .helptext').text(), 'Remove things by selecting them and then select the "Remove" arrow button.');
+    assert.equal($('.selector-filter label .help-tooltip')[0].getAttribute("aria-label"), "Type into this box to filter down the list of available things.");
+    assert.equal($('.selector-filter label .help-tooltip')[1].getAttribute("aria-label"), "Type into this box to filter down the list of selected things.");
+    assert.equal($('#test button:not([type="button"])').length, 0);
 });
 
 QUnit.test('filtering available options', function(assert) {

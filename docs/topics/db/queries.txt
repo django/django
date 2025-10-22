@@ -62,7 +62,8 @@ class represents a particular record in the database table.
 To create an object, instantiate it using keyword arguments to the model class,
 then call :meth:`~django.db.models.Model.save` to save it to the database.
 
-Assuming models live in a file ``mysite/blog/models.py``, here's an example:
+Assuming models live in a ``models.py`` file inside a ``blog`` Django app, here
+is an example:
 
 .. code-block:: pycon
 
@@ -82,7 +83,7 @@ The :meth:`~django.db.models.Model.save` method has no return value.
     :meth:`~django.db.models.Model.save` for complete details.
 
     To create and save an object in a single step, use the
-    :meth:`~django.db.models.query.QuerySet.create()` method.
+    :meth:`~django.db.models.query.QuerySet.create` method.
 
 Saving changes to objects
 =========================
@@ -177,11 +178,11 @@ model class, like so:
 
 .. note::
 
-    ``Managers`` are accessible only via model classes, rather than from model
+    A ``Manager`` is accessible only via model classes, rather than from model
     instances, to enforce a separation between "table-level" operations and
     "record-level" operations.
 
-The :class:`~django.db.models.Manager` is the main source of ``QuerySets`` for
+The :class:`~django.db.models.Manager` is the main source of querysets for
 a model. For example, ``Blog.objects.all()`` returns a
 :class:`~django.db.models.query.QuerySet` that contains all ``Blog`` objects in
 the database.
@@ -273,7 +274,7 @@ Example:
     >>> q2 = q1.exclude(pub_date__gte=datetime.date.today())
     >>> q3 = q1.filter(pub_date__gte=datetime.date.today())
 
-These three ``QuerySets`` are separate. The first is a base
+These three querysets are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
 headline starting with "What". The second is a subset of the first, with an
 additional criteria that excludes records whose ``pub_date`` is today or in the
@@ -287,7 +288,7 @@ refinement process.
 ``QuerySet``\s are lazy
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``QuerySets`` are lazy -- the act of creating a
+``QuerySet`` objects are lazy -- the act of creating a
 :class:`~django.db.models.query.QuerySet` doesn't involve any database
 activity. You can stack filters together all day long, and Django won't
 actually run the query until the :class:`~django.db.models.query.QuerySet` is
@@ -517,8 +518,8 @@ probably use:
     case-insensitive versions called :lookup:`istartswith` and
     :lookup:`iendswith`.
 
-Again, this only scratches the surface. A complete reference can be found in the
-:ref:`field lookup reference <field-lookups>`.
+Again, this only scratches the surface. A complete reference can be found in
+the :ref:`field lookup reference <field-lookups>`.
 
 .. _lookups-that-span-relationships:
 
@@ -705,10 +706,10 @@ and use that ``F()`` object in the query:
     >>> from django.db.models import F
     >>> Entry.objects.filter(number_of_comments__gt=F("number_of_pingbacks"))
 
-Django supports the use of addition, subtraction, multiplication,
-division, modulo, and power arithmetic with ``F()`` objects, both with constants
-and with other ``F()`` objects. To find all the blog entries with more than
-*twice* as many comments as pingbacks, we modify the query:
+Django supports the use of addition, subtraction, multiplication, division,
+modulo, and power arithmetic with ``F()`` objects, both with constants and with
+other ``F()`` objects. To find all the blog entries with more than *twice* as
+many comments as pingbacks, we modify the query:
 
 .. code-block:: pycon
 
@@ -899,7 +900,7 @@ reuse it:
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Querysets do not always cache their results.  When evaluating only *part* of
+Querysets do not always cache their results. When evaluating only *part* of
 the queryset, the cache is checked, but if it is not populated then the items
 returned by the subsequent query are not cached. Specifically, this means that
 :ref:`limiting the queryset <limiting-querysets>` using an array slice or an
@@ -1059,7 +1060,7 @@ representation of the JSON scalar ``null`` is the same as SQL ``NULL``, i.e.
 ``None``. Therefore, it can be hard to distinguish between them.
 
 This only applies to ``None`` as the top-level value of the field. If ``None``
-is inside a :py:class:`list` or :py:class:`dict`, it will always be interpreted
+is inside a :class:`list` or :class:`dict`, it will always be interpreted
 as JSON ``null``.
 
 When querying, ``None`` value will always be interpreted as JSON ``null``. To
@@ -1090,6 +1091,8 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
     <django.db.models.Field.null>`.
 
 .. fieldlookup:: jsonfield.key
+
+.. _key-index-and-path-transforms:
 
 Key, index, and path transforms
 -------------------------------
@@ -1132,6 +1135,22 @@ array:
 
     >>> Dog.objects.filter(data__owner__other_pets__0__name="Fishy")
     <QuerySet [<Dog: Rufus>]>
+
+If the key is a negative integer, it cannot be used in a filter keyword
+directly, but you can still use dictionary unpacking to use it in a query:
+
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(**{"data__owner__other_pets__-1__name": "Fishy"})
+    <QuerySet [<Dog: Rufus>]>
+
+.. admonition:: MySQL, MariaDB, and Oracle
+
+    Negative JSON array indices are not supported.
+
+.. versionchanged:: 6.0
+
+    SQLite support for negative JSON array indices was added.
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
@@ -1178,7 +1197,7 @@ To query for missing keys, use the ``isnull`` lookup:
         ...     },
         ... )
         <Dog: Shep>
-        >>> Dogs.objects.annotate(
+        >>> Dog.objects.annotate(
         ...     first_breed=KT("data__breed__1"), owner_name=KT("data__owner__name")
         ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
         <QuerySet [<Dog: Shep>]>
@@ -1246,10 +1265,15 @@ contained in the top-level of the field. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
     >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
+    >>> Dog.objects.filter(data__contains={"tricks": ["dance"]})
+    <QuerySet [<Dog: Merry>]>
 
 .. admonition:: Oracle and SQLite
 
@@ -1272,10 +1296,17 @@ subset of those in the value passed. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
     >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
+    >>> Dog.objects.filter(
+    ...     data__contained_by={"breed": "pekingese", "tricks": ["dance", "fetch", "hug"]}
+    ... )
+    <QuerySet [<Dog: Merry>, <Dog: Fred>]>
 
 .. admonition:: Oracle and SQLite
 
@@ -1298,7 +1329,7 @@ example:
     >>> Dog.objects.filter(data__has_key="owner")
     <QuerySet [<Dog: Meg>]>
 
-.. fieldlookup:: jsonfield.has_any_keys
+.. fieldlookup:: jsonfield.has_keys
 
 ``has_keys``
 ~~~~~~~~~~~~
@@ -1315,7 +1346,7 @@ For example:
     >>> Dog.objects.filter(data__has_keys=["breed", "owner"])
     <QuerySet [<Dog: Meg>]>
 
-.. fieldlookup:: jsonfield.has_keys
+.. fieldlookup:: jsonfield.has_any_keys
 
 ``has_any_keys``
 ~~~~~~~~~~~~~~~~
@@ -1339,7 +1370,8 @@ Complex lookups with ``Q`` objects
 
 Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for
-example, queries with ``OR`` statements), you can use :class:`Q objects <django.db.models.Q>`.
+example, queries with ``OR`` statements), you can use
+:class:`Q objects <django.db.models.Q>`.
 
 A :class:`Q object <django.db.models.Q>` (``django.db.models.Q``) is an object
 used to encapsulate a collection of keyword arguments. These keyword arguments
@@ -1559,6 +1591,21 @@ For example, assuming ``entry`` is already duplicated as above::
     detail.entry = entry
     detail.save()
 
+Note that it is not possible to copy instances of models with deferred fields
+using this pattern unless values are assigned to them:
+
+.. code-block:: pycon
+
+    >>> blog = Blog.objects.defer("name")[0]
+    >>> blog.pk = None
+    >>> blog._state.adding = True
+    >>> blog.save()
+    Traceback (most recent call last):
+        ...
+    AttributeError: Cannot retrieve deferred field 'name' from an unsaved model.
+    >>> blog.name = "Another Blog"
+    >>> blog.save()
+
 .. _topics-db-queries-update:
 
 Updating multiple objects at once
@@ -1636,14 +1683,14 @@ a join with an ``F()`` object, a ``FieldError`` will be raised:
 Related objects
 ===============
 
-When you define a relationship in a model (i.e., a
+When you define a relationship in a model (with
 :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.OneToOneField`, or
-:class:`~django.db.models.ManyToManyField`), instances of that model will have
-a convenient API to access the related object(s).
+:class:`~django.db.models.ManyToManyField`), instances of the model class gain
+accessor attributes for the related object(s).
 
-Using the models at the top of this page, for example, an ``Entry`` object ``e``
-can get its associated ``Blog`` object by accessing the ``blog`` attribute:
+Using the models at the top of this page, for example, an ``Entry`` object
+``e`` has its associated ``Blog`` object accessible in its ``blog`` attribute:
 ``e.blog``.
 
 (Behind the scenes, this functionality is implemented by Python
@@ -1652,8 +1699,14 @@ you, but we point it out here for the curious.)
 
 Django also creates API accessors for the "other" side of the relationship --
 the link from the related model to the model that defines the relationship.
-For example, a ``Blog`` object ``b`` has access to a list of all related
-``Entry`` objects via the ``entry_set`` attribute: ``b.entry_set.all()``.
+For example, a ``Blog`` object ``b`` has a manager that returns all related
+``Entry`` objects in the ``entry_set`` attribute: ``b.entry_set.all()``.
+
+These accessors may be prefetched by the ``QuerySet`` methods
+:meth:`~django.db.models.query.QuerySet.select_related` or
+:meth:`~django.db.models.query.QuerySet.prefetch_related`. If not prefetched,
+access will trigger an on-demand fetch through the model's
+:doc:`fetch mode </topics/db/fetch-modes>`.
 
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
@@ -1724,8 +1777,8 @@ foreign-key model will have access to a :class:`~django.db.models.Manager` that
 returns all instances of the first model. By default, this
 :class:`~django.db.models.Manager` is named ``FOO_set``, where ``FOO`` is the
 source model name, lowercased. This :class:`~django.db.models.Manager` returns
-``QuerySets``, which can be filtered and manipulated as described in the
-"Retrieving objects" section above.
+``QuerySet`` instances, which can be filtered and manipulated as described in
+the "Retrieving objects" section above.
 
 Example:
 
@@ -1749,7 +1802,7 @@ related_name='entries')``, the above example code would look like this:
     >>> b = Blog.objects.get(id=1)
     >>> b.entries.all()  # Returns all Entry objects related to Blog.
 
-    # b.entries is a Manager that returns QuerySets.
+    # b.entries is a Manager that returns ``QuerySet`` instances.
     >>> b.entries.filter(headline__contains="Lennon")
     >>> b.entries.count()
 
@@ -1759,9 +1812,9 @@ Using a custom reverse manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default the :class:`~django.db.models.fields.related.RelatedManager` used
-for reverse relations is a subclass of the :ref:`default manager <manager-names>`
-for that model. If you would like to specify a different manager for a given
-query you can use the following syntax::
+for reverse relations is a subclass of the :ref:`default manager
+<manager-names>` for that model. If you would like to specify a different
+manager for a given query you can use the following syntax::
 
     from django.db import models
 
@@ -1895,9 +1948,9 @@ For example::
     ed.entry  # Returns the related Entry object.
 
 The difference comes in "reverse" queries. The related model in a one-to-one
-relationship also has access to a :class:`~django.db.models.Manager` object, but
-that :class:`~django.db.models.Manager` represents a single object, rather than
-a collection of objects::
+relationship also has access to a :class:`~django.db.models.Manager` object,
+but that :class:`~django.db.models.Manager` represents a single object, rather
+than a collection of objects::
 
     e = Entry.objects.get(id=2)
     e.entrydetail  # returns the related EntryDetail object

@@ -49,7 +49,6 @@ from django.test.utils import (
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.html import VOID_ELEMENTS
-from django.utils.version import PY311
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -90,9 +89,9 @@ class SkippingTestCase(SimpleTestCase):
             raise ValueError
 
         self._assert_skipping(test_func, ValueError)
-        self._assert_skipping(test_func2, unittest.SkipTest)
+        self._assert_skipping(test_func2, AttributeError)
         self._assert_skipping(test_func3, ValueError)
-        self._assert_skipping(test_func4, unittest.SkipTest)
+        self._assert_skipping(test_func4, AttributeError)
 
         class SkipTestCase(SimpleTestCase):
             @skipUnlessDBFeature("missing")
@@ -103,11 +102,9 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipUnlessDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase%s) "
-            "as SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database."
-            # Python 3.11 uses fully qualified test name in the output.
-            % (".test_foo" if PY311 else ""),
+            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase."
+            "test_foo) as SkippingTestCase.test_skip_unless_db_feature.<locals>."
+            "SkipTestCase doesn't allow queries against the 'default' database.",
         )
 
     def test_skip_if_db_feature(self):
@@ -136,10 +133,10 @@ class SkippingTestCase(SimpleTestCase):
             raise ValueError
 
         self._assert_skipping(test_func, unittest.SkipTest)
-        self._assert_skipping(test_func2, ValueError)
+        self._assert_skipping(test_func2, AttributeError)
         self._assert_skipping(test_func3, unittest.SkipTest)
         self._assert_skipping(test_func4, unittest.SkipTest)
-        self._assert_skipping(test_func5, ValueError)
+        self._assert_skipping(test_func5, AttributeError)
 
         class SkipTestCase(SimpleTestCase):
             @skipIfDBFeature("missing")
@@ -150,11 +147,9 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipIfDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase%s) "
+            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase.test_foo) "
             "as SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database."
-            # Python 3.11 uses fully qualified test name in the output.
-            % (".test_foo" if PY311 else ""),
+            "doesn't allow queries against the 'default' database.",
         )
 
 
@@ -391,6 +386,7 @@ class CaptureQueriesContextManagerTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person_pk = str(Person.objects.create(name="test").pk)
+        cls.url = f"/test_utils/get_person/{cls.person_pk}/"
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -423,25 +419,38 @@ class CaptureQueriesContextManagerTests(TestCase):
 
     def test_with_client(self):
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 1)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
 
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 1)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
 
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 2)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
         self.assertIn(self.person_pk, captured_queries[1]["sql"])
 
+    def test_with_client_nested(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Person.objects.count()
+            with CaptureQueriesContext(connection):
+                pass
+            self.client.get(self.url)
+        self.assertEqual(2, len(captured_queries))
+
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
 class AssertNumQueriesContextManagerTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person_pk = str(Person.objects.create(name="test").pk)
+        cls.url = f"/test_utils/get_person/{cls.person_pk}/"
+
     def test_simple(self):
         with self.assertNumQueries(0):
             pass
@@ -464,17 +473,22 @@ class AssertNumQueriesContextManagerTests(TestCase):
                 raise TypeError
 
     def test_with_client(self):
-        person = Person.objects.create(name="test")
+        with self.assertNumQueries(1):
+            self.client.get(self.url)
 
         with self.assertNumQueries(1):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
-
-        with self.assertNumQueries(1):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get(self.url)
 
         with self.assertNumQueries(2):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get(self.url)
+            self.client.get(self.url)
+
+    def test_with_client_nested(self):
+        with self.assertNumQueries(2):
+            Person.objects.count()
+            with self.assertNumQueries(0):
+                pass
+            self.client.get(self.url)
 
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
@@ -522,7 +536,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         with self.assertTemplateNotUsed("template_used/alternative.html"):
             pass
 
-    def test_error_message(self):
+    def test_error_message_no_template_used(self):
         msg = "No templates used to render the response"
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed("template_used/base.html"):
@@ -532,15 +546,6 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed(template_name="template_used/base.html"):
                 pass
 
-        msg2 = (
-            "Template 'template_used/base.html' was not a template used to render "
-            "the response. Actual template(s) used: template_used/alternative.html"
-        )
-        with self.assertRaisesMessage(AssertionError, msg2):
-            with self.assertTemplateUsed("template_used/base.html"):
-                render_to_string("template_used/alternative.html")
-
-        msg = "No templates used to render the response"
         with self.assertRaisesMessage(AssertionError, msg):
             response = self.client.get("/test_utils/no_template_used/")
             self.assertTemplateUsed(response, "template_used/base.html")
@@ -553,6 +558,15 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed("template_used/base.html"):
                 template = Template("template_used/alternative.html", name=None)
                 template.render(Context())
+
+    def test_error_message_unexpected_template_used(self):
+        msg = (
+            "Template 'template_used/base.html' was not a template used to render "
+            "the response. Actual template(s) used: template_used/alternative.html"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                render_to_string("template_used/alternative.html")
 
     def test_msg_prefix(self):
         msg_prefix = "Prefix"
@@ -630,6 +644,53 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             self.assertTemplateUsed(response, "template.html")
         with self.assertRaisesMessage(ValueError, msg % "assertTemplateNotUsed"):
             self.assertTemplateNotUsed(response, "template.html")
+
+
+@override_settings(ROOT_URLCONF="test_utils.urls")
+class AssertTemplateUsedPartialTests(SimpleTestCase):
+    def test_template_used_pass(self):
+        with self.assertTemplateUsed("template_used/partials.html#hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass(self):
+        with self.assertTemplateNotUsed("hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_used_fail(self):
+        msg = "Template 'hello' was not a template used to render the response."
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("hello"),
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_not_used_fail(self):
+        msg = (
+            "Template 'template_used/partials.html#hello' was used "
+            "unexpectedly in rendering the response"
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateNotUsed("template_used/partials.html#hello"),
+        ):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass_non_partial(self):
+        with self.assertTemplateNotUsed(
+            "template_used/base.html#template_used/base.html"
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_used_fail_non_partial(self):
+        msg = (
+            "Template 'template_used/base.html#template_used/base.html' was not a "
+            "template used to render the response."
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("template_used/base.html#template_used/base.html"),
+        ):
+            render_to_string("template_used/base.html")
 
 
 class HTMLEqualTests(SimpleTestCase):
@@ -948,7 +1009,7 @@ class HTMLEqualTests(SimpleTestCase):
             "('Unexpected end tag `div` (Line 1, Column 6)', (1, 6))"
         )
         with self.assertRaisesMessage(AssertionError, error_msg):
-            self.assertHTMLEqual("< div></ div>", "<div></div>")
+            self.assertHTMLEqual("< div></div>", "<div></div>")
         with self.assertRaises(HTMLParseError):
             parse_html("</p>")
 
@@ -1046,7 +1107,7 @@ class InHTMLTests(SimpleTestCase):
     def test_long_haystack(self):
         haystack = (
             "<p>This is a very very very very very very very very long message which "
-            "exceedes the max limit of truncation.</p>"
+            "exceeds the max limit of truncation.</p>"
         )
         msg = f"Couldn't find '<b>Hello</b>' in the following response\n{haystack!r}"
         with self.assertRaisesMessage(AssertionError, msg):
@@ -1068,6 +1129,15 @@ class InHTMLTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotInHTML("<b>Hello</b>", haystack=haystack)
+
+    def test_assert_not_in_html_msg_prefix(self):
+        haystack = "<p>Hello</p>"
+        msg = (
+            "1 != 0 : Prefix: '<p>Hello</p>' unexpectedly found in the following "
+            f"response\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertNotInHTML("<p>Hello</p>", haystack=haystack, msg_prefix="Prefix")
 
 
 class JSONEqualTests(SimpleTestCase):
@@ -1214,7 +1284,7 @@ class XMLEqualTests(SimpleTestCase):
 
 
 class SkippingExtraTests(TestCase):
-    fixtures = ["should_not_be_loaded.json"]
+    fixtures = ["person.json"]
 
     # HACK: This depends on internals of our TestCase subclasses
     def __call__(self, result=None):
@@ -2186,6 +2256,8 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
         finally:
             new_connection.validate_thread_sharing()
             new_connection._close()
+            if hasattr(new_connection, "close_pool"):
+                new_connection.close_pool()
 
 
 class DatabaseAliasTests(SimpleTestCase):

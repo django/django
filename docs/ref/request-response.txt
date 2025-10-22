@@ -113,9 +113,9 @@ All attributes should be considered read-only, unless stated otherwise.
 
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
-    does not include form data. Therefore, you shouldn't use ``if request.POST``
-    to check for use of the POST method; instead, use ``if request.method ==
-    "POST"`` (see :attr:`HttpRequest.method`).
+    does not include form data. Therefore, you shouldn't use ``if
+    request.POST`` to check for use of the POST method; instead, use ``if
+    request.method == "POST"`` (see :attr:`HttpRequest.method`).
 
     ``POST`` does *not* include file-upload information. See :attr:`FILES`.
 
@@ -127,13 +127,15 @@ All attributes should be considered read-only, unless stated otherwise.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
-    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
+    value in ``FILES`` is an
+    :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
     ``FILES`` will only contain data if the request method was POST and the
-    ``<form>`` that posted to the request had ``enctype="multipart/form-data"``.
-    Otherwise, ``FILES`` will be a blank dictionary-like object.
+    ``<form>`` that posted to the request had
+    ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
+    dictionary-like object.
 
 .. attribute:: HttpRequest.META
 
@@ -225,7 +227,7 @@ application.
 .. attribute:: HttpRequest.current_app
 
     The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.urls.reverse()`.
+    argument to :func:`~django.urls.reverse`.
 
 .. attribute:: HttpRequest.urlconf
 
@@ -264,7 +266,7 @@ middleware class is listed in :setting:`MIDDLEWARE`.
     From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
     An instance of :class:`~django.contrib.sites.models.Site` or
     :class:`~django.contrib.sites.requests.RequestSite` as returned by
-    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    :func:`~django.contrib.sites.shortcuts.get_current_site`
     representing the current site.
 
 .. attribute:: HttpRequest.user
@@ -310,7 +312,7 @@ Methods
     :setting:`ALLOWED_HOSTS` or the domain name is invalid according to
     :rfc:`1034`/:rfc:`1035 <1035>`.
 
-    .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
+    .. note:: The :meth:`~HttpRequest.get_host` method fails when the host is
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
@@ -337,7 +339,7 @@ Methods
                     return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
-        relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
+        relies on the value of :meth:`~HttpRequest.get_host` -- for instance,
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
@@ -351,14 +353,14 @@ Methods
 
     Returns the ``path``, plus an appended query string, if applicable.
 
-    Example: ``"/music/bands/the_beatles/?print=true"``
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.get_full_path_info()
 
     Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
     :attr:`path`.
 
-    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+    Example: ``"/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.build_absolute_uri(location=None)
 
@@ -381,7 +383,7 @@ Methods
     .. note::
 
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
-        :meth:`~HttpRequest.build_absolute_uri()` will always generate an
+        :meth:`~HttpRequest.build_absolute_uri` will always generate an
         absolute URI with the same scheme the current request has. If you need
         to redirect users to HTTPS, it's best to let your web server redirect
         all HTTP traffic to HTTPS.
@@ -425,10 +427,81 @@ Methods
     Returns ``True`` if the request is secure; that is, if it was made with
     HTTPS.
 
+.. method:: HttpRequest.get_preferred_type(media_types)
+
+    Returns the preferred mime type from ``media_types``, based on the
+    ``Accept`` header, or ``None`` if the client does not accept any of the
+    provided types.
+
+    Assuming the client sends an ``Accept`` header of
+    ``text/html,application/json;q=0.8``:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_type(["text/html", "application/json"])
+        "text/html"
+        >>> request.get_preferred_type(["application/json", "text/plain"])
+        "application/json"
+        >>> request.get_preferred_type(["application/xml", "text/plain"])
+        None
+
+    If the mime type includes parameters, these are also considered when
+    determining the preferred media type. For example, with an ``Accept``
+    header of ``text/vcard;version=3.0,text/html;q=0.5``, the return value of
+    ``request.get_preferred_type()`` depends on the available media types:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/vcard; version=3.0",
+        ...         "text/vcard",
+        ...         "text/directory",
+        ...     ]
+        ... )
+        "text/vcard; version=3.0"
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/html",
+        ...     ]
+        ... )
+        "text/html"
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/vcard",
+        ...         "text/directory",
+        ...     ]
+        ... )
+        None
+
+    (For further details on how content negotiation is performed, see
+    :rfc:`9110#section-12.5.1`.)
+
+    Most browsers send ``Accept: */*`` by default, meaning they don't have a
+    preference, in which case the first item in ``media_types`` would be
+    returned.
+
+    Setting an explicit ``Accept`` header in API requests can be useful for
+    returning a different content type for those consumers only. See
+    :ref:`content-negotiation-example` for an example of returning
+    different content based on the ``Accept`` header.
+
+    .. note::
+
+        If a response varies depending on the content of the ``Accept`` header
+        and you are using some form of caching like Django's
+        :mod:`cache middleware <django.middleware.cache>`, you should decorate
+        the view with :func:`vary_on_headers('Accept')
+        <django.views.decorators.vary.vary_on_headers>` so that the responses
+        are properly cached.
+
 .. method:: HttpRequest.accepts(mime_type)
 
-    Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument:
+    Returns ``True`` if the request's ``Accept`` header matches the
+    ``mime_type`` argument:
 
     .. code-block:: pycon
 
@@ -436,17 +509,10 @@ Methods
         True
 
     Most browsers send ``Accept: */*`` by default, so this would return
-    ``True`` for all content types. Setting an explicit ``Accept`` header in
-    API requests can be useful for returning a different content type for those
-    consumers only. See :ref:`content-negotiation-example` of using
-    ``accepts()`` to return different content to API consumers.
+    ``True`` for all content types.
 
-    If a response varies depending on the content of the ``Accept`` header and
-    you are using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
+    See :ref:`content-negotiation-example` for an example of using
+    ``accepts()`` to return different content based on the ``Accept`` header.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
@@ -475,10 +541,10 @@ Methods
 .. class:: QueryDict
 
 In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
-:attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
-a dictionary-like class customized to deal with multiple values for the same
-key. This is necessary because some HTML form elements, notably
-``<select multiple>``, pass multiple values for the same key.
+:attr:`~HttpRequest.POST` attributes are instances of
+``django.http.QueryDict``, a dictionary-like class customized to deal with
+multiple values for the same key. This is necessary because some HTML form
+elements, notably ``<select multiple>``, pass multiple values for the same key.
 
 The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
 when accessed in a normal request/response cycle. To get a mutable version you
@@ -507,8 +573,8 @@ a subclass of dictionary. Exceptions are outlined here:
     instantiating one yourself, you can make it mutable by passing
     ``mutable=True`` to its ``__init__()``.
 
-    Strings for setting both keys and values will be converted from ``encoding``
-    to ``str``. If ``encoding`` is not set, it defaults to
+    Strings for setting both keys and values will be converted from
+    ``encoding`` to ``str``. If ``encoding`` is not set, it defaults to
     :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
@@ -523,11 +589,20 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.__getitem__(key)
 
-    Returns the value for the given key. If the key has more than one value,
-    it returns the last value. Raises
+    Returns the last value for the given key; or an empty list (``[]``) if the
+    key exists but has no values. Raises
     ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard :exc:`KeyError`, so you can
     stick to catching ``KeyError``.)
+
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
+        >>> q.__getitem__("a")
+        '3'
+        >>> q.__setitem__("b", [])
+        >>> q.__getitem__("b")
+        []
 
 .. method:: QueryDict.__setitem__(key, value)
 
@@ -538,8 +613,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.__contains__(key)
 
-    Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
-    in request.GET``.
+    Returns ``True`` if the given key is set. This lets you do, e.g., ``if
+    "foo" in request.GET``.
 
 .. method:: QueryDict.get(key, default=None)
 
@@ -548,7 +623,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.setdefault(key, default=None)
 
-    Like :meth:`dict.setdefault`, except it uses :meth:`__setitem__` internally.
+    Like :meth:`dict.setdefault`, except it uses :meth:`__setitem__`
+    internally.
 
 .. method:: QueryDict.update(other_dict)
 
@@ -568,8 +644,8 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.items()
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
-    :meth:`__getitem__` and returns an iterator object instead of a view object.
-    For example:
+    :meth:`__getitem__` and returns an iterator object instead of a view
+    object. For example:
 
     .. code-block:: pycon
 
@@ -617,7 +693,7 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.lists()
 
-    Like :meth:`items()`, except it includes all values, as a list, for each
+    Like :meth:`items`, except it includes all values, as a list, for each
     member of the dictionary. For example:
 
     .. code-block:: pycon
@@ -768,9 +844,9 @@ You can also set headers on instantiation:
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
 :func:`~django.utils.cache.patch_vary_headers` methods from
-:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
-values. The "patch" methods ensure that other values, e.g. added by a
-middleware, are not removed.
+:mod:`django.utils.cache`, since these fields can have multiple,
+comma-separated values. The "patch" methods ensure that other values, e.g.
+added by a middleware, are not removed.
 
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
@@ -802,9 +878,14 @@ Attributes
 
     A bytestring representing the content, encoded from a string if necessary.
 
+.. attribute:: HttpResponse.text
+
+    A string representation of :attr:`HttpResponse.content`, decoded using the
+    response's :attr:`HttpResponse.charset` (defaulting to ``UTF-8`` if empty).
+
 .. attribute:: HttpResponse.cookies
 
-    A :py:obj:`http.cookies.SimpleCookie` object holding the cookies included
+    A :obj:`http.cookies.SimpleCookie` object holding the cookies included
     in the response.
 
 .. attribute:: HttpResponse.headers
@@ -867,7 +948,7 @@ Methods
     ``"text/html; charset=utf-8"``.
 
     ``status`` is the :rfc:`HTTP status code <9110#section-15>` for the
-    response. You can use Python's :py:class:`http.HTTPStatus` for meaningful
+    response. You can use Python's :class:`http.HTTPStatus` for meaningful
     aliases, such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
@@ -958,7 +1039,7 @@ Methods
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
-    Like :meth:`~HttpResponse.set_cookie()`, but
+    Like :meth:`~HttpResponse.set_cookie`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
     it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
     You can use the optional ``salt`` argument for added key strength, but
@@ -1028,12 +1109,17 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. class:: HttpResponseRedirect
 
     The first argument to the constructor is required -- the path to redirect
-    to. This can be a fully qualified URL
-    (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
-    (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
-    last case, the client browser will reconstruct the full URL itself
-    according to the current path. See :class:`HttpResponse` for other optional
-    constructor arguments. Note that this returns an HTTP status code 302.
+    to. This can be a fully qualified URL (e.g.
+    ``'https://www.yahoo.com/search/'``), an absolute path with no domain (e.g.
+    ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that last
+    case, the client browser will reconstruct the full URL itself according to
+    the current path.
+
+    The constructor accepts an optional ``preserve_request`` keyword argument
+    that defaults to ``False``, producing a response with a 302 status code. If
+    ``preserve_request`` is ``True``, the status code will be 307 instead.
+
+    See :class:`HttpResponse` for other optional constructor arguments.
 
     .. attribute:: HttpResponseRedirect.url
 
@@ -1044,6 +1130,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
+    When ``preserve_request=True``, the response's status code is 308.
 
 .. class:: HttpResponseNotModified
 
@@ -1088,7 +1175,7 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example::
+can create it with the help of :class:`http.HTTPStatus`. For example::
 
     from http import HTTPStatus
     from django.http import HttpResponse
@@ -1159,7 +1246,7 @@ using non-dict objects in JSON-encoded response.
     <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
     poison the JavaScript ``Array`` constructor. For this reason, Django does
     not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    :class:`~django.http.JsonResponse` constructor by default. However, most
     modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
@@ -1240,6 +1327,9 @@ with the following notable differences:
 * It has no ``content`` attribute. Instead, it has a
   :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
   in middleware to wrap the response iterable, but should not be consumed.
+
+* It has no ``text`` attribute, as it would require iterating the response
+  object.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.

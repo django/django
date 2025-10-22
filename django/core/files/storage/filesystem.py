@@ -1,6 +1,5 @@
 import os
-import warnings
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -9,7 +8,6 @@ from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils._os import safe_join
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
 
@@ -22,9 +20,6 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
     """
     Standard filesystem storage
     """
-
-    # RemovedInDjango60Warning: remove OS_OPEN_FLAGS.
-    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
 
     def __init__(
         self,
@@ -40,16 +35,6 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         self._directory_permissions_mode = directory_permissions_mode
         self._allow_overwrite = allow_overwrite
         setting_changed.connect(self._clear_cached_properties)
-        # RemovedInDjango60Warning: remove this warning.
-        if self.OS_OPEN_FLAGS != os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(
-            os, "O_BINARY", 0
-        ):
-            warnings.warn(
-                "Overriding OS_OPEN_FLAGS is deprecated. Use "
-                "the allow_overwrite parameter instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
 
     @cached_property
     def base_location(self):
@@ -119,21 +104,17 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The combination of O_CREAT and O_EXCL makes os.open() raises an
-                    # OSError if the file already exists before it's opened.
+                    # The combination of O_CREAT and O_EXCL makes os.open()
+                    # raises an OSError if the file already exists before it's
+                    # opened.
                     open_flags = (
                         os.O_WRONLY
                         | os.O_CREAT
                         | os.O_EXCL
                         | getattr(os, "O_BINARY", 0)
                     )
-                    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-                    # if self._allow_overwrite:
-                    #     open_flags = open_flags & ~os.O_EXCL
-                    if self.OS_OPEN_FLAGS != open_flags:
-                        open_flags = self.OS_OPEN_FLAGS
-                    elif self._allow_overwrite:
-                        open_flags = open_flags & ~os.O_EXCL
+                    if self._allow_overwrite:
+                        open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
                     fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
@@ -235,7 +216,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        tz = timezone.utc if settings.USE_TZ else None
+        tz = UTC if settings.USE_TZ else None
         return datetime.fromtimestamp(ts, tz=tz)
 
     def get_accessed_time(self, name):

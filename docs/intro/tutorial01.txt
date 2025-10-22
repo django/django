@@ -23,15 +23,12 @@ in a shell prompt (indicated by the $ prefix):
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|, which supports Python 3.10 and
+This tutorial is written for Django |version|, which supports Python 3.12 and
 later. If the Django version doesn't match, you can refer to the tutorial for
 your version of Django by using the version switcher at the bottom right corner
 of this page, or update Django to the newest version. If you're using an older
 version of Python, check :ref:`faq-python-version-support` to find a compatible
 version of Django.
-
-See :doc:`How to install Django </topics/install>` for advice on how to remove
-older versions of Django and install a newer one.
 
 .. admonition:: Where to get help:
 
@@ -42,20 +39,22 @@ Creating a project
 ==================
 
 If this is your first time using Django, you'll have to take care of some
-initial setup. Namely, you'll need to auto-generate some code that establishes a
-Django :term:`project` -- a collection of settings for an instance of Django,
+initial setup. Namely, you'll need to auto-generate some code that establishes
+a Django :term:`project` -- a collection of settings for an instance of Django,
 including database configuration, Django-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code, then run the following command:
+code and run the following command to bootstrap a new Django project:
 
 .. console::
 
-   $ django-admin startproject mysite
+   $ django-admin startproject mysite djangotutorial
 
-This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin`.
+This will create a directory ``djangotutorial`` with a project called
+``mysite`` inside. The directory name doesn't matter to Django; you can rename
+it to anything you like. If it didn't work, see
+:ref:`troubleshooting-django-admin`.
 
 .. note::
 
@@ -68,7 +67,7 @@ Let's look at what :djadmin:`startproject` created:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -79,14 +78,11 @@ Let's look at what :djadmin:`startproject` created:
 
 These files are:
 
-* The outer :file:`mysite/` root directory is a container for your project. Its
-  name doesn't matter to Django; you can rename it to anything you like.
-
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
   :file:`manage.py` in :doc:`/ref/django-admin`.
 
-* The inner :file:`mysite/` directory is the actual Python package for your
+* :file:`mysite/`: A directory that is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
   anything inside it (e.g. ``mysite.urls``).
 
@@ -95,7 +91,7 @@ These files are:
   read :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
-  project.  :doc:`/topics/settings` will tell you all about how settings
+  project. :doc:`/topics/settings` will tell you all about how settings
   work.
 
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a
@@ -111,8 +107,8 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the following commands:
+Let's verify your Django project works. Change into the :file:`djangotutorial`
+directory, if you haven't already, and run the following commands:
 
 .. console::
 
@@ -126,8 +122,8 @@ You'll see the following output on the command line:
 
     System check identified no issues (0 silenced).
 
-    You have unapplied migrations; your app may not work properly until they are applied.
-    Run 'python manage.py migrate' to apply them.
+    You have unapplied migrations; your app may not work properly until they are
+    applied. Run 'python manage.py migrate' to apply them.
 
     |today| - 15:50:53
     Django version |version|, using settings 'mysite.settings'
@@ -154,7 +150,8 @@ Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making web frameworks, not web servers.)
 
-(To serve the site on a different port, see the :djadmin:`runserver` reference.)
+(To serve the site on a different port, see the :djadmin:`runserver`
+reference.)
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
@@ -182,10 +179,8 @@ rather than creating directories.
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your :ref:`Python path <tut-searchpath>`. In
-this tutorial, we'll create our poll app in the same directory as your
-:file:`manage.py` file so that it can be imported as its own top-level module,
-rather than a submodule of ``mysite``.
+Your apps can live anywhere in your :ref:`Python path <tut-searchpath>`. In
+this tutorial, we'll create our poll app inside the ``djangotutorial`` folder.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
@@ -275,6 +270,8 @@ include the URLconf defined in ``polls.urls``. To do this, add an import for
         path("admin/", admin.site.urls),
     ]
 
+The :func:`~django.urls.path` function expects at least two arguments:
+``route`` and ``view``.
 The :func:`~django.urls.include` function allows referencing other URLconfs.
 Whenever Django encounters :func:`~django.urls.include`, it chops off whatever
 part of the URL matched up to that point and sends the remaining string to the
@@ -286,10 +283,11 @@ plug-and-play URLs. Since polls are in their own URLconf
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
-.. admonition:: When to use :func:`~django.urls.include()`
+.. admonition:: When to use :func:`~django.urls.include`
 
     You should always use ``include()`` when you include other URL patterns.
-    ``admin.site.urls`` is the only exception to this.
+    The only exception is ``admin.site.urls``, which is a pre-built URLconf
+    provided by Django for the default admin site.
 
 You have now wired an ``index`` view into the URLconf. Verify it's working with
 the following command:
@@ -306,45 +304,6 @@ text "*Hello, world. You're at the polls index.*", which you defined in the
 
     If you get an error page here, check that you're going to
     http://localhost:8000/polls/ and not http://localhost:8000/.
-
-The :func:`~django.urls.path` function is passed four arguments, two required:
-``route`` and ``view``, and two optional: ``kwargs``, and ``name``.
-At this point, it's worth reviewing what these arguments are for.
-
-:func:`~django.urls.path` argument: ``route``
----------------------------------------------
-
-``route`` is a string that contains a URL pattern. When processing a request,
-Django starts at the first pattern in ``urlpatterns`` and makes its way down
-the list, comparing the requested URL against each pattern until it finds one
-that matches.
-
-Patterns don't search GET and POST parameters, or the domain name. For example,
-in a request to ``https://www.example.com/myapp/``, the URLconf will look for
-``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
-URLconf will also look for ``myapp/``.
-
-:func:`~django.urls.path` argument: ``view``
---------------------------------------------
-
-When Django finds a matching pattern, it calls the specified view function with
-an :class:`~django.http.HttpRequest` object as the first argument and any
-"captured" values from the route as keyword arguments. We'll give an example
-of this in a bit.
-
-:func:`~django.urls.path` argument: ``kwargs``
-----------------------------------------------
-
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
-
-:func:`~django.urls.path` argument: ``name``
---------------------------------------------
-
-Naming your URL lets you refer to it unambiguously from elsewhere in Django,
-especially from within templates. This powerful feature allows you to make
-global changes to the URL patterns of your project while only touching a single
-file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the

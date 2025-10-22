@@ -18,3 +18,12 @@ class XViewClass(View):
 class XViewCallableObject(View):
     def __call__(self, request):
         return HttpResponse()
+
+
+class CompanyView(View):
+    """
+    This is a view for :model:`myapp.Company`
+    """
+
+    def get(self, request):
+        return HttpResponse()

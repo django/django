@@ -6,6 +6,7 @@ from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
+from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
@@ -118,8 +119,8 @@ class OGRInspectTest(SimpleTestCase):
             self.skipTest("Unable to setup an OGR connection to your database")
 
         try:
-            # Writing shapefiles via GDAL currently does not support writing OGRTime
-            # fields, so we need to actually use a database
+            # Writing shapefiles via GDAL currently does not support writing
+            # OGRTime fields, so we need to actually use a database
             model_def = ogrinspect(
                 ogr_db,
                 "Measurement",
@@ -143,7 +144,8 @@ class OGRInspectTest(SimpleTestCase):
         # The ordering of model fields might vary depending on several factors
         # (version of GDAL, etc.).
         if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
-            # SpatiaLite introspection is somewhat lacking on GDAL < 3.4 (#29461).
+            # SpatiaLite introspection is somewhat lacking on GDAL < 3.4
+            # (#29461).
             self.assertIn("    f_decimal = models.CharField(max_length=0)", model_def)
         else:
             self.assertIn(
@@ -205,8 +207,8 @@ def get_ogr_db_string():
     """
     db = connections.settings["default"]
 
-    # Map from the django backend into the OGR driver name and database identifier
-    # https://gdal.org/drivers/vector/
+    # Map from the django backend into the OGR driver name and database
+    # identifier https://gdal.org/drivers/vector/
     #
     # TODO: Support Oracle (OCI).
     drivers = {
@@ -232,7 +234,7 @@ def get_ogr_db_string():
         return None
 
     # SQLite/SpatiaLite in-memory databases
-    if db["NAME"] == ":memory:":
+    if DatabaseCreation.is_in_memory_db(db["NAME"]):
         return None
 
     # Build the params of the OGR database connection string

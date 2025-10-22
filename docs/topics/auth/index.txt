@@ -75,7 +75,7 @@ models defined in your installed apps.
 Usage
 =====
 
-:doc:`Using Django's default implementation <default>`
+:doc:`Using Django's default implementation </topics/auth/default>`
 
 * :ref:`Working with User objects <user-objects>`
 * :ref:`Permissions and authorization <topic-authorization>`
@@ -84,6 +84,6 @@ Usage
 
 :doc:`API reference for the default implementation </ref/contrib/auth>`
 
-:doc:`Customizing Users and authentication <customizing>`
+:doc:`Customizing Users and authentication </topics/auth/customizing>`
 
-:doc:`Password management in Django <passwords>`
+:doc:`Password management in Django </topics/auth/passwords>`

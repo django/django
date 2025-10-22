@@ -25,8 +25,8 @@ class SimpleTest(TestCase):
     def setUpTestData(cls):
         cls.a1 = A.objects.create()
         cls.a2 = A.objects.create()
+        B.objects.bulk_create(B(a=cls.a1) for _ in range(20))
         for x in range(20):
-            B.objects.create(a=cls.a1)
             D.objects.create(a=cls.a1)
 
     def test_nonempty_update(self):
@@ -157,13 +157,34 @@ class AdvancedTests(TestCase):
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
 
     def test_update_m2m_field(self):
-        msg = (
-            "Cannot update model field "
-            "<django.db.models.fields.related.ManyToManyField: m2m_foo> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<django.db.models.fields.related.ManyToManyField: m2m_foo>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo="whatever")
+
+    def test_update_reverse_m2m_descriptor(self):
+        rel = "<ManyToManyRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(m2m_foo="whatever")
+
+    def test_update_reverse_fk_descriptor(self):
+        rel = "<ManyToOneRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(bar="whatever")
+
+    def test_update_reverse_o2o_descriptor(self):
+        rel = "<OneToOneRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
+        with self.assertRaisesMessage(FieldError, msg):
+            Foo.objects.update(o2o_bar="whatever")
+
+    def test_update_reverse_mti_parent_link_descriptor(self):
+        rel = "<OneToOneRel: update.uniquenumberchild>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
+        with self.assertRaisesMessage(FieldError, msg):
+            UniqueNumber.objects.update(uniquenumberchild="whatever")
 
     def test_update_transformed_field(self):
         A.objects.create(x=5)
@@ -196,7 +217,8 @@ class AdvancedTests(TestCase):
 
     def test_update_annotated_multi_table_queryset(self):
         """
-        Update of a queryset that's been annotated and involves multiple tables.
+        Update of a queryset that's been annotated and involves multiple
+        tables.
         """
         # Trivial annotated update
         qs = DataPoint.objects.annotate(related_count=Count("relatedpoint"))
@@ -256,6 +278,13 @@ class AdvancedTests(TestCase):
         Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("-abs_id").update(x=4)
         self.assertEqual(Bar.objects.get().x, 4)
 
+    def test_update_values_annotation(self):
+        RelatedPoint.objects.annotate(abs_id=Abs("id")).filter(
+            data__is_active=False
+        ).values("id", "abs_id").update(data=self.d0)
+        self.r1.refresh_from_db(fields=["data"])
+        self.assertEqual(self.r1.data, self.d0)
+
     def test_update_negated_f(self):
         DataPoint.objects.update(is_active=~F("is_active"))
         self.assertCountEqual(
@@ -292,8 +321,9 @@ class MySQLUpdateOrderByTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        UniqueNumber.objects.create(number=1)
-        UniqueNumber.objects.create(number=2)
+        UniqueNumber.objects.bulk_create(
+            [UniqueNumber(number=1), UniqueNumber(number=2)]
+        )
 
     def test_order_by_update_on_unique_constraint(self):
         tests = [

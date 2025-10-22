@@ -11,6 +11,7 @@ import copy
 import difflib
 import functools
 import sys
+import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -42,15 +43,20 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
 
-# Quotation marks ('"`[]), whitespace characters, semicolons, or inline
+# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs,
+# hashes, or inline SQL comments are forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|#|--|/\*|\*/")
+# Quotation marks ('"`[]), whitespace characters, semicolons, hashes, or inline
 # SQL comments are forbidden in column aliases.
-FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|#|--|/\*|\*/")
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -235,6 +241,7 @@ class Query(BaseExpression):
 
     filter_is_sticky = False
     subquery = False
+    contains_subquery = False
 
     # SQL-related attributes.
     # Select and related select clauses are expressions to use in the SELECT
@@ -301,10 +308,9 @@ class Query(BaseExpression):
         self.alias_map = {}
         # Whether to provide alias to columns during reference resolving.
         self.alias_cols = alias_cols
-        # Sometimes the query contains references to aliases in outer queries (as
-        # a result of split_exclude). Correct alias quoting needs to know these
-        # aliases too.
-        # Map external tables to whether they are aliased.
+        # Sometimes the query contains references to aliases in outer queries
+        # (as a result of split_exclude). Correct alias quoting needs to know
+        # these aliases too. Map external tables to whether they are aliased.
         self.external_aliases = {}
         self.table_map = {}  # Maps table names to list of aliases.
         self.used_aliases = set()
@@ -586,8 +592,8 @@ class Query(BaseExpression):
                 and not inner_query.annotation_select_mask
             ):
                 # In case of Model.objects[0:3].count(), there would be no
-                # field selected in the inner query, yet we must use a subquery.
-                # So, make sure at least one field is selected.
+                # field selected in the inner query, yet we must use a
+                # subquery. So, make sure at least one field is selected.
                 inner_query.select = (
                     self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                 )
@@ -627,8 +633,12 @@ class Query(BaseExpression):
         if result is None:
             result = empty_set_result
         else:
-            converters = compiler.get_converters(outer_query.annotation_select.values())
-            result = next(compiler.apply_converters((result,), converters))
+            cols = outer_query.annotation_select.values()
+            converters = compiler.get_converters(cols)
+            rows = compiler.apply_converters((result,), converters)
+            if compiler.has_composite_fields(cols):
+                rows = compiler.composite_fields_to_tuples(rows, cols)
+            result = next(rows)
 
         return dict(zip(outer_query.annotation_select, result))
 
@@ -921,10 +931,11 @@ class Query(BaseExpression):
         an outer join. If 'unconditional' is False, only promote the join if
         it is nullable or the parent join is an outer join.
 
-        The children promotion is done to avoid join chains that contain a LOUTER
-        b INNER c. So, if we have currently a INNER b INNER c and a->b is promoted,
-        then we must also promote b->c automatically, or otherwise the promotion
-        of a->b doesn't actually change anything in the query results.
+        The children promotion is done to avoid join chains that contain a
+        LOUTER b INNER c. So, if we have currently a INNER b INNER c and a->b
+        is promoted, then we must also promote b->c automatically, or otherwise
+        the promotion of a->b doesn't actually change anything in the query
+        results.
         """
         aliases = list(aliases)
         while aliases:
@@ -1021,11 +1032,21 @@ class Query(BaseExpression):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
+
+        # 3. Rename the direct external aliases and the ones of combined
+        # queries (union, intersection, difference).
         self.external_aliases = {
             # Table is aliased or it's being changed and thus is aliased.
             change_map.get(alias, alias): (aliased or alias in change_map)
             for alias, aliased in self.external_aliases.items()
         }
+        for combined_query in self.combined_queries:
+            external_change_map = {
+                alias: aliased
+                for alias, aliased in change_map.items()
+                if alias in combined_query.external_aliases
+            }
+            combined_query.change_aliases(external_change_map)
 
     def bump_prefix(self, other_query, exclude=None):
         """
@@ -1192,10 +1213,21 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
+        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        if "%" in alias:
+            warnings.warn(
+                "Using percent signs in a column alias is deprecated.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
-                "Column aliases cannot contain whitespace characters, quotation marks, "
-                "semicolons, or SQL comments."
+                "Column aliases cannot contain whitespace characters, hashes, "
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
+                # "quotation marks, semicolons, percent signs, or SQL "
+                # "comments."
+                "quotation marks, semicolons, or SQL comments."
             )
 
     def add_annotation(self, annotation, alias, select=True):
@@ -1207,12 +1239,21 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
-        if self.selected:
+        if select and self.selected:
             self.selected[alias] = alias
+
+    @property
+    def _subquery_fields_len(self):
+        if not self.has_select_fields or not self.select:
+            return len(self.model._meta.pk_fields)
+        return len(self.select) + sum(
+            len(expr.targets) - 1 for expr in self.select if isinstance(expr, ColPairs)
+        )
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
-        # Subqueries need to use a different set of aliases than the outer query.
+        # Subqueries need to use a different set of aliases than the outer
+        # query.
         clone.bump_prefix(query)
         clone.subquery = True
         clone.where.resolve_expression(query, *args, **kwargs)
@@ -1602,7 +1643,7 @@ class Query(BaseExpression):
     def add_filter(self, filter_lhs, filter_rhs):
         self.add_q(Q((filter_lhs, filter_rhs)))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, reuse_all=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1616,7 +1657,11 @@ class Query(BaseExpression):
         existing_inner = {
             a for a in self.alias_map if self.alias_map[a].join_type == INNER
         }
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        if reuse_all:
+            can_reuse = set(self.alias_map)
+        else:
+            can_reuse = self.used_aliases
+        clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
@@ -1669,6 +1714,7 @@ class Query(BaseExpression):
         return target_clause, needed_inner
 
     def add_filtered_relation(self, filtered_relation, alias):
+        self.check_alias(alias)
         filtered_relation.alias = alias
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
             filtered_relation.relation_name
@@ -1690,12 +1736,13 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-                else:
-                    raise ValueError(
-                        "FilteredRelation's condition doesn't support nested "
-                        "relations deeper than the relation_name (got %r for "
-                        "%r)." % (lookup, filtered_relation.relation_name)
-                    )
+            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+                raise ValueError(
+                    "FilteredRelation's condition doesn't support nested "
+                    "relations deeper than the relation_name (got %r for "
+                    "%r)." % (lookup, filtered_relation.relation_name)
+                )
+        filtered_relation = filtered_relation.clone()
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,
@@ -1771,7 +1818,7 @@ class Query(BaseExpression):
                     available = sorted(
                         [
                             *get_field_names_from_opts(opts),
-                            *self.annotation_select,
+                            *self.annotations,
                             *self._filtered_relations,
                         ]
                     )
@@ -1844,9 +1891,9 @@ class Query(BaseExpression):
         Return the final field involved in the joins, the target field (used
         for any 'where' constraint), the final 'opts' value, the joins, the
         field path traveled to generate the joins, and a transform function
-        that takes a field and alias and is equivalent to `field.get_col(alias)`
-        in the simple case but wraps field transforms if they were included in
-        names.
+        that takes a field and alias and is equivalent to
+        `field.get_col(alias)` in the simple case but wraps field transforms if
+        they were included in names.
 
         The target field is the field containing the concrete value. Final
         field can be something different, for example foreign key pointing to
@@ -1932,6 +1979,8 @@ class Query(BaseExpression):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+            if join.filtered_relation and can_reuse is not None:
+                can_reuse.add(alias)
         return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
@@ -2001,7 +2050,8 @@ class Query(BaseExpression):
                 # Summarize currently means we are doing an aggregate() query
                 # which is executed as a wrapped subquery if any of the
                 # aggregate() elements reference an existing annotation. In
-                # that case we need to return a Ref to the subquery's annotation.
+                # that case we need to return a Ref to the subquery's
+                # annotation.
                 if name not in self.annotation_select:
                     raise FieldError(
                         "Cannot aggregate over the '%s' alias. Use annotate() "
@@ -2076,8 +2126,8 @@ class Query(BaseExpression):
         alias = col.alias
         if alias in can_reuse:
             pk = select_field.model._meta.pk
-            # Need to add a restriction so that outer query's filters are in effect for
-            # the subquery, too.
+            # Need to add a restriction so that outer query's filters are in
+            # effect for the subquery, too.
             query.bump_prefix(self)
             lookup_class = select_field.get_lookup("exact")
             # Note that the query.select[0].alias is different from alias
@@ -2153,7 +2203,8 @@ class Query(BaseExpression):
         """
         Return True if adding filters to this instance is still possible.
 
-        Typically, this means no limits or offsets have been put on the results.
+        Typically, this means no limits or offsets have been put on the
+        results.
         """
         return not self.is_sliced
 
@@ -2213,8 +2264,21 @@ class Query(BaseExpression):
                     join_info.joins,
                     join_info.path,
                 )
-                for target in targets:
-                    cols.append(join_info.transform_function(target, final_alias))
+                if len(targets) > 1:
+                    transformed_targets = [
+                        join_info.transform_function(target, final_alias)
+                        for target in targets
+                    ]
+                    cols.append(
+                        ColPairs(
+                            final_alias if self.alias_cols else None,
+                            [col.target for col in transformed_targets],
+                            [col.output_field for col in transformed_targets],
+                            join_info.final_field,
+                        )
+                    )
+                else:
+                    cols.append(join_info.transform_function(targets[0], final_alias))
             if cols:
                 self.set_select(cols)
         except MultiJoin:
@@ -2313,6 +2377,9 @@ class Query(BaseExpression):
             self.append_annotation_mask(group_by_annotations)
             self.select = tuple(values_select.values())
             self.values_select = tuple(values_select)
+            if self.selected is not None:
+                for index, value_select in enumerate(values_select):
+                    self.selected[value_select] = index
         group_by = list(self.select)
         for alias, annotation in self.annotation_select.items():
             if not (group_by_cols := annotation.get_group_by_cols()):
@@ -2386,8 +2453,8 @@ class Query(BaseExpression):
         """
         # Fields on related models are stored in the literal double-underscore
         # format, so that we can use a set datastructure. We do the foo__bar
-        # splitting and handling when computing the SQL column names (as part of
-        # get_columns()).
+        # splitting and handling when computing the SQL column names (as part
+        # of get_columns()).
         existing, defer = self.deferred_loading
         if defer:
             # Add to existing deferred names.
@@ -2576,8 +2643,9 @@ class Query(BaseExpression):
         cols in split_exclude().
 
         Return a lookup usable for doing outerq.filter(lookup=self) and a
-        boolean indicating if the joins in the prefix contain a LEFT OUTER join.
-        _"""
+        boolean indicating if the joins in the prefix contain a LEFT OUTER
+        join.
+        """
         all_paths = []
         for _, paths in names_with_path:
             all_paths.extend(paths)
@@ -2624,9 +2692,10 @@ class Query(BaseExpression):
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
         else:
-            # TODO: It might be possible to trim more joins from the start of the
-            # inner query if it happens to have a longer join chain containing the
-            # values in select_fields. Lets punt this one for now.
+            # TODO: It might be possible to trim more joins from the start of
+            # the inner query if it happens to have a longer join chain
+            # containing the values in select_fields. Lets punt this one for
+            # now.
             select_fields = [r[1] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths]
         # The found starting point is likely a join_class instead of a

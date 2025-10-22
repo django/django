@@ -94,7 +94,11 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
+            if corrected_name == "HTTP_COOKIE":
+                value = value.rstrip("; ")
+                if "HTTP_COOKIE" in self.META:
+                    value = self.META[corrected_name] + "; " + value
+            elif corrected_name in self.META:
                 value = self.META[corrected_name] + "," + value
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
@@ -263,7 +267,16 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                body_file.write(message["body"])
+                on_disk = getattr(body_file, "_rolled", False)
+                if on_disk:
+                    async_write = sync_to_async(
+                        body_file.write,
+                        thread_sensitive=False,
+                    )
+                    await async_write(message["body"])
+                else:
+                    body_file.write(message["body"])
+
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break
@@ -311,9 +324,7 @@ class ASGIHandler(base.BaseHandler):
                 value = value.encode("latin1")
             response_headers.append((bytes(header), bytes(value)))
         for c in response.cookies.values():
-            response_headers.append(
-                (b"Set-Cookie", c.output(header="").encode("ascii").strip())
-            )
+            response_headers.append((b"Set-Cookie", c.OutputString().encode("ascii")))
         # Initial response message.
         await send(
             {
@@ -324,10 +335,10 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly, to
-            #   allow mapping of a sync iterator.
-            # - Use aclosing() when consuming aiter.
-            #   See https://github.com/python/cpython/commit/6e8dcda
+            # - Consume via `__aiter__` and not `streaming_content` directly,
+            #   to allow mapping of a sync iterator.
+            # - Use aclosing() when consuming aiter. See
+            #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
             async with aclosing(aiter(response)) as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
@@ -335,8 +346,9 @@ class ASGIHandler(base.BaseHandler):
                             {
                                 "type": "http.response.body",
                                 "body": chunk,
-                                # Ignore "more" as there may be more parts; instead,
-                                # use an empty final closing message with False.
+                                # Ignore "more" as there may be more parts;
+                                # instead, use an empty final closing message
+                                # with False.
                                 "more_body": True,
                             }
                         )

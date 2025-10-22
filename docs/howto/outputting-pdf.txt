@@ -87,8 +87,8 @@ mention:
   browsers will handle the PDF using whatever program/plugin they've been
   configured to use for PDFs.
 
-* You can provide an arbitrary ``filename`` parameter. It'll be used by browsers
-  in the "Save as..." dialog.
+* You can provide an arbitrary ``filename`` parameter. It'll be used by
+  browsers in the "Save as..." dialog.
 
 * You can hook into the ReportLab API: The same buffer passed as the first
   argument to ``canvas.Canvas`` can be fed to the
@@ -112,8 +112,8 @@ Other formats
 Notice that there isn't a lot in these examples that's PDF-specific -- just the
 bits using ``reportlab``. You can use a similar technique to generate any
 arbitrary format that you can find a Python library for. Also see
-:doc:`/howto/outputting-csv` for another example and some techniques you can use
-when generated text-based formats.
+:doc:`/howto/outputting-csv` for another example and some techniques you can
+use when generated text-based formats.
 
 .. seealso::
 

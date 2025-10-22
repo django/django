@@ -149,10 +149,10 @@ If you haven't set up backups for your database, do it right now!
 
 If your site sends emails, these values need to be set correctly.
 
-By default, Django sends email from webmaster@localhost and root@localhost.
-However, some mail providers reject email from these addresses. To use
-different sender addresses, modify the :setting:`DEFAULT_FROM_EMAIL` and
-:setting:`SERVER_EMAIL` settings.
+By default, Django sends email from ``webmaster@localhost`` and
+``root@localhost``. However, some mail providers reject email from these
+addresses. To use different sender addresses, modify the
+:setting:`DEFAULT_FROM_EMAIL` and :setting:`SERVER_EMAIL` settings.
 
 :setting:`STATIC_ROOT` and :setting:`STATIC_URL`
 ------------------------------------------------

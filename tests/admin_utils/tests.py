@@ -17,13 +17,26 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
+from django.contrib.auth.models import User
+from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
-from .models import Article, Car, Count, Event, EventGuide, Location, Site, Vehicle
+from .models import (
+    Article,
+    Car,
+    Cascade,
+    DBCascade,
+    Event,
+    EventGuide,
+    Location,
+    Site,
+    Vehicle,
+)
 
 
 class NestedObjectsTests(TestCase):
@@ -31,10 +44,12 @@ class NestedObjectsTests(TestCase):
     Tests for ``NestedObject`` utility collection.
     """
 
+    cascade_model = Cascade
+
     @classmethod
     def setUpTestData(cls):
         cls.n = NestedObjects(using=DEFAULT_DB_ALIAS)
-        cls.objs = [Count.objects.create(num=i) for i in range(5)]
+        cls.objs = [cls.cascade_model.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
         self.assertEqual(self.n.nested(lambda obj: obj.num), target)
@@ -100,6 +115,15 @@ class NestedObjectsTests(TestCase):
         n.collect([Vehicle.objects.first()])
 
 
+class DBNestedObjectsTests(NestedObjectsTests):
+    """
+    Exercise NestedObjectsTests but with a model that makes use of DB_CASCADE
+    instead of CASCADE to ensure proper collection of objects takes place.
+    """
+
+    cascade_model = DBCascade
+
+
 class UtilsTests(SimpleTestCase):
     empty_value = "-empty-"
 
@@ -157,6 +181,7 @@ class UtilsTests(SimpleTestCase):
             models.DateField(),
             models.DecimalField(),
             models.FloatField(),
+            models.URLField(),
             models.JSONField(),
             models.TimeField(),
         ]
@@ -196,6 +221,14 @@ class UtilsTests(SimpleTestCase):
                     display_value,
                 )
 
+    def test_url_display_for_field(self):
+        model_field = models.URLField()
+        display_value = display_for_field(
+            "http://example.com", model_field, self.empty_value
+        )
+        expected = '<a href="http://example.com">http://example.com</a>'
+        self.assertHTMLEqual(display_value, expected)
+
     def test_number_formats_display_for_field(self):
         display_value = display_for_field(
             12345.6789, models.FloatField(), self.empty_value
@@ -228,6 +261,28 @@ class UtilsTests(SimpleTestCase):
             12345, models.IntegerField(), self.empty_value
         )
         self.assertEqual(display_value, "12,345")
+
+    @isolate_apps("admin_utils")
+    def test_display_for_field_password_name_not_user_model(self):
+        class PasswordModel(models.Model):
+            password = models.CharField(max_length=200)
+
+        password_field = PasswordModel._meta.get_field("password")
+        display_value = display_for_field("test", password_field, self.empty_value)
+        self.assertEqual(display_value, "test")
+
+    def test_password_display_for_field_user_model(self):
+        password_field = User._meta.get_field("password")
+        for password in [
+            "invalid",
+            "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a",
+            "!b7pk7RNudAXGTNLK6fW5YnBCLVE6UUmeoJJYQHaO",
+        ]:
+            with self.subTest(password=password):
+                display_value = display_for_field(
+                    password, password_field, self.empty_value
+                )
+                self.assertEqual(display_value, render_password_as_hash(password))
 
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
@@ -295,7 +350,8 @@ class UtilsTests(SimpleTestCase):
 
         self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
         self.assertEqual(label_for_field("site_id", Article), "Site id")
-        # The correct name and attr are returned when `__` is in the field name.
+        # The correct name and attr are returned when `__` is in the field
+        # name.
         self.assertEqual(label_for_field("site__domain", Article), "Site  domain")
         self.assertEqual(
             label_for_field("site__domain", Article, return_attr=True),

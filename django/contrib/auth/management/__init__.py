@@ -9,7 +9,9 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.utils import IntegrityError
+from django.utils.text import camel_case_to_spaces
 
 
 def _get_all_permissions(opts):
@@ -80,7 +82,7 @@ def create_permissions(
     )
 
     # Find all the Permissions that have a content_type for a model we're
-    # looking for.  We don't need to check for codenames since we already have
+    # looking for. We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
     all_perms = set(
         Permission.objects.using(using)
@@ -108,6 +110,84 @@ def create_permissions(
             print("Adding permission '%s'" % perm)
 
 
+class RenamePermission(migrations.RunPython):
+    def __init__(self, app_label, old_model, new_model):
+        self.app_label = app_label
+        self.old_model = old_model
+        self.new_model = new_model
+        super(RenamePermission, self).__init__(
+            self.rename_forward, self.rename_backward
+        )
+
+    def _rename(self, apps, schema_editor, old_model, new_model):
+        ContentType = apps.get_model("contenttypes", "ContentType")
+        # Use the live Permission model instead of the frozen one, since frozen
+        # models do not retain foreign key constraints.
+        from django.contrib.auth.models import Permission
+
+        db = schema_editor.connection.alias
+        ctypes = ContentType.objects.using(db).filter(
+            app_label=self.app_label, model__icontains=old_model.lower()
+        )
+        for permission in Permission.objects.using(db).filter(
+            content_type_id__in=ctypes.values("id")
+        ):
+            prefix = permission.codename.split("_")[0]
+            default_verbose_name = camel_case_to_spaces(new_model)
+
+            new_codename = f"{prefix}_{new_model.lower()}"
+            new_name = f"Can {prefix} {default_verbose_name}"
+
+            if permission.codename != new_codename or permission.name != new_name:
+                permission.codename = new_codename
+                permission.name = new_name
+                try:
+                    with transaction.atomic(using=db):
+                        permission.save(update_fields={"name", "codename"})
+                except IntegrityError:
+                    pass
+
+    def rename_forward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.old_model, self.new_model)
+
+    def rename_backward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.new_model, self.old_model)
+
+
+def rename_permissions(
+    plan,
+    verbosity=2,
+    interactive=True,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
+    """
+    Insert a `RenamePermissionType` operation after every planned `RenameModel`
+    operation.
+    """
+    try:
+        Permission = apps.get_model("auth", "Permission")
+    except LookupError:
+        return
+    else:
+        if not router.allow_migrate_model(using, Permission):
+            return
+
+    for migration, backward in plan:
+        inserts = []
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, migrations.RenameModel):
+                operation = RenamePermission(
+                    migration.app_label,
+                    operation.old_name,
+                    operation.new_name,
+                )
+                inserts.append((index + 1, operation))
+        for inserted, (index, operation) in enumerate(inserts):
+            migration.operations.insert(inserted + index, operation)
+
+
 def get_system_username():
     """
     Return the current system user's username, or an empty string if the
@@ -115,10 +195,12 @@ def get_system_username():
     """
     try:
         result = getpass.getuser()
-    except (ImportError, KeyError):
-        # KeyError will be raised by os.getpwuid() (called by getuser())
-        # if there is no corresponding entry in the /etc/passwd file
-        # (a very restricted chroot environment, for example).
+    except (ImportError, KeyError, OSError):
+        # TODO: Drop ImportError and KeyError when dropping support for PY312.
+        # KeyError (Python <3.13) or OSError (Python 3.13+) will be raised by
+        # os.getpwuid() (called by getuser()) if there is no corresponding
+        # entry in the /etc/passwd file (for example, in a very restricted
+        # chroot environment).
         return ""
     return result
 

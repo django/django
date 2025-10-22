@@ -5,8 +5,8 @@ from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.db.models import Index
 
-FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "comment"))
-TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
+FieldInfo = namedtuple("FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "comment"])
+TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -154,8 +154,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all foreign keys in the given table.
+        Return a dictionary of {field_name: (field_name_other_table,
+        other_table)} representing all foreign keys in the given table.
         """
         cursor.execute(
             """
@@ -206,7 +206,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+            WHERE cl.relname = %s
+                AND pg_catalog.pg_table_is_visible(cl.oid)
+                AND c.contype != 'n'
         """,
             [table_name],
         )

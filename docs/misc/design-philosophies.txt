@@ -34,9 +34,9 @@ stack are independent of another wherever possible.
 Less code
 ---------
 
-Django apps should use as little code as possible; they should lack boilerplate.
-Django should take full advantage of Python's dynamic capabilities, such as
-introspection.
+Django apps should use as little code as possible; they should lack
+boilerplate. Django should take full advantage of Python's dynamic
+capabilities, such as introspection.
 
 .. _quick-development:
 
@@ -310,7 +310,7 @@ The core goals of Django's :doc:`cache framework </topics/cache>` are:
 Less code
 ---------
 
-A cache should be as fast as possible.  Hence, all framework code surrounding
+A cache should be as fast as possible. Hence, all framework code surrounding
 the cache backend should be kept to the absolute minimum, especially for
 ``get()`` operations.
 

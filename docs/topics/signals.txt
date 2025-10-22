@@ -83,7 +83,8 @@ function or method::
         print("Request finished!")
 
 Notice that the function takes a ``sender`` argument, along with wildcard
-keyword arguments (``**kwargs``); all signal handlers must take these arguments.
+keyword arguments (``**kwargs``); all signal handlers must take these
+arguments.
 
 We'll look at senders :ref:`a bit later <connecting-to-specific-signals>`, but
 right now look at the ``**kwargs`` argument. All signals send keyword
@@ -181,9 +182,9 @@ Connecting to signals sent by specific senders
 
 Some signals get sent many times, but you'll only be interested in receiving a
 certain subset of those signals. For example, consider the
-:data:`django.db.models.signals.pre_save` signal sent before a model gets saved.
-Most of the time, you don't need to know when *any* model gets saved -- just
-when one *specific* model is saved.
+:data:`django.db.models.signals.pre_save` signal sent before a model gets
+saved. Most of the time, you don't need to know when *any* model gets saved --
+just when one *specific* model is saved.
 
 In these cases, you can register to receive signals sent only by particular
 senders. In the case of :data:`django.db.models.signals.pre_save`, the sender
@@ -201,9 +202,9 @@ signals sent by some model::
 The ``my_handler`` function will only be called when an instance of ``MyModel``
 is saved.
 
-Different signals use different objects as their senders; you'll need to consult
-the :doc:`built-in signal documentation </ref/signals>` for details of each
-particular signal.
+Different signals use different objects as their senders; you'll need to
+consult the :doc:`built-in signal documentation </ref/signals>` for details of
+each particular signal.
 
 .. _preventing-duplicate-signals:
 
@@ -298,7 +299,8 @@ be notified of a signal in the face of an error.
 
 ``send_robust()`` catches all errors derived from Python's ``Exception`` class,
 and ensures all receivers are notified of the signal. If an error occurs, the
-error instance is returned in the tuple pair for the receiver that raised the error.
+error instance is returned in the tuple pair for the receiver that raised the
+error.
 
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
@@ -314,7 +316,7 @@ Whether synchronous or asynchronous, receivers will be correctly adapted to
 whether ``send()`` or ``asend()`` is used. Synchronous receivers will be
 called using :func:`~.sync_to_async` when invoked via ``asend()``. Asynchronous
 receivers will be called using :func:`~.async_to_sync` when invoked via
-``sync()``. Similar to the :ref:`case for middleware <async_performance>`,
+``send()``. Similar to the :ref:`case for middleware <async_performance>`,
 there is a small performance cost to adapting receivers in this way. Note that
 in order to reduce the number of sync/async calling-style switches within a
 ``send()`` or ``asend()`` call, the receivers are grouped by whether or not

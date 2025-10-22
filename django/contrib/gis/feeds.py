@@ -35,7 +35,7 @@ class GeoFeedMixin:
         geom = item.get("geometry")
         if geom is not None:
             if isinstance(geom, (list, tuple)):
-                # Special case if a tuple/list was passed in.  The tuple may be
+                # Special case if a tuple/list was passed in. The tuple may be
                 # a point or a box
                 box_coords = None
                 if isinstance(geom[0], (list, tuple)):

@@ -16,17 +16,11 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
-
-# RemovedInDjango60Warning.
-FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
-    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
-)
 
 
 class SettingsReference(str):
@@ -83,7 +77,8 @@ class LazySettings(LazyObject):
         val = getattr(_wrapped, name)
 
         # Special case some settings which require further modification.
-        # This is done here for performance reasons so the modified value is cached.
+        # This is done here for performance reasons so the modified value is
+        # cached.
         if name in {"MEDIA_URL", "STATIC_URL"} and val is not None:
             val = self._add_script_prefix(val)
         elif name == "SECRET_KEY" and not val:
@@ -155,7 +150,8 @@ class LazySettings(LazyObject):
 
 class Settings:
     def __init__(self, settings_module):
-        # update this dict from global settings (but only for ALL_CAPS settings)
+        # update this dict from global settings (but only for ALL_CAPS
+        # settings)
         for setting in dir(global_settings):
             if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))
@@ -185,12 +181,6 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-
-        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
-            warnings.warn(
-                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
-                RemovedInDjango60Warning,
-            )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -236,11 +226,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
-            warnings.warn(
-                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
-                RemovedInDjango60Warning,
-            )
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

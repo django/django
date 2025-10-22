@@ -1,8 +1,9 @@
 from pathlib import Path
 from unittest import mock, skipIf
 
+from django.contrib.auth.models import User
 from django.template import TemplateSyntaxError
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 
 from .test_dummy import TemplateStringsTests
 
@@ -135,3 +136,31 @@ class Jinja2Tests(TemplateStringsTests):
         self.assertEqual(len(debug["source_lines"]), 0)
         self.assertTrue(debug["name"].endswith("nonexistent.html"))
         self.assertIn("message", debug)
+
+
+@skipIf(jinja2 is None, "this test requires jinja2")
+class Jinja2SandboxTests(TestCase):
+    engine_class = Jinja2
+    backend_name = "jinja2"
+    options = {"environment": "jinja2.sandbox.SandboxedEnvironment"}
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        params = {
+            "DIRS": [],
+            "APP_DIRS": True,
+            "NAME": cls.backend_name,
+            "OPTIONS": cls.options,
+        }
+        cls.engine = cls.engine_class(params)
+
+    def test_set_alters_data(self):
+        template = self.engine.from_string(
+            "{% set test = User.objects.create_superuser("
+            "username='evil', email='a@b.com', password='xxx') %}"
+            "{{ test }}"
+        )
+        with self.assertRaises(jinja2.exceptions.SecurityError):
+            template.render(context={"User": User})
+        self.assertEqual(User.objects.count(), 0)

@@ -1,9 +1,3 @@
-"""
-Bare-bones model
-
-This is a basic model with only two non-primary-key fields.
-"""
-
 import uuid
 
 from django.db import models
@@ -55,6 +49,14 @@ class PrimaryKeyWithDefault(models.Model):
 
 class PrimaryKeyWithDbDefault(models.Model):
     uuid = models.IntegerField(primary_key=True, db_default=1)
+
+
+class PrimaryKeyWithFalseyDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, default=0)
+
+
+class PrimaryKeyWithFalseyDbDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, db_default=0)
 
 
 class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):

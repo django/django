@@ -115,10 +115,6 @@ model it represents, or to retrieve objects from that model:
     on that model, returning the corresponding object. The ``using`` argument
     can be used to specify a different database than the default one.
 
-    .. versionchanged:: 5.1
-
-        The ``using`` argument was added.
-
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
@@ -192,8 +188,8 @@ The ``ContentTypeManager``
 
     .. method:: get_for_id(id)
 
-        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
-        Since this method uses the same shared cache as
+        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by
+        ID. Since this method uses the same shared cache as
         :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
         it's preferred to use this method over the usual
         ``ContentType.objects.get(pk=id)``
@@ -224,7 +220,7 @@ The ``ContentTypeManager``
         referenced via a :ref:`natural key<topics-serialization-natural-keys>`
         during deserialization.
 
-The :meth:`~ContentTypeManager.get_for_model()` method is especially
+The :meth:`~ContentTypeManager.get_for_model` method is especially
 useful when you know you need to work with a
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't
 want to go to the trouble of obtaining the model's metadata to perform a manual
@@ -261,7 +257,7 @@ For example, it could be used for a tagging system like so::
     class TaggedItem(models.Model):
         tag = models.SlugField()
         content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-        object_id = models.PositiveIntegerField()
+        object_id = models.PositiveBigIntegerField()
         content_object = GenericForeignKey("content_type", "object_id")
 
         def __str__(self):
@@ -291,7 +287,7 @@ model:
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
-       :class:`~django.db.models.PositiveIntegerField`. The usual name
+       :class:`~django.db.models.PositiveBigIntegerField`. The usual name
        for this field is "object_id".
 
     3. Give your model a
@@ -342,10 +338,11 @@ model:
 .. admonition:: Serializing references to ``ContentType`` objects
 
    If you're serializing data (for example, when generating
-   :class:`~django.test.TransactionTestCase.fixtures`) from a model that implements
-   generic relations, you should probably be using a natural key to uniquely
-   identify related :class:`~django.contrib.contenttypes.models.ContentType`
-   objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
+   :class:`~django.test.TransactionTestCase.fixtures`) from a model that
+   implements generic relations, you should probably be using a natural key to
+   uniquely identify related
+   :class:`~django.contrib.contenttypes.models.ContentType` objects. See
+   :ref:`natural keys<topics-serialization-natural-keys>` and
    :option:`dumpdata --natural-foreign` for more information.
 
 This will enable an API similar to the one used for a normal
@@ -386,7 +383,7 @@ normal field object, these examples will *not* work:
     >>> TaggedItem.objects.get(content_object=guido)
 
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
-does not appear in :class:`~django.forms.ModelForm`\s.
+do not appear in :class:`~django.forms.ModelForm`\s.
 
 Reverse generic relations
 -------------------------

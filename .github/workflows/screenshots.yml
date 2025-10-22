@@ -20,15 +20,15 @@ jobs:
     name: Screenshots
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
 
       - name: Run Selenium tests with screenshots

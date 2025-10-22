@@ -31,8 +31,8 @@ of change are not possible on all databases - for example, MyISAM does not
 support foreign key constraints.
 
 If you are writing or maintaining a third-party database backend for Django,
-you will need to provide a ``SchemaEditor`` implementation in order to work with
-Django's migration functionality - however, as long as your database is
+you will need to provide a ``SchemaEditor`` implementation in order to work
+with Django's migration functionality - however, as long as your database is
 relatively standard in its use of SQL and relational design, you should be able
 to subclass one of the built-in Django ``SchemaEditor`` classes and tweak the
 syntax a little.

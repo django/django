@@ -103,11 +103,10 @@ class TranslationCatalog:
             yield from cat.keys()
 
     def update(self, trans):
-        # Merge if plural function is the same, else prepend.
-        for cat, plural in zip(self._catalogs, self._plurals):
-            if trans.plural.__code__ == plural.__code__:
-                cat.update(trans._catalog)
-                break
+        # Merge if plural function is the same as the top catalog, else
+        # prepend.
+        if trans.plural.__code__ == self._plurals[0]:
+            self._catalogs[0].update(trans._catalog)
         else:
             self._catalogs.insert(0, trans._catalog.copy())
             self._plurals.insert(0, trans.plural)
@@ -156,7 +155,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
         if self.domain == "django":
             if localedirs is not None:
-                # A module-level cache is used for caching 'django' translations
+                # A module-level cache is used for caching 'django'
+                # translations
                 warnings.warn(
                     "localedirs is ignored when domain is 'django'.", RuntimeWarning
                 )
@@ -255,7 +255,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         if not getattr(other, "_catalog", None):
             return  # NullTranslations() has no _catalog
         if self._catalog is None:
-            # Take plural and _info from first catalog found (generally Django's).
+            # Take plural and _info from first catalog found (generally
+            # Django's).
             self.plural = other.plural
             self._info = other._info.copy()
             self._catalog = TranslationCatalog(other)
@@ -289,7 +290,6 @@ def translation(language):
     """
     Return a translation object in the default 'django' domain.
     """
-    global _translations
     if language not in _translations:
         _translations[language] = DjangoTranslation(language)
     return _translations[language]
@@ -332,7 +332,8 @@ def get_language():
             return t.to_language()
         except AttributeError:
             pass
-    # If we don't have a real translation object, assume it's the default language.
+    # If we don't have a real translation object, assume it's the default
+    # language.
     return settings.LANGUAGE_CODE
 
 
@@ -514,7 +515,8 @@ def get_supported_language_variant(lang_code, strict=False):
                 not strict
                 and (index := lang_code.rfind("-", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0
             ):
-                # There is a generic variant under the maximum length accepted length.
+                # There is a generic variant under the maximum length accepted
+                # length.
                 lang_code = lang_code[:index]
             else:
                 raise LookupError(lang_code)

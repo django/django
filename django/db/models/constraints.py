@@ -1,9 +1,8 @@
-import warnings
 from enum import Enum
 from types import NoneType
 
 from django.core import checks
-from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
@@ -12,7 +11,6 @@ from django.db.models.lookups import Exact, IsNull
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 from django.db.utils import DEFAULT_DB_ALIAS
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
@@ -23,19 +21,11 @@ class BaseConstraint:
     violation_error_code = None
     violation_error_message = None
 
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # def __init__(
-    #     self, *, name, violation_error_code=None, violation_error_message=None
-    # ):
+    non_db_attrs = ("violation_error_code", "violation_error_message")
+
     def __init__(
-        self, *args, name=None, violation_error_code=None, violation_error_message=None
+        self, *, name, violation_error_code=None, violation_error_message=None
     ):
-        # RemovedInDjango60Warning.
-        if name is None and not args:
-            raise TypeError(
-                f"{self.__class__.__name__}.__init__() missing 1 required keyword-only "
-                f"argument: 'name'"
-            )
         self.name = name
         if violation_error_code is not None:
             self.violation_error_code = violation_error_code
@@ -43,17 +33,6 @@ class BaseConstraint:
             self.violation_error_message = violation_error_message
         else:
             self.violation_error_message = self.default_violation_error_message
-        # RemovedInDjango60Warning.
-        if args:
-            warnings.warn(
-                f"Passing positional arguments to {self.__class__.__name__} is "
-                f"deprecated.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            for arg, attr in zip(args, ["name", "violation_error_message"]):
-                if arg:
-                    setattr(self, attr, arg)
 
     @property
     def contains_expressions(self):
@@ -87,15 +66,17 @@ class BaseConstraint:
     def get_violation_error_message(self):
         return self.violation_error_message % {"name": self.name}
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         return []
 
     def _check_references(self, model, references):
+        from django.db.models.fields.composite import CompositePrimaryKey
+
         errors = []
         fields = set()
         for field_name, *lookups in references:
-            # pk is an alias that won't be found by opts.get_field.
-            if field_name != "pk":
+            # pk is an alias that won't be found by opts.get_field().
+            if field_name != "pk" or isinstance(model._meta.pk, CompositePrimaryKey):
                 fields.add(field_name)
             if not lookups:
                 # If it has no lookups it cannot result in a JOIN.
@@ -120,7 +101,7 @@ class BaseConstraint:
                 errors.append(
                     checks.Error(
                         "'constraints' refers to the joined field '%s'."
-                        % LOOKUP_SEP.join([field_name] + lookups),
+                        % LOOKUP_SEP.join([field_name, *lookups]),
                         obj=model,
                         id="models.E041",
                     )
@@ -147,26 +128,14 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
-    # RemovedInDjango60Warning: when the deprecation ends, replace with
-    # def __init__(
-    #  self, *, condition, name, violation_error_code=None, violation_error_message=None
-    # )
     def __init__(
         self,
         *,
+        condition,
         name,
-        condition=None,
-        check=None,
         violation_error_code=None,
         violation_error_message=None,
     ):
-        if check is not None:
-            warnings.warn(
-                "CheckConstraint.check is deprecated in favor of `.condition`.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            condition = check
         self.condition = condition
         if not getattr(condition, "conditional", False):
             raise TypeError(
@@ -178,25 +147,7 @@ class CheckConstraint(BaseConstraint):
             violation_error_message=violation_error_message,
         )
 
-    def _get_check(self):
-        warnings.warn(
-            "CheckConstraint.check is deprecated in favor of `.condition`.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return self.condition
-
-    def _set_check(self, value):
-        warnings.warn(
-            "CheckConstraint.check is deprecated in favor of `.condition`.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        self.condition = value
-
-    check = property(_get_check, _set_check)
-
-    def _check(self, model, connection):
+    def check(self, model, connection):
         errors = []
         if not (
             connection.features.supports_table_check_constraints
@@ -255,13 +206,13 @@ class CheckConstraint(BaseConstraint):
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         against = instance._get_field_expression_map(meta=model._meta, exclude=exclude)
-        try:
-            if not Q(self.condition).check(against, using=using):
-                raise ValidationError(
-                    self.get_violation_error_message(), code=self.violation_error_code
-                )
-        except FieldError:
-            pass
+        # Ignore constraints with excluded fields in condition.
+        if exclude and self._expression_refs_exclude(model, self.condition, exclude):
+            return
+        if not Q(self.condition).check(against, using=using):
+            raise ValidationError(
+                self.get_violation_error_message(), code=self.violation_error_code
+            )
 
     def __repr__(self):
         return "<%s: condition=%s name=%s%s%s>" % (
@@ -381,7 +332,7 @@ class UniqueConstraint(BaseConstraint):
     def contains_expressions(self):
         return bool(self.expressions)
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         errors = model._check_local_fields({*self.fields, *self.include}, "constraints")
         required_db_features = model._meta.required_db_features
         if self.condition is not None and not (
@@ -642,8 +593,8 @@ class UniqueConstraint(BaseConstraint):
                             ].features.interprets_empty_strings_as_nulls
                         )
                     ):
-                        # A composite constraint containing NULL value cannot cause
-                        # a violation since NULL != NULL in SQL.
+                        # A composite constraint containing NULL value cannot
+                        # cause a violation since NULL != NULL in SQL.
                         return
                     lookup_kwargs[field.name] = lookup_value
             lookup_args = []
@@ -686,31 +637,41 @@ class UniqueConstraint(BaseConstraint):
                 filters.append(condition)
             queryset = queryset.filter(*filters)
         model_class_pk = instance._get_pk_val(model._meta)
-        if not instance._state.adding and model_class_pk is not None:
+        if not instance._state.adding and instance._is_pk_set(model._meta):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
-                if self.fields:
-                    # When fields are defined, use the unique_error_message() for
-                    # backward compatibility.
+                if (
+                    self.fields
+                    and self.violation_error_message
+                    == self.default_violation_error_message
+                ):
+                    # When fields are defined, use the unique_error_message()
+                    # as a default for backward compatibility.
+                    validation_error_message = instance.unique_error_message(
+                        model, self.fields
+                    )
                     raise ValidationError(
-                        instance.unique_error_message(model, self.fields),
+                        validation_error_message,
+                        code=validation_error_message.code,
                     )
                 raise ValidationError(
                     self.get_violation_error_message(),
                     code=self.violation_error_code,
                 )
         else:
+            # Ignore constraints with excluded fields in condition.
+            if exclude and self._expression_refs_exclude(
+                model, self.condition, exclude
+            ):
+                return
             against = instance._get_field_expression_map(
                 meta=model._meta, exclude=exclude
             )
-            try:
-                if (self.condition & Exists(queryset.filter(self.condition))).check(
-                    against, using=using
-                ):
-                    raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
-                    )
-            except FieldError:
-                pass
+            if (self.condition & Exists(queryset.filter(self.condition))).check(
+                against, using=using
+            ):
+                raise ValidationError(
+                    self.get_violation_error_message(),
+                    code=self.violation_error_code,
+                )

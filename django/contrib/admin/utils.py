@@ -5,6 +5,8 @@ from collections import defaultdict
 from functools import reduce
 from operator import or_
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.exceptions import FieldDoesNotExist
 from django.core.validators import EMPTY_VALUES
 from django.db import models, router
@@ -71,7 +73,8 @@ def prepare_lookup_value(key, value, separator=","):
     # if key ends with __in, split parameter into separate values
     if key.endswith("__in"):
         value = value.split(separator)
-    # if key ends with __isnull, special case '' and the string literals 'false' and '0'
+    # if key ends with __isnull, special case '' and the string literals
+    # 'false' and '0'
     elif key.endswith("__isnull"):
         value = value.lower() not in ("", "false", "0")
     return value
@@ -181,8 +184,8 @@ def get_deleted_objects(objs, request, admin_site):
 
 
 class NestedObjects(Collector):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, force_collection=True, **kwargs):
+        super().__init__(*args, force_collection=force_collection, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
         self.model_objs = defaultdict(set)
@@ -238,13 +241,6 @@ class NestedObjects(Collector):
         for root in self.edges.get(None, ()):
             roots.extend(self._nested(root, seen, format_callback))
         return roots
-
-    def can_fast_delete(self, *args, **kwargs):
-        """
-        We always want to load the objects into memory so that we can display
-        them to the user in confirm page.
-        """
-        return False
 
 
 def model_format_dict(obj):
@@ -426,10 +422,12 @@ def help_text_for_field(name, model):
     return help_text
 
 
-def display_for_field(value, field, empty_value_display):
+def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
-    if getattr(field, "flatchoices", None):
+    if field.name == "password" and field.model == get_user_model():
+        return render_password_as_hash(value)
+    elif getattr(field, "flatchoices", None):
         try:
             return dict(field.flatchoices).get(value, empty_value_display)
         except TypeError:
@@ -452,8 +450,10 @@ def display_for_field(value, field, empty_value_display):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, (models.IntegerField, models.FloatField)):
         return formats.number_format(value)
-    elif isinstance(field, models.FileField) and value:
+    elif isinstance(field, models.FileField) and value and not avoid_link:
         return format_html('<a href="{}">{}</a>', value.url, value)
+    elif isinstance(field, models.URLField) and value and not avoid_link:
+        return format_html('<a href="{}">{}</a>', value, value)
     elif isinstance(field, models.JSONField) and value:
         try:
             return json.dumps(value, ensure_ascii=False, cls=field.encoder)
@@ -552,9 +552,10 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
-    # Evaluating `form.changed_data` prior to disabling translations is required
-    # to avoid fields affected by localization from being included incorrectly,
-    # e.g. where date formats differ such as MM/DD/YYYY vs DD/MM/YYYY.
+    # Evaluating `form.changed_data` prior to disabling translations is
+    # required to avoid fields affected by localization from being included
+    # incorrectly, e.g. where date formats differ such as MM/DD/YYYY vs
+    # DD/MM/YYYY.
     changed_data = form.changed_data
     with translation_override(None):
         # Deactivate translations while fetching verbose_name for form

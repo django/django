@@ -19,10 +19,10 @@ At the highest level, you can serialize data like this::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all())
+    data = serializers.serialize("json", SomeModel.objects.all())
 
-The arguments to the ``serialize`` function are the format to serialize the data
-to (see `Serialization formats`_) and a
+The arguments to the ``serialize`` function are the format to serialize the
+data to (see `Serialization formats`_) and a
 :class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
 argument can be any iterator that yields Django model instances, but it'll
 almost always be a QuerySet).
@@ -31,16 +31,16 @@ almost always be a QuerySet).
 
 You can also use a serializer object directly::
 
-    XMLSerializer = serializers.get_serializer("xml")
-    xml_serializer = XMLSerializer()
-    xml_serializer.serialize(queryset)
-    data = xml_serializer.getvalue()
+    JSONSerializer = serializers.get_serializer("json")
+    json_serializer = JSONSerializer()
+    json_serializer.serialize(queryset)
+    data = json_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
 (which includes an :class:`~django.http.HttpResponse`)::
 
-    with open("file.xml", "w") as out:
-        xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+    with open("file.json", "w") as out:
+        json_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
@@ -58,11 +58,11 @@ specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all(), fields=["name", "size"])
+    data = serializers.serialize("json", SomeModel.objects.all(), fields=["name", "size"])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
-be serialized. The primary key is always serialized as the ``pk`` element in the
-resulting output; it never appears in the ``fields`` part.
+be serialized. The primary key is always serialized as the ``pk`` element in
+the resulting output; it never appears in the ``fields`` part.
 
 .. note::
 
@@ -94,7 +94,7 @@ model will be serialized. For example, consider the following models::
 
 If you only serialize the Restaurant model::
 
-    data = serializers.serialize("xml", Restaurant.objects.all())
+    data = serializers.serialize("json", Restaurant.objects.all())
 
 the fields on the serialized output will only contain the ``serves_hot_dogs``
 attribute. The ``name`` attribute of the base class will be ignored.
@@ -103,14 +103,14 @@ In order to fully serialize your ``Restaurant`` instances, you will need to
 serialize the ``Place`` models as well::
 
     all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
-    data = serializers.serialize("xml", all_objects)
+    data = serializers.serialize("json", all_objects)
 
 Deserializing data
 ==================
 
 Deserializing data is very similar to serializing it::
 
-    for obj in serializers.deserialize("xml", data):
+    for obj in serializers.deserialize("json", data):
         do_something_with(obj)
 
 As you can see, the ``deserialize`` function takes the same format argument as
@@ -133,7 +133,7 @@ data in your serialized representation doesn't match what's currently in the
 database. Usually, working with these ``DeserializedObject`` instances looks
 something like::
 
-    for deserialized_object in serializers.deserialize("xml", data):
+    for deserialized_object in serializers.deserialize("json", data):
         if object_should_be_saved(deserialized_object):
             deserialized_object.save()
 
@@ -146,7 +146,7 @@ If fields in the serialized data do not exist on a model, a
 ``DeserializationError`` will be raised unless the ``ignorenonexistent``
 argument is passed in as ``True``::
 
-    serializers.deserialize("xml", data, ignorenonexistent=True)
+    serializers.deserialize("json", data, ignorenonexistent=True)
 
 .. _serialization-formats:
 
@@ -224,7 +224,8 @@ the ``auth.User`` model has such a relation to the ``auth.Permission`` model:
         </field>
     </object>
 
-This example links the given user with the permission models with PKs 46 and 47.
+This example links the given user with the permission models with PKs 46 and
+47.
 
 .. admonition:: Control characters
 
@@ -346,6 +347,81 @@ again a mapping with the key being name of the field and the value the value:
         expire_date: 2013-01-16 08:16:59.844560+00:00
 
 Referential fields are again represented by the PK or sequence of PKs.
+
+.. _custom-serialization-formats:
+
+Custom serialization formats
+----------------------------
+
+In addition to the default formats, you can create a custom serialization
+format.
+
+For example, let’s consider a csv serializer and deserializer. First, define a
+``Serializer`` and a ``Deserializer`` class. These can override existing
+serialization format classes:
+
+.. code-block:: python
+   :caption: ``path/to/custom_csv_serializer.py``
+
+    import csv
+
+    from django.apps import apps
+    from django.core import serializers
+    from django.core.serializers.base import DeserializationError
+
+
+    class Serializer(serializers.python.Serializer):
+        def get_dump_object(self, obj):
+            dumped_object = super().get_dump_object(obj)
+            row = [dumped_object["model"], str(dumped_object["pk"])]
+            row += [str(value) for value in dumped_object["fields"].values()]
+            return ",".join(row), dumped_object["model"]
+
+        def end_object(self, obj):
+            dumped_object_str, model = self.get_dump_object(obj)
+            if self.first:
+                fields = [field.name for field in apps.get_model(model)._meta.fields]
+                header = ",".join(fields)
+                self.stream.write(f"model,{header}\n")
+            self.stream.write(f"{dumped_object_str}\n")
+
+        def getvalue(self):
+            return super(serializers.python.Serializer, self).getvalue()
+
+
+    class Deserializer(serializers.python.Deserializer):
+        def __init__(self, stream_or_string, **options):
+            if isinstance(stream_or_string, bytes):
+                stream_or_string = stream_or_string.decode()
+            if isinstance(stream_or_string, str):
+                stream_or_string = stream_or_string.splitlines()
+            try:
+                objects = csv.DictReader(stream_or_string)
+            except Exception as exc:
+                raise DeserializationError() from exc
+            super().__init__(objects, **options)
+
+        def _handle_object(self, obj):
+            try:
+                model_fields = apps.get_model(obj["model"])._meta.fields
+                obj["fields"] = {
+                    field.name: obj[field.name]
+                    for field in model_fields
+                    if field.name in obj
+                }
+                yield from super()._handle_object(obj)
+            except (GeneratorExit, DeserializationError):
+                raise
+            except Exception as exc:
+                raise DeserializationError(f"Error deserializing object: {exc}") from exc
+
+Then add the module containing the serializer definitions to your
+:setting:`SERIALIZATION_MODULES` setting::
+
+    SERIALIZATION_MODULES = {
+        "csv": "path.to.custom_csv_serializer",
+        "json": "django.core.serializers.json",
+    }
 
 .. _topics-serialization-natural-keys:
 
@@ -524,9 +600,9 @@ When ``use_natural_foreign_keys=True`` is specified, Django will use the
 ``natural_key()`` method to serialize any foreign key reference to objects
 of the type that defines the method.
 
-When ``use_natural_primary_keys=True`` is specified, Django will not provide the
-primary key in the serialized data of this object since it can be calculated
-during deserialization::
+When ``use_natural_primary_keys=True`` is specified, Django will not provide
+the primary key in the serialized data of this object since it can be
+calculated during deserialization::
 
     ...
     {
@@ -591,7 +667,7 @@ Typical usage looks like this::
 
     objs_with_deferred_fields = []
 
-    for obj in serializers.deserialize("xml", data, handle_forward_references=True):
+    for obj in serializers.deserialize("json", data, handle_forward_references=True):
         obj.save()
         if obj.deferred_fields is not None:
             objs_with_deferred_fields.append(obj)

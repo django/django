@@ -129,8 +129,22 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. In particular, Python
-:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+supported by ``gettext`` are supported by Django. Python :ref:`f-strings
+<f-strings>` cannot be used directly with ``gettext`` functions because
+f-string expressions are evaluated before they reach ``gettext``. This means
+``_(f"Welcome {name}")`` will not work as expected, as the variable is
+substituted before translation occurs. Instead, use named-string
+interpolation::
+
+    # Good
+    _("Welcome %(name)s") % {"name": name}
+
+    # Good
+    _("Welcome {name}").format(name=name)
+
+    # Bad
+    _(f"Welcome {name}")  # f-string evaluated before translation.
+
 JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
@@ -166,7 +180,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.gettext_noop()` to mark a
+Use the function :func:`django.utils.translation.gettext_noop` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -178,7 +192,7 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ngettext()` to specify
+Use the function :func:`django.utils.translation.ngettext` to specify
 pluralized messages.
 
 ``ngettext()`` takes three arguments: the singular translation string, the
@@ -276,14 +290,14 @@ Contextual markers
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
-:func:`django.utils.translation.pgettext()` function, or the
-:func:`django.utils.translation.npgettext()` function if the string needs
+:func:`django.utils.translation.pgettext` function, or the
+:func:`django.utils.translation.npgettext` function if the string needs
 pluralization. Both take a context string as the first variable.
 
-In the resulting ``.po`` file, the string will then appear as often as there are
-different contextual markers for the same string (the context will appear on the
-``msgctxt`` line), allowing the translator to give a different translation for
-each of them.
+In the resulting ``.po`` file, the string will then appear as often as there
+are different contextual markers for the same string (the context will appear
+on the ``msgctxt`` line), allowing the translator to give a different
+translation for each of them.
 
 For example::
 
@@ -488,10 +502,10 @@ directly with the ``number`` argument::
 Formatting strings: ``format_lazy()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python's :meth:`str.format()` method will not work when either the
-``format_string`` or any of the arguments to :meth:`str.format()`
+Python's :meth:`str.format` method will not work when either the
+``format_string`` or any of the arguments to :meth:`str.format`
 contains lazy translation objects. Instead, you can use
-:func:`django.utils.text.format_lazy()`, which creates a lazy object
+:func:`django.utils.text.format_lazy`, which creates a lazy object
 that runs the ``str.format()`` method only when the result is included
 in a string. For example::
 
@@ -546,7 +560,7 @@ languages:
 
 The ``name``, ``name_local``, and ``name_translated`` attributes of the
 dictionary contain the name of the language in English, in the language
-itself, and in your current active language respectively.  The ``bidi``
+itself, and in your current active language respectively. The ``bidi``
 attribute is True only for bi-directional languages.
 
 The source of the language information is the ``django.conf.locale`` module.
@@ -557,12 +571,12 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-Translations in :doc:`Django templates </ref/templates/language>` uses two template
-tags and a slightly different syntax than in Python code. To give your template
-access to these tags, put ``{% load i18n %}`` toward the top of your template.
-As with all template tags, this tag needs to be loaded in all templates which
-use translations, even those templates that extend from other templates which
-have already loaded the ``i18n`` tag.
+Translations in :doc:`Django templates </ref/templates/language>` uses two
+template tags and a slightly different syntax than in Python code. To give your
+template access to these tags, put ``{% load i18n %}`` toward the top of your
+template. As with all template tags, this tag needs to be loaded in all
+templates which use translations, even those templates that extend from other
+templates which have already loaded the ``i18n`` tag.
 
 .. warning::
 
@@ -679,8 +693,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag:
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
-not allowed inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`)
+are not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -813,7 +827,8 @@ tag:
     <p>{% blocktranslate %}A multiline translatable
     literal.{% endblocktranslate %}</p>
 
-or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
+or with the ``{#`` ... ``#}``
+:ref:`one-line comment constructs <template-comments>`:
 
 .. code-block:: html+django
 
@@ -985,7 +1000,8 @@ There are also some filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
-* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active language is Czech)
+* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active
+  language is Czech)
 
 Internationalization: in JavaScript code
 ========================================
@@ -1004,8 +1020,8 @@ Django provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
-The main solution to these problems is the following ``JavaScriptCatalog`` view,
-which generates a JavaScript code library with functions that mimic the
+The main solution to these problems is the following ``JavaScriptCatalog``
+view, which generates a JavaScript code library with functions that mimic the
 ``gettext`` interface, plus an array of translation strings.
 
 The ``JavaScriptCatalog`` view
@@ -1210,7 +1226,7 @@ in the future.
 ~~~~~~~~~~~~
 
 The ``pgettext`` function behaves like the Python variant
-(:func:`~django.utils.translation.pgettext()`), providing a contextually
+(:func:`~django.utils.translation.pgettext`), providing a contextually
 translated word::
 
     document.write(pgettext("month name", "May"))
@@ -1219,7 +1235,7 @@ translated word::
 ~~~~~~~~~~~~~
 
 The ``npgettext`` function also behaves like the Python variant
-(:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
+(:func:`~django.utils.translation.npgettext`), providing a **pluralized**
 contextually translated word:
 
 .. code-block:: javascript
@@ -1248,8 +1264,8 @@ a word or not:
 In the simplest case, if no custom pluralization is needed, this returns
 ``false`` for the integer ``1`` and ``true`` for all other numbers.
 
-However, pluralization is not this simple in all languages. If the language does
-not support pluralization, an empty value is provided.
+However, pluralization is not this simple in all languages. If the language
+does not support pluralization, an empty value is provided.
 
 Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
@@ -1351,7 +1367,7 @@ Django provides two mechanisms to internationalize URL patterns:
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.gettext_lazy()` function.
+  :func:`django.utils.translation.gettext_lazy` function.
 
 .. warning::
 
@@ -1531,16 +1547,16 @@ Localization: how to create language files
 ==========================================
 
 Once the string literals of an application have been tagged for later
-translation, the translation themselves need to be written (or obtained). Here's
-how that works.
+translation, the translation themselves need to be written (or obtained).
+Here's how that works.
 
 Message files
 -------------
 
-The first step is to create a :term:`message file` for a new language. A message
-file is a plain-text file, representing a single language, that contains all
-available translation strings and how they should be represented in the given
-language. Message files have a ``.po`` file extension.
+The first step is to create a :term:`message file` for a new language. A
+message file is a plain-text file, representing a single language, that
+contains all available translation strings and how they should be represented
+in the given language. Message files have a ``.po`` file extension.
 
 Django comes with a tool, :djadmin:`django-admin makemessages
 <makemessages>`, that automates the creation and upkeep of these files.
@@ -1577,12 +1593,12 @@ directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
 ``locale/de/LC_MESSAGES/django.po``.
 
 When you run ``makemessages`` from the root directory of your project, the
-extracted strings will be automatically distributed to the proper message files.
-That is, a string extracted from a file of an app containing a ``locale``
-directory will go in a message file under that directory. A string extracted
-from a file of an app without any ``locale`` directory will either go in a
-message file under the directory listed first in :setting:`LOCALE_PATHS` or
-will generate an error if :setting:`LOCALE_PATHS` is empty.
+extracted strings will be automatically distributed to the proper message
+files. That is, a string extracted from a file of an app containing a
+``locale`` directory will go in a message file under that directory. A string
+extracted from a file of an app without any ``locale`` directory will either go
+in a message file under the directory listed first in :setting:`LOCALE_PATHS`
+or will generate an error if :setting:`LOCALE_PATHS` is empty.
 
 By default :djadmin:`django-admin makemessages <makemessages>` examines every
 file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
@@ -1690,7 +1706,7 @@ otherwise, they'll be tacked together without whitespace!
     Due to the way the ``gettext`` tools work internally and because we want to
     allow non-ASCII source strings in Django's core and your applications, you
     **must** use UTF-8 as the encoding for your ``.po`` files (the default when
-    ``.po`` files are created).  This means that everybody will be using the
+    ``.po`` files are created). This means that everybody will be using the
     same encoding, which is important when Django processes the ``.po`` files.
 
 .. admonition:: Fuzzy entries
@@ -1711,13 +1727,13 @@ Compiling message files
 -----------------------
 
 After you create your message file -- and each time you make changes to it --
-you'll need to compile it into a more efficient form, for use by ``gettext``. Do
-this with the :djadmin:`django-admin compilemessages <compilemessages>`
+you'll need to compile it into a more efficient form, for use by ``gettext``.
+Do this with the :djadmin:`django-admin compilemessages <compilemessages>`
 utility.
 
-This tool runs over all available ``.po`` files and creates ``.mo`` files, which
-are binary files optimized for use by ``gettext``. In the same directory from
-which you ran :djadmin:`django-admin makemessages <makemessages>`, run
+This tool runs over all available ``.po`` files and creates ``.mo`` files,
+which are binary files optimized for use by ``gettext``. In the same directory
+from which you ran :djadmin:`django-admin makemessages <makemessages>`, run
 :djadmin:`django-admin compilemessages <compilemessages>` like this:
 
 .. code-block:: shell
@@ -1769,11 +1785,11 @@ literals::
 Creating message files from JavaScript source code
 --------------------------------------------------
 
-You create and update the message files the same way as the other Django message
-files -- with the :djadmin:`django-admin makemessages <makemessages>` tool.
-The only difference is you need to explicitly specify what in gettext parlance
-is known as a domain in this case the ``djangojs`` domain, by providing a ``-d
-djangojs`` parameter, like this:
+You create and update the message files the same way as the other Django
+message files -- with the :djadmin:`django-admin makemessages <makemessages>`
+tool. The only difference is you need to explicitly specify what in gettext
+parlance is known as a domain in this case the ``djangojs`` domain, by
+providing a ``-d djangojs`` parameter, like this:
 
 .. code-block:: shell
 
@@ -1788,11 +1804,12 @@ updating message files, run :djadmin:`django-admin compilemessages
 ``gettext`` on Windows
 ----------------------
 
-This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself involves editing existing
-files of this type, but if you want to create your own message files, or want
-to test or compile a changed message file, download `a precompiled binary
-installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
+This is only needed for people who either want to extract message IDs or
+compile message files (``.po``). Translation work itself involves editing
+existing files of this type, but if you want to create your own message files,
+or want to test or compile a changed message file, download `a precompiled
+binary installer
+<https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1850,9 +1867,9 @@ The ``set_language`` redirect view
 
 .. function:: set_language(request)
 
-As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
-that sets a user's language preference and redirects to a given URL or, by default,
-back to the previous page.
+As a convenience, Django comes with a view,
+:func:`django.views.i18n.set_language`, that sets a user's language preference
+and redirects to a given URL or, by default, back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
@@ -1867,10 +1884,9 @@ Activate this view by adding the following line to your URLconf::
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
-parameter set in request. If session support is enabled, the view saves the
-language choice in the user's session. It also saves the language choice in a
-cookie that is named ``django_language`` by default. (The name can be changed
-through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+parameter set in request. The view saves the language choice in a cookie that
+is named ``django_language`` by default. (The name can be changed through the
+:setting:`LANGUAGE_COOKIE_NAME` setting.)
 
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
@@ -1915,12 +1931,12 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-You may want to set the active language for the current session explicitly. Perhaps
-a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate()`. That
-applies to the current thread only. To persist the language for the entire
-session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
-response::
+You may want to set the active language for the current session explicitly.
+Perhaps a user's language preference is retrieved from another system, for
+example. You've already been introduced to
+:func:`django.utils.translation.activate`. That applies to the current thread
+only. To persist the language for the entire session in a cookie, set the
+:setting:`LANGUAGE_COOKIE_NAME` cookie on the response::
 
     from django.conf import settings
     from django.http import HttpResponse
@@ -1931,7 +1947,7 @@ response::
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
 
-You would typically want to use both: :func:`django.utils.translation.activate()`
+You would typically want to use both: :func:`django.utils.translation.activate`
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
 
@@ -1965,14 +1981,14 @@ Calling this function with the value ``'de'`` will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
 Functions of particular interest are
-:func:`django.utils.translation.get_language()` which returns the language used
-in the current thread, :func:`django.utils.translation.activate()` which
+:func:`django.utils.translation.get_language` which returns the language used
+in the current thread, :func:`django.utils.translation.activate` which
 activates a translation catalog for the current thread, and
-:func:`django.utils.translation.check_for_language()`
+:func:`django.utils.translation.check_for_language`
 which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
-:func:`django.utils.translation.override()` that stores the current language on
+:func:`django.utils.translation.override` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation
@@ -2043,9 +2059,9 @@ prefer, then you also need to use the ``LocaleMiddleware``.
 ``LocaleMiddleware`` enables language selection based on data from the request.
 It customizes content for each user.
 
-To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
-to your :setting:`MIDDLEWARE` setting. Because middleware order matters, follow
-these guidelines:
+To use ``LocaleMiddleware``, add
+``'django.middleware.locale.LocaleMiddleware'`` to your :setting:`MIDDLEWARE`
+setting. Because middleware order matters, follow these guidelines:
 
 * Make sure it's one of the first middleware installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
@@ -2068,7 +2084,7 @@ For example, your :setting:`MIDDLEWARE` might look like this::
 ``LocaleMiddleware`` tries to determine the user's language preference by
 following this algorithm:
 
-* First, it looks for the language prefix in the requested URL.  This is
+* First, it looks for the language prefix in the requested URL. This is
   only performed when you are using the ``i18n_patterns`` function in your
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
@@ -2154,20 +2170,20 @@ in ``request.LANGUAGE_CODE``.
 How Django discovers translations
 ---------------------------------
 
-At runtime, Django builds an in-memory unified catalog of literals-translations.
-To achieve this it looks for translations by following this algorithm regarding
-the order in which it examines the different file paths to load the compiled
-:term:`message files <message file>` (``.mo``) and the precedence of multiple
-translations for the same literal:
+At runtime, Django builds an in-memory unified catalog of
+literals-translations. To achieve this it looks for translations by following
+this algorithm regarding the order in which it examines the different file
+paths to load the compiled :term:`message files <message file>` (``.mo``) and
+the precedence of multiple translations for the same literal:
 
 #. The directories listed in :setting:`LOCALE_PATHS` have the highest
    precedence, with the ones appearing first having higher precedence than
    the ones appearing later.
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
-   of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
+   of the installed apps listed in :setting:`INSTALLED_APPS`. The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in :source:`django/conf/locale`
-   is used as a fallback.
+#. Finally, the Django-provided base translation in
+   :source:`django/conf/locale` is used as a fallback.
 
 .. seealso::
 
@@ -2179,11 +2195,11 @@ translations for the same literal:
     :setting:`LOCALE_PATHS` directories if you also set
     :setting:`FORMAT_MODULE_PATH`.
 
-In all cases the name of the directory containing the translation is expected to
-be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
-etc. Untranslated strings for territorial language variants use the translations
-of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
-translations.
+In all cases the name of the directory containing the translation is expected
+to be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``,
+``es_AR``, etc. Untranslated strings for territorial language variants use the
+translations of the generic language. For example, untranslated ``pt_BR``
+strings use ``pt`` translations.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project. Or, you can build a big
@@ -2197,9 +2213,10 @@ All message file repositories are structured the same way. They are:
 * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-To create message files, you use the :djadmin:`django-admin makemessages <makemessages>`
-tool. And you use :djadmin:`django-admin compilemessages <compilemessages>`
-to produce the binary ``.mo`` files that are used by ``gettext``.
+To create message files, you use the
+:djadmin:`django-admin makemessages <makemessages>` tool. And you use
+:djadmin:`django-admin compilemessages <compilemessages>` to produce the binary
+``.mo`` files that are used by ``gettext``.
 
 You can also run :djadmin:`django-admin compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
@@ -2209,8 +2226,8 @@ Using a non-English base language
 ---------------------------------
 
 Django makes the general assumption that the original strings in a translatable
-project are written in English. You can choose another language, but you must be
-aware of certain limitations:
+project are written in English. You can choose another language, but you must
+be aware of certain limitations:
 
 * ``gettext`` only provides two plural forms for the original messages, so you
   will also need to provide a translation for the base language to include all

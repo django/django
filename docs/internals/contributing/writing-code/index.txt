@@ -40,6 +40,7 @@ It's important to understand how we work and the conventions we adopt.
 
    coding-style
    javascript
+   ../accessibility
    ../committing-code
 
 We maintain a curated list of small issues suited to first-time or less

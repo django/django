@@ -21,7 +21,6 @@ from django.db import models
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Band, Concert, Song
 
@@ -74,12 +73,13 @@ class ModelAdminTests(TestCase):
         self.assertIsNone(ma.get_exclude(request, self.band))
 
     def test_default_fieldsets(self):
-        # fieldsets_add and fieldsets_change should return a special data structure that
-        # is used in the templates. They should generate the "right thing" whether we
-        # have specified a custom form, the fields argument, or nothing at all.
+        # fieldsets_add and fieldsets_change should return a special data
+        # structure that is used in the templates. They should generate the
+        # "right thing" whether we have specified a custom form, the fields
+        # argument, or nothing at all.
         #
-        # Here's the default case. There are no custom form_add/form_change methods,
-        # no fields argument, and no fieldsets argument.
+        # Here's the default case. There are no custom form_add/form_change
+        # methods, no fields argument, and no fieldsets argument.
         ma = ModelAdmin(Band, self.site)
         self.assertEqual(
             ma.get_fieldsets(request),
@@ -275,36 +275,6 @@ class ModelAdminTests(TestCase):
             True,
         )
 
-    def test_lookup_allowed_without_request_deprecation(self):
-        class ConcertAdmin(ModelAdmin):
-            list_filter = ["main_band__sign_date"]
-
-            def get_list_filter(self, request):
-                return self.list_filter + ["main_band__name"]
-
-            def lookup_allowed(self, lookup, value):
-                return True
-
-        model_admin = ConcertAdmin(Concert, self.site)
-        msg = (
-            "`request` must be added to the signature of ModelAdminTests."
-            "test_lookup_allowed_without_request_deprecation.<locals>."
-            "ConcertAdmin.lookup_allowed()."
-        )
-        request_band_name_filter = RequestFactory().get(
-            "/", {"main_band__name": "test"}
-        )
-        request_band_name_filter.user = User.objects.create_superuser(
-            username="bob", email="bob@test.com", password="test"
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            changelist = model_admin.get_changelist_instance(request_band_name_filter)
-            filterspec = changelist.get_filters(request_band_name_filter)[0][0]
-            self.assertEqual(filterspec.title, "sign date")
-            filterspec = changelist.get_filters(request_band_name_filter)[0][1]
-            self.assertEqual(filterspec.title, "name")
-            self.assertSequenceEqual(filterspec.lookup_choices, [self.band.name])
-
     def test_field_arguments(self):
         # If fields is specified, fieldsets_add and fieldsets_change should
         # just stick the fields into a formsets structure and return it.
@@ -325,7 +295,8 @@ class ModelAdminTests(TestCase):
         # Form class to the fields specified. This may cause errors to be
         # raised in the db layer if required model fields aren't in fields/
         # fieldsets, but that's preferable to ghost errors where a field in the
-        # Form class isn't being displayed because it's not in fields/fieldsets.
+        # Form class isn't being displayed because it's not in
+        # fields/fieldsets.
 
         # Using `fields`.
         class BandAdmin(ModelAdmin):
@@ -434,7 +405,8 @@ class ModelAdminTests(TestCase):
     def test_custom_form_meta_exclude(self):
         """
         The custom ModelForm's `Meta.exclude` is overridden if
-        `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined (#14496).
+        `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined
+        (#14496).
         """
 
         # With ModelAdmin
@@ -733,9 +705,10 @@ class ModelAdminTests(TestCase):
     def test_default_foreign_key_widget(self):
         # First, without any radio_fields specified, the widgets for ForeignKey
         # and fields with choices specified ought to be a basic Select widget.
-        # ForeignKey widgets in the admin are wrapped with RelatedFieldWidgetWrapper so
-        # they need to be handled properly when type checking. For Select fields, all of
-        # the choices lists have a first entry of dashes.
+        # ForeignKey widgets in the admin are wrapped with
+        # RelatedFieldWidgetWrapper so they need to be handled properly when
+        # type checking. For Select fields, all of the choices lists have a
+        # first entry of dashes.
         cma = ModelAdmin(Concert, self.site)
         cmafa = cma.get_form(request)
 
@@ -762,10 +735,11 @@ class ModelAdminTests(TestCase):
         )
 
     def test_foreign_key_as_radio_field(self):
-        # Now specify all the fields as radio_fields.  Widgets should now be
-        # RadioSelect, and the choices list should have a first entry of 'None' if
-        # blank=True for the model field.  Finally, the widget should have the
-        # 'radiolist' attr, and 'inline' as well if the field is specified HORIZONTAL.
+        # Now specify all the fields as radio_fields. Widgets should now be
+        # RadioSelect, and the choices list should have a first entry of 'None'
+        # if blank=True for the model field. Finally, the widget should have
+        # the 'radiolist' attr, and 'inline' as well if the field is specified
+        # HORIZONTAL.
         class ConcertAdmin(ModelAdmin):
             radio_fields = {
                 "main_band": HORIZONTAL,
@@ -921,80 +895,6 @@ class ModelAdminTests(TestCase):
         ]
         self.assertSequenceEqual(logs, expected_log_values)
 
-    # RemovedInDjango60Warning.
-    def test_log_deletion(self):
-        ma = ModelAdmin(Band, self.site)
-        mock_request = MockRequest()
-        mock_request.user = User.objects.create(username="bill")
-        content_type = get_content_type_for_model(self.band)
-        msg = "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            created = ma.log_deletion(mock_request, self.band, str(self.band))
-        self.assertEqual(ctx.filename, __file__)
-        fetched = LogEntry.objects.filter(action_flag=DELETION).latest("id")
-        self.assertEqual(created, fetched)
-        self.assertEqual(fetched.action_flag, DELETION)
-        self.assertEqual(fetched.content_type, content_type)
-        self.assertEqual(fetched.object_id, str(self.band.pk))
-        self.assertEqual(fetched.user, mock_request.user)
-        self.assertEqual(fetched.change_message, "")
-        self.assertEqual(fetched.object_repr, str(self.band))
-
-    # RemovedInDjango60Warning.
-    def test_log_deletion_fallback(self):
-        class InheritedModelAdmin(ModelAdmin):
-            def log_deletion(self, request, obj, object_repr):
-                return super().log_deletion(request, obj, object_repr)
-
-        ima = InheritedModelAdmin(Band, self.site)
-        mock_request = MockRequest()
-        mock_request.user = User.objects.create(username="akash")
-        content_type = get_content_type_for_model(self.band)
-        Band.objects.create(
-            name="The Beatles",
-            bio="A legendary rock band from Liverpool.",
-            sign_date=date(1962, 1, 1),
-        )
-        Band.objects.create(
-            name="Mohiner Ghoraguli",
-            bio="A progressive rock band from Calcutta.",
-            sign_date=date(1975, 1, 1),
-        )
-        queryset = Band.objects.all().order_by("-id")[:3]
-        self.assertEqual(len(queryset), 3)
-        msg = (
-            "The usage of log_deletion() is deprecated. Implement log_deletions() "
-            "instead."
-        )
-        with self.assertNumQueries(3):
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-                ima.log_deletions(mock_request, queryset)
-        self.assertEqual(ctx.filename, __file__)
-        logs = (
-            LogEntry.objects.filter(action_flag=DELETION)
-            .order_by("id")
-            .values_list(
-                "user_id",
-                "content_type",
-                "object_id",
-                "object_repr",
-                "action_flag",
-                "change_message",
-            )
-        )
-        expected_log_values = [
-            (
-                mock_request.user.id,
-                content_type.id,
-                str(obj.pk),
-                str(obj),
-                DELETION,
-                "",
-            )
-            for obj in queryset
-        ]
-        self.assertSequenceEqual(logs, expected_log_values)
-
     def test_get_autocomplete_fields(self):
         class NameAdmin(ModelAdmin):
             search_fields = ["name"]
@@ -1042,8 +942,8 @@ class ModelAdminTests(TestCase):
 
     def test_get_deleted_objects_with_custom_has_delete_permission(self):
         """
-        ModelAdmin.get_deleted_objects() uses ModelAdmin.has_delete_permission()
-        for permissions checking.
+        ModelAdmin.get_deleted_objects() uses
+        ModelAdmin.has_delete_permission() for permissions checking.
         """
         mock_request = MockRequest()
         mock_request.user = User.objects.create_superuser(

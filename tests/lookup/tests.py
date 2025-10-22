@@ -2,7 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -24,12 +24,14 @@ from django.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
+    In,
     IsNull,
     LessThan,
     LessThanOrEqual,
 )
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps, register_lookup
+from django.test.utils import ignore_warnings, isolate_apps, register_lookup
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Article,
@@ -173,7 +175,8 @@ class LookupTests(TestCase):
         )
 
     def test_in_bulk(self):
-        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to objects.
+        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to
+        # objects.
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
@@ -246,34 +249,22 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.in_bulk([self.au1], field_name="author")
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering(self):
-        articles = (
-            Article.objects.order_by("author_id", "-pub_date")
-            .distinct("author_id")
-            .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-        )
         self.assertEqual(
-            articles,
-            {self.au1.id: self.a4, self.au2.id: self.a5},
+            list(Article.objects.in_bulk([self.a2.id, self.a1.id])),
+            [self.a2.id, self.a1.id],
         )
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        old_max_query_params = connection.features.max_query_params
-        connection.features.max_query_params = 1
-        try:
-            articles = (
-                Article.objects.order_by("author_id", "-pub_date")
-                .distinct("author_id")
-                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-            )
+        qs = Article.objects.all()
+        with (
+            mock.patch.object(connection.ops, "bulk_batch_size", return_value=2),
+            self.assertNumQueries(2),
+        ):
             self.assertEqual(
-                articles,
-                {self.au1.id: self.a4, self.au2.id: self.a5},
+                list(qs.in_bulk([self.a4.id, self.a3.id, self.a2.id, self.a1.id])),
+                [self.a4.id, self.a3.id, self.a2.id, self.a1.id],
             )
-        finally:
-            connection.features.max_query_params = old_max_query_params
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):
@@ -327,16 +318,280 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
 
-    def test_in_bulk_not_model_iterable(self):
-        msg = "in_bulk() cannot be used with values() or values_list()."
-        with self.assertRaisesMessage(TypeError, msg):
-            Author.objects.values().in_bulk()
-        with self.assertRaisesMessage(TypeError, msg):
-            Author.objects.values_list().in_bulk()
+    def test_in_bulk_values_empty(self):
+        arts = Article.objects.values().in_bulk([])
+        self.assertEqual(arts, {})
+
+    def test_in_bulk_values_all(self):
+        Article.objects.exclude(pk__in=[self.a1.pk, self.a2.pk]).delete()
+        arts = Article.objects.values().in_bulk()
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                },
+                self.a2.pk: {
+                    "id": self.a2.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 2",
+                    "pub_date": self.a2.pub_date,
+                    "slug": "a2",
+                },
+            },
+        )
+
+    def test_in_bulk_values_pks(self):
+        arts = Article.objects.values().in_bulk([self.a1.pk])
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_fields(self):
+        arts = Article.objects.values("headline").in_bulk([self.a1.pk])
+        self.assertEqual(
+            arts,
+            {self.a1.pk: {"headline": "Article 1"}},
+        )
+
+    def test_in_bulk_values_fields_including_pk(self):
+        arts = Article.objects.values("pk", "headline").in_bulk([self.a1.pk])
+        self.assertEqual(
+            arts,
+            {self.a1.pk: {"pk": self.a1.pk, "headline": "Article 1"}},
+        )
+
+    def test_in_bulk_values_fields_pk(self):
+        arts = Article.objects.values("pk").in_bulk([self.a1.pk])
+        self.assertEqual(
+            arts,
+            {self.a1.pk: {"pk": self.a1.pk}},
+        )
+
+    def test_in_bulk_values_fields_id(self):
+        arts = Article.objects.values("id").in_bulk([self.a1.pk])
+        self.assertEqual(
+            arts,
+            {self.a1.pk: {"id": self.a1.pk}},
+        )
+
+    def test_in_bulk_values_alternative_field_name(self):
+        arts = Article.objects.values("headline").in_bulk(
+            [self.a1.slug], field_name="slug"
+        )
+        self.assertEqual(
+            arts,
+            {self.a1.slug: {"headline": "Article 1"}},
+        )
+
+    def test_in_bulk_values_list_empty(self):
+        arts = Article.objects.values_list().in_bulk([])
+        self.assertEqual(arts, {})
+
+    def test_in_bulk_values_list_all(self):
+        Article.objects.exclude(pk__in=[self.a1.pk, self.a2.pk]).delete()
+        arts = Article.objects.values_list().in_bulk()
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: (
+                    self.a1.pk,
+                    "Article 1",
+                    self.a1.pub_date,
+                    self.au1.pk,
+                    "a1",
+                ),
+                self.a2.pk: (
+                    self.a2.pk,
+                    "Article 2",
+                    self.a2.pub_date,
+                    self.au1.pk,
+                    "a2",
+                ),
+            },
+        )
+
+    def test_in_bulk_values_list_fields(self):
+        arts = Article.objects.values_list("headline").in_bulk([self.a1.pk, self.a2.pk])
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: ("Article 1",),
+                self.a2.pk: ("Article 2",),
+            },
+        )
+
+    def test_in_bulk_values_list_fields_including_pk(self):
+        arts = Article.objects.values_list("pk", "headline").in_bulk(
+            [self.a1.pk, self.a2.pk]
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: (self.a1.pk, "Article 1"),
+                self.a2.pk: (self.a2.pk, "Article 2"),
+            },
+        )
+
+    def test_in_bulk_values_list_fields_pk(self):
+        arts = Article.objects.values_list("pk").in_bulk([self.a1.pk, self.a2.pk])
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: (self.a1.pk,),
+                self.a2.pk: (self.a2.pk,),
+            },
+        )
+
+    def test_in_bulk_values_list_fields_id(self):
+        arts = Article.objects.values_list("id").in_bulk([self.a1.pk, self.a2.pk])
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: (self.a1.pk,),
+                self.a2.pk: (self.a2.pk,),
+            },
+        )
+
+    def test_in_bulk_values_list_named(self):
+        arts = Article.objects.values_list(named=True).in_bulk([self.a1.pk, self.a2.pk])
+        self.assertIsInstance(arts, dict)
+        self.assertEqual(len(arts), 2)
+        arts1 = arts[self.a1.pk]
+        self.assertEqual(
+            arts1._fields, ("pk", "id", "headline", "pub_date", "author_id", "slug")
+        )
+        self.assertEqual(arts1.pk, self.a1.pk)
+        self.assertEqual(arts1.headline, "Article 1")
+        self.assertEqual(arts1.pub_date, self.a1.pub_date)
+        self.assertEqual(arts1.author_id, self.au1.pk)
+        self.assertEqual(arts1.slug, "a1")
+
+    def test_in_bulk_values_list_named_fields(self):
+        arts = Article.objects.values_list("pk", "headline", named=True).in_bulk(
+            [self.a1.pk, self.a2.pk]
+        )
+        self.assertIsInstance(arts, dict)
+        self.assertEqual(len(arts), 2)
+        arts1 = arts[self.a1.pk]
+        self.assertEqual(arts1._fields, ("pk", "headline"))
+        self.assertEqual(arts1.pk, self.a1.pk)
+        self.assertEqual(arts1.headline, "Article 1")
+
+    def test_in_bulk_values_list_named_fields_alternative_field(self):
+        arts = Article.objects.values_list("headline", named=True).in_bulk(
+            [self.a1.slug, self.a2.slug], field_name="slug"
+        )
+        self.assertEqual(len(arts), 2)
+        arts1 = arts[self.a1.slug]
+        self.assertEqual(arts1._fields, ("slug", "headline"))
+        self.assertEqual(arts1.slug, "a1")
+        self.assertEqual(arts1.headline, "Article 1")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
+    def test_in_bulk_values_list_flat_empty(self):
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk([])
+        self.assertEqual(arts, {})
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
+    def test_in_bulk_values_list_flat_all(self):
+        Article.objects.exclude(pk__in=[self.a1.pk, self.a2.pk]).delete()
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk()
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: self.a1.pk,
+                self.a2.pk: self.a2.pk,
+            },
+        )
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
+    def test_in_bulk_values_list_flat_pks(self):
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            arts = Article.objects.values_list(flat=True).in_bulk(
+                [self.a1.pk, self.a2.pk]
+            )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: self.a1.pk,
+                self.a2.pk: self.a2.pk,
+            },
+        )
+
+    def test_in_bulk_values_list_flat_field(self):
+        arts = Article.objects.values_list("headline", flat=True).in_bulk(
+            [self.a1.pk, self.a2.pk]
+        )
+        self.assertEqual(
+            arts,
+            {self.a1.pk: "Article 1", self.a2.pk: "Article 2"},
+        )
+
+    def test_in_bulk_values_list_flat_field_pk(self):
+        arts = Article.objects.values_list("pk", flat=True).in_bulk(
+            [self.a1.pk, self.a2.pk]
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: self.a1.pk,
+                self.a2.pk: self.a2.pk,
+            },
+        )
+
+    def test_in_bulk_values_list_flat_field_id(self):
+        arts = Article.objects.values_list("id", flat=True).in_bulk(
+            [self.a1.pk, self.a2.pk]
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: self.a1.pk,
+                self.a2.pk: self.a2.pk,
+            },
+        )
 
     def test_values(self):
-        # values() returns a list of dictionaries instead of object instances --
+        # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
+        self.assertSequenceEqual(
+            Article.objects.filter(id__in=(self.a5.id, self.a6.id)).values(),
+            [
+                {
+                    "id": self.a5.id,
+                    "headline": "Article 5",
+                    "pub_date": datetime(2005, 8, 1, 9, 0),
+                    "author_id": self.au2.id,
+                    "slug": "a5",
+                },
+                {
+                    "id": self.a6.id,
+                    "headline": "Article 6",
+                    "pub_date": datetime(2005, 8, 1, 8, 0),
+                    "author_id": self.au2.id,
+                    "slug": "a6",
+                },
+            ],
+        )
         self.assertSequenceEqual(
             Article.objects.values("headline"),
             [
@@ -379,7 +634,8 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
-        # The values() method works with "extra" fields specified in extra(select).
+        # The values() method works with "extra" fields specified in
+        # extra(select).
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
                 "id", "id_plus_one"
@@ -419,7 +675,8 @@ class LookupTests(TestCase):
                 }
             ],
         )
-        # You can specify fields from forward and reverse relations, just like filter().
+        # You can specify fields from forward and reverse relations, just like
+        # filter().
         self.assertSequenceEqual(
             Article.objects.values("headline", "author__name"),
             [
@@ -531,6 +788,41 @@ class LookupTests(TestCase):
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
         self.assertSequenceEqual(
+            Article.objects.filter(id__in=(self.a5.id, self.a6.id)).values_list(),
+            [
+                (
+                    self.a5.id,
+                    "Article 5",
+                    datetime(2005, 8, 1, 9, 0),
+                    self.au2.id,
+                    "a5",
+                ),
+                (
+                    self.a6.id,
+                    "Article 6",
+                    datetime(2005, 8, 1, 8, 0),
+                    self.au2.id,
+                    "a6",
+                ),
+            ],
+        )
+        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # assertion.
+        with ignore_warnings(category=RemovedInDjango70Warning):
+            qs = Article.objects.values_list(flat=True)
+        self.assertSequenceEqual(
+            qs,
+            [
+                self.a5.id,
+                self.a6.id,
+                self.a4.id,
+                self.a2.id,
+                self.a3.id,
+                self.a7.id,
+                self.a1.id,
+            ],
+        )
+        self.assertSequenceEqual(
             Article.objects.values_list("headline"),
             [
                 ("Article 5",),
@@ -626,6 +918,22 @@ class LookupTests(TestCase):
         with self.assertRaises(TypeError):
             Article.objects.values_list("id", "headline", flat=True)
 
+    # RemovedInDjango70Warning: When the deprecation ends, replace with:
+    # def test_values_list_flat_empty_error(self):
+    #     msg = (
+    #         "'flat' is not valid when values_list is called with no fields."
+    #     )
+    #     with self.assertRaisesMessage(TypeError, msg):
+    #         Article.objects.values_list(flat=True)
+    def test_values_list_flat_empty_warning(self):
+        msg = (
+            "Calling values_list() with no field name and flat=True "
+            "is deprecated. Pass an explicit field name instead, like "
+            "'pk'."
+        )
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            Article.objects.values_list(flat=True)
+
     def test_get_next_previous_by(self):
         # Every DateField and DateTimeField creates get_next_by_FOO() and
         # get_previous_by_FOO() methods. In the case of identical date values,
@@ -664,8 +972,9 @@ class LookupTests(TestCase):
         )
 
     def test_escaping(self):
-        # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # Underscores, percent signs and backslashes have special meaning in
+        # the underlying SQL code, but Django handles the quoting of them
+        # automatically.
         a8 = Article.objects.create(
             headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )
@@ -787,6 +1096,14 @@ class LookupTests(TestCase):
             )
         sql = ctx.captured_queries[0]["sql"]
         self.assertIn("IN (%s)" % self.a1.pk, sql)
+
+    def test_in_select_mismatch(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.filter(id__in=Article.objects.values("id", "headline"))
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
@@ -1363,6 +1680,14 @@ class LookupTests(TestCase):
         authors = Author.objects.filter(id=authors_max_ids[:1])
         self.assertEqual(authors.get(), newest_author)
 
+    def test_exact_query_rhs_with_selected_columns_mismatch(self):
+        msg = (
+            "The QuerySet value for the exact lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.filter(id=Author.objects.values("id", "name")[:1])
+
     def test_isnull_non_boolean_value(self):
         msg = "The QuerySet value for an isnull lookup must be True or False."
         tests = [
@@ -1510,6 +1835,25 @@ class LookupQueryingTests(TestCase):
             Season.objects.filter(IsNull(F("nulled_text_field"), True)),
             [self.s1, self.s3],
         )
+
+    def test_in_lookup_in_filter(self):
+        test_cases = [
+            ((), ()),
+            ((1942,), (self.s1,)),
+            ((1842,), (self.s2,)),
+            ((2042,), (self.s3,)),
+            ((1942, 1842), (self.s1, self.s2)),
+            ((1942, 2042), (self.s1, self.s3)),
+            ((1842, 2042), (self.s2, self.s3)),
+            ((1942, 1942, 1942), (self.s1,)),
+            ((1942, 2042, 1842), (self.s1, self.s2, self.s3)),
+        ]
+
+        for years, seasons in test_cases:
+            with self.subTest(years=years, seasons=seasons):
+                self.assertSequenceEqual(
+                    Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
+                )
 
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(

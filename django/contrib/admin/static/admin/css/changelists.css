@@ -1,14 +1,22 @@
 /* CHANGELISTS */
 
-#changelist {
+#changelist .changelist-form-container {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
-    justify-content: space-between;
+    width: 100%;
 }
 
-#changelist .changelist-form-container {
+#changelist .changelist-form-container > div {
     flex: 1 1 auto;
-    min-width: 0;
+}
+
+#changelist .changelist-form-container:not(:has(#changelist-filter)) > div {
+    width: 100%;
+}
+
+#changelist .changelist-form-container:has(#changelist-filter) > div {
+    max-width: calc(100% - 270px);
 }
 
 #changelist table {
@@ -25,8 +33,8 @@
     min-height: 400px;
 }
 
-.change-list .filtered .results, .change-list .filtered .paginator,
-.filtered #toolbar, .filtered div.xfull {
+.change-list .filtered .results, .filtered #toolbar,
+.filtered div.xfull {
     width: auto;
 }
 
@@ -43,11 +51,31 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
+#changelist .changelist-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+#changelist .changelist-footer .paginator {
+    color: var(--body-quiet-color);
+    background: var(--body-bg);
+    border: none;
+    padding: 0;
+}
+
 #changelist .paginator {
     color: var(--body-quiet-color);
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
-    overflow: hidden;
+}
+
+#changelist .paginator ul {
+    padding: 0;
+    white-space: nowrap;
 }
 
 /* CHANGELIST TABLES */

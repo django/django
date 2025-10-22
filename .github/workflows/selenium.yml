@@ -20,17 +20,17 @@ jobs:
     name: SQLite
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
       - name: Run Selenium tests
         working-directory: ./tests/
@@ -43,7 +43,7 @@ jobs:
     name: PostgreSQL
     services:
       postgres:
-        image: postgres:14-alpine
+        image: postgres:15-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user
@@ -57,17 +57,17 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py

@@ -3,6 +3,7 @@ from functools import lru_cache, partial
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.postgresql.compiler import InsertUnnest
 from django.db.backends.postgresql.psycopg_any import (
     Inet,
     Jsonb,
@@ -24,6 +25,7 @@ def get_json_dumps(encoder):
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.postgresql.compiler"
     cast_char_field_without_max_length = "varchar"
     explain_prefix = "EXPLAIN"
     explain_options = frozenset(
@@ -32,7 +34,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             "BUFFERS",
             "COSTS",
             "GENERIC_PLAN",
+            "MEMORY",
             "SETTINGS",
+            "SERIALIZE",
             "SUMMARY",
             "TIMING",
             "VERBOSE",
@@ -146,12 +150,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the tuple of returned data.
-        """
-        return cursor.fetchall()
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        if isinstance(placeholder_rows, InsertUnnest):
+            return f"SELECT * FROM {placeholder_rows}"
+        return super().bulk_insert_sql(fields, placeholder_rows)
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = "%s"
@@ -212,8 +214,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ["%s;" % " ".join(sql_parts)]
 
     def sequence_reset_by_name_sql(self, style, sequences):
-        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
-        # to reset sequence indices
+        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL
+        # statements to reset sequence indices
         sql = []
         for sequence_info in sequences:
             table_name = sequence_info["table"]
@@ -315,19 +317,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                 return cursor.query.decode()
             return None
 
-    def return_insert_columns(self, fields):
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
-
     if is_psycopg3:
 
         def adapt_integerfield_value(self, value, internal_type):
@@ -341,10 +330,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def adapt_datetimefield_value(self, value):
         return value
 
-    def adapt_timefield_value(self, value):
+    def adapt_durationfield_value(self, value):
         return value
 
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+    def adapt_timefield_value(self, value):
         return value
 
     def adapt_ipaddressfield_value(self, value):
@@ -365,6 +354,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def explain_query_prefix(self, format=None, **options):
         extra = {}
+        if serialize := options.pop("serialize", None):
+            if serialize.upper() in {"TEXT", "BINARY"}:
+                extra["SERIALIZE"] = serialize.upper()
         # Normalize options.
         if options:
             options = {

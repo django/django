@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.db import connection, transaction
+from django.db.models import FETCH_PEERS
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -74,7 +74,8 @@ class ManyToManyTests(TestCase):
             with transaction.atomic():
                 a6.publications.add(a5)
 
-        # Add a Publication directly via publications.add by using keyword arguments.
+        # Add a Publication directly via publications.add by using keyword
+        # arguments.
         p5 = a6.publications.create(title="Highlights for Adults")
         self.assertSequenceEqual(
             a6.publications.all(),
@@ -257,8 +258,8 @@ class ManyToManyTests(TestCase):
             [self.a1, self.a3, self.a2, self.a4],
         )
 
-        # Excluding a related item works as you would expect, too (although the SQL
-        # involved is a little complex).
+        # Excluding a related item works as you would expect, too (although the
+        # SQL involved is a little complex).
         self.assertSequenceEqual(
             Article.objects.exclude(publications=self.p2),
             [self.a1],
@@ -325,7 +326,8 @@ class ManyToManyTests(TestCase):
         )
 
     def test_bulk_delete(self):
-        # Bulk delete some Publications - references to deleted publications should go
+        # Bulk delete some Publications - references to deleted publications
+        # should go
         Publication.objects.filter(title__startswith="Science").delete()
         self.assertSequenceEqual(
             Publication.objects.all(),
@@ -577,16 +579,6 @@ class ManyToManyTests(TestCase):
             )
         self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
 
-    def test_get_prefetch_queryset_warning(self):
-        articles = Article.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            self.a1.publications.get_prefetch_queryset(articles)
-        self.assertEqual(ctx.filename, __file__)
-
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         articles = Article.objects.all()
         msg = (
@@ -597,6 +589,46 @@ class ManyToManyTests(TestCase):
                 instances=articles,
                 querysets=[Publication.objects.all(), Publication.objects.all()],
             )
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        a = Article.objects.fetch_mode(FETCH_PEERS).get(pk=self.a1.pk)
+        self.assertEqual(a._state.fetch_mode, FETCH_PEERS)
+        p = a.publications.earliest("pk")
+        self.assertEqual(
+            p._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        articles = list(Article.objects.fetch_mode(FETCH_PEERS))
+        a = articles[0]
+        self.assertEqual(a._state.fetch_mode, FETCH_PEERS)
+        publications = list(a.publications.all())
+        p = publications[0]
+        self.assertEqual(
+            p._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        p1 = Publication.objects.fetch_mode(FETCH_PEERS).get(pk=self.p1.pk)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        a = p1.article_set.earliest("pk")
+        self.assertEqual(
+            a._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        publications = list(Publication.objects.fetch_mode(FETCH_PEERS))
+        p = publications[0]
+        self.assertEqual(p._state.fetch_mode, FETCH_PEERS)
+        articles = list(p.article_set.all())
+        a = articles[0]
+        self.assertEqual(
+            a._state.fetch_mode,
+            FETCH_PEERS,
+        )
 
 
 class ManyToManyQueryTests(TestCase):

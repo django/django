@@ -1,5 +1,5 @@
-from django.db import NotSupportedError
 from django.db.models.expressions import ColPairs
+from django.db.models.fields import composite
 from django.db.models.fields.tuple_lookups import TupleIn, tuple_lookups
 from django.db.models.lookups import (
     Exact,
@@ -16,10 +16,10 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
 
     if isinstance(value, Model):
-        if value.pk is None:
+        if not value._is_pk_set():
             raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
-        sources = lhs.output_field.path_infos[-1].target_fields
+        sources = composite.unnest(lhs.output_field.path_infos[-1].target_fields)
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:
                 source = source.remote_field.model._meta.get_field(
@@ -28,9 +28,11 @@ def get_normalized_value(value, lhs):
             try:
                 value_list.append(getattr(value, source.attname))
             except AttributeError:
-                # A case like Restaurant.objects.filter(place=restaurant_instance),
-                # where place is a OneToOneField and the primary key of Restaurant.
-                return (value.pk,)
+                # A case like
+                # Restaurant.objects.filter(place=restaurant_instance), where
+                # place is a OneToOneField and the primary key of Restaurant.
+                pk = value.pk
+                return pk if isinstance(pk, tuple) else (pk,)
         return tuple(value_list)
     if not isinstance(value, tuple):
         return (value,)
@@ -39,7 +41,16 @@ def get_normalized_value(value, lhs):
 
 class RelatedIn(In):
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, ColPairs):
+        from django.db.models.sql.query import Query  # avoid circular import
+
+        if isinstance(self.lhs, ColPairs):
+            if (
+                isinstance(self.rhs, Query)
+                and not self.rhs.has_select_fields
+                and self.lhs.output_field.related_model is self.rhs.model
+            ):
+                self.rhs.set_values([f.name for f in self.lhs.sources])
+        else:
             if self.rhs_is_direct_value():
                 # If we get here, we are dealing with single-column relations.
                 self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
@@ -74,25 +85,12 @@ class RelatedIn(In):
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
-            # For multicolumn lookups we need to build a multicolumn where clause.
-            # This clause is either a SubqueryConstraint (for values that need
-            # to be compiled to SQL) or an OR-combined list of
-            # (col1 = val1 AND col2 = val2 AND ...) clauses.
-            from django.db.models.sql.where import SubqueryConstraint
-
             if self.rhs_is_direct_value():
                 values = [get_normalized_value(value, self.lhs) for value in self.rhs]
                 lookup = TupleIn(self.lhs, values)
-                return compiler.compile(lookup)
             else:
-                return compiler.compile(
-                    SubqueryConstraint(
-                        self.lhs.alias,
-                        [target.column for target in self.lhs.targets],
-                        [source.name for source in self.lhs.sources],
-                        self.rhs,
-                    ),
-                )
+                lookup = TupleIn(self.lhs, self.rhs)
+            return compiler.compile(lookup)
 
         return super().as_sql(compiler, connection)
 
@@ -104,10 +102,10 @@ class RelatedLookupMixin:
         ):
             # If we get here, we are dealing with single-column relations.
             self.rhs = get_normalized_value(self.rhs, self.lhs)[0]
-            # We need to run the related field's get_prep_value(). Consider case
-            # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
-            # doesn't have validation for non-integers, so we must run validation
-            # using the target field.
+            # We need to run the related field's get_prep_value(). Consider
+            # case ForeignKey to IntegerField given value 'abc'. The ForeignKey
+            # itself doesn't have validation for non-integers, so we must run
+            # validation using the target field.
             if self.prepare_rhs and hasattr(self.lhs.output_field, "path_infos"):
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.
@@ -119,7 +117,7 @@ class RelatedLookupMixin:
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
             if not self.rhs_is_direct_value():
-                raise NotSupportedError(
+                raise ValueError(
                     f"'{self.lookup_name}' doesn't support multi-column subqueries."
                 )
             self.rhs = get_normalized_value(self.rhs, self.lhs)

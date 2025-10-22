@@ -5,7 +5,6 @@ from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
 from django.test import TestCase
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Answer, Post, Question
 
@@ -16,13 +15,16 @@ class GenericForeignKeyTests(TestCase):
         class Model(models.Model):
             field = GenericForeignKey()
 
-        self.assertEqual(str(Model.field), "contenttypes_tests.Model.field")
+        field = Model._meta.get_field("field")
+
+        self.assertEqual(str(field), "contenttypes_tests.Model.field")
 
     def test_get_content_type_no_arguments(self):
+        field = Answer._meta.get_field("question")
         with self.assertRaisesMessage(
             Exception, "Impossible arguments to GFK.get_content_type!"
         ):
-            Answer.question.get_content_type()
+            field.get_content_type()
 
     def test_get_object_cache_respects_deleted_objects(self):
         question = Question.objects.create(text="Who?")
@@ -57,6 +59,16 @@ class GenericForeignKeyTests(TestCase):
         self.assertIsNot(answer.question, old_question_obj)
         self.assertEqual(answer.question, old_question_obj)
 
+    def test_clear_cached_generic_relation_when_deferred(self):
+        question = Question.objects.create(text="question")
+        Answer.objects.create(text="answer", question=question)
+        answer = Answer.objects.defer("text").get()
+        old_question_obj = answer.question
+        # The reverse relation is refreshed even when the text field is
+        # deferred.
+        answer.refresh_from_db()
+        self.assertIsNot(answer.question, old_question_obj)
+
 
 class GenericRelationTests(TestCase):
     def test_value_to_string(self):
@@ -88,29 +100,6 @@ class DeferredGenericRelationTests(TestCase):
         obj.text  # Accessing a deferred field.
         with self.assertNumQueries(0):
             obj.question
-
-
-class GetPrefetchQuerySetDeprecation(TestCase):
-    def test_generic_relation_warning(self):
-        Question.objects.create(text="test")
-        questions = Question.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            questions[0].answer_set.get_prefetch_queryset(questions)
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_generic_foreign_key_warning(self):
-        answers = Answer.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Answer.question.get_prefetch_queryset(answers)
-        self.assertEqual(ctx.filename, __file__)
 
 
 class GetPrefetchQuerySetsTests(TestCase):

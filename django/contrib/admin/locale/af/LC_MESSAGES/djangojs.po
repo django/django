@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019,2023
+# F Wolff <friedel@translate.org.za>, 2019,2023,2025
 # Pi Delport <pjdelport@gmail.com>, 2013
 # Pi Delport <pjdelport@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023,2025\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -25,11 +25,8 @@ msgstr "Beskikbare %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Hierdie is die lys beskikbare %s. Kies gerus deur hulle in die boksie "
-"hieronder te merk en dan die “Kies”-knoppie tussen die boksies te klik."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Kies %s deur hulle te merk en klik dan die \"Kies\"-pylknoppie"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -38,18 +35,17 @@ msgstr "Tik in hierdie blokkie om die lys beskikbare %s te filtreer."
 msgid "Filter"
 msgstr "Filteer"
 
-msgid "Choose all"
-msgstr "Kies almal"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Kies alle %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klik om al die %s gelyktydig te kies."
+msgid "Choose selected %s"
+msgstr "Kies gemerkte %s"
 
-msgid "Choose"
-msgstr "Kies"
-
-msgid "Remove"
-msgstr "Verwyder"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -57,28 +53,26 @@ msgstr "Gekose %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Hierdie is die lys gekose %s. Verwyder gerus deur hulle in die boksie "
-"hieronder te merk en dan die “Verwyder”-knoppie tussen die boksies te klik."
+"Verwyder %s deur hulle te merk en klik dan die \"Verwyder\"-pylknoppie."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Tik in hierdie blokkie om die lys gekose %s te filtreer."
 
-msgid "Remove all"
-msgstr "Verwyder almal"
+msgid "(click to clear)"
+msgstr "(klik vir skoon lys)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klik om al die %s gelyktydig te verwyder."
+msgid "Remove all %s"
+msgstr "Verwyder alle %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s gemerkte keuse onsigbaar"
+msgstr[1] "%s gemerkte keuses onsigbaar"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -316,9 +310,3 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Wys"
-
-msgid "Hide"
-msgstr "Versteek"

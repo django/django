@@ -2,7 +2,7 @@ import base64
 import re
 import unicodedata
 from binascii import Error as BinasciiError
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import formatdate
 from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
@@ -24,6 +24,7 @@ ETAG_MATCH = _lazy_re_compile(
     re.X,
 )
 
+MAX_HEADER_LENGTH = 10_000
 MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
 __D = r"(?P<day>[0-9]{2})"
 __D2 = r"(?P<day>[ 0-9][0-9])"
@@ -37,6 +38,7 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
+MAX_URL_LENGTH = 2048
 
 
 def urlencode(query, doseq=False):
@@ -115,7 +117,7 @@ def parse_http_date(date):
     try:
         year = int(m["year"])
         if year < 100:
-            current_year = datetime.now(tz=timezone.utc).year
+            current_year = datetime.now(tz=UTC).year
             current_century = current_year - (current_year % 100)
             if year - (current_year % 100) > 50:
                 # year that appears to be more than 50 years in the future are
@@ -128,7 +130,7 @@ def parse_http_date(date):
         hour = int(m["hour"])
         min = int(m["min"])
         sec = int(m["sec"])
-        result = datetime(year, month, day, hour, min, sec, tzinfo=timezone.utc)
+        result = datetime(year, month, day, hour, min, sec, tzinfo=UTC)
         return int(result.timestamp())
     except Exception as exc:
         raise ValueError("%r is not a valid date" % date) from exc
@@ -272,16 +274,19 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlsplit is not so flexible. Treat any url with three slashes as unsafe.
-    if url.startswith("///"):
+    if url.startswith("///") or len(url) > MAX_URL_LENGTH:
+        # urlsplit does not perform validation of inputs. Unicode normalization
+        # is very slow on Windows and can be a DoS attack vector.
+        # https://docs.python.org/3/library/urllib.parse.html#url-parsing-security
         return False
     try:
         url_info = urlsplit(url)
     except ValueError:  # e.g. invalid IPv6 addresses
         return False
-    # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
-    # In that URL, example.com is not the hostname but, a path component. However,
-    # Chrome will still consider example.com to be the hostname, so we must not
-    # allow this syntax.
+    # Forbid URLs like http:///example.com - with a scheme, but without a
+    # hostname. In that URL, example.com is not the hostname but, a path
+    # component. However, Chrome will still consider example.com to be the
+    # hostname, so we must not allow this syntax.
     if not url_info.netloc and url_info.scheme:
         return False
     # Forbid URLs that start with control characters. Some browsers (like
@@ -323,11 +328,19 @@ def _parseparam(s):
         s = s[end:]
 
 
-def parse_header_parameters(line):
+def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     """
     Parse a Content-type like header.
     Return the main content-type and a dictionary of options.
+
+    If `line` is longer than `max_length`, `ValueError` is raised.
     """
+    if not line:
+        return "", {}
+
+    if max_length is not None and len(line) > max_length:
+        raise ValueError("Unable to parse header parameters (value too long).")
+
     parts = _parseparam(";" + line)
     key = parts.__next__().lower()
     pdict = {}
@@ -337,7 +350,7 @@ def parse_header_parameters(line):
             has_encoding = False
             name = p[:i].strip().lower()
             if name.endswith("*"):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # Embedded lang/encoding, like "filename*=UTF-8''file.ext".
                 # https://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
                 if p.count("'") == 2:
@@ -362,10 +375,19 @@ def content_disposition_header(as_attachment, filename):
         disposition = "attachment" if as_attachment else "inline"
         try:
             filename.encode("ascii")
+            is_ascii = True
+        except UnicodeEncodeError:
+            is_ascii = False
+        # Quoted strings can contain horizontal tabs, space characters, and
+        # characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
+        # can still be expressed but must be escaped with their own `\`.
+        # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
+        quotable_characters = r"^[\t \x21-\x7e]*$"
+        if is_ascii and re.match(quotable_characters, filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")
             )
-        except UnicodeEncodeError:
+        else:
             file_expr = "filename*=utf-8''{}".format(quote(filename))
         return f"{disposition}; {file_expr}"
     elif as_attachment:
