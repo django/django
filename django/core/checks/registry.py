@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from itertools import chain
 
+from django.db import connections
 from django.utils.inspect import func_accepts_kwargs
 
 
@@ -84,6 +85,9 @@ class CheckRegistry:
 
         if tags is not None:
             checks = [check for check in checks if not set(check.tags).isdisjoint(tags)]
+
+        if databases is None:
+            databases = list(connections)
 
         for check in checks:
             new_errors = check(app_configs=app_configs, databases=databases)

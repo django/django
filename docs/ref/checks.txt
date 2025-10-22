@@ -83,6 +83,13 @@ Django's system checks are organized using the following tags:
   regular checks do. They are only run by the :djadmin:`migrate` command or if
   you specify configured database aliases using the ``--database`` option when
   calling the :djadmin:`check` command.
+
+  .. versionchanged:: 6.0
+
+     Management commands now default to running checks against all configured
+     databases. Previously, database checks were only run by the
+     :djadmin:`migrate` command or when explicitly requested via the
+     ``--database`` option.
 * ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.

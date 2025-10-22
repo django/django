@@ -118,7 +118,14 @@ Specifies the database to run checks requiring database access:
 
     django-admin check --database default --database other
 
-By default, these checks will not be run.
+.. versionchanged:: 6.0
+
+   Management commands now default to running checks against all configured
+   databases. Previously, database checks were only run by the migrate
+   command or when explicitly requested via the ``--database`` option.
+
+   The ``--database`` option now limits checks to only run against the
+   specified aliases instead of enabling them for those aliases.
 
 .. django-admin-option:: --list-tags
 
