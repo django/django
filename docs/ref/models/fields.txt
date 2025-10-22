@@ -1699,11 +1699,11 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
-    emulate the behavior of the SQL constraint specified by the
-    :attr:`on_delete` argument. For example, if you have a nullable
-    :class:`ForeignKey` and you want it to be set null when the referenced
-    object is deleted::
+    When an object referenced by a :class:`ForeignKey` is deleted, the
+    referring objects need updating. The :attr:`on_delete` argument specifies
+    how this is done, and whether Django or your database makes the updates.
+    For example, if you have a nullable :class:`ForeignKey` and you want Django
+    to set it to ``None`` when the referenced object is deleted::
 
         user = models.ForeignKey(
             User,
@@ -1712,8 +1712,21 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create an SQL constraint in the database. Support for
-    database-level cascade options :ticket:`may be implemented later <21961>`.
+    The possible values for :attr:`~ForeignKey.on_delete` are listed below.
+    Import them from :mod:`django.db.models`. The ``DB_*`` variants use the
+    database to prevent deletions or update referring objects, whilst the other
+    values make Django perform the relevant actions.
+
+    The database variants are more efficient because they avoid fetching
+    related objects, but ``pre_delete`` and ``post_delete`` signals won't be
+    sent when ``DB_CASCADE`` is used.
+
+    The database variants cannot be mixed with Python variants (other than
+    :attr:`DO_NOTHING`) in the same model and in models related to each other.
+
+.. versionchanged:: 6.1
+
+    Support for ``DB_*`` variants of the ``on_delete`` attribute was added.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
@@ -1728,6 +1741,13 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :data:`~django.db.models.signals.pre_delete` and
     :data:`~django.db.models.signals.post_delete` signals are sent for all
     deleted objects.
+
+* .. attribute:: DB_CASCADE
+
+    .. versionadded:: 6.1
+
+    Cascade deletes. Database-level version of :attr:`CASCADE`: the database
+    deletes referred-to rows and the one containing the ``ForeignKey``.
 
 * .. attribute:: PROTECT
 
@@ -1782,10 +1802,29 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Set the :class:`ForeignKey` null; this is only possible if
     :attr:`~Field.null` is ``True``.
 
+* .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 6.1
+
+    Set the :class:`ForeignKey` value to ``NULL``. This is only possible if
+    :attr:`~Field.null` is ``True``. Database-level version of
+    :attr:`SET_NULL`.
+
 * .. attribute:: SET_DEFAULT
 
     Set the :class:`ForeignKey` to its default value; a default for the
     :class:`ForeignKey` must be set.
+
+* .. attribute:: DB_SET_DEFAULT
+
+    .. versionadded:: 6.1
+
+    Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value,
+    which must be set. If a row in the referenced table is deleted, the foreign
+    key values in the referencing table will be updated to their
+    :attr:`Field.db_default` values.
+
+    ``DB_SET_DEFAULT`` is not supported on MySQL and MariaDB.
 
 * .. function:: SET()
 

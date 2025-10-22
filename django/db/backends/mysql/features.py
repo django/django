@@ -44,6 +44,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
+    supports_on_delete_db_default = False
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     # COLLATE must be wrapped in parentheses because MySQL treats COLLATE as an

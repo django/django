@@ -13,7 +13,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
-        "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+        "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s DEFERRABLE INITIALLY "
+        "DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
@@ -338,10 +339,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.delete_model(field.remote_field.through)
             # For explicit "through" M2M fields, do nothing
         elif (
-            self.connection.features.can_alter_table_drop_column
             # Primary keys, unique fields, indexed fields, and foreign keys are
             # not supported in ALTER TABLE DROP COLUMN.
-            and not field.primary_key
+            not field.primary_key
             and not field.unique
             and not field.db_index
             and not (field.remote_field and field.db_constraint)

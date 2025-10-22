@@ -81,6 +81,28 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
+class DatabaseOnDelete:
+    def __init__(self, operation, name, forced_collector=None):
+        self.operation = operation
+        self.forced_collector = forced_collector
+        self.__name__ = name
+
+    __call__ = DO_NOTHING
+
+    def on_delete_sql(self, schema_editor):
+        return schema_editor.connection.ops.fk_on_delete_sql(self.operation)
+
+    def __str__(self):
+        return self.__name__
+
+
+DB_CASCADE = DatabaseOnDelete("CASCADE", "DB_CASCADE", CASCADE)
+DB_SET_DEFAULT = DatabaseOnDelete("SET DEFAULT", "DB_SET_DEFAULT")
+DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
+
+SKIP_COLLECTION = frozenset([DO_NOTHING, DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL])
+
+
 def get_candidate_relations_to_delete(opts):
     # The candidate relations are the ones that come from N-1 and 1-1
     # relations. N-N  (i.e., many-to-many) relations aren't candidates for
@@ -93,10 +115,12 @@ def get_candidate_relations_to_delete(opts):
 
 
 class Collector:
-    def __init__(self, using, origin=None):
+    def __init__(self, using, origin=None, force_collection=False):
         self.using = using
         # A Model or QuerySet object.
         self.origin = origin
+        # Force collecting objects for deletion on the Python-level.
+        self.force_collection = force_collection
         # Initially, {model: {instances}}, later values become lists.
         self.data = defaultdict(set)
         # {(field, value): [instances, …]}
@@ -194,6 +218,8 @@ class Collector:
         skipping parent -> child -> parent chain preventing fast delete of
         the child.
         """
+        if self.force_collection:
+            return False
         if from_field and from_field.remote_field.on_delete is not CASCADE:
             return False
         if hasattr(objs, "_meta"):
@@ -215,7 +241,7 @@ class Collector:
             and
             # Foreign keys pointing to this model.
             all(
-                related.field.remote_field.on_delete is DO_NOTHING
+                related.field.remote_field.on_delete in SKIP_COLLECTION
                 for related in get_candidate_relations_to_delete(opts)
             )
             and (
@@ -316,8 +342,13 @@ class Collector:
                 continue
             field = related.field
             on_delete = field.remote_field.on_delete
-            if on_delete == DO_NOTHING:
-                continue
+            if on_delete in SKIP_COLLECTION:
+                if self.force_collection and (
+                    forced_on_delete := getattr(on_delete, "forced_collector", None)
+                ):
+                    on_delete = forced_on_delete
+                else:
+                    continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):
                 model_fast_deletes[related_model].append(field)

@@ -226,8 +226,9 @@ and :meth:`~django.db.models.query.QuerySet.prefetch_related`. Understand their
 documentation thoroughly and apply them where needed.
 
 It may be useful to apply these methods in :doc:`managers and default managers
-</topics/db/managers>`. Be aware when your manager is and is not used;
-sometimes this is tricky so don't make assumptions.
+</topics/db/managers>`. Be aware when your manager is and is not used; for
+example, related object access :ref:`uses the base manager
+<managers-for-related-objects>` rather than the default manager.
 
 Use ``prefetch_related_objects()``
 ----------------------------------

@@ -299,9 +299,15 @@ Related fields
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
   related model ``<app label>.<model>``.
-* **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
-* **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
-  default value.
+* **fields.E320**: Field specifies ``on_delete=<set null option>``, but cannot
+  be null.
+* **fields.E321**: Field specifies ``on_delete=SET_DEFAULT``, but has no
+  ``default`` value.
+* **fields.E322**: Field specifies ``on_delete=DB_SET_DEFAULT``, but has no
+  ``db_default`` value.
+* **fields.E323**: Field specifies database/Python-level on_delete variant, but
+  referenced model uses python/database-level variant.
+* **fields.E324**: ``<database>`` does not support ``DB_SET_DEFAULT``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
@@ -446,6 +452,8 @@ Models
 * **models.E049**: ``constraints/indexes/unique_together`` refers to a
   ``ForeignObject`` ``<field name>`` with multiple ``from_fields``, which is
   not supported for that option.
+* **models.E050**: The model cannot have related fields with both
+  database-level and Python-level ``on_delete`` variants.
 
 Management Commands
 -------------------
@@ -921,6 +929,8 @@ The following checks are performed when a model contains a
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
 * **contenttypes.E005**: Model names must be at most 100 characters.
+* **contenttypes.E006**: ``<field>`` cannot use the database-level
+  ``on_delete`` variant.
 
 ``postgres``
 ------------

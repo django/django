@@ -121,7 +121,7 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_fk = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
+        "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_create_column_inline_fk = None
@@ -241,6 +241,7 @@ class BaseDatabaseSchemaEditor:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
                         "to_column": self.quote_name(to_column),
+                        "on_delete_db": self._create_on_delete_sql(model, field),
                     }
                 elif self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(
@@ -759,6 +760,7 @@ class BaseDatabaseSchemaEditor:
                     "to_table": self.quote_name(to_table),
                     "to_column": self.quote_name(to_column),
                     "deferrable": self.connection.ops.deferrable_sql(),
+                    "on_delete_db": self._create_on_delete_sql(model, field),
                 }
             # Otherwise, add FK constraints later.
             else:
@@ -1628,6 +1630,13 @@ class BaseDatabaseSchemaEditor:
             new_name=self.quote_name(new_name),
         )
 
+    def _create_on_delete_sql(self, model, field):
+        remote_field = field.remote_field
+        try:
+            return remote_field.on_delete.on_delete_sql(self)
+        except AttributeError:
+            return ""
+
     def _index_columns(self, table, columns, col_suffixes, opclasses):
         return Columns(table, columns, self.quote_name, col_suffixes=col_suffixes)
 
@@ -1740,6 +1749,7 @@ class BaseDatabaseSchemaEditor:
             to_table=to_table,
             to_column=to_column,
             deferrable=deferrable,
+            on_delete_db=self._create_on_delete_sql(model, field),
         )
 
     def _fk_constraint_name(self, model, field, suffix):

@@ -133,5 +133,5 @@ class TestUtils(AdminDocsSimpleTestCase):
         )
         source = "reST, `interpreted text`, default role."
         markup = "<p>reST, <cite>interpreted text</cite>, default role.</p>\n"
-        parts = docutils.core.publish_parts(source=source, writer_name="html4css1")
+        parts = docutils.core.publish_parts(source=source, writer="html4css1")
         self.assertEqual(parts["fragment"], markup)
