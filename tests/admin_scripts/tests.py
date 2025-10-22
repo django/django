@@ -2855,8 +2855,17 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         test_manage_py = os.path.join(testproject_dir, "manage.py")
         with open(test_manage_py) as fp:
             content = fp.read()
-            self.assertIn('project_name = "another_project"', content)
-            self.assertIn('project_directory = "%s"' % testproject_dir, content)
+
+        expected = (
+            'project_name = "another_project"\n'
+            f'project_directory = "{testproject_dir}"'
+        )
+        if HAS_BLACK:
+            import black
+
+            expected = black.format_str(expected, mode=black.FileMode())
+
+        self.assertIn(expected, content)
 
     def test_no_escaping_of_project_variables(self):
         "Make sure template context variables are not html escaped"
