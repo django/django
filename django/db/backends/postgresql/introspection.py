@@ -3,7 +3,7 @@ from collections import namedtuple
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.models import Index
+from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING, Index
 
 FieldInfo = namedtuple("FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "comment"])
 TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
@@ -37,6 +37,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     index_default_access_method = "btree"
 
     ignored_tables = []
+
+    on_delete_types = {
+        "a": DO_NOTHING,
+        "c": DB_CASCADE,
+        "d": DB_SET_DEFAULT,
+        "n": DB_SET_NULL,
+        # DB_RESTRICT - "r" is not supported.
+    }
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
@@ -154,12 +162,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table,
-        other_table)} representing all foreign keys in the given table.
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
+        representing all foreign keys in the given table.
         """
         cursor.execute(
             """
-            SELECT a1.attname, c2.relname, a2.attname
+            SELECT a1.attname, c2.relname, a2.attname, con.confdeltype
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
@@ -175,7 +186,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """,
             [table_name],
         )
-        return {row[0]: (row[2], row[1]) for row in cursor.fetchall()}
+        return {
+            row[0]: (row[2], row[1], self.on_delete_types.get(row[3]))
+            for row in cursor.fetchall()
+        }
 
     def get_constraints(self, cursor, table_name):
         """

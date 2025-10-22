@@ -161,3 +161,11 @@ class CompositePKModel(models.Model):
     pk = models.CompositePrimaryKey("column_1", "column_2")
     column_1 = models.IntegerField()
     column_2 = models.IntegerField()
+
+
+class DbOnDeleteModel(models.Model):
+    fk_do_nothing = models.ForeignKey(UniqueTogether, on_delete=models.DO_NOTHING)
+    fk_db_cascade = models.ForeignKey(ColumnTypes, on_delete=models.DB_CASCADE)
+    fk_set_null = models.ForeignKey(
+        DigitsInColumnName, on_delete=models.DB_SET_NULL, null=True
+    )

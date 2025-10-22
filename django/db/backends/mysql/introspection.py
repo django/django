@@ -6,8 +6,9 @@ from MySQLdb.constants import FIELD_TYPE
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.models import Index
+from django.db.models import DO_NOTHING, Index
 from django.utils.datastructures import OrderedSet
+from django.utils.functional import cached_property
 
 FieldInfo = namedtuple(
     "FieldInfo",
@@ -52,6 +53,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.LONG_BLOB: "TextField",
         FIELD_TYPE.VAR_STRING: "CharField",
     }
+
+    @cached_property
+    def on_delete_types(self):
+        on_delete_types = super().on_delete_types
+        if self.connection.mysql_is_mariadb:
+            # On MariaDB "NO ACTION" and "RESTRICT" are synonyms.
+            on_delete_types["RESTRICT"] = DO_NOTHING
+        return on_delete_types
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
@@ -196,24 +205,36 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table,
-        other_table)} representing all foreign keys in the given table.
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
+        representing all foreign keys in the given table.
         """
         cursor.execute(
             """
-            SELECT column_name, referenced_column_name, referenced_table_name
-            FROM information_schema.key_column_usage
-            WHERE table_name = %s
-                AND table_schema = DATABASE()
-                AND referenced_table_schema = DATABASE()
-                AND referenced_table_name IS NOT NULL
-                AND referenced_column_name IS NOT NULL
+            SELECT
+                kcu.column_name,
+                kcu.referenced_column_name,
+                kcu.referenced_table_name,
+                rc.delete_rule
+            FROM
+                information_schema.key_column_usage kcu
+            JOIN
+                information_schema.referential_constraints rc
+                ON rc.constraint_name = kcu.constraint_name
+                AND rc.constraint_schema = kcu.constraint_schema
+            WHERE kcu.table_name = %s
+                AND kcu.table_schema = DATABASE()
+                AND kcu.referenced_table_schema = DATABASE()
+                AND kcu.referenced_table_name IS NOT NULL
+                AND kcu.referenced_column_name IS NOT NULL
             """,
             [table_name],
         )
         return {
-            field_name: (other_field, other_table)
-            for field_name, other_field, other_table in cursor.fetchall()
+            field_name: (other_field, other_table, self.on_delete_types.get(on_delete))
+            for field_name, other_field, other_table, on_delete in cursor.fetchall()
         }
 
     def get_storage_engine(self, cursor, table_name):
