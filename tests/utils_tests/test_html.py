@@ -116,21 +116,20 @@ class TestUtilsHtml(SimpleTestCase):
                 self.check_output(linebreaks, lazystr(value), output)
 
     def test_strip_tags(self):
-        # Python fixed a quadratic-time issue in HTMLParser in 3.13.6, 3.12.12,
-        # 3.11.14, 3.10.19, and 3.9.24. The fix slightly changes HTMLParser's
-        # output, so tests for particularly malformed input must handle both
-        # old and new results. The check below is temporary until all supported
-        # Python versions and CI workers include the fix. See:
+        # Python fixed a quadratic-time issue in HTMLParser in 3.13.6, 3.12.12.
+        # The fix slightly changes HTMLParser's output, so tests for
+        # particularly malformed input must handle both old and new results.
+        # The check below is temporary until all supported Python versions and
+        # CI workers include the fix. See:
         # https://github.com/python/cpython/commit/6eb6c5db
         min_fixed = {
-            (3, 14): (3, 14),
             (3, 13): (3, 13, 6),
             (3, 12): (3, 12, 12),
-            (3, 11): (3, 11, 14),
-            (3, 10): (3, 10, 19),
-            (3, 9): (3, 9, 24),
         }
-        htmlparser_fixed = sys.version_info >= min_fixed[sys.version_info[:2]]
+        major_version = sys.version_info[:2]
+        htmlparser_fixed = sys.version_info >= min_fixed.get(
+            major_version, major_version
+        )
         items = (
             (
                 "<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>",
