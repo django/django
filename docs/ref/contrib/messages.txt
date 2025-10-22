@@ -91,6 +91,10 @@ To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
 ``_store`` methods.
 
+There is a method called `def _weak_request` at
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage`
+which will prevent a circular reference of the Request objects
+
 .. _message-level:
 
 Message levels

@@ -2,6 +2,8 @@ from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.messages.storage.session import SessionStorage
 
+import weakref
+
 
 class FallbackStorage(BaseStorage):
     """
@@ -13,6 +15,7 @@ class FallbackStorage(BaseStorage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._weak_request()
         self.storages = [
             storage_class(*args, **kwargs) for storage_class in self.storage_classes
         ]
@@ -54,3 +57,11 @@ class FallbackStorage(BaseStorage):
                 storage._store([], response)
                 self._used_storages.remove(storage)
         return messages
+
+    def _weak_request(self):
+        """
+        This method will collect the request objects when called
+        to prevent circular references
+        """
+        weak_request = weakref.ref(self.request)
+        return weak_request
