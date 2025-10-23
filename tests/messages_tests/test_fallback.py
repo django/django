@@ -1,5 +1,5 @@
-import random
 import gc
+import random
 
 from django.contrib.messages import constants
 from django.contrib.messages.storage.fallback import CookieStorage, FallbackStorage
