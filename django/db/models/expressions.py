@@ -758,18 +758,29 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         return combined_type()
 
     def as_sql(self, compiler, connection):
+        # We need output_field for specific combined operations
+        # AND we don't want to block the run in case of None
+        try:
+            output_field = self.output_field
+        except FieldError:
+            output_field = None
+        sql, params = self._compile_expressions(compiler)
+        sql = self._handle_operator(sql, connection, output_field=output_field)
+        return f"({sql})", params
+
+    def _compile_expressions(self, compiler):
         expressions = []
-        expression_params = []
-        sql, params = compiler.compile(self.lhs)
-        expressions.append(sql)
-        expression_params.extend(params)
-        sql, params = compiler.compile(self.rhs)
-        expressions.append(sql)
-        expression_params.extend(params)
-        # order of precedence
-        expression_wrapper = "(%s)"
-        sql = connection.ops.combine_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        params = []
+        for expr in [self.lhs, self.rhs]:
+            sql, param = compiler.compile(expr)
+            expressions.append(sql)
+            params.extend(param)
+        return expressions, params
+
+    def _handle_operator(self, expressions, connection, output_field=None):
+        return connection.ops.combine_expression(
+            self.connector, expressions, output_field=output_field
+        )
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
