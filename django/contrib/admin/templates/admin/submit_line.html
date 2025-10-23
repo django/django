@@ -7,11 +7,11 @@
 {% if show_save_and_continue %}<input type="submit" value="{% if can_change %}{% translate 'Save and continue editing' %}{% else %}{% translate 'Save and view' %}{% endif %}" name="_continue">{% endif %}
 {% if show_close %}
     {% url opts|admin_urlname:'changelist' as changelist_url %}
-    <a role="button" href="{% add_preserved_filters changelist_url %}" class="closelink">{% translate 'Close' %}</a>
+    <a href="{% add_preserved_filters changelist_url %}" class="closelink">{% translate 'Close' %}</a>
 {% endif %}
 {% if show_delete_link and original %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <a role="button" href="{% add_preserved_filters delete_url %}" class="deletelink">{% translate "Delete" %}</a>
+    <a href="{% add_preserved_filters delete_url %}" class="deletelink">{% translate "Delete" %}</a>
 {% endif %}
 {% endblock %}
 </div>

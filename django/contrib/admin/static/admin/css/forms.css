@@ -486,8 +486,14 @@ body.popup .submit-row {
     border-bottom: 1px solid var(--hairline-color);
 }
 
-.inline-group div.add-row a,
-.inline-group .tabular tr.add-row td a {
+.inline-group div.add-row button,
+.inline-group .tabular tr.add-row td button {
+    background: none;
+    border: none;
+    padding-left: 16px;
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+    cursor: pointer;
+    color: var(--link-fg);
     font-size: 0.75rem;
 }
 
