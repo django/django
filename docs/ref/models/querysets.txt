@@ -3188,6 +3188,8 @@ As a convenience when no lookup type is provided (like in
 
 Exact match. If the value provided for comparison is ``None``, it will be
 interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they
+interpret ``None`` as JSON ``null`` instead.
 
 Examples::
 
