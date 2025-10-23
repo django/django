@@ -133,10 +133,21 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
+    .. versionchanged:: 5.2
+
+       The validator now follows the HTML5 specification and supports
+       internationalized email addresses with Unicode characters in the
+       local part.
+
     An :class:`EmailValidator` ensures that a value looks like an email, and
     raises a :exc:`~django.core.exceptions.ValidationError` with
     :attr:`message` and :attr:`code` if it doesn't. Values longer than 320
     characters are always considered invalid.
+    
+    The implementation is more permissive than in previous Django versions,
+    especially regarding Unicode characters in the local part of the email
+    address. For more restrictive validation, consider implementing a custom
+    validator.
 
     .. attribute:: message
 
