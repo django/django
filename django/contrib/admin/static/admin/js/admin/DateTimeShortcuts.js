@@ -21,9 +21,9 @@
         dismissCalendarFunc: [],
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
         calendarDivName2: 'calendarin', // name of <div> that contains calendar
-        calendarLinkName: 'calendarlink', // name of the link that is used to toggle
+        calendarButtonName: 'calendarbutton', // name of the button that is used to toggle
         clockDivName: 'clockbox', // name of clock <div> that gets toggled
-        clockLinkName: 'clocklink', // name of the link that is used to toggle
+        clockButtonName: 'clockbutton', // name of the button that is used to toggle
         shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
         timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
         timezoneOffset: 0,
@@ -108,18 +108,17 @@
             const shortcuts_span = document.createElement('span');
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
-            const now_link = document.createElement('a');
-            now_link.href = "#";
-            now_link.textContent = gettext('Now');
-            now_link.role = 'button';
-            now_link.addEventListener('click', function(e) {
+            const now_button = document.createElement('button');
+            now_button.type = 'button';
+            now_button.textContent = gettext('Now');
+            now_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleClockQuicklink(num, -1);
             });
-            const clock_link = document.createElement('a');
-            clock_link.href = '#';
-            clock_link.id = DateTimeShortcuts.clockLinkName + num;
-            clock_link.addEventListener('click', function(e) {
+            const clock_button = document.createElement('button');
+            clock_button.type = 'button';
+            clock_button.id = DateTimeShortcuts.clockButtonName + num;
+            clock_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 // avoid triggering the document click handler to dismiss the clock
                 e.stopPropagation();
@@ -127,14 +126,14 @@
             });
 
             quickElement(
-                'span', clock_link, '',
+                'span', clock_button, '',
                 'class', 'clock-icon',
                 'title', gettext('Choose a Time')
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
-            shortcuts_span.appendChild(now_link);
+            shortcuts_span.appendChild(now_button);
             shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            shortcuts_span.appendChild(clock_link);
+            shortcuts_span.appendChild(clock_button);
 
             // Create clock link div
             //
@@ -142,13 +141,13 @@
             // <div id="clockbox1" class="clockbox module">
             //     <h2>Choose a time</h2>
             //     <ul class="timelist">
-            //         <li><a href="#">Now</a></li>
-            //         <li><a href="#">Midnight</a></li>
-            //         <li><a href="#">6 a.m.</a></li>
-            //         <li><a href="#">Noon</a></li>
-            //         <li><a href="#">6 p.m.</a></li>
+            //         <li><button type="button">Now</button></li>
+            //         <li><button type="button">Midnight</button></li>
+            //         <li><button type="button">6 a.m.</button></li>
+            //         <li><button type="button">Noon</button></li>
+            //         <li><button type="button">6 p.m.</button></li>
             //     </ul>
-            //     <p class="calendar-cancel"><a href="#">Cancel</a></p>
+            //     <p class="calendar-cancel"><button type="button">Cancel</button></p>
             // </div>
 
             const clock_box = document.createElement('div');
@@ -167,8 +166,8 @@
             // where name is the name attribute of the <input>.
             const name = typeof DateTimeShortcuts.clockHours[inp.name] === 'undefined' ? 'default_' : inp.name;
             DateTimeShortcuts.clockHours[name].forEach(function(element) {
-                const time_link = quickElement('a', quickElement('li', time_list), gettext(element[0]), 'role', 'button', 'href', '#');
-                time_link.addEventListener('click', function(e) {
+                const time_button = quickElement('button', quickElement('li', time_list), gettext(element[0]), 'type', 'button');
+                time_button.addEventListener('click', function(e) {
                     e.preventDefault();
                     DateTimeShortcuts.handleClockQuicklink(num, element[1]);
                 });
@@ -176,8 +175,8 @@
 
             const cancel_p = quickElement('p', clock_box);
             cancel_p.className = 'calendar-cancel';
-            const cancel_link = quickElement('a', cancel_p, gettext('Cancel'), 'role', 'button', 'href', '#');
-            cancel_link.addEventListener('click', function(e) {
+            const cancel_button = quickElement('button', cancel_p, gettext('Cancel'), 'type', 'button');
+            cancel_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.dismissClock(num);
             });
@@ -192,19 +191,19 @@
         },
         openClock: function(num) {
             const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
-            const clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
+            const clock_button = document.getElementById(DateTimeShortcuts.clockButtonName + num);
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== 'rtl') {
-                clock_box.style.left = findPosX(clock_link) + 17 + 'px';
+                clock_box.style.left = findPosX(clock_button) + 17 + 'px';
             }
             else {
                 // since style's width is in em, it'd be tough to calculate
                 // px value of it. let's use an estimated px for now
-                clock_box.style.left = findPosX(clock_link) - 110 + 'px';
+                clock_box.style.left = findPosX(clock_button) - 110 + 'px';
             }
-            clock_box.style.top = Math.max(0, findPosY(clock_link) - 30) + 'px';
+            clock_box.style.top = Math.max(0, findPosY(clock_button) - 30) + 'px';
 
             // Show the clock box
             clock_box.style.display = 'block';
@@ -237,49 +236,51 @@
             const shortcuts_span = document.createElement('span');
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
-            const today_link = document.createElement('a');
-            today_link.href = '#';
-            today_link.role = 'button';
-            today_link.appendChild(document.createTextNode(gettext('Today')));
-            today_link.addEventListener('click', function(e) {
+            const today_button = document.createElement('button');
+            today_button.type = 'button';
+            today_button.appendChild(document.createTextNode(gettext('Today')));
+            today_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, 0);
             });
-            const cal_link = document.createElement('a');
-            cal_link.href = '#';
-            cal_link.id = DateTimeShortcuts.calendarLinkName + num;
-            cal_link.addEventListener('click', function(e) {
+            const cal_button = document.createElement('button');
+            cal_button.type = 'button';
+            cal_button.id = DateTimeShortcuts.calendarButtonName + num;
+            cal_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 // avoid triggering the document click handler to dismiss the calendar
                 e.stopPropagation();
                 DateTimeShortcuts.openCalendar(num);
             });
             quickElement(
-                'span', cal_link, '',
+                'span', cal_button, '',
                 'class', 'date-icon',
                 'title', gettext('Choose a Date')
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
-            shortcuts_span.appendChild(today_link);
+            shortcuts_span.appendChild(today_button);
             shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            shortcuts_span.appendChild(cal_link);
+            shortcuts_span.appendChild(cal_button);
 
             // Create calendarbox div.
             //
             // Markup looks like:
             //
             // <div id="calendarbox3" class="calendarbox module">
-            //     <h2>
-            //           <a href="#" class="link-previous">&lsaquo;</a>
-            //           <a href="#" class="link-next">&rsaquo;</a> February 2003
-            //     </h2>
+            //     <div>
+            //         <button type="button" class="calendarnav-previous">&lsaquo;</button>
+            //         <button type="button" class="calendarnav-next">&rsaquo;</button>
+            //     </div>
             //     <div class="calendar" id="calendarin3">
-            //         <!-- (cal) -->
+            //.        <table>
+            //             <caption>February 2003</caption>
+            //             <!-- (cal) -->
+            //         </table>
             //     </div>
             //     <div class="calendar-shortcuts">
-            //          <a href="#">Yesterday</a> | <a href="#">Today</a> | <a href="#">Tomorrow</a>
+            //          <button type="button">Yesterday</button> | <button type="button">Today</button> | <button type="button">Tomorrow</button>
             //     </div>
-            //     <p class="calendar-cancel"><a href="#">Cancel</a></p>
+            //     <p class="calendar-cancel"><button type="button">Cancel</button></p>
             // </div>
             const cal_box = document.createElement('div');
             cal_box.style.display = 'none';
@@ -291,14 +292,14 @@
 
             // next-prev links
             const cal_nav = quickElement('div', cal_box);
-            const cal_nav_prev = quickElement('a', cal_nav, '<', 'href', '#');
+            const cal_nav_prev = quickElement('button', cal_nav, '<', 'type', 'button');
             cal_nav_prev.className = 'calendarnav-previous';
             cal_nav_prev.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.drawPrev(num);
             });
 
-            const cal_nav_next = quickElement('a', cal_nav, '>', 'href', '#');
+            const cal_nav_next = quickElement('button', cal_nav, '>', 'type', 'button');
             cal_nav_next.className = 'calendarnav-next';
             cal_nav_next.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -314,20 +315,20 @@
             // calendar shortcuts
             const shortcuts = quickElement('div', cal_box);
             shortcuts.className = 'calendar-shortcuts';
-            let day_link = quickElement('a', shortcuts, gettext('Yesterday'), 'role', 'button', 'href', '#');
-            day_link.addEventListener('click', function(e) {
+            let day_button = quickElement('button', shortcuts, gettext('Yesterday'), 'type', 'button');
+            day_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, -1);
             });
             shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            day_link = quickElement('a', shortcuts, gettext('Today'), 'role', 'button', 'href', '#');
-            day_link.addEventListener('click', function(e) {
+            day_button = quickElement('button', shortcuts, gettext('Today'), 'type', 'button');
+            day_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, 0);
             });
             shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            day_link = quickElement('a', shortcuts, gettext('Tomorrow'), 'role', 'button', 'href', '#');
-            day_link.addEventListener('click', function(e) {
+            day_button = quickElement('button', shortcuts, gettext('Tomorrow'), 'type', 'button');
+            day_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, +1);
             });
@@ -335,8 +336,8 @@
             // cancel bar
             const cancel_p = quickElement('p', cal_box);
             cancel_p.className = 'calendar-cancel';
-            const cancel_link = quickElement('a', cancel_p, gettext('Cancel'), 'role', 'button', 'href', '#');
-            cancel_link.addEventListener('click', function(e) {
+            const cancel_button = quickElement('button', cancel_p, gettext('Cancel'), 'type', 'button');
+            cancel_button.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.dismissCalendar(num);
             });
@@ -350,7 +351,7 @@
         },
         openCalendar: function(num) {
             const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
-            const cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
+            const cal_link = document.getElementById(DateTimeShortcuts.calendarButtonName + num);
             const inp = DateTimeShortcuts.calendarInputs[num];
 
             // Determine if the current value in the input has a valid date.

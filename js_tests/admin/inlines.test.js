@@ -20,18 +20,18 @@ QUnit.module('admin.inlines: tabular formsets', {
 
 QUnit.test('no forms', function(assert) {
     assert.ok(this.inlineRow.hasClass('dynamic-first'));
-    assert.equal(this.table.find('.add-row a').text(), this.addText);
+    assert.equal(this.table.find('.add-row button').text(), this.addText);
 });
 
 QUnit.test('add form', function(assert) {
-    const addButton = this.table.find('.add-row a');
+    const addButton = this.table.find('.add-row button');
     assert.equal(addButton.text(), this.addText);
     addButton.click();
     assert.ok(this.table.find('#first-1'));
 });
 
 QUnit.test('added form has remove button', function(assert) {
-    const addButton = this.table.find('.add-row a');
+    const addButton = this.table.find('.add-row button');
     assert.equal(addButton.text(), this.addText);
     addButton.click();
     assert.equal(this.table.find('#first-1 .inline-deletelink').length, 1);
@@ -39,7 +39,7 @@ QUnit.test('added form has remove button', function(assert) {
 
 QUnit.test('add/remove form events', function(assert) {
     assert.expect(5);
-    const addButton = this.table.find('.add-row a');
+    const addButton = this.table.find('.add-row button');
     document.addEventListener('formset:added', (event) => {
         assert.ok(true, 'event `formset:added` triggered');
         assert.equal(true, event.target.matches('#first-1'));
@@ -67,7 +67,7 @@ QUnit.test('existing add button', function(assert) {
         deleteText: 'Remove',
         addButton: addButton
     });
-    assert.equal(this.table.find('.add-row a').length, 0);
+    assert.equal(this.table.find('.add-row button').length, 0);
     addButton.click();
     assert.ok(this.table.find('#first-1'));
 });
@@ -115,7 +115,7 @@ QUnit.test('removing a form-row also removed related row with non-field errors',
     const tr = this.inlineRows.slice(1, 2);
     const trWithErrors = tr.prev();
     assert.ok(trWithErrors.hasClass('row-form-errors'));
-    const deleteLink = tr.find('a.inline-deletelink');
+    const deleteLink = tr.find('button.inline-deletelink');
     deleteLink.trigger($.Event('click', {target: deleteLink}));
     assert.notOk(this.table.find('.row-form-errors').length);
 });
@@ -135,13 +135,13 @@ QUnit.module('admin.inlines: tabular formsets with max_num', {
 });
 
 QUnit.test('does not show the add button if already at max_num', function(assert) {
-    const addButton = this.table.find('tr.add_row > td > a');
+    const addButton = this.table.find('tr.add_row > td > button');
     assert.notOk(addButton.is(':visible'));
 });
 
 QUnit.test('make addButton visible again', function(assert) {
     const $ = django.jQuery;
-    const addButton = this.table.find('tr.add_row > td > a');
+    const addButton = this.table.find('tr.add_row > td > button');
     const removeButton = this.table.find('tr.form-row:first').find('a.inline-deletelink');
     removeButton.trigger($.Event( "click", { target: removeButton } ));
     assert.notOk(addButton.is(':visible'));
@@ -168,7 +168,7 @@ QUnit.test('does not show the remove buttons if already at min_num', function(as
 
 QUnit.test('make removeButtons visible again', function(assert) {
     const $ = django.jQuery;
-    const addButton = this.table.find('tr.add-row > td > a');
+    const addButton = this.table.find('tr.add-row > td > button');
     addButton.trigger($.Event( "click", { target: addButton } ));
     assert.equal(this.table.find('.inline-deletelink:visible').length, 2);
 });

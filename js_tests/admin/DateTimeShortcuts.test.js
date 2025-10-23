@@ -13,8 +13,8 @@ QUnit.test('init', function(assert) {
 
     const shortcuts = $('.datetimeshortcuts');
     assert.equal(shortcuts.length, 1);
-    assert.equal(shortcuts.find('a:first').text(), 'Today');
-    assert.equal(shortcuts.find('a:last .date-icon').length, 1);
+    assert.equal(shortcuts.find('button:first').text(), 'Today');
+    assert.equal(shortcuts.find('button:last .date-icon').length, 1);
 
     // To prevent incorrect timezone warnings on date/time widgets, timezoneOffset
     // should be 0 when a timezone offset isn't set in the HTML body attribute.
@@ -27,7 +27,7 @@ QUnit.test('custom time shortcuts', function(assert) {
     $('#qunit-fixture').append(timeField);
     DateTimeShortcuts.clockHours.time_test = [['3 a.m.', 3]];
     DateTimeShortcuts.init();
-    assert.equal($('.clockbox').find('a').first().text(), '3 a.m.');
+    assert.equal($('.clockbox').find('button').first().text(), '3 a.m.');
 });
 
 QUnit.test('time zone offset warning - single field', function(assert) {

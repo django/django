@@ -50,12 +50,12 @@
                     // If forms are laid out as table rows, insert the
                     // "add" button in a new table row:
                     const numCols = $this.eq(-1).children().length;
-                    $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a role="button" class="addlink" href="#">' + options.addText + "</a></tr>");
-                    addButton = $parent.find("tr:last a");
+                    $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><button class="addlink">' + options.addText + "</button></tr>");
+                    addButton = $parent.find("tr:last button");
                 } else {
                     // Otherwise, insert it immediately after the last form:
-                    $this.filter(":last").after('<div class="' + options.addCssClass + '"><a role="button" class="addlink" href="#">' + options.addText + "</a></div>");
-                    addButton = $this.filter(":last").next().find("a");
+                    $this.filter(":last").after('<div class="' + options.addCssClass + '"><button class="addlink">' + options.addText + "</button></div>");
+                    addButton = $this.filter(":last").next().find("button");
                 }
             }
             addButton.on('click', addInlineClickHandler);
@@ -104,18 +104,18 @@
             if (row.is("tr")) {
                 // If the forms are laid out in table rows, insert
                 // the remove button into the last table cell:
-                row.children(":last").append('<div><a role="button" class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></div>");
+                row.children(":last").append('<div><button class="' + options.deleteCssClass + '">' + options.deleteText + "</button></div>");
             } else if (row.is("ul") || row.is("ol")) {
                 // If they're laid out as an ordered/unordered list,
                 // insert an <li> after the last list item:
-                row.append('<li><a role="button" class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></li>");
+                row.append('<li><button class="' + options.deleteCssClass + '">' + options.deleteText + "</button></li>");
             } else {
                 // Otherwise, just insert the remove button as the
                 // last child element of the form's container:
-                row.children(":first").append('<span><a role="button" class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></span>");
+                row.children(":first").append('<span><button class="' + options.deleteCssClass + '">' + options.deleteText + "</button></span>");
             }
             // Add delete handler for each row.
-            row.find("a." + options.deleteCssClass).on('click', inlineDeleteHandler.bind(this));
+            row.find("button." + options.deleteCssClass).on('click', inlineDeleteHandler.bind(this));
         };
 
         const inlineDeleteHandler = function(e1) {
