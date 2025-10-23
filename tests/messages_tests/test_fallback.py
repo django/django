@@ -166,25 +166,18 @@ class FallbackTests(BaseTests, SimpleTestCase):
         """
         request = self.get_request()
         storage = self.storage_class(request)
-
         # Get the weak reference from your method
         weak_ref = storage._weak_request()
-
         # Test that it points to the same request
         self.assertIs(weak_ref(), storage.request)
         self.assertIs(weak_ref(), request)
-
         # Test garbage collection
         del request
         gc.collect()
-
         # Should still exist because storage holds reference
         self.assertIsNotNone(weak_ref())
-
         # Remove storage and test again
         del storage
         gc.collect()
-
         # Now should be None
         self.assertIsNone(weak_ref())
-
