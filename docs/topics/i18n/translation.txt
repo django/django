@@ -715,7 +715,7 @@ An example:
 .. code-block:: html+django
 
     {% blocktranslate count counter=list|length %}
-    There is only one {{ name }} object.
+    There is {{ counter }} {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
     {% endblocktranslate %}
