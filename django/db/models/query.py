@@ -5,9 +5,11 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from collections.abc import Iterable
 from contextlib import nullcontext
-from functools import reduce
+from functools import partial, reduce
 from itertools import chain, islice
+from typing import Literal, overload
 from weakref import ref as weak_ref
 
 from asgiref.sync import sync_to_async
@@ -959,25 +961,50 @@ class QuerySet(AltersData):
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
         updates = []
+        resolvable_fields = set()
         for batch_objs in batches:
             update_kwargs = {}
             for field in fields:
                 when_statements = []
                 for obj in batch_objs:
                     attr = getattr(obj, field.attname)
-                    if not hasattr(attr, "resolve_expression"):
+                    if hasattr(attr, "resolve_expression"):
+                        resolvable_fields.add(field.attname)
+                    else:
                         attr = Value(attr, output_field=field)
                     when_statements.append(When(pk=obj.pk, then=attr))
                 case_statement = Case(*when_statements, output_field=field)
                 if requires_casting:
                     case_statement = Cast(case_statement, output_field=field)
                 update_kwargs[field.attname] = case_statement
-            updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+            updates.append(({obj.pk: obj for obj in batch_objs}, update_kwargs))
         rows_updated = 0
         queryset = self.using(self.db)
         with transaction.atomic(using=self.db, savepoint=False):
-            for pks, update_kwargs in updates:
-                rows_updated += queryset.filter(pk__in=pks).update(**update_kwargs)
+            if resolvable_fields and connection.features.can_return_rows_from_update:
+                resolvable_fields = list(resolvable_fields)
+                returning_fields = [
+                    *(field.name for field in opts.pk_fields),
+                    *resolvable_fields,
+                ]
+                pk_fields_len = len(opts.pk_fields)
+                pk_slice = slice(0, pk_fields_len) if pk_fields_len > 1 else 0
+                update_slice = slice(pk_fields_len, None)
+                for objs, update_kwargs in updates:
+                    rows = queryset.filter(pk__in=list(objs)).update(
+                        update_kwargs, returning_values_list=returning_fields
+                    )
+                    for row in rows:
+                        pk = row[pk_slice]
+                        obj = objs[pk]
+                        for attname, value in zip(resolvable_fields, row[update_slice]):
+                            setattr(obj, attname, value)
+                    rows_updated += len(rows)
+            else:
+                for pks, update_kwargs in updates:
+                    rows_updated += queryset.filter(pk__in=list(pks)).update(
+                        **update_kwargs
+                    )
         return rows_updated
 
     bulk_update.alters_data = True
@@ -1330,7 +1357,38 @@ class QuerySet(AltersData):
 
     _raw_delete.alters_data = True
 
-    def update(self, **kwargs):
+    # Existing signature with keyword only updates.
+    @overload
+    def update(self, **updates) -> int: ...
+
+    # New signature with positional only updates to preserve backward
+    # compatibility with update(updates={"something"}) for models with
+    # an "updates" field.
+    @overload
+    def update(self, updates: dict, /) -> int: ...
+
+    # New signature with positional only updates and returning support which
+    # also allows paves the way for other options in the future if needs be.
+    @overload
+    def update(
+        self, updates: dict, *, returning: Literal[True] | Iterable[str]
+    ) -> list: ...
+
+    # New signature with positional only updates and returning support which
+    # also allows paves the way for other options in the future if needs be.
+    @overload
+    def update(
+        self, updates: dict, *, returning_values: Literal[True] | Iterable[str]
+    ) -> list[dict]: ...
+
+    # New signature with positional only updates and returning support which
+    # also allows paves the way for other options in the future if needs be.
+    @overload
+    def update(
+        self, updates: dict, *, returning_values_list: Literal[True] | Iterable[str]
+    ) -> list[tuple]: ...
+
+    def update(self, *args, **kwargs):
         """
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
@@ -1338,9 +1396,68 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("update")
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
+        returning_fields = None
+        if args:
+            opts = self.model._meta
+            update_values = args[0]
+            returning_type = None
+            returning = None
+            for returning_kwarg in (
+                "returning",
+                "returning_values",
+                "returning_values_list",
+            ):
+                returning_value = kwargs.pop(returning_kwarg, None)
+                if returning_value is not None:
+                    if returning is not None:
+                        raise TypeError(
+                            "Only one of returning, returning_values, or "
+                            "returning_values_list can be specified."
+                        )
+                    returning_type = returning_kwarg
+                    returning = returning_value
+            if len(args) > 1 or kwargs or not isinstance(update_values, dict):
+                raise TypeError(
+                    "Fields to update must be either specified as positional "
+                    "dict argument or through **kwargs."
+                )
+            if returning_type == "returning" and opts.parents:
+                raise NotImplementedError(
+                    "update(returning) is not implemented on MTI models."
+                )
+            if returning is not None:
+                if returning is True:
+                    returning_fields = opts.local_concrete_fields
+                elif isinstance(returning, Iterable):
+                    get_field = opts.get_field
+                    # Store fields in a dict to preserve ordering while
+                    # avoiding duplicates.
+                    returning_fields = {}
+                    for field_name in returning:
+                        field = get_field(field_name)
+                        if field.model is not self.model:
+                            raise exceptions.FieldError(
+                                f"Can't return field {field.name} "
+                                f"from multi-table inherited model "
+                                f"{field.model._meta.label}."
+                            )
+                        returning_fields[field] = field_name
+                    # The primary key fields must always be included
+                    # when returning models.
+                    if returning_type == "returning":
+                        for pk_field in opts.pk_fields:
+                            returning_fields.setdefault(pk_field, pk_field.attname)
+                else:
+                    raise TypeError(
+                        f"{returning_type} must be either True or an iterable."
+                    )
+        else:
+            update_values = kwargs
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
-        query.add_update_values(kwargs)
+        query.add_update_values(update_values)
+        if returning_fields is not None and query.related_updates:
+            raise ValueError("Can't return fields for updates involving MTI.")
 
         # Inline annotations in order_by(), if possible.
         new_order_by = []
@@ -1365,8 +1482,48 @@ class QuerySet(AltersData):
         # Clear SELECT clause as all annotation references were inlined by
         # add_update_values() already.
         query.clear_select_clause()
+        compiler = query.get_compiler(self.db)
         with transaction.mark_for_rollback_on_error(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+            if returning_fields is not None:
+                if not compiler.connection.features.can_return_rows_from_update:
+                    raise NotSupportedError(
+                        "This backend doesn't support returning rows from updates."
+                    )
+                # XXX: Ideally we'd use self._iterable_class here to delegate
+                # the object creation but they are expected to operate from
+                # SELECT queries so they would require adjustments.
+                # See BaseIterable and friends.
+                match returning_type:
+                    case "returning":
+                        # Re-ordering returning_fields to ease model
+                        # initialization.
+                        returning_fields = [
+                            field
+                            for field in opts.concrete_fields
+                            if field in returning_fields
+                        ]
+                        returning_field_attnames = [
+                            field.attname for field in returning_fields
+                        ]
+                        factory = partial(
+                            self.model.from_db, self.db, returning_field_attnames
+                        )
+                    case "returning_values":
+                        returning_field_attnames = [
+                            field.attname for field in returning_fields
+                        ]
+
+                        def factory(row):
+                            return dict(zip(returning_field_attnames, row))
+
+                    case "returning_values_list":
+                        factory = tuple
+
+                rows = list(
+                    map(factory, compiler.execute_returning_sql(returning_fields))
+                )
+            else:
+                rows = compiler.execute_sql(ROW_COUNT)
         self._result_cache = None
         return rows
 
