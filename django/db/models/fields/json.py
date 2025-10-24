@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django import forms
 from django.core import checks, exceptions
@@ -11,6 +12,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -332,10 +334,24 @@ class CaseInsensitiveMixin:
 
 
 class JSONExact(lookups.Exact):
+    # RemovedInDjango70Warning: When the deprecation period is over, remove
+    # the following line.
     can_use_none_as_rhs = True
 
     def process_rhs(self, compiler, connection):
+        if self.rhs is None and not isinstance(self.lhs, KeyTransform):
+            warnings.warn(
+                "Using None as the right-hand side of an exact lookup on JSONField to "
+                "mean JSON scalar 'null' is deprecated. Use JSONNull() instead (or use "
+                "the __isnull lookup if you meant SQL NULL).",
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+
         rhs, rhs_params = super().process_rhs(compiler, connection)
+
+        # RemovedInDjango70Warning: When the deprecation period is over, remove
+        # The following if-block entirely.
         # Treat None lookup values as null.
         if rhs == "%s" and (*rhs_params,) == (None,):
             rhs_params = ("null",)
@@ -547,6 +563,10 @@ class KeyTransformIn(lookups.In):
 
 
 class KeyTransformExact(JSONExact):
+    # RemovedInDjango70Warning: When deprecation period ends, uncomment the
+    # flag below.
+    # can_use_none_as_rhs = True
+
     def process_rhs(self, compiler, connection):
         if isinstance(self.rhs, KeyTransform):
             return super(lookups.Exact, self).process_rhs(compiler, connection)
