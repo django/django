@@ -889,19 +889,27 @@ class BulkCreateTests(TestCase):
 class BulkCreateTransactionTests(TransactionTestCase):
     available_apps = ["bulk_create"]
 
+    def get_unused_country_id(self):
+        # Find a serial ID that hasn't been used already and has enough of a
+        # buffer for the following `bulk_create` call without an explicit pk
+        # not to conflict.
+        return getattr(Country.objects.last(), "id", 10) + 100
+
     def test_no_unnecessary_transaction(self):
+        unused_id = self.get_unused_country_id()
         with self.assertNumQueries(1):
             Country.objects.bulk_create(
-                [Country(id=1, name="France", iso_two_letter="FR")]
+                [Country(id=unused_id, name="France", iso_two_letter="FR")]
             )
         with self.assertNumQueries(1):
             Country.objects.bulk_create([Country(name="Canada", iso_two_letter="CA")])
 
     def test_objs_with_and_without_pk(self):
+        unused_id = self.get_unused_country_id()
         with self.assertNumQueries(4):
             Country.objects.bulk_create(
                 [
-                    Country(id=10, name="France", iso_two_letter="FR"),
+                    Country(id=unused_id, name="France", iso_two_letter="FR"),
                     Country(name="Canada", iso_two_letter="CA"),
                 ]
             )
