@@ -360,6 +360,13 @@ Miscellaneous
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
 
+* The use of ``None`` to represent a top-level JSON scalar ``null`` when
+  querying :class:`~django.db.models.JSONField` is now deprecated in favor of
+  the new :class:`~django.db.models.JSONNull` expression. At the end
+  of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
+  used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
+  are unaffected by this deprecation.
+
 Features removed in 6.1
 =======================
 
