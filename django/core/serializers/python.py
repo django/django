@@ -41,15 +41,10 @@ class Serializer(base.Serializer):
             natural_key_func = getattr(obj, "natural_key", None)
 
             if callable(natural_key_func):
-                natural_key_value = None
-                try:
-                    natural_key_value = natural_key_func()
-                except Exception:
-                    pass
+                natural_key_value = natural_key_func()
 
                 is_opt_out = (
-                    natural_key_value is None
-                    or not natural_key_value
+                    not natural_key_value
                     or natural_key_value == (obj.pk,)
                     or not isinstance(natural_key_value, tuple)
                 )
@@ -83,8 +78,10 @@ class Serializer(base.Serializer):
             if related:
                 natural_key_value = related.natural_key()
 
-                is_opt_out = (natural_key_value is None) or (
-                    natural_key_value == (related.pk,)
+                is_opt_out = (
+                    not natural_key_value
+                    or natural_key_value == (related.pk,)
+                    or not isinstance(natural_key_value, tuple)
                 )
 
                 if is_opt_out:
