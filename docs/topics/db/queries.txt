@@ -1068,6 +1068,11 @@ as JSON ``null``.
 When querying, :lookup:`isnull=True <isnull>` is used to match SQL ``NULL``,
 while exact-matching ``JSONNull()`` is used to match JSON ``null``.
 
+.. deprecated:: 6.1
+
+    Exact-matching ``None`` in a query to mean JSON ``null`` is deprecated.
+    After the deprecation period, it will be interpreted as SQL ``NULL``.
+
 .. versionchanged:: 6.1
 
     ``JSONNull()`` expression was added.
@@ -1079,6 +1084,12 @@ while exact-matching ``JSONNull()`` is used to match JSON ``null``.
     <Dog: Max>
     >>> Dog.objects.create(name="Archie", data=JSONNull())  # JSON null.
     <Dog: Archie>
+    >>> Dog.objects.filter(data=None)
+    ...: RemovedInDjango70Warning: Using None as the right-hand side of an
+    exact lookup on JSONField to mean JSON scalar 'null' is deprecated. Use
+    JSONNull() instead.
+    ...
+    <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data=JSONNull())
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
