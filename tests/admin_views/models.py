@@ -401,8 +401,8 @@ class Picture(models.Model):
 
 
 class Language(models.Model):
-    iso = models.CharField(max_length=5, primary_key=True)
-    name = models.CharField(max_length=50)
+    iso = models.CharField(max_length=5, primary_key=True, help_text="iso helptext")
+    name = models.CharField(max_length=50, help_text="name helptext")
     english_name = models.CharField(max_length=50)
     shortlist = models.BooleanField(default=False)
 
