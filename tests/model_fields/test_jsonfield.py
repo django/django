@@ -782,6 +782,12 @@ class TestQuerying(TestCase):
             [self.objs[4]],
         )
 
+    def test_key_iexact_none(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__j__iexact=None),
+            [self.objs[4]],
+        )
+
     def test_none_key_exclude(self):
         obj = NullableJSONModel.objects.create(value={"j": 1})
         if connection.vendor == "oracle":

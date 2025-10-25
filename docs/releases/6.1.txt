@@ -400,6 +400,11 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1
