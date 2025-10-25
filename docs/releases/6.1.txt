@@ -86,6 +86,26 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+``JSONNull()`` expression
+-------------------------
+
+The new :class:`~django.db.models.JSONNull` expression provides an explicit
+way to represent the JSON scalar ``null``. It can be used when saving a
+top-level :class:`~django.db.models.JSONField` value, or querying for
+top-level or nested JSON ``null`` values.
+
+See :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
+To align behavior consistently, the use of ``None`` to represent a top-level
+JSON scalar ``null`` when querying :class:`~django.db.models.JSONField` is
+now deprecated in favor of the new :class:`~django.db.models.JSONNull`
+expression. At the end of the deprecation period, ``None`` values will match
+SQL ``IS NULL`` when used as the top-level value. Key transform lookups are
+unaffected by this change.
+
+:lookup:`Key and index lookups <jsonfield.key>` are unaffected by this
+deprecation.
+
 Minor features
 --------------
 
@@ -313,6 +333,15 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+:mod:`django.contrib.postgres`
+------------------------------
+
+* Top-level elements set to ``None`` in an
+  :class:`~django.contrib.postgres.fields.ArrayField` with a
+  :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
+  instead of the JSON ``null`` primitive. This matches the behavior of a
+  standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
 Dropped support for PostgreSQL 14
 ---------------------------------
 
@@ -338,6 +367,10 @@ Miscellaneous
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
+
+* Using None to represent a top-level JSON scalar null when querying top-level
+  :class:`~django.db.models.JSONField` values is deprecated in favor of the new
+  :class:`JSONNull() <django.db.models.JSONNull>` expression.
 
 Features removed in 6.1
 =======================

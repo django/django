@@ -15,6 +15,7 @@ from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -1577,3 +1578,30 @@ class TestAdminUtils(PostgreSQLTestCase):
             self.empty_value,
         )
         self.assertEqual(display_value, self.empty_value)
+
+
+class TestJSONFieldQuerying(PostgreSQLTestCase):
+    def test_saving_and_querying_for_sql_null(self):
+        obj = OtherTypesArrayModel.objects.create(json=[None, None])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__isnull=True), [obj]
+        )
+
+    def test_saving_and_querying_for_nested_none(self):
+        obj = OtherTypesArrayModel.objects.create(json=[[None, 1], [None, 2]])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0=None), [obj]
+        )
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
+        )
+
+    # RemovedInDjango70Warning.
+    def test_exact_none_deprecation_warning(self):
+        msg = (
+            "Using None as the right-hand side of an exact lookup on JSONField to mean "
+            "JSON scalar 'null' is deprecated. Use JSONNull() instead (or use the "
+            "__isnull=True lookup if you meant to match SQL NULL)."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            list(OtherTypesArrayModel.objects.filter(json__0=None))
