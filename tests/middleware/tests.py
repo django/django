@@ -171,15 +171,15 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         # Use 4 slashes because of RequestFactory behavior.
         request = self.rf.get("////evil.com/security")
-        r = CommonMiddleware(get_response_404).process_request(request)
-        self.assertIsNone(r)
+        res = CommonMiddleware(get_response_404).process_request(request)
+        self.assertIsNone(res)
         response = HttpResponseNotFound()
-        r = CommonMiddleware(get_response_404).process_response(request, response)
-        self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, "/%2Fevil.com/security/")
-        r = CommonMiddleware(get_response_404)(request)
-        self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, "/%2Fevil.com/security/")
+        res = CommonMiddleware(get_response_404).process_response(request, response)
+        self.assertEqual(res.status_code, 301)
+        self.assertEqual(res.url, "/%2Fevil.com/security/")
+        res = CommonMiddleware(get_response_404)(request)
+        self.assertEqual(res.status_code, 301)
+        self.assertEqual(res.url, "/%2Fevil.com/security/")
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www(self):
@@ -320,6 +320,38 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "http://www.testserver/customurlconf/slash/")
 
+    @override_settings(APPEND_SLASH=True)
+    def test_empty_path_info_not_found_with_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponseNotFound()
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 301)
+
+    @override_settings(APPEND_SLASH=False)
+    def test_empty_path_info_not_found_without_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponseNotFound()
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 404)
+
+    @override_settings(APPEND_SLASH=True)
+    def test_empty_path_info_200_with_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponse("content")
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 200)
+
+    @override_settings(APPEND_SLASH=False)
+    def test_empty_path_info_200_without_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponse("content")
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 200)
+
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
@@ -377,11 +409,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         """Regression test for #15152"""
         request = self.rf.get("/slash")
         request.META["QUERY_STRING"] = "drink=café"
-        r = CommonMiddleware(get_response_empty).process_request(request)
-        self.assertIsNone(r)
+        res = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertEqual(res.status_code, 301)
         response = HttpResponseNotFound()
-        r = CommonMiddleware(get_response_empty).process_response(request, response)
-        self.assertEqual(r.status_code, 301)
+        res = CommonMiddleware(get_response_empty).process_response(request, response)
+        self.assertEqual(res.status_code, 301)
 
     def test_response_redirect_class(self):
         request = self.rf.get("/slash")
