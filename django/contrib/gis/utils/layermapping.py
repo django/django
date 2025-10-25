@@ -215,7 +215,7 @@ class LayerMapping:
                 )
             return idx
 
-        # No need to increment through each feature in the model, simply check
+        # No need to increment through each feature in the model, check
         # the Layer metadata against what was given in the mapping dictionary.
         for field_name, ogr_name in self.mapping.items():
             # Ensuring that a corresponding field exists in the model

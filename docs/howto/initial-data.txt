@@ -24,7 +24,7 @@ however, this data isn't loaded automatically, except if you use
 :attr:`.TransactionTestCase.fixtures`.
 
 A fixture is a collection of data that Django knows how to import into a
-database. The most straightforward way of creating a fixture if you've already
+database. The most direct way of creating a fixture if you've already
 got some data is to use the :djadmin:`manage.py dumpdata <dumpdata>` command.
 Or, you can write fixtures by hand; fixtures can be written as JSON, XML or
 YAML (with PyYAML_ installed) documents. The :doc:`serialization documentation

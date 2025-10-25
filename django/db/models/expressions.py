@@ -347,7 +347,7 @@ class BaseExpression:
         """
         Attempt to infer the output type of the expression.
 
-        As a guess, if the output fields of all source fields match then simply
+        As a guess, if the output fields of all source fields match then
         infer the same type here.
 
         If a source's output field resolves to None, exclude it from this

@@ -53,7 +53,7 @@ class ModelTests(TestCase):
         query.get_compiler(using=db).as_sql()
 
     def test_empty_choice(self):
-        # NOTE: Part of the regression test here is merely parsing the model
+        # NOTE: Part of the regression test here is only parsing the model
         # declaration. The verbose_name, in particular, did not always work.
         a = Article.objects.create(
             headline="Look at me!", pub_date=datetime.datetime.now()

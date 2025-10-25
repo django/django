@@ -59,7 +59,7 @@ Notes:
   :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
   can be used here.
 * The default implementation for
-  :meth:`~django.views.generic.edit.FormMixin.form_valid` simply
+  :meth:`~django.views.generic.edit.FormMixin.form_valid`
   redirects to the :attr:`~django.views.generic.edit.FormMixin.success_url`.
 
 Model forms

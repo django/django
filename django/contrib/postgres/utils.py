@@ -13,7 +13,7 @@ def prefix_validation_error(error, prefix, code, params):
     if error.error_list == [error]:
         error_params = error.params or {}
         return ValidationError(
-            # We can't simply concatenate messages since they might require
+            # We can't concatenate messages since they might require
             # their associated parameters to be expressed correctly which
             # is not something `format_lazy` does. For example, proxied
             # ngettext calls require a count parameter and are converted
