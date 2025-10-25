@@ -715,10 +715,18 @@ An example:
 .. code-block:: html+django
 
     {% blocktranslate count counter=list|length %}
-    There is only one {{ name }} object.
+    There is {{ counter }} {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
     {% endblocktranslate %}
+
+.. note::
+
+    Pluralization rules are complex and differ between languages. For example,
+    some languages (like French or Russian) have different rules for
+    the 0 case than English does. You should not assume English pluralization
+    logic (e.g., "1 is singular, everything else is plural") applies to
+    all languages.
 
 A more complex example:
 
