@@ -243,6 +243,7 @@ class NovelReadonlyChapter(Novel):
 
 class Chapter(models.Model):
     name = models.CharField(max_length=40)
+    page = models.IntegerField(blank=True, null=True)
     novel = models.ForeignKey(Novel, models.CASCADE)
 
 
