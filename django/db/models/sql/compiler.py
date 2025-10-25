@@ -228,6 +228,13 @@ class SQLCompiler:
             ]
         return expressions
 
+    @classmethod
+    def get_select_from_parent(cls, klass_info):
+        for ki in klass_info["related_klass_infos"]:
+            if ki["from_parent"]:
+                ki["select_fields"] = klass_info["select_fields"] + ki["select_fields"]
+            cls.get_select_from_parent(ki)
+
     def get_select(self, with_col_aliases=False):
         """
         Return three values:
@@ -300,15 +307,7 @@ class SQLCompiler:
             related_klass_infos = self.get_related_selections(select, select_mask)
             klass_info["related_klass_infos"] = related_klass_infos
 
-            def get_select_from_parent(klass_info):
-                for ki in klass_info["related_klass_infos"]:
-                    if ki["from_parent"]:
-                        ki["select_fields"] = (
-                            klass_info["select_fields"] + ki["select_fields"]
-                        )
-                    get_select_from_parent(ki)
-
-            get_select_from_parent(klass_info)
+            self.get_select_from_parent(klass_info)
 
         ret = []
         col_idx = 1

@@ -189,12 +189,13 @@ Limitations of the provided locale formats
 Some locales use context-sensitive formats for numbers, which Django's
 localization system cannot handle automatically.
 
-Switzerland (German)
---------------------
+Switzerland (German, French)
+----------------------------
 
-The Swiss number formatting depends on the type of number that is being
-formatted. For monetary values, a comma is used as the thousand separator and
-a decimal point for the decimal separator. For all other numbers, a comma is
-used as decimal separator and a space as thousand separator. The locale format
-provided by Django uses the generic separators, a comma for decimal and a space
-for thousand separators.
+The Swiss number formatting traditionally varies depending on context. For
+example, monetary values may use a dot as decimal separator (``Fr. 23.50``),
+while measurements often use a comma (``22,5 m``). Django’s localization system
+does not support such context-specific variations automatically.
+
+The locale format provided by Django uses the generic separators, a comma for
+decimal and a space for thousand separators.
