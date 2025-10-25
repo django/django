@@ -312,6 +312,12 @@ not be looking at your Django code. For example::
 
         ordering = [F("author").asc(nulls_last=True)]
 
+.. note::
+
+    This default ordering is not used in :ref:`GROUP BY queries
+    <aggregation-ordering-interaction>`, such as those using
+    :meth:`~.QuerySet.annotate` or :meth:`~.QuerySet.values`.
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
