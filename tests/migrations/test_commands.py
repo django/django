@@ -25,6 +25,7 @@ from django.db import (
     connections,
     models,
 )
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -1203,10 +1204,10 @@ class MigrateTests(MigrationTestBase):
             create_table_count = len(
                 [call for call in execute.mock_calls if "CREATE TABLE" in str(call)]
             )
-            self.assertEqual(create_table_count, 2)
+            self.assertEqual(create_table_count, 3)
             # There's at least one deferred SQL for creating the foreign key
             # index.
-            self.assertGreater(len(execute.mock_calls), 2)
+            self.assertGreater(len(execute.mock_calls), 3)
         stdout = stdout.getvalue()
         self.assertIn("Synchronize unmigrated apps: unmigrated_app_syncdb", stdout)
         self.assertIn("Creating tables...", stdout)
@@ -1240,8 +1241,54 @@ class MigrateTests(MigrationTestBase):
             create_table_count = len(
                 [call for call in execute.mock_calls if "CREATE TABLE" in str(call)]
             )
-            self.assertEqual(create_table_count, 2)
+            self.assertEqual(create_table_count, 3)
+            self.assertGreater(len(execute.mock_calls), 3)
+            self.assertIn(
+                "Synchronize unmigrated app: unmigrated_app_syncdb", stdout.getvalue()
+            )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.unmigrated_app_syncdb",
+            "migrations.migrations_test_apps.unmigrated_app_simple",
+        ]
+    )
+    def test_migrate_syncdb_installed_truncated_db_model(self):
+        """
+        Running migrate --run-syncdb doesn't try to create models with long
+        truncated name if already exist.
+        """
+        with connection.cursor() as cursor:
+            mock_existing_tables = connection.introspection.table_names(cursor)
+        # Add truncated name for the VeryLongNameModel to the list of
+        # existing table names.
+        table_name = truncate_name(
+            "long_db_table_that_should_be_truncated_before_checking",
+            connection.ops.max_name_length(),
+        )
+        mock_existing_tables.append(table_name)
+        stdout = io.StringIO()
+        with (
+            mock.patch.object(BaseDatabaseSchemaEditor, "execute") as execute,
+            mock.patch.object(
+                BaseDatabaseIntrospection,
+                "table_names",
+                return_value=mock_existing_tables,
+            ),
+        ):
+            call_command(
+                "migrate", "unmigrated_app_syncdb", run_syncdb=True, stdout=stdout
+            )
+            create_table_calls = [
+                str(call).upper()
+                for call in execute.mock_calls
+                if "CREATE TABLE" in str(call)
+            ]
+            self.assertEqual(len(create_table_calls), 2)
             self.assertGreater(len(execute.mock_calls), 2)
+            self.assertFalse(
+                any([table_name.upper() in call for call in create_table_calls])
+            )
             self.assertIn(
                 "Synchronize unmigrated app: unmigrated_app_syncdb", stdout.getvalue()
             )
