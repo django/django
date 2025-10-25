@@ -82,3 +82,30 @@ def never_cache(view_func):
             return response
 
     return wraps(view_func)(_view_wrapper)
+
+
+def cache_page_per_item(timeout, key_prefix=None):
+    """Decorator that applies cache_page with a dynamic key_prefix based on item id."""
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            item_id = kwargs.get("pk") or kwargs.get("id")
+            if key_prefix is None:
+                rm = getattr(request, "resolver_match", None)
+                if rm and rm.view_name:
+                    base = rm.view_name.replace(":", "_")
+                else:
+                    base = getattr(view_func, "__name__", "view")
+            else:
+                base = key_prefix
+
+            prefix = f"{base}_{item_id}" if item_id is not None else base
+
+            return cache_page(timeout, key_prefix=prefix)(view_func)(
+                request, *args, **kwargs
+            )
+
+        return _wrapped_view
+
+    return decorator
