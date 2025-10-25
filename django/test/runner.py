@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import faulthandler
+import functools
 import hashlib
 import io
 import itertools
@@ -480,6 +481,15 @@ def _init_worker(
         )
 
 
+def _safe_init_worker(init_worker, counter, *args, **kwargs):
+    try:
+        init_worker(counter, *args, **kwargs)
+    except Exception:
+        with counter.get_lock():
+            counter.value = -1
+        raise
+
+
 def _run_subsuite(args):
     """
     Run a suite of tests with a RemoteTestRunner and return a RemoteTestResult.
@@ -553,7 +563,7 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=self.init_worker.__func__,
+            initializer=functools.partial(_safe_init_worker, self.init_worker.__func__),
             initargs=[
                 counter,
                 self.initial_settings,
@@ -580,9 +590,12 @@ class ParallelTestSuite(unittest.TestSuite):
 
             try:
                 subsuite_index, events = test_results.next(timeout=0.1)
-            except multiprocessing.TimeoutError:
+            except multiprocessing.TimeoutError as err:
+                if counter.value == -1:
+                    err.add_note("_init_worker failed")
+                    raise
                 continue
-            except StopIteration:
+            except (StopIteration, multiprocessing.TimeoutError):
                 pool.close()
                 break
 
