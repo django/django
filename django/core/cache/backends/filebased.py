@@ -9,7 +9,7 @@ import time
 import zlib
 from hashlib import md5
 
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, NO_TIMEOUT, BaseCache
 from django.core.files import locks
 from django.core.files.move import file_move_safe
 
@@ -23,7 +23,7 @@ class FileBasedCache(BaseCache):
         self._dir = os.path.abspath(dir)
         self._createdir()
 
-    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def add(self, key, value, timeout=NO_TIMEOUT, version=None):
         if self.has_key(key, version):
             return False
         self.set(key, value, timeout, version)
@@ -39,20 +39,33 @@ class FileBasedCache(BaseCache):
             pass
         return default
 
-    def _write_content(self, file, timeout, value):
-        expiry = self.get_backend_timeout(timeout)
+    def _write_content(self, file, timeout, value, expiry=None):
+        if expiry is None:
+            expiry = self.get_backend_timeout(timeout)
         file.write(pickle.dumps(expiry, self.pickle_protocol))
         file.write(zlib.compress(pickle.dumps(value, self.pickle_protocol)))
 
-    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def set(self, key, value, timeout=NO_TIMEOUT, version=None):
+        no_timeout = timeout == NO_TIMEOUT
+        if no_timeout:
+            timeout = DEFAULT_TIMEOUT
+
         self._createdir()  # Cache dir can be deleted at any time.
         fname = self._key_to_file(key, version)
         self._cull()  # make some room if necessary
         fd, tmp_path = tempfile.mkstemp(dir=self._dir)
         renamed = False
+        exp = None
+        if no_timeout:
+            try:
+                with open(fname, "rb") as f:
+                    exp = self._get_expiring_time(f)
+            except FileNotFoundError:
+                exp = None
+
         try:
             with open(fd, "wb") as f:
-                self._write_content(f, timeout, value)
+                self._write_content(f, timeout, value, expiry=exp)
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
         finally:
@@ -150,15 +163,22 @@ class FileBasedCache(BaseCache):
         """
         Take an open cache file `f` and delete it if it's expired.
         """
-        try:
-            exp = pickle.load(f)
-        except EOFError:
-            exp = 0  # An empty file is considered expired.
+        exp = self._get_expiring_time(f)
         if exp is not None and exp < time.time():
             f.close()  # On Windows a file has to be closed before deleting
             self._delete(f.name)
             return True
         return False
+
+    def _get_expiring_time(self, f):
+        try:
+            try:
+                exp = pickle.load(f)
+            except EOFError:
+                exp = 0  # An empty file is considered expired.
+            return exp
+        except FileNotFoundError:
+            return None
 
     def _list_cache_files(self):
         """
