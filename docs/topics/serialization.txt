@@ -636,6 +636,29 @@ command line flags to generate natural keys.
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 
+.. versionchanged:: 6.1
+
+    The serialization framework was updated to allow models inheriting
+    the ``natural_key()`` method
+    to explicitly opt out of natural key serialization by returning ``None``.
+    Previously, the existence of the inherited
+    method would cause the primary key to be omitted
+    when ``use_natural_primary_keys=True`` was used.
+
+    To explicitly opt out and revert to standard primary key serialization,
+    override the method to return a signal value.
+    The preferred signal is ``None``:
+
+    .. code-block:: python
+
+        def natural_key(self):
+            # Explicitly signals opt-out to the serializer.
+            return None
+
+    Returning an empty tuple (``()``)
+    or the primary key as a tuple (``(self.pk,)``)
+    will also be interpreted as an opt-out signal by the serializers.
+
 .. _natural-keys-and-forward-references:
 
 Natural keys and forward references
