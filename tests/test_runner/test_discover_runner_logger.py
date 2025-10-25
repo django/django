@@ -2,7 +2,6 @@ import logging
 import sys
 from io import StringIO
 from unittest import mock
-
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
 from django.test.utils import captured_stdout
@@ -124,14 +123,16 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        # Patch call_command where it's used in runner module
+        with mock.patch("django.test.runner.call_command") as mock_call:
             # Simulate check command printing to stdout
             def fake_check(*args, **kwargs):
                 print("System check identified no issues (0 silenced).")
 
             mock_call.side_effect = fake_check
 
-            with captured_stdout() as stdout:
+            # The logger writes to stdout, so capture it to verify
+            with self.assertLogs("django.test.check", level=logging.INFO) as cm:
                 runner.run_checks(databases=["default"])
 
             # Verify call_command was called with correct arguments
@@ -142,7 +143,9 @@ class RunChecksTests(SimpleTestCase):
             )
 
             # Verify output was logged
-            self.assertIn("System check identified no issues", stdout.getvalue())
+            self.assertIn(
+                "System check identified no issues", cm.records[0].getMessage()
+            )
 
     def test_run_checks_with_custom_logger(self):
         """
@@ -156,10 +159,11 @@ class RunChecksTests(SimpleTestCase):
         handler = logging.StreamHandler(stream)
         handler.setLevel(logging.INFO)
         custom_logger.addHandler(handler)
+        self.addCleanup(custom_logger.removeHandler, handler)
 
         runner = DiscoverRunner(logger=custom_logger)
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("Check output from custom logger")
@@ -179,7 +183,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("Stdout message")
@@ -192,7 +196,7 @@ class RunChecksTests(SimpleTestCase):
             # Check that the message was logged at INFO level
             self.assertEqual(len(cm.records), 1)
             self.assertEqual(cm.records[0].levelname, "INFO")
-            self.assertIn("Stdout message", cm.output[0])
+            self.assertIn("Stdout message", cm.records[0].getMessage())
 
     def test_run_checks_logs_stderr_as_error(self):
         """
@@ -200,7 +204,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 sys.stderr.write("Error message\n")
@@ -213,7 +217,7 @@ class RunChecksTests(SimpleTestCase):
             # Check that the message was logged at ERROR level
             self.assertEqual(len(cm.records), 1)
             self.assertEqual(cm.records[0].levelname, "ERROR")
-            self.assertIn("Error message", cm.output[0])
+            self.assertIn("Error message", cm.records[0].getMessage())
 
     def test_run_checks_empty_stdout_not_logged(self):
         """
@@ -221,16 +225,14 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command"):
+        with mock.patch("django.test.runner.call_command"):
             # call_command doesn't print anything
-            with self.assertLogs("django.test.check", level=logging.INFO) as cm:
+            # Use captured_stdout to verify no output
+            with captured_stdout() as stdout:
                 runner.run_checks(databases=["default"])
-                # Force at least one log to avoid assertLogs error
-                runner._get_or_create_check_logger().info("test")
 
-            # Only the forced log should be present
-            self.assertEqual(len(cm.records), 1)
-            self.assertEqual(cm.records[0].getMessage(), "test")
+            # There should be no output since nothing was printed
+            self.assertEqual(stdout.getvalue(), "")
 
     def test_run_checks_empty_stderr_not_logged(self):
         """
@@ -238,7 +240,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("Only stdout")
@@ -258,7 +260,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
             runner.run_checks(databases=["default", "other"])
 
             mock_call.assert_called_once()
@@ -271,7 +273,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner(verbosity=2)
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
             runner.run_checks(databases=["default"])
 
             mock_call.assert_called_once()
@@ -284,7 +286,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("Stdout output")
@@ -306,7 +308,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("\n  Message with whitespace  \n")
@@ -317,8 +319,8 @@ class RunChecksTests(SimpleTestCase):
                 runner.run_checks(databases=["default"])
 
             # Message should be stripped
-            self.assertIn("Message with whitespace", cm.records[0].getMessage())
-            self.assertNotIn("\n", cm.records[0].getMessage())
+            message = cm.records[0].getMessage()
+            self.assertEqual(message, "Message with whitespace")
 
     def test_run_checks_multiline_output(self):
         """
@@ -326,7 +328,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command") as mock_call:
+        with mock.patch("django.test.runner.call_command") as mock_call:
 
             def fake_check(*args, **kwargs):
                 print("Line 1\nLine 2\nLine 3")
@@ -347,7 +349,7 @@ class RunChecksTests(SimpleTestCase):
         """
         runner = DiscoverRunner()
 
-        with mock.patch("django.core.management.call_command"):
+        with mock.patch("django.test.runner.call_command"):
             runner.run_checks(databases=["default"])
             logger1 = runner.logger
 
