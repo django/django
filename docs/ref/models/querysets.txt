@@ -520,8 +520,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     ordering), it sometimes looks like non-distinct results are being returned.
 
     Similarly, if you use a :meth:`values` query to restrict the columns
-    selected, the columns used in any :meth:`order_by` (or default model
-    ordering) will still be involved and may affect uniqueness of the results.
+    selected, the columns used in any *explicit* :meth:`order_by` call
+    will still be involved and may affect uniqueness of the results. Note
+    that a model's default ordering
+    (:attr:`~django.db.models.Options.ordering`) is ignored for such
+    queries, as noted in the :ref:`aggregation ordering interaction
+    <aggregation-ordering-interaction>` documentation.
 
     The moral here is that if you are using ``distinct()`` be careful about
     ordering by related models. Similarly, when using ``distinct()`` and
