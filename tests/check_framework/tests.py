@@ -190,10 +190,12 @@ class CheckCommandTests(SimpleTestCase):
     def test_simple_call(self):
         call_command("check")
         self.assertEqual(
-            simple_system_check.kwargs, {"app_configs": None, "databases": None}
+            simple_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -203,11 +205,17 @@ class CheckCommandTests(SimpleTestCase):
         admin_config = apps.get_app_config("admin")
         self.assertEqual(
             simple_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
         self.assertEqual(
             tagged_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -215,7 +223,8 @@ class CheckCommandTests(SimpleTestCase):
         call_command("check", tags=["simpletag"])
         self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
