@@ -21,7 +21,8 @@ from hashlib import md5
 
 from django.conf import settings
 from django.core.cache import caches
-from django.http import HttpResponse, HttpResponseNotModified
+from django.http import HttpRequest, HttpResponse, HttpResponseNotModified
+from django.test import RequestFactory
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
@@ -443,3 +444,31 @@ def _to_tuple(s):
     if len(t) == 2:
         return t[0].lower(), t[1]
     return t[0].lower(), True
+
+
+def invalidate_view_cache(request, key_prefix=None, cache=None):
+    """
+    Delete a cached page based on either a relative URL (type: any)
+    or a request object (type: django.http.HttpRequest).
+
+    The cache key is reconstructed in two steps:
+        1. A headers cache key is built using the absolute URL,
+            key prefix, and locale code.
+        2. A response cache key is then built using the absolute URL,
+            key prefix, HTTP method, and recovered headers.
+
+    The ``key_prefix`` must match the value used in the ``cache_page``
+    decorator for the corresponding view.
+    """
+    if not isinstance(request, HttpRequest):
+        factory = RequestFactory()
+        request = factory.get(request)
+
+    if cache is None:
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
+
+    cache_key = get_cache_key(request, key_prefix=key_prefix, cache=cache)
+    if cache_key is None:
+        return 0
+
+    return cache.delete(cache_key)
