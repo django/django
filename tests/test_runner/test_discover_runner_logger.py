@@ -2,6 +2,7 @@ import logging
 import sys
 from io import StringIO
 from unittest import mock
+
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
 from django.test.utils import captured_stdout
