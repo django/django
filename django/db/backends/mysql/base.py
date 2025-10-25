@@ -337,6 +337,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 for column_name, (
                     referenced_column_name,
                     referenced_table_name,
+                    _,
                 ) in relations.items():
                     cursor.execute(
                         """

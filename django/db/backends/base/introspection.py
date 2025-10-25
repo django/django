@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from django.utils.functional import cached_property
+
 # Structure returned by DatabaseIntrospection.get_table_list()
 TableInfo = namedtuple("TableInfo", ["name", "type"])
 
@@ -21,6 +23,18 @@ class BaseDatabaseIntrospection:
 
     def __del__(self):
         del self.connection
+
+    @cached_property
+    def on_delete_types(self):
+        from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING
+
+        return {
+            "CASCADE": DB_CASCADE,
+            "NO ACTION": DO_NOTHING,
+            "SET DEFAULT": DB_SET_DEFAULT,
+            "SET NULL": DB_SET_NULL,
+            # DB_RESTRICT - "RESTRICT" is not supported.
+        }
 
     def get_field_type(self, data_type, description):
         """
@@ -169,8 +183,11 @@ class BaseDatabaseIntrospection:
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table,
-        other_table)} representing all foreign keys in the given table.
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
+        representing all foreign keys in the given table.
         """
         raise NotImplementedError(
             "subclasses of BaseDatabaseIntrospection may require a "
