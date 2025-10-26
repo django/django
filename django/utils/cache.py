@@ -446,7 +446,9 @@ def _to_tuple(s):
     return t[0].lower(), True
 
 
-def invalidate_view_cache(request, key_prefix=None, cache=None):
+def invalidate_view_cache(
+    request, key_prefix=None, cache=None, invalidate_whole_prefix=False
+):
     """
     Delete a cached page based on either a relative URL (type: any)
     or a request object (type: django.http.HttpRequest).
@@ -457,6 +459,11 @@ def invalidate_view_cache(request, key_prefix=None, cache=None):
         2. A response cache key is then built using the absolute URL,
             key prefix, HTTP method, and recovered headers.
 
+    invalidate_whole_prefix: If True, the function will
+      attempt to invalidate all cached entries that share the given key_prefix
+      (i.e. all pages cached under that prefix). The exact scope and method of
+      prefix invalidation depends on the cache backend capabilities.
+
     The ``key_prefix`` must match the value used in the ``cache_page``
     decorator for the corresponding view.
     """
@@ -466,6 +473,19 @@ def invalidate_view_cache(request, key_prefix=None, cache=None):
 
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
+
+    if invalidate_whole_prefix:
+        cache_class = f"{cache.__class__.__module__}.{cache.__class__.__name__}"
+        if cache_class != "django_redis.cache.RedisCache":
+            raise ValueError("invalidate_view_cache only supports RedisCache backend")
+        try:
+            # Get all keys matching the prefix
+            keys = cache.iter_keys(f"*{key_prefix}*")
+            # Get all `cache_header` keys to delete associated entries
+            keys = cache.iter_keys(f"*{next(keys).split('.')[6]}*")
+        except StopIteration:
+            return 0
+        return cache.delete_many(keys)
 
     cache_key = get_cache_key(request, key_prefix=key_prefix, cache=cache)
     if cache_key is None:

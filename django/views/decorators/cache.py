@@ -85,7 +85,20 @@ def never_cache(view_func):
 
 
 def cache_page_per_item(timeout, key_prefix=None):
-    """Decorator that applies cache_page with a dynamic key_prefix based on item id."""
+    """Decorator that applies cache_page with a dynamic key_prefix
+    based on item id. The item id is expected to be passed as
+    'pk' or 'id' keyword argument to the view. If key_prefix
+    is not provided, the view name will be used as base for the key prefix.
+    Example usage:
+        @cache_page_per_item(60 * 15, key_prefix="prefix")
+        def my_view(request, pk):
+            ...
+
+    This will cache the view for 15 minutes with a key prefix of 'prefix_<pk>'
+    allowing cache keys to be unique per item and identifiable.
+    If key_prefix is not provided it will default to 'my_view_<pk>' where
+    'my_view' is the name of the view function.
+    """
 
     def decorator(view_func):
         @wraps(view_func)
