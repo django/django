@@ -223,12 +223,8 @@ class Serializer:
             if callable(natural_key_func):
                 natural_key_value = natural_key_func()
 
-                is_pk_tuple = natural_key_value == (obj.pk,)
-
-                is_opt_out = (
-                    not natural_key_value
-                    or is_pk_tuple
-                    or not isinstance(natural_key_value, tuple)
+                is_opt_out = not natural_key_value or not isinstance(
+                    natural_key_value, tuple
                 )
 
                 if not is_opt_out:

@@ -77,21 +77,6 @@ class FKAsPKNoNaturalKey(models.Model):
         raise NotImplementedError("This method was not expected to be called.")
 
 
-class PKTupleOptOutUser(AbstractBaseUser):
-    email = models.EmailField(unique=False, null=True, blank=True)
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
-
-    class Manager(models.Manager):
-        def get_by_natural_key(self, pk_value):
-            return self.get(pk=pk_value)
-
-    objects = Manager()
-
-    def natural_key(self):
-        return (self.pk,)
-
-
 class NoneOptOutUser(AbstractBaseUser):
     email = models.EmailField(unique=False, null=True, blank=True)
     USERNAME_FIELD = "email"
@@ -105,11 +90,6 @@ class NoneOptOutUser(AbstractBaseUser):
 
     def natural_key(self):
         return None
-
-
-class PostToPKTupleUser(models.Model):
-    author = models.ForeignKey(PKTupleOptOutUser, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
 
 
 class PostToNoneUser(models.Model):

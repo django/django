@@ -12,9 +12,7 @@ from .models import (
     NaturalKeyThing,
     NaturalPKWithDefault,
     NoneOptOutUser,
-    PKTupleOptOutUser,
     PostToNoneUser,
-    PostToPKTupleUser,
 )
 from .tests import register_tests
 
@@ -264,15 +262,10 @@ def natural_key_opt_out_test(self, format):
 
     Verifies that when natural_key() returns None or (self.pk,):
     """
-
-    user1 = PKTupleOptOutUser.objects.create(email="user1@example.com")
-    post1 = PostToPKTupleUser.objects.create(author=user1, title="Post 1 (PK Opt-out)")
-
-    user2 = NoneOptOutUser.objects.create(email="user2@example.com")
-    post2 = PostToNoneUser.objects.create(author=user2, title="Post 2 (None Opt-out)")
+    user1 = NoneOptOutUser.objects.create(email="user2@example.com")
+    post1 = PostToNoneUser.objects.create(author=user1, title="Post 2 (None Opt-out)")
     scenarios = [
         (user1, post1),
-        (user2, post2),
     ]
 
     is_json = format == "json"
