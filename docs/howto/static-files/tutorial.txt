@@ -1,0 +1,40 @@
+==========================
+Using Static Files in Django
+==========================
+
+This tutorial introduces the basics of serving static files such as CSS, JavaScript,
+and images in your Django project.
+
+.. contents:: Table of contents
+   :local:
+
+Setting up
+==========
+
+Add this to your settings:
+
+.. code-block:: python
+
+   STATIC_URL = '/static/'
+   STATICFILES_DIRS = [BASE_DIR / "static"]
+
+Loading static files in templates
+=================================
+
+In your HTML templates, load the ``static`` tag library:
+
+.. code-block:: html+django
+
+   {% load static %}
+   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+Collecting files for deployment
+===============================
+
+When deploying, run:
+
+.. code-block:: bash
+
+   python manage.py collectstatic
+
+This gathers all static files into ``STATIC_ROOT`` for production use.
