@@ -66,7 +66,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return (10, 6)
         else:
-            return (8, 0, 11)
+            return (8, 4)
 
     @cached_property
     def test_collations(self):
@@ -104,24 +104,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
         }
-        if not self.supports_explain_analyze:
-            skips.update(
-                {
-                    "MariaDB and MySQL >= 8.0.18 specific.": {
-                        "queries.test_explain.ExplainTests.test_mysql_analyze",
-                    },
-                }
-            )
-        if self.connection.mysql_version < (8, 0, 31):
-            skips.update(
-                {
-                    "Nesting of UNIONs at the right-hand side is not supported on "
-                    "MySQL < 8.0.31": {
-                        "queries.test_qs_combinators.QuerySetSetOperationTests."
-                        "test_union_nested"
-                    },
-                }
-            )
         if not self.connection.mysql_is_mariadb:
             skips.update(
                 {
@@ -187,43 +169,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_server_data["sql_auto_is_null"]
 
     @cached_property
-    def supports_column_check_constraints(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 16)
-
-    supports_table_check_constraints = property(
-        operator.attrgetter("supports_column_check_constraints")
-    )
-
-    @cached_property
-    def can_introspect_check_constraints(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 16)
-
-    @cached_property
     def has_select_for_update_of(self):
         return not self.connection.mysql_is_mariadb
-
-    @cached_property
-    def supports_explain_analyze(self):
-        return self.connection.mysql_is_mariadb or self.connection.mysql_version >= (
-            8,
-            0,
-            18,
-        )
 
     @cached_property
     def supported_explain_formats(self):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other
         # backends.
         formats = {"JSON", "TEXT", "TRADITIONAL"}
-        if not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            8,
-            0,
-            16,
-        ):
+        if not self.connection.mysql_is_mariadb:
             formats.add("TREE")
         return formats
 
@@ -262,23 +216,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return (
             not self.connection.mysql_is_mariadb
             and self._mysql_storage_engine != "MyISAM"
-            and self.connection.mysql_version >= (8, 0, 13)
         )
-
-    @cached_property
-    def supports_select_intersection(self):
-        is_mariadb = self.connection.mysql_is_mariadb
-        return is_mariadb or self.connection.mysql_version >= (8, 0, 31)
-
-    supports_select_difference = property(
-        operator.attrgetter("supports_select_intersection")
-    )
-
-    @cached_property
-    def supports_expression_defaults(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 13)
 
     @cached_property
     def has_native_uuid_field(self):

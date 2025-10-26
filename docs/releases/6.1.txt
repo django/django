@@ -319,6 +319,12 @@ Dropped support for PostgreSQL 14
 Upstream support for PostgreSQL 14 ends in November 2026. Django 6.1 supports
 PostgreSQL 15 and higher.
 
+Dropped support for MySQL < 8.4
+-------------------------------
+
+Upstream support for MySQL 8.0 ends in April 2026, and MySQL 8.1-8.3 are
+short-term innovation releases. Django 6.1 supports MySQL 8.4 and higher.
+
 Miscellaneous
 -------------
 
