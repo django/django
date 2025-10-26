@@ -209,6 +209,33 @@ class Serializer:
         if callable(getattr(self.stream, "getvalue", None)):
             return self.stream.getvalue()
 
+    def _should_include_pk(self, obj):
+        """
+        Determines whether the Primary Key (PK) should be included in the
+        serialized data for the given object, especially when
+        use_natural_primary_keys=True is set.
+        """
+        pk_included = True
+
+        if self.use_natural_primary_keys:
+            natural_key_func = getattr(obj, "natural_key", None)
+
+            if callable(natural_key_func):
+                natural_key_value = natural_key_func()
+
+                is_pk_tuple = natural_key_value == (obj.pk,)
+
+                is_opt_out = (
+                    not natural_key_value
+                    or is_pk_tuple
+                    or not isinstance(natural_key_value, tuple)
+                )
+
+                if not is_opt_out:
+                    pk_included = False
+
+        return pk_included
+
 
 class Deserializer:
     """

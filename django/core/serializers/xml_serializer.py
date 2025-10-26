@@ -54,29 +54,7 @@ class Serializer(base.Serializer):
         self.indent(1)
         attrs = {"model": str(obj._meta)}
 
-        pk_included = True
-
-        if self.use_natural_primary_keys:
-            natural_key_func = getattr(obj, "natural_key", None)
-
-            if callable(natural_key_func):
-                natural_key_value = None
-                try:
-                    natural_key_value = natural_key_func()
-                except Exception:
-                    pass
-
-                is_pk_tuple = natural_key_value == (obj.pk,)
-
-                is_opt_out = (
-                    natural_key_value is None
-                    or not natural_key_value
-                    or is_pk_tuple
-                    or not isinstance(natural_key_value, tuple)
-                )
-
-                if not is_opt_out:
-                    pk_included = False
+        pk_included = self._should_include_pk(obj)
 
         if pk_included:
             obj_pk = obj.pk
