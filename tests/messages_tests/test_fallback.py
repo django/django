@@ -1,4 +1,3 @@
-import gc
 import random
 
 from django.contrib.messages import constants
