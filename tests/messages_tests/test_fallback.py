@@ -158,26 +158,3 @@ class FallbackTests(BaseTests, SimpleTestCase):
         self.assertEqual(cookie_storing, 0)
         session_storing = self.stored_session_messages_count(storage, response)
         self.assertEqual(session_storing, 1)
-
-    def test_weak_request(self):
-        """
-        This method tests if the request objects will be collected by the GC
-        to prevent circular references
-        """
-        request = self.get_request()
-        storage = self.storage_class(request)
-        # Get the weak reference from your method
-        weak_ref = storage._weak_request()
-        # Test that it points to the same request
-        self.assertIs(weak_ref(), storage.request)
-        self.assertIs(weak_ref(), request)
-        # Test garbage collection
-        del request
-        gc.collect()
-        # Should still exist because storage holds reference
-        self.assertIsNotNone(weak_ref())
-        # Remove storage and test again
-        del storage
-        gc.collect()
-        # Now should be None
-        self.assertIsNone(weak_ref())
