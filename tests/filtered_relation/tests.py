@@ -1044,6 +1044,9 @@ class FilteredRelationAggregationTests(TestCase):
             [self.book1],
         )
 
+    def test_recursion_error(self):
+        ...
+
 
 class FilteredRelationAnalyticalAggregationTests(TestCase):
     @classmethod
