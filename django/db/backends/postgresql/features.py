@@ -81,10 +81,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def django_test_skips(self):
         skips = {
-            "opclasses are PostgreSQL only.": {
-                "indexes.tests.SchemaIndexesNotPostgreSQLTests."
-                "test_create_index_ignores_opclasses",
-            },
             "PostgreSQL requires casting to text.": {
                 "lookup.tests.LookupTests.test_textfield_exact_null",
             },

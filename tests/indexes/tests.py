@@ -1,5 +1,5 @@
 import datetime
-from unittest import skipUnless
+from unittest import skipIf, skipUnless
 
 from django.conf import settings
 from django.db import connection
@@ -106,6 +106,7 @@ class SchemaIndexesTests(TestCase):
             self.assertIn("charfield_added", str(editor.deferred_sql[0].parts["name"]))
 
 
+@skipIf(connection.vendor == "postgresql", "No PostgreSQL tests")
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
     available_apps = ["indexes"]
 
