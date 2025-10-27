@@ -63,10 +63,9 @@ and the ``weight`` rounded to the nearest integer.
     error. This means that functions such as
     :class:`Concat() <django.db.models.functions.Concat>` aren't accepted.
 
-.. admonition:: MySQL and MariaDB
+.. admonition:: MariaDB
 
-    Functional indexes are ignored with MySQL < 8.0.13 and MariaDB as neither
-    supports them.
+    Functional indexes are unsupported and ignored with MariaDB.
 
 ``fields``
 ----------
