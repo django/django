@@ -10,16 +10,6 @@ logger = logging.getLogger("django.contrib.gis")
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index = "CREATE SPATIAL INDEX %(index)s ON %(table)s(%(column)s)"
 
-    def skip_default(self, field):
-        # Geometry fields are stored as BLOB/TEXT, for which MySQL < 8.0.13
-        # doesn't support defaults.
-        if (
-            isinstance(field, GeometryField)
-            and not self._supports_limited_data_type_defaults
-        ):
-            return True
-        return super().skip_default(field)
-
     def quote_value(self, value):
         if isinstance(value, self.connection.ops.Adapter):
             return super().quote_value(str(value))

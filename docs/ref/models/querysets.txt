@@ -3161,8 +3161,8 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL:
 
 On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
-by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
-there are triggers or if a function is called, even for a ``SELECT`` query.
+by MariaDB, MySQL, and PostgreSQL could result in changes to data if there are
+triggers or if a function is called, even for a ``SELECT`` query.
 
 .. _field-lookups:
 
