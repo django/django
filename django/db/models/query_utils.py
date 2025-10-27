@@ -541,13 +541,14 @@ class FilteredRelation:
         if clone.resolved_condition is not None:
             return clone
 
-        if not hasattr(query, '_resolving_relations'):
+        if not hasattr(query, "_resolving_relations"):
             query._resolving_relations = {}
 
         relation_key = self.relation_name
 
         if query._resolving_relations.get(relation_key, False):
             from django.db.models.sql.where import WhereNode
+
             clone.resolved_condition = WhereNode()
 
             return clone
@@ -560,12 +561,13 @@ class FilteredRelation:
                 can_reuse=reuse,
                 allow_joins=True,
                 split_subq=False,
-                update_join_types=False
+                update_join_types=False,
             )
             clone.resolved_condition = where_node
 
         except RecursionError:
             from django.db.models.sql.where import WhereNode
+
             clone.resolved_condition = WhereNode()
         finally:
             query._resolving_relations[relation_key] = False
