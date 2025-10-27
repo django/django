@@ -2767,6 +2767,15 @@ backend definition in :setting:`STORAGES`.
     Defining this setting overrides the default value and is *not* merged with
     it.
 
+.. admonition:: There are community maintained solutions too!
+
+    Django has a vibrant ecosystem. There are storage backends
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Storage Backends grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#storage-and-static-files
+.. _Storage Backends grid: https://djangopackages.org/grids/g/storage-backends/
+
 .. setting:: TASKS
 
 ``TASKS``
