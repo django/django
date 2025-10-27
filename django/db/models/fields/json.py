@@ -316,8 +316,8 @@ class JSONExact(lookups.Exact):
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
         # Treat None lookup values as null.
-        if rhs == "%s" and rhs_params == [None]:
-            rhs_params = ["null"]
+        if rhs == "%s" and (*rhs_params,) == (None,):
+            rhs_params = ("null",)
         if connection.vendor == "mysql":
             func = ["JSON_EXTRACT(%s, '$')"] * len(rhs_params)
             rhs %= tuple(func)
@@ -552,7 +552,7 @@ class KeyTransformExact(JSONExact):
 
     def as_oracle(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
-        if rhs_params == ["null"]:
+        if rhs_params and (*rhs_params,) == ("null",):
             # Field has key and it's NULL.
             has_key_expr = HasKeyOrArrayIndex(self.lhs.lhs, self.lhs.key_name)
             has_key_sql, has_key_params = has_key_expr.as_oracle(compiler, connection)
