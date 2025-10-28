@@ -2,7 +2,9 @@ import datetime
 import re
 from collections import namedtuple
 
+from django.conf import settings
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
+from django.utils.module_loading import import_string
 
 FieldReference = namedtuple("FieldReference", "to through")
 
@@ -127,3 +129,8 @@ def get_references(state, model_tuple, field_tuple=()):
 def field_is_referenced(state, model_tuple, field_tuple):
     """Return whether `field_tuple` is referenced by any state models."""
     return next(get_references(state, model_tuple, field_tuple), None) is not None
+
+
+def get_migrate_executor():
+    """Returns the executor to use for migration."""
+    return import_string(settings.MIGRATION_EXECUTOR_BACKEND)
