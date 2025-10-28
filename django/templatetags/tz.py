@@ -92,6 +92,8 @@ class LocalTimeNode(Node):
     Template node class used by ``localtime_tag``.
     """
 
+    __slots__ = ("nodelist", "use_tz")
+
     def __init__(self, nodelist, use_tz):
         self.nodelist = nodelist
         self.use_tz = use_tz
@@ -109,6 +111,8 @@ class TimezoneNode(Node):
     Template node class used by ``timezone_tag``.
     """
 
+    __slots__ = ("nodelist", "tz")
+
     def __init__(self, nodelist, tz):
         self.nodelist = nodelist
         self.tz = tz
@@ -123,6 +127,8 @@ class GetCurrentTimezoneNode(Node):
     """
     Template node class used by ``get_current_timezone_tag``.
     """
+
+    __slots__ = ("variable",)
 
     def __init__(self, variable):
         self.variable = variable
