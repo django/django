@@ -474,6 +474,11 @@ def _init_worker(
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
+        if (
+            is_spawn_or_forkserver
+            and os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true"
+        ):
+            connection.creation.mark_expected_failures_and_skips()
 
     if is_spawn_or_forkserver:
         call_command(
