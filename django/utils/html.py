@@ -228,11 +228,13 @@ def strip_tags(value):
         strip_tags_depth += 1
     return value
 
+_strip_spaces_pattern = _lazy_re_compile(r">\s+<")
+
 
 @keep_lazy_text
 def strip_spaces_between_tags(value):
     """Return the given HTML with spaces between tags removed."""
-    return re.sub(r">\s+<", "><", str(value))
+    return _strip_spaces_pattern.sub("><", str(value))
 
 
 def smart_urlquote(url):
