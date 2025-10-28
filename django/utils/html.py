@@ -228,6 +228,7 @@ def strip_tags(value):
         strip_tags_depth += 1
     return value
 
+
 _strip_spaces_pattern = _lazy_re_compile(r">\s+<")
 
 
