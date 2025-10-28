@@ -632,7 +632,7 @@ class BaseDatabaseSchemaEditor:
         """
         olds = {tuple(fields) for fields in old_index_together}
         news = {tuple(fields) for fields in new_index_together}
-        
+
         # Remove indexes that are no longer needed
         for fields in olds.difference(news):
             self._delete_composed_index(
@@ -641,7 +641,7 @@ class BaseDatabaseSchemaEditor:
                 {"index": True, "unique": False},
                 self.sql_delete_index,
             )
-        
+
         # Create all indexes in the new set
         for field_names in news:
             fields = [model._meta.get_field(field) for field in field_names]
@@ -1659,13 +1659,15 @@ class BaseDatabaseSchemaEditor:
                 or self.connection.features.supports_expression_indexes
             ):
                 output.append(index.create_sql(model, self))
-        
+
         # Include index_together for historical migrations
-        if hasattr(model._meta, 'index_together') and model._meta.index_together:
+        if hasattr(model._meta, "index_together") and model._meta.index_together:
             for field_names in model._meta.index_together:
                 fields = [model._meta.get_field(field) for field in field_names]
-                output.append(self._create_index_sql(model, fields=fields, suffix="_idx"))
-        
+                output.append(
+                    self._create_index_sql(model, fields=fields, suffix="_idx")
+                )
+
         return output
 
     def _field_indexes_sql(self, model, field):
