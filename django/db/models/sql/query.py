@@ -2346,13 +2346,7 @@ class Query(BaseExpression):
         query (not even the model's default).
         """
         if not force and (
-            self.is_sliced
-            or self.distinct_fields
-            or self.select_for_update
-            or (
-                isinstance(self.group_by, tuple)
-                and not {*self.order_by, *self.extra_order_by}.issubset(self.group_by)
-            )
+            self.is_sliced or self.distinct_fields or self.select_for_update
         ):
             return
         self.order_by = ()
