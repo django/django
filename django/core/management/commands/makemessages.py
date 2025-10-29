@@ -153,7 +153,7 @@ class BuildFile:
             # removing either of those two removes both.
             if os.path.exists(self.work_path):
                 os.unlink(self.work_path)
-                
+
 
 def normalize_eols(raw_contents):
     """
@@ -423,18 +423,19 @@ class Command(BaseCommand):
             potfiles = self.build_potfiles()
 
             # Build po files for each selected locale
+            # Build po files for each selected locale
             for locale in locales:
                 if not is_valid_locale(locale):
                     # Try to find a valid locale by normalizing the input.
-                    # Handles BCP 47 casing and private subtags like "-x-informal".
+                    from django.conf.locale import LANG_INFO
+
                     proposed_locale = None
 
+                    # Handle private subtags (e.g., nl-nl-x-informal)
                     base_locale, _, private_subtag = locale.partition("-x-")
-                    private_subtag = f"-x-{private_subtag}" if private_subtag else ""
-
+                    private_subtag = "-x-%s" % private_subtag if private_subtag else ""
                     # Normalize separators (e.g., en-US → en_US)
                     normalized_locale = base_locale.replace("-", "_").replace("+", "_")
-
                     # Try case-insensitive lookup in Django's LANG_INFO
                     locale_lower = normalized_locale.lower()
                     for valid_locale in LANG_INFO.keys():
@@ -450,16 +451,20 @@ class Command(BaseCommand):
                                 else valid_locale
                             )
                             break
-
                     # Attempt reconstruction if not matched
                     if not proposed_locale:
                         parts = normalized_locale.split("_")
                         if len(parts) >= 2:
                             reconstructed = [parts[0].lower()]
                             for part in parts[1:]:
-                                if len(part) == 4 and part.isalpha():
+                                if part.isdigit():
+                                    # Numeric region code (e.g., en_001)
+                                    reconstructed.append(part)
+                                elif len(part) == 4 and part.isalpha():
+                                    # Script code (e.g., Hans, Latn)
                                     reconstructed.append(part.capitalize())
                                 elif len(part) == 2 and part.isalpha():
+                                    # Country code (e.g., GB, MA)
                                     reconstructed.append(part.upper())
                                 else:
                                     reconstructed.append(part)
@@ -470,17 +475,15 @@ class Command(BaseCommand):
                             test_locale = normalized_locale.lower() + private_subtag
                             if is_valid_locale(test_locale):
                                 proposed_locale = test_locale
-
                     # Output suggestions
                     if proposed_locale:
                         self.stdout.write(
-                            f"invalid locale {locale}, did you mean {proposed_locale}?"
+                            "invalid locale %s, did you mean %s?"
+                            % (locale, proposed_locale)
                         )
                     else:
-                        self.stdout.write(f"invalid locale {locale}")
-
+                        self.stdout.write("invalid locale %s" % locale)
                     continue
-
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s" % locale)
                 for potfile in potfiles:
