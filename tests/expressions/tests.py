@@ -57,6 +57,7 @@ from django.db.models.expressions import (
     Ref,
 )
 from django.db.models.functions import (
+    Cast,
     Coalesce,
     Concat,
     ExtractDay,
@@ -2909,6 +2910,47 @@ class ExpressionWrapperTests(SimpleTestCase):
         group_by_cols = expr.get_group_by_cols()
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
+
+
+class DateFieldTimedeltaTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_date = datetime.date(2025, 10, 11)
+        cls.experiment = Experiment.objects.create(
+            name="DateField Test",
+            assigned=cls.test_date,
+            start=datetime.datetime(2025, 10, 11, 18, 0, 0),
+            end=datetime.datetime(2025, 10, 13, 18, 0, 0),
+            completed=datetime.date(2025, 10, 13),
+            estimated_time=datetime.timedelta(days=2),
+        )
+
+    def test_datefield_timedelta_with_cast(self):
+        """Cast ensures date type when subtracting timedelta from DateField."""
+        qs = Experiment.objects.annotate(
+            next_day=Cast(
+                F("assigned") + datetime.timedelta(days=1),
+                output_field=DateField(),
+            )
+        )
+        result = qs.first().next_day
+        self.assertIsInstance(result, datetime.date)
+        self.assertNotIsInstance(result, datetime.datetime)
+        self.assertEqual(result, datetime.date(2025, 10, 12))
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL only")
+    def test_datefield_timedelta_integer_arithmetic(self):
+        """Integer arithmetic with DateField returns date type."""
+        qs = Experiment.objects.annotate(
+            previous_day=ExpressionWrapper(
+                F("assigned") - 1,
+                output_field=DateField(),
+            )
+        )
+        result = qs.first().previous_day
+        self.assertIsInstance(result, datetime.date)
+        self.assertNotIsInstance(result, datetime.datetime)
+        self.assertEqual(result, datetime.date(2025, 10, 10))
 
 
 class NegatedExpressionTests(TestCase):
