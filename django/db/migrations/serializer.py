@@ -386,6 +386,26 @@ class Serializer:
         cls._registry.pop(type_)
 
 
+class GenericAliasSerializer(BaseSerializer):
+    """
+    Generic Serializer class to convert
+    any type into a string
+    """
+    def serialize(self):
+        imports = set()
+        value_repr = repr(self.value)
+        print(f'O IMPORT FOI: {imports}')
+        print(f'O VALUE_REPR FOI: {value_repr}')
+
+        if hasattr(self.value, '__origin__'):
+            origin = self.value.__origin__
+            print(f'O ORIGIN FOI: {origin}')
+            if origin is not None and hasattr(origin, '__module__') and origin.__module__ != 'builtins':
+                imports.add(f"Import {origin.__module__}")
+
+        return value_repr, imports
+
+
 def serializer_factory(value):
     if isinstance(value, Promise):
         value = str(value)
@@ -405,6 +425,12 @@ def serializer_factory(value):
     # Anything that knows how to deconstruct itself.
     if hasattr(value, "deconstruct"):
         return DeconstructibleSerializer(value)
+    if hasattr(types, 'GenericAlias') and isinstance(value, types.GenericAlias):
+        print(f'O VALUE FOI: 1# {value}')
+        return GenericAliasSerializer(value)
+    elif hasattr(value, '__origin__') and hasattr(value, '__args__'):
+        print(f'O VALUE FOI: 2# {value}')
+        return GenericAliasSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
             return serializer_cls(value)
