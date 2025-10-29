@@ -6,9 +6,8 @@ Because Django was developed in a fast-paced newsroom environment, it was
 designed to make common web development tasks fast and easy. Here's an informal
 overview of how to write a database-driven web app with Django.
 
-The goal of this document is to give you enough technical specifics to
-understand how Django works, but this isn't intended to be a tutorial or
-reference -- but we've got both! When you're ready to start a project, you can
+The goal of this document is to provide enough technical details to understand how Django works. 
+It’s not intended as a tutorial or reference — but Django provides both! When you're ready to start a project, you can
 :doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into
 more detailed documentation </topics/index>`.
 
@@ -146,7 +145,7 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 ============================================================================
 
 Once your models are defined, Django can automatically create a professional,
-production ready :doc:`administrative interface </ref/contrib/admin/index>` --
++ production-ready :doc:`administrative interface </ref/contrib/admin/index>` –
 a website that lets authenticated users add, change and delete objects. The
 only step required is to register your model in the admin site:
 
@@ -181,6 +180,7 @@ start populating data. Then, develop the way data is presented to the public.
 
 Design your URLs
 ================
++
 
 A clean, elegant URL scheme is an important detail in a high-quality web
 application. Django encourages beautiful URL design and doesn't put any cruft
