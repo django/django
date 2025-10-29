@@ -2435,7 +2435,8 @@ This has a number of caveats though:
 
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
-* It does not work with child models in a multi-table inheritance scenario.
+* Child models in a multi-table inheritance (MTI) scenario are supported in
+  limited cases (see *Multi-table inheritance* below).
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
   a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
   is ``False``, the primary key attribute can only be retrieved on certain
@@ -2474,6 +2475,50 @@ be in conflict must be provided.
 
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
+
+Multi-table inheritance
+-----------------------
+
+``bulk_create()`` supports child models in multi-table inheritance in two
+cases:
+
+* Backends that can return rows from bulk inserts (currently PostgreSQL and
+  SQLite >= 3.35): calling ``bulk_create()`` on the child model inserts the
+  top-most parent rows, any intermediate levels, and then the child rows,
+  preserving primary key alignment across the hierarchy.
+
+* Backends without RETURNING (for example, MariaDB/MySQL, Oracle): support is
+  limited to a single inheritance level if each child instance has its parent
+  pointer pre-set. In practice, first bulk-create the parents, then
+  bulk-create the children while setting ``id=parent.pk`` (or the appropriate
+  parent link field).
+
+Example (preset parent pointer pattern):
+
+.. code-block:: python
+
+    # Create parents first.
+    parents = [ArticleParent(title=f"title {i}") for i in range(3)]
+    ArticleParent.objects.bulk_create(parents)
+
+    # Then create children with the same PKs as their parents.
+    children = [
+        ArticleChild(id=p.pk, body=f"body {i}")  # id equals parent.pk
+        for i, p in enumerate(parents)
+    ]
+    ArticleChild.objects.bulk_create(children)
+
+Notes and limitations:
+
+* Conflict handling is **not supported** for multi-table inheritance: passing
+  ``ignore_conflicts=True`` or ``update_conflicts=True`` raises
+  ``NotSupportedError``.
+
+* Multi-level inheritance (grandchild, etc.) is supported only on backends
+  that can return rows from bulk inserts.
+
+* As with other models, ``save()`` is not called and the ``pre_save`` /
+  ``post_save`` signals are not sent.
 
 .. warning::
 

@@ -26,13 +26,15 @@ from .models import (
     Country,
     DbDefaultModel,
     DbDefaultPrimaryKey,
+    DoubleProxyMTIChild,
     FieldsWithDbColumns,
+    MTIChild,
+    MTIGrandChild,
+    MTIParent,
     NoFields,
     NullableFields,
-    Pizzeria,
     ProxyCountry,
-    ProxyMultiCountry,
-    ProxyMultiProxyCountry,
+    ProxyMTIChild,
     ProxyProxyCountry,
     RelatedModel,
     Restaurant,
@@ -40,6 +42,8 @@ from .models import (
     State,
     TwoFields,
     UpsertConflict,
+    UUIDChild,
+    UUIDParent,
 )
 
 
@@ -96,27 +100,6 @@ class BulkCreateTests(TestCase):
             ]
         )
         self.assertEqual(Country.objects.count(), 4)
-
-    def test_multi_table_inheritance_unsupported(self):
-        expected_message = "Can't bulk create a multi-table inherited model"
-        with self.assertRaisesMessage(ValueError, expected_message):
-            Pizzeria.objects.bulk_create(
-                [
-                    Pizzeria(name="The Art of Pizza"),
-                ]
-            )
-        with self.assertRaisesMessage(ValueError, expected_message):
-            ProxyMultiCountry.objects.bulk_create(
-                [
-                    ProxyMultiCountry(name="Fillory", iso_two_letter="FL"),
-                ]
-            )
-        with self.assertRaisesMessage(ValueError, expected_message):
-            ProxyMultiProxyCountry.objects.bulk_create(
-                [
-                    ProxyMultiProxyCountry(name="Fillory", iso_two_letter="FL"),
-                ]
-            )
 
     def test_proxy_inheritance_supported(self):
         ProxyCountry.objects.bulk_create(
@@ -923,3 +906,179 @@ class BulkCreateTransactionTests(TransactionTestCase):
                 ],
                 batch_size=1,
             )
+
+
+class BulkCreateMTITests(TestCase):
+    """
+    bulk_create() with multi-table inheritance (MTI).
+
+    Covers:
+      - General path with RETURNING (PostgreSQL, SQLite ≥ 3.35).
+      - Optimized path with preset parent pointer (all backends).
+      - Mixed preset/non-preset cases.
+      - Batching.
+      - Explicit parent link attname.
+      - Instance state after insertion.
+      - Expected errors (conflict handling unsupported on MTI v1).
+    """
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_mti_single_level_with_returning(self):
+        objs = [MTIChild(name=f"n{i}", bval=i) for i in range(5)]
+        MTIChild.objects.bulk_create(objs)
+        self.assertEqual(MTIParent.objects.count(), 5)
+        self.assertEqual(MTIChild.objects.count(), 5)
+        for i, ch in enumerate(MTIChild.objects.order_by("id")):
+            par = MTIParent.objects.get(pk=ch.pk)
+            self.assertEqual(par.name, f"n{i}")
+            self.assertEqual(ch.bval, i)
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_mti_multi_level_with_returning(self):
+        objs = [MTIGrandChild(name=f"n{i}", bval=i, cval=i * 10) for i in range(7)]
+        MTIGrandChild.objects.bulk_create(objs)
+        self.assertEqual(MTIParent.objects.count(), 7)
+        self.assertEqual(MTIChild.objects.count(), 7)
+        self.assertEqual(MTIGrandChild.objects.count(), 7)
+        for i, leaf in enumerate(MTIGrandChild.objects.order_by("id")):
+            child = MTIChild.objects.get(pk=leaf.pk)
+            parent = MTIParent.objects.get(pk=leaf.pk)
+            self.assertEqual(parent.name, f"n{i}")
+            self.assertEqual(child.bval, i)
+            self.assertEqual(leaf.cval, i * 10)
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_mti_with_returning_respects_batch_size(self):
+        objs = [MTIChild(name=f"b{i}", bval=i) for i in range(6)]
+        MTIChild.objects.bulk_create(objs, batch_size=2)
+        self.assertEqual(MTIParent.objects.count(), 6)
+        self.assertEqual(MTIChild.objects.count(), 6)
+        for i, ch in enumerate(MTIChild.objects.order_by("id")):
+            self.assertEqual(MTIParent.objects.get(pk=ch.pk).name, f"b{i}")
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_mti_mix_preset_and_nonpreset_with_returning(self):
+        p = MTIParent.objects.create(name="p0")
+        objs = [MTIChild(id=p.pk, bval=1), MTIChild(name="np", bval=2)]
+        MTIChild.objects.bulk_create(objs)
+        for ch in MTIChild.objects.all():
+            self.assertTrue(MTIParent.objects.filter(pk=ch.pk).exists())
+
+    def test_mti_single_level_preset_ptr_all_backends(self):
+        parents = [MTIParent.objects.create(name=f"p{i}") for i in range(3)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
+        children = [
+            MTIChild(**{attname: p.pk}, bval=100 + i) for i, p in enumerate(parents)
+        ]
+        MTIChild.objects.bulk_create(children)
+        self.assertEqual(MTIParent.objects.count(), 3)
+        self.assertEqual(MTIChild.objects.count(), 3)
+        for i, ch in enumerate(MTIChild.objects.order_by("id")):
+            par = MTIParent.objects.get(pk=ch.pk)
+            self.assertEqual(par.name, f"p{i}")
+            self.assertEqual(ch.bval, 100 + i)
+
+    def test_mti_uuid_preset_ptr_all_backends(self):
+        parents = [UUIDParent(title=f"t{i}") for i in range(4)]
+        UUIDParent.objects.bulk_create(parents)
+        idx_by_pk = {p.pk: i for i, p in enumerate(parents)}
+        kids = [UUIDChild(id=p.pk, score=idx_by_pk[p.pk] * 5) for p in parents]
+        UUIDChild.objects.bulk_create(kids)
+        self.assertEqual(UUIDParent.objects.count(), 4)
+        self.assertEqual(UUIDChild.objects.count(), 4)
+        for kid in UUIDChild.objects.all():
+            par = UUIDParent.objects.get(pk=kid.pk)
+            i = idx_by_pk[kid.pk]
+            self.assertEqual(par.title, f"t{i}")
+            self.assertEqual(kid.score, i * 5)
+
+    def test_mti_preset_via_parent_link_attname(self):
+        p = MTIParent.objects.create(name="x")
+        parent_link_field = MTIChild._meta.parents[MTIParent]
+        attname = parent_link_field.attname
+        ch = MTIChild(**{attname: p.pk}, bval=7)
+        MTIChild.objects.bulk_create([ch])
+        ch_db = MTIChild.objects.get()
+        self.assertEqual(ch_db.pk, p.pk)
+        self.assertEqual(ch_db.bval, 7)
+
+    def test_mti_mix_preset_and_nonpreset_on_nonreturning_backend(self):
+        if connection.features.can_return_rows_from_bulk_insert:
+            self.skipTest(
+                "Backend supports RETURNING; this targets non-RETURNING backends."
+            )
+        p = MTIParent.objects.create(name="p0")
+        objs = [MTIChild(id=p.pk, bval=1), MTIChild(name="np", bval=2)]
+        with self.assertRaisesMessage(
+            NotSupportedError, "requires the database to return rows"
+        ):
+            MTIChild.objects.bulk_create(objs)
+
+    def test_mti_raises_without_returning_and_without_preset_ptr(self):
+        if connection.features.can_return_rows_from_bulk_insert:
+            self.skipTest(
+                "Backend supports RETURNING; this targets non-RETURNING backends."
+            )
+        with self.assertRaisesMessage(
+            NotSupportedError, "requires the database to return rows"
+        ):
+            MTIChild.objects.bulk_create([MTIChild(name="x", bval=1)])
+
+    def test_mti_rejects_conflict_handling_v1(self):
+        with self.assertRaisesMessage(NotSupportedError, "doesn't support conflict"):
+            MTIChild.objects.bulk_create(
+                [MTIChild(name="y", bval=2)], ignore_conflicts=True
+            )
+
+    def test_mti_rejects_update_conflicts_v1(self):
+        with self.assertRaisesMessage(NotSupportedError, "doesn't support conflict"):
+            MTIChild.objects.bulk_create(
+                [MTIChild(name="z", bval=3)],
+                update_conflicts=True,
+                update_fields=["bval"],
+                unique_fields=["pk"],
+            )
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_mti_state_after_bulk_create(self):
+        (ch,) = MTIChild.objects.bulk_create([MTIChild(name="s", bval=1)])
+        self.assertFalse(ch._state.adding)
+        self.assertEqual(ch._state.db, connection.alias)
+
+    def test_mti_preset_ptr_via_proxy_leaf_all_backends(self):
+        """
+        bulk_create() on a proxy over an MTI leaf should work on all backends
+        when the parent pointer is preset (child.pk == parent.pk).
+        """
+        parents = [MTIParent.objects.create(name=f"p{i}") for i in range(3)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
+        children = [
+            ProxyMTIChild(**{attname: p.pk}, bval=10 + i) for i, p in enumerate(parents)
+        ]
+        ProxyMTIChild.objects.bulk_create(children)
+
+        self.assertEqual(MTIParent.objects.count(), 3)
+        self.assertEqual(MTIChild.objects.count(), 3)
+        for i, ch in enumerate(MTIChild.objects.order_by("id")):
+            self.assertEqual(ch.bval, 10 + i)
+            self.assertTrue(MTIParent.objects.filter(pk=ch.pk).exists())
+
+    def test_mti_preset_ptr_via_double_proxy_leaf_all_backends(self):
+        """
+        bulk_create() on a double proxy over an MTI leaf should also work
+        when the parent pointer is preset.
+        """
+        parents = [MTIParent.objects.create(name=f"q{i}") for i in range(2)]
+        parent_link = MTIChild._meta.parents[MTIParent]
+        attname = parent_link.attname
+        leaves = [
+            DoubleProxyMTIChild(**{attname: p.pk}, bval=99 + i)
+            for i, p in enumerate(parents)
+        ]
+        DoubleProxyMTIChild.objects.bulk_create(leaves)
+
+        self.assertEqual(MTIChild.objects.count(), 2)
+        vals = list(MTIChild.objects.order_by("id").values_list("bval", flat=True))
+        self.assertEqual(vals, [99, 100])
