@@ -27,13 +27,18 @@ class TemplateDoesNotExist(Exception):
 
     def __init__(self, msg, tried=None, backend=None, chain=None):
         self.backend = backend
-        if tried is None:
-            tried = []
-        self.tried = tried
-        if chain is None:
-            chain = []
-        self.chain = chain
+        self.tried = tried or []
+        self.chain = chain or []
         super().__init__(msg)
+
+    def __str__(self):
+        base_msg = super().__str__()
+        if self.tried:
+            tried_sources = ", ".join(
+                f"{origin} ({status})" for origin, status in self.tried
+            )
+            return f"{base_msg} | Tried: {tried_sources}"
+        return base_msg
 
 
 class TemplateSyntaxError(Exception):
@@ -41,4 +46,12 @@ class TemplateSyntaxError(Exception):
     The exception used for syntax errors during parsing or rendering.
     """
 
-    pass
+    def __init__(self, msg, line_number=None):
+        self.line_number = line_number
+        super().__init__(msg)
+
+    def __str__(self):
+        base_msg = super().__str__()
+        if self.line_number is not None:
+            return f"Syntax error at line {self.line_number}: {base_msg}"
+        return base_msg
