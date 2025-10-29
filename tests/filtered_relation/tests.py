@@ -16,9 +16,9 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.query import QuerySet
 from django.db.models.functions import Concat
 from django.db.models.lookups import Exact, IStartsWith
+from django.db.models.query import QuerySet
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -1048,8 +1048,7 @@ class FilteredRelationAggregationTests(TestCase):
     def test_recursion_error(self):
         qs = Book.objects.alias(
             specific_mission=FilteredRelation(
-                "author__favorite_books",
-                condition=Q(author__content_type__name="test")
+                "author__favorite_books", condition=Q(author__content_type__name="test")
             )
         )
         self.assertIsInstance(qs, QuerySet)
