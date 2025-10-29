@@ -186,9 +186,9 @@ root of the project.
 Configure a formatter
 ~~~~~~~~~~~~~~~~~~~~~
 
-By default, the final log output contains the message part of each :class:`log
-record <logging.LogRecord>`. Use a formatter if you want to include additional
-data. First name and define your formatters - this example defines
+By default, the final log output contains the message part of each
+:class:`~logging.LogRecord` object. Use a formatter if you want to include
+additional data. First name and define your formatters - this example defines
 formatters named ``verbose`` and ``simple``:
 
 .. code-block:: python

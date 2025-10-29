@@ -110,8 +110,7 @@ model it represents, or to retrieve objects from that model:
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does
-    :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
+    represents, and does a :meth:`~django.db.models.query.QuerySet.get` lookup
     on that model, returning the corresponding object. The ``using`` argument
     can be used to specify a different database than the default one.
 
@@ -160,11 +159,10 @@ two extremely important use cases:
    to get access to those model classes.
 
 Several of Django's bundled applications make use of the latter technique.
-For example,
-:class:`the permissions system <django.contrib.auth.models.Permission>` in
-Django's authentication framework uses a
-:class:`~django.contrib.auth.models.Permission` model with a foreign
-key to :class:`~django.contrib.contenttypes.models.ContentType`; this lets
+For example, :ref:`the permissions system <topic-authorization>` in Django's
+authentication framework uses a :class:`~django.contrib.auth.models.Permission`
+model with a foreign key to
+:class:`~django.contrib.contenttypes.models.ContentType`; this lets
 :class:`~django.contrib.auth.models.Permission` represent concepts like
 "can add blog entry" or "can delete news story".
 

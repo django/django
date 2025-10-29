@@ -211,10 +211,10 @@ filtering.
 
 See the PostgreSQL documentation for more details about `covering indexes`_.
 
-.. admonition:: Restrictions on PostgreSQL
+.. admonition:: PostgreSQL-specific indexes
 
-    PostgreSQL supports covering B-Tree, :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`, and :class:`SP-GiST indexes
-    <django.contrib.postgres.indexes.SpGistIndex>`.
+    In addition to B-Tree indexes (via :class:`Index`), PostgreSQL also
+    supports :class:`~django.contrib.postgres.indexes.GistIndex` and
+    :class:`~django.contrib.postgres.indexes.SpGistIndex` indexes.
 
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

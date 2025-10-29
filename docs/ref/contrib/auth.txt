@@ -646,10 +646,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. To match the
-        behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
-        which :meth:`prohibits inactive users from logging in
-        <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>`,
-        this method returns ``False`` for users with :attr:`is_active=False
+        behavior of :meth:`.AuthenticationForm.confirm_login_allowed`, this
+        method returns ``False`` for users with :attr:`is_active=False
         <django.contrib.auth.models.User.is_active>`. Custom user models that
         don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
         field are allowed.

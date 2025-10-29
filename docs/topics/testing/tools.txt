@@ -801,26 +801,21 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
 * Some useful assertions like:
 
-  * Checking that a callable :meth:`raises a certain exception
-    <SimpleTestCase.assertRaisesMessage>`.
-  * Checking that a callable :meth:`triggers a certain warning
-    <SimpleTestCase.assertWarnsMessage>`.
-  * Testing form field :meth:`rendering and error treatment
-    <SimpleTestCase.assertFieldOutput>`.
-  * Testing :meth:`HTML responses for the presence/lack of a given fragment
-    <SimpleTestCase.assertContains>`.
-  * Verifying that a template :meth:`has/hasn't been used to generate a given
-    response content <SimpleTestCase.assertTemplateUsed>`.
-  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
-  * Verifying an HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
-    performed by the app.
-  * Robustly testing two :meth:`HTML fragments
-    <SimpleTestCase.assertHTMLEqual>` for equality/inequality or
-    :meth:`containment <SimpleTestCase.assertInHTML>`.
-  * Robustly testing two :meth:`XML fragments <SimpleTestCase.assertXMLEqual>`
-    for equality/inequality.
-  * Robustly testing two :meth:`JSON fragments
-    <SimpleTestCase.assertJSONEqual>` for equality.
+  =========================================== ======================================
+  Assertion                                   What it checks
+  =========================================== ======================================
+  :meth:`~SimpleTestCase.assertRaisesMessage` That a callable raises a certain exception
+  :meth:`~SimpleTestCase.assertWarnsMessage`  That a callable triggers a certain warning
+  :meth:`~SimpleTestCase.assertFieldOutput`   Form field rendering and error output
+  :meth:`~SimpleTestCase.assertContains`      Presence or absence of HTML fragments
+  :meth:`~SimpleTestCase.assertTemplateUsed`  Template usage in a response
+  :meth:`~SimpleTestCase.assertURLEqual`      That two URLs are equal
+  :meth:`~SimpleTestCase.assertRedirects`     That an HTTP redirect occurred
+  :meth:`~SimpleTestCase.assertHTMLEqual`     HTML fragment equality
+  :meth:`~SimpleTestCase.assertInHTML`        HTML fragment containment
+  :meth:`~SimpleTestCase.assertXMLEqual`      XML fragment equality or inequality
+  :meth:`~SimpleTestCase.assertJSONEqual`     JSON fragment equality
+  =========================================== ======================================
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
 * Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
@@ -1688,7 +1683,7 @@ your test suite.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    Asserts that an :class:`~django.http.HttpResponse` produced the
     given :attr:`~django.http.HttpResponse.status_code` and that ``text``
     appears in its :attr:`~django.http.HttpResponse.content`. If ``count``
     is provided, ``text`` must occur exactly ``count`` times in the response.
@@ -1701,7 +1696,7 @@ your test suite.
 
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    Asserts that an :class:`~django.http.HttpResponse` produced the
     given :attr:`~django.http.HttpResponse.status_code` and that ``text`` does
     *not* appear in its :attr:`~django.http.HttpResponse.content`.
 
@@ -1716,8 +1711,8 @@ your test suite.
     Asserts that the template with the given name was used in rendering the
     response.
 
-    ``response`` must be a response instance returned by the
-    :class:`test client <django.test.Response>`.
+    ``response`` must be a :class:`~django.test.Response` instance returned by
+    the test client.
 
     ``template_name`` should be a string such as ``'admin/index.html'``.
 
@@ -1749,9 +1744,10 @@ your test suite.
 
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
-    Asserts that the :class:`response <django.http.HttpResponse>` returned a
-    :attr:`~django.http.HttpResponse.status_code` redirect status, redirected
-    to ``expected_url`` (including any ``GET`` data), and that the final page
+    Asserts that the :class:`~django.http.HttpResponse` returned a response
+    with a redirect status (based on its
+    :attr:`~django.http.HttpResponse.status_code`), redirected to
+    ``expected_url`` (including any ``GET`` data), and that the final response
     was received with ``target_status_code``.
 
     If your request used the ``follow`` argument, the ``expected_url`` and
