@@ -5,6 +5,7 @@ from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
+from django.utils.functional import classproperty
 
 
 class Driver(GDALBase):
@@ -19,25 +20,31 @@ class Driver(GDALBase):
     # For a complete list of original driver names see
     # https://gdal.org/drivers/vector/
     # https://gdal.org/drivers/raster/
-    _alias = {
-        # vector
-        "esri": "ESRI Shapefile",
-        "shp": "ESRI Shapefile",
-        "shape": "ESRI Shapefile",
-        # raster
-        "tiff": "GTiff",
-        "tif": "GTiff",
-        "jpeg": "JPEG",
-        "jpg": "JPEG",
-    }
+    @classproperty
+    def _alias(cls):
+        # use `classproperty` so that the check for `GDAL_VERSION`
+        # is lazy and doesn't trigger the library to load
+        alias = {
+            # vector
+            "esri": "ESRI Shapefile",
+            "shp": "ESRI Shapefile",
+            "shape": "ESRI Shapefile",
+            # raster
+            "tiff": "GTiff",
+            "tif": "GTiff",
+            "jpeg": "JPEG",
+            "jpg": "JPEG",
+        }
 
-    if GDAL_VERSION[:2] <= (3, 10):
-        _alias.update(
-            {
-                "tiger": "TIGER",
-                "tiger/line": "TIGER",
-            }
-        )
+        if GDAL_VERSION[:2] <= (3, 10):
+            alias.update(
+                {
+                    "tiger": "TIGER",
+                    "tiger/line": "TIGER",
+                }
+            )
+
+        return alias
 
     def __init__(self, dr_input):
         """
