@@ -107,3 +107,35 @@ I'm sure my ticket is absolutely 100% perfect, can I mark it as "Ready For Check
 
 Sorry, no. It's always better to get another set of eyes on a ticket. If
 you're having trouble getting that second set of eyes, see questions above.
+
+Tips to help your PR get reviewed faster
+========================================
+
+1. Verify your PR is in the review queue.
+
+   Make sure your pull request appears in the `review queue`_ so reviewers can
+   easily find it.
+
+2. Find potential reviewers.
+
+   Look for contributors who are familiar with the component you're working on
+   and are still active.
+   You can do this by filtering *Ready for checkin* tickets by component and
+   grouping them by owner to see recent activity.
+   For example, for GIS-related changes, use the `GIS component filters`_ to
+   find active contributors.
+
+3. Make your PR easy to review.
+
+   A well-prepared pull request attracts faster attention. Before requesting a
+   review, do a self-review and follow this checklist:
+
+  - Organize commits. Squash or group them logically (for example, separate
+    refactors from functional changes).
+  - Keep changes minimal. Avoid unrelated modifications.
+  - Ensure test coverage. Add or update tests where appropriate.
+  - Provide clear testing instructions. Include reproduction steps, profiling
+    scripts, or other details if automated tests can't cover the change.
+
+.. _`review queue`: https://code.djangoproject.com/query?has_patch=1&needs_better_patch=0&needs_docs=0&needs_tests=0&stage=Accepted&status=!closed&order=changetime&desc=1
+.. _`GIS component filters`: https://code.djangoproject.com/query?component=GIS&owner=!nobody&stage=Ready+for+checkin&status=assigned&status=closed&status=new&group=owner&order=owner&col=id&col=summary&col=status&col=owner&col=type&col=version&col=changetime
