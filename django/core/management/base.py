@@ -298,6 +298,11 @@ class BaseCommand:
         parse the arguments to this command.
         """
         kwargs.setdefault("formatter_class", DjangoHelpFormatter)
+        
+        # Enable suggest_on_error for Python 3.14+
+        if sys.version_info >= (3, 14):
+            kwargs.setdefault("suggest_on_error", True)
+        
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,

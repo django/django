@@ -22,7 +22,8 @@ from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 
 from .management.commands import dance
-
+import sys
+import unittest
 
 # A minimal set of apps to avoid system checks running on all apps.
 @override_settings(
@@ -425,7 +426,89 @@ class CommandTests(SimpleTestCase):
             management.call_command("outputwrapper", stdout=out)
         self.assertIn("Working...", out.getvalue())
         self.assertIs(mocked_flush.called, True)
+        
+class SuggestOnErrorTests(SimpleTestCase):
+    """
+    Tests for argparse suggest_on_error feature on Python 3.14+.
+    """
 
+    def test_parser_kwargs_suggest_on_error_on_python_314_plus(self):
+        """
+        BaseCommand.create_parser() passes suggest_on_error=True to
+        CommandParser on Python 3.14+.
+        """
+        command = BaseCommand()
+        parser = command.create_parser("prog_name", "subcommand")
+        
+        if sys.version_info >= (3, 14):
+            # On Python 3.14+, suggest_on_error should be True
+            self.assertTrue(
+                getattr(parser, "suggest_on_error", False),
+                "Parser should have suggest_on_error=True on Python 3.14+",
+            )
+        else:
+            # On older Python versions, the attribute may not exist
+            # This test just ensures no errors occur
+            pass
+
+    def test_custom_suggest_on_error_respected(self):
+        """
+        Explicitly passed suggest_on_error kwarg should not be overridden.
+        """
+        if sys.version_info >= (3, 14):
+            # Explicitly pass suggest_on_error=False
+            parser = BaseCommand().create_parser(
+                "prog_name", "subcommand", suggest_on_error=False
+            )
+            self.assertFalse(
+                parser.suggest_on_error,
+                "Explicit suggest_on_error=False should be respected",
+            )
+
+    @unittest.skipIf(
+        sys.version_info < (3, 14),
+        "suggest_on_error requires Python 3.14+",
+    )
+    def test_misspelled_option_suggests_correct_option(self):
+        """
+        On Python 3.14+, misspelled options should trigger suggestions.
+        """
+        # Create a command with some options
+        command = BaseCommand()
+        parser = command.create_parser("django-admin", "test")
+        
+        # The parser already has --verbosity, try to parse --verbositty
+        err = StringIO()
+        with mock.patch("sys.stderr", err):
+            with self.assertRaises(SystemExit) as cm:
+                parser.parse_args(["--verbositty", "2"])
+        
+        # SystemExit code should be 2 for argument parsing errors
+        self.assertEqual(cm.exception.code, 2)
+        
+        # Error message should contain suggestion (Python 3.14+ behavior)
+        error_output = err.getvalue()
+        # Note: The exact format may vary, but it should mention the correct option
+        self.assertIn("--verbosity", error_output.lower())
+
+    def test_suggest_on_error_works_with_management_commands(self):
+        """
+        Management commands should have suggest_on_error enabled on Python 3.14+.
+        """
+        out = StringIO()
+        command_instance = management.get_commands()
+        
+        # Get a real command instance
+        from .management.commands.dance import Command as DanceCommand
+        
+        dance_cmd = DanceCommand()
+        parser = dance_cmd.create_parser("django-admin", "dance")
+        
+        if sys.version_info >= (3, 14):
+            self.assertTrue(
+                getattr(parser, "suggest_on_error", False),
+                "Management command parsers should have suggest_on_error=True",
+            )
 
 class CommandRunTests(AdminScriptTestCase):
     """
