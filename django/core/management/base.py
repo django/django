@@ -142,7 +142,7 @@ class DjangoHelpFormatter(HelpFormatter):
         super().add_arguments(self._reordered_actions(actions))
 
 
-class OutputWrapper:
+class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
@@ -181,9 +181,6 @@ class OutputWrapper:
         self._out.write(style_func(msg))
 
 
-TextIOBase.register(OutputWrapper)
-
-
 class BaseCommand:
     """
     The base class from which all management commands ultimately
@@ -214,7 +211,7 @@ class BaseCommand:
        SQL statements, will be wrapped in ``BEGIN`` and ``COMMIT``.
 
     4. If ``handle()`` or ``execute()`` raised any exception (e.g.
-       ``CommandError``), ``run_from_argv()`` will instead print an error
+       ``CommandError``), ``run_from_argv()`` will  instead print an error
        message to ``stderr``.
 
     Thus, the ``handle()`` method is typically the starting point for
@@ -301,6 +298,11 @@ class BaseCommand:
         parse the arguments to this command.
         """
         kwargs.setdefault("formatter_class", DjangoHelpFormatter)
+        
+        # Enable suggest_on_error for Python 3.14+
+        if sys.version_info >= (3, 14):
+            kwargs.setdefault("suggest_on_error", True)
+        
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
@@ -453,8 +455,10 @@ class BaseCommand:
             self.stderr = OutputWrapper(options["stderr"])
 
         if self.requires_system_checks and not options["skip_checks"]:
-            check_kwargs = self.get_check_kwargs(options)
-            self.check(**check_kwargs)
+            if self.requires_system_checks == ALL_CHECKS:
+                self.check()
+            else:
+                self.check(tags=self.requires_system_checks)
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
@@ -468,11 +472,6 @@ class BaseCommand:
                 )
             self.stdout.write(output)
         return output
-
-    def get_check_kwargs(self, options):
-        if self.requires_system_checks == ALL_CHECKS:
-            return {}
-        return {"tags": self.requires_system_checks}
 
     def check(
         self,

@@ -288,6 +288,10 @@ Management Commands
   custom commands to control the running of system checks, e.g. to opt into
   database-dependent checks.
 
+* Management commands now use argparse's ``suggest_on_error`` feature when
+  running on Python 3.14+. This provides helpful suggestions when command-line
+  arguments are misspelled. For example, ``--verbositty`` will suggest ``--verbosity``.
+
 Migrations
 ~~~~~~~~~~
 
