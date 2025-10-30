@@ -209,7 +209,7 @@ The lookup parameters (``**kwargs``) should be in the format described in
 underlying SQL statement.
 
 If you need to execute more complex queries (for example, queries with ``OR``
-statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+statements), you can use :ref:`q-objects` (``*args``).
 
 ``exclude()``
 ~~~~~~~~~~~~~
@@ -259,8 +259,8 @@ statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
-expressions </ref/models/expressions>` or :class:`~django.db.models.Q` objects.
-Each object can be annotated with:
+expressions </ref/models/expressions>` or :ref:`q-objects`. Each object can be
+annotated with:
 
 * a simple value,  via ``Value()``;
 * a reference to a field on the model (or any related models), via ``F()``;
@@ -1276,9 +1276,9 @@ database.
     :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
-    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
-    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
-    any prefetched cache for the relation will be cleared.
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on a
+    :class:`~django.db.models.fields.related.RelatedManager`, any prefetched
+    cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -1433,8 +1433,8 @@ where prefetching with a custom ``QuerySet`` is useful:
 
 * You want to prefetch only a subset of the related objects.
 
-* You want to use performance optimization techniques like
-  :meth:`deferred fields <defer()>`:
+* You want to use performance optimization techniques like deferring fields,
+  for example, via :meth:`defer` or :meth:`only`:
 
   .. code-block:: pycon
 
@@ -1797,11 +1797,10 @@ will always be fetched into the resulting queryset.
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
     reason, create a model with ``Meta.managed = False`` (see the
-    :attr:`managed attribute <django.db.models.Options.managed>` documentation)
-    containing just the fields you normally need to load and use that where you
-    might otherwise call ``defer()``. This makes your code more explicit to the
-    reader, is slightly faster and consumes a little less memory in the Python
-    process.
+    :attr:`~django.db.models.Options.managed` documentation) containing just
+    the fields you normally need to load and use that where you might otherwise
+    call ``defer()``. This makes your code more explicit to the reader, is
+    slightly faster and consumes a little less memory in the Python process.
 
     For example, both of these models use the same underlying database table::
 
@@ -2266,9 +2265,9 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
     inserted.
 
 You can specify more complex conditions for the retrieved object by chaining
-``get_or_create()`` with ``filter()`` and using :class:`Q objects
-<django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
-exists, and create the latter otherwise::
+``get_or_create()`` with ``filter()`` and using :ref:`q-objects`. For example,
+to retrieve Robert or Bob Marley if either exists, and create the latter
+otherwise::
 
     from django.db.models import Q
 
@@ -3189,6 +3188,8 @@ As a convenience when no lookup type is provided (like in
 
 Exact match. If the value provided for comparison is ``None``, it will be
 interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they
+interpret ``None`` as JSON ``null`` instead.
 
 Examples::
 
@@ -3963,8 +3964,8 @@ An optional argument that represents the :doc:`model field
 ``filter``
 ~~~~~~~~~~
 
-An optional :class:`Q object <django.db.models.Q>` that's used to filter the
-rows that are aggregated.
+An optional :ref:`Q object <q-objects>` that's used to filter the rows that
+are aggregated.
 
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
 example usage.
@@ -4178,6 +4179,8 @@ Query-related tools
 This section provides reference material for query-related tools not documented
 elsewhere.
 
+.. _q-objects:
+
 ``Q()`` objects
 ---------------
 
@@ -4282,7 +4285,7 @@ overridden by using a custom queryset in a related lookup.
 
     .. attribute:: FilteredRelation.condition
 
-        A :class:`~django.db.models.Q` object to control the filtering.
+        A :ref:`Q object <q-objects>` to control the filtering.
 
 ``FilteredRelation`` is used with :meth:`~.QuerySet.annotate` to create an
 ``ON`` clause when a ``JOIN`` is performed. It doesn't act on the default

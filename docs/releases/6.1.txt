@@ -238,6 +238,12 @@ Models
 * :meth:`.QuerySet.in_bulk` now supports chaining after
   :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
+* The new :class:`~django.db.models.JSONNull` expression provides an explicit
+  way to represent the JSON scalar ``null``. It can be used when saving a
+  top-level :class:`~django.db.models.JSONField` value, or querying for
+  top-level or nested JSON ``null`` values. See
+  :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
 Pagination
 ~~~~~~~~~~
 
@@ -313,6 +319,15 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+:mod:`django.contrib.postgres`
+------------------------------
+
+* Top-level elements set to ``None`` in an
+  :class:`~django.contrib.postgres.fields.ArrayField` with a
+  :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
+  instead of the JSON ``null`` primitive. This matches the behavior of a
+  standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
 Dropped support for PostgreSQL 14
 ---------------------------------
 
@@ -344,6 +359,13 @@ Miscellaneous
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
+
+* The use of ``None`` to represent a top-level JSON scalar ``null`` when
+  querying :class:`~django.db.models.JSONField` is now deprecated in favor of
+  the new :class:`~django.db.models.JSONNull` expression. At the end
+  of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
+  used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
+  are unaffected by this deprecation.
 
 Features removed in 6.1
 =======================

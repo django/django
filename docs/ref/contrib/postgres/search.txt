@@ -338,9 +338,9 @@ than comparing the size of an integer, for example.
 
 In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional
-:class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
-:class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
-the search vector you wish to use. For example::
+:class:`~django.contrib.postgres.indexes.GinIndex` or
+:class:`~django.contrib.postgres.indexes.GistIndex` which matches the search
+vector you wish to use. For example::
 
     GinIndex(
         SearchVector("body_text", "headline", config="english"),
