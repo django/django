@@ -561,8 +561,8 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
-The primary key field is set to ``None`` when
-:meth:`deleting <django.db.models.Model.delete>` an object.
+The primary key field is set to ``None`` when calling a model instance’s
+:meth:`~django.db.models.Model.delete` method.
 
 ``unique``
 ----------
@@ -2436,9 +2436,9 @@ Field API reference
     Python types to database (:meth:`get_prep_value`) and vice-versa
     (:meth:`from_db_value`).
 
-    A field is thus a fundamental piece in different Django APIs, notably,
-    :class:`models <django.db.models.Model>` and :class:`querysets
-    <django.db.models.query.QuerySet>`.
+    A field is thus a fundamental piece in different Django APIs, notably the
+    :class:`~django.db.models.Model` and the
+    :class:`~django.db.models.query.QuerySet` APIs.
 
     In models, a field is instantiated as a class attribute and represents a
     particular table column, see :doc:`/topics/db/models`. It has attributes
@@ -2598,7 +2598,7 @@ Field API reference
 
         See :ref:`converting-model-field-to-serialization` for usage.
 
-    When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
+    When using :doc:`model forms </topics/forms/modelforms>`, the ``Field``
     needs to know which form field it should be represented by:
 
     .. method:: formfield(form_class=None, choices_form_class=None, **kwargs)

@@ -284,13 +284,16 @@ the scenes, limiting the number of search fields to a reasonable number will
 make it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
-default is to display 100 items per page. :attr:`Change list pagination
-<django.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
-<django.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
-<django.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
-<django.contrib.admin.ModelAdmin.date_hierarchy>`, and
-:attr:`column-header-ordering <django.contrib.admin.ModelAdmin.list_display>`
-all work together like you think they should.
+default is to display 100 items per page.
+
+.. seealso::
+
+   The following :class:`~django.contrib.admin.ModelAdmin` options allow
+   further customization of change lists:
+   :attr:`~django.contrib.admin.ModelAdmin.list_per_page`,
+   :attr:`~django.contrib.admin.ModelAdmin.search_fields`,
+   :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy`, and
+   :attr:`~django.contrib.admin.ModelAdmin.list_display`.
 
 Customize the admin look and feel
 =================================

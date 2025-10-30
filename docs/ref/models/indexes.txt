@@ -63,10 +63,9 @@ and the ``weight`` rounded to the nearest integer.
     error. This means that functions such as
     :class:`Concat() <django.db.models.functions.Concat>` aren't accepted.
 
-.. admonition:: MySQL and MariaDB
+.. admonition:: MariaDB
 
-    Functional indexes are ignored with MySQL < 8.0.13 and MariaDB as neither
-    supports them.
+    Functional indexes are unsupported and ignored with MariaDB.
 
 ``fields``
 ----------
@@ -212,10 +211,10 @@ filtering.
 
 See the PostgreSQL documentation for more details about `covering indexes`_.
 
-.. admonition:: Restrictions on PostgreSQL
+.. admonition:: PostgreSQL-specific indexes
 
-    PostgreSQL supports covering B-Tree, :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`, and :class:`SP-GiST indexes
-    <django.contrib.postgres.indexes.SpGistIndex>`.
+    In addition to B-Tree indexes (via :class:`Index`), PostgreSQL also
+    supports :class:`~django.contrib.postgres.indexes.GistIndex` and
+    :class:`~django.contrib.postgres.indexes.SpGistIndex` indexes.
 
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

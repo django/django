@@ -206,7 +206,7 @@ Arguments
     the object.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -286,7 +286,7 @@ Arguments
     list.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and

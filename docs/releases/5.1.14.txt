@@ -1,0 +1,10 @@
+===========================
+Django 5.1.14 release notes
+===========================
+
+*November 5, 2025*
+
+Django 5.1.14 fixes one security issue with severity "high" and one security
+issue with severity "moderate" in 5.1.13.
+
+...

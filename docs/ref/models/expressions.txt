@@ -111,6 +111,8 @@ Built-in Expressions
     ``django.db.models.aggregates``, but for convenience they're available and
     usually imported from :mod:`django.db.models`.
 
+.. _f-expressions:
+
 ``F()`` expressions
 -------------------
 
@@ -493,7 +495,7 @@ should be invoked for each distinct value of ``expressions`` (or set of
 values, for multiple ``expressions``). The argument is only supported on
 aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
 
-The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
+The ``filter`` argument takes a :ref:`Q object <q-objects>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
@@ -572,6 +574,18 @@ properties, such as :ref:`output_field<output-field>`, that may not be
 available on other expressions. ``ExpressionWrapper`` is necessary when using
 arithmetic on ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
+
+``JSONNull()`` expression
+-------------------------
+
+.. versionadded:: 6.1
+
+.. class:: JSONNull()
+
+Specialized expression to represent JSON scalar ``null`` on a
+:class:`~django.db.models.JSONField`.
+
+See :ref:`storing-and-querying-for-none` for usage examples.
 
 Conditional expressions
 -----------------------

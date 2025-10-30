@@ -33,11 +33,13 @@ from django.core.management.base import LabelCommand, SystemCheckError
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
+from django.core.management.utils import find_formatters
 from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
+from django.utils.functional import cached_property
 from django.utils.version import PY313, get_docs_version
 from django.views.static import serve
 
@@ -46,8 +48,6 @@ from . import urls
 custom_templates_dir = os.path.join(os.path.dirname(__file__), "custom_templates")
 
 SYSTEM_CHECK_MSG = "System check identified no issues"
-
-HAS_BLACK = shutil.which("black")
 
 
 class AdminScriptTestCase(SimpleTestCase):
@@ -112,7 +112,20 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=-1):
+    @cached_property
+    def path_without_formatters(self):
+        return os.pathsep.join(
+            [
+                path_component
+                for path_component in os.environ.get("PATH", "").split(os.pathsep)
+                for formatter_path in find_formatters().values()
+                if os.path.commonpath([path_component, formatter_path]) == os.sep
+            ]
+        )
+
+    def run_test(
+        self, args, settings_file=None, apps=None, umask=-1, discover_formatters=False
+    ):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -134,6 +147,8 @@ class AdminScriptTestCase(SimpleTestCase):
         python_path.extend(ext_backend_base_dirs)
         test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
         test_environ["PYTHONWARNINGS"] = ""
+        if not discover_formatters:
+            test_environ["PATH"] = self.path_without_formatters
 
         p = subprocess.run(
             [sys.executable, *args],
@@ -145,10 +160,19 @@ class AdminScriptTestCase(SimpleTestCase):
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None, umask=-1):
-        return self.run_test(["-m", "django", *args], settings_file, umask=umask)
+    def run_django_admin(
+        self, args, settings_file=None, umask=-1, discover_formatters=False
+    ):
+        return self.run_test(
+            ["-m", "django", *args],
+            settings_file,
+            umask=umask,
+            discover_formatters=discover_formatters,
+        )
 
-    def run_manage(self, args, settings_file=None, manage_py=None):
+    def run_manage(
+        self, args, settings_file=None, manage_py=None, discover_formatters=False
+    ):
         template_manage_py = (
             os.path.join(os.path.dirname(__file__), manage_py)
             if manage_py
@@ -167,7 +191,11 @@ class AdminScriptTestCase(SimpleTestCase):
         with open(test_manage_py, "w") as fp:
             fp.write(manage_py_contents)
 
-        return self.run_test(["./manage.py", *args], settings_file)
+        return self.run_test(
+            ["./manage.py", *args],
+            settings_file,
+            discover_formatters=discover_formatters,
+        )
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
@@ -744,10 +772,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "settings_test"' if HAS_BLACK else "name = 'settings_test'",
-                content,
-            )
+            self.assertIn("name = 'settings_test'", content)
 
     def test_setup_environ_custom_template(self):
         """
@@ -772,9 +797,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
-            )
+            self.assertIn("name = 'こんにちは'", content)
 
     def test_builtin_command(self):
         """
@@ -1936,7 +1959,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_version(self):
         "version is handled as a special case"
         args = ["version"]
-        out, err = self.run_manage(args)
+        out, err = self.run_manage(args, discover_formatters=True)
         self.assertNoOutput(err)
         self.assertOutput(out, get_version())
 
@@ -2689,7 +2712,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ["startproject", "--template", template_path, "customtestproject"]
         testproject_dir = os.path.join(self.test_dir, "customtestproject")
 
-        _, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args, discover_formatters=True)
         self.assertNoOutput(err)
         with open(
             os.path.join(template_path, "additional_dir", "requirements.in")
@@ -2784,7 +2807,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 f"{self.live_server_url}/user_agent_check/project_template.tgz"
             )
             args = ["startproject", "--template", template_url, "urltestproject"]
-            _, err = self.run_django_admin(args)
+            _, err = self.run_django_admin(args, discover_formatters=True)
 
             self.assertNoOutput(err)
             self.assertIn("Django/%s" % get_version(), user_agent)
@@ -3126,10 +3149,7 @@ class StartApp(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class NewAppConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
-                content,
-            )
+            self.assertIn("name = 'new_app'", content)
 
     def test_creates_directory_when_custom_app_destination_missing(self):
         args = [

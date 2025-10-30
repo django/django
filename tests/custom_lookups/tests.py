@@ -119,7 +119,7 @@ class YearLte(models.lookups.LessThanOrEqual):
         real_lhs = self.lhs.lhs
         lhs_sql, params = self.process_lhs(compiler, connection, real_lhs)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
+        params = (*params, *rhs_params)
         # Build SQL where the integer year is concatenated with last month
         # and day, then convert that to date. (We try to have SQL like:
         #     WHERE somecol <= '2013-12-31')

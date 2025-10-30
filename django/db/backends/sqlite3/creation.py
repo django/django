@@ -155,5 +155,3 @@ class DatabaseCreation(BaseDatabaseCreation):
             # connection.
             self.connection.connect()
             target_db.close()
-            if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
-                self.mark_expected_failures_and_skips()

@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import faulthandler
+import functools
 import hashlib
 import io
 import itertools
@@ -473,11 +474,26 @@ def _init_worker(
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
+        if (
+            is_spawn_or_forkserver
+            and os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true"
+        ):
+            connection.creation.mark_expected_failures_and_skips()
 
     if is_spawn_or_forkserver:
         call_command(
             "check", stdout=io.StringIO(), stderr=io.StringIO(), databases=used_aliases
         )
+
+
+def _safe_init_worker(init_worker, counter, *args, **kwargs):
+    try:
+        init_worker(counter, *args, **kwargs)
+    except Exception:
+        with counter.get_lock():
+            # Set a value that will not increment above zero any time soon.
+            counter.value = -1000
+        raise
 
 
 def _run_subsuite(args):
@@ -553,7 +569,7 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=self.init_worker.__func__,
+            initializer=functools.partial(_safe_init_worker, self.init_worker.__func__),
             initargs=[
                 counter,
                 self.initial_settings,
@@ -580,7 +596,11 @@ class ParallelTestSuite(unittest.TestSuite):
 
             try:
                 subsuite_index, events = test_results.next(timeout=0.1)
-            except multiprocessing.TimeoutError:
+            except multiprocessing.TimeoutError as err:
+                if counter.value < 0:
+                    err.add_note("ERROR: _init_worker failed, see prior traceback")
+                    pool.close()
+                    raise
                 continue
             except StopIteration:
                 pool.close()

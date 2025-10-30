@@ -541,9 +541,10 @@ is ``'Beatles Blog'``:
 
 This spanning can be as deep as you'd like.
 
-It works backwards, too. While it :attr:`can be customized
-<.ForeignKey.related_query_name>`, by default you refer to a "reverse"
-relationship in a lookup using the lowercase name of the model.
+It works backwards, too. While it can be customized by setting
+:class:`~django.db.models.ForeignKey.related_query_name`, by default you
+refer to a "reverse" relationship in a lookup using the lowercase name of the
+model.
 
 This example retrieves all ``Blog`` objects which have at least one ``Entry``
 whose ``headline`` contains ``'Lennon'``:
@@ -692,10 +693,10 @@ In the examples given so far, we have constructed filters that compare
 the value of a model field with a constant. But what if you want to compare
 the value of a model field with another field on the same model?
 
-Django provides :class:`F expressions <django.db.models.F>` to allow such
-comparisons. Instances of ``F()`` act as a reference to a model field within a
-query. These references can then be used in query filters to compare the values
-of two different fields on the same model instance.
+Django provides :ref:`f-expressions` to allow such comparisons. Instances of
+``F()`` act as a reference to a model field within a query. These references
+can then be used in query filters to compare the values of two different fields
+on the same model instance.
 
 For example, to find a list of all blog entries that have had more comments
 than pingbacks, we construct an ``F()`` object to reference the pingback count,
@@ -1047,13 +1048,15 @@ the following example model::
         def __str__(self):
             return self.name
 
+.. _storing-and-querying-for-none:
+
 Storing and querying for ``None``
 ---------------------------------
 
 As with other fields, storing ``None`` as the field's value will store it as
 SQL ``NULL``. While not recommended, it is possible to store JSON scalar
-``null`` instead of SQL ``NULL`` by using :class:`Value(None, JSONField())
-<django.db.models.Value>`.
+``null`` instead of SQL ``NULL`` by using the :class:`JSONNull()
+<django.db.models.JSONNull>` expression.
 
 Whichever of the values is stored, when retrieved from the database, the Python
 representation of the JSON scalar ``null`` is the same as SQL ``NULL``, i.e.
@@ -1063,23 +1066,40 @@ This only applies to ``None`` as the top-level value of the field. If ``None``
 is inside a :class:`list` or :class:`dict`, it will always be interpreted
 as JSON ``null``.
 
-When querying, ``None`` value will always be interpreted as JSON ``null``. To
-query for SQL ``NULL``, use :lookup:`isnull`:
+When querying, :lookup:`isnull=True <isnull>` is used to match SQL ``NULL``,
+while exact-matching ``JSONNull()`` is used to match JSON ``null``.
+
+.. deprecated:: 6.1
+
+    Exact-matching ``None`` in a query to mean JSON ``null`` is deprecated.
+    After the deprecation period, it will be interpreted as SQL ``NULL``.
+
+.. versionchanged:: 6.1
+
+    ``JSONNull()`` expression was added.
 
 .. code-block:: pycon
 
+    >>> from django.db.models import JSONNull
     >>> Dog.objects.create(name="Max", data=None)  # SQL NULL.
     <Dog: Max>
-    >>> Dog.objects.create(name="Archie", data=Value(None, JSONField()))  # JSON null.
+    >>> Dog.objects.create(name="Archie", data=JSONNull())  # JSON null.
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
+    ...: RemovedInDjango70Warning: Using None as the right-hand side of an
+    exact lookup on JSONField to mean JSON scalar 'null' is deprecated. Use
+    JSONNull() instead (or use the __isnull lookup if you meant SQL NULL).
+    ...
     <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value(None, JSONField()))
+    >>> Dog.objects.filter(data=JSONNull())
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
     >>> Dog.objects.filter(data__isnull=False)
     <QuerySet [<Dog: Archie>]>
+
+.. RemovedInDjango70Warning: Alter the example with the deprecation warning to:
+  <QuerySet [<Dog: Max>]>.
 
 Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 ``null=False`` and providing a suitable default for empty values, such as
@@ -1089,6 +1109,14 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
+
+.. admonition:: Storing JSON ``null`` inside JSON data
+
+    While :class:`JSONNull() <django.db.models.JSONNull>` can be used in
+    :lookup:`jsonfield.key` exact lookups, it cannot be stored inside
+    :class:`dict` or :class:`list` instances meant to be saved in a
+    ``JSONField``, unless a custom encoder is used. If you don't want to use
+    a custom encoder, use ``None`` instead.
 
 .. fieldlookup:: jsonfield.key
 
@@ -1120,6 +1148,16 @@ To query based on a given dictionary key, use that key as the lookup name:
     <Dog: Meg>
     >>> Dog.objects.filter(data__breed="collie")
     <QuerySet [<Dog: Meg>]>
+
+To query a key for JSON ``null``, ``None`` or :class:`JSONNull()
+<django.db.models.JSONNull>` can be used.
+
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(data__owner=None)
+    <Dog: Meg>
+    >>> Dog.objects.filter(data__owner=JSONNull())
+    <Dog: Meg>
 
 Multiple keys can be chained together to form a path lookup:
 
@@ -1370,12 +1408,11 @@ Complex lookups with ``Q`` objects
 
 Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for
-example, queries with ``OR`` statements), you can use
-:class:`Q objects <django.db.models.Q>`.
+example, queries with ``OR`` statements), you can use :ref:`q-objects`.
 
-A :class:`Q object <django.db.models.Q>` (``django.db.models.Q``) is an object
-used to encapsulate a collection of keyword arguments. These keyword arguments
-are specified as in "Field lookups" above.
+A :ref:`Q object <q-objects>` (``django.db.models.Q``) is an object used to
+encapsulate a collection of keyword arguments. These keyword arguments are
+specified as in "Field lookups" above.
 
 For example, this ``Q`` object encapsulates a single ``LIKE`` query::
 
@@ -1659,10 +1696,10 @@ them and call :meth:`~django.db.models.Model.save`::
     for item in my_queryset:
         item.save()
 
-Calls to update can also use :class:`F expressions <django.db.models.F>` to
-update one field based on the value of another field in the model. This is
-especially useful for incrementing counters based upon their current value. For
-example, to increment the pingback count for every entry in the blog:
+Calls to update can also use :ref:`f-expressions` to update one field based on
+the value of another field in the model. This is especially useful for
+incrementing counters based upon their current value. For example, to increment
+the pingback count for every entry in the blog:
 
 .. code-block:: pycon
 

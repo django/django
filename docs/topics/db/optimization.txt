@@ -133,8 +133,8 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :class:`F expressions <django.db.models.F>` to filter
-  based on other fields within the same model.
+* Use :ref:`f-expressions` to filter based on other fields within the same
+  model.
 
 * Use :doc:`annotate to do aggregation in the database
   </topics/db/aggregation>`.
@@ -396,9 +396,8 @@ number of SQL queries. For example::
     Entry.objects.create(headline="This is a test")
     Entry.objects.create(headline="This is only a test")
 
-Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
-for your use case.
+Note that :meth:`~django.db.models.query.QuerySet.bulk_create` has several
+caveats, so ensure it's appropriate for your use case.
 
 Update in bulk
 --------------
@@ -427,9 +426,8 @@ The following example::
     entries[1].headline = "This is no longer a test"
     entries[1].save()
 
-Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
-for your use case.
+Note that :meth:`~django.db.models.query.QuerySet.bulk_update` has several
+caveats, so ensure it's appropriate for your use case.
 
 Insert in bulk
 --------------
@@ -491,12 +489,12 @@ objects to reduce the number of SQL queries. For example::
 
 ...where ``Band`` and ``Artist`` are models with a many-to-many relationship.
 
-When removing different pairs of objects from :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, use
-:meth:`~django.db.models.query.QuerySet.delete` on a
-:class:`~django.db.models.Q` expression with multiple
-:attr:`~django.db.models.ManyToManyField.through`  model instances to reduce
-the number of SQL queries. For example::
+When removing multiple many-to-many relationships involving several instances
+of the related models, use the :meth:`~django.db.models.query.QuerySet.delete`
+method on a filtered queryset of the field's
+:attr:`~django.db.models.ManyToManyField.through` model. By combining multiple
+conditions with :ref:`q-objects`, you can delete several relationships in a
+single query. For example::
 
     from django.db.models import Q
 
