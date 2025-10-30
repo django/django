@@ -1,8 +1,13 @@
 import subprocess
 import unittest
+from typing import TYPE_CHECKING
 
 from django.shortcuts import aget_object_or_404
 from django.utils import inspect
+from django.utils.version import PY314
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class Person:
@@ -102,6 +107,16 @@ class TestInspectMethods(unittest.TestCase):
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
         self.assertIs(inspect.func_accepts_kwargs(Person.all_kinds), True)
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_func_accepts_kwargs_deferred_annotations(self):
+
+        def func_with_annotations(self, name: str, complex: SafeString) -> None:
+            pass
+
+        # Inspection fails with deferred annotations with python 3.14+. Earlier
+        # Python versions trigger the NameError on module initialization.
+        self.assertIs(inspect.func_accepts_kwargs(func_with_annotations), False)
 
 
 class IsModuleLevelFunctionTestCase(unittest.TestCase):
