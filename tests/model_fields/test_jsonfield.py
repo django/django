@@ -1010,6 +1010,19 @@ class TestQuerying(TestCase):
             NullableJSONModel.objects.filter(value__foo__iexact='"BaR"').exists(), False
         )
 
+    def test_in(self):
+        tests = [
+            ([[]], [self.objs[1]]),
+            ([{}], [self.objs[2]]),
+            ([{"a": "b", "c": 14}], [self.objs[3]]),
+            ([[1, [2]]], [self.objs[5]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
     def test_key_in(self):
         tests = [
             ("value__c__in", [14], self.objs[3:5]),
@@ -1295,6 +1308,13 @@ class JSONNullTests(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__isnull=True), [sql_null]
+        )
+
+    def test_filter_in(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__in=[JSONNull()]),
+            [obj],
         )
 
     def test_bulk_update(self):
