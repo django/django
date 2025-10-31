@@ -13,7 +13,7 @@ import functools
 import sys
 import warnings
 from collections import Counter, namedtuple
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1632,7 +1632,15 @@ class Query(BaseExpression):
                 ):
                     lookup_class = targets[0].get_lookup("isnull")
                     col = self._get_col(targets[0], join_info.targets[0], alias)
-                    clause.add(lookup_class(col, False), AND)
+                    if (
+                        lookup_type == "in"
+                        and isinstance(condition.rhs, Iterable)
+                        and not isinstance(condition.rhs, (str, bytes))
+                        and any(v is None for v in condition.rhs)
+                    ):
+                        clause.add(lookup_class(col, True), OR)
+                    else:
+                        clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
                 if isinstance(value, Col) and self.is_nullable(value.target):
