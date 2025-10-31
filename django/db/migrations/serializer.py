@@ -423,10 +423,8 @@ def serializer_factory(value):
     if hasattr(value, "deconstruct"):
         return DeconstructibleSerializer(value)
     if hasattr(types, 'GenericAlias') and isinstance(value, types.GenericAlias):
-        print(f'O VALUE FOI: 1# {value}')
         return GenericAliasSerializer(value)
     elif hasattr(value, '__origin__') and hasattr(value, '__args__'):
-        print(f'O VALUE FOI: 2# {value}')
         return GenericAliasSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
