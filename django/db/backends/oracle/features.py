@@ -127,6 +127,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "Oracle doesn't support casting filters to NUMBER.": {
                 "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
             },
+            "Oracle doesn't support JSON null scalar extraction for IN queries": {
+                "model_fields.test_jsonfield.JSONNullTests.test_filter_in"
+            },
         }
         if self.connection.oracle_version < (23,):
             skips.update(
