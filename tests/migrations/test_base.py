@@ -14,7 +14,7 @@ from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.serializer import serializer_factory
 from django.db.migrations.state import ProjectState
-from django.test import SimpleTestCase, TransactionTestCase
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
@@ -451,3 +451,27 @@ class OptimizerTestBase(SimpleTestCase):
 
     def assertDoesNotOptimize(self, operations, **kwargs):
         self.assertOptimizesTo(operations, operations, **kwargs)
+
+
+class GenericAliasSerializerTestCase(TestCase):
+    def setUp(self):
+        from django.db.migrations.serializer import GenericAliasSerializer
+
+        self.serializer_class = GenericAliasSerializer
+        self.value = dict[str, float]
+        self.value_list = list[str]
+        self.serializer = serializer_factory(self.value)
+        self.serializer_list = serializer_factory(self.value_list)
+
+    def test_generic_alias_types(self):
+        self.assertIsInstance(self.serializer, self.serializer_class)
+
+    def test_serialize_basic_generic_dict(self):
+        result, imports = self.serializer.serialize()
+        self.assertEqual(result, "dict[str, float]")
+        self.assertEqual(imports, set())
+
+    def test_serialize_basic_generic_list(self):
+        result, imports = self.serializer_list.serialize()
+        self.assertEqual(result, "list[str]")
+        self.assertEqual(imports, set())
