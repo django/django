@@ -394,12 +394,9 @@ class GenericAliasSerializer(BaseSerializer):
     def serialize(self):
         imports = set()
         value_repr = repr(self.value)
-        print(f'O IMPORT FOI: {imports}')
-        print(f'O VALUE_REPR FOI: {value_repr}')
 
         if hasattr(self.value, '__origin__'):
             origin = self.value.__origin__
-            print(f'O ORIGIN FOI: {origin}')
             if origin is not None and hasattr(origin, '__module__') and origin.__module__ != 'builtins':
                 imports.add(f"Import {origin.__module__}")
 
