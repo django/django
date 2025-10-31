@@ -46,7 +46,7 @@ class Command(BaseCommand):
             action="append",
             choices=tuple(connections),
             dest="databases",
-            help="Run database related checks against these aliases.",
+            help="Run database related checks only against these aliases.",
         )
 
     def handle(self, *app_labels, **options):
