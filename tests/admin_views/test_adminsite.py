@@ -51,7 +51,10 @@ class SiteEachContextTest(TestCase):
         ctx = self.ctx
         self.assertEqual(ctx["site_header"], "Django administration")
         self.assertEqual(ctx["site_title"], "Django site admin")
-        self.assertEqual(ctx["site_url"], "/")
+        # 'site_url' is not '/' in this case because from the admin site it
+        # might lead to http://admin.example.com/ if the admin site is not
+        # hosted at the same url as the site, see #29030
+        self.assertEqual(ctx["site_url"], "http/example.com")
         self.assertIs(ctx["has_permission"], True)
 
     def test_custom_admin_titles(self):

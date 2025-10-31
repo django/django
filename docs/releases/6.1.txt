@@ -112,6 +112,11 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+* For sites running on a subpath, the default :attr:`URL for the "View site"
+  link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
+  will now point to the current site if SCRIPT_NAME is not set, instead of
+  ``/`` as advertised in the documentation from djangoproject.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
