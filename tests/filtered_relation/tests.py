@@ -18,7 +18,6 @@ from django.db.models import (
 )
 from django.db.models.functions import Concat
 from django.db.models.lookups import Exact, IStartsWith
-from django.db.models.query import QuerySet
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
