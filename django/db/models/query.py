@@ -20,6 +20,7 @@ from django.db import (
     IntegrityError,
     NotSupportedError,
     connections,
+    models,
     router,
     transaction,
 )
@@ -1011,7 +1012,24 @@ class QuerySet(AltersData):
                     return self.create(**params), True
             except IntegrityError:
                 try:
-                    return self.get(**kwargs), False
+                    obj = self.get(**kwargs)
+
+                    # Conditional reverse OneToOne cache clearing
+                    get_field = self.model._meta.get_field
+                    for field_name, value in kwargs.items():
+                        if not isinstance(value, models.Model):
+                            continue
+                        try:
+                            field = get_field(field_name)
+                        except exceptions.FieldDoesNotExist:
+                            continue
+                        if getattr(field, "one_to_one", False):
+                            cache_attr = field.remote_field.cache_name
+                            cached = getattr(value, cache_attr, None)
+                            # Clear cache only if object is missing or unsaved
+                            if cached is None or getattr(cached, "pk", None) is None:
+                                value._state.fields_cache.pop(cache_attr, None)
+                    return obj, False
                 except self.model.DoesNotExist:
                     pass
                 raise
