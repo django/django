@@ -1,5 +1,5 @@
-import sys
 import getpass
+import sys
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -43,23 +43,27 @@ class Command(BaseCommand):
         parser.add_argument(
             "--stdin",
             action="store_true",
-            help="Read new password from stdin rather than prompting, default is False"
+            help="Read new password from stdin rather than prompting, default is False",
         )
 
     def handle(self, *args, **options):
+        def _input_getter_getpass():
+            p1 = self._get_pass()
+            p2 = self._get_pass("Password (again): ")
+            return p1, p2
+
+        def _input_getter_stdin():
+            return self._get_stdin()
+
         if options["username"]:
             username = options["username"]
         else:
             username = getpass.getuser()
 
         if options["stdin"]:
-            input_getter = lambda: self._get_stdin()
+            input_getter = _input_getter_stdin
         else:
-            input_getter = lambda: (
-                self._get_pass(), 
-                self._get_pass("Password (again): ")
-            )
-
+            input_getter = _input_getter_getpass
         try:
             u = UserModel._default_manager.using(options["database"]).get(
                 **{UserModel.USERNAME_FIELD: username}
