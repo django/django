@@ -314,6 +314,11 @@ backends.
   database has native support for ``DurationField``, override this method to
   simply return the value.
 
+* The ``DatabaseIntrospection.get_relations()`` should now return a dictionary
+  with 3-tuples containing (``field_name_other_table``, ``other_table``,
+  ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
+  delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
+
 :mod:`django.contrib.gis`
 -------------------------
 
