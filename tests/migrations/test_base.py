@@ -14,7 +14,7 @@ from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.serializer import serializer_factory
 from django.db.migrations.state import ProjectState
-from django.test import SimpleTestCase, TransactionTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
@@ -456,6 +456,7 @@ class OptimizerTestBase(SimpleTestCase):
 class GenericAliasSerializerTestCase(TestCase):
     def setUp(self):
         from django.db.migrations.serializer import GenericAliasSerializer
+
         self.serializer_class = GenericAliasSerializer
         self.value = dict[str, float]
         self.value_list = list[str]

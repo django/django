@@ -391,13 +391,17 @@ class GenericAliasSerializer(BaseSerializer):
     Generic Serializer class to convert
     any type into a string
     """
+
     def serialize(self):
         imports = set()
         value_repr = repr(self.value)
 
-        if hasattr(self.value, '__origin__'):
+        if hasattr(self.value, "__origin__"):
             origin = self.value.__origin__
-            if origin is not None and hasattr(origin, '__module__') and origin.__module__ != 'builtins':
+            if (
+                origin is not None and hasattr(origin, "__module__")
+                and origin.__module__ != "builtins"
+            ):
                 imports.add(f"Import {origin.__module__}")
 
         return value_repr, imports
@@ -422,9 +426,9 @@ def serializer_factory(value):
     # Anything that knows how to deconstruct itself.
     if hasattr(value, "deconstruct"):
         return DeconstructibleSerializer(value)
-    if hasattr(types, 'GenericAlias') and isinstance(value, types.GenericAlias):
+    if hasattr(types, "GenericAlias") and isinstance(value, types.GenericAlias):
         return GenericAliasSerializer(value)
-    elif hasattr(value, '__origin__') and hasattr(value, '__args__'):
+    elif hasattr(value, "__origin__") and hasattr(value, "__args__"):
         return GenericAliasSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
