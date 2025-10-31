@@ -550,7 +550,8 @@ class FilteredRelation:
 
     def as_sql(self, compiler, connection):
         if self.resolved_condition is None:
-            # fallback: empty ON condition but default join behaviour (i.e., don’t filter out rows)
+            # fallback: empty ON condition
+            # but default join behaviour (i.e., don’t filter out rows)
             # withput the "1=1", this method fails to compile the joins
             return "1=1", []
         return compiler.compile(self.resolved_condition)
