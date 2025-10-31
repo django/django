@@ -780,7 +780,7 @@ S2.define('select2/utils',[
     // Get a unique element Id. If element has no id,
     // creates a new unique number, stores it in the id
     // attribute and returns the new id.
-    // If an id already exists, it simply returns it.
+    // If an id already exists, it just returns it.
 
     var select2Id = element.getAttribute('data-select2-id');
     if (select2Id == null) {

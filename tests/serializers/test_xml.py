@@ -80,7 +80,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         """
         The XML deserializer shouldn't allow a DTD.
 
-        This is the most straightforward way to prevent all entity definitions
+        This is the most direct way to prevent all entity definitions
         and avoid both external entities and entity-expansion attacks.
         """
         xml = (

@@ -170,7 +170,7 @@ class AppConfig:
             # an app module. Provide a nice error message in both cases.
             mod_path, _, cls_name = entry.rpartition(".")
             if mod_path and cls_name[0].isupper():
-                # We could simply re-trigger the string import exception, but
+                # We could just re-trigger the string import exception, but
                 # we're going the extra mile and providing a better error
                 # message for typos in INSTALLED_APPS.
                 # This may raise ImportError, which is the best exception

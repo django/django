@@ -74,7 +74,7 @@ newly-introduced problem.
 Tests don't just identify problems, they prevent them
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's a mistake to think of tests merely as a negative aspect of development.
+It's a mistake to think of tests only as a negative aspect of development.
 
 Without tests, the purpose or intended behavior of an application might be
 rather opaque. Even when it's your own code, you will sometimes find yourself

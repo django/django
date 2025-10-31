@@ -584,7 +584,7 @@ When spanning a :class:`~django.db.models.ManyToManyField` or a reverse
 filtering on multiple attributes raises the question of whether to require each
 attribute to coincide in the same related object. We might seek blogs that have
 an entry from 2008 with *“Lennon”* in its headline, or we might seek blogs that
-merely have any entry from 2008 as well as some newer or older entry with
+only have any entry from 2008 as well as some newer or older entry with
 *“Lennon”* in its headline.
 
 To select all blogs containing at least one entry from 2008 having *"Lennon"*
@@ -592,7 +592,7 @@ in its headline (the same entry satisfying both conditions), we would write::
 
     Blog.objects.filter(entry__headline__contains="Lennon", entry__pub_date__year=2008)
 
-Otherwise, to perform a more permissive query selecting any blogs with merely
+Otherwise, to perform a more permissive query selecting any blogs with only
 *some* entry with *"Lennon"* in its headline and *some* entry from 2008, we
 would write::
 
@@ -938,7 +938,7 @@ being evaluated and therefore populate the cache:
 
 .. note::
 
-    Simply printing the queryset will not populate the cache. This is because
+    printing the queryset will not populate the cache. This is because
     the call to ``__repr__()`` only returns a slice of the entire queryset.
 
 .. _async-queries:
@@ -2044,7 +2044,7 @@ Django's database-mapper to handle, you can fall back on writing SQL by hand.
 Django has a couple of options for writing raw SQL queries; see
 :doc:`/topics/db/sql`.
 
-Finally, it's important to note that the Django database layer is merely an
+Finally, it's important to note that the Django database layer is only an
 interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.

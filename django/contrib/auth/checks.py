@@ -36,7 +36,7 @@ def check_user_model(app_configs, **kwargs):
                 break
         else:
             # Checks might be run against a set of app configs that don't
-            # include the specified user model. In this case we simply don't
+            # include the specified user model. In this case we don't
             # perform the checks defined below.
             return []
 
