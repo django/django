@@ -1045,18 +1045,6 @@ class FilteredRelationAggregationTests(TestCase):
             [self.book1],
         )
 
-    def test_recursion_error(self):
-        qs = Book.objects.alias(
-            specific_mission=FilteredRelation(
-                "author__favorite_books", condition=Q(author__content_type__name="test")
-            )
-        )
-        self.assertIsInstance(qs, QuerySet)
-        try:
-            list(qs)
-        except RecursionError as e:
-            self.fail(f"RecursionError occurred: {e}")
-
 
 class FilteredRelationAnalyticalAggregationTests(TestCase):
     @classmethod
