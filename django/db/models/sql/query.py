@@ -1632,7 +1632,14 @@ class Query(BaseExpression):
                 ):
                     lookup_class = targets[0].get_lookup("isnull")
                     col = self._get_col(targets[0], join_info.targets[0], alias)
-                    clause.add(lookup_class(col, False), AND)
+                    if (
+                        lookup_type == "in"
+                        and isinstance(condition.rhs, (list, tuple))
+                        and any(v is None for v in condition.rhs)
+                    ):
+                        clause.add(lookup_class(col, True), OR)
+                    else:
+                        clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
                 if isinstance(value, Col) and self.is_nullable(value.target):
