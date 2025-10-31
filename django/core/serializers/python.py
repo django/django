@@ -34,8 +34,12 @@ class Serializer(base.Serializer):
 
     def get_dump_object(self, obj):
         data = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
+
+        pk_included = self._should_include_pk(obj)
+
+        if pk_included:
             data["pk"] = self._value_from_field(obj, obj._meta.pk)
+
         data["fields"] = self._current
         return data
 
@@ -57,7 +61,18 @@ class Serializer(base.Serializer):
         ):
             related = getattr(obj, field.name)
             if related:
-                value = related.natural_key()
+                natural_key_value = related.natural_key()
+
+                is_opt_out = (
+                    not natural_key_value
+                    or natural_key_value == (related.pk,)
+                    or not isinstance(natural_key_value, tuple)
+                )
+
+                if is_opt_out:
+                    value = self._value_from_field(obj, field)
+                else:
+                    value = natural_key_value
             else:
                 value = None
         else:
