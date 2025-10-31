@@ -366,6 +366,19 @@
     color: var(--body-fg);
 }
 
+#changelist .actions span.question button,
+#changelist .actions span.clear button {
+    background: none;
+    border: none;
+    color: var(--link-fg);
+    cursor: pointer;
+}
+
+#changelist .actions span.question button:hover,
+#changelist .actions span.clear button:hover {
+    color: var(--link-hover-color);
+}
+
 #changelist .actions .button:focus, #changelist .actions .button:hover {
     border-color: var(--body-quiet-color);
 }

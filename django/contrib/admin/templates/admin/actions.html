@@ -13,9 +13,9 @@
         {% if cl.result_count != cl.result_list|length %}
         <span class="all hidden">{{ selection_note_all }}</span>
         <span class="question hidden">
-            <a role="button" href="#" title="{% translate "Click here to select the objects across all pages" %}">{% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}</a>
+            <button type="button" title="{% translate "Click here to select the objects across all pages" %}">{% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}</button>
         </span>
-        <span class="clear hidden"><a role="button" href="#">{% translate "Clear selection" %}</a></span>
+        <span class="clear hidden"><button type="button">{% translate "Clear selection" %}</button></span>
         {% endif %}
     {% endif %}
     {% endblock %}
