@@ -257,3 +257,12 @@ The ``Storage`` class
         Returns the URL where the contents of the file referenced by ``name``
         can be accessed. For storage systems that don't support access by URL
         this will raise ``NotImplementedError`` instead.
+
+.. admonition:: There are community-maintained solutions too!
+
+    Django has a vibrant ecosystem. There are storage backends
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Storage Backends grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#storage-and-static-files
+.. _Storage Backends grid: https://djangopackages.org/grids/g/storage-backends/
