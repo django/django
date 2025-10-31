@@ -617,9 +617,20 @@ class CompositePKExcludeNoneTests(TestCase):
             tenant=cls.tenant, id=1, email="exclude@example.com"
         )
 
-    def test_pk_in_with_partial_or_all_none(self):
-        qs = User.objects
-        self.assertQuerySetEqual(qs.filter(pk__in=[(1, None)]), [])
-        self.assertQuerySetEqual(qs.filter(pk__in=[(None, None)]), [])
-        self.assertQuerySetEqual(qs.exclude(pk__in=[(1, None)]), [self.user])
-        self.assertQuerySetEqual(qs.exclude(pk__in=[(None, None)]), [self.user])
+    def test_filter_pk_in_partial_none(self):
+        self.assertQuerySetEqual(
+            User.objects.filter(pk__in=[(self.user.pk[0], None)]), []
+        )
+
+    def test_filter_pk_in_full_none(self):
+        self.assertQuerySetEqual(User.objects.filter(pk__in=[(None, None)]), [])
+
+    def test_exclude_pk_in_partial_none(self):
+        self.assertQuerySetEqual(
+            User.objects.exclude(pk__in=[(self.user.pk[0], None)]), [self.user]
+        )
+
+    def test_exclude_pk_in_full_none(self):
+        self.assertQuerySetEqual(
+            User.objects.exclude(pk__in=[(None, None)]), [self.user]
+        )
