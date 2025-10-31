@@ -12,6 +12,14 @@ templates using the format specified for the current
 Two users accessing the same content may see dates, times and numbers formatted
 in different ways, depending on the formats for their current locale.
 
+.. warning::
+
+    Because of how browsers enforce their own locale on to form inputs such as dates,
+    Django is not capable of formatting native date inputs (inputs that use the 
+    attribute type="date" and similar). This also means that Django does not use
+    native date inputs by default - as there is nothing it can do to format such
+    form inputs.
+
 .. note::
 
     To enable number formatting with thousand separators, it is necessary to
