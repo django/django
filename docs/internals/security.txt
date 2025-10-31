@@ -205,6 +205,8 @@ displayed.
 Proof of concepts which use over 100 KB of data to be processed by the DTL will
 be considered invalid.
 
+.. _ai-assistance:
+
 AI-Assisted Reports
 ~~~~~~~~~~~~~~~~~~~
 
