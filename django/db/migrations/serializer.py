@@ -399,7 +399,8 @@ class GenericAliasSerializer(BaseSerializer):
         if hasattr(self.value, "__origin__"):
             origin = self.value.__origin__
             if (
-                origin is not None and hasattr(origin, "__module__")
+                origin is not None
+                and hasattr(origin, "__module__")
                 and origin.__module__ != "builtins"
             ):
                 imports.add(f"Import {origin.__module__}")
