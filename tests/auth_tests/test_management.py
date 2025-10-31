@@ -261,6 +261,27 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         User.objects.create_user(username="J\xfalia", password="qwerty")
         call_command("changepassword", username="J\xfalia", stdout=self.stdout)
 
+    @mock.patch.object(changepassword.Command, "_get_stdin", return_value=("not qwerty", "not qwerty"))
+    def test_that_stdin_pipe_is_allowed(
+        self,
+        mock_get_stdin,
+    ):
+        call_command(
+            "changepassword", 
+            username="joe", 
+            stdout=self.stdout,
+            stdin=True,
+        )
+        command_output = self.stdout.getvalue().strip()
+
+        self.assertEqual(
+            command_output,
+            "Changing password for user 'joe'\n"
+            "Password changed successfully for user 'joe'",
+        )
+        self.assertTrue(User.objects.get(username="joe").check_password("not qwerty"))
+
+
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     databases = {"default", "other"}
