@@ -269,6 +269,20 @@ backends.
 Miscellaneous
 -------------
 
+* The default :attr:`URL for the "View site" link
+  <django.contrib.admin.AdminSite.site_url>` at the top of each admin page now
+  points to the domain of the current site (from :mod:`the sites framework
+  <django.contrib.sites>`) when ``SCRIPT_NAME`` is not set, instead of ``/``.
+  This makes the link consistent with the "View on site" button, which already
+  used the current site's domain. If ``django.contrib.sites`` is installed,
+  make sure the current :class:`~django.contrib.sites.models.Site` has the
+  correct ``domain`` — the default site created by the framework uses
+  ``example.com``, and the "View site" link will now point there until it is
+  updated. Alternatively, set :attr:`AdminSite.site_url
+  <django.contrib.admin.AdminSite.site_url>` to override the link. When the
+  sites framework is not installed, the link points to the current host, and
+  it falls back to ``/`` when the current site can't be determined.
+
 * To facilitate the deprecation of the ``safe`` parameter of
   :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the
   pollution vulnerability in the ``Array`` prototype was fixed in
