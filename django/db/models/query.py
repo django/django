@@ -840,8 +840,7 @@ class QuerySet(AltersData):
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
                     for result, field in zip(results, opts.db_returning_fields):
-                        if field != opts.pk:
-                            setattr(obj_with_pk, field.attname, result)
+                        setattr(obj_with_pk, field.attname, result)
                 for obj_with_pk in objs_with_pk:
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
