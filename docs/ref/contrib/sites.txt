@@ -221,21 +221,21 @@ Using ``site`` in templates
 
 .. versionadded:: 6.0
 
-   Add the :func:`~django.template.context_processors.csp` context processor
-   to your :setting:`TEMPLATES` setting. This makes the current Site object
-   available in the Django templates as the ``site`` context variable::
+Add the :func:`~django.template.context_processors.csp` context processor
+to your :setting:`TEMPLATES` setting. This makes the current Site object
+available in the Django templates as the ``site`` context variable::
 
-    TEMPLATES = [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "OPTIONS": {
-                "context_processors": [
-                    # ...
-                    "django.contrib.sites.context_processors.site",
-                ],
-            },
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "OPTIONS": {
+            "context_processors": [
+                # ...
+                "django.contrib.sites.context_processors.site",
+            ],
         },
-    ]
+    },
+]
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
