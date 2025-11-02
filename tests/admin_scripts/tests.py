@@ -120,6 +120,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 for path_component in os.environ.get("PATH", "").split(os.pathsep)
                 for formatter_path in find_formatters().values()
                 if formatter_path
+                and os.path.isabs(path_component)
                 and os.path.commonpath([path_component, formatter_path]) == os.sep
             ]
         )
