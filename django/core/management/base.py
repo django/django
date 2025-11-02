@@ -59,7 +59,7 @@ class CommandParser(ArgumentParser):
         self.missing_args_message = missing_args_message
         self.called_from_command_line = called_from_command_line
         # Enable suggest_on_error for Python 3.14+
-        if PY314:
+        if PY314 and called_from_command_line:
             kwargs.setdefault("suggest_on_error", True)
         super().__init__(**kwargs)
 
