@@ -228,7 +228,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Management commands now set :class:`~argparse.ArgumentParser`\'s
+  ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
+  suggestions for mistyped subcommand names and argument choices.
 
 Migrations
 ~~~~~~~~~~
