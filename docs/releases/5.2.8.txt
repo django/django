@@ -2,10 +2,11 @@
 Django 5.2.8 release notes
 ==========================
 
-*Expected November 5, 2025*
+*November 5, 2025*
 
-Django 5.2.8 fixes several bugs in 5.2.7 and adds compatibility with Python
-3.14.
+Django 5.2.8 fixes one security issue with severity "high", one security issue
+with severity "moderate", and several bugs in 5.2.7. It also adds compatibility
+with Python 3.14.
 
 Bugfixes
 ========
