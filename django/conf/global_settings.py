@@ -92,6 +92,7 @@ LANGUAGES = [
     ("hi", gettext_noop("Hindi")),
     ("hr", gettext_noop("Croatian")),
     ("hsb", gettext_noop("Upper Sorbian")),
+    ("ht", gettext_noop("Haitian Creole")),
     ("hu", gettext_noop("Hungarian")),
     ("hy", gettext_noop("Armenian")),
     ("ia", gettext_noop("Interlingua")),

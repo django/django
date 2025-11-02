@@ -119,7 +119,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+Django supports PostgreSQL 15 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
 2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
@@ -454,7 +454,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 8.0.11 and higher.
+Django supports MySQL 8.4 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -834,7 +834,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.31.0 and later.
+Django supports SQLite 3.37.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As

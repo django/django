@@ -754,19 +754,37 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 /* BREADCRUMBS */
 
-div.breadcrumbs {
+ol.breadcrumbs {
     background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
     color: var(--breadcrumbs-fg);
-    text-align: left;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-div.breadcrumbs a {
+ol.breadcrumbs li {
+    display: inline-block;
+    font-size: 0.875rem;
+    padding: 0;
+    line-height: 0;
+}
+
+ol.breadcrumbs li:not([aria-current="page"])::after {
+    content: ' \203A ' / '';
+}
+
+ol.breadcrumbs li a[aria-current="page"] {
+    color: var(--breadcrumbs-fg);
+    text-decoration: none !important;
+    cursor: default;
+}
+
+ol.breadcrumbs a {
     color: var(--breadcrumbs-link-fg);
 }
 
-div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
     color: var(--breadcrumbs-fg);
 }
 

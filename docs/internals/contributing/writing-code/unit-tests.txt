@@ -83,7 +83,7 @@ environments can be seen as follows:
     blacken-docs
     flake8>=3.7.0
     docs
-    isort>=5.1.0
+    isort>=7.0.0
     lint-docs
 
 Testing other Python versions and database backends
@@ -317,7 +317,7 @@ dependencies:
 * :pypi:`asgiref` 3.9.1+ (required)
 * :pypi:`bcrypt` 4.1.1+
 * :pypi:`colorama` 0.4.6+
-* :pypi:`docutils` 0.19+
+* :pypi:`docutils` 0.22+
 * :pypi:`geoip2` 4.8.0+
 * :pypi:`Jinja2` 2.11+
 * :pypi:`numpy` 1.26.0+
@@ -325,7 +325,6 @@ dependencies:
 * :pypi:`PyYAML` 6.0.2+
 * :pypi:`pywatchman`
 * :pypi:`redis` 5.1.0+
-* :pypi:`setuptools`
 * :pypi:`pymemcache`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_

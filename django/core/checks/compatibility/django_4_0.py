@@ -1,6 +1,5 @@
 from django.conf import settings
-
-from .. import Error, Tags, register
+from django.core.checks import Error, Tags, register
 
 
 @register(Tags.compatibility)

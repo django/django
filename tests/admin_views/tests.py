@@ -2579,7 +2579,7 @@ class AdminViewPermissionsTest(TestCase):
         # Add user may login and POST to add view, then redirect to admin root
         self.client.force_login(self.adduser)
         addpage = self.client.get(reverse("admin:admin_views_article_add"))
-        change_list_link = '&rsaquo; <a href="%s">Articles</a>' % reverse(
+        change_list_link = '<a href="%s">Articles</a>' % reverse(
             "admin:admin_views_article_changelist"
         )
         self.assertNotContains(

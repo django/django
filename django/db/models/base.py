@@ -30,8 +30,9 @@ from django.db import (
 )
 from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, Collector
+from django.db.models.deletion import CASCADE, DO_NOTHING, Collector, DatabaseOnDelete
 from django.db.models.expressions import DatabaseDefault
+from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.fields.related import (
     ForeignObjectRel,
@@ -466,6 +467,14 @@ class ModelStateFieldsCacheDescriptor:
         return res
 
 
+class ModelStateFetchModeDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.fetch_mode = FETCH_ONE
+        return res
+
+
 class ModelState:
     """Store model instance state."""
 
@@ -476,6 +485,14 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    fetch_mode = ModelStateFetchModeDescriptor()
+    peers = ()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Weak references can't be pickled.
+        state.pop("peers", None)
+        return state
 
 
 class Model(AltersData, metaclass=ModelBase):
@@ -595,7 +612,7 @@ class Model(AltersData, metaclass=ModelBase):
         post_init.send(sender=cls, instance=self)
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         if len(values) != len(cls._meta.concrete_fields):
             values_iter = iter(values)
             values = [
@@ -605,6 +622,8 @@ class Model(AltersData, metaclass=ModelBase):
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
+        if fetch_mode is not None:
+            new._state.fetch_mode = fetch_mode
         return new
 
     def __repr__(self):
@@ -714,8 +733,8 @@ class Model(AltersData, metaclass=ModelBase):
         should be an iterable of field attnames. If fields is None, then
         all non-deferred fields are reloaded.
 
-        When accessing deferred fields of an instance, the deferred loading
-        of the field will call this method.
+        When fetching deferred fields for a single instance (the FETCH_ONE
+        fetch mode), the deferred loading uses this method.
         """
         if fields is None:
             self._prefetched_objects_cache = {}
@@ -1182,8 +1201,9 @@ class Model(AltersData, metaclass=ModelBase):
         returning_fields,
     ):
         """
-        Try to update the model. Return True if the model was updated (if an
-        update query was done and a matching row was found in the DB).
+        Try to update the model. Return a list of updated fields if the model
+        was updated (if an update query was done and a matching row was
+        found in the DB).
         """
         filtered = base_qs.filter(pk=pk_val)
         if not values:
@@ -1750,6 +1770,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_fields(**kwargs),
                 *cls._check_m2m_through_same_relationship(),
                 *cls._check_long_column_names(databases),
+                *cls._check_related_fields(),
             ]
             clash_errors = (
                 *cls._check_id_field(),
@@ -2220,6 +2241,20 @@ class Model(AltersData, metaclass=ModelBase):
                             id="models.E048",
                         )
                     )
+                elif (
+                    isinstance(field.remote_field, ForeignObjectRel)
+                    and field not in cls._meta.local_concrete_fields
+                    and len(field.from_fields) > 1
+                ):
+                    errors.append(
+                        checks.Error(
+                            f"{option!r} refers to a ForeignObject {field_name!r} with "
+                            "multiple 'from_fields', which is not supported for that "
+                            "option.",
+                            obj=cls,
+                            id="models.E049",
+                        )
+                    )
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
@@ -2420,6 +2455,29 @@ class Model(AltersData, metaclass=ModelBase):
                     )
 
         return errors
+
+    @classmethod
+    def _check_related_fields(cls):
+        has_db_variant = False
+        has_python_variant = False
+        for rel in cls._meta.get_fields():
+            if rel.related_model:
+                if not (on_delete := getattr(rel.remote_field, "on_delete", None)):
+                    continue
+                if isinstance(on_delete, DatabaseOnDelete):
+                    has_db_variant = True
+                elif on_delete != DO_NOTHING:
+                    has_python_variant = True
+                if has_db_variant and has_python_variant:
+                    return [
+                        checks.Error(
+                            "The model cannot have related fields with both "
+                            "database-level and Python-level on_delete variants.",
+                            obj=cls,
+                            id="models.E050",
+                        )
+                    ]
+        return []
 
     @classmethod
     def _get_expr_references(cls, expr):

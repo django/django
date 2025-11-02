@@ -18,8 +18,8 @@ project.
 Python compatibility
 ====================
 
-Django 6.0 supports Python 3.12 and 3.13. We **highly recommend**, and only
-officially support, the latest release of each series.
+Django 6.0 supports Python 3.12, 3.13, and 3.14. We **highly recommend**, and
+only officially support, the latest release of each series.
 
 The Django 5.2.x series is the last to support Python 3.10 and 3.11.
 
@@ -124,7 +124,7 @@ Backends are configured via the :setting:`TASKS` setting. The :ref:`two
 built-in backends <task-available-backends>` included in this release are
 primarily intended for development and testing.
 
-Django handles task creation and queuing but does not provide a worker
+Django handles task creation and queuing, but does not provide a worker
 mechanism to run tasks. Execution must be managed by external infrastructure,
 such as a separate process or service.
 
@@ -229,6 +229,11 @@ Email
   accepts a :class:`~email.message.MIMEPart` object from Python's modern email
   API.
 
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added support and translations for the Haitian Creole language.
+
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
@@ -289,6 +294,10 @@ Models
   the ``RETURNING`` clause (SQLite, PostgreSQL, and Oracle). On backends that
   don't support it (MySQL and MariaDB), the fields are marked as deferred to
   trigger a refresh on subsequent accesses.
+
+* Using a :ref:`ForeignObject <cpk-and-relations>` with multiple
+  ``from_fields`` in Model indexes, constraints, or :attr:`unique_together
+  <django.db.models.Options.unique_together>` now emits a system check error.
 
 Pagination
 ~~~~~~~~~~
@@ -368,6 +377,7 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``aiosmtpd`` 1.4.5
 * ``argon2-cffi`` 23.1.0
 * ``bcrypt`` 4.1.1
+* ``docutils`` 0.22
 * ``geoip2`` 4.8.0
 * ``Pillow`` 10.1.0
 * ``mysqlclient`` 2.2.1
@@ -483,24 +493,18 @@ Features deprecated in 6.0
 Positional arguments in ``django.core.mail`` APIs
 -------------------------------------------------
 
-.. currentmodule:: django.core.mail
-
 :mod:`django.core.mail` APIs now require keyword arguments for less commonly
 used parameters. Using positional arguments for these now emits a deprecation
-warning and will raise a :exc:`TypeError` when the deprecation period ends.
+warning and will raise a :exc:`TypeError` when the deprecation period ends:
 
 * All *optional* parameters (``fail_silently`` and later) must be passed as
-  keyword arguments to :func:`get_connection`, :func:`mail_admins`,
-  :func:`mail_managers`, :func:`send_mail`, and :func:`send_mass_mail`.
+  keyword arguments to :func:`.get_connection`, :func:`.mail_admins`,
+  :func:`.mail_managers`, :func:`.send_mail`, and :func:`.send_mass_mail`.
 
 * All parameters must be passed as keyword arguments when creating an
-  :class:`EmailMessage` or :class:`EmailMultiAlternatives` instance, except for
-  the first four (``subject``, ``body``, ``from_email``, and ``to``), which may
-  still be passed either as positional or keyword arguments.
-
-* :mod:`django.core.mail` APIs now require keyword arguments for less commonly
-  used parameters. Using positional arguments for these now emits a deprecation
-  warning and will raise a :exc:`TypeError` when the deprecation period ends:
+  :class:`.EmailMessage` or :class:`.EmailMultiAlternatives` instance, except
+  for the first four (``subject``, ``body``, ``from_email``, and ``to``), which
+  may still be passed either as positional or keyword arguments.
 
 Miscellaneous
 -------------
@@ -571,7 +575,7 @@ to remove usage of these features.
 * Support for calling ``format_html()`` without passing args or kwargs is
   removed.
 
-* The default scheme for ``forms.URLField`` changed from ``"http"`` to
+* The default scheme for ``forms.URLField`` has changed from ``"http"`` to
   ``"https"``.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is removed.

@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
@@ -135,10 +136,9 @@ class View:
         # Try to dispatch to the right method; if a method doesn't exist,
         # defer to the error handler. Also defer to the error handler if the
         # request method isn't on the approved list.
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(
-                self, request.method.lower(), self.http_method_not_allowed
-            )
+        method = request.method.lower()
+        if method in self.http_method_names:
+            handler = getattr(self, method, self.http_method_not_allowed)
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
@@ -252,7 +252,10 @@ class RedirectView(View):
 
         args = self.request.META.get("QUERY_STRING", "")
         if args and self.query_string:
-            url = "%s?%s" % (url, args)
+            if urlparse(url).query:
+                url = f"{url}&{args}"
+            else:
+                url = f"{url}?{args}"
         return url
 
     def get(self, request, *args, **kwargs):

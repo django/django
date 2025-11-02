@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgis-version: [latest, "17-3.5-alpine", "17-master"]
+        postgis-version: ["latest", "18-3.6-alpine", "17-master"]
     name: PostGIS ${{ matrix.postgis-version }}
     services:
       postgres:
@@ -42,7 +42,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Update apt repo
@@ -59,7 +59,7 @@ jobs:
         run: |
           PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -c "SELECT PostGIS_full_version();"
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
