@@ -93,9 +93,10 @@ class ContextProcessorTest(TestCase):
         server_url = "testserver"
         apps = list(settings.INSTALLED_APPS)
         apps.remove("django.contrib.sites")
+
         with self.settings(INSTALLED_APPS=apps):
             request = self.factory.get("/")
             context = site(request)
 
-        self.assertEqual(context["site"].name, server_url)
-        self.assertEqual(context["site"].domain, server_url)
+            self.assertEqual(context["site"].name, server_url)
+            self.assertEqual(context["site"].domain, server_url)
