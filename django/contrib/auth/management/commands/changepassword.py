@@ -22,8 +22,11 @@ class Command(BaseCommand):
         return p
 
     def _get_stdin(self):
-        stdin_content = sys.stdin.readline()
-        return stdin_content, stdin_content
+        try:
+            stdin_content = sys.stdin.readline()
+            return stdin_content, stdin_content
+        except Exception as ex:
+            raise CommandError("aborted")
 
     def add_arguments(self, parser):
         parser.add_argument(
