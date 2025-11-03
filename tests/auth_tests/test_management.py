@@ -261,17 +261,20 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         User.objects.create_user(username="J\xfalia", password="qwerty")
         call_command("changepassword", username="J\xfalia", stdout=self.stdout)
 
-    @mock.patch.object(
-        changepassword.Command, "_get_stdin", return_value=("not qwerty", "not qwerty")
+    @mock.patch(
+        "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
+        return_value="not qwerty",
     )
     def test_that_stdin_pipe_is_allowed(
         self,
-        mock_get_stdin,
+        _,
     ):
         """
         Executing the changepassword command with the --stdin option
-        should should joe's password.
+        should change joe's password.
         """
+        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+
         call_command(
             "changepassword",
             username="joe",
