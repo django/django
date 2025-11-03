@@ -39,6 +39,31 @@ the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via a couple of conventions.
 
+Using ``site`` in templates
+---------------------------
+
+.. versionadded:: 6.0
+
+The current site can be made available in templates through a dedicated
+context processor.
+
+Add the :func:`~django.template.context_processors.csp` context processor
+to your :setting:`TEMPLATES` setting. This makes the current Site object
+available in the Django templates as the ``site`` context variable::
+
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "context_processors": [
+                    # ...
+                    "django.contrib.sites.context_processors.site",
+                ],
+            },
+        },
+    ]
+
+
 Example usage
 =============
 
@@ -215,27 +240,6 @@ Here's an example of what the form-handling view looks like::
 On Lawrence.com, this email has the subject line "Thanks for subscribing to
 lawrence.com alerts." On LJWorld.com, the email has the subject "Thanks for
 subscribing to LJWorld.com alerts." Same goes for the email's message body.
-
-Using ``site`` in templates
----------------------------
-
-.. versionadded:: 6.0
-
-Add the :func:`~django.template.context_processors.csp` context processor
-to your :setting:`TEMPLATES` setting. This makes the current Site object
-available in the Django templates as the ``site`` context variable::
-
-    TEMPLATES = [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "OPTIONS": {
-                "context_processors": [
-                    # ...
-                    "django.contrib.sites.context_processors.site",
-                ],
-            },
-        },
-    ]
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
