@@ -50,3 +50,29 @@ Supporting the Development of Django
 Django's development depends on your contributions.
 
 If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/
+
+Contributors
+============
+
+Django is the work of thousands of contributors from around the world. We are grateful to everyone who has contributed code, documentation, bug reports, and ideas to the project.
+
+A full list of contributors can be found in the AUTHORS file in this repository.
+
+How to Contribute
+-----------------
+
+We welcome contributions from everyone! Here's how you can help:
+
+* Report bugs and request features by opening issues on our issue tracker: https://code.djangoproject.com/
+* Contribute code by submitting patches or pull requests
+* Improve documentation
+* Help answer questions in the community forums and Discord
+* Review pull requests from other contributors
+
+For detailed information on contributing to Django, please visit:
+https://docs.djangoproject.com/en/dev/internals/contributing/
+
+Code of Conduct
+---------------
+
+Django has adopted a Code of Conduct that we expect all contributors to adhere to. Please read the full text at https://www.djangoproject.com/conduct/ so you can understand what actions will and will not be tolerated.
