@@ -290,6 +290,33 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         )
         self.assertTrue(User.objects.get(username="joe").check_password("not qwerty"))
 
+    @mock.patch(
+        "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
+        side_effect=RuntimeError("stop"),
+    )
+    def test_that_stdin_pipe_can_fail_gracefully(
+        self,
+        _,
+    ):
+        """
+        Executing the changepassword command with the --stdin option
+        with the call to stdin failing,
+        should raise a CommandError and leave the password unchanged.
+        """
+        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+
+        msg = "aborted"
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=True,
+            )
+
+        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     databases = {"default", "other"}
