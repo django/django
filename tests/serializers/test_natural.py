@@ -263,7 +263,11 @@ def natural_key_opt_out_test(self, format):
     Verifies that when natural_key() returns None or (self.pk,):
     """
     user1 = NoneOptOutUser.objects.create(email="user2@example.com")
+    user2 = NoneOptOutUser.objects.create(email="user3@example.com")
+
     post1 = PostToNoneUser.objects.create(author=user1, title="Post 2 (None Opt-out)")
+    post1.subscribers.add(user1, user2)
+
     scenarios = [
         (user1, post1),
     ]
@@ -304,6 +308,15 @@ def natural_key_opt_out_test(self, format):
                 user_pk,
                 f"[{user.__class__.__name__}] FK must be serialized as PK integer"
                 f", not a natural key list.",
+            )
+
+            subscribers_pks = [user1.pk, user2.pk]
+
+            self.assertEqual(
+                sorted(serialized_post["fields"]["subscribers"]),
+                sorted(subscribers_pks),
+                f"[{user.__class__.__name__}] "
+                f"M2M field must be serialized as PK integer list.",
             )
 
         try:

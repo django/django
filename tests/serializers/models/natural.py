@@ -95,3 +95,7 @@ class NoneOptOutUser(AbstractBaseUser):
 class PostToNoneUser(models.Model):
     author = models.ForeignKey(NoneOptOutUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
+
+    subscribers = models.ManyToManyField(
+        NoneOptOutUser, related_name="subscribed_posts", blank=True
+    )

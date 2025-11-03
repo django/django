@@ -147,6 +147,11 @@ class Serializer(base.Serializer):
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
                     natural = value.natural_key()
+
+                    if not natural:
+                        self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+                        return
+
                     # Iterable natural keys are rolled out as subelements
                     self.xml.startElement("object", {})
                     for key_value in natural:

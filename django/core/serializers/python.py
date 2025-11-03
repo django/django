@@ -86,7 +86,12 @@ class Serializer(base.Serializer):
             ):
 
                 def m2m_value(value):
-                    return value.natural_key()
+                    natural_key_value = value.natural_key()
+
+                    if not natural_key_value:
+                        return self._value_from_field(value, value._meta.pk)
+                    else:
+                        return natural_key_value
 
                 def queryset_iterator(obj, field):
                     attr = getattr(obj, field.name)
