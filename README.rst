@@ -54,25 +54,78 @@ If you depend on Django, remember to support the Django Software Foundation: htt
 Contributors
 ============
 
-Django is the work of thousands of contributors from around the world. We are grateful to everyone who has contributed code, documentation, bug reports, and ideas to the project.
+Django is the work of thousands of contributors from around the world. We are deeply grateful to everyone who has contributed code, documentation, bug reports, translations, and ideas to make Django better.
 
-A full list of contributors can be found in the AUTHORS file in this repository.
+Hall of Fame
+------------
+
+A complete list of contributors can be found in the AUTHORS file in this repository. This file honors everyone who has made Django possible through their contributions, big and small.
+
+To view all contributors on GitHub, visit: https://github.com/django/django/graphs/contributors
+
+Types of Contributions
+----------------------
+
+Django welcomes many types of contributions, including but not limited to:
+
+* **Code contributions**: New features, bug fixes, performance improvements
+* **Documentation**: Improvements to docs, tutorials, and examples
+* **Bug reports**: Detailed issue reports that help us improve Django
+* **Translations**: Helping Django speak your language
+* **Community support**: Answering questions on forums, Discord, and mailing lists
+* **Code reviews**: Reviewing and testing pull requests from other contributors
+* **Design and UX**: Improving the developer and user experience
+* **Infrastructure**: Helping maintain CI/CD, testing, and deployment systems
 
 How to Contribute
 -----------------
 
-We welcome contributions from everyone! Here's how you can help:
+We welcome contributions from everyone! Here's how you can get started:
 
-* Report bugs and request features by opening issues on our issue tracker: https://code.djangoproject.com/
-* Contribute code by submitting patches or pull requests
-* Improve documentation
-* Help answer questions in the community forums and Discord
-* Review pull requests from other contributors
+1. **Report bugs and request features**: Open issues on our issue tracker at https://code.djangoproject.com/
 
-For detailed information on contributing to Django, please visit:
+2. **Contribute code**:
+
+   * Fork the repository
+   * Create a new branch for your changes
+   * Write tests for your changes
+   * Submit a pull request with a clear description
+   * Follow our coding style and guidelines
+
+3. **Improve documentation**: Documentation improvements are always welcome, whether it's fixing a typo or adding a new tutorial
+
+4. **Help the community**: Answer questions in the `Django Discord community <https://chat.djangoproject.com>`_ or on the `Django Forum <https://forum.djangoproject.com/>`_
+
+5. **Review pull requests**: Help review and test changes from other contributors
+
+For detailed information on contributing to Django, including our development process, how to propose changes, and coding standards, please visit:
 https://docs.djangoproject.com/en/dev/internals/contributing/
+
+First-time Contributors
+-----------------------
+
+New to Django or open source? No problem! We have a welcoming community ready to help you get started:
+
+* Look for issues labeled "easy pickings" on our issue tracker: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=0&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
+* Read our contributor documentation: https://docs.djangoproject.com/en/dev/internals/contributing/new-contributors/
+* Join our community channels and introduce yourself
+* Don't hesitate to ask questions!
 
 Code of Conduct
 ---------------
 
-Django has adopted a Code of Conduct that we expect all contributors to adhere to. Please read the full text at https://www.djangoproject.com/conduct/ so you can understand what actions will and will not be tolerated.
+Django is committed to fostering a welcoming and inclusive community. We have adopted a Code of Conduct that we expect all contributors and community members to adhere to.
+
+Please read the full text at https://www.djangoproject.com/conduct/ so you can understand what actions will and will not be tolerated.
+
+Recognition
+-----------
+
+We believe in recognizing the hard work of our contributors:
+
+* All contributors are listed in the AUTHORS file
+* Major contributors may be invited to join the Django team
+* Outstanding contributions are highlighted in release notes
+* We celebrate contributors in our community channels and social media
+
+Thank you to all our contributors for making Django the amazing framework it is today!
