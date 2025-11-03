@@ -39,31 +39,6 @@ the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via a couple of conventions.
 
-Using ``site`` in templates
----------------------------
-
-.. versionadded:: 6.0
-
-The current site can be made available in templates through a dedicated
-context processor.
-
-Add the :func:`~django.template.context_processors.csp` context processor
-to your :setting:`TEMPLATES` setting. This makes the current Site object
-available in the Django templates as the ``site`` context variable::
-
-    TEMPLATES = [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "OPTIONS": {
-                "context_processors": [
-                    # ...
-                    "django.contrib.sites.context_processors.site",
-                ],
-            },
-        },
-    ]
-
-
 Example usage
 =============
 
@@ -261,8 +236,12 @@ farm out to the template system like so::
         # ...
 
 In this case, you'd have to create :file:`subject.txt` and :file:`message.txt`
-template files that include ``{{ site.name }}`` and ``{{ site.domain }}``.
+template files for both the LJWorld.com and Lawrence.com template directories.
 That gives you more flexibility, but it's also more complex.
+
+It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
+objects as much as possible, to remove unneeded complexity and redundancy.
+
 
 Getting the current domain for full URLs
 ----------------------------------------
@@ -440,6 +419,30 @@ To avoid repetitions, add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
 request object, so you can use ``request.site`` to get the current site.
+
+Site context_processor
+======================
+
+.. versionadded:: 6.0
+
+The current site can be made available in templates through a dedicated
+context processor.
+
+Add the :func:`~django.template.context_processors.csp` context processor
+to your :setting:`TEMPLATES` setting. This makes the current Site object
+available in the Django templates as the ``site`` context variable::
+
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "context_processors": [
+                    # ...
+                    "django.contrib.sites.context_processors.site",
+                ],
+            },
+        },
+    ]
 
 How Django uses the sites framework
 ===================================
