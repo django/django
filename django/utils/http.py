@@ -169,11 +169,11 @@ def int_to_base36(i):
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
         return char_set[i]
-    b36 = ""
+    b36_parts = []
     while i != 0:
         i, n = divmod(i, 36)
-        b36 = char_set[n] + b36
-    return b36
+        b36_parts.append(char_set[n])
+    return "".join(reversed(b36_parts))
 
 
 def urlsafe_base64_encode(s):

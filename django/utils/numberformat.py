@@ -91,15 +91,15 @@ def format(
             # grouping is a single value
             intervals = [grouping, 0]
         active_interval = intervals.pop(0)
-        int_part_gd = ""
+        int_part_gd = []
         cnt = 0
         for digit in int_part[::-1]:
             if cnt and cnt == active_interval:
                 if intervals:
                     active_interval = intervals.pop(0) or active_interval
-                int_part_gd += thousand_sep[::-1]
+                int_part_gd.append(thousand_sep[::-1])
                 cnt = 0
-            int_part_gd += digit
+            int_part_gd.append(digit)
             cnt += 1
-        int_part = int_part_gd[::-1]
+        int_part = "".join(int_part_gd)[::-1]
     return sign + int_part + dec_part
