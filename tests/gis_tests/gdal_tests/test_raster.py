@@ -6,7 +6,7 @@ import zipfile
 from pathlib import Path
 from unittest import mock
 
-from django.contrib.gis.gdal import GDALRaster, SpatialReference
+from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
@@ -406,6 +406,8 @@ class GDALRasterTests(SimpleTestCase):
         self.assertIn("NAD83 / Florida GDL Albers", infos)
 
     def test_compressed_file_based_raster_creation(self):
+        if GDAL_VERSION > (3, 4):
+            self.skipTest("GDAL_PIXEL_TYPES are missing types from GDAL 3.5+.")
         rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
         # Make a compressed copy of an existing raster.
         compressed = self.rs.warp(
