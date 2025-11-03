@@ -25,7 +25,7 @@ class Command(BaseCommand):
         try:
             stdin_content = sys.stdin.readline()
             return stdin_content, stdin_content
-        except Exception as ex:
+        except Exception:
             raise CommandError("aborted")
 
     def add_arguments(self, parser):
