@@ -94,7 +94,7 @@ of changing a user's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
 do not supply a user, the command will attempt to change the password
-whose username matches the current system user. You can also use the option 
+whose username matches the current system user. You can also use the option
 named ``--stdin`` to pass the new password via a pipe:
 
 .. console::
