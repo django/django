@@ -114,13 +114,15 @@ class AdminScriptTestCase(SimpleTestCase):
 
     @cached_property
     def path_without_formatters(self):
+        def dir_contains_formatter_executable(path):
+            with mock.patch.dict(os.environ, {"PATH": path}):
+                return any(cmd is not None for cmd in find_formatters().values())
+
         return os.pathsep.join(
             [
                 path_component
                 for path_component in os.environ.get("PATH", "").split(os.pathsep)
-                for formatter_path in find_formatters().values()
-                if formatter_path
-                and os.path.commonpath([path_component, formatter_path]) == os.sep
+                if not dir_contains_formatter_executable(path_component)
             ]
         )
 
