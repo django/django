@@ -2783,16 +2783,31 @@ class AutoFieldMixin:
         super().__init__(*args, **kwargs)
 
     def check(self, **kwargs):
+        databases = kwargs.get("databases") or []
         return [
             *super().check(**kwargs),
-            *self._check_primary_key(),
+            *self._check_primary_key(databases),
         ]
 
-    def _check_primary_key(self):
-        if not self.primary_key:
+    def _check_primary_key(self, databases):
+        if not (
+            self.primary_key
+            or (
+                (
+                    all(
+                        connections[db].features.supports_autofields_in_composite_pk
+                        for db in databases
+                    )
+                    or "supports_autofields_in_composite_pk"
+                    in self.model._meta.required_db_features
+                )
+                and self in self.model._meta.pk_fields
+            )
+        ):
             return [
                 checks.Error(
-                    "AutoFields must set primary_key=True.",
+                    "AutoFields must either set primary_key=True or be part of a "
+                    "CompositePrimaryKey.",
                     obj=self,
                     id="fields.E100",
                 ),
@@ -2803,7 +2818,6 @@ class AutoFieldMixin:
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["blank"]
-        kwargs["primary_key"] = True
         return name, path, args, kwargs
 
     def validate(self, value, model_instance):
