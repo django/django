@@ -53,3 +53,5 @@ If you depend on Django, remember to support the Django Software Foundation: htt
 
 With Python's grace and structure so clean,
 Django builds the web like a well-oiled machine.
+From models to views, it handles with ease,
+Creating web apps that aim to please.
