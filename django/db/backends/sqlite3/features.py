@@ -55,6 +55,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
+    supports_no_precision_decimalfield = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
     can_return_rows_from_update = True

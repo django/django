@@ -383,6 +383,9 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does the backend support numeric columns with no precision?
+    supports_no_precision_decimalfield = False
+
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
 

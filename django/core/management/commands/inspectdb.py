@@ -359,21 +359,11 @@ class Command(BaseCommand):
         if field_type in {"CharField", "TextField"} and row.collation:
             field_params["db_collation"] = row.collation
 
-        if field_type == "DecimalField":
-            if row.precision is None or row.scale is None:
-                field_notes.append(
-                    "max_digits and decimal_places have been guessed, as this "
-                    "database handles decimal fields as float"
-                )
-                field_params["max_digits"] = (
-                    row.precision if row.precision is not None else 10
-                )
-                field_params["decimal_places"] = (
-                    row.scale if row.scale is not None else 5
-                )
-            else:
-                field_params["max_digits"] = row.precision
-                field_params["decimal_places"] = row.scale
+        if field_type == "DecimalField" and (
+            row.precision is not None or row.scale is not None
+        ):
+            field_params["max_digits"] = row.precision
+            field_params["decimal_places"] = row.scale
 
         return field_type, field_params, field_notes
 

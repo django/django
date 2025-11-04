@@ -196,6 +196,8 @@ Model fields
 * **fields.E133**: ``max_digits`` must be a positive integer.
 * **fields.E134**: ``max_digits`` must be greater or equal to
   ``decimal_places``.
+* **fields.E135**: ``DecimalField``’s ``max_digits`` and ``decimal_places``
+  must both be defined or both omitted.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
 * **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if

@@ -121,6 +121,15 @@ class CharFieldUnlimited(models.Model):
         required_db_features = {"supports_unlimited_charfield"}
 
 
+class DecimalFieldNoPrec(models.Model):
+    decimal_field_no_precision = models.DecimalField(
+        max_digits=None, decimal_places=None
+    )
+
+    class Meta:
+        required_db_features = {"supports_no_precision_decimalfield"}
+
+
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
