@@ -16,3 +16,6 @@ Bugfixes
 * Fixed a bug in Django 5.2 where ``QuerySet.first()`` and ``QuerySet.last()``
   raised an error on querysets performing aggregation that selected all fields
   of a composite primary key.
+
+* Fixed a bug in Django 5.2 where proxy models having a ``CompositePrimaryKey``
+  incorrectly raised a ``models.E042`` system check error.
