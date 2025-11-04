@@ -194,14 +194,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 comment,
             ) = field_map[name]
             name %= {}  # oracledb, for some reason, doubles percent signs.
+            if desc[1] == oracledb.NUMBER and desc[5] == -127 and desc[4] == 0:
+                # DecimalField with no precision.
+                precision = None
+                scale = None
+            else:
+                precision = desc[4] or 0
+                scale = desc[5] or 0
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),
                     desc[1],
                     display_size,
                     desc[3],
-                    desc[4] or 0,
-                    desc[5] or 0,
+                    precision,
+                    scale,
                     *desc[6:],
                     default,
                     collation,
