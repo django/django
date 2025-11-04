@@ -1782,7 +1782,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = cls._meta
         pk = meta.pk
 
-        if not isinstance(pk, CompositePrimaryKey):
+        if meta.proxy or not isinstance(pk, CompositePrimaryKey):
             return errors
 
         seen_columns = defaultdict(list)
