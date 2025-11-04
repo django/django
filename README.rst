@@ -53,3 +53,5 @@ If you depend on Django, remember to support the Django Software Foundation: htt
 
 Thank you for being part of the Django community!
 Happy coding with Django!
+Build something amazing with Django today!
+Together, we make the web better.
