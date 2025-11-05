@@ -206,7 +206,6 @@ class UserModelChecksTests(SimpleTestCase):
             ],
         )
 
-
     @override_settings(AUTH_USER_MODEL="auth_tests.VulnerableStaticUser")
     def test_is_anonymous_authenticated_static_methods(self):
         """
