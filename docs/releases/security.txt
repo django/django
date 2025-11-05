@@ -36,6 +36,30 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+November 5, 2025 - :cve:`2025-64458`
+------------------------------------
+
+Potential denial-of-service vulnerability in ``HttpResponseRedirect`` and
+``HttpResponsePermanentRedirect`` on Windows. `Full description
+<https://www.djangoproject.com/weblog/2025/nov/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <6e13348436fccf8f22982921d6a3a3e65c956a9f>`
+* Django 5.2 :commit:`(patch) <4f5d904b63751dea9ffc3b0e046404a7fa5881ac>`
+* Django 5.1 :commit:`(patch) <3790593781d26168e7306b5b2f8ea0309de16242>`
+* Django 4.2 :commit:`(patch) <770eea38d7a0e9ba9455140b5a9a9e33618226a7>`
+
+November 5, 2025 - :cve:`2025-64459`
+------------------------------------
+
+Potential SQL injection via ``_connector`` keyword argument in ``QuerySet`` and
+``Q`` objects. `Full description
+<https://www.djangoproject.com/weblog/2025/nov/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <06dd38324ac3d60d83d9f3adabf0dcdf423d2a85>`
+* Django 5.2 :commit:`(patch) <6703f364d767e949c5b0e4016433ef75063b4f9b>`
+* Django 5.1 :commit:`(patch) <72d2c87431f2ae0431d65d0ec792047f078c8241>`
+* Django 4.2 :commit:`(patch) <59ae82e67053d281ff4562a24bbba21299f0a7d4>`
+
 October 1, 2025 - :cve:`2025-59681`
 -----------------------------------
 
