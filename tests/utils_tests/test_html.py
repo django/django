@@ -455,6 +455,18 @@ class TestUtilsHtml(SimpleTestCase):
                 '<a href="mailto:idna-2008@%DE%89%DE%A8%DE%80%DE%A7%DE%83%DE%AA.ex'
                 'ample.mv">idna-2008@މިހާރު.example.mv</a>',
             ),
+            (
+                "as.d8f.ghj8.gov",
+                '<a href="https://as.d8f.ghj8.gov">as.d8f.ghj8.gov</a>',
+            ),
+            (
+                "a.b2c.com",
+                '<a href="https://a.b2c.com">a.b2c.com</a>',
+            ),
+            (
+                "www.sub1.d2f.gov",
+                '<a href="https://www.sub1.d2f.gov">www.sub1.d2f.gov</a>',
+            ),
         )
         for value, output in tests:
             with self.subTest(value=value):
