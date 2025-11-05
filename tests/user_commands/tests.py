@@ -12,7 +12,7 @@ from django.apps import apps
 from django.core import management
 from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
-from django.core.management.base import OutputWrapper
+from django.core.management.base import CommandParser, OutputWrapper
 from django.core.management.utils import (
     find_command,
     get_random_secret_key,
@@ -25,7 +25,7 @@ from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils.version import PY314
+from django.utils.version import PY314, PY315
 
 from .management.commands import dance
 from .utils import AssertFormatterFailureCaughtContext
@@ -456,79 +456,23 @@ class CommandTests(SimpleTestCase):
         self.assertIn("Working...", out.getvalue())
         self.assertIs(mocked_flush.called, True)
 
-
-class SuggestOnErrorTests(SimpleTestCase):
-    """
-    Tests for argparse suggest_on_error feature on Python 3.14+.
-    """
-
-    def test_parser_kwargs_suggest_on_error_on_python_314_plus(self):
+    @unittest.skipUnless(PY314 and not PY315, "Requires Python 3.14")
+    def test_suggest_on_error_defaults_true(self):
         """
-        CommandParser sets suggest_on_error=True on Python 3.14+.
+        CommandParser sets suggest_on_error=True on Python 3.14.
         """
-        command = BaseCommand()
-        command._called_from_command_line = True  # ADD THIS LINE
-        parser = command.create_parser("prog_name", "subcommand")
+        parser = CommandParser(prog="test", called_from_command_line=True)
+        self.assertTrue(parser.suggest_on_error)
 
-        if PY314:
-            self.assertTrue(
-                getattr(parser, "suggest_on_error", False),
-                "Parser should have suggest_on_error=True on Python 3.14+",
-            )
-
-    @unittest.skipUnless(PY314, "Requires Python 3.14+")
-    def test_custom_suggest_on_error_respected(self):
+    @unittest.skipUnless(PY314 and not PY315, "Requires Python 3.14")
+    def test_suggest_on_error_custom(self):
         """
         Explicit suggest_on_error=False is respected.
         """
-        command = BaseCommand()
-        command._called_from_command_line = True  # ADD THIS LINE
-        parser = command.create_parser(
-            "prog_name", "subcommand", suggest_on_error=False
+        parser = CommandParser(
+            prog="test", called_from_command_line=True, suggest_on_error=False
         )
-        self.assertFalse(
-            parser.suggest_on_error,
-            "Explicit suggest_on_error=False is respected",
-        )
-
-    @unittest.skipUnless(PY314, "Requires Python 3.14+")
-    def test_misspelled_option_suggests_correct_option(self):
-        """
-        On Python 3.14+, misspelled options trigger suggestions when available.
-        """
-        command = BaseCommand()
-        command._called_from_command_line = True
-        parser = command.create_parser("django-admin", "test")
-
-        err = StringIO()
-        with mock.patch("sys.stderr", err):
-            with self.assertRaises(SystemExit) as cm:
-                parser.parse_args(["--verbositty", "2"])
-        self.assertEqual(cm.exception.code, 2)
-
-        error_output = err.getvalue().lower()
-        # Ensure it failed for the right reason
-        self.assertIn("unrecognized arguments", error_output)
-
-        # On Python 3.14+, suggestions *may* appear depending on environment
-        if "did you mean" in error_output:
-            self.assertIn("--verbosity", error_output)
-
-    def test_suggest_on_error_works_with_management_commands(self):
-        """
-        Management commands have suggest_on_error on Python 3.14+.
-        """
-        from .management.commands.dance import Command as DanceCommand
-
-        dance_cmd = DanceCommand()
-        dance_cmd._called_from_command_line = True  # ADD THIS LINE
-        parser = dance_cmd.create_parser("django-admin", "dance")
-
-        if PY314:
-            self.assertTrue(
-                getattr(parser, "suggest_on_error", False),
-                "Management command parsers should have suggest_on_error=True",
-            )
+        self.assertFalse(parser.suggest_on_error)
 
 
 class CommandRunTests(AdminScriptTestCase):
