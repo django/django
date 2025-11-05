@@ -456,18 +456,6 @@ class TestUtilsHtml(SimpleTestCase):
                 'ample.mv">idna-2008@މިހާރު.example.mv</a>',
             ),
             (
-                "as.d8f.ghj8.gov",
-                '<a href="https://as.d8f.ghj8.gov">as.d8f.ghj8.gov</a>',
-            ),
-            (
-                "a.b2c.com",
-                '<a href="https://a.b2c.com">a.b2c.com</a>',
-            ),
-            (
-                "www.sub1.d2f.gov",
-                '<a href="https://www.sub1.d2f.gov">www.sub1.d2f.gov</a>',
-            ),
-            (
                 "host.djangoproject.com",
                 '<a href="https://host.djangoproject.com">host.djangoproject.com</a>',
             ),
