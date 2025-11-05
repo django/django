@@ -467,6 +467,10 @@ class TestUtilsHtml(SimpleTestCase):
                 "www.sub1.d2f.gov",
                 '<a href="https://www.sub1.d2f.gov">www.sub1.d2f.gov</a>',
             ),
+            (
+                "host.djangoproject.com",
+                '<a href="https://host.djangoproject.com">host.djangoproject.com</a>',
+            )
         )
         for value, output in tests:
             with self.subTest(value=value):
