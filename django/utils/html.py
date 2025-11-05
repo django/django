@@ -297,6 +297,7 @@ class Urlizer:
     simple_url_re = _lazy_re_compile(r"^https?://\[?\w", re.IGNORECASE)
     simple_url_2_re = _lazy_re_compile(
         rf"^www\.|^(?!http)(?:{DomainNameValidator.hostname_re})"
+        rf"(?:{DomainNameValidator.domain_re})"
         r"\.(com|edu|gov|int|mil|net|org)($|/.*)$",
         re.IGNORECASE,
     )
