@@ -456,6 +456,10 @@ class TestUtilsHtml(SimpleTestCase):
                 '<a href="mailto:idna-2008@%DE%89%DE%A8%DE%80%DE%A7%DE%83%DE%AA.ex'
                 'ample.mv">idna-2008@މިހާރު.example.mv</a>',
             ),
+            (
+                "host.djangoproject.com",
+                '<a href="https://host.djangoproject.com">host.djangoproject.com</a>',
+            ),
         )
         for value, output in tests:
             with self.subTest(value=value):
