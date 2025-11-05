@@ -1398,6 +1398,90 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             self.assertTrue(user.check_password("cmd_password"))
 
         test(self)
+    
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "OPTIONS": {"min_length": 20},
+            }
+        ]
+    )
+    def test_createsuperuser_noinput_password_validation_fails(self):
+        """
+        Test that --noinput mode respects password validators and fails when
+        an invalid password is provided via environment variable.
+        """
+        # Set environment variable with a password that violates the validator
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DJANGO_SUPERUSER_PASSWORD": "short",
+                "DJANGO_SUPERUSER_EMAIL": "test@example.com",
+            },
+        ):
+            # Check that the command correctly raises a CommandError with the
+            # specific validation message.
+            with self.assertRaisesMessage(CommandError, "This password is too short."):
+                call_command(
+                    "createsuperuser",
+                    username="testuser",
+                    interactive=False,
+                )
+            # Ensure no user was actually created
+            self.assertFalse(
+                User.objects.filter(username="testuser").exists()
+            )
+
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "OPTIONS": {"min_length": 10},
+            }
+        ]
+    )
+    def test_createsuperuser_noinput_password_validation_succeeds(self):
+        """
+        Test that --noinput mode correctly creates a user when a valid
+        password is provided via environment variable.
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DJANGO_SUPERUSER_PASSWORD": "a-very-long-and-valid-password",
+                "DJANGO_SUPERUSER_EMAIL": "test@example.com",
+            },
+        ):
+            # This should run without raising an error
+            call_command(
+                "createsuperuser",
+                username="testuser",
+                interactive=False,
+            )
+            # Ensure the user was created
+            user = User.objects.get(username="testuser")
+            self.assertTrue(user.check_password("a-very-long-and-valid-password"))
+
+    def test_createsuperuser_noinput_no_password_env_var(self):
+        """
+        Test that --noinput mode (without the password env var)
+        creates a user with an unusable password, preserving the
+        original behavior.
+        """
+        with mock.patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": "test@example.com"}):
+            # This should run without raising an error
+            call_command(
+                "createsuperuser",
+                username="testuser",
+                interactive=False,
+            )
+            # Ensure the user was created
+            self.assertTrue(
+                User.objects.filter(username="testuser").exists()
+            )
+            user = User.objects.get(username="testuser")
+            self.assertFalse(user.has_usable_password())
 
 
 class MultiDBCreatesuperuserTestCase(TestCase):

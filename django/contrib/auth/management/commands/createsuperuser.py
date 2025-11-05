@@ -193,12 +193,6 @@ class Command(BaseCommand):
                     user_data[PASSWORD_FIELD] = password
             else:
                 # Non-interactive mode.
-                # Use password from environment variable, if provided.
-                if (
-                    PASSWORD_FIELD in user_data
-                    and "DJANGO_SUPERUSER_PASSWORD" in os.environ
-                ):
-                    user_data[PASSWORD_FIELD] = os.environ["DJANGO_SUPERUSER_PASSWORD"]
                 # Use username from environment variable, if not provided in
                 # options.
                 if username is None:
@@ -235,6 +229,22 @@ class Command(BaseCommand):
                         user_data[field_name] = [
                             pk.strip() for pk in user_data[field_name].split(",")
                         ]
+
+                # Validate the password from the environment variable.
+                if PASSWORD_FIELD in user_data:
+                    password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+                    if password:
+                        try:
+                            # Now user_data contains the username and other fields,
+                            # so all validators will run correctly.
+                            validate_password(password, self.UserModel(**user_data))
+                        except exceptions.ValidationError as err:
+                            raise CommandError("\n".join(err.messages))
+                        user_data[PASSWORD_FIELD] = password
+                    else:
+                        # Password not provided, so user_data[PASSWORD_FIELD]
+                        # remains None, creating a user with an unusable password.
+                        pass
 
             self.UserModel._default_manager.db_manager(database).create_superuser(
                 **user_data
