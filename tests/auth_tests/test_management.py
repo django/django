@@ -1398,11 +1398,11 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             self.assertTrue(user.check_password("cmd_password"))
 
         test(self)
-    
+
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa: E501
                 "OPTIONS": {"min_length": 20},
             }
         ]
@@ -1422,21 +1422,22 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         ):
             # Check that the command correctly raises a CommandError with the
             # specific validation message.
-            with self.assertRaisesMessage(CommandError, "This password is too short."):
+            with self.assertRaisesMessage(
+                CommandError,
+                "This password is too short.",
+            ):
                 call_command(
                     "createsuperuser",
                     username="testuser",
                     interactive=False,
                 )
             # Ensure no user was actually created
-            self.assertFalse(
-                User.objects.filter(username="testuser").exists()
-            )
+            self.assertFalse(User.objects.filter(username="testuser").exists())
 
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa: E501
                 "OPTIONS": {"min_length": 10},
             }
         ]
@@ -1461,7 +1462,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
             # Ensure the user was created
             user = User.objects.get(username="testuser")
-            self.assertTrue(user.check_password("a-very-long-and-valid-password"))
+            self.assertTrue(
+                user.check_password("a-very-long-and-valid-password")
+            )  # noqa: E501
 
     def test_createsuperuser_noinput_no_password_env_var(self):
         """
@@ -1469,7 +1472,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         creates a user with an unusable password, preserving the
         original behavior.
         """
-        with mock.patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": "test@example.com"}):
+        with mock.patch.dict(
+            os.environ, {"DJANGO_SUPERUSER_EMAIL": "test@example.com"}
+        ):
             # This should run without raising an error
             call_command(
                 "createsuperuser",
@@ -1477,9 +1482,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 interactive=False,
             )
             # Ensure the user was created
-            self.assertTrue(
-                User.objects.filter(username="testuser").exists()
-            )
+            self.assertTrue(User.objects.filter(username="testuser").exists())
             user = User.objects.get(username="testuser")
             self.assertFalse(user.has_usable_password())
 

@@ -235,15 +235,17 @@ class Command(BaseCommand):
                     password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
                     if password:
                         try:
-                            # Now user_data contains the username and other fields,
-                            # so all validators will run correctly.
+                            # Now user_data contains the username and other,
+                            # fields so all validators will run correctly.
                             validate_password(password, self.UserModel(**user_data))
                         except exceptions.ValidationError as err:
                             raise CommandError("\n".join(err.messages))
                         user_data[PASSWORD_FIELD] = password
                     else:
-                        # Password not provided, so user_data[PASSWORD_FIELD]
-                        # remains None, creating a user with an unusable password.
+                        # Password not provided,
+                        # so user_data[PASSWORD_FIELD]
+                        # remains None, creating a user,
+                        # with an unusable password.
                         pass
 
             self.UserModel._default_manager.db_manager(database).create_superuser(
