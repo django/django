@@ -9,6 +9,7 @@ from .models import (
     FKAsPKNoNaturalKey,
     FKDataNaturalKey,
     NaturalKeyAnchor,
+    NaturalKeyOptOut,
     NaturalKeyThing,
     NaturalPKWithDefault,
     NoneOptOutUser,
@@ -334,6 +335,29 @@ def natural_key_opt_out_test(self, format):
             )
 
 
+def deserialize_natural_key_then_opted_out(self, format):
+    # Refs #35729
+    """
+    Deserialization remains backward compatible when a model that previously
+    used natural keys later opts out by returning None from natural_key().
+
+    Old serialized data using natural keys should still deserialize
+    without error.
+    """
+    user = NaturalKeyOptOut.objects.create(name="example")
+    serialized = serializers.serialize(format, [user], use_natural_primary_keys=True)
+
+    def optout_natural_key(self):
+        return None
+
+    NaturalKeyOptOut.natural_key = optout_natural_key
+
+    try:
+        list(serializers.deserialize(format, serialized))
+    except Exception as e:
+        self.fail(f"Deserialization failed after opt-out: {e}")
+
+
 # Dynamically register tests for each serializer
 register_tests(
     NaturalKeySerializerTests,
@@ -372,4 +396,9 @@ register_tests(
     NaturalKeySerializerTests,
     "test_%s_natural_key_opt_out",
     natural_key_opt_out_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_deserialize_natural_key_then_opted_out",
+    deserialize_natural_key_then_opted_out,
 )

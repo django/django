@@ -99,3 +99,16 @@ class PostToNoneUser(models.Model):
     subscribers = models.ManyToManyField(
         NoneOptOutUser, related_name="subscribed_posts", blank=True
     )
+
+
+class NaturalKeyOptOut(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Manager(models.Manager):
+        def get_by_natural_key(self, name):
+            return self.get(name=name)
+
+    objects = Manager()
+
+    def natural_key(self):
+        return (self.name,)

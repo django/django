@@ -340,12 +340,13 @@ def build_instance(Model, data, db):
         obj = Model(**data)
         obj._state.db = db
         natural_key = obj.natural_key()
-        try:
-            data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
-            )
-        except Model.DoesNotExist:
-            pass
+        if natural_key is not None:
+            try:
+                data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                    default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+                )
+            except Model.DoesNotExist:
+                pass
     return Model(**data)
 
 
