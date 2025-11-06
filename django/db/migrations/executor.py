@@ -1,3 +1,4 @@
+import logging
 from django.apps.registry import apps as global_apps
 from django.db import migrations, router
 
@@ -260,6 +261,20 @@ class MigrationExecutor:
                         migration_recorded = True
         if not migration_recorded:
             self.record_migration(migration.app_label, migration.name)
+
+        if fake:
+            logger.debug(
+                'Marked migration %s as applied on database %s',
+                migration,
+                self.connection.alias
+            )
+        else:
+            logger.info(
+                'Applied migration %s on database %s',
+                migration,
+                self.connection.alias
+            )
+
         # Report progress
         if self.progress_callback:
             self.progress_callback("apply_success", migration, fake)
@@ -286,6 +301,20 @@ class MigrationExecutor:
             ) as schema_editor:
                 state = migration.unapply(state, schema_editor)
         self.record_migration(migration.app_label, migration.name, forward=False)
+
+        if fake:
+            logger.debug(
+                'Marked migration %s as unapplied on database %s',
+                migration,
+                self.connection.alias
+            )
+        else:
+            logger.info(
+                'Unapplied migration %s on database %s',
+                migration,
+                self.connection.alias
+            )
+
         # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)
