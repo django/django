@@ -126,7 +126,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`inspectdb` now introspects
+  :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
+  installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
