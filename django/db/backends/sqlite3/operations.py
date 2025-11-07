@@ -141,30 +141,42 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def _quote_params_for_last_executed_query(self, params):
         """
-        Only for last_executed_query! Don't use this to execute SQL queries!
+        Return a tuple of SQL-quoted parameters for the last executed query.
+        Only used for generating the last_executed_query representation.
+        Not for executing SQL queries directly.
         """
-        # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
-        # number of return values, default = 2000). Since Python's sqlite3
-        # module doesn't expose the get_limit() C API, assume the default
-        # limits are in effect and split the work in batches if needed.
-        BATCH_SIZE = 999
-        if len(params) > BATCH_SIZE:
+        # SQLite has built-in limits on the number of parameters per statement
+        # (SQLITE_LIMIT_VARIABLE_NUMBER, default = 999) and on the number of
+        # columns in a result set (SQLITE_MAX_COLUMN, default = 2000).
+        # Since Python’s sqlite3 module didn’t expose the get_limit() API
+        # until Python 3.12, fall back to the default limit when unavailable.
+        conn = self.connection.connection
+        try:
+            variable_limit = conn.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
+        except AttributeError:
+            # For older Python versions (<3.12) where getlimit() isn’t defined.
+            variable_limit = 999
+
+        # If the number of parameters exceeds SQLite’s variable limit,
+        # split them into smaller chunks and process recursively.
+        if len(params) > variable_limit:
             results = ()
-            for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index : index + BATCH_SIZE]
+            for index in range(0, len(params), variable_limit):
+                chunk = params[index : index + variable_limit]
                 results += self._quote_params_for_last_executed_query(chunk)
             return results
 
+        # Construct a SELECT query that returns the quoted parameters.
+        # QUOTE(?) safely serializes each parameter as an SQL literal.
         sql = "SELECT " + ", ".join(["QUOTE(?)"] * len(params))
-        # Bypass Django's wrappers and use the underlying sqlite3 connection
-        # to avoid logging this query - it would trigger infinite recursion.
-        cursor = self.connection.connection.cursor()
-        # Native sqlite3 cursors cannot be used as context managers.
+
+        # Use the underlying sqlite3 connection directly to avoid Django’s wrappers.
+        cursor = conn.cursor()
         try:
             return cursor.execute(sql, params).fetchone()
         finally:
             cursor.close()
+
 
     def last_executed_query(self, cursor, sql, params):
         # Python substitutes parameters in Modules/_sqlite/cursor.c with:
