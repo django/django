@@ -1352,7 +1352,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aclear.alters_data = True
 
-        def set(self, objs, *, clear=False, through_defaults=None):
+        def set_base(self, objs, *, clear=False, through_defaults=None):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
@@ -1386,6 +1386,9 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     self._add_base(
                         *new_objs, through_defaults=through_defaults, using=db
                     )
+
+        def set(self, objs, *, clear=False, through_defaults=None):
+            self.set_base(objs, clear=clear, through_defaults=through_defaults)
 
         set.alters_data = True
 
