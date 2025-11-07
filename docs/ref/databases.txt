@@ -1279,13 +1279,13 @@ by 3rd parties that allow you to use other databases with Django:
 
 * :pypi:`CockroachDB <django-cockroachdb>`
 * :pypi:`Firebird <django-firebird>`
+* :pypi:`GaussDB Django <gaussdb-django>`
 * :pypi:`Google Cloud Spanner <django-google-spanner>`
 * :pypi:`Microsoft SQL Server <mssql-django>`
 * :pypi:`MongoDB <django-mongodb-backend>`
 * :pypi:`Snowflake <django-snowflake>`
 * :pypi:`TiDB <django-tidb>`
 * :pypi:`YugabyteDB <django-yugabytedb>`
-* :pypi:`GaussDB Django <gaussdb-django>`
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
