@@ -1262,15 +1262,15 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             else:
                 return super().count()
 
-        def add(self, *objs, through_defaults=None):
-            self._remove_prefetched_objects()
-            db = router.db_for_write(self.through, instance=self.instance)
+        def _add_base(self, *objs, through_defaults=None, using=None):
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(
                     self.source_field_name,
                     self.target_field_name,
                     *objs,
                     through_defaults=through_defaults,
+                    using=db,
                 )
                 # If this is a symmetrical m2m relation to self, add the mirror
                 # entry in the m2m table.
@@ -1280,7 +1280,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         self.source_field_name,
                         *objs,
                         through_defaults=through_defaults,
+                        using=db,
                     )
+
+        def add(self, *objs, through_defaults=None):
+            self._remove_prefetched_objects()
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._add_base(*objs, through_defaults=through_defaults, using=db)
 
         add.alters_data = True
 
@@ -1291,9 +1297,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aadd.alters_data = True
 
+        def _remove_base(self, *objs, using=None):
+            db = using or router.db_for_write(self.through, instance=self.instance)
+            self._remove_items(
+                self.source_field_name, self.target_field_name, *objs, using=db
+            )
+
         def remove(self, *objs):
             self._remove_prefetched_objects()
-            self._remove_items(self.source_field_name, self.target_field_name, *objs)
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._remove_base(*objs, using=db)
 
         remove.alters_data = True
 
@@ -1302,8 +1315,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aremove.alters_data = True
 
-        def clear(self):
-            db = router.db_for_write(self.through, instance=self.instance)
+        def _clear_base(self, using=None):
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 signals.m2m_changed.send(
                     sender=self.through,
@@ -1314,7 +1327,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     pk_set=None,
                     using=db,
                 )
-                self._remove_prefetched_objects()
                 filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
@@ -1327,6 +1339,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     pk_set=None,
                     using=db,
                 )
+
+        def clear(self):
+            self._remove_prefetched_objects()
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._clear_base(using=db)
 
         clear.alters_data = True
 
@@ -1516,7 +1533,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             )
 
         def _add_items(
-            self, source_field_name, target_field_name, *objs, through_defaults=None
+            self,
+            source_field_name,
+            target_field_name,
+            *objs,
+            through_defaults=None,
+            using=None,
         ):
             # source_field_name: the PK fieldname in join table for the source
             # object target_field_name: the PK fieldname in join table for the
@@ -1527,7 +1549,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
             through_defaults = dict(resolve_callables(through_defaults or {}))
             target_ids = self._get_target_ids(target_field_name, objs)
-            db = router.db_for_write(self.through, instance=self.instance)
+            db = using or router.db_for_write(self.through, instance=self.instance)
             can_ignore_conflicts, must_send_signals, can_fast_add = self._get_add_plan(
                 db, source_field_name
             )
@@ -1586,7 +1608,9 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         using=db,
                     )
 
-        def _remove_items(self, source_field_name, target_field_name, *objs):
+        def _remove_items(
+            self, source_field_name, target_field_name, *objs, using=None
+        ):
             # source_field_name: the PK colname in join table for the source
             # object target_field_name: the PK colname in join table for the
             # target object *objs - objects to remove. Either object instances,
@@ -1603,7 +1627,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 else:
                     old_ids.add(obj)
 
-            db = router.db_for_write(self.through, instance=self.instance)
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 # Send a signal to the other end if need be.
                 signals.m2m_changed.send(
