@@ -187,49 +187,25 @@ class ASGIHandler(base.BaseHandler):
                 await sync_to_async(error_response.close)()
                 return
 
-            async def process_request(request, send):
-                response = await self.run_get_response(request)
-                try:
-                    await self.send_response(response, send)
-                except asyncio.CancelledError:
-                    # Client disconnected during send_response (ignore exception).
-                    pass
+            class RequestProcessed(Exception):
+                pass
 
-                return response
-
-            # Try to catch a disconnect while getting response.
-            tasks = [
-                # Check the status of these tasks and (optionally) terminate them
-                # in this order. The listen_for_disconnect() task goes first
-                # because it should not raise unexpected errors that would prevent
-                # us from cancelling process_request().
-                asyncio.create_task(self.listen_for_disconnect(receive)),
-                asyncio.create_task(process_request(request, send)),
-            ]
-            await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-            # Now wait on both tasks (they may have both finished by now).
-            for task in tasks:
-                if task.done():
-                    try:
-                        task.result()
-                    except RequestAborted:
-                        # Ignore client disconnects.
-                        pass
-                    except AssertionError:
-                        body_file.close()
-                        raise
-                else:
-                    # Allow views to handle cancellation.
-                    task.cancel()
-                    try:
-                        await task
-                    except asyncio.CancelledError:
-                        # Task re-raised the CancelledError as expected.
-                        pass
-
+            response = None
             try:
-                response = tasks[1].result()
-            except asyncio.CancelledError:
+                try:
+                    async with asyncio.TaskGroup() as tg:
+                        tg.create_task(self.listen_for_disconnect(receive))
+                        response = await self.run_get_response(request)
+                        await self.send_response(response, send)
+                        raise RequestProcessed
+                except* (RequestProcessed, RequestAborted):
+                    pass
+            except BaseExceptionGroup as exception_group:
+                if len(exception_group.exceptions) == 1:
+                    raise exception_group.exceptions[0]
+                raise
+
+            if response is None:
                 await signals.request_finished.asend(sender=self.__class__)
             else:
                 await sync_to_async(response.close)()
