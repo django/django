@@ -237,6 +237,10 @@ Management Commands
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
   suggestions for mistyped subcommand names and argument choices.
 
+* The :djadmin:`loaddata` command now calls
+  :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
+  loading fixtures.
+
 Migrations
 ~~~~~~~~~~
 
