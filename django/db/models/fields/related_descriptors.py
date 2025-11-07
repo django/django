@@ -1262,7 +1262,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             else:
                 return super().count()
 
-        def _add_base(self, *objs, through_defaults=None, using=None):
+        def _add_base(self, *objs, through_defaults=None, using=None, raw=False):
             db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(
@@ -1271,6 +1271,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     *objs,
                     through_defaults=through_defaults,
                     using=db,
+                    raw=raw,
                 )
                 # If this is a symmetrical m2m relation to self, add the mirror
                 # entry in the m2m table.
@@ -1281,6 +1282,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         *objs,
                         through_defaults=through_defaults,
                         using=db,
+                        raw=raw,
                     )
 
         def add(self, *objs, through_defaults=None):
@@ -1297,10 +1299,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aadd.alters_data = True
 
-        def _remove_base(self, *objs, using=None):
+        def _remove_base(self, *objs, using=None, raw=False):
             db = using or router.db_for_write(self.through, instance=self.instance)
             self._remove_items(
-                self.source_field_name, self.target_field_name, *objs, using=db
+                self.source_field_name, self.target_field_name, *objs, using=db, raw=raw
             )
 
         def remove(self, *objs):
@@ -1315,7 +1317,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aremove.alters_data = True
 
-        def _clear_base(self, using=None):
+        def _clear_base(self, using=None, raw=False):
             db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 signals.m2m_changed.send(
@@ -1326,6 +1328,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=None,
                     using=db,
+                    raw=raw,
                 )
                 filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
@@ -1338,6 +1341,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=None,
                     using=db,
+                    raw=raw,
                 )
 
         def clear(self):
@@ -1352,7 +1356,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aclear.alters_data = True
 
-        def set_base(self, objs, *, clear=False, through_defaults=None):
+        def set_base(self, objs, *, clear=False, through_defaults=None, raw=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
@@ -1361,8 +1365,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             with transaction.atomic(using=db, savepoint=False):
                 self._remove_prefetched_objects()
                 if clear:
-                    self._clear_base(using=db)
-                    self._add_base(*objs, through_defaults=through_defaults, using=db)
+                    self._clear_base(using=db, raw=raw)
+                    self._add_base(
+                        *objs, through_defaults=through_defaults, using=db, raw=raw
+                    )
                 else:
                     old_ids = set(
                         self.using(db).values_list(
@@ -1382,9 +1388,9 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         else:
                             new_objs.append(obj)
 
-                    self._remove_base(*old_ids, using=db)
+                    self._remove_base(*old_ids, using=db, raw=raw)
                     self._add_base(
-                        *new_objs, through_defaults=through_defaults, using=db
+                        *new_objs, through_defaults=through_defaults, using=db, raw=raw
                     )
 
         def set(self, objs, *, clear=False, through_defaults=None):
@@ -1545,6 +1551,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             *objs,
             through_defaults=None,
             using=None,
+            raw=False,
         ):
             # source_field_name: the PK fieldname in join table for the source
             # object target_field_name: the PK fieldname in join table for the
@@ -1587,6 +1594,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         model=self.model,
                         pk_set=missing_target_ids,
                         using=db,
+                        raw=raw,
                     )
                 # Add the ones that aren't there already.
                 self.through._default_manager.using(db).bulk_create(
@@ -1612,10 +1620,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         model=self.model,
                         pk_set=missing_target_ids,
                         using=db,
+                        raw=raw,
                     )
 
         def _remove_items(
-            self, source_field_name, target_field_name, *objs, using=None
+            self, source_field_name, target_field_name, *objs, using=None, raw=False
         ):
             # source_field_name: the PK colname in join table for the source
             # object target_field_name: the PK colname in join table for the
@@ -1644,6 +1653,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=old_ids,
                     using=db,
+                    raw=raw,
                 )
                 target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
@@ -1663,6 +1673,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=old_ids,
                     using=db,
+                    raw=raw,
                 )
 
     return ManyRelatedManager
