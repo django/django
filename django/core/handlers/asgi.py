@@ -3,7 +3,7 @@ import logging
 import sys
 import tempfile
 import traceback
-from contextlib import aclosing
+from contextlib import aclosing, closing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -174,65 +174,65 @@ class ASGIHandler(base.BaseHandler):
             body_file = await self.read_body(receive)
         except RequestAborted:
             return
-        # Request is complete and can be served.
-        set_script_prefix(get_script_prefix(scope))
-        await signals.request_started.asend(sender=self.__class__, scope=scope)
-        # Get the request and check for basic issues.
-        request, error_response = self.create_request(scope, body_file)
-        if request is None:
-            body_file.close()
-            await self.send_response(error_response, send)
-            await sync_to_async(error_response.close)()
-            return
 
-        async def process_request(request, send):
-            response = await self.run_get_response(request)
-            try:
-                await self.send_response(response, send)
-            except asyncio.CancelledError:
-                # Client disconnected during send_response (ignore exception).
-                pass
+        with closing(body_file):
+            # Request is complete and can be served.
+            set_script_prefix(get_script_prefix(scope))
+            await signals.request_started.asend(sender=self.__class__, scope=scope)
+            # Get the request and check for basic issues.
+            request, error_response = self.create_request(scope, body_file)
+            if request is None:
+                body_file.close()
+                await self.send_response(error_response, send)
+                await sync_to_async(error_response.close)()
+                return
 
-            return response
-
-        # Try to catch a disconnect while getting response.
-        tasks = [
-            # Check the status of these tasks and (optionally) terminate them
-            # in this order. The listen_for_disconnect() task goes first
-            # because it should not raise unexpected errors that would prevent
-            # us from cancelling process_request().
-            asyncio.create_task(self.listen_for_disconnect(receive)),
-            asyncio.create_task(process_request(request, send)),
-        ]
-        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-        # Now wait on both tasks (they may have both finished by now).
-        for task in tasks:
-            if task.done():
+            async def process_request(request, send):
+                response = await self.run_get_response(request)
                 try:
-                    task.result()
-                except RequestAborted:
-                    # Ignore client disconnects.
-                    pass
-                except AssertionError:
-                    body_file.close()
-                    raise
-            else:
-                # Allow views to handle cancellation.
-                task.cancel()
-                try:
-                    await task
+                    await self.send_response(response, send)
                 except asyncio.CancelledError:
-                    # Task re-raised the CancelledError as expected.
+                    # Client disconnected during send_response (ignore exception).
                     pass
 
-        try:
-            response = tasks[1].result()
-        except asyncio.CancelledError:
-            await signals.request_finished.asend(sender=self.__class__)
-        else:
-            await sync_to_async(response.close)()
+                return response
 
-        body_file.close()
+            # Try to catch a disconnect while getting response.
+            tasks = [
+                # Check the status of these tasks and (optionally) terminate them
+                # in this order. The listen_for_disconnect() task goes first
+                # because it should not raise unexpected errors that would prevent
+                # us from cancelling process_request().
+                asyncio.create_task(self.listen_for_disconnect(receive)),
+                asyncio.create_task(process_request(request, send)),
+            ]
+            await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            # Now wait on both tasks (they may have both finished by now).
+            for task in tasks:
+                if task.done():
+                    try:
+                        task.result()
+                    except RequestAborted:
+                        # Ignore client disconnects.
+                        pass
+                    except AssertionError:
+                        body_file.close()
+                        raise
+                else:
+                    # Allow views to handle cancellation.
+                    task.cancel()
+                    try:
+                        await task
+                    except asyncio.CancelledError:
+                        # Task re-raised the CancelledError as expected.
+                        pass
+
+            try:
+                response = tasks[1].result()
+            except asyncio.CancelledError:
+                await signals.request_finished.asend(sender=self.__class__)
+            else:
+                await sync_to_async(response.close)()
 
     async def listen_for_disconnect(self, receive):
         """Listen for disconnect from the client."""
