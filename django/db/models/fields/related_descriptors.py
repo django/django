@@ -1359,9 +1359,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
+                self._remove_prefetched_objects()
                 if clear:
-                    self.clear()
-                    self.add(*objs, through_defaults=through_defaults)
+                    self._clear_base(using=db)
+                    self._add_base(*objs, through_defaults=through_defaults, using=db)
                 else:
                     old_ids = set(
                         self.using(db).values_list(
@@ -1381,8 +1382,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         else:
                             new_objs.append(obj)
 
-                    self.remove(*old_ids)
-                    self.add(*new_objs, through_defaults=through_defaults)
+                    self._remove_base(*old_ids, using=db)
+                    self._add_base(
+                        *new_objs, through_defaults=through_defaults, using=db
+                    )
 
         set.alters_data = True
 
