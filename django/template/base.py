@@ -825,9 +825,20 @@ class FilterExpression:
         # Check to see if a decorator is providing the real function.
         func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
-        alen = len(args)
-        dlen = len(defaults or [])
+        try:
+            # Using signature first(more modern)
+            sig = inspect.signature(func)
+            alen = len(sig.parameters)
+
+            non_default_params = [p for p in sig.parameters.values()
+                                  if p.default is p.empty]
+            dlen = alen - len(non_default_params)
+        except (TypeError, ValueError):
+            # If fails, use the old getfullargspec(deprecated)
+            args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
+            alen = len(args)
+            dlen = len(defaults or [])
+
         # Not enough OR Too many
         if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError(
