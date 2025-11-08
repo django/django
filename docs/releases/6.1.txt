@@ -254,6 +254,10 @@ Models
   <django.db.models.DecimalField.decimal_places>` are no longer required to be
   set on Oracle, PostgreSQL, and SQLite.
 
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
+  21c+.
+
 Pagination
 ~~~~~~~~~~
 
