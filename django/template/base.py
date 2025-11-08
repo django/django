@@ -830,8 +830,9 @@ class FilterExpression:
             sig = inspect.signature(func)
             alen = len(sig.parameters)
 
-            non_default_params = [p for p in sig.parameters.values()
-                                  if p.default is p.empty]
+            non_default_params = [
+                p for p in sig.parameters.values() if p.default is p.empty
+            ]
             dlen = alen - len(non_default_params)
         except (TypeError, ValueError):
             # If fails, use the old getfullargspec(deprecated)
