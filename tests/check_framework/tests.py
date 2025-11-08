@@ -1,11 +1,11 @@
 import multiprocessing
 import sys
 from io import StringIO
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from django.apps import apps
 from django.core import checks
-from django.core.checks import Error, Warning
+from django.core.checks import Error, Tags, Warning
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
@@ -267,6 +267,18 @@ class CheckCommandTests(SimpleTestCase):
     def test_fail_level(self):
         with self.assertRaises(CommandError):
             call_command("check", fail_level="WARNING")
+
+    def test_database_system_checks(self):
+        database_check = mock.Mock(return_value=[], tags=[Tags.database])
+
+        with override_system_checks([database_check]):
+            call_command("check")
+            database_check.assert_called_once_with(app_configs=None, databases=None)
+            database_check.reset_mock()
+            call_command("check", databases=["default"])
+            database_check.assert_called_once_with(
+                app_configs=None, databases=["default"]
+            )
 
 
 def custom_error_system_check(app_configs, **kwargs):

@@ -113,7 +113,7 @@ class MigrateTests(MigrationTestBase):
         out = io.StringIO()
         call_command("migrate", skip_checks=False, no_color=True, stdout=out)
         self.assertIn("Apply all migrations: migrated_app", out.getvalue())
-        mocked_check.assert_called_once()
+        mocked_check.assert_called_once_with(databases=["default"])
 
     def test_migrate_with_custom_system_checks(self):
         original_checks = registry.registered_checks.copy()
@@ -136,6 +136,25 @@ class MigrateTests(MigrationTestBase):
 
         command = CustomMigrateCommandWithSecurityChecks()
         call_command(command, skip_checks=False, stdout=io.StringIO())
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "migrations.migrations_test_apps.migrated_app",
+        ]
+    )
+    def test_migrate_runs_database_system_checks(self):
+        original_checks = registry.registered_checks.copy()
+        self.addCleanup(setattr, registry, "registered_checks", original_checks)
+
+        out = io.StringIO()
+        mock_check = mock.Mock(return_value=[])
+        register(mock_check, Tags.database)
+
+        call_command("migrate", skip_checks=False, no_color=True, stdout=out)
+        self.assertIn("Apply all migrations: migrated_app", out.getvalue())
+        mock_check.assert_called_once_with(app_configs=None, databases=["default"])
 
     @override_settings(
         INSTALLED_APPS=[
