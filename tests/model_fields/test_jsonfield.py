@@ -1265,6 +1265,13 @@ class JSONNullTests(TestCase):
     def test_repr(self):
         self.assertEqual(repr(JSONNull()), "JSONNull()")
 
+    def test_deconstruct(self):
+        jsonnull = JSONNull()
+        path, args, kwargs = jsonnull.deconstruct()
+        self.assertEqual(path, "django.db.models.JSONNull")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {})
+
     def test_save_load(self):
         obj = JSONModel(value=JSONNull())
         obj.save()
