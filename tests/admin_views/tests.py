@@ -2413,6 +2413,32 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context[REDIRECT_FIELD_NAME], reverse("admin:index"))
 
+    def test_login_redirect_when_logged_in(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse("admin:login"))
+        self.assertRedirects(response, reverse("admin:index"))
+
+    def test_login_redirect_to_next_url_when_logged_in(self):
+        self.client.force_login(self.superuser)
+        next_url = reverse("admin:admin_views_article_add")
+        response = self.client.get(
+            reverse("admin:login"),
+            query_params={REDIRECT_FIELD_NAME: next_url},
+        )
+        self.assertRedirects(response, next_url)
+
+    def test_login_redirect_unsafe_next_url_when_logged_in(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("admin:login"),
+            query_params={
+                REDIRECT_FIELD_NAME: "https://example.com/bad",
+            },
+        )
+        self.assertRedirects(
+            response, reverse("admin:index"), fetch_redirect_response=False
+        )
+
     def test_login_has_permission(self):
         # Regular User should not be able to login.
         response = self.client.get(reverse("has_permission_admin:index"))
