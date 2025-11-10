@@ -14,7 +14,16 @@ from django.template.base import (
     VariableDoesNotExist,
 )
 from django.template.defaultfilters import register as filter_library
+from django.utils.version import PY314
 from django.test import SimpleTestCase
+from django.template import Library
+from django.utils.html import escape
+
+from typing import TYPE_CHECKING
+import unittest
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeText
 
 
 class ParserTests(SimpleTestCase):
@@ -240,3 +249,17 @@ class ParserTests(SimpleTestCase):
                     FilterExpression(num, p).resolve({})
                 with self.assertRaises(TemplateSyntaxError):
                     FilterExpression(f"0|default:{num}", p).resolve({})
+
+
+class FilterExpressionArgsTests(unittest.TestCase):
+    @unittest.skipUnless(PY314, "Deferred annotations area Python 3.14+ only")
+    def test_register_filter_deferred_annotations(self):
+        register = Library()
+
+        @register.filter("example")
+        def example_filter(value: str) -> SafeText:
+            return escape(value)
+
+        result = example_filter("example")
+
+        self.assertTrue(result)
