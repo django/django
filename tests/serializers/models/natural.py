@@ -77,27 +77,21 @@ class FKAsPKNoNaturalKey(models.Model):
         raise NotImplementedError("This method was not expected to be called.")
 
 
-class NoneOptOutUser(AbstractBaseUser):
+class SubclassNaturalKeyOptOutUser(AbstractBaseUser):
     email = models.EmailField(unique=False, null=True, blank=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-    class Manager(models.Manager):
-        def get_by_natural_key(self, pk_value):
-            return self.get(pk=pk_value)
-
-    objects = Manager()
-
     def natural_key(self):
-        return None
+        return ()
 
 
-class PostToNoneUser(models.Model):
-    author = models.ForeignKey(NoneOptOutUser, on_delete=models.CASCADE)
+class PostToOptOutSubclassUser(models.Model):
+    author = models.ForeignKey(SubclassNaturalKeyOptOutUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
 
     subscribers = models.ManyToManyField(
-        NoneOptOutUser, related_name="subscribed_posts", blank=True
+        SubclassNaturalKeyOptOutUser, related_name="subscribed_posts", blank=True
     )
 
 

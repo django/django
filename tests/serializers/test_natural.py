@@ -12,8 +12,8 @@ from .models import (
     NaturalKeyOptOut,
     NaturalKeyThing,
     NaturalPKWithDefault,
-    NoneOptOutUser,
-    PostToNoneUser,
+    PostToOptOutSubclassUser,
+    SubclassNaturalKeyOptOutUser,
 )
 from .tests import register_tests
 
@@ -261,12 +261,14 @@ def natural_key_opt_out_test(self, format):
     Tests natural key opt-out scenarios for models inheriting
     from AbstractBaseUser.
 
-    Verifies that when natural_key() returns None or (self.pk,):
+    Verifies that when natural_key() returns an empty tuple:
     """
-    user1 = NoneOptOutUser.objects.create(email="user2@example.com")
-    user2 = NoneOptOutUser.objects.create(email="user3@example.com")
+    user1 = SubclassNaturalKeyOptOutUser.objects.create(email="user2@example.com")
+    user2 = SubclassNaturalKeyOptOutUser.objects.create(email="user3@example.com")
 
-    post1 = PostToNoneUser.objects.create(author=user1, title="Post 2 (None Opt-out)")
+    post1 = PostToOptOutSubclassUser.objects.create(
+        author=user1, title="Post 2 (Subclass Opt-out)"
+    )
     post1.subscribers.add(user1, user2)
 
     scenarios = [
