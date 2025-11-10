@@ -3,6 +3,9 @@ Testing some internals of the template processing.
 These are *not* examples to be copied in user code.
 """
 
+import unittest
+from typing import TYPE_CHECKING
+
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     FilterExpression,
@@ -17,9 +20,6 @@ from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
 from django.utils.html import escape
 from django.utils.version import PY314
-
-import unittest
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeText
