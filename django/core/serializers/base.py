@@ -215,22 +215,51 @@ class Serializer:
         serialized data for the given object, especially when
         use_natural_primary_keys=True is set.
         """
-        pk_included = True
+        if not self.use_natural_primary_keys:
+            return True
 
-        if self.use_natural_primary_keys:
-            natural_key_func = getattr(obj, "natural_key", None)
+        return not self._resolve_natural_key(obj)
 
-            if callable(natural_key_func):
-                natural_key_value = natural_key_func()
+    def _resolve_fk_natural_key(self, obj, field):
+        """
+        Return the natural key for a ForeignKey's related object when valid.
 
-                is_opt_out = not natural_key_value or not isinstance(
-                    natural_key_value, tuple
-                )
+        When natural foreign keys are enabled, the helper attempts to use the
+        related object's natural key; otherwise it falls back to the PK.
+        """
+        if not self.use_natural_foreign_keys:
+            return None
 
-                if not is_opt_out:
-                    pk_included = False
+        if not self._model_supports_natural_key(field.remote_field.model):
+            return None
 
-        return pk_included
+        related = getattr(obj, field.name, None)
+        return self._resolve_natural_key(related)
+
+    def _resolve_natural_key(self, obj):
+        """
+        Return a natural key tuple for the given object when available.
+        """
+        if not obj:
+            return None
+
+        natural_key_func = getattr(obj, "natural_key", None)
+        if not callable(natural_key_func):
+            return None
+
+        natural_key_value = natural_key_func()
+        if self._is_natural_key_opt_out(natural_key_value):
+            return None
+
+        return natural_key_value
+
+    def _is_natural_key_opt_out(self, natural_key_value):
+        return not natural_key_value or not isinstance(natural_key_value, tuple)
+
+    def _model_supports_natural_key(self, model):
+        """Return True if the model class exposes a callable natural_key()."""
+        natural_key = getattr(model, "natural_key", None)
+        return callable(natural_key)
 
 
 class Deserializer:
