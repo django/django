@@ -2523,8 +2523,8 @@ Field API reference
     .. method:: get_db_prep_value(value, connection, prepared=False)
 
         Converts ``value`` to a backend-specific value. By default it returns
-        ``value`` if ``prepared=True`` and :meth:`~Field.get_prep_value` if is
-        ``False``.
+        ``value`` if ``prepared=True``, and :meth:`get_prep_value(value)
+        <Field.get_prep_value>` otherwise.
 
         See :ref:`converting-query-values-to-database-values` for usage.
 
