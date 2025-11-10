@@ -1225,7 +1225,7 @@ Subclassing the built-in database backends
 ==========================================
 
 Django comes with built-in database backends. You may subclass an existing
-database backends to modify its behavior, features, or configuration.
+database backend to modify its behavior, features, or configuration.
 
 Consider, for example, that you need to change a single database feature.
 First, you have to create a new directory with a ``base`` module in it. For
