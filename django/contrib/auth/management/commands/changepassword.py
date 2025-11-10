@@ -46,7 +46,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--stdin",
             action="store_true",
-            help="Read new password from stdin rather than prompting, default is False",
+            help="Read new password from stdin rather than prompting. Default is False",
         )
 
     def handle(self, *args, **options):
@@ -65,8 +65,11 @@ class Command(BaseCommand):
 
         if options["stdin"]:
             input_getter = _input_getter_stdin
+            max_tries = 1
         else:
             input_getter = _input_getter_getpass
+            max_tries = 3
+
         try:
             u = UserModel._default_manager.using(options["database"]).get(
                 **{UserModel.USERNAME_FIELD: username}
@@ -76,11 +79,10 @@ class Command(BaseCommand):
 
         self.stdout.write("Changing password for user '%s'" % u)
 
-        MAX_TRIES = 3
         count = 0
         p1, p2 = 1, 2  # To make them initially mismatch.
         password_validated = False
-        while (p1 != p2 or not password_validated) and count < MAX_TRIES:
+        while (p1 != p2 or not password_validated) and count < max_tries:
             p1, p2 = input_getter()
             if p1 != p2:
                 self.stdout.write("Passwords do not match. Please try again.")
@@ -95,9 +97,9 @@ class Command(BaseCommand):
             else:
                 password_validated = True
 
-        if count == MAX_TRIES:
+        if count == max_tries:
             raise CommandError(
-                "Aborting password change for user '%s' after %s attempts" % (u, count)
+                "Aborting password change for user '%s' after %s attempt%s" % (u, count, "s" if count >= 2 else "")
             )
 
         u.set_password(p1)
