@@ -104,8 +104,9 @@ Minor features
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,200,000 to 1,500,000.
-* A new option ``--stdin`` was added to the ChangePassword command
-  to grab new password value from a pipe.
+
+* The new :option:`changepassword --stdin` option accept a new password value
+  from stdin.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
