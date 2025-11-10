@@ -830,7 +830,9 @@ class FilterExpression:
         func = inspect.unwrap(func)
 
         if PY314:
-            sig = inspect.signature(func, annotation_format=annotationlib.Format.FORWARDREF)
+            sig = inspect.signature(
+                func, annotation_format=annotationlib.Format.FORWARDREF
+            )
         else:
             sig = inspect.signature(func)
         alen = len(sig.parameters)

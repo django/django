@@ -14,13 +14,12 @@ from django.template.base import (
     VariableDoesNotExist,
 )
 from django.template.defaultfilters import register as filter_library
-from django.utils.version import PY314
 from django.test import SimpleTestCase
-from django.template import Library
 from django.utils.html import escape
+from django.utils.version import PY314
 
-from typing import TYPE_CHECKING
 import unittest
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeText
