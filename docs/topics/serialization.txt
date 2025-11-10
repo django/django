@@ -641,6 +641,7 @@ You can opt out of natural key serialization by returning an empty tuple
 the standard primary key.
 
 .. versionchanged:: 6.1
+
    Support for opting out of natural key serialization by returning an
    empty tuple was added.
 
