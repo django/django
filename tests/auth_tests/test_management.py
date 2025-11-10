@@ -270,7 +270,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         Executing the changepassword command with the --stdin option
         should change joe's password.
         """
-        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+        joe = User.objects.get(username="joe")
+        self.assertFalse(joe.check_password("not qwerty"))
 
         call_command(
             "changepassword",
@@ -285,7 +286,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
             "Changing password for user 'joe'\n"
             "Password changed successfully for user 'joe'",
         )
-        self.assertTrue(User.objects.get(username="joe").check_password("not qwerty"))
+        joe.refresh_from_db()
+        self.assertTrue(joe.check_password("not qwerty"))
 
     @mock.patch(
         "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
@@ -296,9 +298,9 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         A CommandError should be raised if the password value read with --stdin
         fail validation, with only one error message.
         """
-        self.assertTrue(User.objects.get(username="joe").check_password("qwerty"))
+        joe = User.objects.get(username="joe")
+        self.assertTrue(joe.check_password("qwerty"))
 
-        # todo: plural of 'attempt'
         abort_msg = "Aborting password change for user 'joe' after 1 attempt"
         with self.assertRaisesMessage(CommandError, abort_msg):
             call_command(
@@ -318,7 +320,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
             self.stderr.getvalue(),
         )
 
-        self.assertTrue(User.objects.get(username="joe").check_password("qwerty"))
+        joe.refresh_from_db()
+        self.assertTrue(joe.check_password("qwerty"))
 
     @mock.patch(
         "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
@@ -330,7 +333,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         with the call to stdin failing,
         should raise a CommandError and leave the password unchanged.
         """
-        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+        joe = User.objects.get(username="joe")
+        self.assertFalse(joe.check_password("not qwerty"))
 
         msg = "aborted"
         with self.assertRaisesMessage(CommandError, msg):
@@ -342,7 +346,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdin=True,
             )
 
-        self.assertFalse(User.objects.get(username="joe").check_password("not qwerty"))
+        joe.refresh_from_db()
+        self.assertFalse(joe.check_password("not qwerty"))
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
