@@ -1,0 +1,25 @@
+===========================
+Django 5.1.14 release notes
+===========================
+
+*November 5, 2025*
+
+Django 5.1.14 fixes one security issue with severity "high" and one security
+issue with severity "moderate" in 5.1.13.
+
+CVE-2025-64458: Potential denial-of-service vulnerability in ``HttpResponseRedirect`` and ``HttpResponsePermanentRedirect`` on Windows
+======================================================================================================================================
+
+Python's :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
+Windows. As a consequence, :class:`~django.http.HttpResponseRedirect`,
+:class:`~django.http.HttpResponsePermanentRedirect`, and the shortcut
+:func:`redirect() <django.shortcuts.redirect>` were subject to a potential
+denial-of-service attack via certain inputs with a very large number of Unicode
+characters (follow up to :cve:`2025-27556`).
+
+CVE-2025-64459: Potential SQL injection via ``_connector`` keyword argument
+===========================================================================
+
+:meth:`.QuerySet.filter`, :meth:`~.QuerySet.exclude`, :meth:`~.QuerySet.get`,
+and :class:`~.Q` were subject to SQL injection using a suitably crafted
+dictionary, with dictionary expansion, as the ``_connector`` argument.

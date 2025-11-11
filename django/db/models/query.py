@@ -46,6 +46,8 @@ MAX_GET_RESULTS = 21
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
+PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
+
 
 class BaseIterable:
     def __init__(
@@ -840,8 +842,7 @@ class QuerySet(AltersData):
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
                     for result, field in zip(results, opts.db_returning_fields):
-                        if field != opts.pk:
-                            setattr(obj_with_pk, field.attname, result)
+                        setattr(obj_with_pk, field.attname, result)
                 for obj_with_pk in objs_with_pk:
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
@@ -1338,6 +1339,8 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("update")
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
+        if self.query.distinct_fields:
+            raise TypeError("Cannot call update() after .distinct(*fields).")
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
@@ -1643,6 +1646,9 @@ class QuerySet(AltersData):
         return clone
 
     def _filter_or_exclude_inplace(self, negate, args, kwargs):
+        if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(kwargs):
+            invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+            raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         if negate:
             self._query.add_q(~Q(*args, **kwargs))
         else:

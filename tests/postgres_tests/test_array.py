@@ -10,11 +10,13 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
+from django.db.models import JSONNull
 from django.db.models.expressions import Exists, F, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -1577,3 +1579,40 @@ class TestAdminUtils(PostgreSQLTestCase):
             self.empty_value,
         )
         self.assertEqual(display_value, self.empty_value)
+
+
+class TestJSONFieldQuerying(PostgreSQLTestCase):
+    def test_saving_and_querying_for_sql_null(self):
+        obj = OtherTypesArrayModel.objects.create(json=[None, None])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__isnull=True), [obj]
+        )
+        # RemovedInDjango70Warning.
+        msg = (
+            "Using None as the right-hand side of an exact lookup on JSONField to mean "
+            "JSON scalar 'null' is deprecated. Use JSONNull() instead (or use the "
+            "__isnull lookup if you meant SQL NULL)."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            # RemovedInDjango70Warning: deindent, and replace [] with [obj].
+            self.assertSequenceEqual(
+                OtherTypesArrayModel.objects.filter(json__1=None), []
+            )
+
+    def test_saving_and_querying_for_json_null(self):
+        obj = OtherTypesArrayModel.objects.create(json=[JSONNull(), JSONNull()])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1=JSONNull()), [obj]
+        )
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__isnull=True), []
+        )
+
+    def test_saving_and_querying_for_nested_json_nulls(self):
+        obj = OtherTypesArrayModel.objects.create(json=[[None, 1], [None, 2]])
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0=None), [obj]
+        )
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
+        )

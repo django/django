@@ -4,6 +4,7 @@ import html
 import json
 import re
 import warnings
+from collections import deque
 from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
@@ -297,6 +298,7 @@ class Urlizer:
     simple_url_re = _lazy_re_compile(r"^https?://\[?\w", re.IGNORECASE)
     simple_url_2_re = _lazy_re_compile(
         rf"^www\.|^(?!http)(?:{DomainNameValidator.hostname_re})"
+        rf"(?:{DomainNameValidator.domain_re})"
         r"\.(com|edu|gov|int|mil|net|org)($|/.*)$",
         re.IGNORECASE,
     )
@@ -428,7 +430,7 @@ class Urlizer:
         # Strip all opening wrapping punctuation.
         middle = word.lstrip(self.wrapping_punctuation_openings)
         lead = word[: len(word) - len(middle)]
-        trail = ""
+        trail = deque()
 
         # Continue trimming until middle remains unchanged.
         trimmed_something = True
@@ -441,7 +443,7 @@ class Urlizer:
                     rstripped = middle.rstrip(closing)
                     if rstripped != middle:
                         strip = counts[closing] - counts[opening]
-                        trail = middle[-strip:]
+                        trail.appendleft(middle[-strip:])
                         middle = middle[:-strip]
                         trimmed_something = True
                         counts[closing] -= strip
@@ -452,7 +454,7 @@ class Urlizer:
             else:
                 rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
             if rstripped != middle:
-                trail = middle[len(rstripped) :] + trail
+                trail.appendleft(middle[len(rstripped) :])
                 middle = rstripped
                 trimmed_something = True
 
@@ -469,13 +471,14 @@ class Urlizer:
                         # entity.
                         recent_semicolon = middle[trail_start:].index(";")
                         middle_semicolon_index = recent_semicolon + trail_start + 1
-                        trail = middle[middle_semicolon_index:] + trail
+                        trail.appendleft(middle[middle_semicolon_index:])
                         middle = rstripped + middle[trail_start:middle_semicolon_index]
                     else:
-                        trail = middle[trail_start:] + trail
+                        trail.appendleft(middle[trail_start:])
                         middle = rstripped
                     trimmed_something = True
 
+        trail = "".join(trail)
         return lead, middle, trail
 
     @staticmethod

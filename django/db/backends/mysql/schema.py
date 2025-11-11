@@ -65,13 +65,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         default_is_empty = self.effective_default(field) in ("", b"")
         if default_is_empty and self._is_text_or_blob(field):
             return True
-        if not self._supports_limited_data_type_defaults:
-            return self._is_limited_data_type(field)
         return False
 
     def skip_default_on_alter(self, field):
-        default_is_empty = self.effective_default(field) in ("", b"")
-        if default_is_empty and self._is_text_or_blob(field):
+        if self.skip_default(field):
             return True
         if self._is_limited_data_type(field) and not self.connection.mysql_is_mariadb:
             # MySQL doesn't support defaults for BLOB and TEXT in the
@@ -79,19 +76,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return True
         return False
 
-    @property
-    def _supports_limited_data_type_defaults(self):
-        # MariaDB and MySQL >= 8.0.13 support defaults for BLOB and TEXT.
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 13)
-
     def _column_default_sql(self, field):
-        if (
-            not self.connection.mysql_is_mariadb
-            and self._supports_limited_data_type_defaults
-            and self._is_limited_data_type(field)
-        ):
+        if not self.connection.mysql_is_mariadb and self._is_limited_data_type(field):
             # MySQL supports defaults for BLOB and TEXT columns only if the
             # default value is written as an expression i.e. in parentheses.
             return "(%s)"
