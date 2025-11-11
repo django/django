@@ -1,7 +1,8 @@
+import asyncio
 from contextlib import contextmanager
 from copy import copy
+
 from asgiref.sync import async_to_sync
-import asyncio
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ("django.template.context_processors.csrf",)
