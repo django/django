@@ -278,6 +278,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
             username="joe",
             stdout=self.stdout,
             stdin=True,
+            interactive=False,
         )
         command_output = self.stdout.getvalue().strip()
 
@@ -309,6 +310,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdout=self.stdout,
                 stderr=self.stderr,
                 stdin=True,
+                interactive=False,
             )
         
         self.assertEqual(
@@ -344,11 +346,32 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdout=self.stdout,
                 stderr=self.stderr,
                 stdin=True,
+                interactive=False,
             )
 
         joe.refresh_from_db()
         self.assertFalse(joe.check_password("not qwerty"))
 
+    def test_that_stdin_and_noinput_options_must_be_used_together(self):
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=True,
+                interactive=True,
+            )
+        
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=False,
+                interactive=False,
+            )
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     databases = {"default", "other"}
