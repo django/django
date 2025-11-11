@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Selenium tests with screenshots
         working-directory: ./tests/
-        run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=2
+        run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=1
 
       - name: Cache oxipng
         uses: actions/cache@v4
