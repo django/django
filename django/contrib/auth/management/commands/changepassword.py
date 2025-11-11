@@ -74,7 +74,9 @@ class Command(BaseCommand):
             username = getpass.getuser()
 
         if not options["interactive"] ^ options["stdin"]:
-            raise CommandError("The '--no-input' option must be used with the '--stdin' option.")
+            raise CommandError(
+                "The '--no-input' option must be used " "with the '--stdin' option."
+            )
 
         if options["stdin"]:
             input_getter = _input_getter_stdin
@@ -112,7 +114,8 @@ class Command(BaseCommand):
 
         if count == max_tries:
             raise CommandError(
-                "Aborting password change for user '%s' after %s attempt%s" % (u, count, "s" if count >= 2 else "")
+                "Aborting password change for user '%s' after %s attempt%s"
+                % (u, count, "s" if count >= 2 else "")
             )
 
         u.set_password(p1)

@@ -312,13 +312,13 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdin=True,
                 interactive=False,
             )
-        
+
         self.assertEqual(
             self.stdout.getvalue().strip(),
             "Changing password for user 'joe'",
         )
         self.assertIn(
-            "This password is entirely numeric.", 
+            "This password is entirely numeric.",
             self.stderr.getvalue(),
         )
 
@@ -362,7 +362,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdin=True,
                 interactive=True,
             )
-        
+
         with self.assertRaisesMessage(CommandError, ""):
             call_command(
                 "changepassword",
@@ -372,6 +372,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
                 stdin=False,
                 interactive=False,
             )
+
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     databases = {"default", "other"}
