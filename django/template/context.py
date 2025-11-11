@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 from copy import copy
+from asgiref.sync import async_to_sync
+import asyncio
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ("django.template.context_processors.csrf",)
@@ -291,6 +293,9 @@ def make_context(context, request=None, **kwargs):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
+    if asyncio.iscoroutine(context):
+        context = async_to_sync(lambda: context)()
+
     if context is not None and not isinstance(context, dict):
         raise TypeError(
             "context must be a dict rather than %s." % context.__class__.__name__
