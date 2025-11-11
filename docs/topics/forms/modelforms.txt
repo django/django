@@ -133,6 +133,45 @@ Model field                         Form field
 :class:`UUIDField`                  :class:`~django.forms.UUIDField`
 =================================== ==================================================
 
+.. HTML Form Field Equivalents in Django
+
+| **Django Form Field**       | **Common HTML Equivalent**    | **HTML Tag / Input Type**                                       |
+| --------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| `CharField`                 | Text input                    | `<input type="text">`                                           |
+| `EmailField`                | Email input                   | `<input type="email">`                                          |
+| `SlugField`                 | Text input                    | `<input type="text">`                                           |
+| `URLField`                  | URL input                     | `<input type="url">`                                            |
+| `IntegerField`              | Number input                  | `<input type="number">`                                         |
+| `BigIntegerField`           | Number input                  | `<input type="number">`                                         |
+| `PositiveIntegerField`      | Number input                  | `<input type="number">`                                         |
+| `PositiveSmallIntegerField` | Number input                  | `<input type="number">`                                         |
+| `SmallIntegerField`         | Number input                  | `<input type="number">`                                         |
+| `FloatField`                | Number input                  | `<input type="number">`                                         |
+| `DecimalField`              | Number input                  | `<input type="number">`                                         |
+| `BooleanField`              | Checkbox input                | `<input type="checkbox">`                                       |
+| `DateField`                 | Date input                    | `<input type="date">`                                           |
+| `TimeField`                 | Time input                    | `<input type="time">`                                           |
+| `DateTimeField`             | Datetime input                | `<input type="datetime-local">`                                 |
+| `TextField`                 | Multiline text area           | `<textarea></textarea>`                                         |
+| `FileField`                 | File upload input             | `<input type="file">`                                           |
+| `ImageField`                | Image upload input            | `<input type="file" accept="image/*">`                          |
+| `ChoiceField`               | Dropdown menu                 | `<select><option>...</option></select>`                         |
+| `ForeignKey`                | Dropdown menu (single choice) | `<select><option>...</option></select>`                         |
+| `ManyToManyField`           | Multi-select dropdown         | `<select multiple><option>...</option></select>`                |
+| `FilePathField`             | Dropdown menu                 | `<select><option>...</option></select>`                         |
+| `GenericIPAddressField`     | IP address input              | `<input type="text" pattern="...">` *(no direct HTML5 IP type)* |
+| `JSONField`                 | Text area for JSON input      | `<textarea></textarea>`                                         |
+| `UUIDField`                 | Text input                    | `<input type="text">`                                           |
+| `DurationField`             | Text input (custom format)    | `<input type="text">`                                           |
+
+Note:
+* Fields like `AutoField`, `BigAutoField`, and `SmallAutoField` are not represented in HTML forms 
+  because they’re auto-incrementing database fields, not user-editable.
+
+* Some Django form fields (like `BinaryField` or `JSONField`) don’t have direct HTML equivalents and are
+  rendered as generic text inputs or text areas by default.
+========================================== ============================================================
+
 .. currentmodule:: django.forms
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
