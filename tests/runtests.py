@@ -746,7 +746,10 @@ if __name__ == "__main__":
         options.settings = os.environ["DJANGO_SETTINGS_MODULE"]
 
     if options.selenium:
-        if multiprocessing.get_start_method() == "spawn" and options.parallel != 1:
+        if (
+            multiprocessing.get_start_method() in {"spawn", "forkserver"}
+            and options.parallel != 1
+        ):
             parser.error(
                 "You cannot use --selenium with parallel tests on this system. "
                 "Pass --parallel=1 to use --selenium."
