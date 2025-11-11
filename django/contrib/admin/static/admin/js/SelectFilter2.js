@@ -18,18 +18,6 @@ Requires core.js and SelectBox.js.
             from_box.setAttribute('aria-labelledby', field_id + '_from_label');
             from_box.setAttribute('aria-describedby', `${field_id}_helptext ${field_id}_choose_helptext`);
 
-            for (const p of from_box.parentNode.getElementsByTagName('p')) {
-                if (p.classList.contains("info")) {
-                    // Remove <p class="info">, because it just gets in the way.
-                    from_box.parentNode.removeChild(p);
-                } else if (p.classList.contains("help")) {
-                    // Move help text up to the top so it isn't below the select
-                    // boxes or wrapped off on the side to the right of the add
-                    // button:
-                    from_box.parentNode.insertBefore(p, from_box.parentNode.firstChild);
-                }
-            }
-
             // <div class="selector"> or <div class="selector stacked">
             const selector_div = quickElement('div', from_box.parentNode);
             // Make sure the selector div appears between the label and the add link.
