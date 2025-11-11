@@ -20,6 +20,10 @@ urlpatterns = [
         views.CustomTemplateView.as_view(template_name="generic_views/about.html"),
     ),
     path(
+        "template/custom_async/<foo>/",
+        views.AsyncCustomTemplateView.as_view(template_name="generic_views/about.html"),
+    ),
+    path(
         "template/content_type/",
         TemplateView.as_view(
             template_name="generic_views/robots.txt", content_type="text/plain"
