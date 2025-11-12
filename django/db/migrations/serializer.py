@@ -15,7 +15,7 @@ import zoneinfo
 from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
-from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
+from django.db.migrations.utils import RegexObject
 from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
 from django.utils.version import get_docs_version
@@ -377,7 +377,7 @@ class Serializer:
         FUNCTION_TYPES: FunctionTypeSerializer,
         types.GenericAlias: GenericAliasSerializer,
         collections.abc.Iterable: IterableSerializer,
-        (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
+        (re.Pattern, RegexObject): RegexSerializer,
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,

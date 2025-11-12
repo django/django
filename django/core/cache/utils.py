@@ -1,6 +1,10 @@
 from hashlib import md5
 
+from django.utils.regex_helper import _lazy_re_compile
+
 TEMPLATE_FRAGMENT_KEY_TEMPLATE = "template.cache.%s.%s"
+
+server_separator_re = _lazy_re_compile("[;,]")
 
 
 def make_template_fragment_key(fragment_name, vary_on=None):

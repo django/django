@@ -47,6 +47,8 @@ FORMAT_SETTINGS = frozenset(
     ]
 )
 
+_sanitize_strftime_format_re = re.compile(r"((?:^|[^%])(?:%%)*)%([CFGY])")
+
 
 def reset_format_cache():
     """Clear any cached formats.
@@ -266,8 +268,7 @@ def sanitize_strftime_format(fmt):
     if datetime.date(1, 1, 1).strftime("%Y") == "0001":
         return fmt
     mapping = {"C": 2, "F": 10, "G": 4, "Y": 4}
-    return re.sub(
-        r"((?:^|[^%])(?:%%)*)%([CFGY])",
+    return _sanitize_strftime_format_re.sub(
         lambda m: r"%s%%0%s%s" % (m[1], mapping[m[2]], m[2]),
         fmt,
     )

@@ -175,8 +175,10 @@ class TruncateCharsHTMLParser(TruncateHTMLParser):
 
 
 class TruncateWordsHTMLParser(TruncateHTMLParser):
+    html_words_pattern = _lazy_re_compile(r"(?<=\S)\s+(?=\S)")
+
     def process(self, data):
-        data = re.split(r"(?<=\S)\s+(?=\S)", data)
+        data = self.html_words_pattern.split(data)
         output = escape(" ".join(data[: self.remaining]))
         return data, output
 
@@ -266,6 +268,9 @@ class Truncator(SimpleLazyObject):
         return " ".join(words)
 
 
+_valid_filename_re = _lazy_re_compile(r"[^-\w.]")
+
+
 @keep_lazy_text
 def get_valid_filename(name):
     """
@@ -276,8 +281,7 @@ def get_valid_filename(name):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = str(name).strip().replace(" ", "_")
-    s = re.sub(r"(?u)[^-\w.]", "", s)
+    s = _valid_filename_re.sub("", str(name).strip().replace(" ", "_"))
     if s in {"", ".", ".."}:
         raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
     return s
@@ -465,6 +469,10 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r"\%s" % quote, quote).replace(r"\\", "\\")
 
 
+_slugify_invalid_chars_re = re.compile(r"[^\w\s-]")
+_slugify_separators_re = re.compile(r"[-\s]+")
+
+
 @keep_lazy_text
 def slugify(value, allow_unicode=False):
     """
@@ -482,8 +490,8 @@ def slugify(value, allow_unicode=False):
             .encode("ascii", "ignore")
             .decode("ascii")
         )
-    value = re.sub(r"[^\w\s-]", "", value.lower())
-    return re.sub(r"[-\s]+", "-", value).strip("-_")
+    value = _slugify_invalid_chars_re.sub("", value.lower())
+    return _slugify_separators_re.sub("-", value).strip("-_")
 
 
 def camel_case_to_spaces(value):
@@ -502,3 +510,12 @@ def _format_lazy(format_string, *args, **kwargs):
 
 
 format_lazy = lazy(_format_lazy, str)
+
+_non_word_re = re.compile(r"\W+")
+
+
+def replace_non_word_chars(replacement, value):
+    """
+    Replace non-word characters with the provided replacement.
+    """
+    return _non_word_re.sub(replacement, value)

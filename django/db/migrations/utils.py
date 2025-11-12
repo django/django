@@ -1,12 +1,9 @@
 import datetime
-import re
 from collections import namedtuple
 
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 
 FieldReference = namedtuple("FieldReference", "to through")
-
-COMPILED_REGEX_TYPE = type(re.compile(""))
 
 
 class RegexObject:

@@ -126,6 +126,12 @@ Python style
   such as merging mappings (``{**x, **y}``) or sequences (``[*a, *b]``). This
   improves performance, readability, and maintainability while reducing errors.
 
+* Where possible, regular expressions should be defined at the module level and
+  pre-compiled, rather than being compiled at runtime. This means using either
+  :func:`re.compile` when the pattern will be used by the majority of
+  applications, or the internal ``django.utils.regex_helper._lazy_re_compile``
+  to avoid extending startup time at the cost of slightly slower matching.
+
 .. _coding-style-imports:
 
 Imports

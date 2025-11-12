@@ -23,6 +23,8 @@ from .pgraster import from_pgraster
 # Identifier to mark raster lookups as bilateral.
 BILATERAL = "bilateral"
 
+_postgis_version_re = re.compile(r"(\d+)\.(\d+)\.(\d+)")
+
 
 class PostGISOperator(SpatialOperator):
     def __init__(self, geography=False, raster=False, **kwargs):
@@ -372,10 +374,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         Return the version of PROJ used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
-        proj_regex = re.compile(r"(\d+)\.(\d+)\.(\d+)")
-        proj_ver_str = self.postgis_proj_version()
-        m = proj_regex.search(proj_ver_str)
-        if m:
+        if m := _postgis_version_re.search(self.postgis_proj_version()):
             return tuple(map(int, m.groups()))
         else:
             raise Exception("Could not determine PROJ version from PostGIS.")

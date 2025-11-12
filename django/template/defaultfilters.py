@@ -29,6 +29,9 @@ from .library import Library
 
 register = Library()
 
+_title_1_re = re.compile("([a-z])'([A-Z])")
+_title_2_re = re.compile(r"\d([A-Z])")
+
 
 #######################
 # STRING DECORATOR    #
@@ -298,8 +301,8 @@ def stringformat(value, arg):
 @stringfilter
 def title(value):
     """Convert a string into titlecase."""
-    t = re.sub("([a-z])'([A-Z])", lambda m: m[0].lower(), value.title())
-    return re.sub(r"\d([A-Z])", lambda m: m[0].lower(), t)
+    t = _title_1_re.sub(lambda m: m[0].lower(), value.title())
+    return _title_2_re.sub(lambda m: m[0].lower(), t)
 
 
 @register.filter(is_safe=True)

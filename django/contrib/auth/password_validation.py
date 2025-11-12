@@ -1,6 +1,5 @@
 import functools
 import gzip
-import re
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -13,6 +12,7 @@ from django.core.exceptions import (
 from django.utils.functional import cached_property, lazy
 from django.utils.html import format_html, format_html_join
 from django.utils.module_loading import import_string
+from django.utils.text import _non_word_re
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
@@ -190,7 +190,7 @@ class UserAttributeSimilarityValidator:
             if not value or not isinstance(value, str):
                 continue
             value_lower = value.lower()
-            value_parts = [*re.split(r"\W+", value_lower), value_lower]
+            value_parts = [*_non_word_re.split(value_lower), value_lower]
             for value_part in value_parts:
                 if exceeds_maximum_length_ratio(
                     password, self.max_similarity, value_part
