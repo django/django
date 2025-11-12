@@ -144,6 +144,7 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         # inspect.getfullargspec(), which is not ready for deferred
         # evaluation of annotations.
         InclusionAdminNode(
+            "test",
             parser=object(),
             token=Token(token_type=TokenType.TEXT, contents="a"),
             func=action,
