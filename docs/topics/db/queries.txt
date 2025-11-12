@@ -654,6 +654,8 @@ contained in a single :meth:`~django.db.models.query.QuerySet.filter` call.
         ... )
         <QuerySet [<Blog: Beatles Blog>, <Blog: Beatles Blog>, <Blog: Pop Music Blog]>
 
+.. _exclude-implementation:
+
 .. note::
 
     The behavior of :meth:`~django.db.models.query.QuerySet.filter` for queries
@@ -1922,6 +1924,71 @@ relationships accept primary key values. For example, if ``e1`` and ``e2`` are
     a = Author.objects.get(id=5)
     a.entry_set.set([e1, e2])
     a.entry_set.set([e1.pk, e2.pk])
+
+Filtering on many-to-many relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When calling ``filter()`` on a many-to-many relationship, be aware that the
+join between ``Entry`` and the intermediary model to ``Author`` is performed
+only once, resulting in a restrictive, or "sticky", filter. Consider the
+following example:
+
+.. code-block:: pycon
+
+    >>> from datetime import date
+    >>> batucada = Blog.objects.create(name="Batucada Blog")
+    >>> e = Entry.objects.create(
+    ...     blog=batucada,
+    ...     headline="Supporting social movements with drums",
+    ...     pub_date=date(2019, 6, 14),
+    ... )
+
+    >>> gloria = Author.objects.create(name="Gloria")
+    >>> anna = Author.objects.create(name="Anna")
+    >>> e.authors.add(gloria, anna)
+
+    >>> anna.entry_set.filter(authors__name="Gloria")
+    <QuerySet []>
+
+This filtered query is looking for blog entries that are co-authored by
+``anna`` and ``gloria``. You would expect it to return the entry ``e``.
+However, the filter condition, which traverses the many-to-many
+relationship between ``Entry`` and ``Author``, yields an empty
+``QuerySet``.
+
+Since the join between ``Entry`` and the intermediary model to ``Author``
+happens only once, no single object of the joined models - i.e., a relation
+between one author and one entry - can fulfill the query condition (entries
+that are co-authored by ``anna`` and ``gloria``). You can circumvent this
+behavior by chaining two consecutive ``filter()`` calls, resulting in two
+separate joins and thus a more permissive filter:
+
+.. code-block:: pycon
+
+    >>> anna.entry_set.filter().filter(authors__name="Gloria")
+    <QuerySet [<Entry: Supporting social movements with drums>]>
+
+.. admonition:: exclude() is also sticky
+
+    Please note that for this example,
+    :meth:`~django.db.models.query.QuerySet.exclude` behaves similarly
+    to :meth:`~django.db.models.query.QuerySet.filter` despite being
+    implemented differently. When traversing the many-to-many relationship,
+    it does not exclude the entry ``e`` despite being co-authored by Gloria:
+
+    >>> anna.entry_set.exclude(authors__name="Gloria")
+    <QuerySet [<Entry: Supporting social movements with drums>]>
+
+    When chaining a second ``exclude()`` call, an empty ``QuerySet`` is
+    returned, as expected:
+
+    >>> anna.entry_set.exclude().exclude(authors__name="Gloria")
+    <QuerySet []>
+
+    However, in other cases, :meth:`~django.db.models.query.QuerySet.exclude`
+    behaves differently from :meth:`~django.db.models.query.QuerySet.filter`.
+    See the :ref:`note <exclude-implementation>` in the "Spanning multi-valued
+    relationships" section above.
 
 One-to-one relationships
 ------------------------
