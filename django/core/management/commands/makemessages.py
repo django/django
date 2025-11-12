@@ -26,6 +26,10 @@ from django.utils.translation import templatize
 plural_forms_re = _lazy_re_compile(
     r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL
 )
+locale_re = _lazy_re_compile(r"^[a-z]+$|^[a-z]+_[A-Z0-9].*$")
+locale_separator_re = _lazy_re_compile(
+    r"^(?P<language>[a-zA-Z]+)(?P<separator>[^a-zA-Z])(?P<territory>.+)$"
+)
 STATUS_OK = 0
 NO_LOCALE_DIR = object()
 
@@ -40,7 +44,7 @@ def check_programs(*programs):
 
 
 def is_valid_locale(locale):
-    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z0-9].*$", locale)
+    return bool(locale_re.match(locale))
 
 
 @total_ordering
@@ -430,13 +434,7 @@ class Command(BaseCommand):
 
                     # Search for characters followed by a non character (i.e.
                     # separator)
-                    match = re.match(
-                        r"^(?P<language>[a-zA-Z]+)"
-                        r"(?P<separator>[^a-zA-Z])"
-                        r"(?P<territory>.+)$",
-                        locale,
-                    )
-                    if match:
+                    if match := locale_separator_re.match(locale):
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
                         territory = (
