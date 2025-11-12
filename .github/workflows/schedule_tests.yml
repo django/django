@@ -98,7 +98,7 @@ jobs:
       - name: Run Selenium tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 1
 
   selenium-postgresql:
     runs-on: ubuntu-latest
@@ -136,7 +136,7 @@ jobs:
       - name: Run Selenium tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 1
 
   postgresql:
     strategy:
