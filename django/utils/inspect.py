@@ -1,10 +1,24 @@
 import functools
 import inspect
 
+from django.utils.version import PY314
+
+if PY314:
+    import annotationlib
+
 
 @functools.lru_cache(maxsize=512)
 def _get_func_parameters(func, remove_first):
-    parameters = tuple(inspect.signature(func).parameters.values())
+    # As the annotations are not used in any case, inspect the signature with
+    # FORWARDREF to leave any deferred annotations unevaluated.
+    if PY314:
+        signature = inspect.signature(
+            func, annotation_format=annotationlib.Format.FORWARDREF
+        )
+    else:
+        signature = inspect.signature(func)
+
+    parameters = tuple(signature.parameters.values())
     if remove_first:
         parameters = parameters[1:]
     return parameters
@@ -74,3 +88,13 @@ def method_has_no_args(meth):
 
 def func_supports_parameter(func, name):
     return any(param.name == name for param in _get_callable_parameters(func))
+
+
+def is_module_level_function(func):
+    if not inspect.isfunction(func) or inspect.isbuiltin(func):
+        return False
+
+    if "<locals>" in func.__qualname__:
+        return False
+
+    return True

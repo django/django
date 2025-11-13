@@ -178,3 +178,9 @@ class DistinctOnTests(TestCase):
             .order_by("nAmEAlIaS")
         )
         self.assertSequenceEqual(qs, [self.p1_o1, self.p2_o1, self.p3_o1])
+
+    def test_disallowed_update_distinct_on(self):
+        qs = Staff.objects.distinct("organisation").order_by("organisation")
+        msg = "Cannot call update() after .distinct(*fields)."
+        with self.assertRaisesMessage(TypeError, msg):
+            qs.update(name="p4")

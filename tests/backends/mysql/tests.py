@@ -109,8 +109,8 @@ class Tests(TestCase):
             mocked_get_database_version.return_value = (10, 5)
             msg = "MariaDB 10.6 or later is required (found 10.5)."
         else:
-            mocked_get_database_version.return_value = (8, 0, 4)
-            msg = "MySQL 8.0.11 or later is required (found 8.0.4)."
+            mocked_get_database_version.return_value = (8, 0, 31)
+            msg = "MySQL 8.4 or later is required (found 8.0.31)."
 
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()

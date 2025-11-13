@@ -30,7 +30,7 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.duration import duration_microseconds, duration_string
+from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
@@ -155,8 +155,6 @@ class Field(RegisterLookupMixin):
         "error_messages",
         "help_text",
         "limit_choices_to",
-        # Database-level options are not supported, see #21961.
-        "on_delete",
         "related_name",
         "related_query_name",
         "validators",
@@ -1890,11 +1888,7 @@ class DurationField(Field):
         )
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if connection.features.has_native_duration_field:
-            return value
-        if value is None:
-            return None
-        return duration_microseconds(value)
+        return connection.ops.adapt_durationfield_value(value)
 
     def get_db_converters(self, connection):
         converters = []

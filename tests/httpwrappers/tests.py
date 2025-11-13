@@ -24,6 +24,7 @@ from django.http import (
 )
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
+from django.utils.http import MAX_URL_LENGTH
 
 
 class QueryDictTests(SimpleTestCase):
@@ -490,6 +491,7 @@ class HttpResponseTests(SimpleTestCase):
             'data:text/html,<script>window.alert("xss")</script>',
             "mailto:test@example.com",
             "file:///etc/passwd",
+            "é" * (MAX_URL_LENGTH + 1),
         ]
         for url in bad_urls:
             with self.assertRaises(DisallowedRedirect):

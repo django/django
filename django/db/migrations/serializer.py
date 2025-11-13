@@ -16,6 +16,7 @@ from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
+from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
 from django.utils.version import get_docs_version
 
@@ -69,6 +70,12 @@ class BaseSimpleSerializer(BaseSerializer):
 class ChoicesSerializer(BaseSerializer):
     def serialize(self):
         return serializer_factory(self.value.value).serialize()
+
+
+class DatabaseOnDeleteSerializer(BaseSerializer):
+    def serialize(self):
+        path = self.value.__class__.__module__
+        return f"{path}.{self.value.__name__}", {f"import {path}"}
 
 
 class DateTimeSerializer(BaseSerializer):
@@ -215,6 +222,17 @@ class FunctoolsPartialSerializer(BaseSerializer):
         )
 
 
+class GenericAliasSerializer(BaseSerializer):
+    def serialize(self):
+        imports = set()
+        # Avoid iterating self.value, because it returns itself.
+        # https://github.com/python/cpython/issues/103450
+        for item in self.value.__args__:
+            _, item_imports = serializer_factory(item).serialize()
+            imports.update(item_imports)
+        return repr(self.value), imports
+
+
 class IterableSerializer(BaseSerializer):
     def serialize(self):
         imports = set()
@@ -357,12 +375,14 @@ class Serializer:
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         FUNCTION_TYPES: FunctionTypeSerializer,
+        types.GenericAlias: GenericAliasSerializer,
         collections.abc.Iterable: IterableSerializer,
         (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
         zoneinfo.ZoneInfo: ZoneInfoSerializer,
+        DatabaseOnDelete: DatabaseOnDeleteSerializer,
     }
 
     @classmethod

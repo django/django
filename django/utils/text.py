@@ -103,7 +103,7 @@ class TruncateHTMLParser(HTMLParser):
     def __init__(self, *, length, replacement, convert_charrefs=True):
         super().__init__(convert_charrefs=convert_charrefs)
         self.tags = deque()
-        self.output = ""
+        self.output = []
         self.remaining = length
         self.replacement = replacement
 
@@ -119,13 +119,13 @@ class TruncateHTMLParser(HTMLParser):
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
-        self.output += self.get_starttag_text()
+        self.output.append(self.get_starttag_text())
         if tag not in self.void_elements:
             self.tags.appendleft(tag)
 
     def handle_endtag(self, tag):
         if tag not in self.void_elements:
-            self.output += f"</{tag}>"
+            self.output.append(f"</{tag}>")
             try:
                 self.tags.remove(tag)
             except ValueError:
@@ -136,16 +136,16 @@ class TruncateHTMLParser(HTMLParser):
         data_len = len(data)
         if self.remaining < data_len:
             self.remaining = 0
-            self.output += add_truncation_text(output, self.replacement)
+            self.output.append(add_truncation_text(output, self.replacement))
             raise self.TruncationCompleted
         self.remaining -= data_len
-        self.output += output
+        self.output.append(output)
 
     def feed(self, data):
         try:
             super().feed(data)
         except self.TruncationCompleted:
-            self.output += "".join([f"</{tag}>" for tag in self.tags])
+            self.output.extend([f"</{tag}>" for tag in self.tags])
             self.tags.clear()
             self.reset()
         else:
@@ -166,9 +166,9 @@ class TruncateCharsHTMLParser(TruncateHTMLParser):
     def process(self, data):
         self.processed_chars += len(data)
         if (self.processed_chars == self.length) and (
-            len(self.output) + len(data) == len(self.rawdata)
+            sum(len(p) for p in self.output) + len(data) == len(self.rawdata)
         ):
-            self.output += data
+            self.output.append(data)
             raise self.TruncationCompleted
         output = escape("".join(data[: self.remaining]))
         return data, output
@@ -213,7 +213,7 @@ class Truncator(SimpleLazyObject):
             parser = TruncateCharsHTMLParser(length=length, replacement=truncate)
             parser.feed(text)
             parser.close()
-            return parser.output
+            return "".join(parser.output)
         return self._text_chars(length, truncate, text)
 
     def _text_chars(self, length, truncate, text):
@@ -250,7 +250,7 @@ class Truncator(SimpleLazyObject):
             parser = TruncateWordsHTMLParser(length=length, replacement=truncate)
             parser.feed(self._wrapped)
             parser.close()
-            return parser.output
+            return "".join(parser.output)
         return self._text_words(length, truncate)
 
     def _text_words(self, length, truncate):
@@ -386,6 +386,22 @@ def compress_sequence(sequence, *, max_random_bytes=None):
         # Output headers...
         yield buf.read()
         for item in sequence:
+            zfile.write(item)
+            data = buf.read()
+            if data:
+                yield data
+    yield buf.read()
+
+
+async def acompress_sequence(sequence, *, max_random_bytes=None):
+    buf = StreamingBuffer()
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
+        # Output headers...
+        yield buf.read()
+        async for item in sequence:
             zfile.write(item)
             data = buf.read()
             if data:

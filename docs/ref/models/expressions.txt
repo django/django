@@ -117,6 +117,8 @@ Built-in Expressions
     ``django.db.models.aggregates``, but for convenience they're available and
     usually imported from :mod:`django.db.models`.
 
+.. _f-expressions:
+
 ``F()`` expressions
 -------------------
 
@@ -188,8 +190,8 @@ Slicing ``F()`` expressions
 
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
-array-slicing syntax. The indices are 0-based and the ``step`` argument to
-``slice`` is not supported. For example:
+array-slicing syntax. The indices are 0-based. The ``step`` argument to
+``slice`` and negative indexing are not supported. For example:
 
 .. code-block:: pycon
 
@@ -499,7 +501,7 @@ should be invoked for each distinct value of ``expressions`` (or set of
 values, for multiple ``expressions``). The argument is only supported on
 aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
 
-The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
+The ``filter`` argument takes a :ref:`Q object <q-objects>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
@@ -584,6 +586,18 @@ arithmetic on ``F()`` expressions with different types as described in
     ``ExpressionWrapper`` only sets the output field for the ORM and does not
     perform any database-level casting. To ensure a specific type is returned
     from the database, use :class:`~django.db.models.functions.Cast` instead.
+    
+``JSONNull()`` expression
+-------------------------
+
+.. versionadded:: 6.1
+
+.. class:: JSONNull()
+
+Specialized expression to represent JSON scalar ``null`` on a
+:class:`~django.db.models.JSONField`.
+
+See :ref:`storing-and-querying-for-none` for usage examples.
 
 Conditional expressions
 -----------------------
@@ -1107,8 +1121,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: set_returning
 
-        .. versionadded:: 5.2
-
         Tells Django that this expression contains a set-returning function,
         enforcing subquery evaluation. It's used, for example, to allow some
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
@@ -1116,8 +1128,6 @@ calling the appropriate methods on the wrapped expression.
         annotations spawn rows themselves. Defaults to ``False``.
 
     .. attribute:: allows_composite_expressions
-
-        .. versionadded:: 5.2
 
         Tells Django that this expression allows composite expressions, for
         example, to support :ref:`composite primary keys

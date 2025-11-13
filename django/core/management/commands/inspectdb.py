@@ -4,6 +4,7 @@ import re
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.deletion import DatabaseOnDelete
 
 
 class Command(BaseCommand):
@@ -163,7 +164,9 @@ class Command(BaseCommand):
                         extra_params["unique"] = True
 
                     if is_relation:
-                        ref_db_column, ref_db_table = relations[column_name]
+                        ref_db_column, ref_db_table, db_on_delete = relations[
+                            column_name
+                        ]
                         if extra_params.pop("unique", False) or extra_params.get(
                             "primary_key"
                         ):
@@ -191,6 +194,8 @@ class Command(BaseCommand):
                                 model_name.lower(),
                                 att_name,
                             )
+                        if db_on_delete and isinstance(db_on_delete, DatabaseOnDelete):
+                            extra_params["on_delete"] = f"models.{db_on_delete}"
                         used_relations.add(rel_to)
                     else:
                         # Calling `get_field_type` to get the field type string
@@ -227,8 +232,12 @@ class Command(BaseCommand):
                         "" if "." in field_type else "models.",
                         field_type,
                     )
+                    on_delete_qualname = extra_params.pop("on_delete", None)
                     if field_type.startswith(("ForeignKey(", "OneToOneField(")):
-                        field_desc += ", models.DO_NOTHING"
+                        if on_delete_qualname:
+                            field_desc += f", {on_delete_qualname}"
+                        else:
+                            field_desc += ", models.DO_NOTHING"
 
                     # Add comment.
                     if connection.features.supports_comments and row.comment:

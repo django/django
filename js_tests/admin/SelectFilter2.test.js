@@ -10,8 +10,11 @@ QUnit.test('init', function(assert) {
     $('<div class="helptext">This is helpful.</div>').appendTo('#test');
     $('<select id="id"><option value="0">A</option></select>').appendTo('#test');
     SelectFilter.init('id', 'things', 0);
-    assert.equal($('#test').children().first().prop("tagName"), "DIV");
-    assert.equal($('#test').children().first().attr("class"), "selector");
+    assert.deepEqual(
+        Array.from($('#test')[0].children).map(child => child.tagName),
+        ["LABEL", "DIV", "DIV"]
+    );
+    assert.equal($('.helptext')[0].nextSibling.getAttribute("class"), "selector");
     assert.equal($('.selector-available label').text().trim(), "Available things");
     assert.equal($('.selector-available label').attr("id"), "id_from_label");
     assert.equal($('.selector-chosen label').text().trim(), "Chosen things");

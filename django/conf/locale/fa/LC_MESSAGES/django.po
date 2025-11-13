@@ -15,6 +15,7 @@
 # Milad Hazrati <miladhazrati75@gmail.com>, 2019
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013,2019
+# Natalia, 2025
 # Pouya Abbassi, 2016
 # Pouya Abbassi, 2016
 # rahim agh <rahim.aghareb@gmail.com>, 2020-2021
@@ -25,9 +26,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: ali salehi, 2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Natalia, 2025\n"
 "Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -362,6 +363,9 @@ msgstr "این صفحه خالی از اطلاعات است"
 msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "یک نشانی اینترنتی معتبر وارد کنید."
 
@@ -384,14 +388,18 @@ msgstr ""
 "یک \"اسلاگ\" معتبر وارد کنید که شامل حروف یونیکد، اعداد، خط زیر یا خط فاصله "
 "باشد."
 
-msgid "Enter a valid IPv4 address."
-msgstr "یک نشانی IPv4 معتبر وارد کنید."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "یک آدرس معتبر IPv6 وارد کنید."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "IPv4 یا IPv6 آدرس معتبر وارد کنید."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "فقط ارقام جدا شده با کاما وارد کنید."
@@ -694,8 +702,8 @@ msgid "Value must be valid JSON."
 msgstr "مقدار، باید یک JSON معتبر باشد."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s با %(field)s %(value)r وجود ندارد."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "کلید خارجی ( نوع بر اساس فیلد رابط مشخص میشود )"
@@ -877,7 +885,7 @@ msgstr "خیر"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "بله،خیر،شاید"
+msgstr "بله,خیر,شاید"
 
 #, python-format
 msgid "%(size)d byte"

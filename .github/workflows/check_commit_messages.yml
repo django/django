@@ -24,8 +24,9 @@ jobs:
           echo "prefix=[$VERSION]" >> $GITHUB_OUTPUT
 
       - name: Check PR title prefix
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
           PREFIX="${{ steps.vars.outputs.prefix }}"
           if [[ "$TITLE" != "$PREFIX"* ]]; then
             echo "❌ PR title must start with the required prefix: $PREFIX"

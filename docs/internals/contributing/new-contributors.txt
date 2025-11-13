@@ -28,7 +28,7 @@ If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you can
 reproduce it and it seems valid, make a note that you confirmed the bug and
 accept the ticket. Make sure the ticket is filed under the correct component
 area. Consider writing a patch that adds a test for the bug's behavior, even if
-you don't fix the bug itself. See more at :ref:`how-can-i-help-with-triaging`
+you don't fix the bug itself. See more at :ref:`how-can-i-help-with-triaging`.
 
 Review patches of accepted tickets
 ----------------------------------

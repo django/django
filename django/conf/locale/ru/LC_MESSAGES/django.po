@@ -19,16 +19,16 @@
 # Panasoft, 2021
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022-2024
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022-2025
 # Bobsans <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2013-2017,2019-2020,2022-2024\n"
+"2013-2017,2019-2020,2022-2025\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -729,10 +729,10 @@ msgid "Value must be valid JSON."
 msgstr "Значение должно быть корректным JSON-ом."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr ""
-"Объект модели %(model)s со значением поля %(field)s, равным %(value)r, не "
-"существует."
+"Значение \"%(value)r\" не является допустимым для поля \"%(field)s\" объекта "
+"типа %(model)s"
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Внешний Ключ (тип определен по связанному полю)"

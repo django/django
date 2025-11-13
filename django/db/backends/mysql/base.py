@@ -144,11 +144,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             _data_types["UUIDField"] = "uuid"
         return _data_types
 
-    # For these data types:
-    # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
-    #   as nullable
-    # - all versions of MySQL and MariaDB don't support full width database
-    #   indexes
+    # For these data types MySQL and MariaDB don't support full width database
+    # indexes.
     _limited_data_types = (
         "tinyblob",
         "blob",
@@ -337,6 +334,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 for column_name, (
                     referenced_column_name,
                     referenced_table_name,
+                    _,
                 ) in relations.items():
                     cursor.execute(
                         """

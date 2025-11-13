@@ -3,10 +3,11 @@ import datetime
 import pickle
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
+from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
 
 from .models import (
@@ -15,6 +16,7 @@ from .models import (
     ArticleTag,
     ArticleTranslation,
     Country,
+    CustomerTab,
     Friendship,
     Group,
     Membership,
@@ -602,6 +604,42 @@ class MultiColumnFKTests(TestCase):
             [m4],
         )
 
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        person = Person.objects.fetch_mode(FETCH_PEERS).get(pk=self.bob.pk)
+        self.assertEqual(person._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            person.person_country._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        people = list(Person.objects.fetch_mode(FETCH_PEERS))
+        person = people[0]
+        self.assertEqual(person._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            person.person_country._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        country = Country.objects.fetch_mode(FETCH_PEERS).get(pk=self.usa.pk)
+        self.assertEqual(country._state.fetch_mode, FETCH_PEERS)
+        person = country.person_set.get(pk=self.bob.pk)
+        self.assertEqual(
+            person._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        countries = list(Country.objects.fetch_mode(FETCH_PEERS))
+        country = countries[0]
+        self.assertEqual(country._state.fetch_mode, FETCH_PEERS)
+        person = country.person_set.earliest("pk")
+        self.assertEqual(
+            person._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
 
 class TestModelCheckTests(SimpleTestCase):
     @isolate_apps("foreign_object")
@@ -767,3 +805,33 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
+
+
+class ForeignObjectModelValidationTests(TestCase):
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_with_foreign_object(self):
+        customer_tab = CustomerTab(customer_id=1500)
+        with self.assertRaisesMessage(ValidationError, "customer_id_limit"):
+            customer_tab.validate_constraints()
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_success_case_single_query(self):
+        customer_tab = CustomerTab(customer_id=500)
+        with CaptureQueriesContext(connection) as ctx:
+            customer_tab.validate_constraints()
+        select_queries = [
+            query["sql"]
+            for query in ctx.captured_queries
+            if "select" in query["sql"].lower()
+        ]
+        self.assertEqual(len(select_queries), 1)
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_excluding_foreign_object(self):
+        customer_tab = CustomerTab(customer_id=150)
+        customer_tab.validate_constraints(exclude={"customer"})
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_validate_constraints_excluding_foreign_object_member(self):
+        customer_tab = CustomerTab(customer_id=150)
+        customer_tab.validate_constraints(exclude={"customer_id"})

@@ -2,24 +2,25 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# coby2023t, 2025
+# yubike, 2025
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
 # 0a3cb7bfd0810218facdfb511e592a6d_8d19d07 <c136e508049103f37d35b6c3314e9b1d_5225>, 2011
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
+# W. H. Wang <mattwang44@gmail.com>, 2025
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# coby2023t, 2024
+# yubike, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: coby2023t, 2025\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: W. H. Wang <mattwang44@gmail.com>, 2025\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -347,7 +348,7 @@ msgid "Models in the %(name)s application"
 msgstr "%(name)s 應用程式中的模型"
 
 msgid "Model name"
-msgstr "型號"
+msgstr "模型名稱"
 
 msgid "Add link"
 msgstr "加入鏈結"
@@ -368,7 +369,7 @@ msgid "After you’ve created a user, you’ll be able to edit more user options
 msgstr "建立帳號後即可編輯更多用戶選項。"
 
 msgid "Error:"
-msgstr "錯誤:"
+msgstr "錯誤："
 
 msgid "Change password"
 msgstr "修改密碼"
@@ -554,7 +555,7 @@ msgstr ""
 "入？"
 
 msgid "Forgotten your login credentials?"
-msgstr "忘記您的簽入証 ?"
+msgstr "忘記您的登入驗證資訊 ?"
 
 msgid "Toggle navigation"
 msgstr "切換導航"

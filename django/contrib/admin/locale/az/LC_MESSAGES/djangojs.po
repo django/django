@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -34,7 +34,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Bu xanaya yazmaqla mövcud %s siyahısını filtrləyə bilərsiniz."
+msgstr "Bu xanaya yazmaqla mövcud %s siyahısını süzə bilərsiniz."
 
 msgid "Filter"
 msgstr "Süzgəc"
@@ -64,7 +64,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
-msgstr "Seçilmiş %s siyahısını filtrləmək üçün bu xanaya yazın"
+msgstr "Seçilmiş %s siyahısını süzmək üçün bu xanaya yazın"
 
 msgid "(click to clear)"
 msgstr "(təmizləmək üçün toxunun)"
@@ -97,7 +97,7 @@ msgid ""
 "action."
 msgstr ""
 "Əməliyyat seçmisiniz, amma fərdi xanalardakı dəyişiklikləriniz hələ də yadda "
-"saxlanılmayıb. Saxlamaq üçün lütfən Tamam düyməsinə klikləyin. Əməliyyatı "
+"saxlanılmayıb. Saxlamaq üçün lütfən OLDU düyməsinə toxunun. Əməliyyatı "
 "təkrar icra etməli olacaqsınız."
 
 msgid ""

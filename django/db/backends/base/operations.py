@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.models.expressions import Col
 from django.utils import timezone
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
 
 
@@ -252,6 +253,16 @@ class BaseDatabaseOperations:
             )
             if sql
         )
+
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement.
+        """
+        if operation in ["CASCADE", "SET NULL", "SET DEFAULT"]:
+            return f" ON DELETE {operation}"
+        if operation == "":
+            return ""
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
@@ -563,6 +574,16 @@ class BaseDatabaseOperations:
         if value is None:
             return None
         return str(value)
+
+    def adapt_durationfield_value(self, value):
+        """
+        Transform a timedelta value into an object compatible with what is
+        expected by the backend driver for duration columns (by default,
+        an integer of microseconds).
+        """
+        if value is None:
+            return None
+        return duration_microseconds(value)
 
     def adapt_timefield_value(self, value):
         """

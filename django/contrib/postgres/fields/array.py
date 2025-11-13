@@ -2,6 +2,10 @@ import json
 
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
+from django.contrib.postgres.utils import (
+    CheckPostgresInstalledMixin,
+    prefix_validation_error,
+)
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, Func, IntegerField, Transform, Value
@@ -9,7 +13,6 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import CheckPostgresInstalledMixin, prefix_validation_error
 from .utils import AttributeSetter
 
 __all__ = ["ArrayField"]
@@ -130,6 +133,11 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 self.base_field.get_db_prep_value(i, connection, prepared=False)
                 for i in value
             ]
+        return value
+
+    def get_db_prep_save(self, value, connection):
+        if isinstance(value, (list, tuple)):
+            return [self.base_field.get_db_prep_save(i, connection) for i in value]
         return value
 
     def deconstruct(self):

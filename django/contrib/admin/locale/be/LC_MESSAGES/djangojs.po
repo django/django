@@ -2,14 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -26,11 +26,9 @@ msgstr "Даступныя %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Сьпіс даступных %s. Каб нешта абраць, пазначце патрэбнае ў полі ніжэй і "
-"пстрыкніце па стрэлцы «Абраць» між двума палямі."
+"Абярыце %s, выбраўшы іх, а потым націсніце кнопку са стрэлкай «Абраць»."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +37,17 @@ msgstr "Каб прасеяць даступныя %s, друкуйце ў гэ�
 msgid "Filter"
 msgstr "Прасеяць"
 
-msgid "Choose all"
-msgstr "Абраць усе"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Абраць усе %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Каб абраць усе %s, пстрыкніце тут."
+msgid "Choose selected %s"
+msgstr "Змяніць абраныя %s"
 
-msgid "Choose"
-msgstr "Абраць"
-
-msgid "Remove"
-msgstr "Прыбраць"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Выдаліць абраныя %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,22 +55,20 @@ msgstr "Абралі %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Сьпіс абраных %s. Каб нешта прыбраць, пазначце патрэбнае ў полі ніжэй і "
-"пстрыкніце па стрэлцы «Прыбраць» між двума палямі."
+"Выдаліце ​​%s, выбраўшы іх, а потым націсніце кнопку са стрэлкай «Выдаліць»."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Друкуйце ў гэтым полі, каб прасеяць спіс выбраных %s."
 
-msgid "Remove all"
-msgstr "Прыбраць усё"
+msgid "(click to clear)"
+msgstr "(націсніце каб ачысьціць)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Каб прыбраць усе %s, пстрыкніце тут."
+msgid "Remove all %s"
+msgstr "Прыбраць усе %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -325,9 +320,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Паказаць"
-
-msgid "Hide"
-msgstr "Схаваць"

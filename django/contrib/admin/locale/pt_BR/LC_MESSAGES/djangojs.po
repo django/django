@@ -5,6 +5,7 @@
 # andrewsmedina <andrewsmedina@gmail.com>, 2016
 # Eduardo Cereto Carvalho, 2011
 # Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
+# Felipe Silveira (Felipebros) <felipeiturama@gmail.com>, 2025
 # Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023
 # fa9e10542e458baef0599ae856e43651_13d2225, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -18,9 +19,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-25 15:04-0500\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>, 2021,2025\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Felipe Silveira (Felipebros) <felipeiturama@gmail.com>, "
+"2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -48,15 +50,15 @@ msgstr "Filtro"
 
 #, javascript-format
 msgid "Choose all %s"
-msgstr ""
+msgstr "Escolher todos %s"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "Escolher selecionado(s) %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Remover selecionado(s) %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -66,6 +68,7 @@ msgstr "%s escolhido(s)"
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
+"Remova %s selecionando-os e depois selecione o botão de seta \"Remover\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
@@ -76,7 +79,7 @@ msgstr "(clique para limpar)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr ""
+msgstr "Remover todos %s"
 
 #, javascript-format
 msgid "%s selected option not visible"

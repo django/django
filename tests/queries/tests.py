@@ -1967,8 +1967,8 @@ class Queries5Tests(TestCase):
     def test_extra_select_alias_sql_injection(self):
         crafted_alias = """injected_name" from "queries_note"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Note.objects.extra(select={crafted_alias: "1"})
@@ -4514,6 +4514,14 @@ class TestInvalidValuesRelation(SimpleTestCase):
             Annotation.objects.filter(tag="abc")
         with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag__in=[123, "abc"])
+
+
+class TestInvalidFilterArguments(TestCase):
+    def test_filter_rejects_invalid_arguments(self):
+        school = School.objects.create()
+        msg = "The following kwargs are invalid: '_connector', '_negated'"
+        with self.assertRaisesMessage(TypeError, msg):
+            School.objects.filter(pk=school.pk, _negated=True, _connector="evil")
 
 
 class TestTicket24605(TestCase):
