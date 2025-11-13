@@ -333,6 +333,9 @@ class IndexTransform(Transform):
     def __init__(self, index, base_field, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.index = index
+        #accept either a Field instance or a Field subclass for convenience..
+        if isinstance(base_field, type) and issubclass(base_field, Field):
+            base_field = base_field()
         self.base_field = base_field
 
     def as_sql(self, compiler, connection):
