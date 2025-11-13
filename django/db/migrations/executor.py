@@ -1,4 +1,5 @@
 import logging
+
 from django.apps.registry import apps as global_apps
 from django.db import migrations, router
 
@@ -6,6 +7,8 @@ from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
+
+logger = logging.getLogger(__name__)
 
 
 class MigrationExecutor:
