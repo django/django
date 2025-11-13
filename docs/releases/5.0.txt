@@ -529,9 +529,10 @@ Should become::
         uuid = Char32UUIDField(primary_key=True, default=uuid.uuid4)
 
 Running the :djadmin:`makemigrations` command will generate a migration
-containing a no-op ``AlterField`` operation. Since any new ``UUIDField``
-would use a ``UUID`` column, the ``Char32UUIDField`` should be used
-instead, when mixing column types is not desired.
+containing a no-op ``AlterField`` operation. By default, new
+``UUIDField`` instances will use the ``UUID`` column type: To ensure
+consistency with existing fields, use ``Char32UUIDField`` instead for
+new fields that should have the same column type.
 
 ----
 
@@ -551,8 +552,8 @@ a data migration::
           )
       ]
 
-This would avoid potentially mixing the old and new column types and
-needs no additional consideration on new fields, once migrated.
+Once migrated, this would need no additional consideration when adding
+new ``UUIDField`` instances.
 
 Please note that for larger tables or when ``UUIDFields`` are used as
 primary keys or in constraints, this operation could either require a
