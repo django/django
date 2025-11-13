@@ -529,7 +529,34 @@ Should become::
         uuid = Char32UUIDField(primary_key=True, default=uuid.uuid4)
 
 Running the :djadmin:`makemigrations` command will generate a migration
-containing a no-op ``AlterField`` operation.
+containing a no-op ``AlterField`` operation. Since any new ``UUIDField``
+would use a ``UUID`` column, the ``Char32UUIDField`` should be used
+instead, when mixing column types is not desired.
+
+----
+
+Alternatively, existing ``UUIDField`` columns could be altered in the
+database to use a ``UUID`` column, by running a ``RunSQL`` operation in
+a data migration::
+
+  class Migration(migrations.Migration):
+      ...
+      operations = [
+          migrations.RunSQL(
+              sql="""
+              ALTER TABLE my_app_model1 MODIFY my_uuid_field1 UUID NOT NULL;
+              ALTER TABLE my_app_model2 MODIFY my_uuid_field2 UUID NOT NULL;
+              """,
+          )
+      ]
+
+This would avoid potentially mixing the old and new column types and
+needs no additional consideration on new fields, once migrated.
+
+Please note that for larger tables or when ``UUIDFields`` are used as
+primary keys or in constraints, this operation could either require a
+lengthy table rebuild, or even end up failing to migrate the constraints
+without additional steps (see :ticket:`33507` for details).
 
 Miscellaneous
 -------------
