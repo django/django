@@ -12,6 +12,13 @@ version has several benefits:
 * Upgrading as each new Django release is available makes future upgrades less
   painful by keeping your code base up to date.
 
+.. admonition:: Tools to help with version upgrades
+
+    Django has a vibrant ecosystem. There are automated upgrade helpers
+    highlighted on the `Community Ecosystem
+    <https://www.djangoproject.com/community/ecosystem/#upgrade-utilities>`__
+    page.
+
 Here are some things to consider to help make your upgrade process as smooth as
 possible.
 
