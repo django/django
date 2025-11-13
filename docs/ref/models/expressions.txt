@@ -37,6 +37,12 @@ determine the result's field type, such as complex expressions that mix field
 types. For example, adding a ``DecimalField()`` and a ``FloatField()`` requires
 an output field, like ``output_field=FloatField()``.
 
+``output_field`` is also useful for encapsulating type conversion behavior in
+custom fields. For example, if you frequently need to perform date arithmetic
+with ``timedelta``, you can create a custom field that handles the casting to
+ensure consistent results across databases. See :doc:`/howto/custom-model-fields`
+for more information on creating custom fields.
+
 Some examples
 =============
 
@@ -573,69 +579,11 @@ available on other expressions. ``ExpressionWrapper`` is necessary when using
 arithmetic on ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
 
-.. _expression-wrapper-datefield-timedelta:
+.. note::
 
-DateField and ``timedelta`` behavior
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning::
-
-    When combining a :class:`~django.db.models.DateField` with
-    :class:`~datetime.timedelta` in an ``ExpressionWrapper`` on PostgreSQL and
-    MySQL, the database returns a ``datetime`` instead of a ``date``.
-    This occurs because Python's ``timedelta`` is converted
-    to SQL ``INTERVAL`` type, and the SQL operation ``date - interval`` returns
-    a ``timestamp`` on these databases::
-
-        from django.db.models import DateField, ExpressionWrapper, F
-        import datetime
-
-        # On PostgreSQL/MySQL: returns datetime, not date
-        qs = MyModel.objects.annotate(
-            previous_day=ExpressionWrapper(
-                F("date_field") - datetime.timedelta(days=1),
-                output_field=DateField(),
-            )
-        )
-        result = qs.first().previous_day
-        type(result)  # datetime.datetime (not datetime.date!)
-
-To ensure a ``date`` result across all databases, use one of these approaches:
-
-Use :class:`~django.db.models.functions.Cast`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The recommended approach is to explicitly cast the result to a date::
-
-    from django.db.models import DateField, F
-    from django.db.models.functions import Cast
-    import datetime
-
-    qs = MyModel.objects.annotate(
-        previous_day=Cast(
-            F("date_field") - datetime.timedelta(days=1),
-            output_field=DateField(),
-        )
-    )
-
-Use integer arithmetic
-^^^^^^^^^^^^^^^^^^^^^^
-
-PostgreSQL supports ``date +/- integer`` operations where the integer
-represents days::
-
-    from django.db.models import DateField, ExpressionWrapper, F
-
-    qs = MyModel.objects.annotate(
-        previous_day=ExpressionWrapper(
-            F("date_field") - 1,  # Subtract 1 day as integer
-            output_field=DateField(),
-        )
-    )
-
-For applications that frequently perform date arithmetic, consider creating
-a custom field that converts ``timedelta`` values to integers for database
-operations. See :doc:`/howto/custom-model-fields` for more information.
+    ``ExpressionWrapper`` only sets the output field for the ORM and does not
+    perform any database-level casting. To ensure a specific type is returned
+    from the database, use :class:`~django.db.models.functions.Cast` instead.
 
 Conditional expressions
 -----------------------
