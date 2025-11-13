@@ -40,8 +40,8 @@ an output field, like ``output_field=FloatField()``.
 ``output_field`` is also useful for encapsulating type conversion behavior in
 custom fields. For example, if you frequently need to perform date arithmetic
 with ``timedelta``, you can create a custom field that handles the casting to
-ensure consistent results across databases. 
-See :doc:`/howto/custom-model-fields` 
+ensure consistent results across databases.
+See :doc:`/howto/custom-model-fields`
 for more information on creating custom fields.
 
 Some examples
@@ -587,7 +587,7 @@ arithmetic on ``F()`` expressions with different types as described in
     ``ExpressionWrapper`` only sets the output field for the ORM and does not
     perform any database-level casting. To ensure a specific type is returned
     from the database, use :class:`~django.db.models.functions.Cast` instead.
-    
+
 ``JSONNull()`` expression
 -------------------------
 
