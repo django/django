@@ -11,6 +11,13 @@ Upgrading Django to the latest version offers several benefits:
 * Upgrading with each new release helps keep your code base current and makes
   future upgrades smoother.
 
+.. admonition:: Tools to help with version upgrades
+
+    Django has a vibrant ecosystem. There are automated upgrade helpers
+    highlighted on the `Community Ecosystem
+    <https://www.djangoproject.com/community/ecosystem/#upgrade-utilities>`__
+    page.
+
 Here are some things to consider to help make your upgrade process as smooth as
 possible.
 
