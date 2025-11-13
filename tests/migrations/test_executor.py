@@ -1010,13 +1010,13 @@ class ExecutorLoggingTests(MigrationTestBase):
         """Applied migrations are logged at INFO level."""
         executor = MigrationExecutor(connection)
 
-        with self.assertLogs('django.db.migrations.executor', level='INFO') as cm:
+        with self.assertLogs("django.db.migrations.executor", level="INFO") as cm:
             executor.migrate([("migrations", "0001_initial")])
 
         self.assertGreater(len(cm.records), 0)
-        self.assertEqual(cm.records[0].levelname, 'INFO')
-        self.assertIn('Applied migration', cm.records[0].message)
-        self.assertIn('0001_initial', cm.records[0].message)
+        self.assertEqual(cm.records[0].levelname, "INFO")
+        self.assertIn("Applied migration", cm.records[0].message)
+        self.assertIn("0001_initial", cm.records[0].message)
 
         executor.loader.build_graph()
         executor.migrate([("migrations", None)])
@@ -1025,12 +1025,12 @@ class ExecutorLoggingTests(MigrationTestBase):
         """Faked migrations are logged at DEBUG level."""
         executor = MigrationExecutor(connection)
 
-        with self.assertLogs('django.db.migrations.executor', level='DEBUG') as cm:
+        with self.assertLogs("django.db.migrations.executor", level="DEBUG") as cm:
             executor.migrate([("migrations", "0001_initial")], fake=True)
 
-        self.assertEqual(cm.records[0].levelname, 'DEBUG')
-        self.assertIn('Marked migration', cm.records[0].message)
-        self.assertIn('0001_initial', cm.records[0].message)
+        self.assertEqual(cm.records[0].levelname, "DEBUG")
+        self.assertIn("Marked migration", cm.records[0].message)
+        self.assertIn("0001_initial", cm.records[0].message)
 
         executor.loader.build_graph()
         executor.migrate([("migrations", None)], fake=True)
@@ -1042,21 +1042,21 @@ class ExecutorLoggingTests(MigrationTestBase):
         executor.migrate([("migrations", "0001_initial")])
         executor.loader.build_graph()
 
-        with self.assertLogs('django.db.migrations.executor', level='INFO') as cm:
+        with self.assertLogs("django.db.migrations.executor", level="INFO") as cm:
             executor.migrate([("migrations", None)])
 
-        self.assertEqual(cm.records[0].levelname, 'INFO')
-        self.assertIn('Unapplied migration', cm.records[0].message)
-        self.assertIn('0001_initial', cm.records[0].message)
+        self.assertEqual(cm.records[0].levelname, "INFO")
+        self.assertIn("Unapplied migration", cm.records[0].message)
+        self.assertIn("0001_initial", cm.records[0].message)
 
     def test_log_includes_database_alias(self):
         """Log messages include the database alias."""
         executor = MigrationExecutor(connection)
 
-        with self.assertLogs('django.db.migrations.executor', level='INFO') as cm:
+        with self.assertLogs("django.db.migrations.executor", level="INFO") as cm:
             executor.migrate([("migrations", "0001_initial")])
 
-        self.assertIn('default', cm.records[0].message)
+        self.assertIn("default", cm.records[0].message)
 
         executor.loader.build_graph()
         executor.migrate([("migrations", None)])
