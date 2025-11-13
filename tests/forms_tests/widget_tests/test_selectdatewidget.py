@@ -718,7 +718,7 @@ class SelectDateWidgetTest(WidgetTest):
         form = TestForm()
         self.assertIs(self.widget.use_fieldset, True)
         self.assertHTMLEqual(
-            '<div><fieldset><legend for="id_field_month">Field:</legend>'
+            "<div><fieldset><legend>Field:</legend>"
             '<select name="field_month" required id="id_field_month">'
             '<option value="1">January</option><option value="2">February</option>'
             '<option value="3">March</option><option value="4">April</option>'

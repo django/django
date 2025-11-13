@@ -12,6 +12,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
+from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.translation import gettext_lazy as _
 
@@ -150,6 +151,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         )
 
 
+@deconstructible(path="django.db.models.JSONNull")
 class JSONNull(expressions.Value):
     """Represent JSON `null` primitive."""
 
