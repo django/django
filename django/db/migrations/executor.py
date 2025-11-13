@@ -267,15 +267,13 @@ class MigrationExecutor:
 
         if fake:
             logger.debug(
-                'Marked migration %s as applied on database %s',
+                "Marked migration %s as applied on database %s",
                 migration,
-                self.connection.alias
+                self.connection.alias,
             )
         else:
             logger.info(
-                'Applied migration %s on database %s',
-                migration,
-                self.connection.alias
+                "Applied migration %s on database %s", migration, self.connection.alias
             )
 
         # Report progress
@@ -307,15 +305,15 @@ class MigrationExecutor:
 
         if fake:
             logger.debug(
-                'Marked migration %s as unapplied on database %s',
+                "Marked migration %s as unapplied on database %s",
                 migration,
-                self.connection.alias
+                self.connection.alias,
             )
         else:
             logger.info(
-                'Unapplied migration %s on database %s',
+                "Unapplied migration %s on database %s",
                 migration,
-                self.connection.alias
+                self.connection.alias,
             )
 
         # Report progress
