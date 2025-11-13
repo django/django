@@ -547,6 +547,7 @@ a data migration::
               ALTER TABLE my_app_model1 MODIFY my_uuid_field1 UUID NOT NULL;
               ALTER TABLE my_app_model2 MODIFY my_uuid_field2 UUID NOT NULL;
               """,
+              elidable=True,
           )
       ]
 
