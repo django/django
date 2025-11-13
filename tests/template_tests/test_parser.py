@@ -18,7 +18,6 @@ from django.template.base import (
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
-from django.utils.html import escape
 from django.utils.version import PY314
 
 if TYPE_CHECKING:
