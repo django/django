@@ -843,8 +843,7 @@ exclusive. Any combination of these options will result in an error.
     To ensure a ``date`` result across all databases, use one of these
     approaches:
 
-    Use :class:`~django.db.models.functions.Cast`
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    **Use** :class:`~django.db.models.functions.Cast`
 
     Explicitly cast the result to a date::
 
@@ -859,8 +858,7 @@ exclusive. Any combination of these options will result in an error.
             )
         )
 
-    Use integer arithmetic (PostgreSQL only)
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    **Use integer arithmetic (PostgreSQL only)**
 
     PostgreSQL supports ``date +/- integer`` operations where the integer
     represents days::
