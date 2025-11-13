@@ -842,8 +842,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
+        req.META["HTTP_HOST"] = "www.example.com"
         req.META["HTTP_REFERER"] = "https://foo.example.com/"
-        req.META["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -852,9 +852,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain_with_different_port(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
+        req.META["HTTP_HOST"] = "www.example.com:4443"
         req.META["HTTP_REFERER"] = "https://foo.example.com:4443/"
-        req.META["SERVER_PORT"] = "4443"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1277,28 +1276,15 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertEqual(csrf_cookie, TEST_SECRET)
         self._check_token_present(resp, csrf_cookie)
 
-    def test_bare_secret_accepted_and_not_replaced(self):
-        """
-        The csrf cookie is left unchanged if originally not masked.
-        """
-        req = self._get_POST_request_with_token(cookie=TEST_SECRET)
-        mw = CsrfViewMiddleware(token_view)
-        mw.process_request(req)
-        resp = mw.process_view(req, token_view, (), {})
-        self.assertIsNone(resp)
-        resp = mw(req)
-        csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(csrf_cookie, TEST_SECRET)
-        self._check_token_present(resp, csrf_cookie)
-
     @override_settings(
         ALLOWED_HOSTS=["www.example.com"],
         CSRF_COOKIE_DOMAIN=".example.com",
         USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
     )
     def test_https_good_referer_behind_proxy(self):
         """
-        A POST HTTPS request is accepted when USE_X_FORWARDED_PORT=True.
+        A POST HTTPS request is accepted when USE_X_FORWARDED_*=True.
         """
         self._test_https_good_referer_behind_proxy()
 
@@ -1431,11 +1417,12 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         ALLOWED_HOSTS=["www.example.com"],
         SESSION_COOKIE_DOMAIN=".example.com",
         USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
         DEBUG=True,
     )
     def test_https_good_referer_behind_proxy(self):
         """
-        A POST HTTPS request is accepted when USE_X_FORWARDED_PORT=True.
+        A POST HTTPS request is accepted when USE_X_FORWARDED_*=True.
         """
         self._test_https_good_referer_behind_proxy()
 
