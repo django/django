@@ -250,15 +250,17 @@ class ParserTests(SimpleTestCase):
                     FilterExpression(f"0|default:{num}", p).resolve({})
 
 
-class FilterExpressionArgsTests(unittest.TestCase):
-    @unittest.skipUnless(PY314, "Deferred annotations area Python 3.14+ only")
+class FilterExpressionArgsTests(SimpleTestCase):
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_register_filter_deferred_annotations(self):
         register = Library()
 
         @register.filter("example")
-        def example_filter(value: str) -> SafeText:
-            return escape(value)
+        def example_filter(value: str, arg: str = "default") -> SafeText:
+            return f"{value}_{arg}"
 
-        result = example_filter("example")
+        result = FilterExpression.args_check(
+            "example", example_filter, ["extra_example"]
+        )
 
         self.assertTrue(result)
