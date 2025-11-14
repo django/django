@@ -198,7 +198,7 @@ class IntegerFieldTests(TestCase):
             (TypeError, {}),
             (TypeError, set()),
             (TypeError, object()),
-            (TypeError, complex()),
+            (TypeError, complex(0, 1)),
             (ValueError, "non-numeric string"),
             (ValueError, b"non-numeric byte-string"),
         ]
