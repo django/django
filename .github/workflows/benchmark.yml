@@ -17,6 +17,7 @@ jobs:
         with:
           repository: django/django-asv
           path: "."
+          persist-credentials: false
       - name: Install Requirements
         run: pip install -r requirements.txt
       - name: Cache Django
