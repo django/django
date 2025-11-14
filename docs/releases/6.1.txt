@@ -375,6 +375,9 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+* Support for negative JSON array indices was added for Oracle versions 21c
+  and higher.
+
 Features removed in 6.1
 =======================
 
