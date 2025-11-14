@@ -248,8 +248,6 @@ class ParserTests(SimpleTestCase):
                 with self.assertRaises(TemplateSyntaxError):
                     FilterExpression(f"0|default:{num}", p).resolve({})
 
-
-class FilterExpressionArgsTests(SimpleTestCase):
     @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_register_filter_deferred_annotations(self):
         register = Library()
