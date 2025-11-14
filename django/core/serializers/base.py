@@ -240,14 +240,10 @@ class Serializer:
         """
         Return a natural key tuple for the given object when available.
         """
-        if not obj:
+        if not (obj and callable(getattr(obj, "natural_key", None))):
             return None
 
-        natural_key_func = getattr(obj, "natural_key", None)
-        if not callable(natural_key_func):
-            return None
-
-        natural_key_value = natural_key_func()
+        natural_key_value = obj.natural_key()
         if self._is_natural_key_opt_out(natural_key_value):
             return None
 
