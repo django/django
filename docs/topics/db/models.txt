@@ -4,9 +4,14 @@ Models
 
 .. module:: django.db.models
 
-A model is the single, definitive source of information about your data.
-It defines the database structure and provides the Python API for creating, retrieving, and manipulating records.
-It contains the essential fields and behaviors of the data you're storing.
+Model:
+
+*A model is the single, definitive source of information about your data.
+
+*It defines the database structure and provides the Python API for
+creating, retrieving, and manipulating records.
+
+*It contains the essential fields and behaviors of the data you're storing.
 Generally, each model maps to a single database table.
 
 The basics:
