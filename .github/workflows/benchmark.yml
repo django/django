@@ -19,7 +19,8 @@ jobs:
           path: "."
           persist-credentials: false
       - name: Setup Miniforge
-        uses: conda-incubator/setup-miniconda@v3
+        # Pinned to v3.2.0.
+        uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f
         with:
           miniforge-version: "24.1.2-0"
           activate-environment: asv-bench
