@@ -1036,6 +1036,7 @@ class TestQuerying(TestCase):
                 [self.objs[7]],
             ),
             ("value__foo__in", [F("value__bax__foo")], [self.objs[7]]),
+            ("value__foo__in", [F("value__bax__foo"), {}], [self.objs[7]]),
             (
                 "value__foo__in",
                 [KeyTransform("foo", KeyTransform("bax", "value")), "baz"],
@@ -1045,6 +1046,16 @@ class TestQuerying(TestCase):
             ("value__foo__in", ["bar", "baz"], [self.objs[7]]),
             ("value__bar__in", [["foo", "bar"]], [self.objs[7]]),
             ("value__bar__in", [Value(["foo", "bar"], JSONField())], [self.objs[7]]),
+            (
+                "value__bar__in",
+                [["foo", "bar"], Value({}, JSONField())],
+                [self.objs[7]],
+            ),
+            (
+                "value__bar__in",
+                [Value(["foo", "bar"], JSONField()), {"a": "b"}],
+                [self.objs[7]],
+            ),
             ("value__bar__in", [["foo", "bar"], ["a"]], [self.objs[7]]),
             ("value__bax__in", [{"foo": "bar"}, {"a": "b"}], [self.objs[7]]),
             ("value__h__in", [True, "foo"], [self.objs[4]]),
@@ -1313,9 +1324,18 @@ class JSONNullTests(TestCase):
 
     def test_filter_in(self):
         obj = NullableJSONModel.objects.create(value=JSONNull())
+        obj2 = NullableJSONModel.objects.create(value=[1])
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value__in=[JSONNull()]),
-            [obj],
+            NullableJSONModel.objects.filter(value__in=[JSONNull(), [1], "foo"]),
+            [obj, obj2],
+        )
+
+    def test_key_in(self):
+        obj1 = NullableJSONModel.objects.create(value={"key": None})
+        obj2 = NullableJSONModel.objects.create(value={"key": [1]})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key__in=[JSONNull(), [1], 0]),
+            [obj1, obj2],
         )
 
     def test_bulk_update(self):
