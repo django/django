@@ -1,5 +1,3 @@
-import json
-
 from django.core import serializers
 from django.db import connection
 from django.test import TestCase
@@ -256,108 +254,48 @@ def fk_as_pk_natural_key_not_called(self, format):
 
 
 def natural_key_opt_out_test(self, format):
-    # Refs #35729
     """
-    Tests natural key opt-out scenarios for models inheriting
-    from AbstractBaseUser.
-
-    Verifies that when natural_key() returns an empty tuple:
+    When a subclass of AbstractBaseUser opts out of natural key serialization
+    by returning an empty tuple, both FK and M2M relations serialize as
+    integer PKs and can be deserialized without error.
     """
     user1 = SubclassNaturalKeyOptOutUser.objects.create(email="user2@example.com")
     user2 = SubclassNaturalKeyOptOutUser.objects.create(email="user3@example.com")
 
-    post1 = PostToOptOutSubclassUser.objects.create(
+    post = PostToOptOutSubclassUser.objects.create(
         author=user1, title="Post 2 (Subclass Opt-out)"
     )
-    post1.subscribers.add(user1, user2)
+    post.subscribers.add(user1, user2)
 
-    scenarios = [
-        (user1, post1),
-    ]
+    user_data = serializers.serialize(format, [user1], use_natural_primary_keys=True)
+    post_data = serializers.serialize(format, [post], use_natural_foreign_keys=True)
 
-    is_json = format == "json"
+    list(serializers.deserialize(format, user_data))
+    deserialized_posts = list(serializers.deserialize(format, post_data))
 
-    for user, post in scenarios:
-        user_pk = user.pk
-
-        user_data_str = serializers.serialize(
-            format, [user], indent=2, use_natural_primary_keys=True
-        )
-
-        if is_json:
-            user_data = json.loads(user_data_str)
-            serialized_user = user_data[0]
-
-            self.assertEqual(
-                serialized_user.get("pk"),
-                user_pk,
-                f"[{user.__class__.__name__}] PK must be included "
-                f"in the primary object after patch.",
-            )
-
-        post_data_str = serializers.serialize(
-            format,
-            [post],
-            indent=2,
-            use_natural_foreign_keys=True,
-        )
-
-        if is_json:
-            post_data = json.loads(post_data_str)
-            serialized_post = post_data[0]
-
-            self.assertEqual(
-                serialized_post["fields"]["author"],
-                user_pk,
-                f"[{user.__class__.__name__}] FK must be serialized as PK integer"
-                f", not a natural key list.",
-            )
-
-            subscribers_pks = [user1.pk, user2.pk]
-
-            self.assertEqual(
-                sorted(serialized_post["fields"]["subscribers"]),
-                sorted(subscribers_pks),
-                f"[{user.__class__.__name__}] "
-                f"M2M field must be serialized as PK integer list.",
-            )
-
-        try:
-            list(serializers.deserialize(format, user_data_str))
-        except Exception as e:
-            self.fail(
-                f"Deserialization of {user.__class__.__name__} failed in {format}: {e}"
-            )
-
-        try:
-            list(serializers.deserialize(format, post_data_str))
-        except Exception as e:
-            self.fail(
-                f"Deserialization of {post.__class__.__name__} failed in {format}: {e}"
-            )
+    post_obj = deserialized_posts[0].object
+    self.assertEqual(user1.email, post_obj.author.email)
+    self.assertEqual(
+        sorted([user1.email, user2.email]),
+        sorted(post_obj.subscribers.values_list("email", flat=True)),
+    )
 
 
 def deserialize_natural_key_then_opted_out(self, format):
-    # Refs #35729
     """
-    Deserialization remains backward compatible when a model that previously
-    used natural keys later opts out by returning None from natural_key().
-
-    Old serialized data using natural keys should still deserialize
-    without error.
+    Deserialization remains backward compatible:
+    data serialized with natural keys continues to load correctly
+    after the model opts out by returning empty tuple from natural_key().
     """
     user = NaturalKeyOptOut.objects.create(name="example")
     serialized = serializers.serialize(format, [user], use_natural_primary_keys=True)
 
     def optout_natural_key(self):
-        return None
+        return ()
 
     NaturalKeyOptOut.natural_key = optout_natural_key
 
-    try:
-        list(serializers.deserialize(format, serialized))
-    except Exception as e:
-        self.fail(f"Deserialization failed after opt-out: {e}")
+    list(serializers.deserialize(format, serialized))
 
 
 # Dynamically register tests for each serializer

@@ -369,7 +369,7 @@ def build_instance(Model, data, db):
         obj = Model(**data)
         obj._state.db = db
         natural_key = obj.natural_key()
-        if natural_key is not None:
+        if natural_key:
             try:
                 data[Model._meta.pk.attname] = Model._meta.pk.to_python(
                     default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
