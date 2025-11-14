@@ -530,9 +530,9 @@ Should become::
 
 Running the :djadmin:`makemigrations` command will generate a migration
 containing a no-op ``AlterField`` operation. By default, new
-``UUIDField`` instances will use the ``UUID`` column type: To ensure
-consistency with existing fields, use ``Char32UUIDField`` instead for
-new fields that should have the same column type.
+``UUIDField`` instances will use the ``UUID`` column type. If a
+``CHAR(32)`` column is needed, for example if you want to ensure
+consistency with existing columns, use a ``Char32UUIDField``.
 
 ----
 
