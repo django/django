@@ -140,6 +140,7 @@ class URLValidator(RegexValidator):
     tld_re = DomainNameValidator.tld_re
 
     host_re = "(" + hostname_re + domain_re + tld_re + "|localhost)"
+    ipv6_host_re = _lazy_re_compile(r"^\[(.+)\](?::[0-9]{1,5})?$")
 
     regex = _lazy_re_compile(
         r"^(?:[a-z0-9.+-]*)://"  # scheme is validated separately
@@ -177,7 +178,7 @@ class URLValidator(RegexValidator):
             raise ValidationError(self.message, code=self.code, params={"value": value})
         super().__call__(value)
         # Now verify IPv6 in the netloc part
-        host_match = re.search(r"^\[(.+)\](?::[0-9]{1,5})?$", splitted_url.netloc)
+        host_match = self.ipv6_host_re.search(splitted_url.netloc)
         if host_match:
             potential_ip = host_match[1]
             try:
