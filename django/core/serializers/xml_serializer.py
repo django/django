@@ -53,7 +53,10 @@ class Serializer(base.Serializer):
 
         self.indent(1)
         attrs = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
+
+        pk_included = self._should_include_pk(obj)
+
+        if pk_included:
             obj_pk = obj.pk
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
@@ -108,14 +111,10 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.attname)
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(
-                field.remote_field.model, "natural_key"
-            ):
-                related = getattr(obj, field.name)
-                # If related object has a natural key, use it
-                related = related.natural_key()
+            natural_key_value = self._resolve_fk_natural_key(obj, field)
+            if natural_key_value:
                 # Iterable natural keys are rolled out as subelements
-                for key_value in related:
+                for key_value in natural_key_value:
                     self.xml.startElement("natural", {})
                     self.xml.characters(str(key_value))
                     self.xml.endElement("natural")
@@ -133,36 +132,39 @@ class Serializer(base.Serializer):
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(
-                field.remote_field.model, "natural_key"
-            ):
-                # If the objects in the m2m have a natural key, use it
-                def handle_m2m(value):
-                    natural = value.natural_key()
-                    # Iterable natural keys are rolled out as subelements
-                    self.xml.startElement("object", {})
-                    for key_value in natural:
-                        self.xml.startElement("natural", {})
-                        self.xml.characters(str(key_value))
-                        self.xml.endElement("natural")
-                    self.xml.endElement("object")
 
-                def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name)
+            use_natural = (
+                self.use_natural_foreign_keys
+                and self._model_supports_natural_key(field.remote_field.model)
+            )
+
+            # If the objects in the m2m have a natural key, use it
+            def handle_m2m(value):
+                natural = self._resolve_natural_key(value) if use_natural else None
+
+                if not natural:
+                    self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+                    return
+
+                # Iterable natural keys are rolled out as subelements
+                self.xml.startElement("object", {})
+                for key_value in natural:
+                    self.xml.startElement("natural", {})
+                    self.xml.characters(str(key_value))
+                    self.xml.endElement("natural")
+                self.xml.endElement("object")
+
+            def queryset_iterator(obj, field):
+                attr = getattr(obj, field.name)
+                if use_natural:
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
                     return attr.iterator(chunk_size)
 
-            else:
-
-                def handle_m2m(value):
-                    self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
-
-                def queryset_iterator(obj, field):
-                    query_set = getattr(obj, field.name).select_related(None).only("pk")
-                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                    return query_set.iterator(chunk_size=chunk_size)
+                query_set = attr.select_related(None).only("pk")
+                chunk_size = 2000 if query_set._prefetch_related_lookups else None
+                return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
