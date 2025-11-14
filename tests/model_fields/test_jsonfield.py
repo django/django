@@ -1044,6 +1044,7 @@ class TestQuerying(TestCase):
             ("value__foo__in", [F("value__bax__foo"), "baz"], [self.objs[7]]),
             ("value__foo__in", ["bar", "baz"], [self.objs[7]]),
             ("value__bar__in", [["foo", "bar"]], [self.objs[7]]),
+            ("value__bar__in", [Value(["foo", "bar"], JSONField())], [self.objs[7]]),
             ("value__bar__in", [["foo", "bar"], ["a"]], [self.objs[7]]),
             ("value__bax__in", [{"foo": "bar"}, {"a": "b"}], [self.objs[7]]),
             ("value__h__in", [True, "foo"], [self.objs[4]]),
