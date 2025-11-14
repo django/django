@@ -242,11 +242,13 @@ The following ORM methods provide the ``instance`` hint:
   provides the instance that owns the related manager (e.g., ``author.books.create(title="...")``
   provides ``author`` as the hint).
 
-* :meth:`ManyRelatedManager.get_or_create() <django.db.models.fields.related.ManyRelatedManager.get_or_create>` -
-  provides the instance that owns the related manager.
+* :meth:`QuerySet.get_or_create() <django.db.models.query.QuerySet.get_or_create>` -
+  when called on a many-to-many related manager, provides the instance that
+  owns the related manager.
 
-* :meth:`ManyRelatedManager.update_or_create() <django.db.models.fields.related.ManyRelatedManager.update_or_create>` -
-  provides the instance that owns the related manager.
+* :meth:`QuerySet.update_or_create() <django.db.models.query.QuerySet.update_or_create>` -
+  when called on a many-to-many related manager, provides the instance that
+  owns the related manager.
 
 * Foreign key assignment - when assigning a foreign key value (e.g.,
   ``book.author = author``), both the instance being assigned to and
