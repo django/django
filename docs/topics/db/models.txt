@@ -1516,7 +1516,7 @@ only the first one is going to be used, and all others will be ignored.
 Generally, you won't need to inherit from multiple parents. The main use-case
 where this is useful is for "mix-in" classes: adding a particular extra
 field or method to every class that inherits the mix-in. Try to keep your
-inheritance hierarchies as simple and straightforward as possible so that you
+inheritance hierarchies as simple as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
 

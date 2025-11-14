@@ -39,7 +39,7 @@ The CSRF protection is based on the following things:
    outgoing POST forms.
 
    In order to protect against `BREACH`_ attacks, the value of this field is
-   not simply the secret. It is scrambled differently with each response using
+   not the secret. It is scrambled differently with each response using
    a mask. The mask is generated randomly on every call to ``get_token()``, so
    the form field value is different each time.
 

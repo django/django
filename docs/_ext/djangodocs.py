@@ -302,7 +302,7 @@ class ConsoleDirective(CodeBlock):
 
     required_arguments = 0
     # The 'doscon' Pygments formatter needs a prompt like this. '>' alone
-    # won't do it because then it simply paints the whole command line as a
+    # won't do it because then it paints the whole command line as a
     # gray comment with no highlighting at all.
     WIN_PROMPT = r"...\> "
 

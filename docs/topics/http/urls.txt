@@ -585,7 +585,7 @@ directions:
 
 The first one is the usage we've been discussing in the previous sections. The
 second one is what is known as *reverse resolution of URLs*, *reverse URL
-matching*, *reverse URL lookup*, or simply *URL reversing*.
+matching*, *reverse URL lookup*, or *URL reversing*.
 
 Django provides tools for performing URL reversing that match the different
 layers where URLs are needed:

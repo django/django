@@ -10,7 +10,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_lob = False
     # Although GROUP BY select index is supported by Oracle 23c+, it requires
     # GROUP_BY_POSITION_ENABLED to be enabled to avoid backward compatibility
-    # issues. Introspection of this settings is not straightforward.
+    # issues. Introspection of this settings is not simple.
     allows_group_by_select_index = False
     interprets_empty_strings_as_nulls = True
     has_select_for_update = True
