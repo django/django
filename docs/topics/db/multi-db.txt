@@ -235,12 +235,12 @@ The following ORM methods provide the ``instance`` hint:
   instance being saved as the hint.
 
 * :meth:`RelatedManager.add() <django.db.models.fields.related.RelatedManager.add>` -
-  provides the instance that owns the related manager (e.g., ``author.books.add(book)``
-  provides ``author`` as the hint).
+  provides the instance that owns the related manager (e.g.,
+  ``author.books.add(book)`` provides ``author`` as the hint).
 
 * :meth:`RelatedManager.create() <django.db.models.fields.related.RelatedManager.create>` -
-  provides the instance that owns the related manager (e.g., ``author.books.create(title="...")``
-  provides ``author`` as the hint).
+  provides the instance that owns the related manager (e.g.,
+  ``author.books.create(title="...")`` provides ``author`` as the hint).
 
 * :meth:`QuerySet.get_or_create() <django.db.models.query.QuerySet.get_or_create>` -
   when called on a many-to-many related manager, provides the instance that
