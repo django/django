@@ -8,6 +8,7 @@ import asyncio
 import threading
 import warnings
 from contextlib import contextmanager
+from functools import lru_cache
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -29,6 +30,7 @@ except ImportError:
     raise ImproperlyConfigured("Error loading psycopg2 or psycopg module")
 
 
+@lru_cache
 def psycopg_version():
     version = Database.__version__.split(" ", 1)[0]
     return get_version_tuple(version)

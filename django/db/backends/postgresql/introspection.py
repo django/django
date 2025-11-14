@@ -3,6 +3,7 @@ from collections import namedtuple
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
+from django.db.backends.postgresql.base import psycopg_version
 from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING, Index
 
 FieldInfo = namedtuple("FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "comment"])
@@ -120,10 +121,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute(
             "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
         )
+
+        # PostgreSQL OIDs may vary depending on the installation, especially
+        # for datatypes from extensions, e.g. "hstore". In such cases, the
+        # type_display attribute (psycopg 3.2+) should be used.
+        type_display_available = psycopg_version() >= (3, 2)
         return [
             FieldInfo(
                 line.name,
-                line.type_code,
+                (
+                    line.type_display
+                    if type_display_available and line.type_display == "hstore"
+                    else line.type_code
+                ),
                 # display_size is always None on psycopg2.
                 line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
