@@ -361,10 +361,11 @@ def build_instance(Model, data, db):
     """
     default_manager = Model._meta.default_manager
     pk = data.get(Model._meta.pk.attname)
+    natural_key_method = getattr(Model, "natural_key", None)
     if (
         pk is None
         and hasattr(default_manager, "get_by_natural_key")
-        and hasattr(Model, "natural_key")
+        and callable(natural_key_method)
     ):
         obj = Model(**data)
         obj._state.db = db
