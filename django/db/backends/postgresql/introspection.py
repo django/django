@@ -137,8 +137,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 # display_size is always None on psycopg2.
                 line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
-                line.precision,
-                line.scale,
+                # precision and scale are always 2^16 - 1 on psycopg2 for
+                # DecimalFields with no precision.
+                None if line.precision == 2**16 - 1 else line.precision,
+                None if line.scale == 2**16 - 1 else line.scale,
                 *field_map[line.name],
             )
             for line in cursor.description

@@ -68,6 +68,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_covering_indexes = True
     supports_stored_generated_columns = True
     supports_nulls_distinct_unique_constraints = True
+    supports_no_precision_decimalfield = True
     can_rename_index = True
     test_collations = {
         "deterministic": "C",
