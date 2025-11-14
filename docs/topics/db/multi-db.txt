@@ -226,11 +226,36 @@ database should receive a given request.
 
 At present, the only hint that will be provided is ``instance``, an
 object instance that is related to the read or write operation that is
-underway. This might be the instance that is being saved, or it might
-be an instance that is being added in a many-to-many relation. In some
-cases, no instance hint will be provided at all. The router checks for
-the existence of an instance hint, and determine if that hint should be
-used to alter routing behavior.
+underway. The router checks for the existence of an instance hint, and
+determine if that hint should be used to alter routing behavior.
+
+The following ORM methods provide the ``instance`` hint:
+
+* :meth:`Model.save() <django.db.models.Model.save>` - provides the
+  instance being saved as the hint.
+
+* :meth:`RelatedManager.add() <django.db.models.fields.related.RelatedManager.add>` -
+  provides the instance that owns the related manager (e.g., ``author.books.add(book)``
+  provides ``author`` as the hint).
+
+* :meth:`RelatedManager.create() <django.db.models.fields.related.RelatedManager.create>` -
+  provides the instance that owns the related manager (e.g., ``author.books.create(title="...")``
+  provides ``author`` as the hint).
+
+* :meth:`ManyRelatedManager.get_or_create() <django.db.models.fields.related.ManyRelatedManager.get_or_create>` -
+  provides the instance that owns the related manager.
+
+* :meth:`ManyRelatedManager.update_or_create() <django.db.models.fields.related.ManyRelatedManager.update_or_create>` -
+  provides the instance that owns the related manager.
+
+* Foreign key assignment - when assigning a foreign key value (e.g.,
+  ``book.author = author``), both the instance being assigned to and
+  the instance being assigned are provided as hints to help determine
+  the appropriate database.
+
+In some cases, no instance hint will be provided at all. For example,
+when creating a new object that hasn't been saved yet, or when performing
+bulk operations that don't operate on a specific instance.
 
 Using routers
 -------------
