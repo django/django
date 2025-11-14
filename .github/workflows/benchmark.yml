@@ -17,6 +17,7 @@ jobs:
         with:
           repository: django/django-asv
           path: "."
+          persist-credentials: false
       - name: Setup Miniforge
         uses: conda-incubator/setup-miniconda@v3
         with:
