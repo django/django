@@ -429,12 +429,11 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
             sql,
             param,
         )
-        if (
-            not hasattr(param, "as_sql")
-            and not connection.features.has_native_json_field
+        if not connection.features.has_native_json_field and (
+            not hasattr(param, "as_sql") or isinstance(param, expressions.Value)
         ):
             if connection.vendor == "oracle":
-                value = json.loads(param)
+                value = param.value if hasattr(param, "value") else json.loads(param)
                 sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
                 if isinstance(value, (list, dict)):
                     sql %= "JSON_QUERY"
