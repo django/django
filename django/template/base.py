@@ -65,6 +65,7 @@ from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
+from django.utils.version import PY314
 
 from .exceptions import TemplateSyntaxError
 
@@ -91,6 +92,9 @@ UNKNOWN_SOURCE = "<unknown source>"
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
+
+if PY314:
+    import annotationlib
 
 
 class TokenType(Enum):
@@ -825,9 +829,19 @@ class FilterExpression:
         # Check to see if a decorator is providing the real function.
         func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
-        alen = len(args)
-        dlen = len(defaults or [])
+        if PY314:
+            sig = inspect.signature(
+                func, annotation_format=annotationlib.Format.FORWARDREF
+            )
+        else:
+            sig = inspect.signature(func)
+        alen = len(sig.parameters)
+
+        non_default_params = [
+            p for p in sig.parameters.values() if p.default is p.empty
+        ]
+        dlen = alen - len(non_default_params)
+
         # Not enough OR Too many
         if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError(
