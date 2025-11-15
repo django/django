@@ -162,7 +162,7 @@ class LongNameTest(TransactionTestCase):
             VLM_m2m._meta.db_table,
         ]
         sql_list = connection.ops.sql_flush(no_style(), tables, reset_sequences=True)
-        connection.ops.execute_sql_flush(connection.alias, sql_list)
+        connection.ops.execute_sql_flush(sql_list)
 
 
 class SequenceResetTest(TestCase):

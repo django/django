@@ -172,7 +172,7 @@ class SqlFlushTests(TransactionTestCase):
             reset_sequences=True,
             allow_cascade=True,
         )
-        connection.ops.execute_sql_flush(connection.alias, sql_list)
+        connection.ops.execute_sql_flush(sql_list)
 
         with transaction.atomic():
             self.assertIs(Author.objects.exists(), False)
