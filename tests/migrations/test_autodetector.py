@@ -366,6 +366,16 @@ class AutodetectorTests(TestCase):
         ("writer", models.ForeignKey("testapp.Writer", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
+    book_with_uuid_author = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author_id", models.UUIDField(null=True, blank=True)),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_fk_author = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author_id", models.ForeignKey("testapp.Author", models.SET_NULL, null=True, blank=True)),
+        ("title", models.CharField(max_length=200)),
+    ])
     book_with_multiple_authors = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
         ("authors", models.ManyToManyField("testapp.Author")),
@@ -820,6 +830,21 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=False)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default="Some Name")
+
+    def test_alter_field_to_fk_dependency(self):
+        """
+        Changing a field to a ForeignKey should add a dependency on the
+        related model.
+        """
+        changes = self.get_changes(
+            [self.author_name, self.book_with_uuid_author],
+            [self.author_name, self.book_with_fk_author]
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["AlterField"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="author_id")
+        self.assertMigrationDependencies(changes, 'otherapp', 0, [("testapp", "__first__")])
 
     def test_rename_field(self):
         """Tests autodetection of renamed fields."""
