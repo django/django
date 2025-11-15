@@ -59,3 +59,17 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+# Models for testing self-referencing foreign key ordering
+class OneModel(models.Model):
+    root = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
+    oneval = models.BigIntegerField(null=True)
+
+    class Meta:
+        ordering = ("-id",)
+
+
+class TwoModel(models.Model):
+    record = models.ForeignKey(OneModel, on_delete=models.CASCADE)
+    twoval = models.BigIntegerField(null=True)
