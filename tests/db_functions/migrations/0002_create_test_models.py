@@ -88,4 +88,10 @@ class Migration(migrations.Migration):
                 ("f2", models.FloatField(null=True, blank=True)),
             ],
         ),
+        migrations.CreateModel(
+            name="UUIDModel",
+            fields=[
+                ("uuid", models.UUIDField(null=True)),
+            ],
+        ),
     ]

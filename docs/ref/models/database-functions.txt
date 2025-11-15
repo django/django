@@ -1877,6 +1877,37 @@ Usage example:
 
 .. _window-functions:
 
+UUID functions
+==============
+
+``UUID4``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID4()
+
+Generates a cryptographically secure random UUID.
+
+.. note::
+
+    Available on PostgreSQL, MariaDB version 11.7 or later, and Oracle 23.4
+    (23ai) or later.
+
+``UUID7``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID7()
+
+Generates a time-based UUID.
+
+.. note::
+
+    Available on PostgreSQL version 18 or later, and MariaDB version 11.7 or
+    later.
+
 Window functions
 ================
 
