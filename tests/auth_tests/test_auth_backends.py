@@ -226,6 +226,32 @@ class BaseModelBackendTest:
         authenticate(username='no_such_user', password='test')
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
+    def test_authenticate_with_none_username(self):
+        """
+        authenticate() returns early when username is None, preventing
+        unnecessary database queries and password hashing.
+        """
+        backend = ModelBackend()
+        with self.assertNumQueries(0):
+            self.assertIsNone(backend.authenticate(None, username=None, password='test'))
+
+    def test_authenticate_with_none_password(self):
+        """
+        authenticate() returns early when password is None, preventing
+        unnecessary database queries and password hashing.
+        """
+        backend = ModelBackend()
+        with self.assertNumQueries(0):
+            self.assertIsNone(backend.authenticate(None, username='test', password=None))
+
+    def test_authenticate_with_both_none(self):
+        """
+        authenticate() returns early when both username and password are None.
+        """
+        backend = ModelBackend()
+        with self.assertNumQueries(0):
+            self.assertIsNone(backend.authenticate(None, username=None, password=None))
+
 
 class ModelBackendTest(BaseModelBackendTest, TestCase):
     """
@@ -629,6 +655,18 @@ class SkippedBackend:
         pass
 
 
+class CustomCredentialsBackend:
+    """
+    Backend that uses custom credentials (not username/password).
+    This simulates a scenario like token-based auth or external auth systems.
+    """
+    def authenticate(self, request, token=None):
+        if token == 'valid_token':
+            # In a real scenario, this would look up the user by token
+            return User.objects.get(username='test')
+        return None
+
+
 class AuthenticateTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -650,6 +688,22 @@ class AuthenticateTests(TestCase):
         credentials as arguments.
         """
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'django.contrib.auth.backends.ModelBackend',
+        'auth_tests.test_auth_backends.CustomCredentialsBackend',
+    ))
+    def test_model_backend_without_username_makes_no_queries(self):
+        """
+        When authenticating with credentials for another backend (e.g., token),
+        ModelBackend should return early without making database queries.
+        """
+        # Authenticate with token for CustomCredentialsBackend
+        # ModelBackend should not query the database when it receives
+        # credentials it doesn't understand (no username/password)
+        with self.assertNumQueries(1):  # Only 1 query from CustomCredentialsBackend
+            user = authenticate(token='valid_token')
+        self.assertEqual(user, self.user1)
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):
