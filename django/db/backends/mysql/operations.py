@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.db import DatabaseError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
@@ -287,6 +288,24 @@ class DatabaseOperations(BaseDatabaseOperations):
             lhs, rhs = sub_expressions
             return 'FLOOR(%(lhs)s / POW(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         return super().combine_expression(connector, sub_expressions)
+
+    def combine_duration_expression(self, connector, sub_expressions):
+        # MySQL doesn't support direct arithmetic on INTERVAL expressions.
+        # For duration-only operations, we need to extract the numeric values
+        # and perform integer arithmetic, then format the result.
+        if connector not in ['+', '-']:
+            raise DatabaseError('Invalid connector for timedelta: %s.' % connector)
+        # Remove INTERVAL ... MICROSECOND wrapping if present and do numeric arithmetic
+        unwrapped = []
+        for expr in sub_expressions:
+            if expr.startswith('INTERVAL ') and expr.endswith(' MICROSECOND'):
+                # Extract the numeric part
+                unwrapped.append(expr[9:-12])  # Remove 'INTERVAL ' and ' MICROSECOND'
+            else:
+                unwrapped.append(expr)
+        # Perform the arithmetic and return as microseconds (BIGINT)
+        conn = ' %s ' % connector
+        return conn.join(unwrapped)
 
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)

@@ -561,6 +561,10 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
         return None
     # typecast_timestamp returns a date or a datetime without timezone.
     # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
+    # For timedelta, return the value as microseconds to match the expected
+    # format for DurationField in databases without native duration support.
+    if isinstance(out, datetime.timedelta):
+        return duration_microseconds(out)
     return str(out)
 
 
