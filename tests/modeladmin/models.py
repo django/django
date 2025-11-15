@@ -52,3 +52,56 @@ class ValidationTestModel(models.Model):
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel, models.CASCADE)
+
+
+class DescriptorField(models.IntegerField):
+    """A custom field that mimics the behavior of django-positions PositionField.
+
+    This field's descriptor raises an exception when accessed on the model class
+    (not an instance), which was causing admin.E108 to be incorrectly raised.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('default', 0)
+        super().__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+        # Replace the descriptor with one that raises when accessed on the class
+        setattr(cls, name, DescriptorFieldDescriptor(self))
+
+
+class DescriptorFieldDescriptor:
+    """Descriptor that raises an exception when accessed on the class."""
+
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            # Accessing from the class, not an instance - raise an exception
+            # This simulates the behavior of django-positions PositionField
+            raise AttributeError(
+                "DescriptorField can only be accessed via an instance, not the class."
+            )
+        return instance.__dict__.get(self.field.attname, self.field.default)
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.field.attname] = value
+
+
+class DescriptorModel(models.Model):
+    """Test model with a descriptor field that raises on class access."""
+    name = models.CharField(max_length=100)
+    order = DescriptorField()
+
+    @property
+    def a_property(self):
+        """A regular property that returns a value."""
+        return "property_value"
+
+
+class ModelWithManyToManyDescriptor(models.Model):
+    """Test model to check ManyToMany fields accessed via getattr."""
+    name = models.CharField(max_length=100)
+    related_items = models.ManyToManyField('self', symmetrical=False)

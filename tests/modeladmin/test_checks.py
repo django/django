@@ -9,7 +9,8 @@ from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
 
 from .models import (
-    Band, Song, User, ValidationTestInlineModel, ValidationTestModel,
+    Band, DescriptorModel, ModelWithManyToManyDescriptor, Song, User,
+    ValidationTestInlineModel, ValidationTestModel,
 )
 
 
@@ -508,6 +509,54 @@ class ListDisplayTests(CheckTestCase):
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_descriptor_field_accessible_only_via_instance(self):
+        """
+        Regression test for #30487. Fields that are accessible only via an
+        instance (not via the class) should not raise admin.E108.
+        This happens with fields like django-positions PositionField whose
+        descriptor raises an exception when accessed on the class.
+        """
+        class TestModelAdmin(ModelAdmin):
+            list_display = ('name', 'order')
+
+        self.assertIsValid(TestModelAdmin, DescriptorModel)
+
+    def test_many_to_many_field_still_detected_with_descriptor(self):
+        """
+        Even if hasattr(model, field_name) is False, ManyToManyFields should
+        still raise admin.E109.
+        """
+        class TestModelAdmin(ModelAdmin):
+            list_display = ('users',)
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            'admin.E109'
+        )
+
+    def test_many_to_many_field_via_getattr(self):
+        """
+        ManyToManyFields accessible via getattr should raise admin.E109.
+        """
+        class TestModelAdmin(ModelAdmin):
+            list_display = ('related_items',)
+
+        self.assertIsInvalid(
+            TestModelAdmin, ModelWithManyToManyDescriptor,
+            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            'admin.E109'
+        )
+
+    def test_model_property_in_list_display(self):
+        """
+        Model properties should be valid in list_display.
+        """
+        class TestModelAdmin(ModelAdmin):
+            list_display = ('name', 'a_property')
+
+        self.assertIsValid(TestModelAdmin, DescriptorModel)
 
 
 class ListDisplayLinksCheckTests(CheckTestCase):
