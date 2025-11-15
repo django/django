@@ -17,6 +17,7 @@ from django.db import (
 )
 from django.db.models import AutoField, DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, Expression, F, Value, When
 from django.db.models.functions import Cast, Trunc
@@ -689,8 +690,19 @@ class QuerySet:
         """
         assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with in_bulk"
-        if field_name != 'pk' and not self.model._meta.get_field(field_name).unique:
-            raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
+        if field_name != 'pk':
+            # Check if field is unique via field.unique or UniqueConstraint
+            field = self.model._meta.get_field(field_name)
+            if not field.unique:
+                # Check if field has a total UniqueConstraint (single field, no condition)
+                is_unique_constraint = any(
+                    isinstance(constraint, UniqueConstraint) and
+                    constraint.fields == (field_name,) and
+                    constraint.condition is None
+                    for constraint in self.model._meta.constraints
+                )
+                if not is_unique_constraint:
+                    raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
         if id_list is not None:
             if not id_list:
                 return {}

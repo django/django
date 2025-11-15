@@ -7,7 +7,7 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel, Product, UniqueConstraintConditionProduct,
-    UniqueConstraintProduct,
+    UniqueConstraintInBulkProduct, UniqueConstraintProduct,
 )
 
 
@@ -238,3 +238,41 @@ class UniqueConstraintTests(TestCase):
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'UniqueConstraint.condition must be a Q instance.'):
             models.UniqueConstraint(name='uniq', fields=['name'], condition='invalid')
+
+    def test_in_bulk_with_unique_constraint(self):
+        """Test that in_bulk() works with UniqueConstraint on a single field."""
+        # Create test objects
+        obj1 = UniqueConstraintInBulkProduct.objects.create(name='product1')
+        obj2 = UniqueConstraintInBulkProduct.objects.create(name='product2')
+        obj3 = UniqueConstraintInBulkProduct.objects.create(name='product3')
+
+        # Test in_bulk with field_name that has UniqueConstraint
+        result = UniqueConstraintInBulkProduct.objects.in_bulk(
+            ['product1', 'product2', 'product3'],
+            field_name='name'
+        )
+
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result['product1'], obj1)
+        self.assertEqual(result['product2'], obj2)
+        self.assertEqual(result['product3'], obj3)
+
+    def test_in_bulk_without_id_list_with_unique_constraint(self):
+        """Test that in_bulk() works without id_list for UniqueConstraint fields."""
+        obj1 = UniqueConstraintInBulkProduct.objects.create(name='product_a')
+        obj2 = UniqueConstraintInBulkProduct.objects.create(name='product_b')
+
+        result = UniqueConstraintInBulkProduct.objects.in_bulk(field_name='name')
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result['product_a'], obj1)
+        self.assertEqual(result['product_b'], obj2)
+
+    @skipUnlessDBFeature('supports_partial_indexes')
+    def test_in_bulk_with_partial_unique_constraint_fails(self):
+        """Test that in_bulk() fails for fields with conditional UniqueConstraint."""
+        UniqueConstraintConditionProduct.objects.create(name='p1')
+
+        msg = "in_bulk()'s field_name must be a unique field but 'name' isn't."
+        with self.assertRaisesMessage(ValueError, msg):
+            UniqueConstraintConditionProduct.objects.in_bulk(['p1'], field_name='name')

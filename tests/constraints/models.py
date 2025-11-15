@@ -77,3 +77,13 @@ class AbstractModel(models.Model):
 
 class ChildModel(AbstractModel):
     pass
+
+
+class UniqueConstraintInBulkProduct(models.Model):
+    """Model for testing in_bulk() with UniqueConstraint on a single field."""
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='unique_name'),
+        ]
