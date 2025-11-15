@@ -116,6 +116,10 @@ class DurationParseTests(unittest.TestCase):
             ('-15:30', timedelta(minutes=-15, seconds=30)),
             ('-1:15:30', timedelta(hours=-1, minutes=15, seconds=30)),
             ('-30.1', timedelta(seconds=-30, milliseconds=-100)),
+            # Test negative hours, minutes, and seconds
+            ('-1:-2:-3', timedelta(hours=-1, minutes=-2, seconds=-3)),
+            ('-10:-15:-30', timedelta(hours=-10, minutes=-15, seconds=-30)),
+            ('-5:-10:-20.5', timedelta(hours=-5, minutes=-10, seconds=-20, milliseconds=-500)),
         )
         for source, expected in test_values:
             with self.subTest(source=source):
