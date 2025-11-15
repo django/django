@@ -197,6 +197,59 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
         self.assertEqual(display_value, '12,345')
 
+    def test_json_display_for_field(self):
+        """
+        JSONField values are displayed as valid JSON.
+        """
+        tests = [
+            ({'foo': 'bar'}, '{"foo": "bar"}'),
+            (['foo', 'bar'], '["foo", "bar"]'),
+            ('foo', '"foo"'),
+            ({'a': [1, 2]}, '{"a": [1, 2]}'),
+            (None, self.empty_value),
+            (True, 'true'),
+            (False, 'false'),
+            (123, '123'),
+            (45.67, '45.67'),
+        ]
+        for value, expected_display in tests:
+            with self.subTest(value=value):
+                display_value = display_for_field(value, models.JSONField(), self.empty_value)
+                self.assertEqual(display_value, expected_display)
+
+    def test_json_display_for_field_custom_encoder(self):
+        """
+        JSONField values are displayed as valid JSON with custom encoder.
+        """
+        import json
+
+        class CustomEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, Decimal):
+                    return str(obj)
+                return super().default(obj)
+
+        field = models.JSONField(encoder=CustomEncoder)
+        value = {'price': Decimal('10.50')}
+        display_value = display_for_field(value, field, self.empty_value)
+        # The custom encoder should convert Decimal to string
+        self.assertEqual(display_value, '{"price": "10.50"}')
+
+    def test_json_display_for_field_unicode(self):
+        """
+        JSONField values with Unicode characters are properly displayed.
+        """
+        tests = [
+            ({'name': 'José'}, '{"name": "José"}'),
+            ({'emoji': '😀'}, '{"emoji": "😀"}'),
+            ({'chinese': '你好'}, '{"chinese": "你好"}'),
+            ({'mixed': 'Hello 世界 🌍'}, '{"mixed": "Hello 世界 🌍"}'),
+        ]
+        for value, expected_display in tests:
+            with self.subTest(value=value):
+                display_value = display_for_field(value, models.JSONField(), self.empty_value)
+                self.assertEqual(display_value, expected_display)
+
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
         self.assertEqual(display_value, '1, 2, 3')
