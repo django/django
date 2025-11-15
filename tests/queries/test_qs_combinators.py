@@ -124,6 +124,64 @@ class QuerySetSetOperationTests(TestCase):
         reserved_name = qs1.union(qs1).values_list('name', 'order', 'id').get()
         self.assertEqual(reserved_name[:2], ('a', 2))
 
+    def test_union_multiple_values_list(self):
+        # Test that calling values_list() multiple times on the same
+        # composed query properly changes the columns.
+        ReservedName.objects.create(name='a', order=2)
+        qs1 = ReservedName.objects.all()
+        union = qs1.union(qs1)
+        # First call with two fields
+        result1 = union.values_list('name', 'order').get()
+        self.assertEqual(result1, ('a', 2))
+        # Second call with different fields - should return only one field
+        result2 = union.values_list('order').get()
+        self.assertEqual(result2, (2,))
+        # Third call with different fields
+        result3 = union.values_list('name').get()
+        self.assertEqual(result3, ('a',))
+
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_intersection_multiple_values_list(self):
+        # Test that calling values_list() multiple times on the same
+        # composed query properly changes the columns.
+        ReservedName.objects.create(name='b', order=3)
+        qs1 = ReservedName.objects.all()
+        intersection = qs1.intersection(qs1)
+        # First call with two fields
+        result1 = intersection.values_list('name', 'order').get()
+        self.assertEqual(result1, ('b', 3))
+        # Second call with different fields - should return only one field
+        result2 = intersection.values_list('order').get()
+        self.assertEqual(result2, (3,))
+
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_difference_multiple_values_list(self):
+        # Test that calling values_list() multiple times on the same
+        # composed query properly changes the columns.
+        ReservedName.objects.create(name='c', order=4)
+        qs1 = ReservedName.objects.all()
+        qs2 = ReservedName.objects.none()
+        difference = qs1.difference(qs2)
+        # First call with two fields
+        result1 = difference.values_list('name', 'order').get()
+        self.assertEqual(result1, ('c', 4))
+        # Second call with different fields - should return only one field
+        result2 = difference.values_list('order').get()
+        self.assertEqual(result2, (4,))
+
+    def test_union_multiple_values(self):
+        # Test that calling values() multiple times on the same
+        # composed query properly changes the columns.
+        ReservedName.objects.create(name='d', order=5)
+        qs1 = ReservedName.objects.all()
+        union = qs1.union(qs1)
+        # First call with two fields
+        result1 = union.values('name', 'order').get()
+        self.assertEqual(result1, {'name': 'd', 'order': 5})
+        # Second call with different fields - should return only one field
+        result2 = union.values('order').get()
+        self.assertEqual(result2, {'order': 5})
+
     def test_union_with_two_annotated_values_list(self):
         qs1 = Number.objects.filter(num=1).annotate(
             count=Value(0, IntegerField()),

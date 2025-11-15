@@ -424,8 +424,18 @@ class SQLCompiler:
             try:
                 # If the columns list is limited, then all combined queries
                 # must have the same columns list. Set the selects defined on
-                # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
+                # the query on all combined queries. Update combined queries
+                # if the values_select differs to allow values()/values_list()
+                # to be called multiple times on the combined query, but only
+                # if both queries use the same model.
+                if (
+                    self.query.values_select and
+                    compiler.query.model == self.query.model and
+                    (
+                        not compiler.query.values_select or
+                        compiler.query.values_select != self.query.values_select
+                    )
+                ):
                     compiler.query.set_values((
                         *self.query.extra_select,
                         *self.query.values_select,
