@@ -159,3 +159,20 @@ class FeedgeneratorTests(SimpleTestCase):
             str(stylesheet), 'href="test.css" type="text/css" media="screen"'
         )
         m.assert_called_once()
+
+    def test_stylesheet_attribute_escaping(self):
+        """
+        Stylesheet.__str__() should escape attribute values.
+        """
+        style = feedgenerator.Stylesheet(
+            url='http://example.com/style.css?foo="bar"&baz=<>',
+            mimetype='text/css; charset="utf-8"',
+            media='screen and (max-width: "600px")',
+        )
+
+        self.assertEqual(
+            str(style),
+            'href="http://example.com/style.css?foo=%22bar%22&amp;baz=%3C%3E" '
+            'type="text/css; charset=&quot;utf-8&quot;" '
+            'media="screen and (max-width: &quot;600px&quot;)"',
+        )
