@@ -157,6 +157,16 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registreren/')
             # path() URL pattern
             self.assertEqual(translate_url('/en/account/register-as-path/', 'nl'), '/nl/profiel/registreren-als-pad/')
+            # URL with optional parameter missing
+            self.assertEqual(
+                translate_url('/en/with-arguments/regular-argument/', 'nl'),
+                '/nl/with-arguments/regular-argument/',
+            )
+            # URL with optional parameter present
+            self.assertEqual(
+                translate_url('/en/with-arguments/regular-argument/optional.html', 'nl'),
+                '/nl/with-arguments/regular-argument/optional.html',
+            )
             self.assertEqual(translation.get_language(), 'en')
 
         with translation.override('nl'):
