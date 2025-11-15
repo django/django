@@ -516,6 +516,9 @@ class CheckReferrerPolicyTest(SimpleTestCase):
         SECURE_REFERRER_POLICY=None,
     )
     def test_no_referrer_policy(self):
+        """
+        Warn when SECURE_REFERRER_POLICY is explicitly set to None.
+        """
         self.assertEqual(self.func(None), [base.W022])
 
     @override_settings(MIDDLEWARE=[], SECURE_REFERRER_POLICY=None)
