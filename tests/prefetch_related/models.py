@@ -295,3 +295,19 @@ class Flea(models.Model):
     current_room = models.ForeignKey(Room, models.SET_NULL, related_name='fleas', null=True)
     pets_visited = models.ManyToManyField(Pet, related_name='fleas_hosted')
     people_visited = models.ManyToManyField(Person, related_name='fleas_hosted')
+
+
+# Models for UUID primary key with GenericForeignKey tests:
+
+class UUIDItem(models.Model):
+    """Model with UUID primary key to be referenced by GenericForeignKey."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+
+
+class TaggedUUIDItem(models.Model):
+    """Model with GenericForeignKey pointing to UUIDItem."""
+    tag = models.CharField(max_length=50)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    object_id = models.CharField(max_length=255)
+    content_object = GenericForeignKey('content_type', 'object_id')
