@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from django.utils.deprecation import django_file_prefixes
 
 from .config import AppConfig
 
@@ -228,7 +229,7 @@ class Apps:
                     "advised as it can lead to inconsistencies, most notably with "
                     "related models." % (app_label, model_name),
                     RuntimeWarning,
-                    stacklevel=2,
+                    skip_file_prefixes=django_file_prefixes(),
                 )
             else:
                 raise RuntimeError(
