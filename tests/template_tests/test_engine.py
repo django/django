@@ -21,6 +21,44 @@ class RenderToStringTest(SimpleTestCase):
             'obj:test\n',
         )
 
+    def test_autoescape_off(self):
+        """
+        The Engine.render_to_string() method should honor the autoescape
+        attribute of the engine.
+        """
+        engine_with_autoescape_off = Engine(
+            dirs=[TEMPLATE_DIR],
+            autoescape=False,
+        )
+        # Create a simple template string with HTML that would normally be escaped
+        template_content = '{{ var }}'
+
+        # Save a template file for this test
+        template_name = 'test_autoescape.html'
+        template_path = os.path.join(TEMPLATE_DIR, template_name)
+
+        try:
+            with open(template_path, 'w') as f:
+                f.write(template_content)
+
+            # Test with autoescape=False - HTML should NOT be escaped
+            output = engine_with_autoescape_off.render_to_string(
+                template_name,
+                {'var': '<b>test</b>'}
+            )
+            self.assertEqual(output, '<b>test</b>')
+
+            # Test with default autoescape=True - HTML should be escaped
+            output_escaped = self.engine.render_to_string(
+                template_name,
+                {'var': '<b>test</b>'}
+            )
+            self.assertEqual(output_escaped, '&lt;b&gt;test&lt;/b&gt;')
+        finally:
+            # Clean up the test template file
+            if os.path.exists(template_path):
+                os.remove(template_path)
+
 
 class GetDefaultTests(SimpleTestCase):
 
