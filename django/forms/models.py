@@ -39,18 +39,40 @@ def construct_instance(form, instance, fields=None, exclude=None):
     cleaned_data = form.cleaned_data
     file_field_list = []
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) \
-                or f.name not in cleaned_data:
+        if not f.editable or isinstance(f, models.AutoField):
             continue
+        # Skip if field is not in cleaned_data
+        if f.name not in cleaned_data:
+            # If field is not in cleaned_data, respect fields/exclude restrictions
+            if fields is not None and f.name not in fields:
+                continue
+            if exclude and f.name in exclude:
+                continue
+            continue
+        # Field is in cleaned_data - check if we should use it
         if fields is not None and f.name not in fields:
-            continue
-        if exclude and f.name in exclude:
+            # Field not in form's fields list but is in cleaned_data.
+            # Allow it only if the field is also not in the form's field list
+            # (meaning it was added to cleaned_data in clean()).
+            if f.name not in form.fields:
+                # Field added in clean(), use it
+                pass
+            else:
+                # Field is in form but excluded via fields parameter, skip it
+                continue
+        elif exclude and f.name in exclude:
             continue
         # Leave defaults for fields that aren't in POST data, except for
         # checkbox inputs because they don't appear in POST data if not checked.
-        if (f.has_default() and
-                form[f.name].field.widget.value_omitted_from_data(form.data, form.files, form.add_prefix(f.name))):
-            continue
+        # Also check if cleaned_data has a non-empty value - if so, use it even
+        # if the field wasn't in POST data (it may have been set in clean()).
+        elif f.name in form.fields:
+            form_field = form[f.name].field
+            if (f.has_default() and
+                    form_field.widget.value_omitted_from_data(
+                        form.data, form.files, form.add_prefix(f.name)) and
+                    cleaned_data[f.name] in form_field.empty_values):
+                continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, models.FileField):

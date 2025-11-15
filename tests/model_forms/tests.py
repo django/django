@@ -704,6 +704,55 @@ class ModelFormBaseTest(TestCase):
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.date_published, datetime.date(2010, 1, 1))
 
+    def test_cleaned_data_overrides_default(self):
+        """
+        Test that cleaned_data can override a field's default value when the
+        field is not included in the form but added via clean().
+        """
+        class PubForm(forms.ModelForm):
+            class Meta:
+                model = PublicationDefaults
+                fields = ('title',)  # 'mode' is not in the form
+
+            def clean(self):
+                # Add 'mode' to cleaned_data with a value different from the default
+                # This simulates deriving a field's value from other fields
+                self.cleaned_data['mode'] = 'de'
+                return self.cleaned_data
+
+        # Only 'title' is in POST data, 'mode' is not in the form
+        # The clean() method adds mode to cleaned_data
+        mf = PubForm({'title': 'Test Publication'})
+        self.assertEqual(mf.errors, {})
+        m = mf.save(commit=False)
+        # The cleaned_data value 'de' should override the default 'di'
+        self.assertEqual(m.mode, 'de')
+
+    def test_cleaned_data_overrides_default_in_form_field(self):
+        """
+        Test that cleaned_data can override a field's default value even when
+        the field is in the form but not in POST data.
+        """
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(max_length=2, required=False)
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('title', 'mode')
+
+            def clean(self):
+                # Modify 'mode' in cleaned_data even though it wasn't in POST
+                self.cleaned_data['mode'] = 'de'
+                return self.cleaned_data
+
+        # Only 'title' is in POST data, 'mode' is not
+        # The clean() method sets mode to 'de' via cleaned_data
+        mf = PubForm({'title': 'Test Publication'})
+        self.assertEqual(mf.errors, {})
+        m = mf.save(commit=False)
+        # The cleaned_data value 'de' should override the default 'di'
+        self.assertEqual(m.mode, 'de')
+
 
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
