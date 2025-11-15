@@ -28,6 +28,7 @@ import mimetypes
 from io import StringIO
 from urllib.parse import urlparse
 
+from django.forms.utils import flatatt
 from django.utils.encoding import iri_to_uri
 from django.utils.xmlutils import SimplerXMLGenerator
 
@@ -94,12 +95,12 @@ class Stylesheet:
         return self._mimetype
 
     def __str__(self):
-        data = [f'href="{self.url}"']
-        if self.mimetype is not None:
-            data.append(f'type="{self.mimetype}"')
-        if self.media is not None:
-            data.append(f'media="{self.media}"')
-        return " ".join(data)
+        attrs = {
+            "href": iri_to_uri(self._url),
+            "type": self.mimetype,
+            "media": self.media,
+        }
+        return flatatt(attrs).strip()
 
     def __repr__(self):
         return repr((self.url, self.mimetype, self.media))
