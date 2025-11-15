@@ -29,6 +29,7 @@ from io import StringIO
 from urllib.parse import urlparse
 
 from django.utils.encoding import iri_to_uri
+from django.utils.html import escape
 from django.utils.xmlutils import SimplerXMLGenerator
 
 
@@ -95,11 +96,15 @@ class Stylesheet:
         return self._mimetype
 
     def __str__(self):
-        data = [f'href="{self.url}"']
-        if self.mimetype is not None:
-            data.append(f'type="{self.mimetype}"')
-        if self.media is not None:
-            data.append(f'media="{self.media}"')
+        url = escape(iri_to_uri(self._url))
+        mimetype = escape(self.mimetype) if self.mimetype is not None else None
+        media = escape(self.media) if self.media is not None else None
+
+        data = [f'href="{url}"']
+        if mimetype is not None:
+            data.append(f'type="{mimetype}"')
+        if media is not None:
+            data.append(f'media="{media}"')
         return " ".join(data)
 
     def __repr__(self):
