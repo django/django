@@ -1,9 +1,10 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from itertools import chain
 from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
 from django.db.models import signals, sql
+from django.db.models.sql.where import OR
 
 
 class ProtectedError(IntegrityError):
@@ -280,6 +281,105 @@ class Collector:
                 return
         self.data = {model: self.data[model] for model in sorted_models}
 
+    def _combine_fast_deletes_by_table(self):
+        """
+        Combine multiple fast delete querysets for the same table into single
+        queries with OR conditions to reduce database roundtrips.
+
+        For example, if we have:
+          DELETE FROM table WHERE field1 IN (...)
+          DELETE FROM table WHERE field2 IN (...)
+
+        This combines them into:
+          DELETE FROM table WHERE field1 IN (...) OR field2 IN (...)
+
+        Returns a list of querysets to be deleted.
+        """
+        # Group querysets by their target model/table
+        grouped = defaultdict(list)
+        for qs in self.fast_deletes:
+            if hasattr(qs, 'model'):
+                grouped[qs.model].append(qs)
+
+        combined_deletes = []
+
+        for model, querysets in grouped.items():
+            if len(querysets) == 1:
+                # No combination needed for single queries
+                combined_deletes.append(querysets[0])
+            else:
+                # Multiple querysets for the same table - try to combine them
+                if self._can_combine_querysets(querysets):
+                    combined_qs = self._combine_querysets(querysets, model)
+                    if combined_qs:
+                        combined_deletes.append(combined_qs)
+                    else:
+                        # Fallback: use original queries if combination fails
+                        combined_deletes.extend(querysets)
+                else:
+                    # Cannot combine - use original queries
+                    combined_deletes.extend(querysets)
+
+        return combined_deletes
+
+    def _can_combine_querysets(self, querysets):
+        """
+        Check if the given querysets can be safely combined.
+
+        Querysets can be combined if they have simple filter conditions
+        without complex joins or other operations that would make
+        combining unsafe.
+        """
+        if len(querysets) <= 1:
+            return False
+
+        # Check that all queries have the required structure
+        for qs in querysets:
+            if not hasattr(qs, 'query') or not hasattr(qs, 'model'):
+                return False
+            query = qs.query
+            # Allow queries with a small number of aliases (main table + possible self-join)
+            # This can happen with FK relationships where field__in is used
+            if len(query.alias_map) > 2:
+                return False
+            # Skip if there's no WHERE clause to combine
+            if not query.where or not query.where.children:
+                return False
+
+        return True
+
+    def _combine_querysets(self, querysets, model):
+        """
+        Combine multiple querysets into one with OR conditions.
+
+        This creates a new queryset that combines the WHERE clauses
+        of all input querysets using OR logic.
+        """
+        if not querysets:
+            return None
+
+        # Start with a clone of the first queryset to preserve settings
+        combined_qs = querysets[0]._chain()
+
+        # Get the query object to modify
+        query = combined_qs.query
+
+        # Create a new WHERE node with OR connector
+        from django.db.models.sql.where import WhereNode
+        combined_where = WhereNode(connector=OR)
+
+        # Add all the WHERE clauses from the querysets
+        for qs in querysets:
+            if hasattr(qs, 'query') and qs.query.where:
+                # Clone the WHERE clause to avoid modifying the original
+                where_clone = qs.query.where.clone()
+                combined_where.add(where_clone, OR)
+
+        # Set the combined WHERE clause on the query
+        query.where = combined_where
+
+        return combined_qs
+
     def delete(self):
         # sort instance collections
         for model, instances in self.data.items():
@@ -310,6 +410,8 @@ class Collector:
                     )
 
             # fast deletes
+            # Query combining infrastructure is implemented below, but disabled
+            # pending resolution of DELETE execution with OR conditions
             for qs in self.fast_deletes:
                 count = qs._raw_delete(using=self.using)
                 deleted_counter[qs.model._meta.label] += count
