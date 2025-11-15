@@ -63,10 +63,33 @@ class ResolverMatch:
         )
 
 
-@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
+    """
+    Return a URLResolver for the given URLconf.
+
+    If urlconf is None, use settings.ROOT_URLCONF. This normalization happens
+    before the cached function call to ensure that get_resolver(None) and
+    get_resolver(settings.ROOT_URLCONF) return the same cached instance.
+
+    This optimization prevents multiple URLResolver instances from being
+    created when get_resolver is called both before (e.g., at import time with
+    None) and after (with explicit settings.ROOT_URLCONF) request handling.
+    Since URLResolver._populate() can be expensive for applications with many
+    routes, avoiding duplicate instances saves significant resources.
+    """
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
+    return _get_resolver_cached(urlconf)
+
+
+@functools.lru_cache(maxsize=None)
+def _get_resolver_cached(urlconf):
+    """
+    Internal cached function that creates URLResolver instances.
+
+    This is separated from get_resolver() to allow urlconf normalization
+    (None -> settings.ROOT_URLCONF) to happen before caching.
+    """
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
 
