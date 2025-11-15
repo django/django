@@ -658,9 +658,6 @@ input[type="submit"], button {
         padding: 10px;
         border-top-width: 0;
         border-bottom-width: 2px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 .inline_label {
