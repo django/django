@@ -126,3 +126,8 @@ class Base(models.Model):
 
 class RelToBase(models.Model):
     base = models.ForeignKey(Base, models.DO_NOTHING)
+
+
+class Origin(models.Model):
+    """Model with no reverse relations and no dependencies."""
+    name = models.CharField(max_length=100)

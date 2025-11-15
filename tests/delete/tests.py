@@ -6,7 +6,7 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
-    M2MTo, MRNull, Parent, R, RChild, S, T, User, create_a, get_default_r,
+    M2MTo, MRNull, Origin, Parent, R, RChild, S, T, User, create_a, get_default_r,
 )
 
 
@@ -522,3 +522,15 @@ class FastDeleteTests(TestCase):
                 User.objects.filter(avatar__desc='missing').delete(),
                 (0, {'delete.User': 0})
             )
+
+    def test_fast_delete_instance_set_pk_to_none(self):
+        """
+        Test that deleting an instance with no dependencies clears its PK.
+        """
+        # Origin model has no dependencies, should use fast delete path
+        origin = Origin.objects.create(name='test')
+        origin_pk = origin.pk
+        self.assertIsNotNone(origin_pk)
+        origin.delete()
+        # After delete, pk should be None
+        self.assertIsNone(origin.pk)
