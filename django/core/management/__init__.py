@@ -136,6 +136,18 @@ def call_command(command_name, *args, **options):
         '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
         for opt in parser_actions if opt.required and opt.dest in options
     ]
+    # Handle mutually exclusive groups with required=True.
+    for group in parser._mutually_exclusive_groups:
+        if group.required:
+            # If any option from this group is in options, pass it to parse_args().
+            for opt in group._group_actions:
+                if opt.dest in arg_options and opt.option_strings:
+                    option_string = '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
+                    # Avoid duplicates
+                    if option_string not in parse_args:
+                        parse_args.append(option_string)
+                    # Only add one option from the mutually exclusive group
+                    break
     defaults = parser.parse_args(args=parse_args)
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.

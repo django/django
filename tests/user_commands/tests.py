@@ -254,6 +254,71 @@ class CommandTests(SimpleTestCase):
         parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
         self.assertEqual(parser.epilog, epilog)
 
+    def test_call_command_with_required_mutually_exclusive_group(self):
+        """
+        call_command() should work when an argument from a required mutually
+        exclusive group is passed in kwargs.
+        """
+        out = StringIO()
+        # Test passing shop_id as kwarg
+        management.call_command('mutually_exclusive', shop_id=1, stdout=out)
+        self.assertIn('1', out.getvalue())
+        self.assertIn('None', out.getvalue())
+
+        # Reset StringIO
+        out = StringIO()
+        # Test passing shop_name as kwarg
+        management.call_command('mutually_exclusive', shop_name='my_shop', stdout=out)
+        self.assertIn('None', out.getvalue())
+        self.assertIn('my_shop', out.getvalue())
+
+    def test_call_command_with_required_mutually_exclusive_group_as_string_arg(self):
+        """
+        call_command() works when an argument from a required mutually
+        exclusive group is passed as a string argument.
+        """
+        out = StringIO()
+        # Test passing shop_id as string argument
+        management.call_command('mutually_exclusive', '--shop-id=1', stdout=out)
+        self.assertIn('1', out.getvalue())
+        self.assertIn('None', out.getvalue())
+
+        # Reset StringIO
+        out = StringIO()
+        # Test passing shop as string argument
+        management.call_command('mutually_exclusive', '--shop=my_shop', stdout=out)
+        self.assertIn('None', out.getvalue())
+        self.assertIn('my_shop', out.getvalue())
+
+    def test_call_command_without_required_mutually_exclusive_group(self):
+        """
+        call_command() should raise an error when no argument from a required
+        mutually exclusive group is provided.
+        """
+        msg = 'Error: one of the arguments --shop-id --shop is required'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('mutually_exclusive', stdout=StringIO())
+
+    def test_call_command_with_optional_mutually_exclusive_group(self):
+        """
+        call_command() should work with optional (non-required) mutually
+        exclusive groups.
+        """
+        out = StringIO()
+        # Test with no arguments (should work since group is optional)
+        management.call_command('mutually_exclusive_optional', stdout=out)
+        self.assertIn('None', out.getvalue())
+
+        # Test with option_a as kwarg
+        out = StringIO()
+        management.call_command('mutually_exclusive_optional', option_a='value_a', stdout=out)
+        self.assertIn('value_a', out.getvalue())
+
+        # Test with option_b as kwarg
+        out = StringIO()
+        management.call_command('mutually_exclusive_optional', option_b='value_b', stdout=out)
+        self.assertIn('value_b', out.getvalue())
+
 
 class CommandRunTests(AdminScriptTestCase):
     """
