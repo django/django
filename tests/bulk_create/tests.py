@@ -305,3 +305,27 @@ class BulkCreateTests(TestCase):
         # Without ignore_conflicts=True, there's a problem.
         with self.assertRaises(IntegrityError):
             TwoFields.objects.bulk_create(conflicting_objects)
+
+    def test_batch_size_respects_max_batch_size(self):
+        """
+        Test that when batch_size is provided, it doesn't exceed the
+        max_batch_size calculated by the backend (e.g., SQLite has limits).
+        """
+        # Create a large batch of objects
+        objs = [TwoFields(f1=i, f2=i + 1000) for i in range(0, 100)]
+
+        # Get the max_batch_size for this database
+        fields = TwoFields._meta.concrete_fields
+        max_batch_size = connection.ops.bulk_batch_size(fields, objs)
+
+        # Try to use a batch_size larger than max_batch_size
+        # This should work without errors because the code should use
+        # min(batch_size, max_batch_size)
+        TwoFields.objects.bulk_create(objs, batch_size=max_batch_size + 1000)
+        self.assertEqual(TwoFields.objects.count(), 100)
+
+        TwoFields.objects.all().delete()
+
+        # Also verify it works with batch_size smaller than max_batch_size
+        TwoFields.objects.bulk_create(objs, batch_size=10)
+        self.assertEqual(TwoFields.objects.count(), 100)
