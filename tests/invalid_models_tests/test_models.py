@@ -893,6 +893,50 @@ class OtherModelTests(SimpleTestCase):
         with register_lookup(models.CharField, Lower):
             self.assertEqual(Model.check(), [])
 
+    def test_ordering_with_lookups_on_related_fields(self):
+        """
+        Ordering can use lookups (e.g., isnull) on related fields.
+        Regression test for #29408.
+        """
+        class Product(models.Model):
+            parent = models.ForeignKey('self', models.CASCADE, null=True)
+
+        class Supply(models.Model):
+            product = models.ForeignKey(Product, models.CASCADE)
+
+        class Stock(models.Model):
+            supply = models.ForeignKey(Supply, models.CASCADE)
+
+            class Meta:
+                ordering = ('supply__product__parent__isnull',)
+
+        self.assertEqual(Stock.check(), [])
+
+    def test_ordering_with_invalid_lookup_on_related_field(self):
+        """
+        Invalid lookups on related fields should still raise errors.
+        """
+        class Product(models.Model):
+            parent = models.ForeignKey('self', models.CASCADE, null=True)
+
+        class Supply(models.Model):
+            product = models.ForeignKey(Product, models.CASCADE)
+
+        class Stock(models.Model):
+            supply = models.ForeignKey(Supply, models.CASCADE)
+
+            class Meta:
+                ordering = ('supply__product__parent__nonexistent',)
+
+        self.assertEqual(Stock.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'supply__product__parent__nonexistent'.",
+                obj=Stock,
+                id='models.E015',
+            ),
+        ])
+
     def test_ordering_pointing_to_related_model_pk(self):
         class Parent(models.Model):
             pass
