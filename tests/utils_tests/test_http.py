@@ -325,8 +325,45 @@ class HttpDateProcessingTests(unittest.TestCase):
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
     def test_parsing_year_less_than_70(self):
+        # This test may fail in the distant future when 0037 is more than
+        # 50 years in the past. The logic dynamically adjusts based on the
+        # current year.
         parsed = parse_http_date('Sun Nov  6 08:49:37 0037')
+        # As of 2025, year 37 should be interpreted as 2037 (not more than 50 years in future)
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2037, 11, 6, 8, 49, 37))
+
+    def test_parsing_rfc850_two_digit_year_current_century(self):
+        # Test two-digit year that should be in the current century
+        # Using year 24 which should be 2024 (close to current year 2025)
+        parsed = parse_http_date('Wednesday, 06-Nov-24 08:49:37 GMT')
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2024, 11, 6, 8, 49, 37))
+
+    def test_parsing_rfc850_two_digit_year_previous_century(self):
+        # Test two-digit year that should be in the previous century
+        # Using year 94 which should be 1994 (would be 2094 if interpreted
+        # as current century, which is more than 50 years in the future)
+        parsed = parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
+        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+
+    def test_parsing_rfc850_two_digit_year_boundary(self):
+        # Test the boundary: a year that's approximately 50 years in the future
+        # As of 2025, year 75 should be 2075 (exactly 50 years in future, <= 50)
+        # but year 76 should be 1976 (would be 2076, which is > 50 years in future)
+        current_year = datetime.utcnow().year
+
+        # Test a year just within the 50-year window (should be future)
+        future_year_2digit = (current_year + 50) % 100
+        date_str = 'Wednesday, 06-Nov-%02d 08:49:37 GMT' % future_year_2digit
+        parsed = parse_http_date(date_str)
+        expected_year = current_year + 50
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
+
+        # Test a year just outside the 50-year window (should be past)
+        past_year_2digit = (current_year + 51) % 100
+        date_str = 'Thursday, 07-Nov-%02d 08:49:37 GMT' % past_year_2digit
+        parsed = parse_http_date(date_str)
+        expected_year = current_year + 51 - 100
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
 
 
 class EscapeLeadingSlashesTests(unittest.TestCase):
