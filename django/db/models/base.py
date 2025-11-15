@@ -399,6 +399,8 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    # Tracks whether the pk value came from the field's default during initialization
+    pk_from_default = False
 
 
 class Model(metaclass=ModelBase):
@@ -414,6 +416,22 @@ class Model(metaclass=ModelBase):
 
         # Set up the storage for instance state
         self._state = ModelState()
+
+        # Check if 'pk' was explicitly provided in kwargs or args before processing fields.
+        # This is needed to correctly track whether the primary key value came from
+        # the field's default or was explicitly set by the user.
+        pk_explicitly_provided = 'pk' in kwargs or opts.pk.attname in kwargs or opts.pk.name in kwargs
+        # Check if pk was provided as a positional argument
+        if args:
+            # Find the position of the pk field in concrete_fields
+            pk_position = None
+            for i, field in enumerate(opts.concrete_fields):
+                if field.primary_key:
+                    pk_position = i
+                    break
+            # If pk field position is within the provided args, it was explicitly provided
+            if pk_position is not None and pk_position < len(args):
+                pk_explicitly_provided = True
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
@@ -450,6 +468,8 @@ class Model(metaclass=ModelBase):
             # Virtual field
             if field.attname not in kwargs and field.column is None:
                 continue
+            # Track if this field's value came from get_default()
+            from_default = False
             if kwargs:
                 if isinstance(field.remote_field, ForeignObjectRel):
                     try:
@@ -462,6 +482,7 @@ class Model(metaclass=ModelBase):
                             val = kwargs.pop(field.attname)
                         except KeyError:
                             val = field.get_default()
+                            from_default = True
                 else:
                     try:
                         val = kwargs.pop(field.attname)
@@ -471,8 +492,15 @@ class Model(metaclass=ModelBase):
                         # get_default() to be evaluated, and then not used.
                         # Refs #12057.
                         val = field.get_default()
+                        from_default = True
             else:
                 val = field.get_default()
+                from_default = True
+
+            # Track if the primary key value came from the default.
+            # Only set this if the pk was not explicitly provided in kwargs.
+            if field.primary_key and from_default and not pk_explicitly_provided:
+                self._state.pk_from_default = True
 
             if is_related_object:
                 # If we are passed a related instance, set it using the
@@ -847,12 +875,14 @@ class Model(metaclass=ModelBase):
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
-        # Skip an UPDATE when adding an instance and primary key has a default.
+        # Skip an UPDATE when adding an instance and primary key has a default,
+        # but only if the pk value came from the default during initialization.
         if (
             not force_insert and
             self._state.adding and
             self._meta.pk.default and
-            self._meta.pk.default is not NOT_PROVIDED
+            self._meta.pk.default is not NOT_PROVIDED and
+            self._state.pk_from_default
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.

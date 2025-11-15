@@ -139,6 +139,58 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_with_explicit_pk_when_pk_has_default(self):
+        """
+        When saving a model instance with an explicit pk value that already
+        exists in the database, it should perform an UPDATE, not an INSERT,
+        even if the pk field has a default value.
+        Regression test for issue where Django 3.0+ incorrectly tries to
+        INSERT instead of UPDATE when pk field has a default.
+        """
+        # Create an initial instance
+        obj1 = PrimaryKeyWithDefault.objects.create()
+        initial_pk = obj1.pk
+
+        # Create a new instance with the same explicit pk
+        obj2 = PrimaryKeyWithDefault(pk=initial_pk)
+        obj2.uuid = initial_pk  # Explicitly set the pk
+
+        # This should perform an UPDATE, not an INSERT
+        obj2.save()
+
+        # Verify there's still only one object
+        self.assertEqual(PrimaryKeyWithDefault.objects.count(), 1)
+        self.assertEqual(PrimaryKeyWithDefault.objects.get().pk, initial_pk)
+
+    def test_save_with_explicit_pk_after_objects_create(self):
+        """
+        Test the exact scenario from the ticket:
+        After creating an object, creating a new instance with the explicit pk
+        of the existing object should perform an UPDATE, not an INSERT.
+        This is particularly important for loaddata to work correctly when
+        loading fixtures multiple times.
+        """
+        # This mirrors the scenario from the ticket description:
+        # s0 = Sample.objects.create()
+        s0 = PrimaryKeyWithDefault.objects.create()
+
+        # s1 = Sample(pk=s0.pk, name='Test 1')
+        # Since PrimaryKeyWithDefault doesn't have a name field,
+        # we'll just test with the pk
+        s1 = PrimaryKeyWithDefault(pk=s0.pk)
+
+        # s1.save()
+        # In Django 2.2 and earlier, this would result in an INSERT followed by an UPDATE.
+        # In Django 3.0+ with the bug, this would result in two INSERTs (second one fails).
+        # With our fix, this should attempt UPDATE first, which succeeds.
+        s1.save()
+
+        # Verify that there's still only one object in the database
+        self.assertEqual(PrimaryKeyWithDefault.objects.count(), 1)
+
+        # Verify the pk hasn't changed
+        self.assertEqual(s1.pk, s0.pk)
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
