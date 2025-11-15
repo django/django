@@ -247,6 +247,9 @@ Models
   top-level or nested JSON ``null`` values. See
   :ref:`storing-and-querying-for-none` for usage examples and some caveats.
 
+* The new :class:`~django.db.models.functions.UUID4` and
+  :class:`~django.db.models.functions.UUID7` database functions were added.
+
 Pagination
 ~~~~~~~~~~
 
@@ -374,6 +377,10 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* :class:`~django.contrib.postgres.functions.RandomUUID` is deprecated (except
+  in historical migrations). Use :class:`~django.db.models.functions.UUID4`
+  instead.
 
 Features removed in 6.1
 =======================
