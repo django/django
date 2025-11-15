@@ -1666,6 +1666,7 @@ class Query(BaseExpression):
             filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)
+        query._filtered_relations = self._filtered_relations.copy()
         query.add_filter(filter_expr)
         query.clear_ordering(True)
         # Try to have as simple as possible subquery -> trim leading joins from
@@ -2150,6 +2151,14 @@ class Query(BaseExpression):
                 self.where_class, None, lookup_tables[trimmed_paths + 1])
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
+            # Add filtered relation conditions to WHERE if the trimmed join had one
+            trimmed_join = self.alias_map.get(lookup_tables[trimmed_paths + 1])
+            if trimmed_join and trimmed_join.filtered_relation:
+                filtered_relation_condition = self.build_filtered_relation_q(
+                    trimmed_join.filtered_relation.condition,
+                    reuse={select_alias}
+                )
+                self.where.add(filtered_relation_condition, AND)
         else:
             # TODO: It might be possible to trim more joins from the start of the
             # inner query if it happens to have a longer join chain containing the

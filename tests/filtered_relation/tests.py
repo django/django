@@ -98,6 +98,28 @@ class FilteredRelationTests(TestCase):
             [self.author1]
         )
 
+    def test_with_join_exclude(self):
+        # Test that exclude() works correctly with FilteredRelation
+        # by ensuring FieldError doesn't occur and results are correct
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice')),
+            ).exclude(book_alice__isnull=False).order_by('pk'),
+            [self.author2]
+        )
+
+    def test_with_join_exclude_complex(self):
+        # Test exclude() with complex FilteredRelation condition
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                book_complex=FilteredRelation(
+                    'book',
+                    condition=Q(book__title__icontains='alice') & Q(book__editor=self.editor_a)
+                ),
+            ).exclude(book_complex__isnull=False).order_by('pk'),
+            [self.author2]
+        )
+
     def test_with_join_and_complex_condition(self):
         self.assertSequenceEqual(
             Author.objects.annotate(
