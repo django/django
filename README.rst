@@ -50,3 +50,10 @@ Supporting the Development of Django
 Django's development depends on your contributions.
 
 If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/
+
+----
+
+In Python's embrace, Django stands tall and bright,
+Building web apps with grace, from morning until night,
+With models, views, and templates, creating with delight,
+Empowering developers worldwide, making complex simple and light.
