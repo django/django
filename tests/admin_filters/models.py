@@ -77,3 +77,20 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class ImplicitlyOrderedBook(models.Model):
+    title = models.CharField(max_length=50)
+    author = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        verbose_name="Verbose Author",
+        related_name='implicit_books_authored',
+        blank=True, null=True,
+    )
+
+    class Meta:
+        ordering = ('title',)
+
+    def __str__(self):
+        return self.title

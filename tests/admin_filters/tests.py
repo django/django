@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from .models import Book, Bookmark, Department, Employee, TaggedItem
+from .models import Book, Bookmark, Department, Employee, ImplicitlyOrderedBook, TaggedItem
 
 
 def select_by(dictlist, key, value):
@@ -1253,3 +1253,80 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         changelist.get_results(request)
         self.assertEqual(changelist.full_result_count, 4)
+
+    def test_relatedfieldlistfilter_foreignkey_ordering_fallback_to_model_meta(self):
+        """
+        RelatedFieldListFilter ordering falls back to the related model's
+        Meta.ordering when there's no ModelAdmin registered for it.
+        """
+        # Create ImplicitlyOrderedBook instances with different titles
+        # to test that ordering uses Meta.ordering
+        ImplicitlyOrderedBook.objects.create(title='Zulu Book', author=self.alfred)
+        ImplicitlyOrderedBook.objects.create(title='Alpha Book', author=self.bob)
+        ImplicitlyOrderedBook.objects.create(title='Beta Book', author=self.lisa)
+
+        class ImplicitlyOrderedBookAdmin(ModelAdmin):
+            list_filter = ('author',)
+
+        modeladmin = ImplicitlyOrderedBookAdmin(ImplicitlyOrderedBook, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+
+        # User model doesn't have Meta.ordering, so should be ordered by pk
+        # which is the default behavior
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_foreignkey_ordering_with_model_admin(self):
+        """
+        RelatedOnlyFieldListFilter ordering respects ModelAdmin.ordering.
+        """
+        class EmployeeAdminWithOrdering(ModelAdmin):
+            ordering = ('name',)
+
+        class BookAdmin(ModelAdmin):
+            list_filter = (('employee', RelatedOnlyFieldListFilter),)
+
+        site.register(Employee, EmployeeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Employee))
+
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [(self.jack.pk, 'Jack Red'), (self.john.pk, 'John Blue')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_foreignkey_ordering_fallback_to_model_meta(self):
+        """
+        RelatedOnlyFieldListFilter ordering falls back to the related model's
+        Meta.ordering when there's no ModelAdmin registered for it.
+        """
+        # Create ImplicitlyOrderedBook instances
+        book1 = ImplicitlyOrderedBook.objects.create(title='Zulu Book', author=self.alfred)
+        book2 = ImplicitlyOrderedBook.objects.create(title='Alpha Book', author=self.bob)
+        book3 = ImplicitlyOrderedBook.objects.create(title='Beta Book', author=self.lisa)
+
+        class ImplicitlyOrderedBookAdmin(ModelAdmin):
+            list_filter = (('author', RelatedOnlyFieldListFilter),)
+
+        modeladmin = ImplicitlyOrderedBookAdmin(ImplicitlyOrderedBook, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+
+        # User model doesn't have Meta.ordering, so should be ordered by pk
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(filterspec.lookup_choices, expected)
