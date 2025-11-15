@@ -94,11 +94,31 @@ class TestNumberFormat(SimpleTestCase):
             ('1e-10', 8, '0.00000000'),
             ('1e-11', 8, '0.00000000'),
             ('1' + ('0' * 300), 3, '1.000e+300'),
-            ('0.{}1234'.format('0' * 299), 3, '1.234e-300'),
+            ('0.{}1234'.format('0' * 299), 3, '0.000'),
         ]
         for value, decimal_pos, expected_value in tests:
             with self.subTest(value=value):
                 self.assertEqual(nformat(Decimal(value), '.', decimal_pos), expected_value)
+
+    def test_small_decimal_with_decimal_pos(self):
+        """
+        Test that extremely small decimals return zero-padded strings
+        instead of exponential notation when decimal_pos is specified.
+        """
+        # Test case from the issue report
+        self.assertEqual(nformat(Decimal('1e-199'), '.', decimal_pos=2), '0.00')
+        self.assertEqual(nformat(Decimal('1e-200'), '.', decimal_pos=2), '0.00')
+        # Test with different decimal_pos values
+        self.assertEqual(nformat(Decimal('1e-201'), '.', decimal_pos=5), '0.00000')
+        self.assertEqual(nformat(Decimal('1e-999'), '.', decimal_pos=3), '0.000')
+        # Test negative small numbers
+        self.assertEqual(nformat(Decimal('-1e-200'), '.', decimal_pos=2), '-0.00')
+        self.assertEqual(nformat(Decimal('-1e-999'), '.', decimal_pos=4), '-0.0000')
+        # Test edge cases where number is at the boundary
+        self.assertEqual(nformat(Decimal('1e-2'), '.', decimal_pos=2), '0.01')
+        self.assertEqual(nformat(Decimal('1e-3'), '.', decimal_pos=2), '0.00')
+        # Ensure exponential notation is still used when decimal_pos is None
+        self.assertEqual(nformat(Decimal('1e-999'), '.', decimal_pos=None), '1e-999')
 
     def test_decimal_subclass(self):
         class EuroDecimal(Decimal):
