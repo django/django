@@ -241,3 +241,13 @@ def inclusion_extends1():
 @register.inclusion_tag('inclusion_extends2.html')
 def inclusion_extends2():
     return {}
+
+
+@register.inclusion_tag('inclusion.html')
+def inclusion_keyword_only_default(*, greeting='hello'):
+    return {"result": f'{greeting} world'}
+
+
+@register.inclusion_tag('inclusion.html')
+def inclusion_keyword_only_required(*, greeting):
+    return {"result": f'{greeting} world'}

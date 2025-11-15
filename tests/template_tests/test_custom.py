@@ -111,6 +111,50 @@ class SimpleTagTests(TagTestCase):
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
                 self.engine.from_string("%s as var %%}" % entry[1][0:-2])
 
+    def test_keyword_only_args_with_defaults(self):
+        """Test keyword-only arguments with default values work correctly."""
+        c = Context({})
+
+        # Test 1: keyword-only arg with default, using default value
+        t = self.engine.from_string('{% load custom %}{% simple_keyword_only_default_with_override %}')
+        self.assertEqual(t.render(c), 'hello world')
+
+        # Test 2: keyword-only arg with default, overriding with a value
+        t = self.engine.from_string('{% load custom %}{% simple_keyword_only_default_with_override greeting="hi" %}')
+        self.assertEqual(t.render(c), 'hi world')
+
+        # Test 3: Multiple keyword-only args with defaults
+        t = self.engine.from_string('{% load custom %}{% simple_multiple_keyword_only %}')
+        self.assertEqual(t.render(c), 'one=default1, two=default2')
+
+        # Test 4: Multiple keyword-only args, overriding one
+        t = self.engine.from_string('{% load custom %}{% simple_multiple_keyword_only one="custom1" %}')
+        self.assertEqual(t.render(c), 'one=custom1, two=default2')
+
+        # Test 5: Multiple keyword-only args, overriding both
+        t = self.engine.from_string('{% load custom %}{% simple_multiple_keyword_only one="custom1" two="custom2" %}')
+        self.assertEqual(t.render(c), 'one=custom1, two=custom2')
+
+        # Test 6: Mixed required and optional keyword-only args
+        t = self.engine.from_string('{% load custom %}{% simple_mixed_keyword_only required="test" %}')
+        self.assertEqual(t.render(c), 'required=test, optional=default')
+
+        # Test 7: Mixed required and optional keyword-only args, overriding optional
+        t = self.engine.from_string('{% load custom %}{% simple_mixed_keyword_only required="test" optional="custom" %}')
+        self.assertEqual(t.render(c), 'required=test, optional=custom')
+
+    def test_keyword_only_args_errors(self):
+        """Test proper error messages for keyword-only arguments."""
+        # Test 1: Duplicate keyword argument should give "multiple values" error
+        msg = "'simple_keyword_only_required' received multiple values for keyword argument 'greeting'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string('{% load custom %}{% simple_keyword_only_required greeting="hi" greeting="hello" %}')
+
+        # Test 2: Unexpected keyword argument should give proper error
+        msg = "'simple_keyword_only_default_with_override' received unexpected keyword argument 'invalid'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string('{% load custom %}{% simple_keyword_only_default_with_override invalid="test" %}')
+
     def test_simple_tag_escaping_autoescape_off(self):
         c = Context({'name': "Jack & Jill"}, autoescape=False)
         t = self.engine.from_string("{% load custom %}{% escape_naive %}")
@@ -220,6 +264,25 @@ class InclusionTagTests(TagTestCase):
         for entry in errors:
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
                 self.engine.from_string(entry[1])
+
+    def test_inclusion_keyword_only_args_with_defaults(self):
+        """Test inclusion tags with keyword-only arguments with default values."""
+        c = Context({})
+
+        # Test 1: keyword-only arg with default, using default value
+        t = self.engine.from_string('{% load inclusion %}{% inclusion_keyword_only_default %}')
+        self.assertEqual(t.render(c), 'hello world\n')
+
+        # Test 2: keyword-only arg with default, overriding with a value
+        t = self.engine.from_string('{% load inclusion %}{% inclusion_keyword_only_default greeting="hi" %}')
+        self.assertEqual(t.render(c), 'hi world\n')
+
+    def test_inclusion_keyword_only_args_errors(self):
+        """Test proper error messages for inclusion tags with keyword-only arguments."""
+        # Test: Duplicate keyword argument should give "multiple values" error
+        msg = "'inclusion_keyword_only_required' received multiple values for keyword argument 'greeting'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string('{% load inclusion %}{% inclusion_keyword_only_required greeting="hi" greeting="hello" %}')
 
     def test_include_tag_missing_context(self):
         # The 'context' parameter must be present when takes_context is True

@@ -99,6 +99,26 @@ def simple_keyword_only_default(*, kwarg=42):
 
 
 @register.simple_tag
+def simple_keyword_only_default_with_override(*, greeting='hello'):
+    return f'{greeting} world'
+
+
+@register.simple_tag
+def simple_keyword_only_required(*, greeting):
+    return f'{greeting} world'
+
+
+@register.simple_tag
+def simple_multiple_keyword_only(*, one='default1', two='default2'):
+    return f'one={one}, two={two}'
+
+
+@register.simple_tag
+def simple_mixed_keyword_only(*, required, optional='default'):
+    return f'required={required}, optional={optional}'
+
+
+@register.simple_tag
 def simple_one_default(one, two='hi'):
     """Expected simple_one_default __doc__"""
     return "simple_one_default - Expected result: %s, %s" % (one, two)
