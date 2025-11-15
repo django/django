@@ -184,6 +184,44 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
             'Hold down “Control”, or “Command” on a Mac, to select more than one.'
         )
 
+    def test_formfield_for_manytomany_widget_override(self):
+        """
+        The widget can be overridden in formfield_for_manytomany().
+        """
+        class BandAdmin(admin.ModelAdmin):
+            def formfield_for_manytomany(self, db_field, request, **kwargs):
+                if db_field.name == 'members':
+                    kwargs['widget'] = forms.CheckboxSelectMultiple
+                return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+        ma = BandAdmin(Band, admin.site)
+        ff = ma.formfield_for_dbfield(Band._meta.get_field('members'), request=None)
+        # Unwrap the widget wrapper if needed
+        if isinstance(ff.widget, widgets.RelatedFieldWidgetWrapper):
+            widget = ff.widget.widget
+        else:
+            widget = ff.widget
+        self.assertIsInstance(widget, forms.CheckboxSelectMultiple)
+
+    def test_formfield_for_foreignkey_widget_override(self):
+        """
+        The widget can be overridden in formfield_for_foreignkey().
+        """
+        class EventAdmin(admin.ModelAdmin):
+            def formfield_for_foreignkey(self, db_field, request, **kwargs):
+                if db_field.name == 'main_band':
+                    kwargs['widget'] = forms.RadioSelect
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+        ma = EventAdmin(Event, admin.site)
+        ff = ma.formfield_for_dbfield(Event._meta.get_field('main_band'), request=None)
+        # Unwrap the widget wrapper
+        if isinstance(ff.widget, widgets.RelatedFieldWidgetWrapper):
+            widget = ff.widget.widget
+        else:
+            widget = ff.widget
+        self.assertIsInstance(widget, forms.RadioSelect)
+
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
