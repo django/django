@@ -804,6 +804,33 @@ class TestInlinePermissions(TestCase):
             html=True,
         )
 
+    def test_inline_change_m2m_view_only_perm(self):
+        """
+        User with view-only permission on the related model should not be able
+        to add, change, or delete M2M relationships. Regression test for #31395.
+        """
+        permission = Permission.objects.get(codename='view_book', content_type=self.book_ct)
+        self.user.user_permissions.add(permission)
+        response = self.client.get(self.author_change_url)
+        # View-only permission on books, so no inline should be shown
+        self.assertNotContains(response, '<h2>Author-book relationships</h2>')
+        self.assertNotContains(response, 'Add another Author-Book Relationship')
+        self.assertNotContains(response, 'id="id_Author_books-TOTAL_FORMS"')
+        self.assertNotContains(response, 'id="id_Author_books-0-DELETE"')
+
+    def test_inline_add_m2m_view_only_perm(self):
+        """
+        User with view-only permission on the related model should not be able
+        to see the M2M inline on add views. Regression test for #31395.
+        """
+        permission = Permission.objects.get(codename='view_book', content_type=self.book_ct)
+        self.user.user_permissions.add(permission)
+        response = self.client.get(reverse('admin:admin_inlines_author_add'))
+        # View-only permission on books, so no inline should be shown
+        self.assertNotContains(response, '<h2>Author-book relationships</h2>')
+        self.assertNotContains(response, 'Add another Author-Book Relationship')
+        self.assertNotContains(response, 'id="id_Author_books-TOTAL_FORMS"')
+
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):

@@ -585,10 +585,20 @@ class ModelAdmin(BaseModelAdmin):
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
             if request:
-                if not (inline.has_view_or_change_permission(request, obj) or
-                        inline.has_add_permission(request, obj) or
-                        inline.has_delete_permission(request, obj)):
-                    continue
+                # For auto-created M2M intermediate models, the inline should only
+                # be shown if the user has change permission on the related model.
+                # View-only permission is not sufficient because the inline is for
+                # managing relationships, not just viewing the related objects.
+                if inline.opts.auto_created:
+                    if not (inline.has_add_permission(request, obj) or
+                            inline.has_change_permission(request, obj) or
+                            inline.has_delete_permission(request, obj)):
+                        continue
+                else:
+                    if not (inline.has_view_or_change_permission(request, obj) or
+                            inline.has_add_permission(request, obj) or
+                            inline.has_delete_permission(request, obj)):
+                        continue
                 if not inline.has_add_permission(request, obj):
                     inline.max_num = 0
             inline_instances.append(inline)
@@ -2115,27 +2125,51 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
-            # to have the view permission for the related model in order to
-            # be able to do anything with the intermediate model.
-            return self.has_view_permission(request, obj)
+            # to have the change permission for the related model in order to
+            # be able to add relationships to the intermediate model.
+            opts = self.opts
+            # The model was auto-created as intermediary for a many-to-many
+            # relationship; find the target model.
+            for field in opts.fields:
+                if field.remote_field and field.remote_field.model != self.parent_model:
+                    opts = field.remote_field.model._meta
+                    break
+            codename = get_permission_codename('change', opts)
+            return request.user.has_perm('%s.%s' % (opts.app_label, codename))
         return super().has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
-            # to have the view permission for the related model in order to
-            # be able to do anything with the intermediate model.
-            return self.has_view_permission(request, obj)
+            # to have the change permission for the related model in order to
+            # be able to modify relationships in the intermediate model.
+            opts = self.opts
+            # The model was auto-created as intermediary for a many-to-many
+            # relationship; find the target model.
+            for field in opts.fields:
+                if field.remote_field and field.remote_field.model != self.parent_model:
+                    opts = field.remote_field.model._meta
+                    break
+            codename = get_permission_codename('change', opts)
+            return request.user.has_perm('%s.%s' % (opts.app_label, codename))
         return super().has_change_permission(request)
 
     def has_delete_permission(self, request, obj=None):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
-            # to have the view permission for the related model in order to
-            # be able to do anything with the intermediate model.
-            return self.has_view_permission(request, obj)
+            # to have the change permission for the related model in order to
+            # be able to delete relationships from the intermediate model.
+            opts = self.opts
+            # The model was auto-created as intermediary for a many-to-many
+            # relationship; find the target model.
+            for field in opts.fields:
+                if field.remote_field and field.remote_field.model != self.parent_model:
+                    opts = field.remote_field.model._meta
+                    break
+            codename = get_permission_codename('change', opts)
+            return request.user.has_perm('%s.%s' % (opts.app_label, codename))
         return super().has_delete_permission(request, obj)
 
     def has_view_permission(self, request, obj=None):
