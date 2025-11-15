@@ -21,6 +21,10 @@ Usage example:
     >>> from django.contrib.postgres.functions import RandomUUID
     >>> Article.objects.update(uuid=RandomUUID())
 
+.. deprecated:: 6.1
+
+    Use :class:`django.db.models.functions.UUID4` instead.
+
 ``TransactionNow``
 ==================
 
