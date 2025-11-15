@@ -1878,6 +1878,39 @@ Usage example:
 
 .. _window-functions:
 
+UUID functions
+==============
+
+``UUID4``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID4()
+
+Generates a :rfc:`version 4 UUID <9562#section-5.4>`, which is random and is
+generated using a cryptographically secure method.
+
+.. admonition:: Availability
+
+    Available on PostgreSQL, SQLite, MariaDB version 11.7 or later, and Oracle
+    23ai/26ai (23.9) or later.
+
+``UUID7``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID7()
+
+Generates a :rfc:`version 7 UUID <9562#section-5.7>`, which starts with a
+time-based component.
+
+.. admonition:: Availability
+
+    Available on PostgreSQL version 18 or later, MariaDB version 11.7 or later,
+    and SQLite on Python version 3.14 or later.
+
 Window functions
 ================
 
