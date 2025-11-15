@@ -25,13 +25,13 @@ from .models import (
     Member, MixedCaseDbColumnCategoryItem, MixedCaseFieldCategoryItem, ModelA,
     ModelB, ModelC, ModelD, MyObject, NamedCategory, Node, Note, NullableName,
     Number, ObjectA, ObjectB, ObjectC, OneToOneCategory, Order, OrderItem,
-    Page, Paragraph, Person, Plaything, PointerA, Program, ProxyCategory,
-    ProxyObjectA, ProxyObjectB, Ranking, Related, RelatedIndividual,
-    RelatedObject, Report, ReportComment, ReservedName, Responsibility, School,
-    SharedConnection, SimpleCategory, SingleObject, SpecialCategory, Staff,
-    StaffUser, Student, Tag, Task, Teacher, Ticket21203Child,
-    Ticket21203Parent, Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
-    X,
+    Page, Paragraph, Person, Plaything, PointerA, ProductMetaData,
+    ProductMetaDataType, Program, ProxyCategory, ProxyObjectA, ProxyObjectB,
+    Ranking, Related, RelatedIndividual, RelatedObject, Report, ReportComment,
+    ReservedName, Responsibility, School, SharedConnection, SimpleCategory,
+    SingleObject, SpecialCategory, Staff, StaffUser, Student, Tag, Task,
+    Teacher, Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Ticket23605C, TvChef, Valid, X,
 )
 
 
@@ -3974,3 +3974,44 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+    def test_model_instance_with_filterable_attribute(self):
+        """
+        Regression test for issue where model instances with a 'filterable'
+        field set to False were incorrectly identified as non-filterable
+        expressions, causing NotSupportedError.
+        """
+        # Create a metadata type with filterable=False
+        metadata_type = ProductMetaDataType.objects.create(
+            label="Brand",
+            filterable=False
+        )
+
+        # Create some metadata instances
+        ProductMetaData.objects.create(
+            product_name="Product 1",
+            value="Nike",
+            metadata_type=metadata_type
+        )
+        ProductMetaData.objects.create(
+            product_name="Product 2",
+            value="Adidas",
+            metadata_type=metadata_type
+        )
+
+        # This should not raise NotSupportedError even though
+        # metadata_type.filterable is False
+        results = ProductMetaData.objects.filter(
+            value="Nike",
+            metadata_type=metadata_type
+        )
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results.first().product_name, "Product 1")
+
+        # Also test with explicit pk
+        results_pk = ProductMetaData.objects.filter(
+            metadata_type=metadata_type,
+            value="Adidas"
+        )
+        self.assertEqual(results_pk.count(), 1)
+        self.assertEqual(results_pk.first().product_name, "Product 2")

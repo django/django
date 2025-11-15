@@ -745,3 +745,19 @@ class JSONFieldNullable(models.Model):
 
     class Meta:
         required_db_features = {'supports_json_field'}
+
+
+# Test for ticket where model instances with a 'filterable' field
+# should not be confused with Expression instances that have filterable=False
+class ProductMetaDataType(models.Model):
+    label = models.CharField(max_length=255, unique=True)
+    filterable = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.label
+
+
+class ProductMetaData(models.Model):
+    product_name = models.CharField(max_length=255)
+    value = models.TextField()
+    metadata_type = models.ForeignKey(ProductMetaDataType, on_delete=models.CASCADE)
