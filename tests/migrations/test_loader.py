@@ -190,12 +190,38 @@ class LoaderTests(TestCase):
             )
 
     def test_load_empty_dir(self):
+        """
+        A namespace package (directory without __init__.py) can be a valid
+        migrations module even when it has no migration files. It's treated
+        the same as a regular package with no migrations.
+        """
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
             loader = MigrationLoader(connection)
             self.assertIn(
-                "migrations", loader.unmigrated_apps,
-                "App missing __init__.py in migrations module not in unmigrated apps."
+                "migrations", loader.migrated_apps,
+                "Namespace package should be in migrated apps even without migrations."
             )
+            # Ensure no migrations were actually loaded
+            migration_count = len([
+                key for key in loader.disk_migrations if key[0] == "migrations"
+            ])
+            self.assertEqual(migration_count, 0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_namespace_package"})
+    def test_namespace_package_with_migrations(self):
+        """
+        Namespace packages (directories without __init__.py) can contain
+        migration files and should be loaded correctly.
+        """
+        loader = MigrationLoader(connection)
+        self.assertIn(
+            "migrations", loader.migrated_apps,
+            "Namespace package with migrations should be in migrated apps."
+        )
+        self.assertIn(
+            ("migrations", "0001_initial"), loader.disk_migrations,
+            "Migration from namespace package should be loaded."
+        )
 
     @override_settings(
         INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
