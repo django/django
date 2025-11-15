@@ -44,6 +44,23 @@ class TestUtils(AdminDocsSimpleTestCase):
         )
         self.assertEqual(trim_docstring_output, trimmed_docstring)
 
+    def test_trim_docstring_first_line_not_empty(self):
+        """
+        Test trim_docstring with docstrings where text starts on the first line.
+        This is a common docstring style and should not cause errors.
+        """
+        docstring = """test tests something.
+        This is the second line.
+        """
+        expected = "test tests something.\nThis is the second line."
+        self.assertEqual(trim_docstring(docstring), expected)
+
+    def test_trim_docstring_single_line(self):
+        """Test trim_docstring with a single-line docstring."""
+        docstring = """Single line docstring."""
+        expected = "Single line docstring."
+        self.assertEqual(trim_docstring(docstring), expected)
+
     def test_parse_docstring(self):
         title, description, metadata = parse_docstring(self.docstring)
         docstring_title = (
