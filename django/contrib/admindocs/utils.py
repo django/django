@@ -167,12 +167,6 @@ def replace_named_groups(pattern):
         # Handle nested parentheses, e.g. '^(?P<a>(x|y))/b'.
         unmatched_open_brackets, prev_char = 1, None
         for idx, val in enumerate(pattern[end:]):
-            # If brackets are balanced, the end of the string for the current
-            # named capture group pattern has been reached.
-            if unmatched_open_brackets == 0:
-                group_pattern_and_name.append((pattern[start:end + idx], group_name))
-                break
-
             # Check for unescaped `(` and `)`. They mark the start and end of a
             # nested group.
             if val == '(' and prev_char != '\\':
@@ -180,6 +174,12 @@ def replace_named_groups(pattern):
             elif val == ')' and prev_char != '\\':
                 unmatched_open_brackets -= 1
             prev_char = val
+
+            # If brackets are balanced, the end of the string for the current
+            # named capture group pattern has been reached.
+            if unmatched_open_brackets == 0:
+                group_pattern_and_name.append((pattern[start:end + idx + 1], group_name))
+                break
 
     # Replace the string for named capture groups with their group names.
     for group_pattern, group_name in group_pattern_and_name:

@@ -354,6 +354,10 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^a/?$', '/a/'),
+            # Regression tests for #XXXXX: named groups at the end should be replaced.
+            (r'entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)', '/entries/<pk>/relationships/<related_field>'),
+            (r'test/(?P<id>\d+)', '/test/<id>'),
+            (r'^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>(foo|bar)\w+)$', '/<sport_slug>/athletes/<athlete_slug>'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
