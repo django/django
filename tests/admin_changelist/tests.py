@@ -819,6 +819,38 @@ class ChangeListTests(TestCase):
         pks = m._get_edited_object_pks(request, prefix='form')
         self.assertEqual(sorted(pks), sorted([str(a.pk), str(b.pk), str(c.pk)]))
 
+    def test_get_edited_object_ids_with_regex_chars_in_prefix(self):
+        """
+        Test that _get_edited_object_pks() correctly handles formset prefixes
+        that contain regex special characters.
+        """
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        b = Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        m = SwallowAdmin(Swallow, custom_site)
+
+        # Test with various regex special characters in prefix
+        for prefix in ['form.test', 'form[test]', 'form(test)', 'form+test', 'form*test', 'form?test', 'form$test', 'form^test']:
+            with self.subTest(prefix=prefix):
+                data = {
+                    f'{prefix}-TOTAL_FORMS': '2',
+                    f'{prefix}-INITIAL_FORMS': '2',
+                    f'{prefix}-MIN_NUM_FORMS': '0',
+                    f'{prefix}-MAX_NUM_FORMS': '1000',
+                    f'{prefix}-0-uuid': str(a.pk),
+                    f'{prefix}-1-uuid': str(b.pk),
+                    f'{prefix}-0-load': '9.0',
+                    f'{prefix}-0-speed': '9.0',
+                    f'{prefix}-1-load': '5.0',
+                    f'{prefix}-1-speed': '5.0',
+                    '_save': 'Save',
+                }
+                request = self.factory.post(changelist_url, data=data)
+                pks = m._get_edited_object_pks(request, prefix=prefix)
+                self.assertEqual(sorted(pks), sorted([str(a.pk), str(b.pk)]))
+
     def test_get_list_editable_queryset(self):
         a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
         Swallow.objects.create(origin='Swallow B', load=2, speed=2)
