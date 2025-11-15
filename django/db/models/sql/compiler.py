@@ -353,6 +353,10 @@ class SQLCompiler:
                     elif col_alias:
                         continue
                     if src == sel_expr:
+                        # Create a copy of the expression before modifying it to
+                        # prevent the modification from affecting other querysets
+                        # that might share the same expression object.
+                        resolved = resolved.copy()
                         resolved.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
                         break
                 else:

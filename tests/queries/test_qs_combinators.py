@@ -228,3 +228,73 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.all()
         qs2 = Number.objects.intersection(Number.objects.filter(num__gt=1))
         self.assertEqual(qs1.difference(qs2).count(), 2)
+
+    def test_union_with_ordering_and_derived_queryset(self):
+        """
+        Test that a union queryset with ordering can be re-evaluated after
+        creating a derived queryset that changes the select list.
+        Regression test for issue where ORDER BY position becomes invalid.
+        """
+        ReservedName.objects.create(name='a', order=1)
+        ReservedName.objects.create(name='b', order=2)
+        ReservedName.objects.create(name='c', order=3)
+        ReservedName.objects.create(name='d', order=4)
+
+        # Create a union queryset with ordering
+        qs1 = ReservedName.objects.filter(order__lte=2)
+        qs2 = ReservedName.objects.filter(order__gte=3)
+        qs = qs1.union(qs2).order_by('order')
+
+        # Evaluate the queryset once
+        result1 = list(qs)
+        self.assertEqual(len(result1), 4)
+
+        # Create a derived queryset with different select list
+        # This changes the select clause but should not affect the original qs
+        derived = qs.order_by().values_list('pk', flat=True)
+        list(derived)
+
+        # The original queryset should still be evaluable
+        # This used to fail with "ORDER BY position X is not in select list"
+        result2 = list(qs)
+        self.assertEqual(len(result2), 4)
+        self.assertEqual(result1, result2)
+
+    def test_union_multiple_evaluations_with_different_select(self):
+        """
+        Test that multiple derived querysets from a union query with ordering
+        don't interfere with each other or the original queryset.
+        """
+        ReservedName.objects.create(name='x', order=1)
+        ReservedName.objects.create(name='y', order=2)
+
+        qs = ReservedName.objects.filter(
+            order=1
+        ).union(
+            ReservedName.objects.filter(order=2)
+        ).order_by('order')
+
+        # Evaluate with full model objects
+        result1 = list(qs)
+        self.assertEqual(len(result1), 2)
+        self.assertEqual(result1[0].order, 1)
+        self.assertEqual(result1[1].order, 2)
+
+        # Create derived queryset with values_list (clears ordering)
+        derived1 = qs.order_by().values_list('name', flat=True)
+        names = list(derived1)
+        self.assertCountEqual(names, ['x', 'y'])
+
+        # Re-evaluate original queryset - should still work
+        result2 = list(qs)
+        self.assertEqual(len(result2), 2)
+        self.assertEqual(result1, result2)
+
+        # Create another derived queryset with different fields (clears ordering)
+        derived2 = qs.order_by().values_list('order', 'name')
+        values = list(derived2)
+        self.assertCountEqual(values, [(1, 'x'), (2, 'y')])
+
+        # Re-evaluate original queryset again - should still work
+        result3 = list(qs)
+        self.assertEqual(result1, result3)
