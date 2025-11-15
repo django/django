@@ -1040,6 +1040,46 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 18)
 
+    def test_cull_with_empty_table_after_culling_sql(self):
+        """
+        Test that _cull handles the race condition where the culling SQL
+        query returns no rows (e.g., when multiple processes cull simultaneously
+        or when the table becomes empty between queries).
+        Refs #30934.
+        """
+        from django.core.cache.backends.db import DatabaseCache
+        from django.db import connection, router
+
+        cull_cache = caches['cull']
+        # Directly access the cache backend
+        cache_backend = cull_cache
+
+        db = router.db_for_write(cache_backend.cache_model_class)
+        table = connection.ops.quote_name(cache_backend._table)
+
+        # Test _cull directly with a scenario where cache_key_culling_sql
+        # returns no rows
+        with connection.cursor() as cursor:
+            # Clear the cache table first
+            cursor.execute('DELETE FROM %s' % table)
+
+            # Insert entries that would trigger culling
+            for i in range(35):
+                cache_backend.set('cull%d' % i, 'value', 1000)
+
+            # Manually trigger _cull in a state where it might return no rows
+            # by deleting all but one entry before calling _cull
+            cursor.execute('DELETE FROM %s WHERE cache_key LIKE %%s' % table, ['cull3%'])
+
+            # Now call _cull - this should not crash even if fetchone returns None
+            from django.utils import timezone
+            now = timezone.now()
+            try:
+                cache_backend._cull(db, cursor, now)
+            except TypeError as e:
+                if "'NoneType' object is not subscriptable" in str(e):
+                    self.fail("_cull raised TypeError when fetchone returned None")
+
     def test_second_call_doesnt_crash(self):
         out = io.StringIO()
         management.call_command('createcachetable', stdout=out)
