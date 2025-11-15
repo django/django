@@ -87,3 +87,25 @@ class FilteredAggregateTests(TestCase):
             older_friends_count__gte=2,
         )
         self.assertEqual(qs.get(pk__in=qs.values('pk')), self.a1)
+
+    def test_count_distinct_with_case(self):
+        """Test Count with both distinct=True and a Case expression."""
+        agg = Count(
+            Case(When(age__gte=40, then=F('age'))),
+            distinct=True,
+        )
+        # This should produce valid SQL with space between DISTINCT and CASE
+        result = Author.objects.aggregate(count=agg)
+        # Expected: Count distinct ages >= 40
+        self.assertIsInstance(result['count'], int)
+
+    def test_count_distinct_with_case_and_filter(self):
+        """Test Count with distinct=True, Case, and filter together."""
+        agg = Count(
+            Case(When(age__gte=40, then=F('age'))),
+            distinct=True,
+            filter=Q(name__startswith='test'),
+        )
+        # This should produce valid SQL with all three conditions
+        result = Author.objects.aggregate(count=agg)
+        self.assertIsInstance(result['count'], int)
