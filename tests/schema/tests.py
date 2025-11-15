@@ -2201,6 +2201,41 @@ class SchemaTests(TransactionTestCase):
             True,
         )
 
+    def test_index_together_with_unique_together(self):
+        """
+        Tests that removing index_together doesn't crash when there's also
+        a unique_together on the same fields (#28053).
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        # Add unique_together first
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Tag, [], [['slug', 'title']])
+        # Then add index_together (note: unique constraint may act as index in some DBs)
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(Tag, [], [['slug', 'title']])
+        # Ensure there's a unique constraint
+        constraints = self.get_constraints("schema_tag")
+        unique_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['slug', 'title'] and details['unique']
+        ]
+        self.assertEqual(len(unique_constraints), 1)
+        # Now remove index_together - this should not crash even with unique_together present
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(Tag, [['slug', 'title']], [])
+        # Ensure the unique constraint is still there
+        constraints = self.get_constraints("schema_tag")
+        unique_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['slug', 'title'] and details['unique']
+        ]
+        self.assertEqual(len(unique_constraints), 1)
+        # Clean up: remove unique_together
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Tag, [['slug', 'title']], [])
+
     @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
     def test_remove_index_together_does_not_remove_meta_indexes(self):
         with connection.schema_editor() as editor:
