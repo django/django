@@ -9,4 +9,7 @@ Django 5.2.9 fixes several bugs in 5.2.8.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 5.2 where
+  ``django.utils.feedgenerator.Stylesheet.__str__()`` did not escape
+  the ``url``, ``mimetype``, and ``media`` attributes, potentially leading
+  to invalid XML markup (:ticket:`36733`).
