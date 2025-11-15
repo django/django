@@ -513,6 +513,33 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             with self.subTest(field_name=field_name, autocomplete=autocomplete):
                 self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
 
+    def test_username_field_maxlength_in_widget(self):
+        """
+        The username field's maxlength attribute should be set in the widget.
+        """
+        form = AuthenticationForm()
+        # Check that the field has max_length set
+        self.assertEqual(form.fields['username'].max_length, 150)
+        # Check that the widget has maxlength attribute
+        self.assertEqual(form.fields['username'].widget.attrs.get('maxlength'), '150')
+        # Check that it renders in the HTML
+        rendered = str(form['username'])
+        self.assertIn('maxlength="150"', rendered)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomEmailField')
+    def test_username_field_maxlength_in_widget_for_custom_user(self):
+        """
+        The username field's maxlength attribute should match custom user model.
+        """
+        form = AuthenticationForm()
+        # CustomEmailField has username with max_length=255
+        self.assertEqual(form.fields['username'].max_length, 255)
+        # Check that the widget has maxlength attribute
+        self.assertEqual(form.fields['username'].widget.attrs.get('maxlength'), '255')
+        # Check that it renders in the HTML
+        rendered = str(form['username'])
+        self.assertIn('maxlength="255"', rendered)
+
 
 class SetPasswordFormTest(TestDataMixin, TestCase):
 
