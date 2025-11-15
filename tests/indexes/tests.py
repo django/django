@@ -75,6 +75,15 @@ class SchemaIndexesTests(TestCase):
         index_sql = connection.schema_editor()._model_indexes_sql(IndexTogetherSingleList)
         self.assertEqual(len(index_sql), 1)
 
+    def test_index_sql_whitespace_desc(self):
+        """Test that CREATE INDEX has proper whitespace before DESC."""
+        editor = connection.schema_editor()
+        index = Index(fields=['-headline'], name='test_idx_desc')
+        sql = str(index.create_sql(Article, editor))
+        # Should have space before DESC, not "headline"DESC
+        self.assertIn('"headline" DESC', sql)
+        self.assertNotIn('"headline"DESC', sql)
+
 
 @skipIf(connection.vendor == 'postgresql', 'opclasses are PostgreSQL only')
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
@@ -222,6 +231,32 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % indexname)
             self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
+    def test_ops_class_whitespace(self):
+        """Test proper whitespace in CREATE INDEX with opclasses."""
+        # Test ascending order (empty suffix) doesn't add trailing space
+        index_asc = Index(
+            name='test_ops_class_asc',
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            sql = str(index_asc.create_sql(IndexedArticle2, editor))
+            # Should not have trailing space after opclass
+            self.assertNotIn('text_pattern_ops )', sql)
+            self.assertIn('text_pattern_ops)', sql)
+
+        # Test descending order has proper spacing
+        index_desc = Index(
+            name='test_ops_class_desc',
+            fields=['-body'],
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            sql = str(index_desc.create_sql(IndexedArticle2, editor))
+            # Should have space before DESC, no double spaces
+            self.assertIn('text_pattern_ops DESC', sql)
+            self.assertNotIn('text_pattern_ops  DESC', sql)
 
 
 @skipUnless(connection.vendor == 'mysql', 'MySQL tests')
