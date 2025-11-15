@@ -185,7 +185,9 @@ class GenericSitemap(Sitemap):
 
     def items(self):
         # Make sure to return a clone; we don't want premature evaluation.
-        return self.queryset.filter()
+        if self.limit:
+            return self.queryset[: self.limit]
+        return self.queryset
 
     def lastmod(self, item):
         if self.date_field is not None:
