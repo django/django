@@ -233,6 +233,8 @@ class HttpResponseBase:
             return bytes(value)
         if isinstance(value, str):
             return bytes(value.encode(self.charset))
+        if isinstance(value, memoryview):
+            return bytes(value)
         # Handle non-string types.
         return str(value).encode(self.charset)
 
@@ -309,7 +311,7 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
-        if hasattr(value, '__iter__') and not isinstance(value, (bytes, str)):
+        if hasattr(value, '__iter__') and not isinstance(value, (bytes, str, memoryview)):
             content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
                 try:

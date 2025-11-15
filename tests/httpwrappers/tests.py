@@ -417,6 +417,26 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse(lazystr('helloworld'))
         self.assertEqual(r.content, b'helloworld')
 
+    def test_memoryview_content(self):
+        # Test memoryview content in constructor
+        r = HttpResponse(memoryview(b"My Content"))
+        self.assertEqual(r.content, b'My Content')
+
+        # Test memoryview content via property
+        r = HttpResponse()
+        r.content = memoryview(b"My Content")
+        self.assertEqual(r.content, b'My Content')
+
+        # Test memoryview in write()
+        r = HttpResponse()
+        r.write(memoryview(b"Hello "))
+        r.write(memoryview(b"World"))
+        self.assertEqual(r.content, b'Hello World')
+
+        # Test memoryview in iterable content
+        r = HttpResponse([memoryview(b"abc"), memoryview(b"def")])
+        self.assertEqual(r.content, b'abcdef')
+
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")
