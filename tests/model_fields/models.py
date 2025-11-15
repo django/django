@@ -405,3 +405,22 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+###############################################################################
+# TextChoices and IntegerChoices tests
+
+
+class TestTextChoices(models.TextChoices):
+    FIRST = "first", _("The first choice")
+    SECOND = "second", _("The second choice")
+
+
+class TestIntegerChoices(models.IntegerChoices):
+    ONE = 1, _("First")
+    TWO = 2, _("Second")
+
+
+class ChoicesModel(models.Model):
+    text_choice = models.CharField(max_length=10, choices=TestTextChoices.choices)
+    int_choice = models.IntegerField(choices=TestIntegerChoices.choices)

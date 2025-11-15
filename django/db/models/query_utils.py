@@ -6,6 +6,7 @@ large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
 import copy
+import enum
 import functools
 import inspect
 from collections import namedtuple
@@ -137,6 +138,30 @@ class DeferredAttribute:
                 val = getattr(instance, field_name)
             data[field_name] = val
         return data[field_name]
+
+    def __set__(self, instance, value):
+        """
+        Set the field value on the instance, converting enum.Enum values to
+        their primitive types to ensure consistent behavior between created
+        and retrieved instances.
+        """
+        # Convert Enum values to their primitive type to ensure consistency
+        # between freshly created instances and instances retrieved from the database.
+        # This prevents issues where str(enum_value) returns "EnumClass.MEMBER"
+        # for created instances but "value" for retrieved instances.
+        if isinstance(value, enum.Enum):
+            value = value.value
+        instance.__dict__[self.field.attname] = value
+
+    def __delete__(self, instance):
+        """
+        Delete the field value from the instance, allowing it to be reloaded
+        from the database on next access.
+        """
+        try:
+            del instance.__dict__[self.field.attname]
+        except KeyError:
+            pass
 
     def _check_parent_chain(self, instance):
         """
