@@ -1099,7 +1099,7 @@ class OverrideSettingsTests(SimpleTestCase):
         the file_permissions_mode attribute of
         django.core.files.storage.default_storage.
         """
-        self.assertIsNone(default_storage.file_permissions_mode)
+        self.assertEqual(default_storage.file_permissions_mode, 0o644)
         with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
             self.assertEqual(default_storage.file_permissions_mode, 0o777)
 

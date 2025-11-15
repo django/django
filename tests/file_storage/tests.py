@@ -892,8 +892,14 @@ class FileStoragePermissions(unittest.TestCase):
         actual_mode = os.stat(self.storage.path(name))[0] & 0o777
         self.assertEqual(actual_mode, 0o654)
 
-    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
     def test_file_upload_default_permissions(self):
+        self.storage = FileSystemStorage(self.storage_dir)
+        fname = self.storage.save("some_file", ContentFile("data"))
+        mode = os.stat(self.storage.path(fname))[0] & 0o777
+        self.assertEqual(mode, 0o644)
+
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
+    def test_file_upload_default_permissions_with_none(self):
         self.storage = FileSystemStorage(self.storage_dir)
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
