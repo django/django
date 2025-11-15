@@ -13,7 +13,7 @@ from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
-    HiddenInput, MultipleHiddenInput, SelectMultiple,
+    HiddenInput, MultipleHiddenInput, RadioSelect, SelectMultiple,
 )
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
@@ -1185,7 +1185,18 @@ class ModelChoiceField(ChoiceField):
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, limit_choices_to=None,
                  **kwargs):
+        # Determine whether to include the empty label based on:
+        # 1. If required and initial is provided, never show empty label
+        # 2. If required and widget is RadioSelect, never show empty label
+        #    (RadioSelect has a natural unfilled state)
+        # 3. Otherwise, show the empty label
         if required and (initial is not None):
+            self.empty_label = None
+        elif required and isinstance(widget, type) and issubclass(widget, RadioSelect):
+            # widget is a class (not yet instantiated)
+            self.empty_label = None
+        elif required and isinstance(widget, RadioSelect):
+            # widget is an instance
             self.empty_label = None
         else:
             self.empty_label = empty_label
