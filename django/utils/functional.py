@@ -324,6 +324,11 @@ class LazyObject:
     __str__ = new_method_proxy(str)
     __bool__ = new_method_proxy(bool)
 
+    # Numeric conversion support
+    __int__ = new_method_proxy(int)
+    __float__ = new_method_proxy(float)
+    __complex__ = new_method_proxy(complex)
+
     # Introspection support
     __dir__ = new_method_proxy(dir)
 

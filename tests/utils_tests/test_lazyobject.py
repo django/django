@@ -91,6 +91,24 @@ class LazyObjectTestCase(TestCase):
         for t in [True, 1, (1,), {1: 2}, [1], object(), {1}]:
             self.assertTrue(t)
 
+    def test_int(self):
+        obj = self.lazy_wrap(42)
+        self.assertEqual(int(obj), 42)
+        obj = self.lazy_wrap(3.14)
+        self.assertEqual(int(obj), 3)
+
+    def test_float(self):
+        obj = self.lazy_wrap(42)
+        self.assertEqual(float(obj), 42.0)
+        obj = self.lazy_wrap(3.14)
+        self.assertEqual(float(obj), 3.14)
+
+    def test_complex(self):
+        obj = self.lazy_wrap(42)
+        self.assertEqual(complex(obj), 42+0j)
+        obj = self.lazy_wrap(3.14)
+        self.assertEqual(complex(obj), 3.14+0j)
+
     def test_dir(self):
         obj = self.lazy_wrap('foo')
         self.assertEqual(dir(obj), dir('foo'))

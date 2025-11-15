@@ -6,11 +6,12 @@ from operator import attrgetter
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
+from django.utils.functional import SimpleLazyObject
 
 from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
@@ -2129,6 +2130,39 @@ class SubqueryTests(TestCase):
                 ).order_by('id').distinct().values('double_id')[0:2],
             ).order_by('id').values_list('id', flat=True), [2, 4]
         )
+
+    def test_nested_subquery_with_simplelazyobject(self):
+        """
+        Test that SimpleLazyObject works with nested subquery annotations.
+        Regression test for the issue where using SimpleLazyObject in a filter
+        with nested subquery annotation would fail with:
+        TypeError: int() argument must be a string, a bytes-like object or a
+        number, not 'SimpleLazyObject'
+        """
+        # Create test data
+        category = NamedCategory.objects.create(id=5, name="test")
+
+        # Create a nested subquery annotation
+        # This simulates the scenario in the bug report where we have:
+        # - An outer query on DumbCategory
+        # - Annotated with a subquery on Tag
+        # - That subquery is itself annotated with a subquery on another model
+        # - And we filter using a SimpleLazyObject
+        tag_subquery = Tag.objects.filter(
+            category=OuterRef('pk')
+        ).values('category')
+
+        # Wrap the category id in a SimpleLazyObject
+        # This is the key part - wrapping a numeric value (like a User.id)
+        lazy_category_id = SimpleLazyObject(lambda: category.id)
+
+        # This should not raise a TypeError
+        queryset = NamedCategory.objects.annotate(
+            tag_category=Subquery(tag_subquery)
+        ).filter(tag_category=lazy_category_id)
+
+        # Force evaluation - this is where the bug would occur
+        str(queryset.query)
 
 
 @skipUnlessDBFeature('allow_sliced_subqueries_with_in')
