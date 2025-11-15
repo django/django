@@ -1024,3 +1024,207 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.wait_until_visible(field_name)
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
+
+
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
+class TestGetInlinesHook(TestDataMixin, TestCase):
+    """Tests for the get_inlines() hook."""
+
+    factory = RequestFactory()
+
+    def test_get_inlines_default_behavior(self):
+        """
+        get_inlines() should return self.inlines by default.
+        """
+        class TestModelAdmin(ModelAdmin):
+            inlines = [InnerInline]
+
+        ma = TestModelAdmin(Holder, admin_site)
+        request = self.factory.get('/')
+        request.user = self.superuser
+        inlines = ma.get_inlines(request)
+        self.assertEqual(inlines, [InnerInline])
+
+    def test_get_inlines_based_on_request(self):
+        """
+        get_inlines() can be overridden to return different inlines based on request.
+        """
+        from .admin import InnerInline2
+
+        class RequestBasedModelAdmin(ModelAdmin):
+            inlines = [InnerInline, InnerInline2]
+
+            def get_inlines(self, request, obj=None):
+                # Only superuser sees both inlines
+                if request.user.is_superuser:
+                    return [InnerInline, InnerInline2]
+                return [InnerInline]
+
+        ma = RequestBasedModelAdmin(Holder2, admin_site)
+
+        # Test with superuser
+        request = self.factory.get('/')
+        request.user = self.superuser
+        inlines = ma.get_inlines(request)
+        self.assertEqual(inlines, [InnerInline, InnerInline2])
+
+        # Test with regular user
+        regular_user = User.objects.create_user(username='regular', password='secret')
+        request.user = regular_user
+        inlines = ma.get_inlines(request)
+        self.assertEqual(inlines, [InnerInline])
+
+    def test_get_inlines_based_on_obj(self):
+        """
+        get_inlines() can be overridden to return different inlines based on obj.
+        """
+        from .admin import InnerInline2
+
+        class ObjBasedModelAdmin(ModelAdmin):
+            inlines = [InnerInline, InnerInline2]
+
+            def get_inlines(self, request, obj=None):
+                # Only show InnerInline2 when editing existing objects
+                if obj is None:
+                    return [InnerInline]
+                return [InnerInline, InnerInline2]
+
+        ma = ObjBasedModelAdmin(Holder2, admin_site)
+        request = self.factory.get('/')
+        request.user = self.superuser
+
+        # Test on add view (obj=None)
+        inlines = ma.get_inlines(request, obj=None)
+        self.assertEqual(inlines, [InnerInline])
+
+        # Test on change view (obj exists)
+        holder = Holder2.objects.create(dummy=42)
+        inlines = ma.get_inlines(request, obj=holder)
+        self.assertEqual(inlines, [InnerInline, InnerInline2])
+
+    def test_get_inline_instances_uses_get_inlines(self):
+        """
+        get_inline_instances() should use get_inlines() hook.
+        """
+        from .admin import InnerInline2
+
+        class CustomInlineAdmin(ModelAdmin):
+            inlines = [InnerInline, InnerInline2]
+
+            def get_inlines(self, request, obj=None):
+                return [InnerInline]
+
+        ma = CustomInlineAdmin(Holder2, admin_site)
+        request = self.factory.get('/')
+        request.user = self.superuser
+
+        inline_instances = ma.get_inline_instances(request)
+        self.assertEqual(len(inline_instances), 1)
+        self.assertIsInstance(inline_instances[0], InnerInline)
+
+    def test_get_inlines_empty_list(self):
+        """
+        get_inlines() can return an empty list to show no inlines.
+        """
+        class NoInlinesAdmin(ModelAdmin):
+            inlines = [InnerInline]
+
+            def get_inlines(self, request, obj=None):
+                return []
+
+        ma = NoInlinesAdmin(Holder, admin_site)
+        request = self.factory.get('/')
+        request.user = self.superuser
+
+        inlines = ma.get_inlines(request)
+        self.assertEqual(inlines, [])
+        inline_instances = ma.get_inline_instances(request)
+        self.assertEqual(len(inline_instances), 0)
+
+    def test_get_inlines_with_permissions(self):
+        """
+        get_inlines() works correctly with permission checks in get_inline_instances().
+        """
+        class PermissionBasedAdmin(ModelAdmin):
+            inlines = [InnerInline]
+
+        ma = PermissionBasedAdmin(Holder, admin_site)
+
+        # Create a user without permissions
+        no_perm_user = User.objects.create_user(username='noperm', password='secret')
+        request = self.factory.get('/')
+        request.user = no_perm_user
+
+        # get_inlines() returns inlines
+        inlines = ma.get_inlines(request)
+        self.assertEqual(inlines, [InnerInline])
+
+        # But get_inline_instances() filters based on permissions
+        # (InnerInline has no view/change/add/delete permission for user without permissions)
+        inline_instances = ma.get_inline_instances(request)
+        self.assertEqual(len(inline_instances), 0)
+
+    def test_get_inlines_integration_with_admin_view(self):
+        """
+        Test that get_inlines() works correctly in actual admin views.
+        """
+        from .admin import InnerInline2, InnerInline2Tabular
+
+        # Register a custom admin with conditional inlines
+        class ConditionalInlineAdmin(ModelAdmin):
+            inlines = [InnerInline2, InnerInline2Tabular]
+
+            def get_inlines(self, request, obj=None):
+                # Only show both inlines for superusers
+                if request.user.is_superuser:
+                    return [InnerInline2, InnerInline2Tabular]
+                return [InnerInline2]
+
+        # Temporarily register the admin
+        admin_site.unregister(Holder2)
+        admin_site.register(Holder2, ConditionalInlineAdmin)
+
+        try:
+            # Test with superuser - should see both inlines
+            self.client.force_login(self.superuser)
+            holder = Holder2.objects.create(dummy=99)
+            response = self.client.get(
+                reverse('admin:admin_inlines_holder2_change', args=(holder.id,))
+            )
+            self.assertEqual(response.status_code, 200)
+            # Should have 2 inline formsets
+            self.assertEqual(len(response.context['inline_admin_formsets']), 2)
+
+            # Test with regular user - should see only one inline
+            regular_user = User.objects.create_user(
+                username='regular2',
+                password='secret',
+                is_staff=True
+            )
+            # Give change permission for Holder2
+            content_type = ContentType.objects.get_for_model(Holder2)
+            permission = Permission.objects.get(
+                codename='change_holder2',
+                content_type=content_type
+            )
+            regular_user.user_permissions.add(permission)
+            # Give view permission for Inner2
+            inner2_ct = ContentType.objects.get_for_model(Inner2)
+            inner2_perm = Permission.objects.get(
+                codename='view_inner2',
+                content_type=inner2_ct
+            )
+            regular_user.user_permissions.add(inner2_perm)
+
+            self.client.force_login(regular_user)
+            response = self.client.get(
+                reverse('admin:admin_inlines_holder2_change', args=(holder.id,))
+            )
+            self.assertEqual(response.status_code, 200)
+            # Should have only 1 inline formset
+            self.assertEqual(len(response.context['inline_admin_formsets']), 1)
+        finally:
+            # Restore original registration
+            admin_site.unregister(Holder2)
+            from .admin import HolderAdmin
+            admin_site.register(Holder2, HolderAdmin, inlines=[InnerInline2, InnerInline2Tabular])
