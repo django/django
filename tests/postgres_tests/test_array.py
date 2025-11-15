@@ -1130,3 +1130,37 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
+
+    def test_checkbox_input_with_initial_data(self):
+        """
+        Test that SplitArrayWidget with CheckboxInput correctly renders
+        each checkbox based on its individual value, not getting stuck
+        on checked=True after the first True value.
+        Regression test for #31944.
+        """
+        widget = SplitArrayWidget(forms.CheckboxInput(), size=5)
+        # Test with pattern: False, True, False, True, False
+        context = widget.get_context('field', [False, True, False, True, False], {'id': 'id_field'})
+        subwidgets = context['widget']['subwidgets']
+
+        # Verify each checkbox has the correct checked state
+        self.assertEqual(len(subwidgets), 5)
+        self.assertNotIn('checked', subwidgets[0]['attrs'])  # False
+        self.assertEqual(subwidgets[1]['attrs'].get('checked'), True)  # True
+        self.assertNotIn('checked', subwidgets[2]['attrs'])  # False
+        self.assertEqual(subwidgets[3]['attrs'].get('checked'), True)  # True
+        self.assertNotIn('checked', subwidgets[4]['attrs'])  # False
+
+    def test_checkbox_input_without_id(self):
+        """
+        Test that SplitArrayWidget with CheckboxInput works correctly
+        even when no id attribute is provided.
+        """
+        widget = SplitArrayWidget(forms.CheckboxInput(), size=3)
+        context = widget.get_context('field', [True, False, True], None)
+        subwidgets = context['widget']['subwidgets']
+
+        self.assertEqual(len(subwidgets), 3)
+        self.assertEqual(subwidgets[0]['attrs'].get('checked'), True)  # True
+        self.assertNotIn('checked', subwidgets[1]['attrs'])  # False
+        self.assertEqual(subwidgets[2]['attrs'].get('checked'), True)  # True

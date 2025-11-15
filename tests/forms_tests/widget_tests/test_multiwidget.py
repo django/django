@@ -2,9 +2,9 @@ import copy
 from datetime import datetime
 
 from django.forms import (
-    CharField, FileInput, MultipleChoiceField, MultiValueField, MultiWidget,
-    RadioSelect, SelectMultiple, SplitDateTimeField, SplitDateTimeWidget,
-    TextInput,
+    CharField, CheckboxInput, FileInput, MultipleChoiceField, MultiValueField,
+    MultiWidget, RadioSelect, SelectMultiple, SplitDateTimeField,
+    SplitDateTimeWidget, TextInput,
 )
 
 from .base import WidgetTest
@@ -183,3 +183,47 @@ class MultiWidgetTest(WidgetTest):
         # w2 ought to be independent of w1, since MultiWidget ought
         # to make a copy of its sub-widgets when it is copied.
         self.assertEqual(w1.choices, [1, 2, 3])
+
+    def test_checkbox_multiwidget_with_initial_data(self):
+        """
+        Test that MultiWidget with CheckboxInput widgets correctly renders
+        each checkbox based on its individual value, not getting stuck
+        on checked=True after the first True value.
+        Regression test for the same issue as SplitArrayWidget.
+        """
+        class CheckboxMultiWidget(MultiWidget):
+            def decompress(self, value):
+                return value if value else [False, False, False]
+
+        widget = CheckboxMultiWidget(
+            widgets=[CheckboxInput(), CheckboxInput(), CheckboxInput()]
+        )
+        # Test with pattern: True, False, True
+        context = widget.get_context('field', [True, False, True], {'id': 'id_field'})
+        subwidgets = context['widget']['subwidgets']
+
+        # Verify each checkbox has the correct checked state
+        self.assertEqual(len(subwidgets), 3)
+        self.assertEqual(subwidgets[0]['attrs'].get('checked'), True)  # True
+        self.assertNotIn('checked', subwidgets[1]['attrs'])  # False
+        self.assertEqual(subwidgets[2]['attrs'].get('checked'), True)  # True
+
+    def test_checkbox_multiwidget_without_id(self):
+        """
+        Test that MultiWidget with CheckboxInput works correctly
+        even when no id attribute is provided.
+        """
+        class CheckboxMultiWidget(MultiWidget):
+            def decompress(self, value):
+                return value if value else [False, False, False]
+
+        widget = CheckboxMultiWidget(
+            widgets=[CheckboxInput(), CheckboxInput(), CheckboxInput()]
+        )
+        context = widget.get_context('field', [False, True, False], None)
+        subwidgets = context['widget']['subwidgets']
+
+        self.assertEqual(len(subwidgets), 3)
+        self.assertNotIn('checked', subwidgets[0]['attrs'])  # False
+        self.assertEqual(subwidgets[1]['attrs'].get('checked'), True)  # True
+        self.assertNotIn('checked', subwidgets[2]['attrs'])  # False

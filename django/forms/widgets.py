@@ -830,11 +830,9 @@ class MultiWidget(Widget):
                 widget_value = value[i]
             except IndexError:
                 widget_value = None
+            widget_attrs = final_attrs.copy()
             if id_:
-                widget_attrs = final_attrs.copy()
                 widget_attrs['id'] = '%s_%s' % (id_, i)
-            else:
-                widget_attrs = final_attrs
             subwidgets.append(widget.get_context(widget_name, widget_value, widget_attrs)['widget'])
         context['widget']['subwidgets'] = subwidgets
         return context
