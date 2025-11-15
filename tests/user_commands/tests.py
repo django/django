@@ -164,6 +164,25 @@ class CommandTests(SimpleTestCase):
         finally:
             BaseCommand.check = saved_check
 
+    def test_skip_checks_option(self):
+        """
+        skip_checks=True should prevent checks from running.
+        """
+        self.counter = 0
+
+        def patched_check(self_, **kwargs):
+            self.counter += 1
+
+        saved_check = BaseCommand.check
+        BaseCommand.check = patched_check
+        try:
+            management.call_command("dance", verbosity=0, skip_checks=False)
+            self.assertEqual(self.counter, 1)
+            management.call_command("dance", verbosity=0, skip_checks=True)
+            self.assertEqual(self.counter, 1)  # Should still be 1, not incremented
+        finally:
+            BaseCommand.check = saved_check
+
     def test_check_migrations(self):
         requires_migrations_checks = dance.Command.requires_migrations_checks
         self.assertIs(requires_migrations_checks, False)
@@ -252,6 +271,15 @@ class CommandRunTests(AdminScriptTestCase):
         out, err = self.run_manage(['set_option', '--set', 'foo'])
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), 'Set foo')
+
+    def test_skip_checks_option(self):
+        """
+        --skip-checks should skip system checks.
+        """
+        self.write_settings('settings.py', apps=['user_commands'])
+        out, err = self.run_manage(['dance', '--skip-checks'])
+        self.assertNoOutput(err)
+        self.assertIn("I don't feel like dancing Rock'n'Roll.", out)
 
 
 class UtilsTests(SimpleTestCase):
