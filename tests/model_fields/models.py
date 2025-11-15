@@ -405,3 +405,11 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class CustomGetDisplayModel(models.Model):
+    """Test model for overriding get_FIELD_display()."""
+    foo_bar = models.CharField(max_length=10, choices=[(1, 'foo'), (2, 'bar')])
+
+    def get_foo_bar_display(self):
+        return "something"

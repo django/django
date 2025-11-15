@@ -7,8 +7,8 @@ from django.test import SimpleTestCase, TestCase
 from django.utils.functional import lazy
 
 from .models import (
-    Bar, Choiceful, Foo, RenamedField, VerboseNameField, Whiz, WhizDelayed,
-    WhizIter, WhizIterEmpty,
+    Bar, Choiceful, CustomGetDisplayModel, Foo, RenamedField, VerboseNameField,
+    Whiz, WhizDelayed, WhizIter, WhizIterEmpty,
 )
 
 
@@ -185,6 +185,16 @@ class GetFieldDisplayTests(SimpleTestCase):
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
         self.assertIsNone(WhizIterEmpty(c=None).c)         # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value
+
+    def test_overriding_get_FIELD_display(self):
+        """
+        Can override the get_FIELD_display() method.
+        """
+        obj = CustomGetDisplayModel(foo_bar=1)
+        # Should use the overridden method which always returns "something"
+        self.assertEqual(obj.get_foo_bar_display(), 'something')
+        obj.foo_bar = 2
+        self.assertEqual(obj.get_foo_bar_display(), 'something')
 
 
 class GetChoicesTests(SimpleTestCase):
