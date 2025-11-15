@@ -1,5 +1,6 @@
 import os
 import sys
+import unittest
 from argparse import ArgumentDefaultsHelpFormatter
 from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
@@ -11,7 +12,7 @@ from django.apps import apps
 from django.core import management
 from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
-from django.core.management.base import OutputWrapper
+from django.core.management.base import CommandParser, OutputWrapper
 from django.core.management.utils import (
     find_command,
     get_random_secret_key,
@@ -24,6 +25,7 @@ from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
+from django.utils.version import PY314, PY315
 
 from .management.commands import dance
 from .utils import AssertFormatterFailureCaughtContext
@@ -453,6 +455,24 @@ class CommandTests(SimpleTestCase):
             management.call_command("outputwrapper", stdout=out)
         self.assertIn("Working...", out.getvalue())
         self.assertIs(mocked_flush.called, True)
+
+    @unittest.skipUnless(PY314 and not PY315, "Requires Python 3.14")
+    def test_suggest_on_error_defaults_true(self):
+        """
+        CommandParser sets suggest_on_error=True on Python 3.14.
+        """
+        parser = CommandParser(prog="test", called_from_command_line=True)
+        self.assertTrue(parser.suggest_on_error)
+
+    @unittest.skipUnless(PY314 and not PY315, "Requires Python 3.14")
+    def test_suggest_on_error_custom(self):
+        """
+        Explicit suggest_on_error=False is respected.
+        """
+        parser = CommandParser(
+            prog="test", called_from_command_line=True, suggest_on_error=False
+        )
+        self.assertFalse(parser.suggest_on_error)
 
 
 class CommandRunTests(AdminScriptTestCase):
