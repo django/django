@@ -1073,7 +1073,8 @@ class Query(BaseExpression):
                         ))
                 else:
                     resolved_values.append(sub_value)
-            value = tuple(resolved_values)
+            # Preserve the type of the input iterable (list or tuple).
+            value = type(value)(resolved_values)
         return value
 
     def solve_lookup_type(self, lookup):
