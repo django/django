@@ -27,7 +27,7 @@ class TestUtilsHtml(SimpleTestCase):
             ('<', '&lt;'),
             ('>', '&gt;'),
             ('"', '&quot;'),
-            ("'", '&#39;'),
+            ("'", '&#x27;'),
         )
         # Substitution patterns for testing the above items.
         patterns = ("%s", "asdf%sfdsa", "%s1", "1%sb")
