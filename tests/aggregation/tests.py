@@ -1163,3 +1163,79 @@ class AggregateTestCase(TestCase):
             Exists(long_books_qs),
         ).annotate(total=Count('*'))
         self.assertEqual(dict(has_long_books_breakdown), {True: 2, False: 3})
+
+    def test_avg_distinct(self):
+        """
+        Avg aggregate should support distinct parameter to compute
+        the average of only distinct values.
+        """
+        # All ratings: 4.5, 3.0, 4.0, 4.0, 4.0, 5.0
+        # Average: (4.5 + 3.0 + 4.0 + 4.0 + 4.0 + 5.0) / 6 = 4.083...
+        vals = Book.objects.aggregate(Avg('rating'))
+        self.assertAlmostEqual(vals['rating__avg'], 4.083, places=2)
+
+        # Distinct ratings: 4.5, 3.0, 4.0, 5.0
+        # Average of distinct: (4.5 + 3.0 + 4.0 + 5.0) / 4 = 4.125
+        vals = Book.objects.aggregate(Avg('rating', distinct=True))
+        self.assertEqual(vals['rating__avg'], 4.125)
+
+    def test_sum_distinct(self):
+        """
+        Sum aggregate should support distinct parameter to compute
+        the sum of only distinct values.
+        """
+        # All ratings: 4.5, 3.0, 4.0, 4.0, 4.0, 5.0
+        # Sum: 24.5
+        vals = Book.objects.aggregate(Sum('rating'))
+        self.assertEqual(vals['rating__sum'], 24.5)
+
+        # Distinct ratings: 4.5, 3.0, 4.0, 5.0
+        # Sum of distinct: 16.5
+        vals = Book.objects.aggregate(Sum('rating', distinct=True))
+        self.assertEqual(vals['rating__sum'], 16.5)
+
+    def test_sum_distinct_decimal(self):
+        """
+        Sum with distinct should work with DecimalField.
+        """
+        # All prices: 30.00, 23.09, 29.69, 29.69, 82.80, 75.00
+        # Sum: 270.27
+        vals = Book.objects.aggregate(Sum('price'))
+        self.assertEqual(vals['price__sum'], Decimal('270.27'))
+
+        # Distinct prices: 30.00, 23.09, 29.69, 82.80, 75.00
+        # Sum of distinct: 240.58
+        vals = Book.objects.aggregate(Sum('price', distinct=True))
+        self.assertEqual(vals['price__sum'], Decimal('240.58'))
+
+    def test_avg_distinct_decimal(self):
+        """
+        Avg with distinct should work with DecimalField.
+        """
+        # All prices: 30.00, 23.09, 29.69, 29.69, 82.80, 75.00
+        # Average: 270.27 / 6 = 45.045
+        vals = Book.objects.aggregate(Avg('price'))
+        self.assertEqual(vals['price__avg'], Decimal('45.045'))
+
+        # Distinct prices: 30.00, 23.09, 29.69, 82.80, 75.00
+        # Average of distinct: 240.58 / 5 = 48.116
+        vals = Book.objects.aggregate(Avg('price', distinct=True))
+        self.assertEqual(vals['price__avg'], Decimal('48.116'))
+
+    def test_max_distinct(self):
+        """
+        Max aggregate should support distinct parameter (though it has
+        no practical effect on the result).
+        """
+        # Test that distinct parameter is accepted
+        vals = Book.objects.aggregate(Max('rating', distinct=True))
+        self.assertEqual(vals['rating__max'], 5.0)
+
+    def test_min_distinct(self):
+        """
+        Min aggregate should support distinct parameter (though it has
+        no practical effect on the result).
+        """
+        # Test that distinct parameter is accepted
+        vals = Book.objects.aggregate(Min('rating', distinct=True))
+        self.assertEqual(vals['rating__min'], 3.0)
