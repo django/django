@@ -781,6 +781,24 @@ class BasicExpressionsTests(TestCase):
             [self.example_inc.ceo, self.max],
         )
 
+    def test_expressionwrapper_with_constant_values_aggregate(self):
+        # Constant expressions wrapped in ExpressionWrapper should not be
+        # included in the GROUP BY clause.
+        expr = ExpressionWrapper(Value(3), output_field=IntegerField())
+        qs = Employee.objects.annotate(
+            expr_res=expr
+        ).values('expr_res', 'lastname').annotate(sum=Sum('salary'))
+        # This should work without raising an error about constants in GROUP BY
+        results = list(qs)
+        # Verify that the constant expression is in the SELECT but not in GROUP BY
+        sql = str(qs.query)
+        self.assertIn('3', sql)  # Constant in SELECT
+        # Verify results are grouped by lastname only
+        self.assertEqual(len(results), 3)  # Smith, Meyer, Mustermann
+        # All results should have expr_res=3
+        for result in results:
+            self.assertEqual(result['expr_res'], 3)
+
 
 class IterableLookupInnerExpressionsTests(TestCase):
     @classmethod
