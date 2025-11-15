@@ -563,6 +563,24 @@ class MigrationAutodetector:
                 if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
+                    # Check if any fields in this model exist in the parent model
+                    # in the old state and need to be removed first (to avoid
+                    # FieldError when a field is moved from parent to child).
+                    if (base_app_label, base_name.lower()) in self.kept_model_keys:
+                        old_base_model_state = self.from_state.models.get(
+                            (base_app_label, base_name.lower())
+                        )
+                        if old_base_model_state:
+                            for field_name in model_state.fields:
+                                if field_name in old_base_model_state.fields:
+                                    # This field exists in the parent in the old state
+                                    # Depend on its removal from the parent
+                                    dependencies.append((
+                                        base_app_label,
+                                        base_name.lower(),
+                                        field_name,
+                                        False
+                                    ))
             # Depend on the other end of the primary key if it's a relation
             if primary_key_rel:
                 dependencies.append((

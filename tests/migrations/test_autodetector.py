@@ -2454,3 +2454,34 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'app', 1)
         self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')
+
+    def test_create_model_with_field_removed_from_base_model(self):
+        """
+        Tests autodetection of field being moved from parent model to child
+        model. The field removal from the parent should be ordered before the
+        child model creation to avoid FieldError.
+        """
+        # Before: Readable model with title field
+        readable_with_field = ModelState('app', 'Readable', [
+            ("id", models.AutoField(primary_key=True)),
+            ("title", models.CharField(max_length=200)),
+        ])
+        # After: Readable without title, Book subclass with title
+        readable_without_field = ModelState('app', 'Readable', [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        book = ModelState('app', 'Book', [
+            ("readable_ptr", models.OneToOneField(
+                "app.Readable",
+                models.CASCADE,
+                parent_link=True,
+                primary_key=True,
+                auto_created=True,
+            )),
+            ("title", models.CharField(max_length=200)),
+        ], bases=('app.Readable',))
+        changes = self.get_changes([readable_with_field], [readable_without_field, book])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RemoveField', 'CreateModel'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, model_name='readable', name='title')
+        self.assertOperationAttributes(changes, 'app', 0, 1, name='Book')
