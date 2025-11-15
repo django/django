@@ -118,6 +118,49 @@ class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(null=True, blank=True, unique=True, unpack_ipv4=True)
 
 
+# Models for testing ForeignKey validation with custom managers
+class ArticleManager(models.Manager):
+    """Manager that filters out archived articles by default."""
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
+
+
+class ArticleWithCustomManager(models.Model):
+    """Article model with a custom manager that filters by default."""
+    title = models.CharField(max_length=100)
+    archived = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, default='draft')
+
+    # Use custom manager that excludes archived articles
+    objects = ArticleManager()
+
+    class Meta:
+        db_table = 'validation_article_custom'
+
+
+class FavoriteArticleWithLimitChoices(models.Model):
+    """FavoriteArticle with limit_choices_to constraint."""
+    article = models.ForeignKey(
+        ArticleWithCustomManager,
+        on_delete=models.CASCADE,
+        limit_choices_to={'status': 'published'}
+    )
+
+    class Meta:
+        db_table = 'validation_favorite_article_limited'
+
+
+class FavoriteArticle(models.Model):
+    """FavoriteArticle without limit_choices_to constraint."""
+    article = models.ForeignKey(
+        ArticleWithCustomManager,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = 'validation_favorite_article'
+
+
 # A model can't have multiple AutoFields
 # Refs #12467.
 assertion_error = None
