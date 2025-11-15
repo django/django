@@ -92,9 +92,14 @@ class URLValidator(RegexValidator):
     )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
+    # User and password regex for authentication
+    # RFC 1738: within user/password, ":", "@", "/" must be encoded
+    # Allow unreserved characters and percent-encoded sequences, excluding ":", "@", "/"
+    userinfo_re = r'[^\s:@/]+(?::[^\s@/]*)?'
+
     regex = _lazy_re_compile(
         r'^(?:[a-z0-9\.\-\+]*)://'  # scheme is validated separately
-        r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
+        r'(?:' + userinfo_re + r'@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{2,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
