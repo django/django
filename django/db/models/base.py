@@ -804,9 +804,29 @@ class Model(metaclass=ModelBase):
         inserted = False
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
-            if (field and getattr(self, parent._meta.pk.attname) is None and
-                    getattr(self, field.attname) is not None):
-                setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
+            parent_pk_val = getattr(self, parent._meta.pk.attname)
+            if field:
+                parent_link_val = getattr(self, field.attname)
+                if parent_pk_val is not None and parent_link_val is None:
+                    # When a child's pk (which is the parent link) is set to None,
+                    # but the parent's pk field still has a value, it means the user
+                    # wants to reset the pk to create a new object. We should also
+                    # reset the parent's pk.
+                    setattr(self, parent._meta.pk.attname, None)
+                elif parent_pk_val is None and parent_link_val is not None:
+                    # If the parent's pk is None but the parent link has a value,
+                    # this could be either:
+                    # 1. A new object being created (sync parent pk from parent link)
+                    # 2. An existing object where parent pk was reset to None (should stay None)
+                    # If this is an existing object (_state.adding=False), and the
+                    # parent link equals the object's own primary key field, it means
+                    # the user explicitly reset the parent's pk to None for cloning.
+                    if not self._state.adding and self.pk == parent_link_val:
+                        # User reset parent's pk on an existing object; reset parent link too
+                        setattr(self, field.attname, None)
+                    else:
+                        # New object or mismatch: sync parent pk from parent link
+                        setattr(self, parent._meta.pk.attname, parent_link_val)
             parent_inserted = self._save_parents(cls=parent, using=using, update_fields=update_fields)
             updated = self._save_table(
                 cls=parent, using=using, update_fields=update_fields,
