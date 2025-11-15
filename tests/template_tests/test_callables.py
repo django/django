@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from django.db import models
 from django.template import Context, Engine
 
 
@@ -123,3 +124,62 @@ class CallableVariablesTests(TestCase):
         # Double-check that the object was really never called during the
         # template rendering.
         self.assertEqual(my_doodad.num_calls, 0)
+
+    def test_choices_enum_in_templates(self):
+        # Test that enumeration types (Choices classes) can be used in templates
+        # without being called.
+        class YearInSchool(models.TextChoices):
+            FRESHMAN = 'FR', 'Freshman'
+            SOPHOMORE = 'SO', 'Sophomore'
+            JUNIOR = 'JR', 'Junior'
+            SENIOR = 'SR', 'Senior'
+
+        class Student:
+            def __init__(self, year_in_school):
+                self.year_in_school = year_in_school
+
+        student = Student(YearInSchool.FRESHMAN)
+        c = Context({'student': student, 'YearInSchool': YearInSchool})
+
+        # Test comparison with enum member in template
+        t = self.engine.from_string('{% if student.year_in_school == YearInSchool.FRESHMAN %}freshman{% endif %}')
+        self.assertEqual(t.render(c), 'freshman')
+
+        # Test that accessing enum class attributes works
+        t = self.engine.from_string('{{ YearInSchool.FRESHMAN }}')
+        self.assertEqual(t.render(c), 'FR')
+
+        # Test with different year
+        student.year_in_school = YearInSchool.SENIOR
+        t = self.engine.from_string('{% if student.year_in_school == YearInSchool.SENIOR %}senior{% endif %}')
+        self.assertEqual(t.render(c), 'senior')
+
+        # Test that comparison with wrong enum member returns empty
+        t = self.engine.from_string('{% if student.year_in_school == YearInSchool.FRESHMAN %}freshman{% endif %}')
+        self.assertEqual(t.render(c), '')
+
+    def test_integerchoices_enum_in_templates(self):
+        # Test that IntegerChoices also work in templates
+        class Priority(models.IntegerChoices):
+            LOW = 1, 'Low'
+            MEDIUM = 2, 'Medium'
+            HIGH = 3, 'High'
+
+        class Task:
+            def __init__(self, priority):
+                self.priority = priority
+
+        task = Task(Priority.HIGH)
+        c = Context({'task': task, 'Priority': Priority})
+
+        # Test comparison with enum member in template
+        t = self.engine.from_string('{% if task.priority == Priority.HIGH %}high priority{% endif %}')
+        self.assertEqual(t.render(c), 'high priority')
+
+        # Test that accessing enum class attributes works
+        t = self.engine.from_string('{{ Priority.HIGH }}')
+        self.assertEqual(t.render(c), '3')
+
+        # Test that enum members are accessible
+        t = self.engine.from_string('{{ Priority.LOW.value }}')
+        self.assertEqual(t.render(c), '1')
