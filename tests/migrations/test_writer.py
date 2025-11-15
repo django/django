@@ -61,6 +61,14 @@ class IntEnum(enum.IntEnum):
     B = 2
 
 
+class OuterClass:
+    """Module-level outer class for testing nested class serialization."""
+    class InnerClass(models.CharField):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault('max_length', 20)
+            super().__init__(*args, **kwargs)
+
+
 class OperationWriterTests(SimpleTestCase):
 
     def test_empty_signature(self):
@@ -731,7 +739,13 @@ class WriterTests(SimpleTestCase):
                 return ('DeconstructibleInstances', [], {})
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+        # Since DeconstructibleInstances is defined locally (in a function), it will have
+        # '<locals>' in its __qualname__, resulting in a fully qualified path
+        self.assertEqual(
+            string,
+            "models.CharField(default=migrations.test_writer.WriterTests."
+            "test_deconstruct_class_arguments.<locals>.DeconstructibleInstances)"
+        )
 
     def test_register_serializer(self):
         class ComplexSerializer(BaseSerializer):
@@ -747,3 +761,26 @@ class WriterTests(SimpleTestCase):
     def test_register_non_serializer(self):
         with self.assertRaisesMessage(ValueError, "'TestModel1' must inherit from 'BaseSerializer'."):
             MigrationWriter.register_serializer(complex, TestModel1)
+
+    def test_serialize_nested_class(self):
+        """
+        Test serialization of nested/inner classes.
+        When a custom field is defined as an inner class, the serializer should
+        use the full qualified name including the outer class.
+        Regression test for issue where makemigrations incorrectly serialized
+        inner classes without their outer class qualifier.
+        """
+        # Test serializing the type itself
+        string, imports = MigrationWriter.serialize(OuterClass.InnerClass)
+        self.assertEqual(string, "migrations.test_writer.OuterClass.InnerClass")
+        self.assertEqual(imports, {"import migrations.test_writer"})
+
+        # Test serializing an instance of the nested field
+        field = OuterClass.InnerClass(max_length=20)
+        string, imports = MigrationWriter.serialize(field)
+        # The field instance should reference the correct nested class path
+        self.assertIn("migrations.test_writer.OuterClass.InnerClass", string)
+
+        # The serialized string should NOT be just "InnerClass" without the outer class
+        self.assertNotIn("models.InnerClass", string)
+        self.assertNotIn("test_writer.InnerClass(", string)
