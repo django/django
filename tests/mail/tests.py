@@ -403,6 +403,60 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             payload1.as_bytes().endswith(b'\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
         )
 
+    def test_unicode_dns_name(self):
+        """
+        Test that email messages work correctly when DNS_NAME contains
+        non-ASCII characters and encoding is non-unicode (e.g., iso-8859-1).
+        The domain should be converted to punycode (IDNA encoding).
+        """
+        from unittest.mock import patch
+        from django.core.mail import message as message_module
+        from django.core.mail.utils import CachedDnsName
+
+        # Test with Chinese characters
+        with patch.object(message_module, 'DNS_NAME') as mock_dns:
+            # Create a mock that returns punycode for Chinese characters
+            mock_dns.__str__ = lambda self: 'xn--p8s937b'  # punycode for 漢字
+
+            email = EmailMessage('subject', '', 'from@example.com', ['to@example.com'])
+            email.encoding = 'iso-8859-1'
+            message = email.message()
+
+            # Message-ID should contain the punycode version
+            self.assertIn('xn--p8s937b', message['Message-ID'])
+
+        # Test with another set of unicode characters
+        with patch.object(message_module, 'DNS_NAME') as mock_dns:
+            # punycode for 正宗
+            mock_dns.__str__ = lambda self: 'xn--jbt908a'
+
+            email = EmailMessage('subject', '', 'from@example.com', ['to@example.com'])
+            email.encoding = 'iso-8859-1'
+            message = email.message()
+
+            self.assertIn('xn--jbt908a', message['Message-ID'])
+
+    def test_cached_dns_name_punycode(self):
+        """
+        Test that CachedDnsName._encode_domain() correctly converts
+        unicode domain names to punycode.
+        """
+        from django.core.mail.utils import CachedDnsName
+
+        dns = CachedDnsName()
+
+        # Test ASCII domain (should remain unchanged)
+        self.assertEqual(dns._encode_domain('example.com'), 'example.com')
+
+        # Test unicode domain with Chinese characters (漢字)
+        self.assertEqual(dns._encode_domain('漢字'), 'xn--p8s937b')
+
+        # Test unicode domain (正宗)
+        self.assertEqual(dns._encode_domain('正宗'), 'xn--jbt908a')
+
+        # Test mixed ASCII and unicode
+        self.assertEqual(dns._encode_domain('test.漢字.com'), 'test.xn--p8s937b.com')
+
     def test_attachments(self):
         """Regression test for #9367"""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
