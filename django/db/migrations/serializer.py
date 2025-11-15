@@ -120,9 +120,16 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports = {'import %s' % module, *v_imports}
-        return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
+        # For IntEnum and IntFlag, the value is stable and should be used directly
+        # For other Enum types, use name-based access to handle mutable values
+        # (like translatable strings) that may change between runs
+        if isinstance(self.value, (enum.IntEnum, enum.IntFlag)):
+            v_string, v_imports = serializer_factory(self.value.value).serialize()
+            imports = {'import %s' % module, *v_imports}
+            return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
+        else:
+            imports = {'import %s' % module}
+            return "%s.%s[%r]" % (module, enum_class.__name__, self.value.name), imports
 
 
 class FloatSerializer(BaseSimpleSerializer):

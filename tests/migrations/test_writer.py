@@ -267,11 +267,11 @@ class WriterTests(SimpleTestCase):
 
         self.assertSerializedResultEqual(
             TextEnum.A,
-            ("migrations.test_writer.TextEnum('a-value')", {'import migrations.test_writer'})
+            ("migrations.test_writer.TextEnum['A']", {'import migrations.test_writer'})
         )
         self.assertSerializedResultEqual(
             BinaryEnum.A,
-            ("migrations.test_writer.BinaryEnum(b'a-value')", {'import migrations.test_writer'})
+            ("migrations.test_writer.BinaryEnum['A']", {'import migrations.test_writer'})
         )
         self.assertSerializedResultEqual(
             IntEnum.B,
@@ -283,18 +283,18 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(
             string,
             "models.CharField(choices=["
-            "('a-value', migrations.test_writer.TextEnum('a-value')), "
-            "('value-b', migrations.test_writer.TextEnum('value-b'))], "
-            "default=migrations.test_writer.TextEnum('value-b'))"
+            "('a-value', migrations.test_writer.TextEnum['A']), "
+            "('value-b', migrations.test_writer.TextEnum['B'])], "
+            "default=migrations.test_writer.TextEnum['B'])"
         )
         field = models.CharField(default=BinaryEnum.B, choices=[(m.value, m) for m in BinaryEnum])
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.CharField(choices=["
-            "(b'a-value', migrations.test_writer.BinaryEnum(b'a-value')), "
-            "(b'value-b', migrations.test_writer.BinaryEnum(b'value-b'))], "
-            "default=migrations.test_writer.BinaryEnum(b'value-b'))"
+            "(b'a-value', migrations.test_writer.BinaryEnum['A']), "
+            "(b'value-b', migrations.test_writer.BinaryEnum['B'])], "
+            "default=migrations.test_writer.BinaryEnum['B'])"
         )
         field = models.IntegerField(default=IntEnum.A, choices=[(m.value, m) for m in IntEnum])
         string = MigrationWriter.serialize(field)[0]
@@ -305,6 +305,30 @@ class WriterTests(SimpleTestCase):
             "(2, migrations.test_writer.IntEnum(2))], "
             "default=migrations.test_writer.IntEnum(1))"
         )
+
+    def test_serialize_enums_with_translated_values(self):
+        """
+        Test that enum serialization uses name-based access instead of
+        value-based constructor to handle translatable enum values.
+        """
+        class TranslatedEnum(enum.Enum):
+            GOOD = _('Good')
+            BAD = _('Bad')
+
+        # Enum should be serialized using name-based access
+        self.assertSerializedResultEqual(
+            TranslatedEnum.GOOD,
+            ("migrations.test_writer.TranslatedEnum['GOOD']", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            TranslatedEnum.BAD,
+            ("migrations.test_writer.TranslatedEnum['BAD']", {'import migrations.test_writer'})
+        )
+
+        # Test with a field
+        field = models.CharField(default=TranslatedEnum.GOOD, max_length=128)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertIn("default=migrations.test_writer.TranslatedEnum['GOOD']", string)
 
     def test_serialize_choices(self):
         class TextChoices(models.TextChoices):
