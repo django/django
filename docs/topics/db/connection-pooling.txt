@@ -1,0 +1,101 @@
+=============================
+Database connection pooling
+=============================
+
+.. versionadded:: 5.1
+
+   PostgreSQL connection pooling was introduced in Django 5.1.
+
+.. versionadded:: 5.2
+
+   Oracle connection pooling was introduced in Django 5.2.
+
+Introduction
+============
+
+Database connection pooling allows Django to reuse database connections
+rather than opening and closing a connection for each request. This can
+improve performance and reduce overhead in applications with many
+short-lived database operations.
+
+Django supports two main approaches:
+
+- **Persistent connections** via :setting:`CONN_MAX_AGE` (all backends).
+- **True connection pooling** (currently PostgreSQL and Oracle only).
+
+Supported backends
+==================
+
+PostgreSQL
+-----------
+
+Since Django 5.1, the PostgreSQL backend supports connection pooling
+when using the :pypi:`psycopg` driver with ``psycopg[pool]`` installed.
+
+Enable pooling by setting the ``"pool"`` option in your database
+``OPTIONS``::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "mydb",
+            "USER": "myuser",
+            "PASSWORD": "secret",
+            "OPTIONS": {
+                "pool": True,  # or a dict of parameters for psycopg_pool.ConnectionPool
+            },
+        }
+    }
+
+See :ref:`postgresql-pool` for details.
+
+Oracle
+------
+
+Since Django 5.2, the Oracle backend supports pooling when using the
+`python-oracledb <https://python-oracledb.readthedocs.io/>`_ driver.
+
+Enable pooling by setting the ``"pool"`` option in your database
+``OPTIONS``. See :ref:`oracle-pool` for details.
+
+Other backends
+--------------
+
+- **MySQL / MariaDB / SQLite** do not currently support native connection
+  pooling in Django.
+- These backends can only use persistent connections
+  (:setting:`CONN_MAX_AGE`) or an **external pooler** (for example,
+  ProxySQL, MariaDB MaxScale).
+
+Persistent connections vs pooling
+=================================
+
+- :setting:`CONN_MAX_AGE` keeps connections open for reuse, but each worker
+  maintains its own connection(s).
+- True pooling manages a **shared pool** of connections that can be borrowed
+  and returned, which is more efficient for high-concurrency workloads.
+
+External poolers
+================
+
+For production deployments, it’s common to use an external pooler:
+
+- PostgreSQL: `PgBouncer <https://www.pgbouncer.org/>`_
+- MySQL/MariaDB: `ProxySQL <https://proxysql.com/>`_
+
+When using external poolers, ensure your Django settings are compatible with
+the pooler’s mode (for example, transaction pooling in PgBouncer has special
+considerations, see :ref:`transaction-pooling-server-side-cursors`).
+
+Async considerations
+====================
+
+Django’s ORM is still synchronous, but connection pooling plays a role in
+improving async support in the future. For now:
+
+- Use the backend’s built-in pooling if available.
+
+- Or use an external pooler in async workloads.
+
+See :ref:`async` for details.
+
