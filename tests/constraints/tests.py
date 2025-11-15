@@ -79,6 +79,84 @@ class CheckConstraintTests(TestCase):
         expected_name = 'price_gt_discounted_price'
         self.assertIn(expected_name, constraints)
 
+    def test_check_constraint_sql_with_or(self):
+        """
+        Test that CheckConstraint with OR operator generates correct SQL
+        without table qualifiers on SQLite and Oracle.
+        """
+        from django.db import connection
+        from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+        from django.db.models.sql.query import Query
+
+        # Create a temporary model for testing
+        class TempModel1(models.Model):
+            field_1 = models.IntegerField(blank=True, null=True)
+            flag = models.BooleanField()
+
+            class Meta:
+                app_label = 'constraints'
+                db_table = 'temp_test_constraint'
+
+        # Create the constraint with OR operator
+        constraint_check = models.Q(flag__exact=True, field_1__isnull=False) | models.Q(flag__exact=False)
+
+        # Generate the check SQL directly
+        query = Query(model=TempModel1)
+        where = query.build_where(constraint_check)
+        compiler = query.get_compiler(connection=connection)
+        sql, params = where.as_sql(compiler, connection)
+
+        # The SQL should not contain any table qualifiers
+        # It should look like: (("field_1" IS NOT NULL AND "flag" = 1) OR "flag" = 0)
+        # NOT like: (("temp_test_constraint"."field_1" IS NOT NULL...
+        self.assertNotIn('temp_test_constraint.', sql.lower())
+        self.assertNotIn('new__temp_test_constraint.', sql.lower())
+
+        # Verify that both parts of the OR clause use simple column names
+        # The flag field appears in both parts, so check it's not qualified
+        self.assertIn('"flag"', sql)
+        # Make sure field_1 is present and not qualified
+        self.assertIn('"field_1"', sql)
+
+    def test_check_constraint_sql_with_nested_or_and(self):
+        """
+        Test that CheckConstraint with nested OR and AND operators generates
+        correct SQL without table qualifiers.
+        """
+        from django.db import connection
+        from django.db.models.sql.query import Query
+
+        # Create a temporary model for testing
+        class TempModel2(models.Model):
+            field_1 = models.IntegerField(blank=True, null=True)
+            field_2 = models.IntegerField(blank=True, null=True)
+            flag = models.BooleanField()
+
+            class Meta:
+                app_label = 'constraints'
+                db_table = 'temp_test_constraint_nested'
+
+        # Create a more complex constraint with nested OR and AND
+        constraint_check = (
+            models.Q(flag__exact=True, field_1__isnull=False, field_2__gt=0) |
+            models.Q(flag__exact=False) |
+            models.Q(field_1__exact=0, field_2__exact=0)
+        )
+
+        # Generate the check SQL directly
+        query = Query(model=TempModel2)
+        where = query.build_where(constraint_check)
+        compiler = query.get_compiler(connection=connection)
+        sql, params = where.as_sql(compiler, connection)
+
+        # The SQL should not contain any table qualifiers
+        self.assertNotIn('temp_test_constraint_nested.', sql.lower())
+
+        # Verify all fields are present without table qualifiers
+        self.assertIn('"flag"', sql)
+        self.assertIn('"field_1"', sql)
+        self.assertIn('"field_2"', sql)
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
