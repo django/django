@@ -9,7 +9,10 @@ from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from .models import Article, Author, OrderedByFArticle, Reference
+from .models import (
+    Article, Author, ChildArticle, OrderedByFArticle, Reference,
+    RelatedToArticleWithExpression,
+)
 
 
 class OrderingTests(TestCase):
@@ -471,3 +474,55 @@ class OrderingTests(TestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
             list(Article.objects.values('author').annotate(Count('headline')))
+
+    def test_related_ordering_with_expression_in_parent(self):
+        """
+        Ordering by a ForeignKey to a model with Meta.ordering containing
+        expressions (like OrderBy or F().asc()) should not crash.
+        Regression test for #XXXXX.
+        """
+        # Create test data
+        a1 = Article.objects.create(
+            headline="Test Article 1",
+            pub_date=datetime(2020, 1, 1),
+            author=self.author_1
+        )
+        a2 = Article.objects.create(
+            headline="Test Article 2",
+            pub_date=datetime(2020, 1, 2),
+            author=self.author_2
+        )
+
+        r1 = RelatedToArticleWithExpression.objects.create(article=a1, name="Related 1")
+        r2 = RelatedToArticleWithExpression.objects.create(article=a2, name="Related 2")
+
+        # This should not crash with: TypeError: 'OrderBy' object is not subscriptable
+        # The bug occurred because find_ordering_name didn't handle OrderBy expressions
+        # from Meta.ordering when recursively processing related model ordering
+        queryset = RelatedToArticleWithExpression.objects.all()
+        list(queryset)  # Force evaluation
+
+        # Verify the queryset can be evaluated multiple times
+        self.assertEqual(queryset.count(), 2)
+
+    def test_child_inherits_parent_ordering_with_expressions(self):
+        """
+        A child model that inherits Meta.ordering with expressions from its
+        parent should handle ordering correctly.
+        """
+        # Create test data
+        ChildArticle.objects.create(
+            headline="Child Article 1",
+            pub_date=datetime(2020, 1, 1),
+            author=self.author_1
+        )
+        ChildArticle.objects.create(
+            headline="Child Article 2",
+            pub_date=datetime(2020, 1, 2),
+            author=self.author_2
+        )
+
+        # This should not crash
+        queryset = ChildArticle.objects.all()
+        list(queryset)  # Force evaluation
+        self.assertEqual(queryset.count(), 2)

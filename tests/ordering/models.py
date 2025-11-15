@@ -59,3 +59,24 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class ChildArticle(Article):
+    """
+    Child model that inherits Article's Meta.ordering which contains expressions.
+    """
+    class Meta:
+        pass
+
+
+class RelatedToArticleWithExpression(models.Model):
+    """
+    This model has a ForeignKey to Article (which has expressions in Meta.ordering)
+    and orders by that relation. This tests the bug where expressions in parent
+    model's Meta.ordering crash when processing the related ordering.
+    """
+    article = models.ForeignKey(Article, models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('article',)

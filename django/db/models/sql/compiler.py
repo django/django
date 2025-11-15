@@ -704,6 +704,16 @@ class SQLCompiler:
         not be) and column name for ordering by the given 'name' parameter.
         The 'name' is of the form 'field1__field2__...__fieldN'.
         """
+        # If name is an expression (e.g., OrderBy or F().asc() from Meta.ordering),
+        # we can't process it through find_ordering_name as it's not a simple field name.
+        # Expressions from Meta.ordering are meant for direct use in the model's own queries,
+        # not for recursive processing when ordering by a ForeignKey.
+        # Simply skip them to avoid crashes.
+        if hasattr(name, 'resolve_expression'):
+            # Skip expressions entirely - they're not applicable when recursively
+            # processing related model ordering.
+            return []
+
         name, order = get_order_dir(name, default_order)
         descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
