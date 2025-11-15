@@ -2912,3 +2912,25 @@ class ModelToDictTests(TestCase):
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+    def test_empty_fields_list(self):
+        """model_to_dict() should return an empty dict when fields=[]."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When fields=[] is explicitly passed, no fields should be returned
+        data = model_to_dict(writer, fields=[])
+        self.assertEqual(data, {})
+
+    def test_fields_none(self):
+        """model_to_dict() should return all fields when fields=None (default)."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When fields=None (default), all editable fields should be returned
+        data = model_to_dict(writer, fields=None)
+        self.assertIn('name', data)
+        self.assertEqual(data['name'], 'Test Writer')
+
+    def test_fields_subset(self):
+        """model_to_dict() should return only specified fields."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When specific fields are provided, only those should be returned
+        data = model_to_dict(writer, fields=['name'])
+        self.assertEqual(data, {'name': 'Test Writer'})
