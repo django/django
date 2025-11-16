@@ -113,11 +113,11 @@ ancestor classes are  documented under the section title of **Ancestors
         If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
-        The default implementation returns ``HttpResponseNotAllowed`` with status code **405 Method Not Allowed**.
+        The default implementation returns ``HttpResponseNotAllowed`` with 
+        status code **405 Method Not Allowed**.
 
-        **Note:** The response **does not include the allowed methods in the body**.  
-        Instead, Django sets the list of allowed HTTP methods in the ``Allow`` response header,
-        and the response content is empty.
+        **Note:** Django sets the list of allowed HTTP methods in the ``Allow`` 
+        response header, and the response content is empty.
 
     .. method:: options(request, *args, **kwargs)
 
