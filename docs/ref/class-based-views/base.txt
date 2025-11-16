@@ -118,8 +118,8 @@ ancestor classes are  documented under the section title of **Ancestors
 
         .. Note::
 
-           Django sets the list of allowed HTTP methods in the 
-        ``Allow`` response header, and the response content is empty.
+           Django sets the list of allowed HTTP methods in the ``Allow`` 
+           response header, and the response content is empty.
 
     .. method:: options(request, *args, **kwargs)
 
