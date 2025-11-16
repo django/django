@@ -114,9 +114,11 @@ ancestor classes are  documented under the section title of **Ancestors
         method is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with 
-        status code **405 Method Not Allowed**.
+        status code ``405 Method Not Allowed``.
 
-        **Note:** Django sets the list of allowed HTTP methods in the 
+        .. Note::
+
+           Django sets the list of allowed HTTP methods in the 
         ``Allow`` response header, and the response content is empty.
 
     .. method:: options(request, *args, **kwargs)
