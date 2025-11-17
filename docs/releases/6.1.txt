@@ -360,6 +360,10 @@ Models
   Invalid Base64 strings now raise ``ValidationError`` instead of being
   silently accepted.
 
+* The new :attr:`DecimalField.context <django.db.models.DecimalField.context>`
+  attribute allows customizing the creation of  ``Decimal`` instances from
+  floats.
+
 Pagination
 ~~~~~~~~~~
 
