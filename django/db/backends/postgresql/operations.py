@@ -24,6 +24,7 @@ def get_json_dumps(encoder):
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.postgresql.compiler"
     cast_char_field_without_max_length = "varchar"
     explain_prefix = "EXPLAIN"
     explain_options = frozenset(
