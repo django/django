@@ -7,6 +7,14 @@ Django 5.2.9 release notes
 Django 5.2.9 fixes one security issue with severity "high", one security issue
 with severity "moderate", and several bugs in 5.2.8.
 
+CVE-2025-13372: Potential SQL injection in ``FilteredRelation`` column aliases on PostgreSQL
+============================================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases,
+using a suitably crafted dictionary, with dictionary expansion, as the
+``**kwargs`` passed to :meth:`.QuerySet.annotate` or :meth:`.QuerySet.alias` on
+PostgreSQL.
+
 Bugfixes
 ========
 
