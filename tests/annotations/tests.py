@@ -1507,3 +1507,14 @@ class AliasTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
+
+    def test_alias_filtered_relation_sql_injection_dollar_sign(self):
+        qs = Book.objects.alias(
+            **{"crafted_alia$": FilteredRelation("authors")}
+        ).values("name", "crafted_alia$")
+        if connection.vendor == "postgresql":
+            msg = "Dollar signs are not permitted in column aliases on PostgreSQL."
+            with self.assertRaisesMessage(ValueError, msg):
+                list(qs)
+        else:
+            self.assertEqual(qs.first()["name"], self.b1.name)
