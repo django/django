@@ -252,6 +252,10 @@ Models
   <django.db.models.DecimalField.decimal_places>` are no longer required to be
   set on Oracle, PostgreSQL, and SQLite.
 
+* The new :attr:`DecimalField.context <django.db.models.DecimalField.context>`
+  attribute allows customizing the creation of  ``Decimal`` instances from
+  floats.
+
 Pagination
 ~~~~~~~~~~
 

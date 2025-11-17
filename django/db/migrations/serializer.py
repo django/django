@@ -100,6 +100,19 @@ class DecimalSerializer(BaseSerializer):
         return repr(self.value), {"from decimal import Decimal"}
 
 
+class DecimalContextSerializer(BaseSerializer):
+    def serialize(self):
+        decimal_imports = ["Context"]
+        for trap, is_used in self.value.traps.items():
+            # Decimal exceptions defined in the decimal module.
+            if is_used and trap.__module__ == "decimal":
+                decimal_imports.append(trap.__name__)
+        decimal_imports = ", ".join(sorted(decimal_imports))
+        return repr(self.value), {
+            f"from decimal import {self.value.rounding}, {decimal_imports}"
+        }
+
+
 class DeconstructibleSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(path, args, kwargs):
@@ -372,6 +385,7 @@ class Serializer:
         SettingsReference: SettingsReferenceSerializer,
         float: FloatSerializer,
         (bool, int, types.NoneType, bytes, str, range): BaseSimpleSerializer,
+        decimal.Context: DecimalContextSerializer,
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         FUNCTION_TYPES: FunctionTypeSerializer,

@@ -1706,10 +1706,18 @@ class DecimalField(Field):
         name=None,
         max_digits=None,
         decimal_places=None,
+        context=None,
         **kwargs,
     ):
         self.max_digits, self.decimal_places = max_digits, decimal_places
+        if context is not None and not isinstance(context, decimal.Context):
+            raise ValueError("DecimalField.context must be a decimal.Context instance.")
+        self._context = context
         super().__init__(verbose_name, name, **kwargs)
+
+    @property
+    def non_db_attrs(self):
+        return (*super().non_db_attrs, "context")
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
@@ -1822,6 +1830,8 @@ class DecimalField(Field):
 
     @cached_property
     def context(self):
+        if self._context is not None:
+            return self._context
         return decimal.Context(prec=self.max_digits)
 
     def deconstruct(self):
@@ -1830,6 +1840,8 @@ class DecimalField(Field):
             kwargs["max_digits"] = self.max_digits
         if self.decimal_places is not None:
             kwargs["decimal_places"] = self.decimal_places
+        if self._context is not None:
+            kwargs["context"] = self.context
         return name, path, args, kwargs
 
     def get_internal_type(self):

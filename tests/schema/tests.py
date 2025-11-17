@@ -2,7 +2,7 @@ import datetime
 import itertools
 import unittest
 from copy import copy
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Context, Decimal
 from unittest import mock
 
 from django.core.exceptions import FieldError
@@ -4899,6 +4899,30 @@ class SchemaTests(TransactionTestCase):
             max_length=255,
         )
         new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_field(Author, new_field, old_field, strict=True)
+
+    @isolate_apps("schema")
+    def test_alter_decimalfield_context_noop(self):
+        class ModelWithDecimalField(Model):
+            field = DecimalField(max_digits=5, decimal_places=2)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithDecimalField)
+        self.isolated_local_models = [ModelWithDecimalField]
+
+        old_field = ModelWithDecimalField._meta.get_field("field")
+        new_field = DecimalField(
+            max_digits=5,
+            decimal_places=2,
+            context=Context(prec=13, rounding=ROUND_HALF_UP),
+        )
+        new_field.set_attributes_from_name("field")
         with connection.schema_editor() as editor, self.assertNumQueries(0):
             editor.alter_field(Author, old_field, new_field, strict=True)
         with connection.schema_editor() as editor, self.assertNumQueries(0):
