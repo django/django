@@ -1725,54 +1725,84 @@ class DecimalField(Field):
         return errors
 
     def _check_decimal_places(self):
-        try:
-            decimal_places = int(self.decimal_places)
-            if decimal_places < 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'decimal_places' attribute.",
-                    obj=self,
-                    id="fields.E130",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'decimal_places' must be a non-negative integer.",
-                    obj=self,
-                    id="fields.E131",
-                )
-            ]
+        if self.decimal_places is None:
+            if (
+                not connection.features.supports_no_precision_decimalfield
+                and "supports_no_precision_decimalfield"
+                not in self.model._meta.required_db_features
+            ):
+                return [
+                    checks.Error(
+                        "DecimalFields must define a 'decimal_places' attribute.",
+                        obj=self,
+                        id="fields.E130",
+                    )
+                ]
+            elif self.max_digits is not None:
+                return [
+                    checks.Error(
+                        "DecimalField’s max_digits and decimal_places must both "
+                        "be defined or both omitted.",
+                        obj=self,
+                        id="fields.E135",
+                    ),
+                ]
         else:
-            return []
+            try:
+                decimal_places = int(self.decimal_places)
+                if decimal_places < 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'decimal_places' must be a non-negative integer.",
+                        obj=self,
+                        id="fields.E131",
+                    )
+                ]
+        return []
 
     def _check_max_digits(self):
-        try:
-            max_digits = int(self.max_digits)
-            if max_digits <= 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'max_digits' attribute.",
-                    obj=self,
-                    id="fields.E132",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'max_digits' must be a positive integer.",
-                    obj=self,
-                    id="fields.E133",
-                )
-            ]
+        if self.max_digits is None:
+            if (
+                not connection.features.supports_no_precision_decimalfield
+                and "supports_no_precision_decimalfield"
+                not in self.model._meta.required_db_features
+            ):
+                return [
+                    checks.Error(
+                        "DecimalFields must define a 'max_digits' attribute.",
+                        obj=self,
+                        id="fields.E132",
+                    )
+                ]
+            elif self.decimal_places is not None:
+                return [
+                    checks.Error(
+                        "DecimalField’s max_digits and decimal_places must both "
+                        "be defined or both omitted.",
+                        obj=self,
+                        id="fields.E135",
+                    ),
+                ]
         else:
-            return []
+            try:
+                max_digits = int(self.max_digits)
+                if max_digits <= 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'max_digits' must be a positive integer.",
+                        obj=self,
+                        id="fields.E133",
+                    )
+                ]
+        return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
+        if self.decimal_places is None or self.max_digits is None:
+            return []
         if int(self.decimal_places) > int(self.max_digits):
             return [
                 checks.Error(
