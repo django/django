@@ -176,10 +176,16 @@ def parse_http_date(date):
     try:
         year = int(m.group('year'))
         if year < 100:
-            if year < 70:
-                year += 2000
+            # RFC 7231: interpret a timestamp that appears to be more than 50
+            # years in the future as representing the most recent year in the
+            # past that had the same last two digits.
+            current_year = datetime.datetime.utcnow().year
+            current_century = (current_year // 100) * 100
+            year_candidate = current_century + year
+            if year_candidate - current_year > 50:
+                year = year_candidate - 100
             else:
-                year += 1900
+                year = year_candidate
         month = MONTHS.index(m.group('mon').lower()) + 1
         day = int(m.group('day'))
         hour = int(m.group('hour'))

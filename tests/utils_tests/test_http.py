@@ -324,9 +324,73 @@ class HttpDateProcessingTests(unittest.TestCase):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
-    def test_parsing_year_less_than_70(self):
-        parsed = parse_http_date('Sun Nov  6 08:49:37 0037')
-        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2037, 11, 6, 8, 49, 37))
+    def test_parsing_two_digit_year(self):
+        """
+        Test RFC 7231 compliance: two-digit year handling.
+        A two-digit year that appears to be more than 50 years in the future
+        should be interpreted as the most recent year in the past that had
+        the same last two digits.
+        """
+        current_year = datetime.utcnow().year
+        current_century = (current_year // 100) * 100
+
+        # Test a year that's close to current (within 50 years in future)
+        # For example, if current year is 2025, year "30" should be 2030
+        two_digit = (current_year + 5) % 100
+        year_candidate = current_century + two_digit
+        if year_candidate - current_year > 50:
+            expected_year = year_candidate - 100
+        else:
+            expected_year = year_candidate
+
+        date_str = 'Sunday, 06-Nov-%02d 08:49:37 GMT' % two_digit
+        parsed = parse_http_date(date_str)
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
+
+        # Test a year that's more than 50 years in future
+        # For example, if current year is 2025, year "80" should be 1980
+        two_digit_far = (current_year + 60) % 100
+        year_candidate = current_century + two_digit_far
+        if year_candidate - current_year > 50:
+            expected_year = year_candidate - 100
+        else:
+            expected_year = year_candidate
+
+        date_str = 'Sunday, 06-Nov-%02d 08:49:37 GMT' % two_digit_far
+        parsed = parse_http_date(date_str)
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
+
+    def test_parsing_rfc850_two_digit_year_boundary(self):
+        """
+        Test boundary conditions for RFC 7231 two-digit year conversion.
+        """
+        current_year = datetime.utcnow().year
+        current_century = (current_year // 100) * 100
+
+        # Test exactly 50 years in the future (should still be future)
+        two_digit_50 = (current_year + 50) % 100
+        year_candidate = current_century + two_digit_50
+        # Edge case: exactly 50 years is not "more than 50"
+        if year_candidate - current_year > 50:
+            expected_year = year_candidate - 100
+        else:
+            expected_year = year_candidate
+
+        date_str = 'Sunday, 06-Nov-%02d 08:49:37 GMT' % two_digit_50
+        parsed = parse_http_date(date_str)
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
+
+        # Test exactly 51 years in the future (should be past)
+        two_digit_51 = (current_year + 51) % 100
+        year_candidate = current_century + two_digit_51
+        if year_candidate - current_year > 50:
+            expected_year = year_candidate - 100
+        else:
+            expected_year = year_candidate
+
+        date_str = 'Sunday, 06-Nov-%02d 08:49:37 GMT' % two_digit_51
+        parsed = parse_http_date(date_str)
+        self.assertEqual(datetime.utcfromtimestamp(parsed).year, expected_year)
 
 
 class EscapeLeadingSlashesTests(unittest.TestCase):
