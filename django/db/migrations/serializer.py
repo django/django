@@ -143,7 +143,7 @@ class FunctionTypeSerializer(BaseSerializer):
         if getattr(self.value, "__self__", None) and isinstance(self.value.__self__, type):
             klass = self.value.__self__
             module = klass.__module__
-            return "%s.%s.%s" % (module, klass.__name__, self.value.__name__), {"import %s" % module}
+            return "%s.%s.%s" % (module, klass.__qualname__, self.value.__name__), {"import %s" % module}
         # Further error checking
         if self.value.__name__ == '<lambda>':
             raise ValueError("Cannot serialize function: lambda")
@@ -269,7 +269,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__name__), {"import %s" % module}
+                return "%s.%s" % (module, self.value.__qualname__), {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):

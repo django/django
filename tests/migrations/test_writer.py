@@ -731,7 +731,55 @@ class WriterTests(SimpleTestCase):
                 return ('DeconstructibleInstances', [], {})
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+        self.assertEqual(
+            string,
+            "models.CharField(default=migrations.test_writer.WriterTests."
+            "test_deconstruct_class_arguments.<locals>.DeconstructibleInstances)"
+        )
+
+    def test_serialize_nested_class(self):
+        """
+        Test serialization of nested classes (inner classes).
+        """
+        class Outer:
+            class Inner:
+                pass
+
+        # Test that a nested class is serialized with its qualified name
+        string, imports = MigrationWriter.serialize(Outer.Inner)
+        self.assertEqual(string, "migrations.test_writer.WriterTests.test_serialize_nested_class.<locals>.Outer.Inner")
+        self.assertEqual(imports, {"import migrations.test_writer"})
+
+    def test_serialize_inner_field_class(self):
+        """
+        Test serialization of a field subclass defined as an inner class.
+        Refs #25019.
+        """
+        # Simulate an inner class that could be a custom field
+        class Outer:
+            class InnerCharField(models.CharField):
+                pass
+
+        # When an instance of the inner field is used, the serialized path
+        # should include the outer class name in the qualname
+        field = Outer.InnerCharField(max_length=20)
+        name, path, args, kwargs = field.deconstruct()
+        # The deconstruct() should return the correct path with qualified name
+        self.assertIn("Outer.InnerCharField", path)
+
+    def test_serialize_class_method_on_nested_class(self):
+        """
+        Test that class methods on nested classes are serialized correctly.
+        """
+        class Outer:
+            class Inner:
+                @classmethod
+                def method(cls):
+                    return 'test'
+
+        # Class methods should include the full qualified name
+        string, imports = MigrationWriter.serialize(Outer.Inner.method)
+        self.assertIn('Outer.Inner.method', string)
 
     def test_register_serializer(self):
         class ComplexSerializer(BaseSerializer):
