@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.core.exceptions import FieldError
 from django.db.models import CharField, F, Q
-from django.db.models.expressions import SimpleCol
+from django.db.models.expressions import Col, SimpleCol
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
@@ -113,3 +113,43 @@ class TestQuery(SimpleTestCase):
         clone = query.clone()
         clone.add_select_related(['note', 'creator__extra'])
         self.assertEqual(query.select_related, {'creator': {}})
+
+    def test_resolve_lookup_value_preserves_list_type(self):
+        """
+        resolve_lookup_value() should preserve the type of list/tuple inputs.
+        This is important for field lookups that depend on exact type matching
+        (e.g., PickledField).
+        Regression test for issue where resolve_lookup_value() was converting
+        all iterables to tuples, breaking exact value queries for fields that
+        depend on matching input types.
+        """
+        query = Query(Author)
+        # Test that list input returns list output
+        list_value = [1, 2, 3]
+        resolved = query.resolve_lookup_value(list_value, can_reuse=None, allow_joins=True, simple_col=False)
+        self.assertIsInstance(resolved, list)
+        self.assertEqual(resolved, [1, 2, 3])
+
+        # Test that tuple input returns tuple output
+        tuple_value = (1, 2, 3)
+        resolved = query.resolve_lookup_value(tuple_value, can_reuse=None, allow_joins=True, simple_col=False)
+        self.assertIsInstance(resolved, tuple)
+        self.assertEqual(resolved, (1, 2, 3))
+
+        # Test with expressions in list
+        list_with_f = [F('num'), 2, 3]
+        resolved = query.resolve_lookup_value(list_with_f, can_reuse=None, allow_joins=True, simple_col=False)
+        self.assertIsInstance(resolved, list)
+        self.assertEqual(len(resolved), 3)
+        self.assertIsInstance(resolved[0], Col)
+        self.assertEqual(resolved[1], 2)
+        self.assertEqual(resolved[2], 3)
+
+        # Test with expressions in tuple
+        tuple_with_f = (F('num'), 2, 3)
+        resolved = query.resolve_lookup_value(tuple_with_f, can_reuse=None, allow_joins=True, simple_col=False)
+        self.assertIsInstance(resolved, tuple)
+        self.assertEqual(len(resolved), 3)
+        self.assertIsInstance(resolved[0], Col)
+        self.assertEqual(resolved[1], 2)
+        self.assertEqual(resolved[2], 3)
