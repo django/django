@@ -471,3 +471,28 @@ class OrderingTests(TestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
             list(Article.objects.values('author').annotate(Count('headline')))
+
+    def test_related_ordering_with_expressions(self):
+        """
+        Ordering by a relation to a model with expressions in Meta.ordering
+        should work correctly without crashing (regression test for bug where
+        get_order_dir was called on OrderBy expressions).
+        """
+        # Reference model has ordering = ('article',) where article is a ForeignKey
+        # to OrderedByAuthorArticle. OrderedByAuthorArticle is a proxy of Article
+        # which has expressions (F() and OrderBy()) in its Meta.ordering.
+        # This should not crash when generating the query.
+        author = Author.objects.create(name='Test Author')
+        article = Article.objects.create(
+            headline='Test Article',
+            pub_date=datetime(2020, 1, 1),
+            author=author,
+            second_author=author
+        )
+        # Create a Reference that orders by article which orders by author
+        reference = Reference.objects.create(article_id=article.pk)
+
+        # This should execute without errors
+        references = list(Reference.objects.all())
+        self.assertEqual(len(references), 1)
+        self.assertEqual(references[0], reference)

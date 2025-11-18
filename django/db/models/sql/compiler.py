@@ -704,6 +704,19 @@ class SQLCompiler:
         not be) and column name for ordering by the given 'name' parameter.
         The 'name' is of the form 'field1__field2__...__fieldN'.
         """
+        # Check if name is an expression (e.g., OrderBy, F) rather than a string
+        if hasattr(name, 'resolve_expression'):
+            # Process expressions similar to how get_order_by() handles them
+            if isinstance(name, Value):
+                # output_field must be resolved for constants.
+                name = Cast(name, name.output_field)
+            if not isinstance(name, OrderBy):
+                name = name.asc()
+            if not self.query.standard_ordering:
+                name = name.copy()
+                name.reverse_ordering()
+            return [(name, False)]
+
         name, order = get_order_dir(name, default_order)
         descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
