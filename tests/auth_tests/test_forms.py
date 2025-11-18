@@ -424,6 +424,8 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         self.assertEqual(form.fields['username'].max_length, 255)
         self.assertEqual(form.errors, {})
+        # Ensure maxlength HTML attribute is rendered
+        self.assertIn('maxlength="255"', form['username'].as_widget())
 
     @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
     def test_username_field_max_length_defaults_to_254(self):
@@ -436,6 +438,8 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         self.assertEqual(form.fields['username'].max_length, 254)
         self.assertEqual(form.errors, {})
+        # Ensure maxlength HTML attribute is rendered
+        self.assertIn('maxlength="254"', form['username'].as_widget())
 
     def test_username_field_label(self):
 
@@ -457,6 +461,17 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
     def test_username_field_autocapitalize_none(self):
         form = AuthenticationForm()
         self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
+
+    def test_username_field_maxlength_rendered(self):
+        """Test that maxlength HTML attribute is rendered for the username field."""
+        form = AuthenticationForm()
+        # Check that field's max_length is set
+        self.assertEqual(form.fields['username'].max_length, 150)
+        # Check that maxlength attribute is in widget attrs
+        self.assertIn('maxlength', form.fields['username'].widget.attrs)
+        self.assertEqual(form.fields['username'].widget.attrs['maxlength'], '150')
+        # Check that maxlength is rendered in HTML
+        self.assertIn('maxlength="150"', form['username'].as_widget())
 
     def test_username_field_label_empty_string(self):
 
