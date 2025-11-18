@@ -315,6 +315,22 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
+    def convert_durationfield_value(self, value, expression, connection):
+        if value is not None:
+            # If value is an integer, it's already in microseconds (from database).
+            # If value is a string, it's a timedelta representation from
+            # duration-only expressions like F('duration_field') + timedelta(1).
+            # MySQL's INTERVAL arithmetic returns a string representation.
+            if not isinstance(value, str):
+                import datetime
+                return datetime.timedelta(0, 0, value)
+            # For MySQL, the string might be in the format returned by INTERVAL arithmetic
+            try:
+                from django.utils.dateparse import parse_duration
+                return parse_duration(value)
+            except (ValueError, TypeError):
+                return None
+
     def binary_placeholder_sql(self, value):
         return '_binary %s' if value is not None and not hasattr(value, 'as_sql') else '%s'
 

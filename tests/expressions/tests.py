@@ -1648,6 +1648,28 @@ class FTimeDeltaTests(TestCase):
         e0 = Experiment.objects.get(name='e0')
         self.assertEqual(e0.start, expected_start)
 
+    def test_duration_annotation(self):
+        """
+        Test that annotating with a duration-only expression works correctly.
+        Regression test for #XXXXX - duration-only expressions should work on
+        SQLite and MySQL.
+        """
+        delta = datetime.timedelta(days=1)
+        # Test annotating with F() + timedelta
+        experiments = Experiment.objects.annotate(
+            new_duration=F('estimated_time') + delta
+        )
+        e0 = experiments.get(name='e0')
+        expected = datetime.timedelta(days=1)  # e0.estimated_time is 0 + 1 day
+        self.assertEqual(e0.new_duration, expected)
+
+        # Test annotating with just F() on DurationField
+        experiments = Experiment.objects.annotate(
+            duration_copy=F('estimated_time')
+        )
+        e0 = experiments.get(name='e0')
+        self.assertEqual(e0.duration_copy, e0.estimated_time)
+
 
 class ValueTests(TestCase):
     def test_update_TimeField_using_Value(self):

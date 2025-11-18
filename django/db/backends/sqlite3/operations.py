@@ -321,6 +321,20 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
+    def convert_durationfield_value(self, value, expression, connection):
+        if value is not None:
+            # If value is an integer, it's already in microseconds (from database).
+            # If value is a string, it's a timedelta string representation from
+            # duration-only expressions like F('duration_field') + timedelta(1).
+            if not isinstance(value, str):
+                return datetime.timedelta(0, 0, value)
+            # Parse the string representation of timedelta
+            try:
+                from django.utils.dateparse import parse_duration
+                return parse_duration(value)
+            except (ValueError, TypeError):
+                return None
+
     def bulk_insert_sql(self, fields, placeholder_rows):
         return " UNION ALL ".join(
             "SELECT %s" % ", ".join(row)
