@@ -139,6 +139,43 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_primary_with_default_and_explicit_pk(self):
+        # Test that explicitly setting a pk value attempts an UPDATE first,
+        # even when the primary key has a default value.
+        # This is the behavior expected in Django 2.2 and earlier.
+        obj1 = PrimaryKeyWithDefault.objects.create()
+        # Create a new instance with an explicit pk that already exists
+        obj2 = PrimaryKeyWithDefault(uuid=obj1.uuid)
+        # This should attempt an UPDATE first, then fall back to INSERT if needed
+        # In Django 2.2: UPDATE attempt (finds row) -> updates it (1 query)
+        # In Django 3.0+: Force INSERT directly -> fails with IntegrityError
+        with self.assertNumQueries(1):  # Should be 1 query for UPDATE
+            obj2.save()
+        # Verify the object was updated, not inserted
+        self.assertEqual(PrimaryKeyWithDefault.objects.count(), 1)
+
+    def test_save_primary_with_default_explicit_pk_new(self):
+        # Test that explicitly setting a NEW pk value does INSERT after UPDATE fails
+        obj1 = PrimaryKeyWithDefault.objects.create()
+        # Create instance with a different pk that doesn't exist
+        import uuid
+        new_uuid = uuid.uuid4()
+        obj2 = PrimaryKeyWithDefault(uuid=new_uuid)
+        # This should attempt UPDATE (no rows affected), then do INSERT
+        with self.assertNumQueries(2):  # UPDATE + INSERT
+            obj2.save()
+        # Verify both objects exist
+        self.assertEqual(PrimaryKeyWithDefault.objects.count(), 2)
+
+    def test_save_primary_with_default_from_db(self):
+        # Test that instances loaded from the database behave correctly
+        obj = PrimaryKeyWithDefault.objects.create()
+        # Reload from database
+        obj_from_db = PrimaryKeyWithDefault.objects.get(uuid=obj.uuid)
+        # Saving an object loaded from DB should do UPDATE
+        with self.assertNumQueries(1):  # Just UPDATE
+            obj_from_db.save()
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):

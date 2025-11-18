@@ -399,6 +399,8 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    # Track whether the primary key was explicitly set by the user during __init__
+    pk_explicitly_set = False
 
 
 class Model(metaclass=ModelBase):
@@ -423,6 +425,14 @@ class Model(metaclass=ModelBase):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
+        # Track whether pk field is provided explicitly via args
+        pk_provided_in_args = False
+        if args and opts.pk:
+            # Check if pk is being set via positional args
+            pk_index = next((i for i, f in enumerate(opts.concrete_fields) if f is opts.pk), None)
+            if pk_index is not None and pk_index < len(args) and args[pk_index] is not _DEFERRED:
+                pk_provided_in_args = True
+
         if not kwargs:
             fields_iter = iter(opts.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
@@ -442,6 +452,9 @@ class Model(metaclass=ModelBase):
                 _setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
 
+        if pk_provided_in_args:
+            self._state.pk_explicitly_set = True
+
         # Now we're left with the unprocessed fields that *must* come from
         # keywords, or default.
 
@@ -456,15 +469,21 @@ class Model(metaclass=ModelBase):
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
                         is_related_object = True
+                        if field.primary_key:
+                            self._state.pk_explicitly_set = True
                     except KeyError:
                         try:
                             # Object instance wasn't passed in -- must be an ID.
                             val = kwargs.pop(field.attname)
+                            if field.primary_key:
+                                self._state.pk_explicitly_set = True
                         except KeyError:
                             val = field.get_default()
                 else:
                     try:
                         val = kwargs.pop(field.attname)
+                        if field.primary_key:
+                            self._state.pk_explicitly_set = True
                     except KeyError:
                         # This is done with an exception rather than the
                         # default argument on pop because we don't want
@@ -494,6 +513,9 @@ class Model(metaclass=ModelBase):
                     if prop in property_names or opts.get_field(prop):
                         if kwargs[prop] is not _DEFERRED:
                             _setattr(self, prop, kwargs[prop])
+                            # Check if this is the pk property
+                            if prop == 'pk':
+                                self._state.pk_explicitly_set = True
                         del kwargs[prop]
                 except (AttributeError, FieldDoesNotExist):
                     pass
@@ -847,12 +869,14 @@ class Model(metaclass=ModelBase):
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
-        # Skip an UPDATE when adding an instance and primary key has a default.
+        # Skip an UPDATE when adding an instance and primary key has a default,
+        # but only if the primary key wasn't explicitly set by the user.
         if (
             not force_insert and
             self._state.adding and
             self._meta.pk.default and
-            self._meta.pk.default is not NOT_PROVIDED
+            self._meta.pk.default is not NOT_PROVIDED and
+            not self._state.pk_explicitly_set
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
