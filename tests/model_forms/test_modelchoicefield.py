@@ -3,7 +3,7 @@ import datetime
 from django import forms
 from django.core.validators import ValidationError
 from django.forms.models import ModelChoiceIterator
-from django.forms.widgets import CheckboxSelectMultiple
+from django.forms.widgets import CheckboxSelectMultiple, RadioSelect
 from django.template import Context, Template
 from django.test import TestCase
 
@@ -353,3 +353,45 @@ class ModelChoiceFieldTests(TestCase):
         )
         with self.assertNumQueries(2):
             template.render(Context({'form': CategoriesForm()}))
+
+    def test_radioselect_blank_option(self):
+        """
+        RadioSelect widget should not present a blank option when the field
+        is required (blank=False). Unlike select widgets, radio buttons have
+        an inherent unfilled state, so a "--------" option looks like a valid
+        choice rather than a placeholder.
+        """
+        # Required field with RadioSelect should not have empty_label
+        f = forms.ModelChoiceField(Category.objects.all(), widget=RadioSelect, required=True)
+        self.assertIsNone(f.empty_label)
+        choices = list(f.choices)
+        self.assertEqual(len(choices), 3)  # No blank option
+        self.assertEqual(choices[0], (self.c1.pk, 'Entertainment'))
+        self.assertEqual(choices[1], (self.c2.pk, 'A test'))
+        self.assertEqual(choices[2], (self.c3.pk, 'Third'))
+
+        # Required field with RadioSelect and initial value should also not have empty_label
+        f = forms.ModelChoiceField(Category.objects.all(), widget=RadioSelect, required=True, initial=self.c1)
+        self.assertIsNone(f.empty_label)
+        choices = list(f.choices)
+        self.assertEqual(len(choices), 3)  # No blank option
+
+        # Non-required field with RadioSelect should still have empty_label
+        f = forms.ModelChoiceField(Category.objects.all(), widget=RadioSelect, required=False)
+        self.assertEqual(f.empty_label, '---------')
+        choices = list(f.choices)
+        self.assertEqual(len(choices), 4)
+        self.assertEqual(choices[0], ('', '---------'))
+
+        # Required field with Select widget should still have empty_label (backward compatibility)
+        f = forms.ModelChoiceField(Category.objects.all(), required=True)
+        self.assertEqual(f.empty_label, '---------')
+        choices = list(f.choices)
+        self.assertEqual(len(choices), 4)
+        self.assertEqual(choices[0], ('', '---------'))
+
+        # Required field with Select widget and initial should not have empty_label
+        f = forms.ModelChoiceField(Category.objects.all(), required=True, initial=self.c1)
+        self.assertIsNone(f.empty_label)
+        choices = list(f.choices)
+        self.assertEqual(len(choices), 3)  # No blank option
