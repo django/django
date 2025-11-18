@@ -304,7 +304,7 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertInHTML('<h1>ValueError at /test_view/</h1>', html)
-        self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
+        self.assertIn('<pre class="exception_value">Can&#x27;t find my keys</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
         self.assertIn('<h3 id="user-info">USER</h3>', html)
@@ -325,7 +325,7 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertInHTML('<h1>ValueError</h1>', html)
-        self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
+        self.assertIn('<pre class="exception_value">Can&#x27;t find my keys</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
         self.assertNotIn('<h3 id="user-info">USER</h3>', html)
@@ -463,7 +463,7 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
         html = reporter.get_traceback_html()
         self.assertInHTML('<h1>Report at /test_view/</h1>', html)
-        self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
+        self.assertIn('<pre class="exception_value">I&#x27;m a little teapot</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
         self.assertNotIn('<th>Exception Type:</th>', html)
@@ -476,7 +476,7 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
         html = reporter.get_traceback_html()
         self.assertInHTML('<h1>Report</h1>', html)
-        self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
+        self.assertIn('<pre class="exception_value">I&#x27;m a little teapot</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
         self.assertNotIn('<th>Exception Type:</th>', html)
@@ -508,7 +508,7 @@ class ExceptionReporterTests(SimpleTestCase):
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
-        self.assertIn('<td class="code"><pre>&#39;&lt;p&gt;Local variable&lt;/p&gt;&#39;</pre></td>', html)
+        self.assertIn('<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre></td>', html)
 
     def test_unprintable_values_handling(self):
         "Unprintable values should not make the output generation choke."
@@ -607,7 +607,7 @@ class ExceptionReporterTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
+        value = '<td>items</td><td class="code"><pre>&#x27;Oops&#x27;</pre></td>'
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
@@ -634,7 +634,7 @@ class ExceptionReporterTests(SimpleTestCase):
         request = rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
-        self.assertInHTML('<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>', html)
+        self.assertInHTML('<td>items</td><td class="code"><pre>&#x27;Oops&#x27;</pre></td>', html)
 
     def test_exception_fetching_user(self):
         """

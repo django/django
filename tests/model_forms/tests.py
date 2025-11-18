@@ -1197,7 +1197,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#39;s a test</option>
+<option value="%s" selected>It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1239,7 +1239,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1290,7 +1290,7 @@ class ModelFormBasicTests(TestCase):
 <li><label for="id_categories">Categories:</label>
 <select multiple name="categories" id="id_categories">
 <option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&39;s a test</option>
+<option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
 </select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
@@ -1361,7 +1361,7 @@ class ModelFormBasicTests(TestCase):
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -1391,7 +1391,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1535,7 +1535,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
@@ -1561,7 +1561,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 <option value="%s">Fourth</option>
 </select></li>

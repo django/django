@@ -22,7 +22,9 @@ class WidgetTest(SimpleTestCase):
         if self.jinja2_renderer:
             output = widget.render(name, value, attrs=attrs, renderer=self.jinja2_renderer, **kwargs)
             # Django escapes quotes with '&quot;' while Jinja2 uses '&#34;'.
-            assertEqual(output.replace('&#34;', '&quot;'), html)
+            # Django escapes apostrophes with '&#x27;' while Jinja2 uses '&#39;'.
+            output = output.replace('&#34;', '&quot;').replace('&#39;', '&#x27;')
+            assertEqual(output, html)
 
         output = widget.render(name, value, attrs=attrs, renderer=self.django_renderer, **kwargs)
         assertEqual(output, html)
