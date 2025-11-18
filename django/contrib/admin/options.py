@@ -2050,10 +2050,7 @@ class ModelAdmin(BaseModelAdmin):
             # me back" button on the action confirmation page.
             return HttpResponseRedirect(request.get_full_path())
 
-        # If we're allowing changelist editing, we need to construct a formset
-        # for the changelist given all the fields to be edited. Then we'll
-        # use the formset to validate/process POSTed data.
-        formset = cl.formset = None
+        formset = None
 
         # Handle POSTed bulk-edit data.
         if request.method == "POST" and cl.list_editable and "_save" in request.POST:
@@ -2063,13 +2060,13 @@ class ModelAdmin(BaseModelAdmin):
             modified_objects = self._get_list_editable_queryset(
                 request, FormSet.get_default_prefix()
             )
-            formset = cl.formset = FormSet(
+            cl.formset = FormSet(
                 request.POST, request.FILES, queryset=modified_objects
             )
-            if formset.is_valid():
+            if cl.formset.is_valid():
                 changecount = 0
                 with transaction.atomic(using=router.db_for_write(self.model)):
-                    for form in formset.forms:
+                    for form in cl.formset.forms:
                         if form.has_changed():
                             obj = self.save_form(request, form, change=True)
                             self.save_model(request, obj, form, change=True)
@@ -2095,11 +2092,11 @@ class ModelAdmin(BaseModelAdmin):
         # Handle GET -- construct a formset for display.
         elif cl.list_editable and self.has_change_permission(request):
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(queryset=cl.result_list)
+            cl.formset = FormSet(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
-        if formset:
-            media = self.media + formset.media
+        if cl.formset:
+            media = self.media + cl.formset.media
         else:
             media = self.media
 
