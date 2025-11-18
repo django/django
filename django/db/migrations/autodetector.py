@@ -571,6 +571,30 @@ class MigrationAutodetector:
                     None,
                     True
                 ))
+            # Depend on removal of any fields from parent models that are being
+            # redefined in this model. This handles the case where a field is
+            # moved from a parent to a child class.
+            for base in model_state.bases:
+                if isinstance(base, str) and "." in base:
+                    base_app_label, base_name = base.split(".", 1)
+                    # Check if the base model exists in the old state
+                    if (base_app_label, base_name.lower()) in self.kept_model_keys:
+                        old_base_model_state = self.from_state.models.get(
+                            (base_app_label, base_name.lower())
+                        )
+                        if old_base_model_state:
+                            # Check for fields that are in both the new child model
+                            # and the old parent model
+                            for field_name in model_state.fields:
+                                if field_name in old_base_model_state.fields and field_name not in related_fields:
+                                    # This field is being moved from parent to child
+                                    # Depend on the removal of the field from the parent
+                                    dependencies.append((
+                                        base_app_label,
+                                        base_name.lower(),
+                                        field_name,
+                                        False,
+                                    ))
             # Generate creation operation
             self.add_operation(
                 app_label,

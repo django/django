@@ -2454,3 +2454,32 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'app', 1)
         self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')
+
+    def test_create_model_with_field_removed_from_base(self):
+        """
+        A field that's being removed from a base model and added to a subclass
+        should have RemoveField operation run before CreateModel to avoid
+        FieldError about field clash.
+        """
+        before = ModelState('app', 'Readable', [
+            ("id", models.AutoField(primary_key=True)),
+            ("title", models.CharField(max_length=200)),
+        ])
+        after_parent = ModelState('app', 'Readable', [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        after_child = ModelState('app', 'Book', [
+            ("readable_ptr", models.OneToOneField(
+                'app.Readable',
+                on_delete=models.CASCADE,
+                parent_link=True,
+                auto_created=True,
+                primary_key=True,
+            )),
+            ("title", models.CharField(max_length=200)),
+        ], bases=('app.Readable',))
+        changes = self.get_changes([before], [after_parent, after_child])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RemoveField', 'CreateModel'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, model_name='readable', name='title')
+        self.assertOperationAttributes(changes, 'app', 0, 1, name='Book')
