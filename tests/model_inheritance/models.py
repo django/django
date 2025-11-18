@@ -11,6 +11,8 @@ Model inheritance exists in two varieties:
 
 Both styles are demonstrated here.
 """
+import uuid
+
 from django.db import models
 
 #
@@ -193,4 +195,30 @@ class Child(Parent):
 
 
 class GrandChild(Child):
+    pass
+
+
+class Item(models.Model):
+    uid = models.AutoField(primary_key=True, editable=False)
+    f = models.BooleanField(default=False)
+
+    def reset(self):
+        self.uid = None
+        self.f = False
+
+
+class Derived(Item):
+    pass
+
+
+class ItemUUID(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    f = models.BooleanField(default=False)
+
+    def reset(self):
+        self.uid = None
+        self.f = False
+
+
+class DerivedUUID(ItemUUID):
     pass

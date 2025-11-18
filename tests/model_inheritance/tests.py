@@ -6,9 +6,9 @@ from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from .models import (
-    Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
-    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
-    Supplier, Title, Worker,
+    Base, Chef, CommonInfo, Derived, DerivedUUID, GrandChild, GrandParent,
+    ItalianRestaurant, Item, ItemUUID, MixinModel, ParkingLot, Place, Post,
+    Restaurant, Student, SubBase, Supplier, Title, Worker,
 )
 
 
@@ -522,3 +522,71 @@ class InheritanceUniqueTests(TestCase):
         msg = 'Grand parent with this First name and Last name already exists.'
         with self.assertRaisesMessage(ValidationError, msg):
             grand_child.validate_unique()
+
+
+class ResetPrimaryKeyInheritanceTests(TestCase):
+    def test_reset_pk_child_model(self):
+        """
+        Test that setting the primary key to None on a child model
+        correctly creates a new object rather than updating the old one.
+        """
+        # Create the first object
+        derived = Derived.objects.create(f=True)
+        original_pk = derived.pk
+
+        # Get the object and its derived instance
+        item = Item.objects.get(pk=derived.pk)
+        obj1 = item.derived
+
+        # Reset the object (set pk to None and f to False)
+        obj1.reset()
+
+        # Save should create a new object, not update the old one
+        obj1.save()
+
+        # The new object should have a different pk
+        self.assertNotEqual(obj1.pk, original_pk)
+
+        # The original object should still exist with f=True
+        original_obj = Derived.objects.get(pk=original_pk)
+        self.assertTrue(original_obj.f)
+
+        # The new object should have f=False
+        new_obj = Derived.objects.get(pk=obj1.pk)
+        self.assertFalse(new_obj.f)
+
+        # We should have 2 objects in total
+        self.assertEqual(Derived.objects.count(), 2)
+
+    def test_reset_pk_child_model_with_uuid(self):
+        """
+        Test that setting the UUID primary key to None on a child model
+        correctly creates a new object rather than updating the old one.
+        """
+        # Create the first object
+        derived = DerivedUUID.objects.create(f=True)
+        original_pk = derived.pk
+
+        # Get the object and its derived instance
+        item = ItemUUID.objects.get(pk=derived.pk)
+        obj1 = item.deriveduuid
+
+        # Reset the object (set pk to None and f to False)
+        obj1.reset()
+
+        # Save should create a new object, not update the old one
+        obj1.save()
+
+        # The new object should have a different pk
+        self.assertNotEqual(obj1.pk, original_pk)
+
+        # The original object should still exist with f=True
+        original_obj = DerivedUUID.objects.get(pk=original_pk)
+        self.assertTrue(original_obj.f)
+
+        # The new object should have f=False
+        new_obj = DerivedUUID.objects.get(pk=obj1.pk)
+        self.assertFalse(new_obj.f)
+
+        # We should have 2 objects in total
+        self.assertEqual(DerivedUUID.objects.count(), 2)

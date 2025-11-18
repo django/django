@@ -803,10 +803,27 @@ class Model(metaclass=ModelBase):
         meta = cls._meta
         inserted = False
         for parent, field in meta.parents.items():
-            # Make sure the link fields are synced between parent and self.
-            if (field and getattr(self, parent._meta.pk.attname) is None and
-                    getattr(self, field.attname) is not None):
-                setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
+            # At this point, if the parent's PK is None, we need to decide if
+            # we should copy it from the link field or if we're creating a new
+            # parent instance. If both the parent's PK and the link field are
+            # set (not None), they must match. If the parent's PK is None but
+            # the link field isn't, that's a legacy case we preserve, but we
+            # should not do this if the PK was explicitly set to None.
+            parent_pk = getattr(self, parent._meta.pk.attname)
+            if field:
+                field_value = getattr(self, field.attname)
+                if parent_pk is None and field_value is not None:
+                    # Only copy the link field to the parent PK if this isn't
+                    # an explicit attempt to create a new instance by setting
+                    # the PK to None. The telltale sign is: if self._state.adding
+                    # is False, then we're working with an existing instance but
+                    # its PK was explicitly set to None.
+                    if self._state.adding:
+                        setattr(self, parent._meta.pk.attname, field_value)
+                    else:
+                        # If we're not adding but parent PK is None, clear the
+                        # link field as well so we create new parent instance.
+                        setattr(self, field.attname, None)
             parent_inserted = self._save_parents(cls=parent, using=using, update_fields=update_fields)
             updated = self._save_table(
                 cls=parent, using=using, update_fields=update_fields,
