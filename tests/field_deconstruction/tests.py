@@ -259,6 +259,12 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.permission", "unique": True, "on_delete": models.CASCADE})
+        # Test app label with mixed case
+        field = models.ForeignKey("SomeApp.Model", models.CASCADE)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "SomeApp.model", "on_delete": models.CASCADE})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
@@ -339,6 +345,12 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
+        # Test app label with mixed case
+        field = models.OneToOneField("MixedApp.Model", models.CASCADE)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.OneToOneField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "MixedApp.model", "on_delete": models.CASCADE})
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")
