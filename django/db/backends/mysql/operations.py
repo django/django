@@ -70,7 +70,11 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', '%s')" % (field_name, tzname)
+            # Get the database timezone from connection settings.
+            # If not set, datetimes are stored in UTC.
+            db_timezone = self.connection.timezone_name
+            if db_timezone != tzname:
+                field_name = "CONVERT_TZ(%s, '%s', '%s')" % (field_name, db_timezone, tzname)
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):

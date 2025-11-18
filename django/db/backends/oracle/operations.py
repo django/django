@@ -99,9 +99,22 @@ END;
             return field_name
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
-        # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE
+        # Get the database timezone from connection settings.
+        # If not set, datetimes are stored in UTC.
+        db_timezone = self.connection.timezone_name
+        if not self._tzname_re.match(db_timezone):
+            raise ValueError("Invalid database time zone name: %s" % db_timezone)
+        # Convert from database timezone to target timezone, returning TIMESTAMP WITH TIME ZONE
         # and cast it back to TIMESTAMP to strip the TIME ZONE details.
-        return "CAST((FROM_TZ(%s, '0:00') AT TIME ZONE '%s') AS TIMESTAMP)" % (field_name, tzname)
+        # Only perform conversion if timezones are different to optimize performance.
+        if db_timezone != tzname:
+            # Convert the offset format for Oracle. For UTC, use '0:00', otherwise use the timezone name.
+            if db_timezone == 'UTC':
+                db_tz_sql = '0:00'
+            else:
+                db_tz_sql = db_timezone
+            return "CAST((FROM_TZ(%s, '%s') AT TIME ZONE '%s') AS TIMESTAMP)" % (field_name, db_tz_sql, tzname)
+        return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)

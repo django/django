@@ -578,6 +578,28 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
         fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
         self.assertEqual(event.dt, fake_dt)
 
+    def test_date_lookup_with_database_timezone(self):
+        """
+        Test that date lookups use the database-specific TIME_ZONE setting
+        instead of hardcoding UTC. This test is for the issue reported in
+        ticket #28313.
+        """
+        # Create an event with a specific datetime
+        dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
+        with self.override_database_connection_timezone('Africa/Nairobi'):
+            Event.objects.create(dt=dt)
+
+            # Now query using date lookup. Since the database timezone is
+            # Africa/Nairobi (UTC+3), the datetime is stored as 2011-09-01 13:20:30.
+            # When we filter by date, it should correctly find this record.
+            qs = Event.objects.filter(dt__date=dt.date())
+            self.assertTrue(qs.exists())
+
+            # Also test with a TruncDate expression
+            from django.db.models.functions import TruncDate
+            qs = Event.objects.annotate(dt_date=TruncDate('dt')).filter(dt_date=dt.date())
+            self.assertTrue(qs.exists())
+
 
 @skipUnlessDBFeature('supports_timezones')
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
