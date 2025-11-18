@@ -21,6 +21,26 @@ class RenderToStringTest(SimpleTestCase):
             'obj:test\n',
         )
 
+    def test_autoescape_off(self):
+        """
+        Engine.render_to_string() should honor the autoescape attribute.
+        """
+        engine = Engine(dirs=[TEMPLATE_DIR], autoescape=False)
+        self.assertEqual(
+            engine.render_to_string('test_context.html', {'obj': '<b>test</b>'}),
+            'obj:<b>test</b>\n',
+        )
+
+    def test_autoescape_on(self):
+        """
+        Engine.render_to_string() with autoescape=True should escape HTML.
+        """
+        engine = Engine(dirs=[TEMPLATE_DIR], autoescape=True)
+        self.assertEqual(
+            engine.render_to_string('test_context.html', {'obj': '<b>test</b>'}),
+            'obj:&lt;b&gt;test&lt;/b&gt;\n',
+        )
+
 
 class GetDefaultTests(SimpleTestCase):
 
