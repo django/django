@@ -118,3 +118,51 @@ class TestUtils(AdminDocsSimpleTestCase):
         markup = '<p>reST, <cite>interpreted text</cite>, default role.</p>\n'
         parts = docutils.core.publish_parts(source=source, writer_name="html4css1")
         self.assertEqual(parts['fragment'], markup)
+
+    def test_trim_docstring_first_line_not_empty(self):
+        """
+        trim_docstring() should handle docstrings where the first line
+        is not empty (standard Python docstring style).
+        """
+        # Standard Python style docstring with content on first line
+        docstring = '''test tests something.
+
+    This is a longer description.
+    With more content.
+    '''
+        expected = 'test tests something.\n\nThis is a longer description.\nWith more content.'
+        self.assertEqual(trim_docstring(docstring), expected)
+
+    def test_trim_docstring_single_line(self):
+        """
+        trim_docstring() should handle single-line docstrings.
+        """
+        docstring = 'Single line docstring.'
+        expected = 'Single line docstring.'
+        self.assertEqual(trim_docstring(docstring), expected)
+
+    def test_trim_docstring_first_line_with_only_trailing_whitespace(self):
+        """
+        trim_docstring() should handle docstrings where lines after
+        the first contain only whitespace.
+        """
+        docstring = 'test tests something.\n    '
+        expected = 'test tests something.'
+        self.assertEqual(trim_docstring(docstring), expected)
+
+    def test_parse_rst_with_standard_docstring(self):
+        """
+        parse_rst() should correctly parse docstrings with content on
+        the first line (standard Python style).
+        """
+        # This is the specific case that was causing the error:
+        # Error in "default-role" directive: no content permitted.
+        docstring = '''test tests something.
+
+    More details here.
+    '''
+        trimmed = trim_docstring(docstring)
+        # Should not raise an error
+        result = parse_rst(trimmed, 'view')
+        self.assertIn('test tests something', result)
+        self.assertIn('More details here', result)
