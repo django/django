@@ -11,7 +11,8 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import (
-    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+    Article, ArticleWithUniqueConstraint, Author, Freebie, Game,
+    IsNullWithNoneAsRHS, Player, Season, Tag,
 )
 
 
@@ -193,6 +194,58 @@ class LookupTests(TestCase):
         msg = "in_bulk()'s field_name must be a unique field but 'author' isn't."
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.in_bulk([self.au1], field_name='author')
+
+    def test_in_bulk_with_unique_constraint(self):
+        """in_bulk() should work with fields that have a UniqueConstraint."""
+        # Create test articles with UniqueConstraint on slug field
+        a1 = ArticleWithUniqueConstraint.objects.create(headline='Article 1', slug='article-1')
+        a2 = ArticleWithUniqueConstraint.objects.create(headline='Article 2', slug='article-2')
+        a3 = ArticleWithUniqueConstraint.objects.create(headline='Article 3', slug='article-3')
+
+        # Test in_bulk with field_name='slug' which is unique via UniqueConstraint
+        result = ArticleWithUniqueConstraint.objects.in_bulk(
+            ['article-1', 'article-2', 'article-3'],
+            field_name='slug'
+        )
+        self.assertEqual(
+            result,
+            {
+                'article-1': a1,
+                'article-2': a2,
+                'article-3': a3,
+            }
+        )
+
+        # Test with a subset of slugs
+        result = ArticleWithUniqueConstraint.objects.in_bulk(['article-1'], field_name='slug')
+        self.assertEqual(result, {'article-1': a1})
+
+        # Test with all objects (no id_list)
+        result = ArticleWithUniqueConstraint.objects.in_bulk(field_name='slug')
+        self.assertEqual(
+            result,
+            {
+                'article-1': a1,
+                'article-2': a2,
+                'article-3': a3,
+            }
+        )
+
+    def test_in_bulk_non_unique_field_with_unique_constraint(self):
+        """in_bulk() should still raise ValueError for non-unique fields."""
+        ArticleWithUniqueConstraint.objects.create(headline='Article 1', slug='article-1')
+        msg = "in_bulk()'s field_name must be a unique field but 'headline' isn't."
+        with self.assertRaisesMessage(ValueError, msg):
+            ArticleWithUniqueConstraint.objects.in_bulk(['Article 1'], field_name='headline')
+
+    def test_in_bulk_with_conditional_unique_constraint(self):
+        """in_bulk() should not allow fields with conditional UniqueConstraints."""
+        # headline has a conditional UniqueConstraint (only when published=True)
+        # so it should not be allowed in in_bulk()
+        ArticleWithUniqueConstraint.objects.create(headline='Article 1', slug='article-1', published=True)
+        msg = "in_bulk()'s field_name must be a unique field but 'headline' isn't."
+        with self.assertRaisesMessage(ValueError, msg):
+            ArticleWithUniqueConstraint.objects.in_bulk(['Article 1'], field_name='headline')
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --

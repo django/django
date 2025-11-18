@@ -108,3 +108,20 @@ class Freebie(models.Model):
         to_fields=['id', 'product'],
         on_delete=models.CASCADE,
     )
+
+
+class ArticleWithUniqueConstraint(models.Model):
+    """Model with UniqueConstraint instead of unique=True for testing in_bulk()"""
+    headline = models.CharField(max_length=100)
+    slug = models.CharField(max_length=255)
+    published = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["slug"], name="lookup_article_slug_unq"),
+            models.UniqueConstraint(
+                fields=["headline"],
+                condition=models.Q(published=True),
+                name="lookup_article_headline_unq"
+            )
+        ]

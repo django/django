@@ -690,7 +690,19 @@ class QuerySet:
         assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with in_bulk"
         if field_name != 'pk' and not self.model._meta.get_field(field_name).unique:
-            raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
+            # Check if field is unique via a single-field UniqueConstraint
+            # without a condition.
+            from django.db.models import UniqueConstraint
+            opts = self.model._meta
+            is_unique_constraint = any(
+                isinstance(constraint, UniqueConstraint) and
+                len(constraint.fields) == 1 and
+                constraint.fields[0] == field_name and
+                constraint.condition is None
+                for constraint in opts.constraints
+            )
+            if not is_unique_constraint:
+                raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
         if id_list is not None:
             if not id_list:
                 return {}
