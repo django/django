@@ -1,4 +1,4 @@
-from django.contrib.admin import ModelAdmin, TabularInline
+from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import Permission, User
