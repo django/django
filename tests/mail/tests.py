@@ -403,6 +403,42 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             payload1.as_bytes().endswith(b'\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
         )
 
+    def test_unicode_dns_non_unicode_encoding(self):
+        """
+        Test that non-ASCII DNS names are converted to punycode to avoid
+        encoding errors when email encoding is non-unicode (e.g. iso-8859-1).
+        Regression test for email message crashes on non-ASCII domain.
+        """
+        from unittest.mock import patch
+        from django.core.mail.utils import DNS_NAME
+
+        # Test with a unicode hostname
+        # Clear the cached _fqdn attribute if it exists
+        if hasattr(DNS_NAME, '_fqdn'):
+            delattr(DNS_NAME, '_fqdn')
+
+        with patch('socket.getfqdn', return_value='漢字'):
+            # Trigger the cache to populate with the mocked hostname
+            dns_name = DNS_NAME.get_fqdn()
+            # Should be converted to punycode
+            self.assertEqual(dns_name, 'xn--p8s937b')
+
+            # Now test that an email with non-unicode encoding works
+            email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'])
+            email.encoding = 'iso-8859-1'
+            message = email.message()
+
+            # Message-ID should contain the punycode domain
+            message_id = message['Message-ID']
+            self.assertIsNotNone(message_id)
+            self.assertIn('xn--p8s937b', message_id)
+            # Should not contain the original unicode domain
+            self.assertNotIn('漢字', message_id)
+
+        # Clean up: clear the cached value to avoid affecting other tests
+        if hasattr(DNS_NAME, '_fqdn'):
+            delattr(DNS_NAME, '_fqdn')
+
     def test_attachments(self):
         """Regression test for #9367"""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}

@@ -13,7 +13,15 @@ class CachedDnsName:
 
     def get_fqdn(self):
         if not hasattr(self, '_fqdn'):
-            self._fqdn = socket.getfqdn()
+            fqdn = socket.getfqdn()
+            # Convert to punycode (IDNA) for non-ASCII domain names.
+            # This ensures compatibility with email headers that may use
+            # non-unicode encodings like iso-8859-1.
+            try:
+                fqdn.encode('ascii')
+            except UnicodeEncodeError:
+                fqdn = fqdn.encode('idna').decode('ascii')
+            self._fqdn = fqdn
         return self._fqdn
 
 
