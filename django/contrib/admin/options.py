@@ -2060,9 +2060,7 @@ class ModelAdmin(BaseModelAdmin):
             modified_objects = self._get_list_editable_queryset(
                 request, FormSet.get_default_prefix()
             )
-            cl.formset = FormSet(
-                request.POST, request.FILES, queryset=modified_objects
-            )
+            cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
             if cl.formset.is_valid():
                 changecount = 0
                 with transaction.atomic(using=router.db_for_write(self.model)):
