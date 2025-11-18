@@ -1707,6 +1707,10 @@ class Model(metaclass=ModelBase):
             _cls = cls
             fld = None
             for part in field.split(LOOKUP_SEP):
+                # Skip ordering on pk. This is always a valid order_by field
+                # but is an alias and therefore won't be found by opts.get_field.
+                if part == 'pk':
+                    continue
                 try:
                     fld = _cls._meta.get_field(part)
                     if fld.is_relation:

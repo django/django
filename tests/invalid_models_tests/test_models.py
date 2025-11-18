@@ -836,6 +836,33 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertFalse(Child.check())
 
+    def test_ordering_pointing_to_related_model_pk(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent__pk',)
+
+        self.assertEqual(Child.check(), [])
+
+    def test_ordering_pointing_to_two_related_model_pk(self):
+        class Parent2(models.Model):
+            pass
+
+        class Parent1(models.Model):
+            parent2 = models.ForeignKey(Parent2, models.CASCADE)
+
+        class Child(models.Model):
+            parent1 = models.ForeignKey(Parent1, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent1__parent2__pk',)
+
+        self.assertEqual(Child.check(), [])
+
     def test_name_beginning_with_underscore(self):
         class _Model(models.Model):
             pass
