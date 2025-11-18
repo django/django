@@ -1130,3 +1130,29 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
+
+    def test_checkbox_get_context(self):
+        """
+        Test that CheckboxInput widgets in SplitArrayWidget maintain
+        independent checked states. Regression test for issue where
+        once a checkbox was checked, all subsequent checkboxes would
+        remain checked due to attrs dict mutation.
+        """
+        widget = SplitArrayWidget(forms.CheckboxInput(), size=5)
+        # Test with pattern: False, True, False, True, False
+        value = [False, True, False, True, False]
+        context = widget.get_context('bools', value, {})
+        subwidgets = context['widget']['subwidgets']
+
+        # Verify each checkbox has the correct checked state
+        for i, expected_checked in enumerate(value):
+            with self.subTest(index=i):
+                subwidget = subwidgets[i]
+                has_checked_attr = 'checked' in subwidget['attrs']
+                # 'checked' should only be in attrs when the value is True
+                self.assertEqual(
+                    has_checked_attr,
+                    expected_checked,
+                    f"Widget {i} should {'have' if expected_checked else 'not have'} "
+                    f"'checked' attribute but attrs={subwidget['attrs']}"
+                )
