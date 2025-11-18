@@ -892,8 +892,14 @@ class FileStoragePermissions(unittest.TestCase):
         actual_mode = os.stat(self.storage.path(name))[0] & 0o777
         self.assertEqual(actual_mode, 0o654)
 
-    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
     def test_file_upload_default_permissions(self):
+        self.storage = FileSystemStorage(self.storage_dir)
+        fname = self.storage.save("some_file", ContentFile("data"))
+        mode = os.stat(self.storage.path(fname))[0] & 0o777
+        self.assertEqual(mode, 0o644)
+
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
+    def test_file_upload_permissions_with_none(self):
         self.storage = FileSystemStorage(self.storage_dir)
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
@@ -912,6 +918,19 @@ class FileStoragePermissions(unittest.TestCase):
         name = self.storage.save("the_directory/the_file", ContentFile("data"))
         dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
         self.assertEqual(dir_mode, 0o777 & ~self.umask)
+
+    def test_file_upload_temp_file_permissions(self):
+        """
+        Verify that files uploaded via TemporaryUploadedFile get the correct
+        permissions (0o644) even though temporary files default to 0o600.
+        """
+        self.storage = FileSystemStorage(self.storage_dir)
+        with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as temp_file:
+            temp_file.write(b'data')
+            temp_file.seek(0)
+            fname = self.storage.save("test_file", temp_file)
+        mode = os.stat(self.storage.path(fname))[0] & 0o777
+        self.assertEqual(mode, 0o644)
 
 
 class FileStoragePathParsing(SimpleTestCase):

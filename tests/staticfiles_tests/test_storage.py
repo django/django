@@ -515,11 +515,20 @@ class TestStaticFilePermissions(CollectionTestCase):
         self.assertEqual(file_mode, 0o655)
         self.assertEqual(dir_mode, 0o765)
 
+    def test_collect_static_files_default_permissions(self):
+        call_command('collectstatic', **self.command_params)
+        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
+        file_mode = os.stat(test_file)[0] & 0o777
+        dir_mode = os.stat(test_dir)[0] & 0o777
+        self.assertEqual(file_mode, 0o644)
+        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=None,
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=None,
     )
-    def test_collect_static_files_default_permissions(self):
+    def test_collect_static_files_permissions_with_none(self):
         call_command('collectstatic', **self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
         test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
