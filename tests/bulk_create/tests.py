@@ -884,6 +884,15 @@ class BulkCreateTests(TestCase):
         (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
         self.assertIsInstance(obj.id, datetime)
 
+    @skipUnlessDBFeature(
+        "can_return_rows_from_bulk_insert", "supports_expression_defaults"
+    )
+    def test_db_expression_primary_key(self):
+        (obj,) = DbDefaultPrimaryKey.objects.bulk_create(
+            [DbDefaultPrimaryKey(id=Now())]
+        )
+        self.assertIsInstance(obj.id, datetime)
+
 
 @skipUnlessDBFeature("supports_transactions", "has_bulk_insert")
 class BulkCreateTransactionTests(TransactionTestCase):

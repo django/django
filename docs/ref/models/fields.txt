@@ -862,16 +862,22 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has the following **required** arguments:
+Has the following arguments:
 
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than or equal to ``decimal_places``.
+    must be greater than or equal to ``decimal_places``. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.decimal_places` is provided.
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number.
+    The number of decimal places to store with the number. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.max_digits` is provided.
 
 For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
@@ -894,6 +900,11 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
     should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
     of decimal fields.
+
+.. versionchanged:: 6.1
+
+    Support for ``DecimalField`` with no precision was added on Oracle,
+    PostgreSQL, and SQLite.
 
 ``DurationField``
 -----------------
@@ -2523,8 +2534,8 @@ Field API reference
     .. method:: get_db_prep_value(value, connection, prepared=False)
 
         Converts ``value`` to a backend-specific value. By default it returns
-        ``value`` if ``prepared=True`` and :meth:`~Field.get_prep_value` if is
-        ``False``.
+        ``value`` if ``prepared=True``, and :meth:`get_prep_value(value)
+        <Field.get_prep_value>` otherwise.
 
         See :ref:`converting-query-values-to-database-values` for usage.
 

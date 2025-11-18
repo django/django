@@ -92,7 +92,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The admin site login view now redirects authenticated users to the next URL,
+  if available, instead of always redirecting to the admin index page.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +126,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`inspectdb` now introspects
+  :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
+  installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,6 +246,11 @@ Models
   top-level :class:`~django.db.models.JSONField` value, or querying for
   top-level or nested JSON ``null`` values. See
   :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
+* :attr:`DecimalField.max_digits <django.db.models.DecimalField.max_digits>`
+  and :attr:`DecimalField.decimal_places
+  <django.db.models.DecimalField.decimal_places>` are no longer required to be
+  set on Oracle, PostgreSQL, and SQLite.
 
 Pagination
 ~~~~~~~~~~

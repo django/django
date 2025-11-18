@@ -2161,7 +2161,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         )
         self.assertHTMLEqual(
             form["title"].legend_tag(),
-            '<legend for="id_title">Name:</legend>',
+            "<legend>Name:</legend>",
         )
 
     def test_inlineformset_factory_labels_overrides(self):
@@ -2174,7 +2174,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         )
         self.assertHTMLEqual(
             form["title"].legend_tag(),
-            '<legend for="id_title">Name:</legend>',
+            "<legend>Name:</legend>",
         )
 
     def test_modelformset_factory_help_text_overrides(self):

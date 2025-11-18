@@ -543,3 +543,22 @@ class ConstraintsModel(models.Model):
                 violation_error_message="Price must be greater than zero.",
             ),
         ]
+
+
+class AttnameConstraintsModel(models.Model):
+    left = models.ForeignKey(
+        "self", related_name="+", null=True, on_delete=models.SET_NULL
+    )
+    right = models.ForeignKey(
+        "self", related_name="+", null=True, on_delete=models.SET_NULL
+    )
+
+    class Meta:
+        required_db_features = {"supports_table_check_constraints"}
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_left_not_right",
+                # right_id here is the ForeignKey's attname, not name.
+                condition=~models.Q(left=models.F("right_id")),
+            ),
+        ]

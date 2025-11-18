@@ -1237,6 +1237,12 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.args, instance.args)
         self.assertEqual(result.kwargs, instance.kwargs)
 
+    def test_serialize_generic_alias(self):
+        self.assertSerializedEqual(dict[str, float])
+
+    def test_serialize_generic_alias_complex_args(self):
+        self.assertSerializedEqual(dict[str, models.Manager])
+
     def test_register_serializer(self):
         class ComplexSerializer(BaseSerializer):
             def serialize(self):
