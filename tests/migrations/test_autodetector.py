@@ -2400,3 +2400,134 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'app', 1)
         self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')
+
+    def test_alter_field_to_fk_dependency_other_app(self):
+        """
+        #23315 - Changing a field to a ForeignKey should add a dependency
+        on the related model's app.
+        """
+        # Model with a UUID field
+        before = [
+            ModelState('testapp', 'App1', [
+                ('id', models.UUIDField(primary_key=True)),
+                ('another_app', models.UUIDField(null=True, blank=True)),
+            ]),
+            ModelState('otherapp', 'App2', [
+                ('id', models.UUIDField(primary_key=True)),
+            ]),
+        ]
+        # UUID field changed to ForeignKey
+        after = [
+            ModelState('testapp', 'App1', [
+                ('id', models.UUIDField(primary_key=True)),
+                ('another_app', models.ForeignKey('otherapp.App2', models.SET_NULL, null=True, blank=True)),
+            ]),
+            ModelState('otherapp', 'App2', [
+                ('id', models.UUIDField(primary_key=True)),
+            ]),
+        ]
+        changes = self.get_changes(before, after)
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='another_app')
+        # Should depend on otherapp
+        self.assertMigrationDependencies(changes, 'testapp', 0, [('otherapp', '__first__')])
+
+    def test_alter_field_to_fk_dependency_same_app(self):
+        """
+        #23315 - Changing a field to a ForeignKey in the same app should not add
+        a dependency (the app already depends on itself).
+        """
+        # Model with a UUID field
+        before = [
+            ModelState('testapp', 'App1', [
+                ('id', models.UUIDField(primary_key=True)),
+                ('another_app', models.UUIDField(null=True, blank=True)),
+            ]),
+            ModelState('testapp', 'App2', [
+                ('id', models.UUIDField(primary_key=True)),
+            ]),
+        ]
+        # UUID field changed to ForeignKey
+        after = [
+            ModelState('testapp', 'App1', [
+                ('id', models.UUIDField(primary_key=True)),
+                ('another_app', models.ForeignKey('testapp.App2', models.SET_NULL, null=True, blank=True)),
+            ]),
+            ModelState('testapp', 'App2', [
+                ('id', models.UUIDField(primary_key=True)),
+            ]),
+        ]
+        changes = self.get_changes(before, after)
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='another_app')
+        # Should NOT depend on other migrations since it's in the same app
+        self.assertMigrationDependencies(changes, 'testapp', 0, [])
+
+    def test_alter_field_to_m2m_dependency(self):
+        """
+        #23315 - Changing a field to a ManyToManyField should add a dependency
+        on the related model's app.
+        """
+        # Model with a CharField
+        before = [
+            ModelState('testapp', 'App1', [
+                ('id', models.AutoField(primary_key=True)),
+                ('tags', models.CharField(max_length=255)),
+            ]),
+            ModelState('otherapp', 'Tag', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+        ]
+        # CharField changed to ManyToManyField
+        after = [
+            ModelState('testapp', 'App1', [
+                ('id', models.AutoField(primary_key=True)),
+                ('tags', models.ManyToManyField('otherapp.Tag')),
+            ]),
+            ModelState('otherapp', 'Tag', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+        ]
+        changes = self.get_changes(before, after)
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['RemoveField', 'AddField'])
+        # Should depend on otherapp
+        self.assertMigrationDependencies(changes, 'testapp', 0, [('otherapp', '__first__')])
+
+    @override_settings(AUTH_USER_MODEL='otherapp.AppUser')
+    def test_alter_field_to_fk_swappable_model(self):
+        """
+        #23315 - Changing a field to a ForeignKey to a swappable model should
+        add a dependency on the swappable setting.
+        """
+        # Model with a CharField
+        before = [
+            ModelState('testapp', 'App1', [
+                ('id', models.AutoField(primary_key=True)),
+                ('user', models.CharField(max_length=255)),
+            ]),
+            ModelState('otherapp', 'AppUser', [
+                ('id', models.AutoField(primary_key=True)),
+            ], options={'swappable': 'AUTH_USER_MODEL'}),
+        ]
+        # CharField changed to ForeignKey pointing to swappable model
+        after = [
+            ModelState('testapp', 'App1', [
+                ('id', models.AutoField(primary_key=True)),
+                ('user', models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
+            ]),
+            ModelState('otherapp', 'AppUser', [
+                ('id', models.AutoField(primary_key=True)),
+            ], options={'swappable': 'AUTH_USER_MODEL'}),
+        ]
+        changes = self.get_changes(before, after)
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AlterField'])
+        # Should depend on the swappable setting
+        self.assertMigrationDependencies(changes, 'testapp', 0, [('__setting__', 'AUTH_USER_MODEL')])
