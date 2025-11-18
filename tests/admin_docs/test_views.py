@@ -3,6 +3,7 @@ import unittest
 
 from django.conf import settings
 from django.contrib.admindocs import utils, views
+from django.contrib.admindocs.utils import replace_named_groups, replace_unnamed_groups
 from django.contrib.admindocs.views import get_return_data_type, simplify_regex
 from django.contrib.sites.models import Site
 from django.db import models
@@ -354,7 +355,43 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^a/?$', '/a/'),
+            # Test trailing named groups without following characters
+            (r'entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)', '/entries/<pk>/relationships/<related_field>'),
+            (r'^(?P<a>\w+)/b/(?P<c>\w+)', '/<a>/b/<c>'),
+            (r'(?P<first>\w+)/(?P<second>\w+)/(?P<third>\w+)', '/<first>/<second>/<third>'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
                 self.assertEqual(simplify_regex(pattern), output)
+
+    def test_replace_named_groups(self):
+        tests = (
+            # Basic named groups
+            (r'^(?P<a>\w+)/b/(\w+)$', r'^<a>/b/(\w+)$'),
+            (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', r'^<a>/b/<c>/$'),
+            # Nested parentheses
+            (r'^(?P<a>(x|y))/b/(?P<c>\w+)$', r'^<a>/b/<c>$'),
+            (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', r'^<a>/b/<c>ab'),
+            (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', r'^<a>/b/<c>ab'),
+            # Trailing named groups (regression test for issue)
+            (r'entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)', r'entries/<pk>/relationships/<related_field>'),
+            (r'^(?P<a>\w+)/b/(?P<c>\w+)$', r'^<a>/b/<c>$'),
+            (r'^(?P<a>\w+)/b/(?P<c>\w+)', r'^<a>/b/<c>'),
+            (r'(?P<first>\w+)/(?P<second>\w+)/(?P<third>\w+)', r'<first>/<second>/<third>'),
+        )
+        for pattern, output in tests:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(replace_named_groups(pattern), output)
+
+    def test_replace_unnamed_groups(self):
+        tests = (
+            # Basic unnamed groups (these test after named groups are replaced)
+            (r'^<a>/b/(\w+)$', r'^<a>/b/<var>$'),
+            (r'^<a>/b/((x|y)\w+)$', r'^<a>/b/<var>$'),
+            # Trailing unnamed groups (regression test for issue)
+            (r'^<a>/b/(\w+)', r'^<a>/b/<var>'),
+            (r'a/b/(\w+)', r'a/b/<var>'),
+        )
+        for pattern, output in tests:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(replace_unnamed_groups(pattern), output)
