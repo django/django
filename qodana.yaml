@@ -8,3 +8,13 @@ profile:
   name: qodana.recommended
 include:
   - name: CheckDependencyLicenses
+  - name: JsCoverageInspection
+  - name: JvmLinesOfCodeInspection
+  - name: CheckThirdPartySoftwareList
+  - name: CheckModuleLicenses
+  - name: CssOverwrittenProperties
+  - name: EditorConfigShadowedOption
+  - name: EditorConfigShadowingOption
+  - name: FtlLanguageInspection
+  - name: CyclomaticComplexityInspection
+  - name: VulnerableLibrariesGlobal
