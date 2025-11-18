@@ -1,0 +1,13 @@
+===========================
+Django 5.1.15 release notes
+===========================
+
+*December 2, 2025*
+
+Django 5.1.15 fixes one security issue with severity "high", one security issue
+with severity "moderate", and one bug in 5.1.14.
+
+Bugfixes
+========
+
+* ...
