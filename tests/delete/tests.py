@@ -335,9 +335,9 @@ class DeletionTests(TestCase):
         batch_size = connection.ops.bulk_batch_size(['pk'], objs)
         # The related fetches are done in batches.
         batches = ceil(len(objs) / batch_size)
-        # One query for Avatar.objects.all() and then one related fast delete for
-        # each batch.
-        fetches_to_mem = 1 + batches
+        # One query for Avatar.objects.all() and then one combined related fast
+        # delete (multiple batches combined with OR) instead of one per batch.
+        fetches_to_mem = 1 + 1  # 1 for fetch, 1 for combined fast delete
         # The Avatar objects are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
         queries = fetches_to_mem + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE
         self.assertNumQueries(queries, Avatar.objects.all().delete)
@@ -351,12 +351,15 @@ class DeletionTests(TestCase):
 
         batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
 
-        # TEST_SIZE / batch_size (select related `T` instances)
-        # + 1 (select related `U` instances)
+        # 1 (select related `T` instances, queries combined)
+        # + 1 (select related `U` instances, combined)
         # + TEST_SIZE / GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
         # + 1 (delete `s`)
-        expected_num_queries = ceil(TEST_SIZE / batch_size)
-        expected_num_queries += ceil(TEST_SIZE / GET_ITERATOR_CHUNK_SIZE) + 2
+        # Note: batched fast deletes are now combined with OR, reducing the
+        # number of queries compared to before.
+        expected_num_queries = 1  # Combined T select query
+        expected_num_queries += 1  # Combined U fast delete query
+        expected_num_queries += ceil(TEST_SIZE / GET_ITERATOR_CHUNK_SIZE) + 1
 
         self.assertNumQueries(expected_num_queries, s.delete)
         self.assertFalse(S.objects.exists())

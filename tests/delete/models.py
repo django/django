@@ -147,3 +147,22 @@ class SecondReferrer(models.Model):
     other_referrer = models.ForeignKey(
         Referrer, models.CASCADE, to_field='unique_field', related_name='+'
     )
+
+
+# Models for testing combined fast delete optimization
+class Person(models.Model):
+    """Model with many-to-many self-reference for testing combined deletes."""
+    name = models.CharField(max_length=100)
+    friends = models.ManyToManyField('self', symmetrical=False)
+
+
+class Author(models.Model):
+    """Author model for testing multiple FK relationships to the same model."""
+    name = models.CharField(max_length=100, unique=True)
+
+
+class Article(models.Model):
+    """Article with multiple FKs to Author for testing combined deletes."""
+    title = models.CharField(max_length=200)
+    created_by = models.ForeignKey(Author, models.CASCADE, related_name='created_articles')
+    updated_by = models.ForeignKey(Author, models.CASCADE, null=True, related_name='updated_articles')

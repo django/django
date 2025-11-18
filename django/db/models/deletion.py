@@ -1,9 +1,10 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from itertools import chain
 from operator import attrgetter
 
 from django.db import IntegrityError, connections, transaction
 from django.db.models import signals, sql
+from django.db.models.query_utils import Q
 
 
 class ProtectedError(IntegrityError):
@@ -67,9 +68,9 @@ class Collector:
         # Initially, {model: {instances}}, later values become lists.
         self.data = {}
         self.field_updates = {}  # {model: {(field, value): {instances}}}
-        # fast_deletes is a list of queryset-likes that can be deleted without
-        # fetching the objects into memory.
-        self.fast_deletes = []
+        # fast_deletes is a dict mapping models to lists of querysets that can
+        # be deleted without fetching the objects into memory.
+        self.fast_deletes = defaultdict(list)
 
         # Tracks deletion-order dependency for databases without transactions
         # or ability to defer constraint checks. Only concrete model classes
@@ -191,7 +192,7 @@ class Collector:
         If 'keep_parents' is True, data of parent model's will be not deleted.
         """
         if self.can_fast_delete(objs):
-            self.fast_deletes.append(objs)
+            self.fast_deletes[objs.model].append(objs)
             return
         new_objs = self.add(objs, source, nullable,
                             reverse_dependency=reverse_dependency)
@@ -225,7 +226,7 @@ class Collector:
                 for batch in batches:
                     sub_objs = self.related_objects(related, batch)
                     if self.can_fast_delete(sub_objs, from_field=field):
-                        self.fast_deletes.append(sub_objs)
+                        self.fast_deletes[sub_objs.model].append(sub_objs)
                     else:
                         related_model = related.related_model
                         # Non-referenced fields can be deferred if no signal
@@ -280,6 +281,40 @@ class Collector:
                 return
         self.data = {model: self.data[model] for model in sorted_models}
 
+    def _combine_fast_deletes(self):
+        """
+        Combine multiple fast delete querysets for the same model into a single
+        queryset with OR conditions to reduce database roundtrips.
+        """
+        from django.db.models.sql.where import OR, WhereNode
+
+        for model, querysets in list(self.fast_deletes.items()):
+            if len(querysets) <= 1:
+                # No combining needed for single queryset
+                continue
+
+            # Start with the first queryset as the base
+            base_qs = querysets[0]
+            base_query = base_qs.query.clone()
+
+            # Create a new WhereNode with OR connector
+            combined_where = WhereNode(connector=OR)
+
+            # Add all WHERE clauses from all querysets
+            for qs in querysets:
+                if qs.query.where:
+                    combined_where.add(qs.query.where, OR)
+
+            # Set the combined WHERE clause on the base query
+            base_query.where = combined_where
+
+            # Create a new queryset with the combined query
+            combined_qs = base_qs._chain()
+            combined_qs.query = base_query
+
+            # Replace the list of querysets with a single combined queryset
+            self.fast_deletes[model] = [combined_qs]
+
     def delete(self):
         # sort instance collections
         for model, instances in self.data.items():
@@ -309,10 +344,14 @@ class Collector:
                         sender=model, instance=obj, using=self.using
                     )
 
+            # Combine fast deletes for the same model to reduce queries
+            self._combine_fast_deletes()
+
             # fast deletes
-            for qs in self.fast_deletes:
-                count = qs._raw_delete(using=self.using)
-                deleted_counter[qs.model._meta.label] += count
+            for model, querysets in self.fast_deletes.items():
+                for qs in querysets:
+                    count = qs._raw_delete(using=self.using)
+                    deleted_counter[model._meta.label] += count
 
             # update fields
             for model, instances_for_fieldvalues in self.field_updates.items():
