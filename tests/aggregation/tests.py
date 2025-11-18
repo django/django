@@ -403,6 +403,48 @@ class AggregateTestCase(TestCase):
         )
         self.assertEqual(aggs['distinct_ratings'], 4)
 
+    def test_avg_distinct(self):
+        """
+        Avg aggregate should support distinct parameter.
+        """
+        # Test that Avg with distinct parameter works without error
+        vals = Book.objects.aggregate(Avg("rating", distinct=True))
+        self.assertIn("rating__avg", vals)
+        # Verify the distinct clause is applied
+        with self.assertNumQueries(1) as ctx:
+            Book.objects.aggregate(Avg("rating", distinct=True))
+        sql = ctx.captured_queries[0]['sql']
+        self.assertIn('DISTINCT', sql.upper())
+
+    def test_sum_distinct(self):
+        """
+        Sum aggregate should support distinct parameter.
+        """
+        # Test that Sum with distinct parameter works without error
+        vals = Book.objects.aggregate(Sum("rating", distinct=True))
+        self.assertIn("rating__sum", vals)
+        # Verify the distinct clause is applied
+        with self.assertNumQueries(1) as ctx:
+            Book.objects.aggregate(Sum("rating", distinct=True))
+        sql = ctx.captured_queries[0]['sql']
+        self.assertIn('DISTINCT', sql.upper())
+
+    def test_max_distinct(self):
+        """
+        Max aggregate should support distinct parameter (though pointless).
+        """
+        # Test that Max with distinct parameter works without error
+        vals = Book.objects.aggregate(Max("rating", distinct=True))
+        self.assertIn("rating__max", vals)
+
+    def test_min_distinct(self):
+        """
+        Min aggregate should support distinct parameter (though pointless).
+        """
+        # Test that Min with distinct parameter works without error
+        vals = Book.objects.aggregate(Min("rating", distinct=True))
+        self.assertIn("rating__min", vals)
+
     def test_non_grouped_annotation_not_in_group_by(self):
         """
         An annotation not included in values() before an aggregate should be

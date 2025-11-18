@@ -1507,6 +1507,17 @@ class AggregationTests(TestCase):
             allow_distinct = True
         DistinctAggregate('foo', distinct=True)
 
+    def test_aggregate_distinct_support(self):
+        """
+        Avg, Sum, Min, and Max should support the distinct parameter.
+        """
+        from django.db.models import Avg, Sum, Min, Max
+        # These should not raise TypeError
+        Avg('foo', distinct=True)
+        Sum('foo', distinct=True)
+        Min('foo', distinct=True)
+        Max('foo', distinct=True)
+
 
 class JoinPromotionTests(TestCase):
     def test_ticket_21150(self):
