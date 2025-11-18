@@ -804,6 +804,19 @@ class TestInlinePermissions(TestCase):
             html=True,
         )
 
+    def test_inline_change_m2m_view_only_perm(self):
+        # Give only view permission on Book (not change)
+        permission = Permission.objects.get(codename='view_book', content_type=self.book_ct)
+        self.user.user_permissions.add(permission)
+        response = self.client.get(self.author_change_url)
+        # With only view permission on Book, the M2M inline should not be shown
+        # because there's no "view-only" mode for M2M inlines (they're always editable).
+        # Regression test for the bug where M2M inlines were editable with only view permission.
+        self.assertNotContains(response, '<h2>Author-book relationships</h2>')
+        self.assertNotContains(response, 'Add another Author-book relationship')
+        self.assertNotContains(response, 'id="id_Author_books-TOTAL_FORMS"')
+        self.assertNotContains(response, 'id="id_Author_books-0-DELETE"')
+
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):
