@@ -92,9 +92,15 @@ class URLValidator(RegexValidator):
     )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
+    # Per RFC 1738 section 3.1, the characters ":", "@", or "/" must be
+    # %-encoded in user and password fields. We allow any character except
+    # these three, or permit them if they appear to be %-encoded.
+    user_re = r'[^\s:@/]+'
+    password_re = r'[^\s@/]+'
+
     regex = _lazy_re_compile(
         r'^(?:[a-z0-9\.\-\+]*)://'  # scheme is validated separately
-        r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
+        r'(?:' + user_re + r'(?::' + password_re + r')?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{2,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
