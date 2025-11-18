@@ -202,7 +202,9 @@ class GenericForeignKey(FieldCacheMixin):
             else:
                 model = self.get_content_type(id=ct_id,
                                               using=obj._state.db).model_class()
-                return (model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
+                # Use the primary key field's to_python method to ensure the
+                # fk_field value is converted to the same type as obj.pk
+                return (model._meta.pk.to_python(getattr(obj, self.fk_field)),
                         model)
 
         return (

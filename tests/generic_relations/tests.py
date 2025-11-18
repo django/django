@@ -7,8 +7,8 @@ from django.test import SimpleTestCase, TestCase
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
     ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
-    ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
-    Vegetable,
+    ProxyRelatedModel, Rock, TaggedItem, UUIDModel, UUIDTaggedItem,
+    ValuableRock, ValuableTaggedItem, Vegetable,
 )
 
 
@@ -627,3 +627,53 @@ class TestInitWithNoneArgument(SimpleTestCase):
         # TaggedItem requires a content_type but initializing with None should
         # be allowed.
         TaggedItem(content_object=None)
+
+
+class UUIDPrimaryKeyTests(TestCase):
+    """
+    Test that prefetch_related works correctly when the related model
+    uses a UUID field as its primary key.
+    """
+
+    def test_prefetch_related_with_uuid_pk(self):
+        """
+        Test that prefetch_related works when the target model has a UUID
+        primary key. This is a regression test for the issue where UUID
+        primary keys were not being properly matched during prefetch_related.
+        """
+        # Create UUID models
+        uuid_obj1 = UUIDModel.objects.create(name="Object 1")
+        uuid_obj2 = UUIDModel.objects.create(name="Object 2")
+
+        # Create tagged items that point to the UUID models
+        tag1 = UUIDTaggedItem.objects.create(tag="tag1", content_object=uuid_obj1)
+        tag2 = UUIDTaggedItem.objects.create(tag="tag2", content_object=uuid_obj1)
+        tag3 = UUIDTaggedItem.objects.create(tag="tag3", content_object=uuid_obj2)
+
+        # Fetch tagged items with prefetch_related
+        tags = list(UUIDTaggedItem.objects.all().prefetch_related('content_object'))
+
+        # Verify that content_object is correctly populated
+        self.assertEqual(tags[0].content_object, uuid_obj1)
+        self.assertEqual(tags[1].content_object, uuid_obj1)
+        self.assertEqual(tags[2].content_object, uuid_obj2)
+
+        # Verify the names as well to be sure
+        self.assertEqual(tags[0].content_object.name, "Object 1")
+        self.assertEqual(tags[1].content_object.name, "Object 1")
+        self.assertEqual(tags[2].content_object.name, "Object 2")
+
+    def test_prefetch_related_uuid_not_none(self):
+        """
+        Ensure that prefetch_related returns actual objects, not None.
+        """
+        uuid_obj = UUIDModel.objects.create(name="Test Object")
+        tag = UUIDTaggedItem.objects.create(tag="test", content_object=uuid_obj)
+
+        # Fetch with prefetch_related
+        fetched_tag = UUIDTaggedItem.objects.prefetch_related('content_object').get(pk=tag.pk)
+
+        # The bug would cause content_object to be None
+        self.assertIsNotNone(fetched_tag.content_object)
+        self.assertEqual(fetched_tag.content_object.id, uuid_obj.id)
+        self.assertEqual(fetched_tag.content_object.name, "Test Object")

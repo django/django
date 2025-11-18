@@ -8,6 +8,7 @@ object, be it animal, vegetable, or mineral.
 The canonical example is tags (although this example implementation is *far*
 from complete).
 """
+import uuid
 
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
@@ -146,3 +147,24 @@ class AllowsNullGFK(models.Model):
     content_type = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey()
+
+
+# To test fix for prefetch_related with UUID primary key
+class UUIDModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+
+
+class UUIDTaggedItem(models.Model):
+    """A tag on an item with UUID object_id."""
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    object_id = models.CharField(max_length=255)
+
+    content_object = GenericForeignKey()
+
+    class Meta:
+        ordering = ["tag"]
+
+    def __str__(self):
+        return self.tag
