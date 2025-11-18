@@ -11,23 +11,20 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
     def _run_it(self, dbinfo):
         """
         That function invokes the runshell command, while mocking
-        subprocess.call. It returns a 2-tuple with:
+        subprocess.run. It returns a 2-tuple with:
         - The command line list
-        - The content of the file pointed by environment PGPASSFILE, or None.
+        - The value of the PGPASSWORD environment variable, or None.
         """
-        def _mock_subprocess_call(*args):
-            self.subprocess_args = list(*args)
-            if 'PGPASSFILE' in os.environ:
-                with open(os.environ['PGPASSFILE']) as f:
-                    self.pgpass = f.read().strip()  # ignore line endings
-            else:
-                self.pgpass = None
-            return 0
+        def _mock_subprocess_run(*args, **kwargs):
+            self.subprocess_args = list(args[0])
+            env = kwargs.get('env', os.environ)
+            self.pgpassword = env.get('PGPASSWORD')
+            return mock.Mock()
         self.subprocess_args = None
-        self.pgpass = None
-        with mock.patch('subprocess.call', new=_mock_subprocess_call):
+        self.pgpassword = None
+        with mock.patch('subprocess.run', new=_mock_subprocess_run):
             DatabaseClient.runshell_db(dbinfo)
-        return self.subprocess_args, self.pgpass
+        return self.subprocess_args, self.pgpassword
 
     def test_basic(self):
         self.assertEqual(
@@ -39,7 +36,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                'somehost:444:dbname:someuser:somepassword',
+                'somepassword',
             )
         )
 
@@ -66,7 +63,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
-                '\\:\\:1:444:dbname:some\\:user:some\\:password',
+                'some:password',
             )
         )
 
@@ -80,14 +77,13 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'some\\user', '-h', 'somehost', '-p', '444', 'dbname'],
-                'somehost:444:dbname:some\\\\user:some\\\\password',
+                'some\\password',
             )
         )
 
     def test_accent(self):
         username = 'rôle'
         password = 'sésame'
-        pgpass_string = 'somehost:444:dbname:%s:%s' % (username, password)
         self.assertEqual(
             self._run_it({
                 'database': 'dbname',
@@ -97,20 +93,21 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', username, '-h', 'somehost', '-p', '444', 'dbname'],
-                pgpass_string,
+                password,
             )
         )
 
     def test_sigint_handler(self):
         """SIGINT is ignored in Python and passed to psql to abort quries."""
-        def _mock_subprocess_call(*args):
+        def _mock_subprocess_run(*args, **kwargs):
             handler = signal.getsignal(signal.SIGINT)
             self.assertEqual(handler, signal.SIG_IGN)
+            return mock.Mock()
 
         sigint_handler = signal.getsignal(signal.SIGINT)
         # The default handler isn't SIG_IGN.
         self.assertNotEqual(sigint_handler, signal.SIG_IGN)
-        with mock.patch('subprocess.check_call', new=_mock_subprocess_call):
+        with mock.patch('subprocess.run', new=_mock_subprocess_run):
             DatabaseClient.runshell_db({})
         # dbshell restores the original handler.
         self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))
