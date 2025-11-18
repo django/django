@@ -99,6 +99,18 @@ def simple_keyword_only_default(*, kwarg=42):
 
 
 @register.simple_tag
+def simple_keyword_only_with_default(*, greeting='hello'):
+    """Test keyword-only argument with default value"""
+    return "simple_keyword_only_with_default - Expected result: %s" % greeting
+
+
+@register.simple_tag
+def simple_multiple_keyword_only_with_defaults(*, greeting='hello', name='world'):
+    """Test multiple keyword-only arguments with default values"""
+    return "simple_multiple_keyword_only_with_defaults - Expected result: %s %s" % (greeting, name)
+
+
+@register.simple_tag
 def simple_one_default(one, two='hi'):
     """Expected simple_one_default __doc__"""
     return "simple_one_default - Expected result: %s, %s" % (one, two)

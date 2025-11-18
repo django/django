@@ -224,6 +224,18 @@ def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
 inclusion_unlimited_args_kwargs.anything = "Expected inclusion_unlimited_args_kwargs __dict__"
 
 
+@register.inclusion_tag('inclusion.html')
+def inclusion_keyword_only_with_default(*, greeting='hello'):
+    """Test keyword-only argument with default value for inclusion tag"""
+    return {"result": "inclusion_keyword_only_with_default - Expected result: %s" % greeting}
+
+
+@register.inclusion_tag('inclusion.html')
+def inclusion_multiple_keyword_only_with_defaults(*, greeting='hello', name='world'):
+    """Test multiple keyword-only arguments with default values for inclusion tag"""
+    return {"result": "inclusion_multiple_keyword_only_with_defaults - Expected result: %s %s" % (greeting, name)}
+
+
 @register.inclusion_tag('inclusion.html', takes_context=True)
 def inclusion_tag_without_context_parameter(arg):
     """Expected inclusion_tag_without_context_parameter __doc__"""

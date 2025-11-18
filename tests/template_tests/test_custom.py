@@ -62,6 +62,20 @@ class SimpleTagTests(TagTestCase):
                 'simple_keyword_only_param - Expected result: 37'),
             ('{% load custom %}{% simple_keyword_only_default %}',
                 'simple_keyword_only_default - Expected result: 42'),
+            ('{% load custom %}{% simple_keyword_only_default kwarg=99 %}',
+                'simple_keyword_only_default - Expected result: 99'),
+            ('{% load custom %}{% simple_keyword_only_with_default %}',
+                'simple_keyword_only_with_default - Expected result: hello'),
+            ('{% load custom %}{% simple_keyword_only_with_default greeting="hi" %}',
+                'simple_keyword_only_with_default - Expected result: hi'),
+            ('{% load custom %}{% simple_multiple_keyword_only_with_defaults %}',
+                'simple_multiple_keyword_only_with_defaults - Expected result: hello world'),
+            ('{% load custom %}{% simple_multiple_keyword_only_with_defaults greeting="hi" %}',
+                'simple_multiple_keyword_only_with_defaults - Expected result: hi world'),
+            ('{% load custom %}{% simple_multiple_keyword_only_with_defaults name="Django" %}',
+                'simple_multiple_keyword_only_with_defaults - Expected result: hello Django'),
+            ('{% load custom %}{% simple_multiple_keyword_only_with_defaults greeting="hi" name="Django" %}',
+                'simple_multiple_keyword_only_with_defaults - Expected result: hi Django'),
             ('{% load custom %}{% simple_one_default 37 %}', 'simple_one_default - Expected result: 37, hi'),
             ('{% load custom %}{% simple_one_default 37 two="hello" %}',
                 'simple_one_default - Expected result: 37, hello'),
@@ -101,6 +115,10 @@ class SimpleTagTests(TagTestCase):
                 '{% load custom %}{% simple_unlimited_args_kwargs 37 40|add:2 eggs="scrambled" 56 four=1|add:3 %}'),
             ("'simple_unlimited_args_kwargs' received multiple values for keyword argument 'eggs'",
                 '{% load custom %}{% simple_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}'),
+            ("'simple_keyword_only_with_default' received multiple values for keyword argument 'greeting'",
+                '{% load custom %}{% simple_keyword_only_with_default greeting="hi" greeting="hello" %}'),
+            ("'simple_multiple_keyword_only_with_defaults' received multiple values for keyword argument 'name'",
+                '{% load custom %}{% simple_multiple_keyword_only_with_defaults name="Django" name="Python" %}'),
         ]
 
         for entry in errors:
@@ -190,6 +208,18 @@ class InclusionTagTests(TagTestCase):
                 'inclusion_only_unlimited_args - Expected result: 37, 42, 56, 89\n'),
             ('{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}',
                 'inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4\n'),
+            ('{% load inclusion %}{% inclusion_keyword_only_with_default %}',
+                'inclusion_keyword_only_with_default - Expected result: hello\n'),
+            ('{% load inclusion %}{% inclusion_keyword_only_with_default greeting="hi" %}',
+                'inclusion_keyword_only_with_default - Expected result: hi\n'),
+            ('{% load inclusion %}{% inclusion_multiple_keyword_only_with_defaults %}',
+                'inclusion_multiple_keyword_only_with_defaults - Expected result: hello world\n'),
+            ('{% load inclusion %}{% inclusion_multiple_keyword_only_with_defaults greeting="hi" %}',
+                'inclusion_multiple_keyword_only_with_defaults - Expected result: hi world\n'),
+            ('{% load inclusion %}{% inclusion_multiple_keyword_only_with_defaults name="Django" %}',
+                'inclusion_multiple_keyword_only_with_defaults - Expected result: hello Django\n'),
+            ('{% load inclusion %}{% inclusion_multiple_keyword_only_with_defaults greeting="hi" name="Django" %}',
+                'inclusion_multiple_keyword_only_with_defaults - Expected result: hi Django\n'),
         ]
 
         for entry in templates:
@@ -215,6 +245,10 @@ class InclusionTagTests(TagTestCase):
             ),
             ("'inclusion_unlimited_args_kwargs' received multiple values for keyword argument 'eggs'",
                 '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}'),
+            ("'inclusion_keyword_only_with_default' received multiple values for keyword argument 'greeting'",
+                '{% load inclusion %}{% inclusion_keyword_only_with_default greeting="hi" greeting="hello" %}'),
+            ("'inclusion_multiple_keyword_only_with_defaults' received multiple values for keyword argument 'name'",
+                '{% load inclusion %}{% inclusion_multiple_keyword_only_with_defaults name="Django" name="Python" %}'),
         ]
 
         for entry in errors:

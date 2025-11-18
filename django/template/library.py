@@ -261,15 +261,15 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         if kwarg:
             # The kwarg was successfully extracted
             param, value = kwarg.popitem()
-            if param not in params and param not in unhandled_kwargs and varkw is None:
-                # An unexpected keyword argument was supplied
-                raise TemplateSyntaxError(
-                    "'%s' received unexpected keyword argument '%s'" %
-                    (name, param))
-            elif param in kwargs:
+            if param in kwargs:
                 # The keyword argument has already been supplied once
                 raise TemplateSyntaxError(
                     "'%s' received multiple values for keyword argument '%s'" %
+                    (name, param))
+            elif param not in params and param not in kwonly and varkw is None:
+                # An unexpected keyword argument was supplied
+                raise TemplateSyntaxError(
+                    "'%s' received unexpected keyword argument '%s'" %
                     (name, param))
             else:
                 # All good, record the keyword argument
