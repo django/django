@@ -439,6 +439,16 @@ class DeletionTests(TestCase):
 
 class FastDeleteTests(TestCase):
 
+    def test_fast_delete_instance_set_pk_to_none(self):
+        """
+        Fast deletion should set the pk to None on the instance.
+        """
+        u = User.objects.create()
+        pk = u.pk
+        self.assertIsNotNone(pk)
+        u.delete()
+        self.assertIsNone(u.pk)
+
     def test_fast_delete_fk(self):
         u = User.objects.create(
             avatar=Avatar.objects.create()
