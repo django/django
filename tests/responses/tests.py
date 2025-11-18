@@ -154,3 +154,29 @@ class HttpResponseTests(SimpleTestCase):
         cache.set('my-response-key', response)
         response = cache.get('my-response-key')
         self.assertEqual(response.content, b'0123456789')
+
+    def test_memoryview_content(self):
+        """HttpResponse should handle memoryview objects correctly."""
+        content = b"My Content"
+        response = HttpResponse(memoryview(content))
+        self.assertEqual(response.content, content)
+
+    def test_memoryview_content_alternate_data(self):
+        """HttpResponse should handle different memoryview data correctly."""
+        content = b"Binary data from PostgreSQL"
+        response = HttpResponse(memoryview(content))
+        self.assertEqual(response.content, content)
+
+    def test_memoryview_iterable(self):
+        """HttpResponse should handle iterables containing memoryview objects."""
+        content1 = b"Part 1"
+        content2 = b"Part 2"
+        response = HttpResponse([memoryview(content1), memoryview(content2)])
+        self.assertEqual(response.content, content1 + content2)
+
+    def test_write_memoryview(self):
+        """HttpResponse.write() should handle memoryview objects."""
+        response = HttpResponse()
+        content = b"Written content"
+        response.write(memoryview(content))
+        self.assertEqual(response.content, content)
