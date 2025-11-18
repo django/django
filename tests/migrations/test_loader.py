@@ -190,11 +190,18 @@ class LoaderTests(TestCase):
             )
 
     def test_load_empty_dir(self):
+        """
+        Migration directories without an __init__.py file are allowed.
+        """
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
             loader = MigrationLoader(connection)
             self.assertIn(
-                "migrations", loader.unmigrated_apps,
-                "App missing __init__.py in migrations module not in unmigrated apps."
+                "migrations", loader.migrated_apps,
+                "App with namespace package migrations not in migrated apps."
+            )
+            self.assertIn(
+                ("migrations", "0001_initial"), loader.disk_migrations,
+                "Namespace package migration not loaded."
             )
 
     @override_settings(
