@@ -80,3 +80,7 @@ class VehicleMixin(Vehicle):
 
 class Car(VehicleMixin):
     pass
+
+
+class JsonFieldModel(models.Model):
+    json_field = models.JSONField()

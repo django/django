@@ -14,7 +14,8 @@ from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
 from .models import (
-    Article, Car, Count, Event, EventGuide, Location, Site, Vehicle,
+    Article, Car, Count, Event, EventGuide, JsonFieldModel, Location, Site,
+    Vehicle,
 )
 
 
@@ -387,3 +388,41 @@ class UtilsTests(SimpleTestCase):
 
     def test_quote(self):
         self.assertEqual(quote('something\nor\nother'), 'something_0Aor_0Aother')
+
+    def test_json_display_for_field(self):
+        """
+        JSONField values are displayed as valid JSON.
+        """
+        field = models.JSONField()
+
+        # Test dict with double quotes
+        display_value = display_for_field({"foo": "bar"}, field, self.empty_value)
+        self.assertEqual(display_value, '{"foo": "bar"}')
+
+        # Test list
+        display_value = display_for_field([1, 2, 3], field, self.empty_value)
+        self.assertEqual(display_value, '[1, 2, 3]')
+
+        # Test nested structure
+        display_value = display_for_field(
+            {"name": "test", "values": [1, 2, 3], "nested": {"key": "value"}},
+            field,
+            self.empty_value
+        )
+        self.assertEqual(display_value, '{"name": "test", "values": [1, 2, 3], "nested": {"key": "value"}}')
+
+        # Test string value
+        display_value = display_for_field("simple string", field, self.empty_value)
+        self.assertEqual(display_value, '"simple string"')
+
+        # Test number
+        display_value = display_for_field(42, field, self.empty_value)
+        self.assertEqual(display_value, '42')
+
+        # Test boolean
+        display_value = display_for_field(True, field, self.empty_value)
+        self.assertEqual(display_value, 'true')
+
+        # Test null value
+        display_value = display_for_field(None, field, self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
