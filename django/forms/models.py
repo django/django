@@ -39,18 +39,35 @@ def construct_instance(form, instance, fields=None, exclude=None):
     cleaned_data = form.cleaned_data
     file_field_list = []
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) \
-                or f.name not in cleaned_data:
+        if not f.editable or isinstance(f, models.AutoField):
             continue
-        if fields is not None and f.name not in fields:
+        if f.name not in cleaned_data:
             continue
+        # Skip explicitly excluded fields
         if exclude and f.name in exclude:
             continue
+        # Skip fields not in the fields list, unless they were added to
+        # cleaned_data programmatically (e.g., in clean() method).
+        # A field not in form.fields but in cleaned_data indicates it was
+        # set programmatically and should be saved.
+        if fields is not None and f.name not in fields:
+            if f.name in form.fields:
+                # Field is in form.fields but not in Meta.fields - shouldn't happen
+                # but skip it to be safe
+                continue
+            # Field is not in form.fields, so it was added to cleaned_data
+            # programmatically. Allow it to be saved.
         # Leave defaults for fields that aren't in POST data, except for
         # checkbox inputs because they don't appear in POST data if not checked.
-        if (f.has_default() and
-                form[f.name].field.widget.value_omitted_from_data(form.data, form.files, form.add_prefix(f.name))):
-            continue
+        # Skip this check if field is not in form.fields (programmatically added).
+        if f.name in form.fields:
+            if (
+                f.has_default() and
+                form[f.name].field.widget.value_omitted_from_data(
+                    form.data, form.files, form.add_prefix(f.name)
+                )
+            ):
+                continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, models.FileField):
