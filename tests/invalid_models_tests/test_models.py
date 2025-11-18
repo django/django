@@ -1015,6 +1015,51 @@ class OtherModelTests(SimpleTestCase):
             class ParkingLot(Place):
                 parent = models.OneToOneField(Place, models.CASCADE)
 
+    def test_parent_link_with_multiple_o2o_same_parent(self):
+        """
+        Test that a model with multiple OneToOneFields to the same parent
+        model works correctly when one has parent_link=True, regardless of
+        the order in which the fields are declared.
+        """
+        class Document(models.Model):
+            pass
+
+        # Test case 1: parent_link field declared first
+        class Picking1(Document):
+            document_ptr = models.OneToOneField(
+                Document,
+                on_delete=models.CASCADE,
+                parent_link=True,
+                related_name='picking1_set',
+            )
+            origin = models.OneToOneField(
+                Document,
+                related_name='picking1_origin',
+                on_delete=models.PROTECT,
+            )
+
+        # Should not raise an error
+        self.assertIsNotNone(Picking1._meta.pk)
+        self.assertTrue(Picking1._meta.pk.remote_field.parent_link)
+
+        # Test case 2: parent_link field declared after
+        class Picking2(Document):
+            origin = models.OneToOneField(
+                Document,
+                related_name='picking2_origin',
+                on_delete=models.PROTECT,
+            )
+            document_ptr = models.OneToOneField(
+                Document,
+                on_delete=models.CASCADE,
+                parent_link=True,
+                related_name='picking2_set',
+            )
+
+        # Should not raise an error
+        self.assertIsNotNone(Picking2._meta.pk)
+        self.assertTrue(Picking2._meta.pk.remote_field.parent_link)
+
     def test_m2m_table_name_clash(self):
         class Foo(models.Model):
             bar = models.ManyToManyField('Bar', db_table='myapp_bar')
