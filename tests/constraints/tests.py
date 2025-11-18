@@ -79,6 +79,52 @@ class CheckConstraintTests(TestCase):
         expected_name = 'price_gt_discounted_price'
         self.assertIn(expected_name, constraints)
 
+    def test_check_constraint_with_or_operator_sql(self):
+        """
+        Test that CheckConstraint with OR operator uses simple column names
+        without table qualification. This prevents errors in SQLite when
+        renaming tables during migrations.
+
+        Regression test for #31331.
+        """
+        from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+
+        check = models.Q(price__gt=10, discounted_price__isnull=False) | models.Q(price__lte=10)
+        constraint = models.CheckConstraint(check=check, name='test_or_constraint')
+
+        # Use a schema editor to generate SQL
+        schema_editor = DatabaseSchemaEditor(connection)
+        check_sql = constraint._get_check_sql(Product, schema_editor)
+
+        # The SQL should NOT contain qualified table names like "constraints_product"."field"
+        # This was a bug where AND clauses used Col (qualified) but OR clauses used SimpleCol
+        self.assertNotIn('constraints_product', check_sql.lower())
+        # Verify it contains the expected column references
+        self.assertIn('price', check_sql.lower())
+        self.assertIn('discounted_price', check_sql.lower())
+
+    def test_check_constraint_nested_q_objects(self):
+        """
+        Test that CheckConstraint with nested Q objects uses simple column names.
+
+        Regression test for #31331.
+        """
+        from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+
+        # Complex nested Q objects with both AND and OR
+        check = (
+            models.Q(models.Q(price__gt=10, discounted_price__isnull=False) | models.Q(price__lte=5)) &
+            models.Q(name__isnull=False)
+        )
+        constraint = models.CheckConstraint(check=check, name='test_nested_or_constraint')
+
+        # Use a schema editor to generate SQL
+        schema_editor = DatabaseSchemaEditor(connection)
+        check_sql = constraint._get_check_sql(Product, schema_editor)
+
+        # The SQL should NOT contain qualified table names
+        self.assertNotIn('constraints_product', check_sql.lower())
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
@@ -187,3 +233,24 @@ class UniqueConstraintTests(TestCase):
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'UniqueConstraint.condition must be a Q instance.'):
             models.UniqueConstraint(name='uniq', fields=['name'], condition='invalid')
+
+    def test_unique_constraint_condition_with_or_operator_sql(self):
+        """
+        Test that UniqueConstraint condition with OR operator uses simple column names.
+
+        Regression test for #31331.
+        """
+        from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+
+        condition = models.Q(price__gt=10, discounted_price__isnull=False) | models.Q(price__lte=10)
+        constraint = models.UniqueConstraint(fields=['name'], name='test_or_unique', condition=condition)
+
+        # Use a schema editor to generate SQL
+        schema_editor = DatabaseSchemaEditor(connection)
+        condition_sql = constraint._get_condition_sql(Product, schema_editor)
+
+        # The SQL should NOT contain qualified table names
+        self.assertNotIn('constraints_product', condition_sql.lower())
+        # Verify it contains the expected column references
+        self.assertIn('price', condition_sql.lower())
+        self.assertIn('discounted_price', condition_sql.lower())
