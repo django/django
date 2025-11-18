@@ -254,6 +254,83 @@ class CommandTests(SimpleTestCase):
         parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
         self.assertEqual(parser.epilog, epilog)
 
+    def test_call_command_with_required_mutually_exclusive_group_option_in_kwargs(self):
+        """
+        call_command should accept options from a required mutually exclusive
+        group when passed as kwargs.
+        """
+        out = StringIO()
+        management.call_command('mutually_exclusive', shop_id=1, stdout=out)
+        self.assertIn('shop_id=1', out.getvalue())
+        self.assertIn('shop_name=None', out.getvalue())
+
+    def test_call_command_with_required_mutually_exclusive_group_option_in_args(self):
+        """
+        call_command should accept options from a required mutually exclusive
+        group when passed as args.
+        """
+        out = StringIO()
+        management.call_command('mutually_exclusive', '--shop-id=1', stdout=out)
+        self.assertIn('shop_id=1', out.getvalue())
+        self.assertIn('shop_name=None', out.getvalue())
+
+    def test_call_command_with_required_mutually_exclusive_group_alternative_option(self):
+        """
+        call_command should accept the alternative option from a required
+        mutually exclusive group.
+        """
+        out = StringIO()
+        management.call_command('mutually_exclusive', shop_name='test_shop', stdout=out)
+        self.assertIn('shop_id=None', out.getvalue())
+        self.assertIn('shop_name=test_shop', out.getvalue())
+
+    def test_call_command_with_required_mutually_exclusive_group_no_option(self):
+        """
+        call_command should raise an error when no option from a required
+        mutually exclusive group is provided.
+        """
+        msg = 'Error: one of the arguments --shop-id --shop is required'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('mutually_exclusive', stdout=StringIO())
+
+    def test_call_command_with_required_mutually_exclusive_group_both_options(self):
+        """
+        call_command should raise an error when both options from a mutually
+        exclusive group are provided.
+        """
+        msg = 'Error: argument --shop: not allowed with argument --shop-id'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('mutually_exclusive', shop_id=1, shop_name='test', stdout=StringIO())
+
+    def test_call_command_with_optional_mutually_exclusive_group_no_options(self):
+        """
+        call_command should work when no options from an optional mutually
+        exclusive group are provided.
+        """
+        out = StringIO()
+        management.call_command('mutually_exclusive_optional', stdout=out)
+        self.assertIn('format_json=False', out.getvalue())
+        self.assertIn('format_xml=False', out.getvalue())
+
+    def test_call_command_with_optional_mutually_exclusive_group_one_option(self):
+        """
+        call_command should work when one option from an optional mutually
+        exclusive group is provided.
+        """
+        out = StringIO()
+        management.call_command('mutually_exclusive_optional', format_json=True, stdout=out)
+        self.assertIn('format_json=True', out.getvalue())
+        self.assertIn('format_xml=False', out.getvalue())
+
+    def test_call_command_with_optional_mutually_exclusive_group_both_options(self):
+        """
+        call_command should raise an error when both options from an optional
+        mutually exclusive group are provided.
+        """
+        msg = 'Error: argument --format-xml: not allowed with argument --format-json'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('mutually_exclusive_optional', format_json=True, format_xml=True, stdout=StringIO())
+
 
 class CommandRunTests(AdminScriptTestCase):
     """
