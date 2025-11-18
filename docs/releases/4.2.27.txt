@@ -1,0 +1,13 @@
+===========================
+Django 4.2.27 release notes
+===========================
+
+*December 2, 2025*
+
+Django 4.2.27 fixes one security issue with severity "high", one security issue
+with severity "moderate", and one bug in 4.2.26.
+
+Bugfixes
+========
+
+* ...
