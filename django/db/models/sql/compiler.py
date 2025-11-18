@@ -343,6 +343,9 @@ class SQLCompiler:
         for expr, is_ref in order_by:
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if self.query.combinator:
+                # Make a copy to avoid mutating the resolved expression, since
+                # it might be a reused reference.
+                resolved = resolved.copy()
                 src = resolved.get_source_expressions()[0]
                 # Relabel order by columns to raw numbers if this is a combined
                 # query; necessary since the columns can't be referenced by the

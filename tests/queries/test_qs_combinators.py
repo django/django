@@ -228,3 +228,22 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.all()
         qs2 = Number.objects.intersection(Number.objects.filter(num__gt=1))
         self.assertEqual(qs1.difference(qs2).count(), 2)
+
+    def test_union_with_ordering_and_derived_queryset(self):
+        # Regression test for #30408
+        ReservedName.objects.create(name='rn1', order=1)
+        ReservedName.objects.create(name='rn2', order=2)
+        ReservedName.objects.create(name='rn3', order=3)
+        ReservedName.objects.create(name='rn4', order=4)
+        qs1 = ReservedName.objects.filter(order__lte=2)
+        qs2 = ReservedName.objects.filter(order__gte=3)
+        qs = qs1.union(qs2).order_by('order')
+        # Evaluate the queryset first
+        list(qs)
+        # Create a derived queryset with different ordering/values
+        qs_derived = qs.order_by().values_list('pk', flat=True)
+        list(qs_derived)
+        # Re-evaluate the original queryset - this should not fail
+        list(qs)
+        # Also test that the ordering is still correct
+        self.assertQuerysetEqual(qs, ['rn1', 'rn2', 'rn3', 'rn4'], lambda x: x.name)
