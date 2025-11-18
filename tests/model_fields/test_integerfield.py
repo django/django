@@ -154,6 +154,33 @@ class IntegerFieldTests(TestCase):
                 with self.assertRaisesMessage(exception, msg):
                     self.model.objects.create(value=value)
 
+    def test_integerchoices_value_field_type_consistency(self):
+        """
+        IntegerField with IntegerChoices should return int type for both
+        freshly created instances and instances retrieved from database.
+        Enum members should be converted to their underlying integer values.
+        """
+        class MyIntChoice(models.IntegerChoices):
+            ONE = 1, 'First choice'
+            TWO = 2, 'Second choice'
+
+        # Test via to_python directly
+        field = models.IntegerField()
+        converted = field.to_python(MyIntChoice.ONE)
+        self.assertEqual(type(converted), int)
+        self.assertEqual(converted, 1)
+
+        # Test freshly created instance
+        instance = self.model(value=MyIntChoice.TWO)
+        self.assertIsInstance(instance.value, int)
+        self.assertEqual(instance.value, 2)
+
+        # Test saved and retrieved instance
+        instance.save()
+        instance.refresh_from_db()
+        self.assertIsInstance(instance.value, int)
+        self.assertEqual(instance.value, 2)
+
 
 class SmallIntegerFieldTests(IntegerFieldTests):
     model = SmallIntegerModel

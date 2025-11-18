@@ -2,6 +2,7 @@ import collections.abc
 import copy
 import datetime
 import decimal
+import enum
 import operator
 import uuid
 import warnings
@@ -1008,6 +1009,9 @@ class CharField(Field):
         return "CharField"
 
     def to_python(self, value):
+        # Convert enum members to their values.
+        if isinstance(value, enum.Enum):
+            return value.value
         if isinstance(value, str) or value is None:
             return value
         return str(value)
@@ -1769,6 +1773,9 @@ class IntegerField(Field):
     def to_python(self, value):
         if value is None:
             return value
+        # Convert enum members to their values.
+        if isinstance(value, enum.Enum):
+            value = value.value
         try:
             return int(value)
         except (TypeError, ValueError):

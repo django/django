@@ -138,6 +138,17 @@ class DeferredAttribute:
             data[field_name] = val
         return data[field_name]
 
+    def __set__(self, instance, value):
+        """
+        Set the value on the instance.
+        Convert enum members to their values to ensure type consistency.
+        """
+        # Handle enum members by extracting their value
+        import enum
+        if isinstance(value, enum.Enum):
+            value = value.value
+        instance.__dict__[self.field.attname] = value
+
     def _check_parent_chain(self, instance):
         """
         Check if the field value can be fetched from a parent field already

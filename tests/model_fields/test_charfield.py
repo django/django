@@ -43,6 +43,35 @@ class TestCharField(TestCase):
         self.assertEqual(p1, p2)
         self.assertEqual(p2.title, Event.C)
 
+    def test_textchoices_value_field_type_consistency(self):
+        """
+        CharField with TextChoices should return str type for both
+        freshly created instances and instances retrieved from database.
+        Enum members should be converted to their underlying string values.
+        """
+        class MyChoice(models.TextChoices):
+            FIRST = 'first', 'The first choice'
+            SECOND = 'second', 'The second choice'
+
+        # Test freshly created instance
+        p1 = Post(title=MyChoice.FIRST, body='test')
+        self.assertIsInstance(p1.title, str)
+        self.assertEqual(str(p1.title), 'first')
+        self.assertEqual(p1.title, 'first')
+
+        # Test saved and retrieved instance
+        p1.save()
+        p1.refresh_from_db()
+        self.assertIsInstance(p1.title, str)
+        self.assertEqual(str(p1.title), 'first')
+        self.assertEqual(p1.title, 'first')
+
+        # Test via to_python directly
+        field = models.CharField(max_length=10)
+        converted = field.to_python(MyChoice.FIRST)
+        self.assertEqual(type(converted), str)
+        self.assertEqual(converted, 'first')
+
 
 class ValidationTests(SimpleTestCase):
 
