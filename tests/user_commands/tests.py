@@ -253,6 +253,15 @@ class CommandRunTests(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), 'Set foo')
 
+    def test_skip_checks_option(self):
+        """
+        --skip-checks should prevent system checks from running.
+        """
+        self.write_settings('settings.py', apps=['user_commands'])
+        out, err = self.run_manage(['dance', '--skip-checks'])
+        self.assertNoOutput(err)
+        self.assertIn("I don't feel like dancing Rock'n'Roll.", out)
+
 
 class UtilsTests(SimpleTestCase):
 
