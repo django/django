@@ -2912,3 +2912,41 @@ class ModelToDictTests(TestCase):
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+    def test_model_to_dict_with_empty_fields_list(self):
+        """model_to_dict() should return an empty dict when fields=[]."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When fields=[], no fields should be returned
+        result = model_to_dict(writer, fields=[])
+        self.assertEqual(result, {})
+
+    def test_model_to_dict_with_specific_fields(self):
+        """model_to_dict() should return only specified fields."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When specific fields are provided, only those should be returned
+        result = model_to_dict(writer, fields=['name'])
+        self.assertEqual(list(result.keys()), ['name'])
+        self.assertEqual(result['name'], 'Test Writer')
+
+    def test_model_to_dict_with_fields_none(self):
+        """model_to_dict() should return all editable fields when fields=None."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When fields=None (default), all editable fields should be returned
+        result = model_to_dict(writer, fields=None)
+        self.assertIn('name', result)
+        self.assertIn('id', result)
+
+    def test_model_to_dict_fields_and_exclude(self):
+        """model_to_dict() should handle both fields and exclude parameters."""
+        writer = Writer.objects.create(name='Test Writer')
+        # fields=[] with exclude should still return empty dict
+        result = model_to_dict(writer, fields=[], exclude=['name'])
+        self.assertEqual(result, {})
+
+    def test_model_to_dict_with_empty_exclude_list(self):
+        """model_to_dict() should return all fields when exclude=[]."""
+        writer = Writer.objects.create(name='Test Writer')
+        # When exclude=[], all editable fields should be returned
+        result = model_to_dict(writer, exclude=[])
+        self.assertIn('name', result)
+        self.assertIn('id', result)
