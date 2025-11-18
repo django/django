@@ -410,12 +410,12 @@ class SQLCompiler:
     def get_combinator_sql(self, combinator, all):
         features = self.connection.features
         compilers = [
-            query.get_compiler(self.using, self.connection)
+            query.clone().get_compiler(self.using, self.connection)
             for query in self.query.combined_queries if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
-            for query, compiler in zip(self.query.combined_queries, compilers):
-                if query.low_mark or query.high_mark:
+            for compiler in compilers:
+                if compiler.query.low_mark or compiler.query.high_mark:
                     raise DatabaseError('LIMIT/OFFSET not allowed in subqueries of compound statements.')
                 if compiler.get_order_by():
                     raise DatabaseError('ORDER BY not allowed in subqueries of compound statements.')
