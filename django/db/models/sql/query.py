@@ -1666,6 +1666,8 @@ class Query(BaseExpression):
             filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)
+        # Copy filtered relations so they can be resolved in the subquery
+        query._filtered_relations = self._filtered_relations.copy()
         query.add_filter(filter_expr)
         query.clear_ordering(True)
         # Try to have as simple as possible subquery -> trim leading joins from
@@ -2128,6 +2130,18 @@ class Query(BaseExpression):
             self.unref_alias(alias)
         # The path.join_field is a Rel, lets get the other side's field
         join_field = path.join_field.field
+        # If the path has a filtered relation, we need to add its condition
+        # to the WHERE clause since the join where it would have been applied
+        # is being trimmed.
+        if path.filtered_relation:
+            # The join table is at trimmed_paths + 1 (after trimmed tables)
+            filter_alias = lookup_tables[trimmed_paths + 1]
+            # Build the filtered relation Q with correct table alias
+            condition = self.build_filtered_relation_q(
+                path.filtered_relation.condition,
+                reuse={filter_alias},
+            )
+            self.where.add(condition, AND)
         # Build the filter prefix.
         paths_in_prefix = trimmed_paths
         trimmed_prefix = []
