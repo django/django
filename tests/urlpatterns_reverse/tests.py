@@ -1302,3 +1302,63 @@ class LookaheadTests(SimpleTestCase):
             with self.subTest(name=name, kwargs=kwargs):
                 with self.assertRaises(NoReverseMatch):
                     reverse(name, kwargs=kwargs)
+
+
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
+class ResolverCacheTests(SimpleTestCase):
+    """Tests for get_resolver caching optimization."""
+
+    def test_get_resolver_returns_same_instance_for_none_and_root_urlconf(self):
+        """
+        Test that get_resolver(None) and get_resolver(settings.ROOT_URLCONF)
+        return the same cached URLResolver instance to avoid expensive duplicate
+        calls to URLResolver._populate().
+        """
+        from django.urls import clear_url_caches
+        from django.conf import settings
+
+        # Clear the cache to start fresh
+        clear_url_caches()
+
+        # Get resolver with None (simulates call before set_urlconf is called)
+        resolver_none = get_resolver(None)
+
+        # Get resolver with settings.ROOT_URLCONF (simulates call after set_urlconf)
+        resolver_explicit = get_resolver(settings.ROOT_URLCONF)
+
+        # They should be the exact same instance (same id in memory)
+        self.assertIs(resolver_none, resolver_explicit,
+                      "get_resolver(None) and get_resolver(settings.ROOT_URLCONF) "
+                      "should return the same cached instance")
+
+    def test_resolver_not_populated_multiple_times(self):
+        """
+        Test that URLResolver._populate() is only called once even when
+        get_resolver is called with None and then with settings.ROOT_URLCONF.
+        """
+        from django.urls import clear_url_caches, set_urlconf, get_urlconf
+        from django.conf import settings
+
+        # Clear the cache to start fresh
+        clear_url_caches()
+
+        # Simulate a call at import time (before any request is handled)
+        # At this point, get_urlconf() returns None
+        resolver1 = get_resolver(None)
+        populated_status_1 = resolver1._populated
+
+        # Simulate what happens during request handling:
+        # set_urlconf is called with settings.ROOT_URLCONF
+        set_urlconf(settings.ROOT_URLCONF)
+
+        # Now get_urlconf() returns settings.ROOT_URLCONF
+        # reverse() will call get_resolver with this value
+        resolver2 = get_resolver(get_urlconf())
+
+        # Both should be the same instance
+        self.assertIs(resolver1, resolver2,
+                      "get_resolver should return the same instance before and after set_urlconf")
+
+        # If they're the same instance, _populate status should be the same
+        self.assertEqual(resolver1._populated, resolver2._populated,
+                         "Both resolvers should share the same _populated state")
