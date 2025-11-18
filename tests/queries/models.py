@@ -745,3 +745,23 @@ class JSONFieldNullable(models.Model):
 
     class Meta:
         required_db_features = {'supports_json_field'}
+
+
+# Models for testing fields named 'filterable'
+class ModelWithFilterableField(models.Model):
+    """Model with a BooleanField named 'filterable'."""
+    name = models.CharField(max_length=100)
+    filterable = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
+class RelatedModelWithFilterableField(models.Model):
+    """Model that has a ForeignKey to a model with 'filterable' field."""
+    description = models.TextField()
+    related = models.ForeignKey(
+        ModelWithFilterableField,
+        on_delete=models.CASCADE,
+        related_name='related_models',
+    )

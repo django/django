@@ -23,11 +23,12 @@ from .models import (
     ExtraInfo, Fan, Food, Identifier, Individual, Item, Job,
     JobResponsibilities, Join, LeafA, LeafB, LoopX, LoopZ, ManagedModel,
     Member, MixedCaseDbColumnCategoryItem, MixedCaseFieldCategoryItem, ModelA,
-    ModelB, ModelC, ModelD, MyObject, NamedCategory, Node, Note, NullableName,
-    Number, ObjectA, ObjectB, ObjectC, OneToOneCategory, Order, OrderItem,
-    Page, Paragraph, Person, Plaything, PointerA, Program, ProxyCategory,
-    ProxyObjectA, ProxyObjectB, Ranking, Related, RelatedIndividual,
-    RelatedObject, Report, ReportComment, ReservedName, Responsibility, School,
+    ModelB, ModelC, ModelD, ModelWithFilterableField, MyObject, NamedCategory,
+    Node, Note, NullableName, Number, ObjectA, ObjectB, ObjectC,
+    OneToOneCategory, Order, OrderItem, Page, Paragraph, Person, Plaything,
+    PointerA, Program, ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking,
+    Related, RelatedIndividual, RelatedModelWithFilterableField, RelatedObject,
+    Report, ReportComment, ReservedName, Responsibility, School,
     SharedConnection, SimpleCategory, SingleObject, SpecialCategory, Staff,
     StaffUser, Student, Tag, Task, Teacher, Ticket21203Child,
     Ticket21203Parent, Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
@@ -3974,3 +3975,90 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class ModelFieldNameFilterableTests(TestCase):
+    """
+    Test that model instances with fields named 'filterable' can be used
+    in queryset filters without raising NotSupportedError.
+
+    Regression test for issue where models with a BooleanField named
+    'filterable' would incorrectly trigger check_filterable() validation
+    intended for Django expressions.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create a model instance with filterable=False
+        cls.obj1 = ModelWithFilterableField.objects.create(
+            name='Object 1',
+            filterable=False
+        )
+        # Create a model instance with filterable=True
+        cls.obj2 = ModelWithFilterableField.objects.create(
+            name='Object 2',
+            filterable=True
+        )
+        # Create related models
+        cls.related1 = RelatedModelWithFilterableField.objects.create(
+            description='Related 1',
+            related=cls.obj1
+        )
+        cls.related2 = RelatedModelWithFilterableField.objects.create(
+            description='Related 2',
+            related=cls.obj2
+        )
+
+    def test_filter_with_model_instance_having_filterable_false(self):
+        """
+        Test filtering with a model instance that has filterable=False field.
+        This should work without raising NotSupportedError.
+        """
+        # This used to raise NotSupportedError before the fix
+        result = RelatedModelWithFilterableField.objects.filter(
+            related=self.obj1
+        )
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.related1)
+
+    def test_filter_with_model_instance_having_filterable_true(self):
+        """
+        Test filtering with a model instance that has filterable=True field.
+        """
+        result = RelatedModelWithFilterableField.objects.filter(
+            related=self.obj2
+        )
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.related2)
+
+    def test_filter_by_filterable_field_value(self):
+        """
+        Test that we can still filter by the filterable field itself.
+        """
+        # Filter for objects where filterable=False
+        result = ModelWithFilterableField.objects.filter(filterable=False)
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.obj1)
+
+        # Filter for objects where filterable=True
+        result = ModelWithFilterableField.objects.filter(filterable=True)
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.obj2)
+
+    def test_complex_filter_with_filterable_field(self):
+        """
+        Test more complex queries involving the filterable field.
+        """
+        # Use Q objects
+        result = ModelWithFilterableField.objects.filter(
+            Q(name='Object 1') & Q(filterable=False)
+        )
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.obj1)
+
+        # Filter related objects by the filterable field value
+        result = RelatedModelWithFilterableField.objects.filter(
+            related__filterable=False
+        )
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first(), self.related1)
