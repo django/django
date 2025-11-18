@@ -181,8 +181,28 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         f = ma.formfield_for_dbfield(Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
             f.help_text,
-            'Hold down “Control”, or “Command” on a Mac, to select more than one.'
+            'Hold down "Control", or "Command" on a Mac, to select more than one.'
         )
+
+    def test_formfield_for_manytomany_custom_widget(self):
+        """
+        formfield_for_manytomany() respects the widget parameter passed to it.
+        """
+        class BandAdmin(admin.ModelAdmin):
+            def formfield_for_manytomany(self, db_field, request, **kwargs):
+                if db_field.name == 'members':
+                    kwargs['widget'] = forms.CheckboxSelectMultiple
+                return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+        ma = BandAdmin(Band, admin.site)
+        ff = ma.formfield_for_dbfield(Band._meta.get_field('members'), request=None)
+        # The widget should be CheckboxSelectMultiple and not wrapped
+        # in RelatedFieldWidgetWrapper since it's not in raw_id_fields
+        if isinstance(ff.widget, widgets.RelatedFieldWidgetWrapper):
+            widget = ff.widget.widget
+        else:
+            widget = ff.widget
+        self.assertIsInstance(widget, forms.CheckboxSelectMultiple)
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
