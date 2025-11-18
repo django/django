@@ -90,3 +90,20 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 <sitemap><loc>http://example.com/simple/sitemap-generic.xml</loc><lastmod>2013-03-13T10:00:00</lastmod></sitemap>
 </sitemapindex>"""
         self.assertXMLEqual(response.text, expected_content)
+
+    def test_lazy_pagination(self):
+        sitemap = GenericSitemap({"queryset": TestModel.objects.all().order_by('id')})
+
+        print(sitemap)
+        self.assertFalse(hasattr(sitemap, '_paginator'),
+                        "Paginator was created during initialization") # TODO: REMOVE THE MSG
+
+        paginator = sitemap.paginator
+        print(paginator)
+
+        self.assertTrue(hasattr(sitemap, '_paginator'),
+                        "Paginator was not created when accessed")
+        self.assertIsNotNone(paginator)
+
+    # def test_queryset_not_evaluated_on_init(self):
+    #     ...
