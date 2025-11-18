@@ -473,11 +473,14 @@ class GenericRelation(ForeignObject):
         """
         Return all objects related to ``objs`` via this ``GenericRelation``.
         """
-        return self.remote_field.model._base_manager.db_manager(using).filter(**{
+        qs = self.remote_field.model._base_manager.db_manager(using).filter(**{
             "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
         })
+        # Only load the fields needed for deletion: the primary key and
+        # foreign keys (content_type and object_id fields).
+        return qs.only('pk', self.content_type_field_name, self.object_id_field_name)
 
 
 class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):

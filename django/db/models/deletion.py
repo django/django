@@ -232,9 +232,12 @@ class Collector:
         """
         Get a QuerySet of objects related to `objs` via the relation `related`.
         """
-        return related.related_model._base_manager.using(self.using).filter(
+        qs = related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}
         )
+        # Only load the fields needed for deletion: the primary key and the
+        # foreign key to the parent object.
+        return qs.only('pk', related.field.name)
 
     def instances_with_model(self):
         for model, instances in self.data.items():
