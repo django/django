@@ -866,6 +866,9 @@ class ExpressionWrapper(Expression):
     def as_sql(self, compiler, connection):
         return self.expression.as_sql(compiler, connection)
 
+    def get_group_by_cols(self, alias=None):
+        return self.expression.get_group_by_cols(alias)
+
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.expression)
 

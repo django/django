@@ -6,8 +6,9 @@ from unittest import skipIf
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField, Func,
-    IntegerField, Max, Min, OuterRef, Subquery, Sum, Value, When,
+    Avg, Case, Count, DecimalField, DurationField, Exists, ExpressionWrapper,
+    F, FloatField, Func, IntegerField, Max, Min, OuterRef, Subquery, Sum,
+    Value, When,
 )
 from django.db.models.functions import Coalesce
 from django.test import TestCase
@@ -1310,3 +1311,43 @@ class AggregateTestCase(TestCase):
         # with self.assertNumQueries(1) as ctx:
         #     self.assertSequenceEqual(books_qs, [book])
         # self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
+
+    def test_expression_wrapper_with_constant_value(self):
+        """
+        ExpressionWrapper should not include constant expressions (like Value)
+        in the GROUP BY clause.
+        """
+        # Test with ExpressionWrapper wrapping a Value
+        expr = ExpressionWrapper(Value(3), output_field=IntegerField())
+        qs = Book.objects.annotate(
+            expr_res=expr
+        ).values('expr_res', 'publisher').annotate(sum=Sum('pages'))
+
+        # This should not raise a ProgrammingError about aggregate functions
+        # in GROUP BY clause on PostgreSQL
+        result = list(qs)
+        self.assertTrue(len(result) > 0)
+
+        # All results should have expr_res=3
+        for row in result:
+            self.assertEqual(row['expr_res'], 3)
+
+        # Compare with unwrapped Value - should produce same results
+        qs_unwrapped = Book.objects.annotate(
+            expr_res=Value(3, output_field=IntegerField())
+        ).values('expr_res', 'publisher').annotate(sum=Sum('pages'))
+
+        result_unwrapped = list(qs_unwrapped)
+
+        # Both queries should produce the same number of results
+        self.assertEqual(len(result), len(result_unwrapped))
+
+        # Sort both results for comparison
+        result_sorted = sorted(result, key=lambda x: x['publisher'])
+        result_unwrapped_sorted = sorted(result_unwrapped, key=lambda x: x['publisher'])
+
+        # Both queries should produce the same aggregated sums per publisher
+        for wrapped, unwrapped in zip(result_sorted, result_unwrapped_sorted):
+            self.assertEqual(wrapped['publisher'], unwrapped['publisher'])
+            self.assertEqual(wrapped['sum'], unwrapped['sum'])
+            self.assertEqual(wrapped['expr_res'], unwrapped['expr_res'])
