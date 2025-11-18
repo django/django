@@ -565,7 +565,7 @@ class ResolvedOuterRef(F):
 class OuterRef(F):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None,
                            summarize=False, for_save=False, simple_col=False):
-        if isinstance(self.name, self.__class__):
+        if isinstance(self.name, (self.__class__, ResolvedOuterRef)):
             return self.name
         return ResolvedOuterRef(self.name)
 

@@ -23,7 +23,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OuterRef, Ref, ResolvedOuterRef, SimpleCol,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -1702,7 +1702,12 @@ class Query(BaseExpression):
         handle.
         """
         filter_lhs, filter_rhs = filter_expr
-        if isinstance(filter_rhs, F):
+        if isinstance(filter_rhs, (OuterRef, ResolvedOuterRef)):
+            # Wrap OuterRef/ResolvedOuterRef in another OuterRef to preserve
+            # the reference when the subquery is built (see #30739).
+            filter_expr = (filter_lhs, OuterRef(filter_rhs))
+        elif isinstance(filter_rhs, F):
+            # Convert F to OuterRef to reference the outer query
             filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)

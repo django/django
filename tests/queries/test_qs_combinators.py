@@ -1,9 +1,9 @@
 from django.db import connection
-from django.db.models import Exists, F, IntegerField, OuterRef, Value
+from django.db.models import Exists, F, IntegerField, OuterRef, Q, Value
 from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import Number, ReservedName
+from .models import Item, Number, ReservedName
 
 
 @skipUnlessDBFeature('supports_select_union')
@@ -285,3 +285,28 @@ class QuerySetSetOperationTests(TestCase):
                         msg % (operation, combinator),
                     ):
                         getattr(getattr(qs, combinator)(qs), operation)()
+
+    def test_exists_exclude(self):
+        # filter() - this should work
+        qs = Number.objects.annotate(
+            foo=Exists(
+                Item.objects.filter(tags__category_id=OuterRef('pk'))
+            )
+        ).filter(foo=True)
+        list(qs)  # Force query execution
+
+        # exclude() - this currently crashes
+        qs = Number.objects.annotate(
+            foo=Exists(
+                Item.objects.exclude(tags__category_id=OuterRef('pk'))
+            )
+        ).filter(foo=True)
+        list(qs)  # Force query execution
+
+        # filter(~Q()) - this currently crashes
+        qs = Number.objects.annotate(
+            foo=Exists(
+                Item.objects.filter(~Q(tags__category_id=OuterRef('pk')))
+            )
+        ).filter(foo=True)
+        list(qs)  # Force query execution
