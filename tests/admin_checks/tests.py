@@ -10,7 +10,7 @@ from django.core import checks
 from django.test import SimpleTestCase, override_settings
 
 from .models import (
-    Album, Author, Book, City, Influence, Song, State, TwoAlbumFKAndAnE,
+    Album, Author, Book, City, Influence, Song, State, Thing, TwoAlbumFKAndAnE,
 )
 
 
@@ -913,3 +913,71 @@ class SystemChecksTestCase(SimpleTestCase):
             self.assertEqual(errors, [])
         finally:
             Book._meta.apps.ready = True
+
+    def test_list_display_with_descriptor_field(self):
+        """
+        list_display should work with descriptor fields that are only accessible
+        via instances (like django-positions PositionField).
+        Regression test for bug where hasattr(model, item) returning False
+        prevented get_field from being tried.
+        """
+        class ThingAdmin(admin.ModelAdmin):
+            list_display = ['number', 'order']
+
+        errors = ThingAdmin(Thing, AdminSite()).check()
+        self.assertEqual(errors, [])
+
+    def test_list_display_missing_field(self):
+        """
+        list_display should still raise E108 for non-existent fields.
+        """
+        class ThingAdmin(admin.ModelAdmin):
+            list_display = ['number', 'nonexistent']
+
+        errors = ThingAdmin(Thing, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'list_display[1]' refers to 'nonexistent', which is not a callable, "
+                "an attribute of 'ThingAdmin', or an attribute or method on 'admin_checks.Thing'.",
+                obj=ThingAdmin,
+                id='admin.E108',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_list_display_with_manytomany_from_get_field(self):
+        """
+        list_display should raise E109 for ManyToManyField found via get_field.
+        """
+        class BookAdmin(admin.ModelAdmin):
+            list_display = ['name', 'authors']
+
+        errors = BookAdmin(Book, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'list_display[1]' must not be a ManyToManyField.",
+                obj=BookAdmin,
+                id='admin.E109',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_list_display_with_model_method(self):
+        """
+        list_display should work with model methods.
+        """
+        class SongAdmin(admin.ModelAdmin):
+            list_display = ['title', 'readonly_method_on_model']
+
+        errors = SongAdmin(Song, AdminSite()).check()
+        self.assertEqual(errors, [])
+
+    def test_list_display_with_regular_field(self):
+        """
+        list_display should work with regular model fields.
+        """
+        class ThingAdmin(admin.ModelAdmin):
+            list_display = ['number']
+
+        errors = ThingAdmin(Thing, AdminSite()).check()
+        self.assertEqual(errors, [])
