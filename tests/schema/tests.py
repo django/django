@@ -2245,6 +2245,53 @@ class SchemaTests(TransactionTestCase):
             AuthorWithIndexedNameAndBirthday._meta.indexes = []
             editor.remove_index(AuthorWithIndexedNameAndBirthday, index)
 
+    def test_remove_index_together_does_not_remove_unique_together(self):
+        """
+        Tests that removing index_together doesn't remove unique_together
+        constraints on the same fields (regression test for #28862).
+        """
+        # Create a model with both index_together and unique_together on the same fields
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        # Add both unique_together and index_together on the same fields
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Author, [], [['name', 'height']])
+            editor.alter_index_together(Author, [], [['name', 'height']])
+
+        # Check that both constraints exist
+        constraints = self.get_constraints(Author._meta.db_table)
+        # Find the unique constraint
+        unique_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'height'] and details['unique']
+        ]
+        self.assertEqual(len(unique_constraints), 1, "Should have exactly one unique constraint")
+
+        # Find the index (both unique and regular index should show as index=True)
+        index_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'height'] and details['index']
+        ]
+        # Should have at least the unique constraint (which is also an index)
+        self.assertGreaterEqual(len(index_constraints), 1, "Should have at least one index")
+
+        # Remove index_together - this should not fail even with unique_together on same fields
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(Author, [['name', 'height']], [])
+
+        # Check that unique constraint still exists
+        constraints = self.get_constraints(Author._meta.db_table)
+        unique_constraints = [
+            name for name, details in constraints.items()
+            if details['columns'] == ['name', 'height'] and details['unique']
+        ]
+        self.assertEqual(len(unique_constraints), 1, "Unique constraint should still exist")
+
+        # Cleanup: remove unique_together
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Author, [['name', 'height']], [])
+
     @isolate_apps('schema')
     def test_db_table(self):
         """
