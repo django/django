@@ -231,6 +231,13 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         self.assertNotIn('Referrer-Policy', self.process_response())
 
+    def test_referrer_policy_on_by_default(self):
+        """
+        With SECURE_REFERRER_POLICY at its default value of 'same-origin',
+        the middleware adds a "Referrer-Policy: same-origin" header to the response.
+        """
+        self.assertEqual(self.process_response()['Referrer-Policy'], 'same-origin')
+
     def test_referrer_policy_on(self):
         """
         With SECURE_REFERRER_POLICY set to a valid value, the middleware adds a

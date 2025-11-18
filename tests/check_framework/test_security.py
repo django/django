@@ -527,6 +527,14 @@ class CheckReferrerPolicyTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
     @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_referrer_policy_default(self):
+        """
+        No warning is raised if SECURE_REFERRER_POLICY is set to the default
+        value of 'same-origin'.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
     def test_with_referrer_policy(self):
         tests = (
             'strict-origin',
