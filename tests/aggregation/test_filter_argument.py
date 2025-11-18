@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import Case, Count, F, Q, Sum, When
+from django.db.models import Case, Count, F, IntegerField, Q, Sum, Value, When
 from django.test import TestCase
 
 from .models import Author, Book, Publisher
@@ -87,3 +87,32 @@ class FilteredAggregateTests(TestCase):
             older_friends_count__gte=2,
         )
         self.assertEqual(qs.get(pk__in=qs.values('pk')), self.a1)
+
+    def test_count_distinct_case(self):
+        """
+        Test that Count with distinct=True and a Case expression generates
+        valid SQL with proper spacing: COUNT(DISTINCT CASE ...) not COUNT(DISTINCTCASE ...)
+        """
+        # Test with aggregate
+        agg = Count(
+            Case(
+                When(rating__gte=4, then='id'),
+                output_field=IntegerField(),
+            ),
+            distinct=True
+        )
+        result = Book.objects.aggregate(high_rated=agg)
+        self.assertEqual(result['high_rated'], 2)  # b1 and b3 have rating >= 4
+
+        # Test with annotate
+        qs = Author.objects.annotate(
+            high_rated_books=Count(
+                Case(
+                    When(book__rating__gte=4, then='book__id'),
+                    output_field=IntegerField(),
+                ),
+                distinct=True
+            )
+        ).order_by('pk')
+        # a1 has 1 high-rated book (b1), a2 has 0, a3 has 2 (b1, b3)
+        self.assertSequenceEqual([a.high_rated_books for a in qs], [1, 0, 2])
