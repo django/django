@@ -1071,6 +1071,42 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
+    def test_cull_with_concurrent_delete(self):
+        """
+        Test that _cull handles the case when cache_key_culling_sql returns
+        no results (e.g., during concurrent deletes). This prevents a
+        'NoneType' object is not subscriptable error.
+        """
+        from django.core.cache.backends.db import DatabaseCache
+        from django.db import connections
+        from django.utils import timezone
+
+        # Create a cache instance with low max entries to trigger culling
+        test_cache = DatabaseCache('test cache table', {
+            'OPTIONS': {'MAX_ENTRIES': 5, 'CULL_FREQUENCY': 2}
+        })
+
+        # Add some entries to trigger culling
+        for i in range(10):
+            test_cache.set(f'key{i}', f'value{i}')
+
+        # Manually test _cull with an edge case where the table might be empty
+        # or have fewer entries than expected
+        db = 'default'
+        connection = connections[db]
+        with connection.cursor() as cursor:
+            # Clear the cache table
+            table_name = connection.ops.quote_name('test cache table')
+            cursor.execute('DELETE FROM %s' % table_name)
+
+            # Try to cull with an empty table - should not raise an error
+            now = timezone.now()
+            test_cache._cull(db, cursor, now)
+
+        # Verify cache still works after the edge case
+        test_cache.set('test_key', 'test_value')
+        self.assertEqual(test_cache.get('test_key'), 'test_value')
+
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
