@@ -84,7 +84,10 @@ class Columns(TableColumns):
     def __str__(self):
         def col_str(column, idx):
             try:
-                return self.quote_name(column) + self.col_suffixes[idx]
+                suffix = self.col_suffixes[idx]
+                if suffix:
+                    return '{} {}'.format(self.quote_name(column), suffix)
+                return self.quote_name(column)
             except IndexError:
                 return self.quote_name(column)
 
@@ -114,7 +117,9 @@ class IndexColumns(Columns):
             # length as self.columns.
             col = '{} {}'.format(self.quote_name(column), self.opclasses[idx])
             try:
-                col = '{} {}'.format(col, self.col_suffixes[idx])
+                suffix = self.col_suffixes[idx]
+                if suffix:
+                    col = '{} {}'.format(col, suffix)
             except IndexError:
                 pass
             return col
