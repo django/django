@@ -356,11 +356,8 @@ class MigrationLoader:
                 if parent not in applied:
                     # Skip unapplied squashed migrations that have all of their
                     # `replaces` applied.
-                    if parent in self.replacements:
-                        if all(
-                            m in applied for m in self.replacements[parent].replaces
-                        ):
-                            continue
+                    if self.all_replaced_applied(parent.key, applied):
+                        continue
                     raise InconsistentMigrationHistory(
                         "Migration {}.{} is applied before its dependency "
                         "{}.{} on database '{}'.".format(
@@ -371,6 +368,20 @@ class MigrationLoader:
                             connection.alias,
                         )
                     )
+
+    def all_replaced_applied(self, migration_key, applied):
+        """
+        Checks (recursively) whether all replaced migrations are applied.
+        """
+        if migration_key in self.replacements:
+            for replaced_key in self.replacements[migration_key].replaces:
+                if replaced_key not in applied and not self.all_replaced_applied(
+                    replaced_key, applied
+                ):
+                    return False
+            return True
+
+        return False
 
     def detect_conflicts(self):
         """
