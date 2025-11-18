@@ -844,6 +844,38 @@ class ChangeListTests(TestCase):
         queryset = m._get_list_editable_queryset(request, prefix='form')
         self.assertEqual(queryset.count(), 2)
 
+    def test_get_edited_object_pks_with_regex_chars_in_prefix(self):
+        """
+        Formset prefix containing regex special characters should not cause
+        issues when matching primary keys.
+        Regression test for #XXXXX.
+        """
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        b = Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        m = SwallowAdmin(Swallow, custom_site)
+        # Use a prefix with regex special characters like '.', '+', '*', '?', '[', ']', etc.
+        prefix_with_regex = 'form.test+'
+        data = {
+            f'{prefix_with_regex}-TOTAL_FORMS': '2',
+            f'{prefix_with_regex}-INITIAL_FORMS': '2',
+            f'{prefix_with_regex}-MIN_NUM_FORMS': '0',
+            f'{prefix_with_regex}-MAX_NUM_FORMS': '1000',
+            f'{prefix_with_regex}-0-uuid': str(a.pk),
+            f'{prefix_with_regex}-1-uuid': str(b.pk),
+            f'{prefix_with_regex}-0-load': '9.0',
+            f'{prefix_with_regex}-0-speed': '9.0',
+            f'{prefix_with_regex}-1-load': '5.0',
+            f'{prefix_with_regex}-1-speed': '5.0',
+            '_save': 'Save',
+        }
+        request = self.factory.post(changelist_url, data=data)
+        # This should not raise an error and should correctly identify the PKs
+        pks = m._get_edited_object_pks(request, prefix=prefix_with_regex)
+        self.assertEqual(sorted(pks), sorted([str(a.pk), str(b.pk)]))
+
     def test_changelist_view_list_editable_changed_objects_uses_filter(self):
         """list_editable edits use a filtered queryset to limit memory usage."""
         a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
