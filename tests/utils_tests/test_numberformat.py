@@ -95,6 +95,11 @@ class TestNumberFormat(SimpleTestCase):
             ('1e-11', 8, '0.00000000'),
             ('1' + ('0' * 300), 3, '1.000e+300'),
             ('0.{}1234'.format('0' * 299), 3, '1.234e-300'),
+            # Test for issue: extremely small numbers should return '0.00...' when decimal_pos is specified
+            ('1e-199', 2, '0.00'),
+            ('1e-200', 2, '0.00'),
+            ('1e-300', 5, '0.00000'),
+            ('-1e-200', 2, '-0.00'),
         ]
         for value, decimal_pos, expected_value in tests:
             with self.subTest(value=value):
