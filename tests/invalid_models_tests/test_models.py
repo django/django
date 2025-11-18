@@ -917,6 +917,35 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertFalse(Child.check())
 
+    def test_ordering_allows_isnull_lookup_on_related_field(self):
+        class Product(models.Model):
+            parent = models.ForeignKey('self', models.CASCADE, null=True)
+
+        class Supply(models.Model):
+            product = models.ForeignKey(Product, models.CASCADE)
+
+        class Stock(models.Model):
+            supply = models.ForeignKey(Supply, models.CASCADE)
+
+            class Meta:
+                ordering = ('supply__product__parent__isnull',)
+
+        self.assertEqual(Stock.check(), [])
+
+    def test_ordering_allows_multiple_lookups_on_related_field(self):
+        # Test other common lookups besides isnull
+        class Author(models.Model):
+            name = models.CharField(max_length=100)
+
+        class Book(models.Model):
+            author = models.ForeignKey(Author, models.CASCADE)
+
+            class Meta:
+                # Test exact, isnull, and in lookups
+                ordering = ('author__name__isnull',)
+
+        self.assertEqual(Book.check(), [])
+
     def test_name_beginning_with_underscore(self):
         class _Model(models.Model):
             pass
