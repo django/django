@@ -17,4 +17,6 @@ urlpatterns += i18n_patterns(
     path('prefixed.xml', view, name='prefixed_xml'),
     re_path(_(r'^users/$'), view, name='users'),
     re_path(_(r'^account/'), include('i18n.patterns.urls.namespace', namespace='account')),
+    # URL pattern with optional named group
+    re_path(_(r'^news/(?:(?P<year>[0-9]+)/)?$'), view, name='news'),
 )

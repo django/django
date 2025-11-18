@@ -163,6 +163,18 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/nl/gebruikers/', 'en'), '/en/users/')
             self.assertEqual(translation.get_language(), 'nl')
 
+    def test_translate_url_utility_with_optional_named_groups(self):
+        # Test URLs with optional named groups
+        with translation.override('en'):
+            # URL without the optional parameter should translate correctly
+            self.assertEqual(translate_url('/en/news/', 'nl'), '/nl/nieuws/')
+            # URL with the optional parameter should also translate correctly
+            self.assertEqual(translate_url('/en/news/2023/', 'nl'), '/nl/nieuws/2023/')
+
+        with translation.override('nl'):
+            self.assertEqual(translate_url('/nl/nieuws/', 'en'), '/en/news/')
+            self.assertEqual(translate_url('/nl/nieuws/2023/', 'en'), '/en/news/2023/')
+
 
 class URLNamespaceTests(URLTestCaseBase):
     """

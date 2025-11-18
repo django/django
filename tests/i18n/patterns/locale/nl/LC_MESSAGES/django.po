@@ -40,3 +40,7 @@ msgstr "^registreren/$"
 #: urls/namespace.py:12
 msgid "register-as-path/"
 msgstr "registreren-als-pad/"
+
+#: urls/default.py:21
+msgid "^news/(?:(?P<year>[0-9]+)/)?$"
+msgstr "^nieuws/(?:(?P<year>[0-9]+)/)?$"
