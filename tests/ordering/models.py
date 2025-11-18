@@ -59,3 +59,20 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class SelfRef(models.Model):
+    """Model with self-referencing foreign key for testing ordering."""
+    class Meta:
+        ordering = ("-id",)
+
+    id = models.BigAutoField(primary_key=True)
+    root = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
+    value = models.BigIntegerField(null=True)
+
+
+class RelatedToSelfRef(models.Model):
+    """Model related to SelfRef for testing ordering across relations."""
+    id = models.BigAutoField(primary_key=True)
+    record = models.ForeignKey(SelfRef, on_delete=models.CASCADE)
+    other_value = models.BigIntegerField(null=True)

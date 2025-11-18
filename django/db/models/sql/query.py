@@ -1491,7 +1491,19 @@ class Query(BaseExpression):
                     path.extend(path_to_parent)
                     cur_names_with_path[1].extend(path_to_parent)
                     opts = path_to_parent[-1].to_opts
-            if hasattr(field, 'get_path_info'):
+            # Check if we're specifically referencing a ForeignKey by its attname
+            # (e.g., 'field_id'). If so, treat it as a direct column reference
+            # rather than following the relation. We need to check:
+            # 1. The field is a ForeignKey (not ForeignObject which has multi-column keys)
+            # 2. The field is accessed by its attname (e.g., 'field_id')
+            # 3. The attname is different from the field name (excludes ForeignObject)
+            from django.db.models.fields.related import ForeignKey
+            if hasattr(field, 'get_path_info') and not (
+                isinstance(field, ForeignKey) and
+                hasattr(field, 'attname') and
+                name == field.attname and
+                field.attname != field.name
+            ):
                 pathinfos = field.get_path_info(filtered_relation)
                 if not allow_many:
                     for inner_pos, p in enumerate(pathinfos):
@@ -1507,7 +1519,7 @@ class Query(BaseExpression):
                 cur_names_with_path[1].extend(pathinfos)
                 names_with_path.append(cur_names_with_path)
             else:
-                # Local non-relational field.
+                # Local non-relational field or ForeignKey referenced by attname.
                 final_field = field
                 targets = (field,)
                 if fail_on_missing and pos + 1 != len(names):

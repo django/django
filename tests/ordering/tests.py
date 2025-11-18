@@ -8,7 +8,9 @@ from django.db.models import (
 from django.db.models.functions import Upper
 from django.test import TestCase
 
-from .models import Article, Author, ChildArticle, OrderedByFArticle, Reference
+from .models import (
+    Article, Author, ChildArticle, OrderedByFArticle, Reference, RelatedToSelfRef, SelfRef
+)
 
 
 class OrderingTests(TestCase):
@@ -480,3 +482,73 @@ class OrderingTests(TestCase):
         ca4 = ChildArticle.objects.create(headline='h1', pub_date=datetime(2005, 7, 28))
         articles = ChildArticle.objects.order_by('article_ptr')
         self.assertSequenceEqual(articles, [ca4, ca2, ca1, ca3])
+
+    def test_order_by_self_referencing_fk_id_field(self):
+        """
+        Ordering by a self-referencing foreign key's _id field should work correctly.
+        Regression test for issue where ordering by 'record__root_id' on a model with
+        a self-referencing FK would incorrectly apply the related model's default ordering
+        and create an unnecessary LEFT OUTER JOIN.
+        """
+        # Create test data
+        sr1 = SelfRef.objects.create(value=1, root=None)
+        sr2 = SelfRef.objects.create(value=2, root=sr1)
+        sr3 = SelfRef.objects.create(value=3, root=sr1)
+
+        # Create related records
+        r1 = RelatedToSelfRef.objects.create(record=sr2, other_value=10)
+        r2 = RelatedToSelfRef.objects.create(record=sr3, other_value=20)
+        r3 = RelatedToSelfRef.objects.create(record=sr1, other_value=30)
+
+        # Test ordering by record__root_id
+        qs = RelatedToSelfRef.objects.filter(record__value__in=[1, 2, 3])
+        qs = qs.order_by("record__root_id")
+        sql = str(qs.query)
+
+        # Should NOT have a LEFT OUTER JOIN (only INNER JOIN needed)
+        self.assertNotIn("LEFT OUTER JOIN", sql)
+        # Should order by the root_id column directly from the INNER JOIN table
+        self.assertIn("ORDER BY", sql)
+        # Should be ASC order, not DESC (despite SelfRef having ordering = ("-id",))
+        self.assertIn("ASC", sql)
+
+        # Verify the actual ordering is correct: NULL values first, then by root_id ASC
+        results = list(qs)
+        # r3's record (sr1) has root=None, so it should come first
+        # r1's record (sr2) has root=sr1, r2's record (sr3) has root=sr1
+        # Both should be ordered by their record.root_id in ascending order
+        self.assertEqual(results[0], r3)  # root_id is NULL
+        self.assertIn(results[1], [r1, r2])  # both have same root_id (sr1.id)
+        self.assertIn(results[2], [r1, r2])  # both have same root_id (sr1.id)
+
+    def test_order_by_self_referencing_fk_id_field_descending(self):
+        """
+        Ordering by a self-referencing foreign key's _id field with '-' prefix
+        should produce DESC ordering, not ASC.
+        """
+        # Create test data
+        sr1 = SelfRef.objects.create(value=1, root=None)
+        sr2 = SelfRef.objects.create(value=2, root=sr1)
+        sr3 = SelfRef.objects.create(value=3, root=sr1)
+
+        # Create related records
+        r1 = RelatedToSelfRef.objects.create(record=sr2, other_value=10)
+        r2 = RelatedToSelfRef.objects.create(record=sr3, other_value=20)
+        r3 = RelatedToSelfRef.objects.create(record=sr1, other_value=30)
+
+        # Test ordering by -record__root_id (descending)
+        qs = RelatedToSelfRef.objects.filter(record__value__in=[1, 2, 3])
+        qs = qs.order_by("-record__root_id")
+        sql = str(qs.query)
+
+        # Should NOT have a LEFT OUTER JOIN
+        self.assertNotIn("LEFT OUTER JOIN", sql)
+        # Should be DESC order
+        self.assertIn("DESC", sql)
+
+        # Verify the actual ordering: non-NULL values first (DESC), then NULL
+        results = list(qs)
+        # r1 and r2 have root_id = sr1.id, r3 has root_id = NULL
+        self.assertIn(results[0], [r1, r2])
+        self.assertIn(results[1], [r1, r2])
+        self.assertEqual(results[2], r3)  # NULL comes last in DESC order
