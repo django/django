@@ -1407,11 +1407,18 @@ class SQLInsertCompiler(SQLCompiler):
 class SQLDeleteCompiler(SQLCompiler):
     @cached_property
     def single_alias(self):
-        return sum(self.query.alias_refcount[t] > 0 for t in self.query.alias_map) == 1
+        # A DELETE query can use the simpler "DELETE FROM table" syntax
+        # (instead of "DELETE FROM table WHERE pk IN (SELECT pk FROM table)")
+        # if it only involves a single table. This is the case when either:
+        # 1. No aliases have been set up yet (alias_map is empty), or
+        # 2. Only one alias is referenced (no joins).
+        return sum(self.query.alias_refcount[t] > 0 for t in self.query.alias_map) <= 1
 
     def _as_sql(self, query):
+        # Ensure we have an alias set up for the base table
+        delete_alias = query.get_initial_alias()
         result = [
-            'DELETE FROM %s' % self.quote_name_unless_alias(query.base_table)
+            'DELETE FROM %s' % self.quote_name_unless_alias(delete_alias)
         ]
         where, params = self.compile(query.where)
         if where:

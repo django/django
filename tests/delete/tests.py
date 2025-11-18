@@ -703,3 +703,45 @@ class FastDeleteTests(TestCase):
         referer = Referrer.objects.create(origin=origin, unique_field=42)
         with self.assertNumQueries(2):
             referer.delete()
+
+    def test_all_delete_sql_generation(self):
+        """
+        Test that Model.objects.all().delete() generates simple DELETE SQL
+        without unnecessary subquery (performance regression test).
+        """
+        from django.test.utils import CaptureQueriesContext
+        User.objects.create()
+        with CaptureQueriesContext(connection) as ctx:
+            User.objects.all().delete()
+        # Find the DELETE query
+        delete_queries = [q for q in ctx.captured_queries if 'DELETE' in q['sql'].upper()]
+        self.assertEqual(len(delete_queries), 1)
+        delete_sql = delete_queries[0]['sql']
+        # Should be simple DELETE FROM table without subquery
+        # A subquery would contain both DELETE and SELECT keywords
+        if 'SELECT' in delete_sql.upper():
+            self.fail(
+                f"DELETE query should not contain subquery for simple all().delete(). "
+                f"Got: {delete_sql}"
+            )
+
+    def test_filter_delete_sql_generation(self):
+        """
+        Test that Model.objects.filter().delete() without joins generates
+        simple DELETE SQL without unnecessary subquery.
+        """
+        from django.test.utils import CaptureQueriesContext
+        User.objects.create(avatar=Avatar.objects.create())
+        with CaptureQueriesContext(connection) as ctx:
+            User.objects.filter(pk=1).delete()
+        # Find the DELETE query
+        delete_queries = [q for q in ctx.captured_queries if 'DELETE' in q['sql'].upper()]
+        self.assertGreaterEqual(len(delete_queries), 1)
+        user_delete_sql = delete_queries[0]['sql']
+        # Should be simple DELETE FROM table WHERE with no subquery
+        # A subquery would contain both DELETE and SELECT keywords
+        if 'SELECT' in user_delete_sql.upper():
+            self.fail(
+                f"DELETE query should not contain subquery for simple filter().delete(). "
+                f"Got: {user_delete_sql}"
+            )
