@@ -50,6 +50,9 @@ class Employee(models.Model):
     department = models.ForeignKey(Department, models.CASCADE, to_field="code")
     name = models.CharField(max_length=100)
 
+    class Meta:
+        ordering = ('name',)
+
     def __str__(self):
         return self.name
 

@@ -591,6 +591,24 @@ class ListFiltersTests(TestCase):
         expected = [(self.john.pk, 'John Blue'), (self.jack.pk, 'Jack Red')]
         self.assertEqual(filterspec.lookup_choices, expected)
 
+    def test_relatedfieldlistfilter_foreignkey_ordering_model_meta(self):
+        """
+        RelatedFieldListFilter ordering respects Model._meta.ordering when
+        the related model is not registered in the admin site.
+        """
+        class BookAdmin(ModelAdmin):
+            list_filter = ('employee',)
+
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        # Employee model has Meta.ordering = ('name',)
+        expected = [(self.jack.pk, 'Jack Red'), (self.john.pk, 'John Blue')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
     def test_relatedfieldlistfilter_manytomany(self):
         modeladmin = BookAdmin(Book, site)
 
@@ -740,6 +758,55 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][5]
         expected = [(self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_relatedonlyfieldlistfilter_foreignkey_ordering_model_meta(self):
+        """
+        RelatedOnlyFieldListFilter ordering respects Model._meta.ordering when
+        the related model is not registered in the admin site.
+        """
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        class BookAdmin(ModelAdmin):
+            list_filter = (('employee', RelatedOnlyFieldListFilter),)
+
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        # Employee model has Meta.ordering = ('name',)
+        expected = [(self.jack.pk, 'Jack Red'), (self.john.pk, 'John Blue')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_foreignkey_ordering_modeladmin(self):
+        """
+        RelatedOnlyFieldListFilter ordering respects ModelAdmin.ordering.
+        """
+        class EmployeeAdminWithOrdering(ModelAdmin):
+            ordering = ('-name',)
+
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        class BookAdmin(ModelAdmin):
+            list_filter = (('employee', RelatedOnlyFieldListFilter),)
+
+        site.register(Employee, EmployeeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Employee))
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [(self.john.pk, 'John Blue'), (self.jack.pk, 'Jack Red')]
+        self.assertEqual(filterspec.lookup_choices, expected)
 
     def test_listfilter_genericrelation(self):
         django_bookmark = Bookmark.objects.create(url='https://www.djangoproject.com/')
