@@ -64,7 +64,7 @@ class ChangeListSearchForm(forms.Form):
 
 class ChangeList:
     search_form_class = ChangeListSearchForm
-    formset = None  # noqa: F841
+    formset = None
 
     def __init__(
         self,

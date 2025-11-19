@@ -2050,8 +2050,6 @@ class ModelAdmin(BaseModelAdmin):
             # me back" button on the action confirmation page.
             return HttpResponseRedirect(request.get_full_path())
 
-        formset = None
-
         # Handle POSTed bulk-edit data.
         if request.method == "POST" and cl.list_editable and "_save" in request.POST:
             if not self.has_change_permission(request):
