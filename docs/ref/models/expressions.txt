@@ -41,8 +41,7 @@ an output field, like ``output_field=FloatField()``.
 custom fields. For example, if you frequently need to perform date arithmetic
 with ``timedelta``, you can create a custom field that handles the casting to
 ensure consistent results across databases.
-See :doc:`/howto/custom-model-fields`
-for more information on creating custom fields.
+See :doc:`/howto/custom-model-fields`.
 
 Some examples
 =============
