@@ -66,3 +66,9 @@ version = {attr = "django.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["django*"]
+
+[tool.setuptools.package-data]
+"django" = ["**/*"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["__pycache__", "*.py[co]"]
