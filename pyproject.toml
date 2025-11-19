@@ -17,7 +17,7 @@ authors = [
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 readme = "README.rst"
 license = "BSD-3-Clause"
-license-files = ["LICENSE", "LICENSE.python"]
+license-files = ["LICENSE", "LICENSE.python", "AUTHORS*",]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: Web Environment",
@@ -66,3 +66,16 @@ version = {attr = "django.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["django*"]
+
+[tool.setuptools.package-data]
+"django" = ["**/*"]
+
+[tool.setuptools.data-files]
+"." = [
+  "*.rst",
+  "Gruntfile.js",
+  "INSTALL",
+  "package.json",
+  "tox.ini",
+]
+
