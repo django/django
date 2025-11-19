@@ -831,7 +831,7 @@ exclusive. Any combination of these options will result in an error.
     instance, removing its time component. This is true for both storage and
     comparison.
 
-.. warning:: Arithmetic operations on :class:`DateField` may return a datetime on PostgreSQL and MySQL.
+.. warning::
 
     When performing arithmetic on a ``DateField`` with
     :class:`~datetime.timedelta` on PostgreSQL and MySQL, the database
