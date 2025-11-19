@@ -7,3 +7,13 @@ Django 5.2.11 release notes
 Django 5.2.11 fixes three security issues with severity "high", two security
 issues with severity "moderate", and one security issue with severity "low" in
 5.2.10.
+
+CVE-2025-13473: Username enumeration through timing difference in mod_wsgi authentication handler
+=================================================================================================
+
+The ``django.contrib.auth.handlers.modwsgi.check_password()`` function for
+:doc:`authentication via mod_wsgi</howto/deployment/wsgi/apache-auth>`
+allowed remote attackers to enumerate users via a timing attack.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
