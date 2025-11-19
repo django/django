@@ -20,9 +20,8 @@ jobs:
       - name: Calculate commit prefix
         id: vars
         env:
-          GITHUB_EVENT_PULL_REQUEST_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE: ${{ github.event.pull_request.base.ref }}
         run: |
-          BASE="${GITHUB_EVENT_PULL_REQUEST_BASE_REF}"
           echo "BASE=$BASE" >> $GITHUB_ENV
           VERSION="${BASE#stable/}"
           echo "prefix=[$VERSION]" >> $GITHUB_OUTPUT
@@ -30,9 +29,8 @@ jobs:
       - name: Check PR title prefix
         env:
           TITLE: ${{ github.event.pull_request.title }}
-          STEPS_VARS_OUTPUTS_PREFIX: ${{ steps.vars.outputs.prefix }}
+          PREFIX: ${{ steps.vars.outputs.prefix }}
         run: |
-          PREFIX="${STEPS_VARS_OUTPUTS_PREFIX}"
           if [[ "$TITLE" != "$PREFIX"* ]]; then
             echo "❌ PR title must start with the required prefix: $PREFIX"
             exit 1
@@ -46,9 +44,8 @@ jobs:
 
       - name: Check commit messages prefix
         env:
-          STEPS_VARS_OUTPUTS_PREFIX: ${{ steps.vars.outputs.prefix }}
+          PREFIX: ${{ steps.vars.outputs.prefix }}
         run: |
-          PREFIX="${STEPS_VARS_OUTPUTS_PREFIX}"
           COMMITS=$(git rev-list base..pr)
           echo "Checking commit messages for required prefix: $PREFIX"
           FAIL=0
