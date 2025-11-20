@@ -94,4 +94,11 @@ class Migration(migrations.Migration):
                 ("uuid", models.UUIDField(null=True)),
             ],
         ),
+        migrations.CreateModel(
+            name="UUIDDurationModel",
+            fields=[
+                ("uuid", models.UUIDField(null=True)),
+                ("shift", models.DurationField()),
+            ],
+        ),
     ]
