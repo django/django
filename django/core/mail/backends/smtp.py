@@ -4,6 +4,7 @@ import email.policy
 import smtplib
 import ssl
 import threading
+from email.errors import HeaderParseError
 from email.headerregistry import Address, AddressHeader
 
 from django.conf import settings
@@ -169,7 +170,10 @@ class EmailBackend(BaseEmailBackend):
         SMTPUTF8).
         """
         address = force_str(address)
-        parsed = AddressHeader.value_parser(address)
+        try:
+            parsed = AddressHeader.value_parser(address)
+        except (HeaderParseError, IndexError, ValueError) as e:
+            raise ValueError(f"Invalid address {address!r}") from e
         defects = set(str(defect) for defect in parsed.all_defects)
         # Django allows local mailboxes like "From: webmaster" (#15042).
         defects.discard("addr-spec local part with no domain")
