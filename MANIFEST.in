@@ -5,6 +5,7 @@ include LICENSE
 include LICENSE.python
 include MANIFEST.in
 include package.json
+include THIRD-PARTY-NOTICES.md
 include tox.ini
 include *.rst
 graft django
