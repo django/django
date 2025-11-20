@@ -856,7 +856,7 @@ The default form widget for this field is a single
 ``DecimalField``
 ----------------
 
-.. class:: DecimalField(max_digits=None, decimal_places=None, **options)
+.. class:: DecimalField(max_digits=None, decimal_places=None, context=None, **options)
 
 A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
@@ -878,6 +878,15 @@ Has the following arguments:
     on MySQL because this database doesn't support numeric fields with no
     precision. It's also required for all database backends when
     :attr:`~DecimalField.max_digits` is provided.
+
+.. attribute:: DecimalField.context
+
+    .. versionadded:: 6.1
+
+    Optional. A :class:`decimal.Context` used to create ``Decimal`` instances
+    from floats. If :attr:`~DecimalField.context` is not specified, Django will
+    use a default context based on :attr:`~DecimalField.max_digits`, i.e.
+    ``decimal.Context(prec=max_digits)``.
 
 For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
@@ -905,6 +914,10 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
     Support for ``DecimalField`` with no precision was added on Oracle,
     PostgreSQL, and SQLite.
+
+.. versionchanged:: 6.1
+
+    The ``context`` argument was added.
 
 ``DurationField``
 -----------------

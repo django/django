@@ -1,11 +1,11 @@
 import math
-from decimal import Decimal
+from decimal import ROUND_DOWN, Context, Decimal
 from unittest import mock
 
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, models
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import BigD, Foo
 
@@ -21,6 +21,26 @@ class DecimalFieldTests(TestCase):
         # Uses default rounding of ROUND_HALF_EVEN.
         self.assertEqual(f.to_python(2.0625), Decimal("2.062"))
         self.assertEqual(f.to_python(2.1875), Decimal("2.188"))
+
+    def test_to_python_custom_context(self):
+        f = models.DecimalField(
+            max_digits=4,
+            decimal_places=2,
+            context=Context(prec=5, rounding=ROUND_DOWN),
+        )
+        self.assertEqual(f.to_python(3), Decimal("3"))
+        self.assertEqual(f.to_python("3.14"), Decimal("3.14"))
+        # to_python() converts floats and honors the custom context.
+        self.assertEqual(f.to_python(3.1415926535897), Decimal("3.1415"))
+        self.assertEqual(f.to_python(2.41), Decimal("2.4100"))
+        # Uses custom rounding of ROUND_DOWN.
+        self.assertEqual(f.to_python(2.06245), Decimal("2.0624"))
+        self.assertEqual(f.to_python(2.18775), Decimal("2.1877"))
+
+    def test_invalid_context(self):
+        msg = "DecimalField.context must be a decimal.Context instance."
+        with self.assertRaisesMessage(ValueError, msg):
+            models.DecimalField(context=ROUND_DOWN)
 
     def test_invalid_value(self):
         field = models.DecimalField(max_digits=4, decimal_places=2)
@@ -140,3 +160,20 @@ class DecimalFieldTests(TestCase):
         obj = Foo.objects.create(a="bar", d=Decimal("8.320"))
         obj.refresh_from_db()
         self.assertEqual(obj.d.compare_total(Decimal("8.320")), Decimal("0"))
+
+
+class TestMethods(SimpleTestCase):
+    def test_deconstruct(self):
+        field = models.DecimalField()
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {})
+        custom_context = Context(prec=8, rounding=ROUND_DOWN)
+        field = models.DecimalField(
+            decimal_places=4,
+            max_digits=8,
+            context=custom_context,
+        )
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(
+            kwargs, {"decimal_places": 4, "max_digits": 8, "context": custom_context}
+        )
