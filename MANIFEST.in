@@ -11,6 +11,6 @@ graft django
 graft docs
 graft extras
 graft js_tests
-graft scripts
 graft tests
 global-exclude *.py[co]
+prune scripts
