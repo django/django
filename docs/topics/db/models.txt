@@ -964,6 +964,8 @@ example::
 
 See :ref:`ref-models-update-fields` for more details.
 
+.. _methods-not-called-on-bulk-operations:
+
 .. admonition:: Overridden model methods are not called on bulk operations
 
     Note that the :meth:`~Model.delete` method for an object is not
