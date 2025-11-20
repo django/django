@@ -86,6 +86,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.is_postgresql_18
 
     @cached_property
+    def supports_uuid7_function_shift(self):
+        return self.is_postgresql_18
+
+    @cached_property
     def django_test_skips(self):
         skips = {
             "opclasses are PostgreSQL only.": {

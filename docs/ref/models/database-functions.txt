@@ -1901,7 +1901,7 @@ generated using a cryptographically secure method.
 
 .. versionadded:: 6.1
 
-.. class:: UUID7()
+.. class:: UUID7(shift=None)
 
 Generates a :rfc:`version 7 UUID <9562#section-5.7>`, which starts with a
 time-based component.
@@ -1910,6 +1910,14 @@ time-based component.
 
     Available on PostgreSQL version 18 or later, MariaDB version 11.7 or later,
     and SQLite on Python version 3.14 or later.
+
+.. admonition:: ``shift``
+
+    On PostgreSQL, ``UUID7`` also supports an optional ``shift`` value, which
+    can be used to offset the timestamp of the generated UUID. This should be a
+    :class:`datetime.timedelta` or an expression with an ``output_field`` of
+    :class:`~django.db.models.DurationField`. A positive value will shift the
+    timestamp into the future and a negative value into the past.
 
 Window functions
 ================

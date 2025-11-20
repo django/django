@@ -59,3 +59,4 @@ class FloatModel(models.Model):
 
 class UUIDModel(models.Model):
     uuid = models.UUIDField(null=True)
+    shift = models.DurationField(null=True)

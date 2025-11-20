@@ -92,6 +92,7 @@ class Migration(migrations.Migration):
             name="UUIDModel",
             fields=[
                 ("uuid", models.UUIDField(null=True)),
+                ("shift", models.DurationField(null=True)),
             ],
         ),
     ]
