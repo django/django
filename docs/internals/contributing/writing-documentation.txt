@@ -420,43 +420,42 @@ documentation:
 * Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
   Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
-Directive Content Indentation
-==============================
+* When documenting Python objects (classes, methods, attributes, etc.) using
+  `Sphinx directives`__ such as ``.. class::``, ``.. method::``, and
+  ``.. attribute::``, all content must be properly indented to ensure correct
+  rendering and to support features like automatic table of contents
+  generation.
 
-When documenting Python objects (classes, methods, attributes, etc.) using
-Sphinx directives, all content must be properly indented to ensure correct
-rendering and to support features like automatic table of contents generation.
+  Follow these rules:
 
-Follow these indentation rules:
+  * The directive itself remains flush with the left margin (no indentation).
+  * All descriptive text under the directive must be indented by 4 spaces.
+  * Multi-line descriptions must keep the same indentation level.
+  * Nested directives (for example, methods inside a class) require an
+    additional 4 spaces of indentation to maintain hierarchy.
+  * Field lists (such as ``:param:``, ``:returns:``, etc.) must align with the
+    directive's content level.
 
-* All content under a directive must be indented with 4 spaces relative to the
-  directive declaration.
+  Example:
 
-* Multi-line descriptions maintain the same indentation level
+  .. code-block:: rst
 
-* Nested directives (like methods within a class) require additional
-  indentation to maintain the hierarchy.
+      .. class:: MyClass
 
-* Field lists (like ``:param:`` or ``:returns:``) should align with their
-  parent directive's content.
+          A brief description of the class.
 
-Example of correct indentation::
+          .. method:: my_method(arg1, arg2)
 
-    .. class:: MyClass
+              Method description.
 
-       A brief description of the class goes here.
+              :param arg1: Description of the first parameter
+              :param arg2: Description of the second parameter
 
-       .. method:: my_method(arg1, arg2)
+          .. attribute:: my_attribute
 
-          Method description goes here.
+              Attribute description.
 
-          :param arg1:
-              Description of first parameter
-          :param arg2:
-              Description of second parameter
-       .. attribute:: my_attribute
-
-          Attribute description goes here.
+__ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 
 Django-specific markup
 ======================
