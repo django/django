@@ -833,11 +833,10 @@ exclusive. Any combination of these options will result in an error.
 
 .. warning::
 
-    When performing arithmetic on a ``DateField`` with
-    :class:`~datetime.timedelta` on PostgreSQL and MySQL, the database
-    returns a ``datetime`` instead of a ``date``. This occurs because
-    Python's ``timedelta`` is converted to SQL ``INTERVAL``, and the SQL
-    operation ``date +/- interval`` returns a ``timestamp`` on these
+    On PostgreSQL and MySQL, arithmetic operations on a DateField
+    with :class:~datetime.timedelta return a datetime instead of a date.
+    This occurs because Python's ``timedelta`` is converted to SQL ``INTERVAL``,
+    and the SQL operation ``date +/- interval`` returns a ``timestamp`` on these
     databases.
 
     To ensure a ``date`` result across all databases, use one of these
@@ -847,9 +846,9 @@ exclusive. Any combination of these options will result in an error.
 
     Explicitly cast the result to a date::
 
+        import datetime
         from django.db.models import DateField, F
         from django.db.models.functions import Cast
-        import datetime
 
         qs = MyModel.objects.annotate(
             previous_day=Cast(
