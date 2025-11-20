@@ -36,10 +36,24 @@ class UUID7(Func):
     function = "UUIDV7"
     output_field = UUIDField()
 
+    def __init__(self, shift=None, **extra):
+        self.shift = shift
+        super().__init__(**extra)
+
     def as_sql(self, compiler, connection, **extra_context):
-        if connection.features.supports_uuid7_function:
-            return super().as_sql(compiler, connection, **extra_context)
-        raise NotSupportedError("UUID7 is not supported on this database backend.")
+        if not connection.features.supports_uuid7_function:
+            raise NotSupportedError("UUID7 is not supported on this database backend.")
+
+        if self.shift is not None:
+            if not connection.features.supports_uuid7_function_shift:
+                msg = (
+                    "The shift argument to UUID7 is not supported "
+                    "on this database backend."
+                )
+                raise NotSupportedError(msg)
+            self.source_expressions = self._parse_expressions(self.shift)
+
+        return super().as_sql(compiler, connection, **extra_context)
 
     def as_postgresql(self, compiler, connection, **extra_context):
         if connection.features.supports_uuid7_function:
