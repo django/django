@@ -341,6 +341,12 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+System checks
+-------------
+
+* The :djadmin:`check` management command now supplies all ``databases`` if not
+  specified. Callers should be prepared for databases to be accessed.
+
 Dropped support for PostgreSQL 14
 ---------------------------------
 
