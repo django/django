@@ -13,3 +13,6 @@ Bugfixes
   ``django.utils.feedgenerator.Stylesheet.__str__()`` did not escape
   the ``url``, ``mimetype``, and ``media`` attributes, potentially leading
   to invalid XML markup (:ticket:`36733`).
+
+* Fixed a bug in Django 5.2 on PostgreSQL where ``bulk_create()`` did not apply
+  a field's custom query placeholders (:ticket:`36748`).
