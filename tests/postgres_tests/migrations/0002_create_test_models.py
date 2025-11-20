@@ -426,21 +426,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name="UUIDTestModel",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        verbose_name="ID",
-                        serialize=False,
-                        auto_created=True,
-                        primary_key=True,
-                    ),
-                ),
-                ("uuid", models.UUIDField(default=None, null=True)),
-            ],
-        ),
-        migrations.CreateModel(
             name="RangesModel",
             fields=[
                 (

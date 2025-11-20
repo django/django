@@ -1877,6 +1877,49 @@ Usage example:
 
 .. _window-functions:
 
+UUID functions
+==============
+
+``UUID4``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID4()
+
+Generates a `version 4 UUID
+<https://datatracker.ietf.org/doc/html/rfc9562.html#section-5.4>`_, which is
+random and is generated using a cryptographically secure method.
+
+.. note::
+
+    Available on PostgreSQL, SQLite, MariaDB version 11.7 or later, and Oracle
+    23.4 (23ai) or later.
+
+``UUID7``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID7(shift=None)
+
+Generates a `version 7 UUID
+<https://datatracker.ietf.org/doc/html/rfc9562.html#section-5.7>`_, which
+starts with a time-based component.
+
+.. note::
+
+    Available on PostgreSQL version 18 or later, MariaDB version 11.7 or later,
+    and SQLite on Python version 3.14 or later.
+
+.. note::
+
+    On PostgreSQL, UUID7 also supports an optional ``shift`` value, which can
+    be used to offset the timestamp of the generated UUID. This should be a
+    :class:`datetime.timedelta` or an expression with an ``output_field`` of
+    :class:`~django.db.models.DurationField`. A positive value will shift the
+    timestamp into the past and a negative value into the future.
+
 Window functions
 ================
 
