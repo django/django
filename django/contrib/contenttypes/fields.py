@@ -725,7 +725,7 @@ def create_generic_related_manager(superclass, rel):
             if bulk:
                 pks = []
                 for obj in objs:
-                    if obj._state.adding or obj._state.db != db:
+                    if obj._state.adding:
                         raise ValueError(
                             "%r instance isn't saved. Use bulk=False or save "
                             "the object first." % obj
