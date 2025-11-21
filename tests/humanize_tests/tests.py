@@ -108,7 +108,7 @@ class HumanizeTests(SimpleTestCase):
             "11<sup>e</sup>",
             "12<sup>e</sup>",
             "13<sup>e</sup>",
-            "101<sup>er</sup>",
+            "101<sup>e</sup>",
             "102<sup>e</sup>",
             "103<sup>e</sup>",
             "111<sup>e</sup>",
