@@ -1,13 +1,3 @@
-include AUTHORS
-include Gruntfile.js
-include INSTALL
-include LICENSE
-include LICENSE.python
-include MANIFEST.in
-include package.json
-include tox.ini
-include *.rst
-graft django
 graft docs
 graft extras
 graft js_tests
