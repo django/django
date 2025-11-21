@@ -228,7 +228,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Management commands now set :class:`~argparse.ArgumentParser`\'s
+  ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
+  suggestions for mistyped subcommand names and argument choices.
 
 Migrations
 ~~~~~~~~~~
@@ -340,6 +342,12 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+System checks
+-------------
+
+* The :djadmin:`check` management command now supplies all ``databases`` if not
+  specified. Callers should be prepared for databases to be accessed.
 
 Dropped support for PostgreSQL 14
 ---------------------------------

@@ -57,3 +57,8 @@ except ImportError:
 class EnumField(models.CharField):
     def get_prep_value(self, value):
         return value.value if isinstance(value, enum.Enum) else value
+
+
+class OffByOneField(models.IntegerField):
+    def get_placeholder(self, value, compiler, connection):
+        return "(%s + 1)"

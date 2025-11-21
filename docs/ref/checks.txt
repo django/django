@@ -79,10 +79,10 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flags potential problems with version upgrades.
 * ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
-  are not run by default because they do more than static code analysis as
-  regular checks do. They are only run by the :djadmin:`migrate` command or if
-  you specify configured database aliases using the ``--database`` option when
-  calling the :djadmin:`check` command.
+  are not run by default because they do more than only static code analysis as
+  most regular checks do. They are only run by the :djadmin:`migrate` command
+  or if you specify configured database aliases using the ``--database`` option
+  when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -167,7 +167,7 @@ Model fields
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
 * **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
-  iterable (e.g. a list or tuple).
+  ordered iterable (e.g. a list or tuple, but not a set).
 * **fields.E005**: ``choices`` must be a mapping of actual values to human
   readable names or an iterable containing ``(actual value, human readable
   name)`` tuples.
