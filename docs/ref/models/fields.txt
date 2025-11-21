@@ -833,11 +833,12 @@ exclusive. Any combination of these options will result in an error.
 
 .. warning::
 
-    On PostgreSQL and MySQL, arithmetic operations on a DateField
-    with :class:~datetime.timedelta return a datetime instead of a date.
-    This occurs because Python's ``timedelta`` is converted to SQL ``INTERVAL``,
-    and the SQL operation ``date +/- interval`` returns a ``timestamp`` on these
-    databases.
+    On PostgreSQL and MySQL, arithmetic operations on a ``DateField``
+    with a :class:`~datetime.timedelta` return a ``datetime``
+    instead of a ``date``.
+    This occurs because Python's ``timedelta`` is converted
+    to SQL ``INTERVAL``, and the SQL operation ``date +/- interval``
+    returns a ``timestamp`` on these databases.
 
     To ensure a ``date`` result across all databases, use one of these
     approaches:
