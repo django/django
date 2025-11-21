@@ -15,6 +15,7 @@ from .models import (
     Avatar,
     B,
     Base,
+    CascadeDbModel,
     Child,
     DeleteBottom,
     DeleteTop,
@@ -34,16 +35,15 @@ from .models import (
     RChild,
     RChildChild,
     Referrer,
-    RelatedDbOption,
     RelatedDbOptionGrandParent,
     RelatedDbOptionParent,
     RProxy,
     S,
     SetDefaultDbModel,
+    SetNullDbModel,
     T,
     User,
     create_a,
-    create_related_db_option,
     get_default_r,
 )
 
@@ -81,10 +81,13 @@ class OnDeleteTests(TestCase):
         a = A.objects.get(pk=a.pk)
         self.assertIsNone(a.setnull)
 
+    @skipUnlessDBFeature("supports_on_delete_db_null")
     def test_db_setnull(self):
-        a = create_related_db_option("db_setnull")
+        a = SetNullDbModel.objects.create(
+            db_setnull=RelatedDbOptionParent.objects.create()
+        )
         a.db_setnull.delete()
-        a = RelatedDbOption.objects.get(pk=a.pk)
+        a = SetNullDbModel.objects.get(pk=a.pk)
         self.assertIsNone(a.db_setnull)
 
     def test_setdefault(self):
@@ -394,20 +397,21 @@ class DeletionTests(TestCase):
         self.assertNumQueries(5, s.delete)
         self.assertFalse(S.objects.exists())
 
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
     def test_db_cascade(self):
         related_db_op = RelatedDbOptionParent.objects.create(
             p=RelatedDbOptionGrandParent.objects.create()
         )
-        RelatedDbOption.objects.bulk_create(
+        CascadeDbModel.objects.bulk_create(
             [
-                RelatedDbOption(db_cascade=related_db_op)
+                CascadeDbModel(db_cascade=related_db_op)
                 for _ in range(2 * GET_ITERATOR_CHUNK_SIZE)
             ]
         )
         with self.assertNumQueries(1):
             results = related_db_op.delete()
             self.assertEqual(results, (1, {"delete.RelatedDbOptionParent": 1}))
-        self.assertFalse(RelatedDbOption.objects.exists())
+        self.assertFalse(CascadeDbModel.objects.exists())
         self.assertFalse(RelatedDbOptionParent.objects.exists())
 
     def test_instance_update(self):

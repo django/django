@@ -10,8 +10,9 @@ from .models import (
     Comment,
     Country,
     DbCommentModel,
-    DbOnDeleteModel,
+    DbOnDeleteCascadeModel,
     DbOnDeleteSetDefaultModel,
+    DbOnDeleteSetNullModel,
     District,
     Reporter,
     UniqueConstraintConditionModel,
@@ -244,11 +245,11 @@ class IntrospectionTests(TransactionTestCase):
             editor.add_field(Article, body)
         self.assertEqual(relations, expected_relations)
 
-    @skipUnlessDBFeature("can_introspect_foreign_keys")
-    def test_get_relations_db_on_delete(self):
+    @skipUnlessDBFeature("can_introspect_foreign_keys", "supports_on_delete_db_cascade")
+    def test_get_relations_db_on_delete_cascade(self):
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(
-                cursor, DbOnDeleteModel._meta.db_table
+                cursor, DbOnDeleteCascadeModel._meta.db_table
             )
 
         if connection.vendor == "mysql" and connection.mysql_is_mariadb:
@@ -259,6 +260,18 @@ class IntrospectionTests(TransactionTestCase):
         expected_relations = {
             "fk_db_cascade_id": ("id", City._meta.db_table, DB_CASCADE),
             "fk_do_nothing_id": ("id", Country._meta.db_table, no_db_on_delete),
+        }
+        self.assertEqual(relations, expected_relations)
+
+    @skipUnlessDBFeature("can_introspect_foreign_keys", "supports_on_delete_db_null")
+    def test_get_relations_db_on_delete_null(self):
+        with connection.cursor() as cursor:
+            relations = connection.introspection.get_relations(
+                cursor, DbOnDeleteSetNullModel._meta.db_table
+            )
+
+        # {field_name: (field_name_other_table, other_table, db_on_delete)}
+        expected_relations = {
             "fk_set_null_id": ("id", Reporter._meta.db_table, DB_SET_NULL),
         }
         self.assertEqual(relations, expected_relations)

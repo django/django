@@ -309,7 +309,8 @@ Related fields
   ``db_default`` value.
 * **fields.E323**: Field specifies database/Python-level on_delete variant, but
   referenced model uses python/database-level variant.
-* **fields.E324**: ``<database>`` does not support ``DB_SET_DEFAULT``.
+* **fields.E324**: ``<database>`` does not support
+  ``<database delete option>``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.

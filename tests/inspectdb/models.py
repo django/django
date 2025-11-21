@@ -178,3 +178,9 @@ class DbOnDeleteModel(models.Model):
     fk_set_null = models.ForeignKey(
         DigitsInColumnName, on_delete=models.DB_SET_NULL, null=True
     )
+
+    class Meta:
+        required_db_features = {
+            "supports_on_delete_db_cascade",
+            "supports_on_delete_db_null",
+        }
