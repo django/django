@@ -72,7 +72,7 @@ class Sitemap:
 
     @property
     def paginator(self):
-        if not hasattr(self, '_paginator'):
+        if not hasattr(self, "_paginator"):
             items = self._items()
             self._paginator = paginator.Paginator(items, self.limit)
         return self._paginator
@@ -126,12 +126,12 @@ class Sitemap:
 
         paginator_page = self.paginator.page(page)
         for item in paginator_page.object_list:
-            if self.i18n and not hasattr(self, '_i18n_verified_per_item'):
+            if self.i18n and not hasattr(self, "_i18n_verified_per_item"):
                 # Verify and store i18n info for this item
                 item_for_verification = item[0] if isinstance(item, tuple) else item
                 i18n_info = self._verify_i18n_urls(item_for_verification)
 
-                if not hasattr(self, '_sample_i18n_info'):
+                if not hasattr(self, "_sample_i18n_info"):
                     self._sample_i18n_info = i18n_info
 
             loc = f"{protocol}://{domain}{self._location(item)}"

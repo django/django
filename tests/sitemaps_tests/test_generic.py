@@ -1,10 +1,9 @@
 from datetime import datetime
+from unittest.mock import Mock
 
-from django.contrib.sitemaps import Sitemap, GenericSitemap
+from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.test import override_settings
 from django.utils import translation
-
-from unittest.mock import Mock, patch
 
 from .base import SitemapTestsBase
 from .models import TestModel
@@ -108,7 +107,7 @@ class GenericViewsSitemapTests(SitemapTestsBase):
         queryset.filter.assert_not_called()
 
         # Access paginator - should call filter() but not evaluate fully
-        paginator_obj = sitemap.paginator
+        sitemap.paginator
         queryset.filter.assert_called_once()
 
         # Should not have called count or any evaluation methods
@@ -121,9 +120,7 @@ class GenericViewsSitemapTests(SitemapTestsBase):
         existing_count = TestModel.objects.count()
 
         # Add order_by() to fix the unordered warning
-        sitemap = GenericSitemap({
-            "queryset": TestModel.objects.all().order_by('id')
-        })
+        sitemap = GenericSitemap({"queryset": TestModel.objects.all().order_by("id")})
 
         # Access paginator and get a page
         page = sitemap.paginator.page(1)
@@ -142,17 +139,17 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 
         # Mock item and languages
         mock_item = Mock()
-        sitemap.languages = ['en', 'fr']
+        sitemap.languages = ["en", "fr"]
 
         # Mock location to return different URLs per language
         def mock_location(item):
             lang = translation.get_language()
-            return f'/{lang}/item/'
+            return f"/{lang}/item/"
 
         sitemap.location = mock_location
         result = sitemap._verify_i18n_urls(mock_item)
 
         # Should detect i18n usage since URLs differ
-        self.assertTrue(result['uses_i18n'])
-        self.assertEqual(result['sample_urls']['en'], '/en/item/')
-        self.assertEqual(result['sample_urls']['fr'], '/fr/item/')
+        self.assertTrue(result["uses_i18n"])
+        self.assertEqual(result["sample_urls"]["en"], "/en/item/")
+        self.assertEqual(result["sample_urls"]["fr"], "/fr/item/")
