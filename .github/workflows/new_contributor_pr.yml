@@ -8,7 +8,27 @@ permissions:
   pull-requests: write
 
 jobs:
+  check:
+    name: Close invalid PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Close invalid PRs"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const isInvalid = /99999/.test(title);
+            if (isInvalid) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                state: 'closed'
+              });
+            }
+
   build:
+    needs: check
     name: Hello new contributor
     runs-on: ubuntu-latest
     steps:
