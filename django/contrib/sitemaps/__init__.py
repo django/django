@@ -196,7 +196,7 @@ class Sitemap:
 
     def _verify_i18n_urls(self, item):
         """
-        Verify if URLs use i18n patterns and return analysis
+        Verify which URLs uses i18n patterns and return analysis
         """
         languages = self._languages()
         if len(languages) < 2:

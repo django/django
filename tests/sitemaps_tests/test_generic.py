@@ -1,7 +1,10 @@
 from datetime import datetime
 
-from django.contrib.sitemaps import GenericSitemap
+from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.test import override_settings
+from django.utils import translation
+
+from unittest.mock import Mock, patch
 
 from .base import SitemapTestsBase
 from .models import TestModel
@@ -92,18 +95,64 @@ class GenericViewsSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.text, expected_content)
 
     def test_lazy_pagination(self):
-        sitemap = GenericSitemap({"queryset": TestModel.objects.all().order_by('id')})
+        """
+        Test the not loaded queryset before pagination
+        """
+        # Mock queryset to track evaluation
+        queryset = Mock()
+        queryset.filter.return_value = queryset
 
-        print(sitemap)
-        self.assertFalse(hasattr(sitemap, '_paginator'),
-                        "Paginator was created during initialization") # TODO: REMOVE THE MSG
+        sitemap = GenericSitemap({"queryset": queryset})
 
-        paginator = sitemap.paginator
-        print(paginator)
+        # Before accessing paginator, queryset should not be evaluated
+        queryset.filter.assert_not_called()
 
-        self.assertTrue(hasattr(sitemap, '_paginator'),
-                        "Paginator was not created when accessed")
-        self.assertIsNotNone(paginator)
+        # Access paginator - should call filter() but not evaluate fully
+        paginator_obj = sitemap.paginator
+        queryset.filter.assert_called_once()
 
-    # def test_queryset_not_evaluated_on_init(self):
-    #     ...
+        # Should not have called count or any evaluation methods
+        self.assertFalse(queryset.count.called)
+
+    def test_queryset_after_pagination(self):
+        """
+        Test the queryset after the pagination
+        """
+        existing_count = TestModel.objects.count()
+
+        # Add order_by() to fix the unordered warning
+        sitemap = GenericSitemap({
+            "queryset": TestModel.objects.all().order_by('id')
+        })
+
+        # Access paginator and get a page
+        page = sitemap.paginator.page(1)
+        items = page.object_list
+
+        # After pagination, items should be loaded
+        self.assertEqual(len(items), min(existing_count, sitemap.limit))
+        self.assertTrue(all(isinstance(item, TestModel) for item in items))
+
+    def test_verify_urls_with_i18n(self):
+        """
+        Test i18n URL verification
+        """
+        sitemap = Sitemap()
+        sitemap.i18n = True
+
+        # Mock item and languages
+        mock_item = Mock()
+        sitemap.languages = ['en', 'fr']
+
+        # Mock location to return different URLs per language
+        def mock_location(item):
+            lang = translation.get_language()
+            return f'/{lang}/item/'
+
+        sitemap.location = mock_location
+        result = sitemap._verify_i18n_urls(mock_item)
+
+        # Should detect i18n usage since URLs differ
+        self.assertTrue(result['uses_i18n'])
+        self.assertEqual(result['sample_urls']['en'], '/en/item/')
+        self.assertEqual(result['sample_urls']['fr'], '/fr/item/')
