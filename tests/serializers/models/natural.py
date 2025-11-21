@@ -2,6 +2,7 @@
 
 import uuid
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 
 
@@ -74,3 +75,34 @@ class FKAsPKNoNaturalKey(models.Model):
 
     def natural_key(self):
         raise NotImplementedError("This method was not expected to be called.")
+
+
+class SubclassNaturalKeyOptOutUser(AbstractBaseUser):
+    email = models.EmailField(unique=False, null=True, blank=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    def natural_key(self):
+        return ()
+
+
+class PostToOptOutSubclassUser(models.Model):
+    author = models.ForeignKey(SubclassNaturalKeyOptOutUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+
+    subscribers = models.ManyToManyField(
+        SubclassNaturalKeyOptOutUser, related_name="subscribed_posts", blank=True
+    )
+
+
+class NaturalKeyOptOut(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Manager(models.Manager):
+        def get_by_natural_key(self, name):
+            return self.get(name=name)
+
+    objects = Manager()
+
+    def natural_key(self):
+        return (self.name,)

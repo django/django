@@ -276,7 +276,11 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Improved behavior where models inheriting the ``natural_key()`` method
+  could not opt out of natural key serialization, causing the primary key
+  to be omitted when ``--natural-primary`` was used. Subclasses can now
+  explicitly opt out by implementing the ``natural_key()`` method to
+  return ``None``.
 
 Signals
 ~~~~~~~
