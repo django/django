@@ -1184,13 +1184,17 @@ directly, but you can still use dictionary unpacking to use it in a query:
     >>> Dog.objects.filter(**{"data__owner__other_pets__-1__name": "Fishy"})
     <QuerySet [<Dog: Rufus>]>
 
-.. admonition:: MySQL, MariaDB, and Oracle
+.. admonition:: MySQL, MariaDB, and Oracle < 21c
 
     Negative JSON array indices are not supported.
 
 .. versionchanged:: 6.0
 
     SQLite support for negative JSON array indices was added.
+
+.. versionchanged:: 6.1
+
+    Oracle 21c+ support for negative JSON array indices was added.
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
