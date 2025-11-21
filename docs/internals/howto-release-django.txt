@@ -489,8 +489,7 @@ Building the artifacts
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``python -m build`` to generate the release packages. This will create
-   the release artifacts (tarball and wheel) in a ``dist/`` directory. For
-   Django 5.0 or older, you need to run ``make -f extras/Makefile`` instead.
+   the release artifacts (tarball and wheel) in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages:
 
