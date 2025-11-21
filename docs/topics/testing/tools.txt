@@ -1198,7 +1198,7 @@ A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
-The most straightforward way of creating a fixture is to use the
+The most direct way of creating a fixture is to use the
 :djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
 already have some data in your database. See the :djadmin:`dumpdata
 documentation<dumpdata>` for more details.
@@ -1968,7 +1968,7 @@ won't be run.
 Testing asynchronous code
 =========================
 
-If you merely want to test the output of your asynchronous views, the standard
+If you only want to test the output of your asynchronous views, the standard
 test client will run them inside their own asynchronous loop without any extra
 work needed on your part.
 

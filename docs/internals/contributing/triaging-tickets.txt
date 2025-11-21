@@ -371,7 +371,7 @@ Then, you can help out by:
   flags for tickets where they are incorrectly set.
 
 * Setting the "`Easy pickings`_" flag for tickets that are small and
-  relatively straightforward.
+  relatively easy to address.
 
 * Set the *type* of tickets that are still uncategorized.
 

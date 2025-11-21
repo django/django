@@ -563,7 +563,7 @@ This default output wraps each field with a ``<div>``. Notice the following:
 * Each field type has a default HTML representation. ``CharField`` is
   represented by an ``<input type="text">`` and ``EmailField`` by an
   ``<input type="email">``. ``BooleanField(null=False)`` is represented by an
-  ``<input type="checkbox">``. Note these are merely sensible defaults; you can
+  ``<input type="checkbox">``. Note these are only sensible defaults; you can
   specify which HTML to use for a given field by using widgets, which we'll
   explain shortly.
 
@@ -573,7 +573,7 @@ This default output wraps each field with a ``<div>``. Notice the following:
 * The text label for each field -- e.g. ``'Subject:'``, ``'Message:'`` and
   ``'Cc myself:'`` is generated from the field name by converting all
   underscores to spaces and upper-casing the first letter. Again, note
-  these are merely sensible defaults; you can also specify labels manually.
+  these are only sensible defaults; you can also specify labels manually.
 
 * Each text label is surrounded in an HTML ``<label>`` tag, which points
   to the appropriate form field via its ``id``. Its ``id``, in turn, is

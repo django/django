@@ -294,7 +294,7 @@ representing the list of called receiver functions and their response values.
 
 ``send()`` differs from ``send_robust()`` in how exceptions raised by receiver
 functions are handled. ``send()`` does *not* catch any exceptions raised by
-receivers; it simply allows errors to propagate. Thus not all receivers may
+receivers; it allows errors to propagate. Thus not all receivers may
 be notified of a signal in the face of an error.
 
 ``send_robust()`` catches all errors derived from Python's ``Exception`` class,
