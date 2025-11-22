@@ -89,6 +89,16 @@ def result_headers(cl):
     Generate the list column headers.
     """
     ordering_field_columns = cl.get_ordering_field_columns()
+    priority_description = ""
+    # Add a current sort priority description for screen reader.
+    for index, item in enumerate(ordering_field_columns.items()):
+        text, attr = label_for_field(
+            cl.list_display[item[0]],
+            cl.model,
+            model_admin=cl.model_admin,
+            return_attr=True,
+        )
+        priority_description += "%s priority %d, " % (text, index + 1)
     for i, field_name in enumerate(cl.list_display):
         text, attr = label_for_field(
             field_name, cl.model, model_admin=cl.model_admin, return_attr=True
@@ -129,7 +139,7 @@ def result_headers(cl):
 
         # OK, it is sortable if we got this far
         th_classes = ["sortable", "column-{}".format(field_name)]
-        order_type = ""
+        order_type = "none"
         new_order_type = "asc"
         sort_priority = 0
         # Is it currently being sorted on?
@@ -137,42 +147,48 @@ def result_headers(cl):
         if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
-            th_classes.append("sorted %sending" % order_type)
-            new_order_type = {"asc": "desc", "desc": "asc"}[order_type]
+            th_classes.append("sorted")
+            new_order_type = {"asc": "desc", "desc": "none", "none": "asc"}[order_type]
 
         # build new ordering param
-        o_list_primary = []  # URL for making this field the primary sort
-        o_list_remove = []  # URL for removing this field from sort
         o_list_toggle = []  # URL for toggling order type for this field
+        if new_order_type == "none":
+            description = "toggle sorting remove, " + priority_description
+        else:
+            description = (
+                "toggle sorting %sending, " % new_order_type + priority_description
+            )
 
-        def make_qs_param(t, n):
-            return ("-" if t == "desc" else "") + str(n)
+        def make_qs_param(order_type, param):
+            new_param = ""
+            if order_type == "asc":
+                new_param = "" + str(param)
+            elif order_type == "desc":
+                new_param = "-" + str(param)
+            return new_param
 
         for j, ot in ordering_field_columns.items():
             if j == i:  # Same column
                 param = make_qs_param(new_order_type, j)
                 # We want clicking on this header to bring the ordering to the
                 # front
-                o_list_primary.insert(0, param)
                 o_list_toggle.append(param)
                 # o_list_remove - omit
             else:
                 param = make_qs_param(ot, j)
-                o_list_primary.append(param)
                 o_list_toggle.append(param)
-                o_list_remove.append(param)
 
         if i not in ordering_field_columns:
-            o_list_primary.insert(0, make_qs_param(new_order_type, i))
+            o_list_toggle.insert(0, make_qs_param(new_order_type, i))
 
         yield {
             "text": text,
+            "field_name": field_name,
             "sortable": True,
             "sorted": is_sorted,
-            "ascending": order_type == "asc",
+            "description": description,
+            "sorted_direction": order_type,
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
