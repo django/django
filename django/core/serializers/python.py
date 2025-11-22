@@ -94,7 +94,15 @@ class Serializer(base.Serializer):
                 field.name,
                 queryset_iterator(obj, field),
             )
-            self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+            m2m_list = [m2m_value(related) for related in m2m_iter]
+            # Ensure deterministic ordering for natural key M2M relations.
+
+            if m2m_list:
+                m2m_list = sorted(
+                m2m_list,
+                key=lambda nk: tuple(nk) if isinstance(nk, (list, tuple)) else nk,
+                 )
+            self._current[field.name] = m2m_list
 
     def getvalue(self):
         return self.objects
