@@ -171,6 +171,19 @@ class DatabaseOperationTests(TestCase):
     def setUp(self):
         self.ops = BaseDatabaseOperations(connection=connection)
 
+    def test_last_executed_query_base_fallback(self):
+        sql = "INVALID SQL"
+        params = []
+        with connection.cursor() as cursor:
+            cursor.close()
+            try:
+                cursor.execute(sql, params)
+            except connection.features.closed_cursor_error_class:
+                pass
+            self.assertIsNotNone(
+                connection.ops.last_executed_query(cursor, sql, params),
+            )
+
     @skipIfDBFeature("can_distinct_on_fields")
     def test_distinct_on_fields(self):
         msg = "DISTINCT ON fields is not supported by this database backend"
