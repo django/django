@@ -287,8 +287,8 @@ class BaseForm(RenderableFormMixin):
         if hasattr(error, "error_dict"):
             if field is not None:
                 raise TypeError(
-                    "The argument `field` must be `None` when the `error` "
-                    "argument contains errors for multiple fields."
+                    "The argument `field` must be `None` when the `error` argument "
+                    "is a ValidationError with an error_dict."
                 )
             else:
                 error = error.error_dict
