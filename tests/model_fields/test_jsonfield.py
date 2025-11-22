@@ -364,14 +364,14 @@ class TestQuerying(TestCase):
                 "bax": {"foo": "bar"},
             },
         ]
-        cls.objs = [NullableJSONModel.objects.create(value=value) for value in values]
+        objs = [NullableJSONModel(value=value) for value in values]
         if connection.features.supports_primitives_in_json_field:
-            cls.objs.extend(
-                [
-                    NullableJSONModel.objects.create(value=value)
-                    for value in cls.primitives
-                ]
-            )
+            objs.extend([NullableJSONModel(value=value) for value in cls.primitives])
+        objs = NullableJSONModel.objects.bulk_create(objs)
+        # Some backends don't return primary keys after bulk_create.
+        if any(obj.pk is None for obj in objs):
+            objs = list(NullableJSONModel.objects.order_by("id"))
+        cls.objs = objs
         cls.raw_sql = "%s::jsonb" if connection.vendor == "postgresql" else "%s"
 
     def test_exact(self):
@@ -779,6 +779,12 @@ class TestQuerying(TestCase):
     def test_none_key(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__j=None),
+            [self.objs[4]],
+        )
+
+    def test_key_iexact_none(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__j__iexact=None),
             [self.objs[4]],
         )
 
