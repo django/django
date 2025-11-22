@@ -1632,7 +1632,8 @@ class Query(BaseExpression):
                 ):
                     lookup_class = targets[0].get_lookup("isnull")
                     col = self._get_col(targets[0], join_info.targets[0], alias)
-                    # Fix SQL: use OR + IS NULL when RHS `in` values include None.
+                    # Fix SQL: use OR + IS NULL
+                    # when RHS `in` values include None.
                     if (
                         lookup_type == "in"
                         and isinstance(condition.rhs, Iterable)
