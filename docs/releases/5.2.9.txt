@@ -9,4 +9,9 @@ Django 5.2.9 fixes several bugs in 5.2.8.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2.8 where
+  :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` raised a
+  :class:`~django.core.exceptions.DisallowedRedirect` for URLs longer than
+  2048 characters. The limit is increased to 16,384 characters to
+  accommodate longer URLs (:ticket:`36743`).

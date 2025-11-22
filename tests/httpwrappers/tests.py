@@ -24,7 +24,7 @@ from django.http import (
 )
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
-from django.utils.http import MAX_URL_LENGTH
+from django.utils.http import MAX_REDIRECT_LENGTH
 
 
 class QueryDictTests(SimpleTestCase):
@@ -491,13 +491,20 @@ class HttpResponseTests(SimpleTestCase):
             'data:text/html,<script>window.alert("xss")</script>',
             "mailto:test@example.com",
             "file:///etc/passwd",
-            "é" * (MAX_URL_LENGTH + 1),
+            "é" * (MAX_REDIRECT_LENGTH + 1),
         ]
         for url in bad_urls:
             with self.assertRaises(DisallowedRedirect):
                 HttpResponseRedirect(url)
             with self.assertRaises(DisallowedRedirect):
                 HttpResponsePermanentRedirect(url)
+
+    def test_long_length_redirect_url(self):
+        long_url = "https://example.com/" + ("x" * 16000)
+        response = HttpResponseRedirect(long_url)
+        self.assertEqual(response.url, long_url)
+        response = HttpResponsePermanentRedirect(long_url)
+        self.assertEqual(response.url, long_url)
 
     def test_header_deletion(self):
         r = HttpResponse("hello")
