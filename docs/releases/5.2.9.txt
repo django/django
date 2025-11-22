@@ -16,3 +16,10 @@ Bugfixes
 
 * Fixed a bug in Django 5.2 on PostgreSQL where ``bulk_create()`` did not apply
   a field's custom query placeholders (:ticket:`36748`).
+
+* Fixed a regression in Django 5.2.8 where
+  :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` raised a
+  ``DisallowedRedirect`` exception for URLs longer than 2048
+  characters. The limit is increased to 16,384 characters to
+  accommodate longer URLs (:ticket:`36743`).
