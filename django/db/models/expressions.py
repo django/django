@@ -1177,8 +1177,12 @@ class Value(Expression):
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
-            if hasattr(output_field, "get_placeholder"):
-                return output_field.get_placeholder(val, compiler, connection), [val]
+            try:
+                get_placeholder_sql = output_field.get_placeholder_sql
+            except AttributeError:
+                pass
+            else:
+                return get_placeholder_sql(val, compiler, connection)
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
