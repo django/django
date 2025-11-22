@@ -60,5 +60,5 @@ class EnumField(models.CharField):
 
 
 class OffByOneField(models.IntegerField):
-    def get_placeholder(self, value, compiler, connection):
-        return "(%s + 1)"
+    def get_placeholder_sql(self, value, compiler, connection):
+        return "(%s + %s)", (value, 1)

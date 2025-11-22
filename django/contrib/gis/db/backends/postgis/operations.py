@@ -298,7 +298,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value, compiler):
+    def get_geom_placeholder_sql(self, f, value, compiler):
         """
         Provide a proper substitution value for Geometries or rasters that are
         not in the SRID of the field. Specifically, this routine will
@@ -306,11 +306,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         transform_func = self.spatial_function_name("Transform")
         if hasattr(value, "as_sql"):
-            if value.field.srid == f.srid:
-                placeholder = "%s"
-            else:
-                placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
-            return placeholder
+            sql, params = compiler.compile(value)
+            if value.field.srid != f.srid:
+                sql = f"{transform_func}({sql}, %s)"
+                params = (*params, f.srid)
+            return sql, params
 
         # Get the srid for this object
         if value is None:
@@ -321,11 +321,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # Adding Transform() to the SQL placeholder if the value srid
         # is not equal to the field srid.
         if value_srid is None or value_srid == f.srid:
-            placeholder = "%s"
+            return "%s", (value,)
         else:
-            placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
-
-        return placeholder
+            return f"{transform_func}(%s, %s)", (value, f.srid)
 
     def _get_postgis_func(self, func):
         """

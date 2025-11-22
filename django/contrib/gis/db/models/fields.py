@@ -135,12 +135,12 @@ class BaseSpatialField(Field):
         """
         return get_srid_info(self.srid, connection).geodetic
 
-    def get_placeholder(self, value, compiler, connection):
+    def get_placeholder_sql(self, value, compiler, connection):
         """
         Return the placeholder for the spatial column for the
         given value.
         """
-        return connection.ops.get_geom_placeholder(self, value, compiler)
+        return connection.ops.get_geom_placeholder_sql(self, value, compiler)
 
     def get_srid(self, obj):
         """

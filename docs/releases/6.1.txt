@@ -356,6 +356,15 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+* The ``DatabaseOperations.binary_placeholder_sql()`` method now expects a
+  query compiler as an extra positional argument and should return a two
+  elements tuple composed of a SQL format string and a tuple of associated
+  parameters.
+
+* The ``BaseSpatialOperations.get_geom_placeholder()`` method is renamed to
+  ``get_geom_placeholder_sql`` and is expected to return a two elements tuple
+  composed of a SQL format string and a tuple of associated parameters.
+
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -423,6 +432,12 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The undocumented ``get_placeholder`` method of
+  :class:`~django.db.models.Field` is deprecated in favor of the newly
+  introduced ``get_placeholder_sql`` method which has the same input signature
+  but is expected to return a two elements tuple composed of a SQL format
+  string and a tuple of associated parameters.
 
 Features removed in 6.1
 =======================
