@@ -1142,6 +1142,14 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     that defaults to ``False``, producing a response with a 302 status code. If
     ``preserve_request`` is ``True``, the status code will be 307 instead.
 
+    .. versionchanged:: 6.1
+
+       ``max_length`` was added.
+
+    The constructor accepts an optional ``max_length`` keyword argument to
+    override the maximum allowed length for the redirect URL. You can set it
+    to ``None`` to disable the length check.
+
     See :class:`HttpResponse` for other optional constructor arguments.
 
     .. attribute:: HttpResponseRedirect.url
