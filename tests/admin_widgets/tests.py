@@ -401,7 +401,7 @@ class AdminDateWidgetTest(SimpleTestCase):
             '<p class="date">'
             '<input aria-describedby="id_test_timezone_warning_helptext" '
             'value="2007-12-01" type="text" class="vDateField" name="test" '
-            'size="10"></p>',
+            'size="10" data-first-day-of-week="0"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
@@ -410,7 +410,7 @@ class AdminDateWidgetTest(SimpleTestCase):
             '<p class="date">'
             '<input aria-describedby="id_test_timezone_warning_helptext" '
             'value="2007-12-01" type="text" class="myDateField" name="test" '
-            'size="20"></p>',
+            'size="20" data-first-day-of-week="0"></p>',
         )
 
 
@@ -443,8 +443,8 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             '<p class="datetime">'
             '<label for="id_test_0">Date:</label> '
             '<input aria-describedby="id_test_timezone_warning_helptext" '
-            'value="2007-12-01" type="text" class="vDateField" '
-            'name="test_0" size="10" id="id_test_0"><br>'
+            'value="2007-12-01" type="text" class="vDateField" name="test_0" '
+            'size="10" id="id_test_0" data-first-day-of-week="0"><br>'
             '<label for="id_test_1">Time:</label> '
             '<input aria-describedby="id_test_timezone_warning_helptext" '
             'value="09:30:00" type="text" class="vTimeField" '
@@ -462,7 +462,8 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
                 '<label for="id_test_0">Datum:</label> '
                 '<input aria-describedby="id_test_timezone_warning_helptext" '
                 'value="01.12.2007" type="text" '
-                'class="vDateField" name="test_0" size="10" id="id_test_0"><br>'
+                'class="vDateField" name="test_0" size="10" id="id_test_0" '
+                'data-first-day-of-week="1"><br>'
                 '<label for="id_test_1">Zeit:</label> '
                 '<input aria-describedby="id_test_timezone_warning_helptext" '
                 'value="09:30:00" type="text" class="vTimeField" '
