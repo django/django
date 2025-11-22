@@ -28,7 +28,11 @@ class SQLiteNumericMixin:
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
         try:
-            if self.output_field.get_internal_type() == "DecimalField":
+            if self.output_field.get_internal_type() == "DecimalField" and not getattr(
+                self, "contains_over_clause", False
+            ):
+                # IMPORTANT: Wrap CAST in parentheses so it works in
+                # DEFAULT/CHECK/other DDL contexts on SQLite.
                 sql = "(CAST(%s AS NUMERIC))" % sql
         except FieldError:
             pass
