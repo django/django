@@ -321,7 +321,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
+  durations expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~
