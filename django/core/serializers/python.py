@@ -74,13 +74,15 @@ class Serializer(base.Serializer):
                     return value.natural_key()
 
                 def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name).order_by(
+                    queryset = getattr(obj, field.name).order_by(
                         field.remote_field.model._meta.pk.name
                     )
                     chunk_size = (
-                        2000 if getattr(attr, "prefetch_cache_name", None) else None
+                        2000
+                        if getattr(queryset, "_prefetch_related_lookups", None)
+                        else None
                     )
-                    return attr.iterator(chunk_size)
+                    return queryset.iterator(chunk_size=chunk_size)
 
             else:
 
@@ -88,28 +90,19 @@ class Serializer(base.Serializer):
                     return self._value_from_field(value, value._meta.pk)
 
                 def queryset_iterator(obj, field):
-                    query_set = (
-                        getattr(obj, field.name)
-                        .order_by(field.remote_field.model._meta.pk.name)
-                        .select_related(None)
-                        .only("pk")
+                    queryset = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = (
+                        2000
+                        if getattr(queryset, "_prefetch_related_lookups", None)
+                        else None
                     )
-                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                    return query_set.iterator(chunk_size=chunk_size)
+                    return queryset.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
                 queryset_iterator(obj, field),
             )
-            m2m_list = [m2m_value(related) for related in m2m_iter]
-            # Ensure deterministic ordering for natural key M2M relations.
-
-            if m2m_list:
-                m2m_list = sorted(
-                m2m_list,
-                key=lambda nk: tuple(nk) if isinstance(nk, (list, tuple)) else nk,
-                 )
-            self._current[field.name] = m2m_list
+            self._current[field.name] = [m2m_value(related) for related in m2m_iter]
 
     def getvalue(self):
         return self.objects
