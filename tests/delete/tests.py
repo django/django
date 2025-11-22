@@ -40,10 +40,10 @@ from .models import (
     RProxy,
     S,
     SetDefaultDbModel,
+    SetNullDbModel,
     T,
     User,
     create_a,
-    create_related_db_option,
     get_default_r,
 )
 
@@ -81,10 +81,13 @@ class OnDeleteTests(TestCase):
         a = A.objects.get(pk=a.pk)
         self.assertIsNone(a.setnull)
 
+    @skipUnlessDBFeature("supports_on_delete_db_null")
     def test_db_setnull(self):
-        a = create_related_db_option("db_setnull")
+        a = SetNullDbModel.objects.create(
+            db_setnull=RelatedDbOptionParent.objects.create()
+        )
         a.db_setnull.delete()
-        a = RelatedDbOption.objects.get(pk=a.pk)
+        a = SetNullDbModel.objects.get(pk=a.pk)
         self.assertIsNone(a.db_setnull)
 
     def test_setdefault(self):
@@ -394,6 +397,7 @@ class DeletionTests(TestCase):
         self.assertNumQueries(5, s.delete)
         self.assertFalse(S.objects.exists())
 
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
     def test_db_cascade(self):
         related_db_op = RelatedDbOptionParent.objects.create(
             p=RelatedDbOptionGrandParent.objects.create()
