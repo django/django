@@ -145,7 +145,8 @@ The functions defined in this module share the following properties:
     Expects data in the format ``"DD HH:MM:SS.uuuuuu"``,
     ``"DD HH:MM:SS,uuuuuu"``,  or as specified by ISO 8601 (e.g.
     ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or PostgreSQL's
-    day-time interval format (e.g. ``3 days 04:05:06``).
+    day-time interval format (e.g. ``3 days 04:05:06``). Support for ISO 8601
+    excludes years and months.
 
 ``django.utils.decorators``
 ===========================
