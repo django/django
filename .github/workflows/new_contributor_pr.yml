@@ -3,12 +3,16 @@ name: New contributor message
 on:
   pull_request_target:
     types: [opened]
+    branches:
+      - main
 
 permissions:
   pull-requests: write
 
 jobs:
   build:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
     name: Hello new contributor
     runs-on: ubuntu-latest
     steps:

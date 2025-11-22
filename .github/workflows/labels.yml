@@ -3,6 +3,8 @@ name: Labels
 on:
   pull_request_target:
     types: [ edited, opened, reopened, ready_for_review ]
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: "Check title and manage labels"
         uses: actions/github-script@v8

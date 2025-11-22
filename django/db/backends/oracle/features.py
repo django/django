@@ -76,9 +76,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
-    supports_json_negative_indexing = False
     supports_collation_on_textfield = False
     supports_on_delete_db_default = False
+    supports_no_precision_decimalfield = True
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
@@ -89,6 +89,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
     )
+
+    @cached_property
+    def supports_json_negative_indexing(self):
+        return self.connection.oracle_version >= (21,)
 
     @cached_property
     def django_test_skips(self):

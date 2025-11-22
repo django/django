@@ -7,6 +7,7 @@ import warnings
 from collections import deque
 from collections.abc import Mapping
 from html.parser import HTMLParser
+from itertools import chain
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
 from django.conf import settings
@@ -76,8 +77,11 @@ _js_escapes = {
     ord("\u2029"): "\\u2029",
 }
 
-# Escape every ASCII character with a value less than 32.
-_js_escapes.update((ord("%c" % z), "\\u%04X" % z) for z in range(32))
+# Escape every ASCII character with a value less than 32 (C0), 127(C0),
+# or 128-159(C1).
+_js_escapes.update(
+    (ord("%c" % z), "\\u%04X" % z) for z in chain(range(32), range(0x7F, 0xA0))
+)
 
 
 @keep_lazy(SafeString)

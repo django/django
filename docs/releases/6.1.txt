@@ -228,7 +228,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Management commands now set :class:`~argparse.ArgumentParser`\'s
+  ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
+  suggestions for mistyped subcommand names and argument choices.
 
 Migrations
 ~~~~~~~~~~
@@ -246,6 +248,15 @@ Models
   top-level :class:`~django.db.models.JSONField` value, or querying for
   top-level or nested JSON ``null`` values. See
   :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
+* :attr:`DecimalField.max_digits <django.db.models.DecimalField.max_digits>`
+  and :attr:`DecimalField.decimal_places
+  <django.db.models.DecimalField.decimal_places>` are no longer required to be
+  set on Oracle, PostgreSQL, and SQLite.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
+  21c+.
 
 Pagination
 ~~~~~~~~~~
@@ -335,6 +346,12 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+System checks
+-------------
+
+* The :djadmin:`check` management command now supplies all ``databases`` if not
+  specified. Callers should be prepared for databases to be accessed.
 
 Dropped support for PostgreSQL 14
 ---------------------------------

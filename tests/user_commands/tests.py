@@ -1,5 +1,6 @@
 import os
 import sys
+import unittest
 from argparse import ArgumentDefaultsHelpFormatter
 from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
@@ -24,6 +25,7 @@ from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
+from django.utils.version import PY314, PY315
 
 from .management.commands import dance
 from .utils import AssertFormatterFailureCaughtContext
@@ -453,6 +455,20 @@ class CommandTests(SimpleTestCase):
             management.call_command("outputwrapper", stdout=out)
         self.assertIn("Working...", out.getvalue())
         self.assertIs(mocked_flush.called, True)
+
+    @unittest.skipUnless(PY314 and not PY315, "Only relevant for Python 3.14")
+    def test_suggest_on_error_defaults_true(self):
+        command = BaseCommand()
+        parser = command.create_parser("prog_name", "subcommand")
+        self.assertTrue(parser.suggest_on_error)
+
+    @unittest.skipUnless(PY314 and not PY315, "Only relevant for Python 3.14")
+    def test_suggest_on_error_explicit_false(self):
+        command = BaseCommand()
+        parser = command.create_parser(
+            "prog_name", "subcommand", suggest_on_error=False
+        )
+        self.assertFalse(parser.suggest_on_error)
 
 
 class CommandRunTests(AdminScriptTestCase):

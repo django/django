@@ -432,12 +432,15 @@ All code changes
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
-  guidelines? Are there any  ``black``, ``blacken-docs``, ``flake8``, or
-  ``isort`` errors? You can install the :ref:`pre-commit
+  guidelines? Are there any  ``black``, ``blacken-docs``, ``flake8``,
+  ``isort``, or ``zizmor`` errors? You can install the :ref:`pre-commit
   <coding-style-pre-commit>` hooks to automatically catch these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?
+* If there is a :ref:`code coverage report <code-coverage-on-pull-requests>`
+  comment on the pull request, have you reviewed the missing coverage in
+  context (considering database/platform-specific limitations)?
 * If the change affects the Django admin or rendered HTML output, has
   :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 

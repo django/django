@@ -2432,7 +2432,8 @@ are), and returns created objects as a list, in the same order as provided:
 
 This has a number of caveats though:
 
-* The model's ``save()`` method will not be called, and the ``pre_save`` and
+* The model's ``save()`` method :ref:`will not be called
+  <methods-not-called-on-bulk-operations>`, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
@@ -2513,7 +2514,8 @@ than iterating through the list of models and calling ``save()`` on each of
 them, but it has a few caveats:
 
 * You cannot update the model's primary key.
-* Each model's ``save()`` method isn't called, and the
+* Each model's ``save()`` method :ref:`isn't called
+  <methods-not-called-on-bulk-operations>`, and the
   :attr:`~django.db.models.signals.pre_save` and
   :attr:`~django.db.models.signals.post_save` signals aren't sent.
 * If updating a large number of columns in a large number of rows, the SQL
@@ -2999,7 +3001,8 @@ and calling ``save()``.
     such filter conditions on MySQL.
 
 Finally, realize that ``update()`` does an update at the SQL level and, thus,
-does not call any ``save()`` methods on your models, nor does it emit the
+method :ref:`does not call<methods-not-called-on-bulk-operations>` any
+``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
 calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
@@ -3072,13 +3075,13 @@ This cascade behavior is customizable via the
 :attr:`~django.db.models.ForeignKey.on_delete` argument to the
 :class:`~django.db.models.ForeignKey`.
 
-The ``delete()`` method does a bulk delete and does not call any ``delete()``
-methods on your models. It does, however, emit the
-:data:`~django.db.models.signals.pre_delete` and
-:data:`~django.db.models.signals.post_delete` signals for all deleted objects
-(including cascaded deletions). Signals won't be sent when ``DB_CASCADE`` is
-used. Also, ``delete()`` doesn't return information about objects deleted from
-database variants (``DB_*``) of the
+The ``delete()`` method does a bulk delete and :ref:`does not call
+<methods-not-called-on-bulk-operations>` any ``delete()`` methods on your
+models. It does, however, emit the :data:`~django.db.models.signals.pre_delete`
+and :data:`~django.db.models.signals.post_delete` signals for all deleted
+objects (including cascaded deletions). Signals won't be sent when
+``DB_CASCADE`` is used. Also, ``delete()`` doesn't return information about
+objects deleted from database variants (``DB_*``) of the
 :attr:`~django.db.models.ForeignKey.on_delete` argument, e.g. ``DB_CASCADE``.
 
 Django won’t need to fetch objects into memory when deleting them in the
