@@ -521,6 +521,13 @@ class MemSize(GeoFunc):
     arity = 1
 
 
+@BaseSpatialField.register_lookup
+class NumDimensions(GeoFuncMixin, Transform):
+    lookup_name = "num_dimensions"
+    output_field = IntegerField()
+    arity = 1
+
+
 class NumGeometries(GeoFunc):
     output_field = IntegerField()
     arity = 1
