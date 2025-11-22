@@ -298,6 +298,7 @@ input[type="submit"], button {
     .stacked ul.selector-chooser {
         padding: 0 2px;
         transform: none;
+        margin: 10px auto;
     }
 
     .stacked .selector-chooser li {
@@ -606,6 +607,7 @@ input[type="submit"], button {
         height: 30px;
         padding: 0 2px;
         transform: none;
+        margin: auto;
     }
 
     .selector ul.selector-chooser li {
