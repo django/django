@@ -74,7 +74,9 @@ class Serializer(base.Serializer):
                     return value.natural_key()
 
                 def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name)
+                    attr = getattr(obj, field.name).order_by(
+                        field.remote_field.model._meta.pk.name
+                    )
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
@@ -86,7 +88,12 @@ class Serializer(base.Serializer):
                     return self._value_from_field(value, value._meta.pk)
 
                 def queryset_iterator(obj, field):
-                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    query_set = (
+                        getattr(obj, field.name)
+                        .order_by(field.remote_field.model._meta.pk.name)
+                        .select_related(None)
+                        .only("pk")
+                    )
                     chunk_size = 2000 if query_set._prefetch_related_lookups else None
                     return query_set.iterator(chunk_size=chunk_size)
 
@@ -94,7 +101,15 @@ class Serializer(base.Serializer):
                 field.name,
                 queryset_iterator(obj, field),
             )
-            self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+            m2m_list = [m2m_value(related) for related in m2m_iter]
+            # Ensure deterministic ordering for natural key M2M relations.
+
+            if m2m_list:
+                m2m_list = sorted(
+                m2m_list,
+                key=lambda nk: tuple(nk) if isinstance(nk, (list, tuple)) else nk,
+                 )
+            self._current[field.name] = m2m_list
 
     def getvalue(self):
         return self.objects
