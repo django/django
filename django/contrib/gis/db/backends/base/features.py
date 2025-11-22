@@ -1,8 +1,9 @@
-import re
-
 from django.contrib.gis.db import models
+from django.utils.regex_helper import _lazy_re_compile
 
 from .operations import BaseSpatialOperations
+
+_has_function_re = _lazy_re_compile(r"has_(\w*)_function$")
 
 
 class BaseSpatialFeatures:
@@ -108,8 +109,7 @@ class BaseSpatialFeatures:
         return models.Union not in self.connection.ops.disallowed_aggregates
 
     def __getattr__(self, name):
-        m = re.match(r"has_(\w*)_function$", name)
-        if m:
+        if m := _has_function_re.match(name):
             func_name = m[1]
             if func_name not in BaseSpatialOperations.unsupported_functions:
                 raise ValueError(
