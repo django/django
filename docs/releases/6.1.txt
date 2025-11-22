@@ -349,6 +349,10 @@ Requests and Responses
 * :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
   can now be customized to use a different multipart parser class.
 
+* :class:`~django.http.HttpResponseRedirect` (and its subclasses), as well as
+  the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
+  parameter to override the default maximum URL length limit.
+
 Security
 ~~~~~~~~
 

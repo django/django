@@ -91,7 +91,7 @@ This example is equivalent to::
 ``redirect()``
 ==============
 
-.. function:: redirect(to, *args, permanent=False, preserve_request=False, **kwargs)
+.. function:: redirect(to, *args, permanent=False, preserve_request=False, max_length=MAX_URL_REDIRECT_LENGTH, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -124,6 +124,14 @@ This example is equivalent to::
    ``False``  ``True``         307
    ``True``   ``True``         308
    =========  ================ ================
+
+   An optional ``max_length`` keyword argument can be provided to override
+   the maximum allowed length for the redirect URL. Set it to ``None`` to
+   disable the length check.
+
+    .. versionchanged:: 6.1
+
+       ``max_length`` was added.
 
 Examples
 --------
