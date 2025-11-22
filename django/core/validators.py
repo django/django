@@ -27,16 +27,11 @@ class RegexValidator:
     def __init__(
         self, regex=None, message=None, code=None, inverse_match=None, flags=None
     ):
-        if regex is not None:
-            self.regex = regex
-        if message is not None:
-            self.message = message
-        if code is not None:
-            self.code = code
-        if inverse_match is not None:
-            self.inverse_match = inverse_match
-        if flags is not None:
-            self.flags = flags
+        if regex is not None: self.regex = regex
+        if message is not None: self.message = message
+        if code is not None: self.code = code
+        if inverse_match is not None: self.inverse_match = inverse_match
+        if flags is not None: self.flags = flags
         if self.flags and not isinstance(self.regex, str):
             raise TypeError(
                 "If the flags are set, regex must be a regular expression string."
@@ -196,12 +191,9 @@ class EmailValidator:
     domain_allowlist = ["localhost"]
 
     def __init__(self, message=None, code=None, allowlist=None):
-        if message is not None:
-            self.message = message
-        if code is not None:
-            self.code = code
-        if allowlist is not None:
-            self.domain_allowlist = allowlist
+        if message is not None: self.message = message
+        if code is not None: self.code = code
+        if allowlist is not None: self.domain_allowlist = allowlist
 
     def __call__(self, value):
         # The maximum length of an email is 320 characters per RFC 3696
@@ -550,15 +542,10 @@ class FileExtensionValidator:
 
     def __init__(self, allowed_extensions=None, message=None, code=None):
         if allowed_extensions is not None:
-            allowed_extensions = [
-                allowed_extension.lower() for allowed_extension in allowed_extensions
-            ]
+            allowed_extensions = [ext.lower() for ext in allowed_extensions]
         self.allowed_extensions = allowed_extensions
-        if message is not None:
-            self.message = message
-        if code is not None:
-            self.code = code
-
+        if message is not None: self.message = message
+        if code is not None: self.code = code
     def __call__(self, value):
         extension = Path(value.name).suffix[1:].lower()
         if (
@@ -608,10 +595,8 @@ class ProhibitNullCharactersValidator:
     code = "null_characters_not_allowed"
 
     def __init__(self, message=None, code=None):
-        if message is not None:
-            self.message = message
-        if code is not None:
-            self.code = code
+        if message is not None: self.message = message
+        if code is not None: self.code = code
 
     def __call__(self, value):
         if "\x00" in str(value):
