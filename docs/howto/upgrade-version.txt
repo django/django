@@ -12,6 +12,11 @@ version has several benefits:
 * Upgrading as each new Django release is available makes future upgrades less
   painful by keeping your code base up to date.
 
+.. admonition:: Tools to help with version upgrades
+
+    Django has a vibrant ecosystem. There are automated upgrade helpers
+    highlighted on the `Community Ecosystem`_ page.
+
 Here are some things to consider to help make your upgrade process as smooth as
 possible.
 
@@ -131,3 +136,5 @@ pickle-compatible across Django versions. A past instance of incompatibility
 was caching pickled :class:`~django.http.HttpResponse` objects, either directly
 or indirectly via the :func:`~django.views.decorators.cache.cache_page`
 decorator.
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#upgrade-utilities
