@@ -74,15 +74,23 @@ class Serializer(base.Serializer):
                     return value.natural_key()
 
                 def queryset_iterator(obj, field):
-                    queryset = getattr(obj, field.name).order_by(
-                        field.remote_field.model._meta.pk.name
-                    )
-                    chunk_size = (
-                        2000
-                        if getattr(queryset, "_prefetch_related_lookups", None)
-                        else None
-                    )
-                    return queryset.iterator(chunk_size=chunk_size)
+                    """
+                    Return a queryset for a many-to-many field with deterministic
+                    database-level ordering, regardless of whether the relation
+                    has been prefetched or not.
+                    """
+                    remote_model = field.remote_field.model
+                    manager = getattr(obj, field.name)
+
+                    # Use the database the object is bound to, if any.
+                    db = getattr(obj._state, "db", None)
+                    qs = manager.all()
+                    if db is not None:
+                        qs = qs.using(db)
+
+                    # Enforce a stable ordering at the DB level.
+                    return qs.order_by(remote_model._meta.pk.name)
+
 
             else:
 
@@ -90,13 +98,12 @@ class Serializer(base.Serializer):
                     return self._value_from_field(value, value._meta.pk)
 
                 def queryset_iterator(obj, field):
-                    queryset = getattr(obj, field.name).select_related(None).only("pk")
+                    rel = getattr(obj, field.name)
+                    qs = rel.select_related(None).only("pk")
                     chunk_size = (
-                        2000
-                        if getattr(queryset, "_prefetch_related_lookups", None)
-                        else None
+                        2000 if getattr(qs, "_prefetch_related_lookups", None) else None
                     )
-                    return queryset.iterator(chunk_size=chunk_size)
+                    return qs.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,

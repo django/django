@@ -136,7 +136,7 @@ class Serializer(base.Serializer):
             if self.use_natural_foreign_keys and hasattr(
                 field.remote_field.model, "natural_key"
             ):
-                # If the objects in the m2m have a natural key, use it
+
                 def handle_m2m(value):
                     natural = value.natural_key()
                     # Iterable natural keys are rolled out as subelements
@@ -148,15 +148,21 @@ class Serializer(base.Serializer):
                     self.xml.endElement("object")
 
                 def queryset_iterator(obj, field):
-                    queryset = getattr(obj, field.name).order_by(
-                        field.remote_field.model._meta.pk.name
-                    )
-                    chunk_size = (
-                        2000
-                        if getattr(queryset, "_prefetch_related_lookups", None)
-                        else None
-                    )
-                    return queryset.iterator(chunk_size=chunk_size)
+                    """
+                    Return a queryset for a many-to-many field with deterministic
+                    database-level ordering, regardless of whether the relation
+                    has been prefetched or not.
+                    """
+                    remote_model = field.remote_field.model
+                    manager = getattr(obj, field.name)
+
+                    db = getattr(obj._state, "db", None)
+                    qs = manager.all()
+                    if db is not None:
+                        qs = qs.using(db)
+
+                    return qs.order_by(remote_model._meta.pk.name)
+
 
             else:
 
@@ -164,14 +170,13 @@ class Serializer(base.Serializer):
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
-                    queryset = getattr(obj, field.name).select_related(None).only("pk")
+                    rel = getattr(obj, field.name)
+                    qs = rel.select_related(None).only("pk")
                     chunk_size = (
-                        2000
-                        if getattr(queryset, "_prefetch_related_lookups", None)
-                        else None
+                        2000 if getattr(qs, "_prefetch_related_lookups", None) else None
                     )
 
-                    return queryset.iterator(chunk_size=chunk_size)
+                    return qs.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
