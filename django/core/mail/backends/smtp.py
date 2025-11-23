@@ -11,6 +11,8 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import force_str, punycode
 from django.utils.functional import cached_property
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 class EmailBackend(BaseEmailBackend):
@@ -169,6 +171,14 @@ class EmailBackend(BaseEmailBackend):
         SMTPUTF8).
         """
         address = force_str(address)
+        # Reject CR/LF injection
+        if "\r" in address or "\n" in address:
+            raise ValueError("Invalid address")
+        # Reject addresses that contain '@' but have no domain part: e.g.: "to@", "@"
+        if "@" in address:
+            local, _, domain = address.partition("@")
+            if domain == "":
+                raise ValueError("Invalid address")
         parsed = AddressHeader.value_parser(address)
         defects = set(str(defect) for defect in parsed.all_defects)
         # Django allows local mailboxes like "From: webmaster" (#15042).
