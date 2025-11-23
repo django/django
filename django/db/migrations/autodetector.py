@@ -651,6 +651,13 @@ class MigrationAutodetector:
         )
         for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
+
+            referenced_base_fields = set()
+            for gf_name, gf in model_state.fields.items():
+                if getattr(gf, "generated", False) and getattr(gf, "expression", None) is not None:
+                    referenced_base_fields |= models.Q(
+                        gf.expression).referenced_base_fields
+
             # Gather related fields
             related_fields = {}
             primary_key_rel = None
@@ -660,6 +667,16 @@ class MigrationAutodetector:
                         if field.primary_key:
                             primary_key_rel = field.remote_field.model
                         elif not field.remote_field.parent_link:
+                            attname = None
+                            if hasattr(field, "get_attname"):
+                                attname = field.get_attname()
+                            if (
+                                field_name in referenced_base_fields
+                                or (attname is not None and attname in referenced_base_fields)
+                            ):
+                                # Keep this field inline in CreateModel so the
+                                # GeneratedField's expression can see it.
+                                continue
                             related_fields[field_name] = field
                     if getattr(field.remote_field, "through", None):
                         related_fields[field_name] = field
