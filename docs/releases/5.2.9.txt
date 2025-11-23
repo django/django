@@ -16,3 +16,7 @@ Bugfixes
 
 * Fixed a bug in Django 5.2 on PostgreSQL where ``bulk_create()`` did not apply
   a field's custom query placeholders (:ticket:`36748`).
+
+* Fixed a regression in Django 5.2.2 that caused a crash when using aggregate
+  functions with an empty ``Q`` filter over a queryset with annotations
+  (:ticket:`36751`).
