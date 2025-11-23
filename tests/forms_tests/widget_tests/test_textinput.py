@@ -1,5 +1,5 @@
 from django.forms import CharField, Form, TextInput
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from .base import WidgetTest
 
@@ -106,7 +106,7 @@ class TextInputTest(WidgetTest):
         )
 
     def test_attrs_safestring(self):
-        widget = TextInput(attrs={"onBlur": mark_safe("function('foo')")})
+        widget = TextInput(attrs={"onBlur": SafeString("function('foo')")})
         self.check_html(
             widget,
             "email",

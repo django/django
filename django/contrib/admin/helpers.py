@@ -20,7 +20,7 @@ from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
@@ -158,7 +158,7 @@ class Fieldline:
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe(
+        return SafeString(
             "\n".join(
                 self.form[f].errors.as_ul()
                 for f in self.fields
@@ -190,14 +190,14 @@ class AdminField:
         # checkboxes should not have a label suffix as the checkbox appears
         # to the left of the label.
         return self.field.label_tag(
-            contents=mark_safe(contents),
+            contents=SafeString(contents),
             attrs=attrs,
             label_suffix="" if self.is_checkbox else None,
             tag=tag,
         )
 
     def errors(self):
-        return mark_safe(self.field.errors.as_ul())
+        return SafeString(self.field.errors.as_ul())
 
 
 class AdminReadonlyField:

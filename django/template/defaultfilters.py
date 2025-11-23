@@ -17,7 +17,7 @@ from django.utils.html import avoid_wrapping, conditional_escape, escape, escape
 from django.utils.html import json_script as _json_script
 from django.utils.html import linebreaks, strip_tags
 from django.utils.html import urlize as _urlize
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeString
 from django.utils.text import Truncator, normalize_newlines, phone2numeric
 from django.utils.text import slugify as _slugify
 from django.utils.text import wrap
@@ -46,7 +46,7 @@ def stringfilter(func):
         first = str(first)
         result = func(first, *args, **kwargs)
         if isinstance(first, SafeData) and getattr(unwrap(func), "is_safe", False):
-            result = mark_safe(result)
+            result = SafeString(result)
         return result
 
     return _dec
@@ -182,7 +182,7 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p <= 0:
-        return mark_safe(
+        return SafeString(
             formats.number_format(
                 "%d" % (int(d)),
                 0,
@@ -210,7 +210,7 @@ def floatformat(text, arg=-1):
     if sign and rounded_d:
         digits.append("-")
     number = "".join(reversed(digits))
-    return mark_safe(
+    return SafeString(
         formats.number_format(
             number,
             abs(p),
@@ -241,7 +241,7 @@ def linenumbers(value, autoescape=True):
     else:
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, escape(line))
-    return mark_safe("\n".join(lines))
+    return SafeString("\n".join(lines))
 
 
 @register.filter(is_safe=True)
@@ -383,7 +383,7 @@ def urlencode(value, safe=None):
 @stringfilter
 def urlize(value, autoescape=True):
     """Convert URLs in plain text into clickable links."""
-    return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
+    return SafeString(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -395,7 +395,7 @@ def urlizetrunc(value, limit, autoescape=True):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(
+    return SafeString(
         _urlize(value, trim_url_limit=int(limit), nofollow=True, autoescape=autoescape)
     )
 
@@ -445,7 +445,7 @@ def cut(value, arg):
     safe = isinstance(value, SafeData)
     value = value.replace(arg, "")
     if safe and arg != ";":
-        return mark_safe(value)
+        return SafeString(value)
     return value
 
 
@@ -491,7 +491,7 @@ def linebreaks_filter(value, autoescape=True):
     followed by a blank line becomes a paragraph break (``</p>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
-    return mark_safe(linebreaks(value, autoescape))
+    return SafeString(linebreaks(value, autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -505,14 +505,14 @@ def linebreaksbr(value, autoescape=True):
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace("\n", "<br>"))
+    return SafeString(value.replace("\n", "<br>"))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def safe(value):
     """Mark the value as a string that should not be auto-escaped."""
-    return mark_safe(value)
+    return SafeString(value)
 
 
 @register.filter(is_safe=True)
@@ -522,7 +522,7 @@ def safeseq(value):
     individually, as safe, after converting them to strings. Return a list
     with the results.
     """
-    return [mark_safe(obj) for obj in value]
+    return [SafeString(obj) for obj in value]
 
 
 @register.filter(is_safe=True)
@@ -618,7 +618,7 @@ def join(value, arg, autoescape=True):
             data = arg.join(value)
     except TypeError:  # Fail silently if arg isn't iterable.
         return value
-    return mark_safe(data)
+    return SafeString(data)
 
 
 @register.filter(is_safe=True)
@@ -734,7 +734,7 @@ def unordered_list(value, autoescape=True):
             output.append("%s<li>%s%s</li>" % (indent, escaper(item), sublist))
         return "\n".join(output)
 
-    return mark_safe(list_formatter(value))
+    return SafeString(list_formatter(value))
 
 
 ###################

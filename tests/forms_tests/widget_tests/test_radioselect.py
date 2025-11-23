@@ -2,7 +2,7 @@ import datetime
 
 from django.forms import ChoiceField, Form, MultiWidget, RadioSelect, TextInput
 from django.test import override_settings
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from .test_choicewidget import ChoiceWidgetTest
 
@@ -256,7 +256,7 @@ class RadioSelectTest(ChoiceWidgetTest):
         self.check_html(widget, "num", 3, html=html)
 
     def test_choices_escaping(self):
-        choices = (("bad", "you & me"), ("good", mark_safe("you &gt; me")))
+        choices = (("bad", "you & me"), ("good", SafeString("you &gt; me")))
         html = """
         <div>
           <div>

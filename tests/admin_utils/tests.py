@@ -24,7 +24,7 @@ from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
 from django.utils.formats import localize
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from .models import (
     Article,
@@ -437,8 +437,8 @@ class UtilsTests(SimpleTestCase):
     def test_safestring_in_field_label(self):
         # safestring should not be escaped
         class MyForm(forms.Form):
-            text = forms.CharField(label=mark_safe("<i>text</i>"))
-            cb = forms.BooleanField(label=mark_safe("<i>cb</i>"))
+            text = forms.CharField(label=SafeString("<i>text</i>"))
+            cb = forms.BooleanField(label=SafeString("<i>cb</i>"))
 
         form = MyForm()
         self.assertHTMLEqual(

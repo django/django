@@ -1,7 +1,7 @@
 from django.template.defaultfilters import striptags
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -13,7 +13,7 @@ class StriptagsTests(SimpleTestCase):
             "striptags01",
             {
                 "a": "<a>x</a> <p><b>y</b></p>",
-                "b": mark_safe("<a>x</a> <p><b>y</b></p>"),
+                "b": SafeString("<a>x</a> <p><b>y</b></p>"),
             },
         )
         self.assertEqual(output, "x y x y")
@@ -31,7 +31,7 @@ class StriptagsTests(SimpleTestCase):
             "striptags02",
             {
                 "a": "<a>x</a> <p><b>y</b></p>",
-                "b": mark_safe("<a>x</a> <p><b>y</b></p>"),
+                "b": SafeString("<a>x</a> <p><b>y</b></p>"),
             },
         )
         self.assertEqual(output, "x y x y")

@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.forms.renderers import get_default_renderer
 from django.utils import timezone
 from django.utils.html import escape, format_html_join
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 
 
@@ -52,7 +52,7 @@ class RenderableMixin:
         renderer = renderer or self.renderer
         template = template_name or self.template_name
         context = context or self.get_context()
-        return mark_safe(renderer.render(template, context))
+        return SafeString(renderer.render(template, context))
 
     __str__ = render
     __html__ = render

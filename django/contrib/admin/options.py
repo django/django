@@ -57,7 +57,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.text import (
     capfirst,
     format_lazy,
@@ -376,9 +376,9 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Return the empty_value_display set on ModelAdmin or AdminSite.
         """
         try:
-            return mark_safe(self.empty_value_display)
+            return SafeString(self.empty_value_display)
         except AttributeError:
-            return mark_safe(self.admin_site.empty_value_display)
+            return SafeString(self.admin_site.empty_value_display)
 
     def get_exclude(self, request, obj=None):
         """

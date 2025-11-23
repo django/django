@@ -1,7 +1,7 @@
 from django.template.defaultfilters import linebreaks_filter
 from django.test import SimpleTestCase
 from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -15,7 +15,7 @@ class LinebreaksTests(SimpleTestCase):
     @setup({"linebreaks01": "{{ a|linebreaks }} {{ b|linebreaks }}"})
     def test_linebreaks01(self):
         output = self.engine.render_to_string(
-            "linebreaks01", {"a": "x&\ny", "b": mark_safe("x&\ny")}
+            "linebreaks01", {"a": "x&\ny", "b": SafeString("x&\ny")}
         )
         self.assertEqual(output, "<p>x&amp;<br>y</p> <p>x&<br>y</p>")
 
@@ -29,7 +29,7 @@ class LinebreaksTests(SimpleTestCase):
     )
     def test_linebreaks02(self):
         output = self.engine.render_to_string(
-            "linebreaks02", {"a": "x&\ny", "b": mark_safe("x&\ny")}
+            "linebreaks02", {"a": "x&\ny", "b": SafeString("x&\ny")}
         )
         self.assertEqual(output, "<p>x&<br>y</p> <p>x&<br>y</p>")
 

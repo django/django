@@ -15,7 +15,7 @@ from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.urls import path
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.views.decorators.common import no_append_slash
 
 from .forms import MediaActionForm
@@ -626,7 +626,7 @@ class PostAdmin(admin.ModelAdmin):
 
     @admin.display
     def multiline_html(self, instance):
-        return mark_safe("Multiline<br>\nhtml<br>\ncontent")
+        return SafeString("Multiline<br>\nhtml<br>\ncontent")
 
 
 class FieldOverridePostForm(forms.ModelForm):

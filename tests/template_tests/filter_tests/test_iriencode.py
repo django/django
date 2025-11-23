@@ -1,6 +1,6 @@
 from django.template.defaultfilters import iriencode, urlencode
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -25,7 +25,7 @@ class IriencodeTests(SimpleTestCase):
     @setup({"iriencode03": "{{ url|iriencode }}"})
     def test_iriencode03(self):
         output = self.engine.render_to_string(
-            "iriencode03", {"url": mark_safe("?test=1&me=2")}
+            "iriencode03", {"url": SafeString("?test=1&me=2")}
         )
         self.assertEqual(output, "?test=1&me=2")
 
@@ -34,7 +34,7 @@ class IriencodeTests(SimpleTestCase):
     )
     def test_iriencode04(self):
         output = self.engine.render_to_string(
-            "iriencode04", {"url": mark_safe("?test=1&me=2")}
+            "iriencode04", {"url": SafeString("?test=1&me=2")}
         )
         self.assertEqual(output, "?test=1&me=2")
 

@@ -1,6 +1,6 @@
 from django.template.defaultfilters import default
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -26,12 +26,12 @@ class DefaultTests(SimpleTestCase):
 
     @setup({"default03": '{{ a|default:"x<" }}'})
     def test_default03(self):
-        output = self.engine.render_to_string("default03", {"a": mark_safe("x>")})
+        output = self.engine.render_to_string("default03", {"a": SafeString("x>")})
         self.assertEqual(output, "x>")
 
     @setup({"default04": '{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}'})
     def test_default04(self):
-        output = self.engine.render_to_string("default04", {"a": mark_safe("x>")})
+        output = self.engine.render_to_string("default04", {"a": SafeString("x>")})
         self.assertEqual(output, "x>")
 
 

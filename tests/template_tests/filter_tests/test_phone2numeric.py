@@ -1,6 +1,6 @@
 from django.template.defaultfilters import phone2numeric_filter
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -10,7 +10,7 @@ class Phone2numericTests(SimpleTestCase):
     def test_phone2numeric01(self):
         output = self.engine.render_to_string(
             "phone2numeric01",
-            {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")},
+            {"a": "<1-800-call-me>", "b": SafeString("<1-800-call-me>")},
         )
         self.assertEqual(output, "&lt;1-800-2255-63&gt; <1-800-2255-63>")
 
@@ -25,7 +25,7 @@ class Phone2numericTests(SimpleTestCase):
     def test_phone2numeric02(self):
         output = self.engine.render_to_string(
             "phone2numeric02",
-            {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")},
+            {"a": "<1-800-call-me>", "b": SafeString("<1-800-call-me>")},
         )
         self.assertEqual(output, "<1-800-2255-63> <1-800-2255-63>")
 

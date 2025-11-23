@@ -1,6 +1,6 @@
 from django.template.defaultfilters import capfirst
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -16,14 +16,14 @@ class CapfirstTests(SimpleTestCase):
     )
     def test_capfirst01(self):
         output = self.engine.render_to_string(
-            "capfirst01", {"a": "fred>", "b": mark_safe("fred&gt;")}
+            "capfirst01", {"a": "fred>", "b": SafeString("fred&gt;")}
         )
         self.assertEqual(output, "Fred> Fred&gt;")
 
     @setup({"capfirst02": "{{ a|capfirst }} {{ b|capfirst }}"})
     def test_capfirst02(self):
         output = self.engine.render_to_string(
-            "capfirst02", {"a": "fred>", "b": mark_safe("fred&gt;")}
+            "capfirst02", {"a": "fred>", "b": SafeString("fred&gt;")}
         )
         self.assertEqual(output, "Fred&gt; Fred&gt;")
 

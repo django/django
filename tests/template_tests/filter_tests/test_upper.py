@@ -1,6 +1,6 @@
 from django.template.defaultfilters import upper
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -20,14 +20,14 @@ class UpperTests(SimpleTestCase):
     )
     def test_upper01(self):
         output = self.engine.render_to_string(
-            "upper01", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "upper01", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "A & B A &AMP; B")
 
     @setup({"upper02": "{{ a|upper }} {{ b|upper }}"})
     def test_upper02(self):
         output = self.engine.render_to_string(
-            "upper02", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "upper02", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "A &amp; B A &amp;AMP; B")
 
