@@ -63,7 +63,6 @@ class CodeNotFound(Exception):
     pass
 
 
-
 def module_name_to_file_path(module_name):
     # Avoid importlib machinery as locating a module involves importing its
     # parent, which would trigger import side effects.
@@ -95,8 +94,8 @@ def get_path_and_line(module, fullname, visited=None):
 
     if lineno is not None:
         return path, lineno
-    
-    # Try to resolve first part of fullname via imports if direct match 
+
+    # Try to resolve first part of fullname via imports if direct match
     # from above fails
     base = fullname.split(".", 1)[0]
 
@@ -135,9 +134,7 @@ def get_path_and_line(module, fullname, visited=None):
                 package=module,
             )
         except ImportError:
-            raise ImportError(
-                f"Could not import '{imported_path}' in '{module}'."
-            )
+            raise ImportError(f"Could not import '{imported_path}' in '{module}'.")
 
         return get_path_and_line(
             module=imported_module,
@@ -166,13 +163,11 @@ def get_path_and_line(module, fullname, visited=None):
             name=imported_path, package=module
         )
     except ImportError:
-        raise ImportError(
-            f"Could not import '{imported_path}' in '{module}'."
-        )
+        raise ImportError(f"Could not import '{imported_path}' in '{module}'.")
     try:
         return get_path_and_line(
-            module=imported_module, 
-            fullname=fullname, 
+            module=imported_module,
+            fullname=fullname,
             visited=visited,
         )
     except CodeNotFound:
@@ -182,7 +177,7 @@ def get_path_and_line(module, fullname, visited=None):
         first_element, remainder = fullname.rsplit(".", maxsplit=1)
         # Retrying, assuming the first element of the fullname is a module.
         return get_path_and_line(
-            module=f"{imported_module}.{first_element}", 
+            module=f"{imported_module}.{first_element}",
             fullname=remainder,
             visited=visited,
         )
