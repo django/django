@@ -357,21 +357,19 @@ def build_instance(Model, data, db):
     """
     default_manager = Model._meta.default_manager
     pk = data.get(Model._meta.pk.attname)
-    natural_key_method = getattr(Model, "natural_key", None)
     if (
         pk is None
         and hasattr(default_manager, "get_by_natural_key")
-        and callable(natural_key_method)
+        and hasattr(Model, "natural_key")
     ):
         obj = Model(**data)
         obj._state.db = db
         natural_key = obj.natural_key()
         if natural_key:
             try:
-                existing = default_manager.db_manager(db).get_by_natural_key(
-                    *natural_key
+                data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                    default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
                 )
-                data[Model._meta.pk.attname] = Model._meta.pk.to_python(existing.pk)
             except Model.DoesNotExist:
                 pass
     return Model(**data)
