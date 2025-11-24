@@ -219,7 +219,7 @@ class AppConfig:
             )
 
         # Entry is a path to an app config class.
-        return app_config_class(app_name, app_module)
+        return app
 
     def get_model(self, model_name, require_ready=True):
         """
