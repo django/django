@@ -209,3 +209,22 @@ class I:
             github_links.get_path_and_line(
                 module="tests.sphinx.testdata.package.import_error", fullname="Test"
             )
+
+    def test_code_locator_wildcard_import_without_module(self):
+        locator = github_links.CodeLocator.from_code(
+            """
+from . import *
+
+def some_function():
+    pass
+"""
+        )
+        self.assertEqual(locator.node_line_numbers, {"some_function": 4})
+        self.assertEqual(locator.import_locations, {})
+
+    def test_get_path_and_line_circular_import_protection(self):
+        with self.assertRaises(github_links.CodeNotFound):
+            github_links.get_path_and_line(
+                module="tests.sphinx.testdata.package.circular",
+                fullname="CircularObject",
+            )
