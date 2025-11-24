@@ -88,6 +88,17 @@ class FilteredAggregateTests(TestCase):
         agg = Count("pk", filter=Q())
         self.assertEqual(Author.objects.aggregate(count=agg)["count"], 3)
 
+    def test_empty_filtered_aggregates_with_annotation(self):
+        agg = Count("pk", filter=Q())
+        self.assertEqual(
+            Author.objects.annotate(
+                age_annotation=F("age"),
+            ).aggregate(
+                count=agg
+            )["count"],
+            3,
+        )
+
     def test_double_filtered_aggregates(self):
         agg = Sum("age", filter=Q(Q(name="test2") & ~Q(name="test")))
         self.assertEqual(Author.objects.aggregate(age=agg)["age"], 60)
