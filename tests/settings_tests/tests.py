@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
@@ -15,7 +16,7 @@ from django.test import (
     override_settings,
     signals,
 )
-from django.test.utils import requires_tz_support
+from django.test.utils import override_script_prefix, requires_tz_support
 from django.urls import clear_script_prefix, set_script_prefix
 
 
@@ -653,3 +654,24 @@ class MediaURLStaticURLPrefixTest(SimpleTestCase):
                             self.assertEqual(getattr(settings, setting), expected_path)
                         finally:
                             clear_script_prefix()
+
+    @override_settings(STATIC_URL="static/")
+    def test_static_url_correct_for_thread(self):
+        """
+        Checking the value of STATIC_URL should not interfere with
+        `set_script_prefix` and STATIC_URL in other threads
+
+        Regression test for #36653:
+        FORCE_SCRIPT_NAME is not respected for static URLs
+        """
+
+        def early_access():
+            "Mimics early settings access in Django lifecycle"
+            settings.STATIC_URL
+
+        thread = threading.Thread(target=early_access)
+        thread.start()
+        thread.join()
+
+        with override_script_prefix("forced/"):
+            self.assertEqual(settings.STATIC_URL, "forced/static/")
