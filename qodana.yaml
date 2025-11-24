@@ -1,10 +1,19 @@
 ####################################################################################################################
 # WARNING: Do not store sensitive information in this file, as its contents will be included in the Qodana report. #
 ####################################################################################################################
-
 version: "1.0"
-linter: jetbrains/qodana-python:2025.2
+linter: jetbrains/qodana-jvm:2025.2
 profile:
   name: qodana.recommended
 include:
   - name: CheckDependencyLicenses
+  - name: JvmCoverageInspection
+  - name: JvmLinesOfCodeInspection
+  - name: CheckThirdPartySoftwareList
+  - name: CheckModuleLicenses
+  - name: CssOverwrittenProperties
+  - name: EditorConfigShadowedOption
+  - name: EditorConfigShadowingOption
+  - name: FtlLanguageInspection
+  - name: CyclomaticComplexityInspection
+  - name: VulnerableLibrariesGlobal
