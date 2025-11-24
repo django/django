@@ -340,6 +340,8 @@ backends.
 
 * Support for GEOS 3.8 is removed.
 
+* Support for GDAL 3.1 and 3.2 is removed.
+
 :mod:`django.contrib.postgres`
 ------------------------------
 
