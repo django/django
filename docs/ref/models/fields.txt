@@ -1795,18 +1795,13 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     .. code-block:: pycon
 
-        >>> artist_one = Artist.objects.create(name="artist one")
-        >>> artist_two = Artist.objects.create(name="artist two")
-        >>> album_one = Album.objects.create(artist=artist_one)
-        >>> album_two = Album.objects.create(artist=artist_two)
-        >>> song_one = Song.objects.create(artist=artist_one, album=album_one)
-        >>> song_two = Song.objects.create(artist=artist_one, album=album_two)
-        >>> album_one.delete()
+        >>> artist = Artist.objects.create(name="artist one")
+        >>> album = Album.objects.create(artist=artist)
+        >>> song = Song.objects.create(artist=artist, album=album)
+        >>> album.delete()
         # Raises RestrictedError.
-        >>> artist_two.delete()
-        # Raises RestrictedError.
-        >>> artist_one.delete()
-        (4, {'Song': 2, 'Album': 1, 'Artist': 1})
+        >>> artist.delete()
+        (4, {"Album": 1, "Artist": 1, "Song": 1})
 
 * .. attribute:: SET_NULL
 
