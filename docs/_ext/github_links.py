@@ -38,6 +38,8 @@ class CodeLocator(ast.NodeVisitor):
                 continue
             if alias.name == "*":
                 # Resolve wildcard imports.
+                if node.module is None:
+                    continue
                 file = module_name_to_file_path(node.module)
                 file_contents = file.read_text(encoding="utf-8")
                 locator = CodeLocator.from_code(file_contents)
@@ -61,6 +63,7 @@ class CodeNotFound(Exception):
     pass
 
 
+
 def module_name_to_file_path(module_name):
     # Avoid importlib machinery as locating a module involves importing its
     # parent, which would trigger import side effects.
@@ -75,17 +78,74 @@ def module_name_to_file_path(module_name):
     raise CodeNotFound
 
 
-def get_path_and_line(module, fullname):
-    path = module_name_to_file_path(module_name=module)
+def get_path_and_line(module, fullname, visited=None):
+    if visited is None:
+        visited = set()
 
+    key = (module, fullname)
+    if key in visited:
+        raise CodeNotFound
+    visited.add(key)
+
+    path = module_name_to_file_path(module_name=module)
     locator = get_locator(path)
 
+    # Direct match for exact name keys
     lineno = locator.node_line_numbers.get(fullname)
 
     if lineno is not None:
         return path, lineno
+    
+    # Try to resolve first part of fullname via imports if direct match 
+    # from above fails
+    base = fullname.split(".", 1)[0]
 
-    imported_object = fullname.split(".", maxsplit=1)[0]
+    # If fullname looks like "other_module.MyClass" consider
+    # `base` as a submodule of `module` first.
+    if "." in fullname:
+        package = module.rsplit(".", 1)[0] if "." in module else module
+        possible_module = f"{package}.{base}"
+        try:
+            module_name_to_file_path(possible_module)
+        except CodeNotFound:
+            pass
+        else:
+            _, remainder = fullname.split(".", 1)
+            return get_path_and_line(
+                module=possible_module,
+                fullname=remainder,
+                visited=visited,
+            )
+
+    # Resolve `base` via imports in this file.
+    if base in locator.import_locations:
+        imported_path = locator.import_locations[base]
+
+        if "." in fullname:
+            new_fullname = fullname.split(".", 1)[1]
+        else:
+            new_fullname = fullname
+
+        if path.name != "__init__.py":
+            module = module.rsplit(".", 1)[0]
+
+        try:
+            imported_module = importlib.util.resolve_name(
+                name=imported_path,
+                package=module,
+            )
+        except ImportError:
+            raise ImportError(
+                f"Could not import '{imported_path}' in '{module}'."
+            )
+
+        return get_path_and_line(
+            module=imported_module,
+            fullname=new_fullname,
+            visited=visited,
+        )
+
+    imported_object = base
     try:
         imported_path = locator.import_locations[imported_object]
     except KeyError:
@@ -105,12 +165,16 @@ def get_path_and_line(module, fullname):
         imported_module = importlib.util.resolve_name(
             name=imported_path, package=module
         )
-    except ImportError as error:
+    except ImportError:
         raise ImportError(
             f"Could not import '{imported_path}' in '{module}'."
-        ) from error
+        )
     try:
-        return get_path_and_line(module=imported_module, fullname=fullname)
+        return get_path_and_line(
+            module=imported_module, 
+            fullname=fullname, 
+            visited=visited,
+        )
     except CodeNotFound:
         if "." not in fullname:
             raise
@@ -118,7 +182,9 @@ def get_path_and_line(module, fullname):
         first_element, remainder = fullname.rsplit(".", maxsplit=1)
         # Retrying, assuming the first element of the fullname is a module.
         return get_path_and_line(
-            module=f"{imported_module}.{first_element}", fullname=remainder
+            module=f"{imported_module}.{first_element}", 
+            fullname=remainder,
+            visited=visited,
         )
 
 
