@@ -35,9 +35,7 @@ class Serializer(base.Serializer):
     def get_dump_object(self, obj):
         data = {"model": str(obj._meta)}
 
-        pk_included = self._should_include_pk(obj)
-
-        if pk_included:
+        if self._should_include_pk(obj):
             data["pk"] = self._value_from_field(obj, obj._meta.pk)
 
         data["fields"] = self._current
@@ -56,42 +54,40 @@ class Serializer(base.Serializer):
         self._current[field.name] = self._value_from_field(obj, field)
 
     def handle_fk_field(self, obj, field):
-        if self.use_natural_foreign_keys:
-            natural_key_value = self._resolve_fk_natural_key(obj, field)
-            if natural_key_value is not None:
-                value = natural_key_value
-            else:
-                value = self._value_from_field(obj, field)
+        if natural_key_value := self._resolve_fk_natural_key(obj, field):
+            value = natural_key_value
         else:
             value = self._value_from_field(obj, field)
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
         if field.remote_field.through._meta.auto_created:
-            use_natural = (
-                self.use_natural_foreign_keys
-                and self._model_supports_natural_key(field.remote_field.model)
-            )
+            if self.use_natural_foreign_keys and hasattr(
+                field.remote_field.model, "natural_key"
+            ):
 
-            def m2m_value(value):
-                if use_natural:
+                def m2m_value(value):
                     natural_key_value = self._resolve_natural_key(value)
-                    if natural_key_value is not None:
-                        return natural_key_value
+                    if not natural_key_value:
+                        return self._value_from_field(value, value._meta.pk)
+                    return natural_key_value
 
-                return self._value_from_field(value, value._meta.pk)
-
-            def queryset_iterator(obj, field):
-                attr = getattr(obj, field.name)
-                if use_natural:
+                def queryset_iterator(obj, field):
+                    attr = getattr(obj, field.name)
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
                     return attr.iterator(chunk_size)
 
-                query_set = attr.select_related(None).only("pk")
-                chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                return query_set.iterator(chunk_size=chunk_size)
+            else:
+
+                def m2m_value(value):
+                    return self._value_from_field(value, value._meta.pk)
+
+                def queryset_iterator(obj, field):
+                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
+                    return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
