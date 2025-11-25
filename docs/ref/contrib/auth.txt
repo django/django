@@ -743,8 +743,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: AllowAllUsersRemoteUserBackend
 
     Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
-    users because :attr:`~AllowAllUsersRemoteUserBackend.user_can_authenticate` always
-    returns ``True``.
+    users because :attr:`~AllowAllUsersRemoteUserBackend.user_can_authenticate`
+    always returns ``True``.
 
     .. method:: user_can_authenticate()
 
