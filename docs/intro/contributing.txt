@@ -544,8 +544,10 @@ After committing the changes, send it to your fork on GitHub (substitute
     $ git push origin ticket_99999
 
 You can create a pull request by visiting the `Django GitHub page
-<https://github.com/django/django/>`_. You'll see your branch under "Your
-recently pushed branches". Click "Compare & pull request" next to it.
+<https://github.com/django/django/>`_. You should see your branch there.
+Click "Compare & pull request" next to it. Alternatively, you can create your
+pull request by calling the URL
+https://github.com/GITHUB_USERNAME/django/pull/new/BRANCH_NAME/.
 
 Please don't do it for this tutorial, but on the next page that displays a
 preview of the changes, you would click "Create pull request".
