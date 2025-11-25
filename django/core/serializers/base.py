@@ -244,13 +244,10 @@ class Serializer:
             return None
 
         natural_key_value = obj.natural_key()
-        if self._is_natural_key_opt_out(natural_key_value):
+        if not natural_key_value:
             return None
 
         return natural_key_value
-
-    def _is_natural_key_opt_out(self, natural_key_value):
-        return not natural_key_value or not isinstance(natural_key_value, tuple)
 
     def _model_supports_natural_key(self, model):
         """Return True if the model class exposes a callable natural_key()."""
