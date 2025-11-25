@@ -643,7 +643,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
 
-    .. method:: user_can_authenticate()
+    .. method:: user_can_authenticate(user)
 
         Returns whether the user is allowed to authenticate. To match the
         behavior of :meth:`.AuthenticationForm.confirm_login_allowed`, this
@@ -740,6 +740,12 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
+.. class:: AllowAllUsersRemoteUserBackend
+
+    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
+    users because :attr:`~AllowAllUsersRemoteUserBackend.user_can_authenticate` always
+    returns ``True``.
+
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. This method
@@ -747,12 +753,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         <django.contrib.auth.models.User.is_active>`. Custom user models that
         don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
         field are allowed.
-
-.. class:: AllowAllUsersRemoteUserBackend
-
-    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
-    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
-    returns ``True``.
 
 Utility functions
 =================
