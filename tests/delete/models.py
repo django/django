@@ -48,6 +48,9 @@ class RelatedDbOptionGrandParent(models.Model):
 class RelatedDbOptionParent(models.Model):
     p = models.ForeignKey(RelatedDbOptionGrandParent, models.DB_CASCADE, null=True)
 
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
 
 class CascadeDbModel(models.Model):
     name = models.CharField(max_length=30)
