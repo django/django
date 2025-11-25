@@ -1,7 +1,6 @@
 rules:
   dangerous-triggers:
     ignore:
-      - coverage.yml
       - labels.yml
       - new_contributor_pr.yml
   unpinned-uses:
