@@ -38,7 +38,8 @@ re_newlines = _lazy_re_compile(r"\r\n|\r")  # Used in normalize_newlines
 re_camel_case = _lazy_re_compile(r"(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))")
 # Pre-compile regex for slugify optimization
 _slugify_dash_space = _lazy_re_compile(r"[-\s]+")
-# Pre-compute translation table for slugify character removal (faster than regex)
+# Pre-compute translation table for slugify character removal
+# (faster than regex)
 _slugify_keep_chars = set(string.ascii_letters + string.digits + "_" + " " + "-")
 _slugify_remove_chars = str.maketrans(
     "", "", "".join(c for c in map(chr, range(128)) if c not in _slugify_keep_chars)
