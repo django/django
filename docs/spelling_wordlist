@@ -590,3 +590,8 @@ www
 xe
 xxxxx
 Zope
+BytesIO
+SpooledTemporaryFile
+bool
+__bool__
+filelike

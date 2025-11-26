@@ -18,11 +18,11 @@ The ``File`` class
 
     .. note::
 
-    When wrapping a file-like object that does not provide a ``name`` attribute
-    (for example, :class:`io.BytesIO`, :class:`io.StringIO`, or
-    :class:`tempfile.SpooledTemporaryFile` before it is written to disk), you
-    should supply a ``name`` keyword argument when constructing
-    :class:`django.core.files.base.File`.
+        When wrapping a file-like object that does not provide a ``name`` attribute
+        (for example, :class:`io.BytesIO`, :class:`io.StringIO`, or
+        :class:`tempfile.SpooledTemporaryFile` before it is written to disk), you
+        should supply a ``name`` keyword argument when constructing
+        :class:`django.core.files.base.File`.
 
     Django uses the file’s ``name`` attribute in :meth:`File.__bool__` to
     determine truthiness. If the underlying object has no ``name``, the wrapped
