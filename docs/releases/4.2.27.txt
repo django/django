@@ -10,4 +10,7 @@ with severity "moderate", and one bug in 4.2.26.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.2.26 where ``DisallowedRedirect`` was raised
+  by :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` for URLs longer than 2048
+  characters. The limit is now 16384 characters (:ticket:`36743`).
