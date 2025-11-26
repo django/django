@@ -16,6 +16,26 @@ The ``File`` class
     :term:`file object` with some Django-specific additions.
     Internally, Django uses this class when it needs to represent a file.
 
+    .. note::
+
+    When wrapping a file-like object that does not provide a ``name`` attribute
+    (for example, :class:`io.BytesIO`, :class:`io.StringIO`, or
+    :class:`tempfile.SpooledTemporaryFile` before it is written to disk), you
+    should supply a ``name`` keyword argument when constructing
+    :class:`django.core.files.base.File`.
+
+    Django uses the file’s ``name`` attribute in :meth:`File.__bool__` to
+    determine truthiness. If the underlying object has no ``name``, the wrapped
+    :class:`File` instance may evaluate to ``False`` in boolean contexts.
+
+    For example::
+
+        from io import BytesIO
+        from django.core.files.base import File
+
+        stream = BytesIO(b"example data")
+        uploaded = File(stream, name="memory-upload.bin")
+
     :class:`File` objects have the following attributes and methods:
 
     .. attribute:: name
