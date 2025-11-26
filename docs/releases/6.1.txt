@@ -500,6 +500,13 @@ Miscellaneous
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
 
+* The :class:`~django.core.files.File` class now always evaluates to ``True``
+  in boolean contexts, rather than relying on the ``name`` attribute. The
+  built-in subclasses ``FieldFile``, ``UploadedFile``,
+  ``TemporaryUploadedFile``, ``InMemoryUploadedFile``, and
+  ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
+  the ``name`` attribute.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1

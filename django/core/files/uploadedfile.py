@@ -45,6 +45,9 @@ class UploadedFile(File):
     def __repr__(self):
         return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
 
+    def __bool__(self):
+        return bool(self.name)
+
     def _get_name(self):
         return self._name
 
