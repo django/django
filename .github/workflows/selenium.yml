@@ -18,6 +18,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
     name: SQLite
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +44,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
     name: PostgreSQL
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:14-alpine

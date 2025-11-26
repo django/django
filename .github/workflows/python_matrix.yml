@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       python_versions_output: ${{ steps.set-matrix.outputs.python_versions }}
+    timeout-minutes: 60
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,6 +37,7 @@ jobs:
     strategy:
       matrix:
         python-version: ${{ fromJson(needs.define-matrix.outputs.python_versions_output) }}
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4

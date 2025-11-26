@@ -25,6 +25,7 @@ jobs:
         python-version:
           - '3.14'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,6 +46,7 @@ jobs:
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4

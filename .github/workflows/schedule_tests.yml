@@ -22,6 +22,7 @@ jobs:
           - '3.13'
           - '3.14'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
+    timeout-minutes: 60
     continue-on-error: true
     steps:
       - name: Checkout
@@ -43,6 +44,7 @@ jobs:
   pyc-only:
     runs-on: ubuntu-latest
     name: Byte-compiled Django with no source files (only .pyc files)
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,6 +73,7 @@ jobs:
   pypy-sqlite:
     runs-on: ubuntu-latest
     name: Ubuntu, SQLite, PyPy3.10
+    timeout-minutes: 60
     continue-on-error: true
     steps:
       - name: Checkout
@@ -94,6 +97,7 @@ jobs:
   pypy-postgresql:
     runs-on: ubuntu-latest
     name: Ubuntu, PostgreSQL, PyPy3.10
+    timeout-minutes: 60
     continue-on-error: true
     services:
       postgres:
@@ -219,6 +223,7 @@ jobs:
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
     name: PostgreSQL Versions
+    timeout-minutes: 60
     env:
       SERVER_SIDE_BINDING: ${{ matrix.server_side_bindings }}
     services:

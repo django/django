@@ -23,6 +23,7 @@ jobs:
   docs:
     runs-on: ubuntu-24.04
     name: docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +44,7 @@ jobs:
   blacken-docs:
     runs-on: ubuntu-latest
     name: blacken-docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
