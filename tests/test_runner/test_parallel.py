@@ -309,9 +309,8 @@ class ParallelTestSuiteTest(SimpleTestCase):
                 test_result.shouldStop = True
                 return (0, remote_result.events)
 
-            mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
-                next=fake_next
-            )
+            mock_imap = mock_pool.return_value.__enter__.return_value.imap_unordered
+            mock_imap.return_value = unittest.mock.Mock(next=fake_next)
             pts.run(test_result)
 
         self.assertIn("ValueError: woops", test_result.errors[0][1])
