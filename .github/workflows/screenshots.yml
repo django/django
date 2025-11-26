@@ -18,6 +18,7 @@ jobs:
     if: contains(join(github.event.pull_request.labels.*.name, '|'), 'screenshots')
     runs-on: ubuntu-latest
     name: Screenshots
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -15,6 +15,7 @@ jobs:
     if: github.repository == 'django/django'
     name: Hello new contributor
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/first-interaction@v1
         with:
