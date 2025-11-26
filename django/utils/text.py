@@ -1,6 +1,7 @@
 import gzip
 import re
 import secrets
+import string
 import textwrap
 import unicodedata
 from collections import deque
@@ -35,6 +36,13 @@ def capfirst(x):
 # Set up regular expressions
 re_newlines = _lazy_re_compile(r"\r\n|\r")  # Used in normalize_newlines
 re_camel_case = _lazy_re_compile(r"(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))")
+# Pre-compile regex for slugify optimization
+_slugify_dash_space = _lazy_re_compile(r"[-\s]+")
+# Pre-compute translation table for slugify character removal (faster than regex)
+_slugify_keep_chars = set(string.ascii_letters + string.digits + "_" + " " + "-")
+_slugify_remove_chars = str.maketrans(
+    "", "", "".join(c for c in map(chr, range(128)) if c not in _slugify_keep_chars)
+)
 
 
 @keep_lazy_text
@@ -482,8 +490,10 @@ def slugify(value, allow_unicode=False):
             .encode("ascii", "ignore")
             .decode("ascii")
         )
-    value = re.sub(r"[^\w\s-]", "", value.lower())
-    return re.sub(r"[-\s]+", "-", value).strip("-_")
+    # Use translate() for character removal - significantly faster than regex
+    # for strings with many special characters
+    value = value.lower().translate(_slugify_remove_chars)
+    return _slugify_dash_space.sub("-", value).strip("-_")
 
 
 def camel_case_to_spaces(value):
