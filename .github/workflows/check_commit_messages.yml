@@ -15,6 +15,7 @@ jobs:
   check-commit-prefix:
     if: startsWith(github.event.pull_request.base.ref, 'stable/')
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
