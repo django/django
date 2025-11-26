@@ -54,9 +54,7 @@ class Serializer(base.Serializer):
         self.indent(1)
         attrs = {"model": str(obj._meta)}
 
-        pk_included = self._should_include_pk(obj)
-
-        if pk_included:
+        if self._should_include_pk(obj):
             obj_pk = obj.pk
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
@@ -138,33 +136,37 @@ class Serializer(base.Serializer):
                 and self._model_supports_natural_key(field.remote_field.model)
             )
 
-            # If the objects in the m2m have a natural key, use it
-            def handle_m2m(value):
-                natural = self._resolve_natural_key(value) if use_natural else None
+            if use_natural:
+                # If the objects in the m2m have a natural key, use it
+                def handle_m2m(value):
+                    natural = self._resolve_natural_key(value)
+                    if not natural:
+                        self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+                        return
+                    # Iterable natural keys are rolled out as subelements
+                    self.xml.startElement("object", {})
+                    for key_value in natural:
+                        self.xml.startElement("natural", {})
+                        self.xml.characters(str(key_value))
+                        self.xml.endElement("natural")
+                    self.xml.endElement("object")
 
-                if not natural:
-                    self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
-                    return
-
-                # Iterable natural keys are rolled out as subelements
-                self.xml.startElement("object", {})
-                for key_value in natural:
-                    self.xml.startElement("natural", {})
-                    self.xml.characters(str(key_value))
-                    self.xml.endElement("natural")
-                self.xml.endElement("object")
-
-            def queryset_iterator(obj, field):
-                attr = getattr(obj, field.name)
-                if use_natural:
+                def queryset_iterator(obj, field):
+                    attr = getattr(obj, field.name)
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
                     return attr.iterator(chunk_size)
 
-                query_set = attr.select_related(None).only("pk")
-                chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                return query_set.iterator(chunk_size=chunk_size)
+            else:
+
+                def handle_m2m(value):
+                    self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+
+                def queryset_iterator(obj, field):
+                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
+                    return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
