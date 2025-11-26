@@ -25,10 +25,10 @@ from django.utils.translation import gettext_lazy, pgettext
 @keep_lazy_text
 def capfirst(x):
     """Capitalize the first letter of a string."""
-    if not x:
-        return x
     if not isinstance(x, str):
         x = str(x)
+    if not x:
+        return x
     return x[0].upper() + x[1:]
 
 
