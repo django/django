@@ -364,11 +364,14 @@ def build_instance(Model, data, db):
         natural_key = obj.natural_key()
         if natural_key:
             try:
-                data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                    default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+                existing = default_manager.db_manager(db).get_by_natural_key(
+                    *natural_key
                 )
             except Model.DoesNotExist:
                 pass
+            else:
+                data[Model._meta.pk.attname] = Model._meta.pk.to_python(existing.pk)
+
     return Model(**data)
 
 
