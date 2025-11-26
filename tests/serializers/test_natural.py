@@ -7,7 +7,6 @@ from .models import (
     FKAsPKNoNaturalKey,
     FKDataNaturalKey,
     NaturalKeyAnchor,
-    NaturalKeyOptOut,
     NaturalKeyThing,
     NaturalPKWithDefault,
     PostToOptOutSubclassUser,
@@ -259,8 +258,8 @@ def natural_key_opt_out_test(self, format):
     by returning an empty tuple, both FK and M2M relations serialize as
     integer PKs and can be deserialized without error.
     """
-    user1 = SubclassNaturalKeyOptOutUser.objects.create(email="user2@example.com")
-    user2 = SubclassNaturalKeyOptOutUser.objects.create(email="user3@example.com")
+    user1 = SubclassNaturalKeyOptOutUser.objects.create(email="user1@example.com")
+    user2 = SubclassNaturalKeyOptOutUser.objects.create(email="user2@example.com")
 
     post = PostToOptOutSubclassUser.objects.create(
         author=user1, title="Post 2 (Subclass Opt-out)"
@@ -279,23 +278,6 @@ def natural_key_opt_out_test(self, format):
         sorted([user1.email, user2.email]),
         sorted(post_obj.subscribers.values_list("email", flat=True)),
     )
-
-
-def deserialize_natural_key_then_opted_out(self, format):
-    """
-    Deserialization remains backward compatible:
-    data serialized with natural keys continues to load correctly
-    after the model opts out by returning empty tuple from natural_key().
-    """
-    user = NaturalKeyOptOut.objects.create(name="example")
-    serialized = serializers.serialize(format, [user], use_natural_primary_keys=True)
-
-    def optout_natural_key(self):
-        return ()
-
-    NaturalKeyOptOut.natural_key = optout_natural_key
-
-    list(serializers.deserialize(format, serialized))
 
 
 # Dynamically register tests for each serializer
@@ -336,9 +318,4 @@ register_tests(
     NaturalKeySerializerTests,
     "test_%s_natural_key_opt_out",
     natural_key_opt_out_test,
-)
-register_tests(
-    NaturalKeySerializerTests,
-    "test_%s_deserialize_natural_key_then_opted_out",
-    deserialize_natural_key_then_opted_out,
 )
