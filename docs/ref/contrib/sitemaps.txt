@@ -317,6 +317,22 @@ Note:
         :meth:`~Sitemap.get_languages_for_item` returns
         :attr:`~Sitemap.languages`.
 
+    .. method:: Sitemap._pagination_langs(item, lang_code)
+
+        **Optional.** A method that returns a dict for a given item
+        and lang_code, more specifically, it will verify what language the urls
+        are using. By default
+        :meth: `~Sitemap._pagination_langs` returns
+        :attr: `~Sitemap._get.
+
+    .. method:: Sitemap._verify_i18n_urls(item)
+        **Optional.** A method that returns a dict for a given item
+        in this case the urls will be verified and what languages the urls
+        are using. By default
+        :meth: `~Sitemap._verify_i18n_urls` returns
+        :attr: `dict`.
+
+
 Shortcuts
 =========
 
