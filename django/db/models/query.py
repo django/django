@@ -29,7 +29,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.query_utils import FilteredRelation, Q, class_or_instance_method
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -300,6 +300,8 @@ class FlatValuesListIterable(BaseIterable):
 class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
+    _initial_filter = None
+
     def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
         self._db = using
@@ -323,6 +325,8 @@ class QuerySet(AltersData):
             negate, args, kwargs = self._deferred_filter
             self._filter_or_exclude_inplace(negate, args, kwargs)
             self._deferred_filter = None
+        if self._initial_filter is not None:
+            self._query.add_q(self._initial_filter)
         return self._query
 
     @query.setter
@@ -1618,13 +1622,29 @@ class QuerySet(AltersData):
         """
         return self._chain()
 
-    def filter(self, *args, **kwargs):
+    def _class_filter(cls, *args, **kwargs):
+        if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(kwargs):
+            invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+            raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
+        initial_filter = Q(*args, **kwargs)
+        initial_filter_id = id(initial_filter)
+        class_name = f"{cls.__name__}WithFilter{initial_filter_id}"
+        return type(
+            class_name,
+            (cls,),
+            {"_initial_filter": initial_filter},
+        )
+
+    def _instance_filter(self, *args, **kwargs):
         """
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
         self._not_support_combined_queries("filter")
         return self._filter_or_exclude(False, args, kwargs)
+
+    filter = class_or_instance_method(_class_filter, _instance_filter)
+    _class_filter = classmethod(_class_filter)
 
     def exclude(self, *args, **kwargs):
         """
