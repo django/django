@@ -44,6 +44,8 @@ from .smartif import IfParser, Literal
 
 register = Library()
 
+_loopvars_re = re.compile(r" *, *")
+
 
 class AutoEscapeControlNode(Node):
     """Implement the actions of the autoescape tag."""
@@ -883,7 +885,7 @@ def do_for(parser, token):
         )
 
     invalid_chars = frozenset((" ", '"', "'", FILTER_SEPARATOR))
-    loopvars = re.split(r" *, *", " ".join(bits[1:in_index]))
+    loopvars = _loopvars_re.split(" ".join(bits[1:in_index]))
     for var in loopvars:
         if not var or not invalid_chars.isdisjoint(var):
             raise TemplateSyntaxError(

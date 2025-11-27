@@ -9,6 +9,9 @@ from django.db.backends.base.schema import (
 )
 from django.utils.duration import duration_iso_string
 
+_clob_re = re.compile("^N?CLOB")
+_varchar2_re = re.compile("^N?VARCHAR2")
+
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_column = "ALTER TABLE %(table)s ADD %(column)s %(definition)s"
@@ -127,10 +130,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
-        if re.match("^N?CLOB", old_type):
+        if _clob_re.match(old_type):
             new_value = "TO_CHAR(%s)" % new_value
             old_type = "VARCHAR2"
-        if re.match("^N?VARCHAR2", old_type):
+        if _varchar2_re.match(old_type):
             new_internal_type = new_field.get_internal_type()
             if new_internal_type == "DateField":
                 new_value = "TO_DATE(%s, 'YYYY-MM-DD')" % new_value
