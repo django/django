@@ -636,6 +636,20 @@ class CustomManagerTests(TestCase):
             lambda c: c.objects,
         )
 
+    def test_queryset_initial_filter(self):
+        self.assertSequenceEqual(Book.published_objects_from_qs.all(), [self.b1])
+        self.assertSequenceEqual(Book.not_published_objects_from_qs.all(), [self.b2])
+        self.assertSequenceEqual(Book.not_published_objects_q_from_qs.all(), [self.b2])
+        self.assertSequenceEqual(Book.published_objects_from_qs.authors_a(), [])
+        self.assertSequenceEqual(
+            Book.not_published_objects_from_qs.authors_a(), [self.b2]
+        )
+
+    def test_queryset_initial_filter_invalid_argument(self):
+        msg = "The following kwargs are invalid: '_connector', '_negated'"
+        with self.assertRaisesMessage(TypeError, msg):
+            models.QuerySet.filter(pk=1, _negated=True, _connector="evil")
+
 
 class TestCars(TestCase):
     def test_managers(self):
