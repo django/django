@@ -12,6 +12,7 @@ from django.db.models import NOT_PROVIDED, Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
+    DB_CASCADE,
     DB_SET_DEFAULT,
     DB_SET_NULL,
     DO_NOTHING,
@@ -1056,9 +1057,38 @@ class ForeignKey(ForeignObject):
             *self._check_unique(),
         ]
 
+    def _check_on_delete_db_support(self, on_delete, feature_flag, databases):
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if feature_flag in self.model._meta.required_db_features or getattr(
+                connection.features, feature_flag
+            ):
+                continue
+            no_db_option_name = on_delete.__name__.removeprefix("DB_")
+            yield checks.Error(
+                f"{connection.display_name} does not support a {on_delete.__name__}.",
+                hint=f"Change the on_delete rule to {no_db_option_name}.",
+                obj=self,
+                id="fields.E324",
+            )
+
     def _check_on_delete(self, databases):
         on_delete = getattr(self.remote_field, "on_delete", None)
         errors = []
+        if on_delete == DB_CASCADE:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_cascade", databases
+                )
+            )
+        if on_delete == DB_SET_NULL:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_null", databases
+                )
+            )
         if on_delete in [DB_SET_NULL, SET_NULL] and not self.null:
             errors.append(
                 checks.Error(
@@ -1092,25 +1122,12 @@ class ForeignKey(ForeignObject):
                         id="fields.E322",
                     )
                 )
-            for db in databases:
-                if not router.allow_migrate_model(db, self.model):
-                    continue
-                connection = connections[db]
-                if not (
-                    "supports_on_delete_db_default"
-                    in self.model._meta.required_db_features
-                    or connection.features.supports_on_delete_db_default
-                ):
-                    errors.append(
-                        checks.Error(
-                            f"{connection.display_name} does not support a "
-                            "DB_SET_DEFAULT.",
-                            hint="Change the on_delete rule to SET_DEFAULT.",
-                            obj=self,
-                            id="fields.E324",
-                        ),
-                    )
-        elif not isinstance(self.remote_field.model, str) and on_delete != DO_NOTHING:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_default", databases
+                )
+            )
+        if not isinstance(self.remote_field.model, str) and on_delete != DO_NOTHING:
             # Database and Python variants cannot be mixed in a chain of
             # model references.
             is_db_on_delete = isinstance(on_delete, DatabaseOnDelete)

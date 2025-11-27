@@ -11,14 +11,17 @@ jobs:
   Run_benchmarks:
     if: contains(github.event.pull_request.labels.*.name, 'benchmark')
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout Benchmark Repo
         uses: actions/checkout@v5
         with:
           repository: django/django-asv
           path: "."
+          persist-credentials: false
       - name: Setup Miniforge
-        uses: conda-incubator/setup-miniconda@v3
+        # Pinned to v3.2.0.
+        uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f
         with:
           miniforge-version: "24.1.2-0"
           activate-environment: asv-bench

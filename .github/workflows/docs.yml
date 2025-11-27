@@ -23,9 +23,12 @@ jobs:
   docs:
     runs-on: ubuntu-24.04
     name: spelling
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -41,9 +44,12 @@ jobs:
   blacken-docs:
     runs-on: ubuntu-latest
     name: blacken-docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -62,9 +68,12 @@ jobs:
   lint-docs:
     runs-on: ubuntu-latest
     name: lint-docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:

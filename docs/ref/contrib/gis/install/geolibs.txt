@@ -10,31 +10,28 @@ Geospatial libraries
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-==============================  ====================================  ================================  =======================================================
+==============================  ====================================  ================================  ===================================================
 Program                         Description                           Required                          Supported Versions
-==============================  ====================================  ================================  =======================================================
-:ref:`GEOS <geos-overview>`     Geometry Engine Open Source           Yes                               3.14, 3.13, 3.12, 3.11, 3.10, 3.9, 3.8
+==============================  ====================================  ================================  ===================================================
+:ref:`GEOS <geos-overview>`     Geometry Engine Open Source           Yes                               3.14, 3.13, 3.12, 3.11, 3.10, 3.9
 `PROJ`_                         Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x
-:ref:`GDAL <gdal-overview>`     Geospatial Data Abstraction Library   Yes                               3.11, 3.10, 3.9, 3.8, 3.7, 3.6, 3.5, 3.4, 3.3, 3.2, 3.1
+:ref:`GDAL <gdal-overview>`     Geospatial Data Abstraction Library   Yes                               3.12, 3.11, 3.10, 3.9, 3.8, 3.7, 3.6, 3.5, 3.4, 3.3
 :ref:`GeoIP <geoip2-overview>`  IP-based geolocation library          No                                2
 `PostGIS`__                     Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.6, 3.5, 3.4, 3.3, 3.2
 `SpatiaLite`__                  Spatial extensions for SQLite         Yes (SQLite only)                 5.1, 5.0, 4.3
-==============================  ====================================  ================================  =======================================================
+==============================  ====================================  ================================  ===================================================
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
 
 ..
     Libs release dates:
-    GEOS 3.8.0 2019-10-10
     GEOS 3.9.0 2020-12-14
     GEOS 3.10.0 2021-10-20
     GEOS 3.11.0 2022-07-01
     GEOS 3.12.0 2023-06-27
     GEOS 3.13.0 2024-09-06
     GEOS 3.14.0 2025-08-21
-    GDAL 3.1.0 2020-05-07
-    GDAL 3.2.0 2020-11-02
     GDAL 3.3.0 2021-05-03
     GDAL 3.4.0 2021-11-04
     GDAL 3.5.0 2022-05-13
@@ -44,6 +41,7 @@ totally fine with GeoDjango. Your mileage may vary.
     GDAL 3.9.0 2024-05-10
     GDAL 3.10.0 2024-11-06
     GDAL 3.11.0 2025-05-09
+    GDAL 3.12.0 2025-11-07
     PostGIS 3.2.0 2021-12-18
     PostGIS 3.3.0 2022-08-27
     PostGIS 3.4.0 2023-08-15
@@ -264,7 +262,7 @@ Finally, configure, make and install GDAL:
 
 .. code-block:: shell
 
-    $ cmake ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ cmake --build .
     $ sudo cmake --build . --target install
 

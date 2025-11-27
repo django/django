@@ -24,3 +24,7 @@ repos:
     rev: v9.36.0
     hooks:
       - id: eslint
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.16.3 
+    hooks:
+    - id: zizmor

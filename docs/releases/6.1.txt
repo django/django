@@ -118,6 +118,11 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   database function are now supported on SpatiaLite.
 
+* The new :lookup:`num_dimensions` lookup and :class:`NumDimensions()
+  <django.contrib.gis.db.models.functions.NumDimensions>` database function
+  allow filtering geometries by the number of dimensions on PostGIS and
+  SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -254,6 +259,10 @@ Models
   <django.db.models.DecimalField.decimal_places>` are no longer required to be
   set on Oracle, PostgreSQL, and SQLite.
 
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
+  21c+.
+
 Pagination
 ~~~~~~~~~~
 
@@ -333,6 +342,10 @@ backends.
 -------------------------
 
 * Support for PostGIS 3.1 is removed.
+
+* Support for GEOS 3.8 is removed.
+
+* Support for GDAL 3.1 and 3.2 is removed.
 
 :mod:`django.contrib.postgres`
 ------------------------------

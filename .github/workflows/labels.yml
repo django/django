@@ -3,6 +3,8 @@ name: Labels
 on:
   pull_request_target:
     types: [ edited, opened, reopened, ready_for_review ]
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,8 +19,11 @@ jobs:
     if: github.repository == 'django/django'
     name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: "Check title and manage labels"
         uses: actions/github-script@v8

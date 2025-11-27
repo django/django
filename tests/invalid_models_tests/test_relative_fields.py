@@ -2288,6 +2288,41 @@ class M2mThroughFieldsTests(SimpleTestCase):
 @isolate_apps("invalid_models_tests")
 class DatabaseLevelOnDeleteTests(TestCase):
 
+    def test_db_cascade_support(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_CASCADE)
+
+        field = Child._meta.get_field("parent")
+        expected = (
+            []
+            if connection.features.supports_on_delete_db_cascade
+            else [
+                Error(
+                    f"{connection.display_name} does not support a DB_CASCADE.",
+                    hint="Change the on_delete rule to CASCADE.",
+                    obj=field,
+                    id="fields.E324",
+                )
+            ]
+        )
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_cascade_required_db_features(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_CASCADE)
+
+            class Meta:
+                required_db_features = {"supports_on_delete_db_cascade"}
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
     def test_db_set_default_support(self):
         class Parent(models.Model):
             pass
@@ -2349,6 +2384,41 @@ class DatabaseLevelOnDeleteTests(TestCase):
             ],
         )
 
+    def test_db_set_null_support(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+        field = Child._meta.get_field("parent")
+        expected = (
+            []
+            if connection.features.supports_on_delete_db_null
+            else [
+                Error(
+                    f"{connection.display_name} does not support a DB_SET_NULL.",
+                    hint="Change the on_delete rule to SET_NULL.",
+                    obj=field,
+                    id="fields.E324",
+                )
+            ]
+        )
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_set_null_required_db_features(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+            class Meta:
+                required_db_features = {"supports_on_delete_db_null"}
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
     def test_python_db_chain(self):
         class GrandParent(models.Model):
             pass
@@ -2376,6 +2446,7 @@ class DatabaseLevelOnDeleteTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_on_delete_db_null")
     def test_db_python_chain(self):
         class GrandParent(models.Model):
             pass
@@ -2403,6 +2474,7 @@ class DatabaseLevelOnDeleteTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
     def test_db_python_chain_auto_created(self):
         class GrandParent(models.Model):
             pass
@@ -2430,6 +2502,7 @@ class DatabaseLevelOnDeleteTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_on_delete_db_null")
     def test_db_do_nothing_chain(self):
         class GrandParent(models.Model):
             pass
