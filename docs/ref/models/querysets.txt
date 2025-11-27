@@ -994,6 +994,48 @@ on the resulting ``QuerySet``. Further, databases place restrictions on
 what operations are allowed in the combined queries. For example, most
 databases don't allow ``LIMIT`` or ``OFFSET`` in the combined queries.
 
+If a ``union()`` of ``QuerySet``\s with custom ``Prefetch`` filters is
+created, then only the filters of the first ``Prefetch`` will be used in
+the prefetched results.
+
+.. code-block:: pycon
+
+    >>> qs1 = Restaurant.objects.filter(pk=1).prefetch_related(
+    ...     Prefetch("pizzas", queryset=Pizza.objects.filter(name="Deluxe"))
+    ... )
+    >>> qs2 = Restaurant.objects.filter(pk=2).prefetch_related(
+    ...     Prefetch("pizzas", queryset=Pizza.objects.filter(name="Hawaiian"))
+    ... )
+    >>> qs = qs1.union(qs2)
+    >>> qs[0].pizzas.all()
+    QuerySet [<Pizza: Deluxe>]
+    >>> qs[1].pizzas.all()
+    QuerySet []
+
+``qs[1].pizzas.all()`` will never include pizzas with the name ``Hawaiian``
+because the prefetch SQL query will include the filter
+``app_pizza.name = 'Deluxe'`` but not ``app_pizza.name = 'Hawaiian'``.
+
+If this filtering is required, consider combining the ``Prefetch`` filters
+into the first ``prefetch_related`` using ``Q`` objects instead.
+
+.. code-block:: pycon
+
+    >>> qs1 = Restaurant.objects.filter(pk=1).prefetch_related(
+    ...     Prefetch(
+    ...         "pizzas",
+    ...         queryset=Pizza.objects.filter(
+    ...             Q(retaurant__pk=1, name="Deluxe") | Q(restaurant__pk=2, name="Hawaiian")
+    ...         ),
+    ...     )
+    ... )
+    >>> qs2 = Restaurant.objects.filter(pk=2)
+    >>> qs = qs1.union(qs2)
+    >>> qs[0].pizzas.all()
+    QuerySet [<Pizza: Deluxe>]
+    >>> qs[1].pizzas.all()
+    QuerySet [<Pizza: Hawaiian>]
+
 ``intersection()``
 ~~~~~~~~~~~~~~~~~~
 
