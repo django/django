@@ -29,14 +29,14 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         self.assertIsNone(check_password({}, "unknown", ""))
 
         # Valid user with correct password
-        self.assertTrue(check_password({}, "test", "test"))
+        self.assertIs(check_password({}, "test", "test"), True)
+
+        # Valid user with incorrect password
+        self.assertIs(check_password({}, "test", "incorrect"), False)
 
         # correct password, but user is inactive
         User.objects.filter(username="test").update(is_active=False)
-        self.assertFalse(check_password({}, "test", "test"))
-
-        # Valid user with incorrect password
-        self.assertFalse(check_password({}, "test", "incorrect"))
+        self.assertIsNone(check_password({}, "test", "test"))
 
     @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")
     def test_check_password_custom_user(self):
@@ -53,10 +53,10 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         self.assertIsNone(check_password({}, "unknown", ""))
 
         # Valid user with correct password'
-        self.assertTrue(check_password({}, "test@example.com", "test"))
+        self.assertIs(check_password({}, "test@example.com", "test"), True)
 
         # Valid user with incorrect password
-        self.assertFalse(check_password({}, "test@example.com", "incorrect"))
+        self.assertIs(check_password({}, "test@example.com", "incorrect"), False)
 
     def test_groups_for_user(self):
         """

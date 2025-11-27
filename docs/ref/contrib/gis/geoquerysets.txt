@@ -425,6 +425,28 @@ Oracle      ``SDO_GEOMETRY.GET_GTYPE(geom)``
 SpatiaLite  ``GeometryType(geom)``
 ==========  ==========================
 
+.. fieldlookup:: num_dimensions
+
+``num_dimensions``
+------------------
+
+.. versionadded:: 6.1
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Returns the number of dimensions used by the geometry.
+
+Example::
+
+    Zipcode.objects.filter(geom__num_dimensions=3)
+
+===================  ==================
+Backend              SQL Equivalent
+===================  ==================
+PostGIS, SpatiaLite  ``ST_NDims(geom)``
+===================  ==================
+
 .. fieldlookup:: overlaps
 
 ``overlaps``

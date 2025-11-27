@@ -25,7 +25,7 @@ echo "Download checksum file ..."
 curl --fail --output "$CHECKSUM_FILE" "${MEDIA_URL_PREFIX}/pgp/${CHECKSUM_FILE}"
 
 echo "Verify checksum file ..."
-if [ -n "${GPG_KEY}" ] ; then
+if [ -n "${GPG_KEY:-}" ] ; then
     gpg --recv-keys "${GPG_KEY}"
 fi
 gpg --verify "${CHECKSUM_FILE}"

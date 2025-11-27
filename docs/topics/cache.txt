@@ -188,7 +188,7 @@ To use Redis as your cache backend with Django:
 * Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
   instance, using the appropriate scheme. See the ``redis-py`` docs for
   `details on the available schemes
-  <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`__.
+  <https://redis.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`__.
 
 For example, if Redis is running on localhost (127.0.0.1) port 6379::
 
