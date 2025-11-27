@@ -140,6 +140,11 @@ class FunPerson(models.Model):
     objects = FunPeopleManager()
 
 
+class BookQuerySet(models.QuerySet):
+    def authors_a(self):
+        return self.filter(author__istartswith="a")
+
+
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
@@ -159,6 +164,12 @@ class Book(models.Model):
 
     published_objects = PublishedBookManager()
     annotated_objects = AnnotatedBookManager()
+    # Custom querysets with initial filters.
+    published_objects_from_qs = BookQuerySet.filter(is_published=True).as_manager()
+    not_published_objects_from_qs = BookQuerySet.filter(is_published=False).as_manager()
+    not_published_objects_q_from_qs = models.QuerySet.filter(
+        ~models.Q(is_published=True)
+    ).as_manager()
 
     class Meta:
         base_manager_name = "annotated_objects"

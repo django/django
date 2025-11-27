@@ -1,6 +1,7 @@
 import copy
 import inspect
-from functools import wraps
+import types
+from functools import partial, wraps
 from importlib import import_module
 
 from django.db import router
@@ -90,7 +91,8 @@ class BaseManager:
 
         new_methods = {}
         for name, method in inspect.getmembers(
-            queryset_class, predicate=inspect.isfunction
+            queryset_class,
+            predicate=lambda member: isinstance(member, (types.FunctionType, partial)),
         ):
             # Only copy missing methods.
             if hasattr(cls, name):
