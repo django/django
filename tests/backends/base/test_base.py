@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.base.operations import BaseDatabaseOperations
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -437,34 +436,3 @@ class MultiDatabaseTests(TestCase):
                             len(mocked_check_database_version_supported.mock_calls),
                             after_first_calls,
                         )
-
-
-class DummyCursor:
-    def __init__(self, statement=None):
-        self.statement = statement
-
-
-class DummyConnection:
-    vendor = "sqlite"
-    alias = "default"
-    features = MagicMock()
-    settings_dict = {}
-
-    def __init__(self):
-        self.ops = DummyBackendOperations(self)
-        self.queries_log = []
-
-
-class DummyBackendOperations(BaseDatabaseOperations):
-    """
-    Simulates a backend with the fallback behavior implemented in the patch:
-    - If cursor.statement is truthy, return it.
-    - If cursor.statement is None, fallback to the base implementation.
-    """
-
-    def __init__(self, connection):
-        super().__init__(connection)
-
-    def last_executed_query(self, cursor, sql, params):
-        statement = getattr(cursor, "statement", None)
-        return statement or super().last_executed_query(cursor, sql, params)
