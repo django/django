@@ -1627,6 +1627,9 @@ class QuerySet(AltersData):
             invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
             raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         initial_filter = Q(*args, **kwargs)
+        # Chain initial filters.
+        if cls._initial_filter is not None:
+            initial_filter = cls._initial_filter & initial_filter
         initial_filter_id = id(initial_filter)
         class_name = f"{cls.__name__}WithFilter{initial_filter_id}"
         return type(
