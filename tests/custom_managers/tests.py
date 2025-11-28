@@ -661,10 +661,13 @@ class CustomManagerTests(TestCase):
         objects_published = models.QuerySet.filter(published=True)
         objects_published_title_a = objects_published.filter(title__istartswith="A")
         self.assertEqual(objects_published._initial_filter, models.Q(published=True))
+        self.assertTrue(issubclass(objects_published, models.QuerySet))
         self.assertEqual(
             objects_published_title_a._initial_filter,
             models.Q(published=True) & models.Q(title__istartswith="A"),
         )
+        self.assertTrue(issubclass(objects_published, models.QuerySet))
+        self.assertFalse(issubclass(objects_published_title_a, objects_published))
 
 
 class TestCars(TestCase):

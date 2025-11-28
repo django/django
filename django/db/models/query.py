@@ -1630,11 +1630,14 @@ class QuerySet(AltersData):
         # Chain initial filters.
         if cls._initial_filter is not None:
             initial_filter = cls._initial_filter & initial_filter
-        initial_filter_id = id(initial_filter)
-        class_name = f"{cls.__name__}WithFilter{initial_filter_id}"
+            bases = cls.__bases__
+            class_name = cls.__name__
+        else:
+            bases = (cls,)
+            class_name = f"{cls.__name__}WithFilter"
         return type(
             class_name,
-            (cls,),
+            bases,
             {"_initial_filter": initial_filter},
         )
 
