@@ -637,18 +637,34 @@ class CustomManagerTests(TestCase):
         )
 
     def test_queryset_initial_filter(self):
-        self.assertSequenceEqual(Book.published_objects_from_qs.all(), [self.b1])
+        b3 = Book.published_objects.create(
+            title="The Dark Tower: The Gunslinger",
+            author="Stephen King",
+            is_published=True,
+        )
+
+        self.assertCountEqual(Book.published_objects_from_qs.all(), [self.b1, b3])
         self.assertSequenceEqual(Book.not_published_objects_from_qs.all(), [self.b2])
         self.assertSequenceEqual(Book.not_published_objects_q_from_qs.all(), [self.b2])
         self.assertSequenceEqual(Book.published_objects_from_qs.authors_a(), [])
         self.assertSequenceEqual(
             Book.not_published_objects_from_qs.authors_a(), [self.b2]
         )
+        self.assertSequenceEqual(Book.published_title_t_objects.all(), [b3])
 
     def test_queryset_initial_filter_invalid_argument(self):
         msg = "The following kwargs are invalid: '_connector', '_negated'"
         with self.assertRaisesMessage(TypeError, msg):
             models.QuerySet.filter(pk=1, _negated=True, _connector="evil")
+
+    def test_queryset_initial_filter_chained(self):
+        objects_published = models.QuerySet.filter(published=True)
+        objects_published_title_a = objects_published.filter(title__istartswith="A")
+        self.assertEqual(objects_published._initial_filter, models.Q(published=True))
+        self.assertEqual(
+            objects_published_title_a._initial_filter,
+            models.Q(published=True) & models.Q(title__istartswith="A"),
+        )
 
 
 class TestCars(TestCase):
