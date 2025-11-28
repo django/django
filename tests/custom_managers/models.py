@@ -170,6 +170,12 @@ class Book(models.Model):
     not_published_objects_q_from_qs = models.QuerySet.filter(
         ~models.Q(is_published=True)
     ).as_manager()
+    # Chain initial filters
+    published_title_t_objects = (
+        BookQuerySet.filter(is_published=True)
+        .filter(title__istartswith="T")
+        .as_manager()
+    )
 
     class Meta:
         base_manager_name = "annotated_objects"
