@@ -1630,16 +1630,24 @@ class QuerySet(AltersData):
         # Chain initial filters.
         if cls._initial_filter is not None:
             initial_filter = cls._initial_filter & initial_filter
-            bases = cls.__bases__
-            class_name = cls.__name__
+            base_class = cls.__bases__[0]
         else:
-            bases = (cls,)
-            class_name = f"{cls.__name__}WithFilter"
-        return type(
-            class_name,
-            bases,
-            {"_initial_filter": initial_filter},
+            base_class = cls
+
+        initial_filter_id = id(initial_filter)
+        name = f"{base_class.__name__}WithFilter{initial_filter_id}"
+        new_filter_class = type(
+            name,
+            (base_class,),
+            {
+                "_initial_filter": initial_filter,
+                "__module__": base_class.__module__,
+                "__qualname__": f"{base_class.__qualname__}.{name}",
+            },
         )
+        # Add new class to the QuerySet class to make it pickleable.
+        setattr(base_class, name, new_filter_class)
+        return new_filter_class
 
     def _instance_filter(self, *args, **kwargs):
         """
