@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.models import User
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils.timezone import make_aware
 
 from .admin import EventAdmin
@@ -95,3 +95,11 @@ class DateHierarchyTests(TestCase):
                 self.assertRaises(IncorrectLookupParameters),
             ):
                 self.assertDateParams(invalid_query, None, None)
+
+    @override_settings(ROOT_URLCONF="admin_changelist.urls")
+    def test_label_in_hierarchy(self):
+        self.client.force_login(self.superuser)
+        Event.objects.create(date=datetime(2017, 1, 1))
+        response = self.client.get("/admin/admin_changelist/event/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Filter by")
