@@ -58,6 +58,7 @@ from enum import Enum
 from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
+from django.utils.inspect import lazy_annotations
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
@@ -760,7 +761,8 @@ class FilterExpression:
         # Check to see if a decorator is providing the real function.
         func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
+        with lazy_annotations():
+            args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many

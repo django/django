@@ -3,6 +3,8 @@ Testing some internals of the template processing.
 These are *not* examples to be copied in user code.
 """
 
+import unittest
+
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     FilterExpression,
@@ -14,6 +16,7 @@ from django.template.base import (
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
+from django.utils.version import PY314
 
 
 class ParserTests(SimpleTestCase):
@@ -148,3 +151,17 @@ class ParserTests(SimpleTestCase):
             '1|two_one_opt_arg:"1"',
         ):
             FilterExpression(expr, parser)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_filter_deferred_annotation(self):
+        register = Library()
+
+        @register.filter("example")
+        def example_filter(value: str, arg: SomeType):  # NOQA: F821
+            return f"{value}_{arg}"
+
+        result = FilterExpression.args_check(
+            "example", example_filter, ["extra_example"]
+        )
+
+        self.assertIs(result, True)
