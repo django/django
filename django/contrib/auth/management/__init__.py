@@ -121,8 +121,6 @@ class RenamePermission(migrations.RunPython):
 
     def _rename(self, apps, schema_editor, old_model, new_model):
         ContentType = apps.get_model("contenttypes", "ContentType")
-        # Use the live Permission model instead of the frozen one, since frozen
-        # models do not retain foreign key constraints.
         from django.contrib.auth.models import Permission
 
         db = schema_editor.connection.alias
@@ -138,14 +136,51 @@ class RenamePermission(migrations.RunPython):
             new_codename = f"{prefix}_{new_model.lower()}"
             new_name = f"Can {prefix} {default_verbose_name}"
 
-            if permission.codename != new_codename or permission.name != new_name:
-                permission.codename = new_codename
-                permission.name = new_name
-                try:
-                    with transaction.atomic(using=db):
-                        permission.save(update_fields={"name", "codename"})
-                except IntegrityError:
-                    pass
+            if permission.codename == new_codename and permission.name == new_name:
+                continue
+
+            try:
+                ct = ContentType.objects.using(db).get(
+                    app_label=self.app_label, model=new_model.lower()
+                )
+            except ContentType.DoesNotExist:
+                ct = permission.content_type
+
+            permission.codename = new_codename
+            permission.name = new_name
+
+            try:
+                with transaction.atomic(using=db):
+                    permission.save(update_fields={"name", "codename"})
+            except IntegrityError:
+                duplicate = Permission.objects.using(db).get(
+                    content_type=ct, codename=new_codename
+                )
+                if duplicate.pk != permission.pk:
+                    self._override_permissions(duplicate, permission, db)
+                    duplicate.delete(using=db)
+                    permission.save(update_fields={"codename", "name"})
+
+    def _override_permissions(self, from_perm, to_perm, db_alias):
+        """
+        Replace all user and group assignments on `to_perm`
+        with assignments from `from_perm`.
+        """
+        # Clear existing assignments
+        to_perm.user_set.through.objects.using(db_alias).filter(
+            permission=to_perm
+        ).delete()
+        to_perm.group_set.through.objects.using(db_alias).filter(
+            permission=to_perm
+        ).delete()
+
+        from_perm.user_set.through.objects.using(db_alias).filter(
+            permission=from_perm
+        ).update(permission=to_perm)
+
+        from_perm.group_set.through.objects.using(db_alias).filter(
+            permission=from_perm
+        ).update(permission=to_perm)
 
     def rename_forward(self, apps, schema_editor):
         self._rename(apps, schema_editor, self.old_model, self.new_model)
