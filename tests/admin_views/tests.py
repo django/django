@@ -7397,9 +7397,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         collector = Collector.objects.create(pk=100, name="Test Collector")
         # Create an inline object with a char pk.
-        doohickey = DooHickey.objects.create(
-            code="DH001", owner=collector, name="Test DooHickey"
-        )
+        DooHickey.objects.create(code="DH001", owner=collector, name="Test DooHickey")
         url = reverse("admin:admin_views_collector_change", args=(collector.pk,))
         response = self.client.get(url)
         # The existing inline's pk should be displayed as readonly.
