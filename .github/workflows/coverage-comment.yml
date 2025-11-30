@@ -1,0 +1,104 @@
+name: Coverage Comment
+
+on:
+  workflow_run:
+    workflows: ["Coverage Tests"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.repository == 'django/django'
+    name: Post Coverage Comment
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository  
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-data-${{ github.event.workflow_run.pull_requests[0].number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download PR number
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-number-${{ github.event.workflow_run.pull_requests[0].number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Read PR number
+        id: pr-metadata
+        run: |
+          $pr_number = Get-Content pr_number.txt
+          echo "pr_number=$pr_number" >> $env:GITHUB_OUTPUT
+
+      - name: Run diff-cover
+        if: success()
+        run: |
+          if (Test-Path 'coverage.xml') {
+            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 > diff-cover-report.md
+          } else {
+            Set-Content -Path diff-cover-report.md -Value 'No coverage.xml found; skipping diff-cover.'
+          }
+
+      - name: Post/update PR comment
+        env:
+          PR_NUMBER: ${{ steps.pr-metadata.outputs.pr_number }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'diff-cover-report.md';
+            let body = 'No coverage data available.';
+            if (fs.existsSync(reportPath)) {
+              body = fs.readFileSync(reportPath, 'utf8');
+            }
+            const commentBody = '### 📊 Coverage Report for Changed Files\n\n```\n' + body + '\n```\n\n**Note:** Missing lines are warnings only. Some lines may not be covered by SQLite tests as they are database-specific.\n\nFor more information about code coverage on pull requests, see the [contributing documentation](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests).';
+
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            for (const c of comments) {
+              if ((c.body || '').includes('📊 Coverage Report for Changed Files')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody,
+            });
+            
