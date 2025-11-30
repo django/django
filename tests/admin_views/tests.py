@@ -7363,6 +7363,50 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             response = self.client.get(url)
         self.assertContains(response, "<label>Toppings\u00a0:</label>", html=True)
 
+    def test_pk_is_readonly_on_edit(self):
+        """
+        Primary key fields are automatically readonly when editing existing
+        objects (refs #2259).
+        """
+        # Create an object with a string primary key.
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk="test_pk")
+        url = reverse(
+            "admin:admin_views_modelwithstringprimarykey_change", args=(obj.pk,)
+        )
+        response = self.client.get(url)
+        # The pk field should be displayed as readonly.
+        self.assertContains(response, '<div class="readonly">test_pk</div>', html=True)
+        # No input field for the pk.
+        self.assertNotContains(response, 'name="string_pk"')
+
+    def test_pk_is_editable_on_add(self):
+        """
+        Primary key fields are editable when adding new objects.
+        """
+        url = reverse("admin:admin_views_modelwithstringprimarykey_add")
+        response = self.client.get(url)
+        # The pk field should be an editable input.
+        self.assertContains(response, 'name="string_pk"')
+        # Not displayed as a readonly div (readonly fields use this format).
+        self.assertNotContains(response, '<div class="readonly">')
+
+    def test_inline_pk_is_readonly_for_existing_objects(self):
+        """
+        Inline primary key fields are readonly for existing inline objects but
+        editable for new ones (refs #2259).
+        """
+        collector = Collector.objects.create(pk=100, name="Test Collector")
+        # Create an inline object with a char pk.
+        doohickey = DooHickey.objects.create(
+            code="DH001", owner=collector, name="Test DooHickey"
+        )
+        url = reverse("admin:admin_views_collector_change", args=(collector.pk,))
+        response = self.client.get(url)
+        # The existing inline's pk should be displayed as readonly.
+        self.assertContains(response, '<div class="readonly">DH001</div>', html=True)
+        # But extra forms should still have editable pk fields.
+        self.assertContains(response, 'name="doohickey_set-1-code"')
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):

@@ -685,6 +685,27 @@ class ModelAdmin(BaseModelAdmin):
             f"site={self.admin_site!r}>"
         )
 
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Hook for specifying custom readonly fields.
+        """
+        readonly_fields = list(self.readonly_fields)
+        # When editing an existing object, make the primary key readonly to
+        # prevent accidental creation of new objects (refs #2259).
+        if obj is not None:
+            pk = self.opts.pk
+            # Only add pk to readonly if it's an editable, non-auto field.
+            # AutoFields and non-editable fields are already not shown as
+            # editable form fields.
+            if (
+                pk.editable
+                and not pk.auto_created
+                and not isinstance(pk, models.AutoField)
+                and pk.name not in readonly_fields
+            ):
+                readonly_fields.append(pk.name)
+        return readonly_fields
+
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.get_inlines(request, obj):
