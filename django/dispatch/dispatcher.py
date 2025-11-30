@@ -1,4 +1,5 @@
 import asyncio
+import contextvars
 import logging
 import threading
 import weakref
@@ -22,7 +23,19 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
-async def _gather(*coros):
+def _restore_context(context: contextvars.Context) -> None:
+    # Check for changes in contextvars, and set them to the current
+    # context for downstream consumers
+    for cvar in context:
+        cvalue = context.get(cvar)
+        try:
+            if cvar.get() != cvalue:
+                cvar.set(cvalue)
+        except LookupError:
+            cvar.set(cvalue)
+
+
+async def _gather(*coros, context=None):
     if len(coros) == 0:
         return []
 
@@ -36,12 +49,15 @@ async def _gather(*coros):
         async with asyncio.TaskGroup() as tg:
             results = [None] * len(coros)
             for i, coro in enumerate(coros):
-                tg.create_task(run(i, coro))
+                tg.create_task(run(i, coro), context=context)
         return results
     except BaseExceptionGroup as exception_group:
         if len(exception_group.exceptions) == 1:
             raise exception_group.exceptions[0]
         raise
+    finally:
+        if context:
+            _restore_context(context=context)
 
 
 class Signal:
@@ -237,7 +253,8 @@ class Signal:
                     *(
                         receiver(signal=self, sender=sender, **named)
                         for receiver in async_receivers
-                    )
+                    ),
+                    context=contextvars.copy_context(),
                 )
                 return zip(async_receivers, async_responses)
 
@@ -275,9 +292,12 @@ class Signal:
         ):
             return []
         sync_receivers, async_receivers = self._live_receivers(sender)
+
+        context = contextvars.copy_context()
+
         if sync_receivers:
 
-            @sync_to_async
+            @sync_to_async(context=context)
             def sync_send():
                 responses = []
                 for receiver in sync_receivers:
@@ -296,8 +316,10 @@ class Signal:
                 *(
                     receiver(signal=self, sender=sender, **named)
                     for receiver in async_receivers
-                )
+                ),
+                context=context,
             ),
+            context=context,
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses
@@ -366,7 +388,8 @@ class Signal:
                     *(
                         asend_and_wrap_exception(receiver)
                         for receiver in async_receivers
-                    )
+                    ),
+                    context=contextvars.copy_context(),
                 )
                 return zip(async_receivers, async_responses)
 
@@ -407,10 +430,11 @@ class Signal:
         # Call each receiver with whatever arguments it can accept.
         # Return a list of tuple pairs [(receiver, response), ... ].
         sync_receivers, async_receivers = self._live_receivers(sender)
+        context = contextvars.copy_context()
 
         if sync_receivers:
 
-            @sync_to_async
+            @sync_to_async(context=context)
             def sync_send():
                 responses = []
                 for receiver in sync_receivers:
@@ -440,7 +464,9 @@ class Signal:
             sync_send(),
             _gather(
                 *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
+                context=context,
             ),
+            context=context,
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses
