@@ -1087,12 +1087,9 @@ class TestValidation(PostgreSQLSimpleTestCase):
     def test_with_size(self):
         field = ArrayField(models.IntegerField(), size=3)
         field.clean([1, 2, 3], None)
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "List contains 4 items, it should contain no more than 3."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean([1, 2, 3, 4], None)
-        self.assertEqual(
-            cm.exception.messages[0],
-            "List contains 4 items, it should contain no more than 3.",
-        )
 
     def test_with_size_singular(self):
         field = ArrayField(models.IntegerField(), size=1)
@@ -1156,21 +1153,15 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_to_python_fail(self):
         field = SimpleArrayField(forms.IntegerField())
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "Item 1 in the array did not validate: Enter a whole number."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("a,b,9")
-        self.assertEqual(
-            cm.exception.messages[0],
-            "Item 1 in the array did not validate: Enter a whole number.",
-        )
 
     def test_validate_fail(self):
         field = SimpleArrayField(forms.CharField(required=True))
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "Item 3 in the array did not validate: This field is required."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("a,b,")
-        self.assertEqual(
-            cm.exception.messages[0],
-            "Item 3 in the array did not validate: This field is required.",
-        )
 
     def test_validate_fail_base_field_error_params(self):
         field = SimpleArrayField(forms.CharField(max_length=2))
@@ -1203,12 +1194,9 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_validators_fail(self):
         field = SimpleArrayField(forms.RegexField("[a-e]{2}"))
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "Item 1 in the array did not validate: Enter a valid value."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("a,bc,de")
-        self.assertEqual(
-            cm.exception.messages[0],
-            "Item 1 in the array did not validate: Enter a valid value.",
-        )
 
     def test_delimiter(self):
         field = SimpleArrayField(forms.CharField(), delimiter="|")
@@ -1227,21 +1215,15 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_max_length(self):
         field = SimpleArrayField(forms.CharField(), max_length=2)
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "List contains 3 items, it should contain no more than 2."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("a,b,c")
-        self.assertEqual(
-            cm.exception.messages[0],
-            "List contains 3 items, it should contain no more than 2.",
-        )
 
     def test_min_length(self):
         field = SimpleArrayField(forms.CharField(), min_length=4)
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "List contains 3 items, it should contain no fewer than 4."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("a,b,c")
-        self.assertEqual(
-            cm.exception.messages[0],
-            "List contains 3 items, it should contain no fewer than 4.",
-        )
 
     def test_min_length_singular(self):
         field = SimpleArrayField(forms.IntegerField(), min_length=2)
@@ -1252,9 +1234,9 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_required(self):
         field = SimpleArrayField(forms.CharField(), required=True)
-        with self.assertRaises(exceptions.ValidationError) as cm:
+        msg = "This field is required."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             field.clean("")
-        self.assertEqual(cm.exception.messages[0], "This field is required.")
 
     def test_model_field_formfield(self):
         model_field = ArrayField(models.CharField(max_length=27))
