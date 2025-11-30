@@ -78,6 +78,10 @@ Then at the Python prompt, try to import Django:
 
 You may have another version of Django installed.
 
+.. note::
+
+   If ``python`` doesn't work on your system, try using ``python3`` instead.
+
 That's it!
 ==========
 
