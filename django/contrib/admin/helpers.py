@@ -526,10 +526,7 @@ class InlineAdminForm(AdminForm):
             self.form._meta.model._meta.auto_field
             or not pk.editable
             # The pk can be editable, but excluded from the inline.
-            or (
-                self.form._meta.exclude
-                and pk.name in self.form._meta.exclude
-            )
+            or (self.form._meta.exclude and pk.name in self.form._meta.exclude)
             # The pk can be editable but set as readonly (refs #2259).
             or pk.name in self.readonly_fields
             or
