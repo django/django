@@ -1,10 +1,19 @@
 import functools
 import inspect
+import threading
+from contextlib import contextmanager
 
 from django.utils.version import PY314
 
 if PY314:
     import annotationlib
+
+    safe_signature_from_callable = functools.partial(
+        inspect._signature_from_callable,
+        annotation_format=annotationlib.Format.FORWARDREF,
+    )
+
+lock = threading.Lock()
 
 
 @functools.lru_cache(maxsize=512)
@@ -98,3 +107,27 @@ def is_module_level_function(func):
         return False
 
     return True
+
+
+@contextmanager
+def leave_deferred_annotations_unevaluated():
+    """
+    inspect.getfullargspec eagerly evaluates type annotations. To add
+    compatibility with Python 3.14+ deferred evaluation, patch the module-level
+    helper to provide the annotation_format that we are using elsewhere.
+
+    This private helper could be removed when there is an upstream solution for
+    https://github.com/python/cpython/issues/141560.
+    """
+    with lock:
+        if PY314:
+            module_helper_was_replaced = False
+            if original_fn := getattr(inspect, "_signature_from_callable", None):
+                module_helper_was_replaced = isinstance(original_fn, functools.partial)
+                if not module_helper_was_replaced:
+                    inspect._signature_from_callable = safe_signature_from_callable
+        try:
+            yield
+        finally:
+            if PY314 and original_fn and not module_helper_was_replaced:
+                inspect._signature_from_callable = original_fn
