@@ -209,6 +209,51 @@ class Serializer:
         if callable(getattr(self.stream, "getvalue", None)):
             return self.stream.getvalue()
 
+    def _should_include_pk(self, obj):
+        """
+        Determines whether the Primary Key (PK) should be included in the
+        serialized data for the given object, especially when
+        use_natural_primary_keys=True is set.
+        """
+        if not self.use_natural_primary_keys:
+            return True
+
+        return not self._resolve_natural_key(obj)
+
+    def _resolve_fk_natural_key(self, obj, field):
+        """
+        Return the natural key for a ForeignKey's related object when valid.
+
+        When natural foreign keys are enabled, the helper attempts to use the
+        related object's natural key; otherwise it falls back to the PK.
+        """
+        if not self.use_natural_foreign_keys:
+            return None
+
+        if not self._model_supports_natural_key(field.remote_field.model):
+            return None
+
+        related = getattr(obj, field.name, None)
+        return self._resolve_natural_key(related)
+
+    def _resolve_natural_key(self, obj):
+        """
+        Return a natural key tuple for the given object when available.
+        """
+        if not (obj and callable(getattr(obj, "natural_key", None))):
+            return None
+
+        natural_key_value = obj.natural_key()
+        if not natural_key_value:
+            return None
+
+        return natural_key_value
+
+    def _model_supports_natural_key(self, model):
+        """Return True if the model class exposes a callable natural_key()."""
+        natural_key = getattr(model, "natural_key", None)
+        return callable(natural_key)
+
 
 class Deserializer:
     """
@@ -317,12 +362,16 @@ def build_instance(Model, data, db):
         obj = Model(**data)
         obj._state.db = db
         natural_key = obj.natural_key()
-        try:
-            data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
-            )
-        except Model.DoesNotExist:
-            pass
+        if natural_key:
+            try:
+                existing = default_manager.db_manager(db).get_by_natural_key(
+                    *natural_key
+                )
+            except Model.DoesNotExist:
+                pass
+            else:
+                data[Model._meta.pk.attname] = Model._meta.pk.to_python(existing.pk)
+
     return Model(**data)
 
 

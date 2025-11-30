@@ -34,8 +34,10 @@ class Serializer(base.Serializer):
 
     def get_dump_object(self, obj):
         data = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
+
+        if self._should_include_pk(obj):
             data["pk"] = self._value_from_field(obj, obj._meta.pk)
+
         data["fields"] = self._current
         return data
 
@@ -52,14 +54,8 @@ class Serializer(base.Serializer):
         self._current[field.name] = self._value_from_field(obj, field)
 
     def handle_fk_field(self, obj, field):
-        if self.use_natural_foreign_keys and hasattr(
-            field.remote_field.model, "natural_key"
-        ):
-            related = getattr(obj, field.name)
-            if related:
-                value = related.natural_key()
-            else:
-                value = None
+        if natural_key_value := self._resolve_fk_natural_key(obj, field):
+            value = natural_key_value
         else:
             value = self._value_from_field(obj, field)
         self._current[field.name] = value
@@ -71,7 +67,10 @@ class Serializer(base.Serializer):
             ):
 
                 def m2m_value(value):
-                    return value.natural_key()
+                    natural_key_value = self._resolve_natural_key(value)
+                    if not natural_key_value:
+                        return self._value_from_field(value, value._meta.pk)
+                    return natural_key_value
 
                 def queryset_iterator(obj, field):
                     attr = getattr(obj, field.name)
