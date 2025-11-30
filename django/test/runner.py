@@ -602,6 +602,9 @@ class ParallelTestSuite(unittest.TestSuite):
                     pool.close()
                     raise
                 continue
+            except multiprocessing.pool.MaybeEncodingError:
+                pool.close()
+                raise
             except StopIteration:
                 pool.close()
                 break
