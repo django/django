@@ -18,6 +18,10 @@
     vertical-align: 0;
 }
 
+.form-row select option:checked {
+    background-color: var(--selected-row);
+}
+
 form .form-row p {
     padding-left: 0;
 }
@@ -186,10 +190,6 @@ form .aligned textarea + div.help,
 form .aligned select + div.help {
     margin-left: 160px;
     padding-left: 10px;
-}
-
-form .aligned select option:checked {
-    background-color: var(--selected-row);
 }
 
 form .aligned ul li {
