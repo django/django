@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.test import TestCase
 
-from .models import BigD, Foo
+from .models import BigD, Foo, HighPrecision
 
 
 class DecimalFieldTests(TestCase):
@@ -140,3 +140,12 @@ class DecimalFieldTests(TestCase):
         obj = Foo.objects.create(a="bar", d=Decimal("8.320"))
         obj.refresh_from_db()
         self.assertEqual(obj.d.compare_total(Decimal("8.320")), Decimal("0"))
+
+    def test_sqlite_integer_precision_bypass(self):
+        if connection.vendor != "sqlite":
+            return
+
+        large_int_val = Decimal("9999999999999999")
+        obj = HighPrecision.objects.create(d=large_int_val)
+        obj.refresh_from_db()
+        self.assertEqual(obj.d, large_int_val)
