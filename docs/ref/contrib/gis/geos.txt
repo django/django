@@ -50,7 +50,7 @@ Creating a Geometry
 -------------------
 
 :class:`GEOSGeometry` objects may be created in a few ways. The first is
-to simply instantiate the object on some spatial input -- the following
+to instantiate the object on some spatial input -- the following
 are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
 
 .. code-block:: pycon

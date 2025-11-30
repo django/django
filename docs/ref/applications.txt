@@ -111,7 +111,7 @@ configuration applies to. You can define any other attribute documented in the
 :class:`~django.apps.AppConfig` API reference.
 
 :class:`AppConfig` subclasses may be defined anywhere. The ``apps.py``
-convention merely allows Django to load them automatically when
+convention only allows Django to load them automatically when
 :setting:`INSTALLED_APPS` contains the path to an application module rather
 than the path to a configuration class.
 

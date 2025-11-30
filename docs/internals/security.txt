@@ -443,7 +443,7 @@ notification of security issues is not and will not be made public.
 
 We also aim to keep this list as small as effectively possible, in
 order to better manage the flow of confidential information prior to
-disclosure. As such, our notification list is *not* simply a list of
+disclosure. As such, our notification list is *not* a list of
 users of Django, and being a user of Django is not sufficient reason
 to be placed on the notification list.
 
@@ -495,7 +495,7 @@ Your request **must** include the following information:
   one set of criteria listed above.
 
 * A detailed explanation of why you are requesting security notifications.
-  Again, please keep in mind that this is *not* simply a list for users of
+  Again, please keep in mind that this is *not* a list for users of
   Django, and the overwhelming majority of users should subscribe to
   |django-announce| to receive advanced notice of when a security release will
   happen, without the details of the issues, rather than request detailed

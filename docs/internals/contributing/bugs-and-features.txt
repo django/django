@@ -139,7 +139,7 @@ feedback. The following meanings are assigned to each reaction:
 * 👍: I support this feature and would use it
 * 👎: I oppose this feature or believe it would cause issues for me or Django
 * 😕: I have no strong opinion on this feature
-* 🎉: This feature seems like a straightforward and beneficial addition
+* 🎉: This feature seems like a clear and beneficial addition
 
 The :ref:`Steering Council <steering-council>` will regularly review the ideas
 in the project, moving those with community support through the following

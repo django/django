@@ -15,7 +15,7 @@ The code lives in the ``django.core.mail`` module.
 Quick examples
 ==============
 
-Use :func:`send_mail` for straightforward email sending. For example, to send a
+Use :func:`send_mail` for basic email sending. For example, to send a
 plain text message::
 
     from django.core.mail import send_mail
