@@ -703,12 +703,14 @@ class BaseDatabaseOperations:
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
-    def binary_placeholder_sql(self, value):
+    def binary_placeholder_sql(self, value, compiler):
         """
         Some backends require special syntax to insert binary content (MySQL
         for example uses '_binary %s').
         """
-        return "%s"
+        if hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "%s", (value,)
 
     def modify_insert_params(self, placeholder, params):
         """
