@@ -1488,6 +1488,22 @@ subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
 ``False``, any unapplied migrations will also be applied to the test database
 before running the test suite.
 
+.. warning::
+
+    When using ``--keepdb`` with :option:`test --parallel`, new migrations
+    are not automatically applied to clone databases (e.g., ``test_1``,
+    ``test_2``).
+
+    While migrations are applied to the main test database, clones retain
+    their existing schema. This can cause test failures with errors such as
+    "column does not exist" or "relation does not exist" after adding
+    migrations.
+
+    To avoid this, either omit ``--keepdb`` when you have schema changes,
+    or manually delete the clone databases before running tests.
+
+    This is a known limitation. See :ticket:`26822` for details.
+
 .. django-admin-option:: --shuffle [SEED]
 
 Randomizes the order of tests before running them. This can help detect tests
