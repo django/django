@@ -17,7 +17,7 @@ from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, SafeString, mark_safe
+from django.utils.safestring import SafeData, SafeString
 from django.utils.text import normalize_newlines
 
 # https://html.spec.whatwg.org/#void-elements
@@ -87,7 +87,7 @@ _js_escapes.update(
 @keep_lazy(SafeString)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
-    return mark_safe(str(value).translate(_js_escapes))
+    return SafeString(str(value).translate(_js_escapes))
 
 
 _json_script_escapes = {
@@ -110,10 +110,10 @@ def json_script(value, element_id=None, encoder=None):
     )
     if element_id:
         template = '<script id="{}" type="application/json">{}</script>'
-        args = (element_id, mark_safe(json_str))
+        args = (element_id, SafeString(json_str))
     else:
         template = '<script type="application/json">{}</script>'
-        args = (mark_safe(json_str),)
+        args = (SafeString(json_str),)
     return format_html(template, *args)
 
 
@@ -135,14 +135,14 @@ def conditional_escape(text):
 def format_html(format_string, *args, **kwargs):
     """
     Similar to str.format, but pass all arguments through conditional_escape(),
-    and call mark_safe() on the result. This function should be used instead
+    and call SafeString() on the result. This function should be used instead
     of str.format or % interpolation to build up small HTML fragments.
     """
     if not (args or kwargs):
         raise TypeError("args or kwargs must be provided.")
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
-    return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+    return SafeString(format_string.format(*args_safe, **kwargs_safe))
 
 
 def format_html_join(sep, format_string, args_generator):
@@ -159,7 +159,7 @@ def format_html_join(sep, format_string, args_generator):
       format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
     """
-    return mark_safe(
+    return SafeString(
         conditional_escape(sep).join(
             (
                 format_html(format_string, **args)
@@ -397,14 +397,14 @@ class Urlizer:
                     attrs=nofollow_attr,
                     url=trimmed,
                 )
-                return mark_safe(f"{lead}{middle}{trail}")
+                return SafeString(f"{lead}{middle}{trail}")
             else:
                 if safe_input:
-                    return mark_safe(word)
+                    return SafeString(word)
                 elif autoescape:
                     return escape(word)
         elif safe_input:
-            return mark_safe(word)
+            return SafeString(word)
         elif autoescape:
             return escape(word)
         return word
@@ -529,6 +529,6 @@ def html_safe(klass):
             "define __str__()." % klass.__name__
         )
     klass_str = klass.__str__
-    klass.__str__ = lambda self: mark_safe(klass_str(self))
+    klass.__str__ = lambda self: SafeString(klass_str(self))
     klass.__html__ = lambda self: str(self)
     return klass

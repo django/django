@@ -9,7 +9,7 @@ from django.template.base import Token, TokenType
 from django.templatetags.i18n import BlockTranslateNode
 from django.test import SimpleTestCase, override_settings
 from django.utils import translation
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import trans_real
 
 from ...utils import setup as base_setup
@@ -199,7 +199,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
         }
     )
     def test_i18n21(self):
-        output = self.engine.render_to_string("i18n21", {"andrew": mark_safe("a & b")})
+        output = self.engine.render_to_string("i18n21", {"andrew": SafeString("a & b")})
         self.assertEqual(output, "a & b")
 
     @setup(

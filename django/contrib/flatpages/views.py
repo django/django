@@ -4,7 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.views.decorators.csrf import csrf_protect
 
 DEFAULT_TEMPLATE = "flatpages/default.html"
@@ -64,7 +64,7 @@ def render_flatpage(request, f):
     # To avoid having to always use the "|safe" filter in flatpage templates,
     # mark the title and content as already safe (since they are raw HTML
     # content in the first place).
-    f.title = mark_safe(f.title)
-    f.content = mark_safe(f.content)
+    f.title = SafeString(f.title)
+    f.content = SafeString(f.content)
 
     return HttpResponse(template.render({"flatpage": f}, request))

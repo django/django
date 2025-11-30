@@ -61,7 +61,7 @@ from django.utils.deprecation import django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, SafeString, mark_safe
+from django.utils.safestring import SafeData, SafeString
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
@@ -803,7 +803,7 @@ class FilterExpression:
             arg_vals = []
             for lookup, arg in args:
                 if not lookup:
-                    arg_vals.append(mark_safe(arg))
+                    arg_vals.append(SafeString(arg))
                 else:
                     arg_vals.append(arg.resolve(context))
             if getattr(func, "expects_localtime", False):
@@ -813,7 +813,7 @@ class FilterExpression:
             else:
                 new_obj = func(obj, *arg_vals)
             if getattr(func, "is_safe", False) and isinstance(obj, SafeData):
-                obj = mark_safe(new_obj)
+                obj = SafeString(new_obj)
             else:
                 obj = new_obj
         return obj
@@ -901,7 +901,7 @@ class Variable:
             # If it's wrapped with quotes (single or double), then
             # we're also dealing with a literal.
             try:
-                self.literal = mark_safe(unescape_string_literal(var))
+                self.literal = SafeString(unescape_string_literal(var))
             except ValueError:
                 # Otherwise we'll set self.lookups so that resolve() knows
                 # we're dealing with a bonafide variable
@@ -930,7 +930,7 @@ class Variable:
         if self.translate:
             is_safe = isinstance(value, SafeData)
             msgid = value.replace("%", "%%")
-            msgid = mark_safe(msgid) if is_safe else msgid
+            msgid = SafeString(msgid) if is_safe else msgid
             if self.message_context:
                 return pgettext_lazy(self.message_context, msgid)
             else:
