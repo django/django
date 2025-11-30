@@ -1621,9 +1621,15 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+            try:
+                cursor.close()
+            except Exception:
+                # If closing fails, surface only the
+                # original execute() exception.
+                raise e from None
+            # If close() succeeds, re-raise normally.
             raise
 
         if result_type == ROW_COUNT:
