@@ -3,6 +3,7 @@ import contextvars
 import logging
 import threading
 import weakref
+from dataclasses import dataclass
 
 from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
@@ -23,33 +24,41 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
-def _restore_context(context: contextvars.Context) -> None:
-    # Check for changes in contextvars, and set them to the current
-    # context for downstream consumers
-    for cvar in context:
-        cvalue = context.get(cvar)
-        try:
-            if cvar.get() != cvalue:
+@dataclass
+class ParallelEntity:
+    cor: object
+    with_context: bool = True
+
+
+async def _run_parallel(*entities: ParallelEntity, context=None):
+    """
+    Executes multiple asynchronous entities in parallel.
+    """
+
+    def _restore_context(context):
+        # Check for changes in contextvars, and set them to the current
+        # context for downstream consumers
+        for cvar in context:
+            cvalue = context.get(cvar)
+            try:
+                if cvar.get() != cvalue:
+                    cvar.set(cvalue)
+            except LookupError:
                 cvar.set(cvalue)
-        except LookupError:
-            cvar.set(cvalue)
 
-
-async def _gather(*coros, context=None):
-    if len(coros) == 0:
+    if len(entities) == 0:
         return []
-
-    if len(coros) == 1:
-        return [await coros[0]]
 
     async def run(i, coro):
         results[i] = await coro
 
     try:
         async with asyncio.TaskGroup() as tg:
-            results = [None] * len(coros)
-            for i, coro in enumerate(coros):
-                tg.create_task(run(i, coro), context=context)
+            results = [None] * len(entities)
+            for i, entity in enumerate(entities):
+                tg.create_task(
+                    run(i, entity.cor), context=context if entity.with_context else None
+                )
         return results
     except BaseExceptionGroup as exception_group:
         if len(exception_group.exceptions) == 1:
@@ -249,9 +258,9 @@ class Signal:
         if async_receivers:
 
             async def asend():
-                async_responses = await _gather(
+                async_responses = await _run_parallel(
                     *(
-                        receiver(signal=self, sender=sender, **named)
+                        ParallelEntity(receiver(signal=self, sender=sender, **named))
                         for receiver in async_receivers
                     ),
                     context=contextvars.copy_context(),
@@ -310,14 +319,11 @@ class Signal:
             async def sync_send():
                 return []
 
-        responses, async_responses = await _gather(
-            sync_send(),
-            _gather(
-                *(
-                    receiver(signal=self, sender=sender, **named)
-                    for receiver in async_receivers
-                ),
-                context=context,
+        responses, *async_responses = await _run_parallel(
+            ParallelEntity(sync_send(), with_context=False),
+            *(
+                ParallelEntity(receiver(signal=self, sender=sender, **named))
+                for receiver in async_receivers
             ),
             context=context,
         )
@@ -384,9 +390,9 @@ class Signal:
                 return response
 
             async def asend():
-                async_responses = await _gather(
+                async_responses = await _run_parallel(
                     *(
-                        asend_and_wrap_exception(receiver)
+                        ParallelEntity(asend_and_wrap_exception(receiver))
                         for receiver in async_receivers
                     ),
                     context=contextvars.copy_context(),
@@ -460,11 +466,11 @@ class Signal:
                 return err
             return response
 
-        responses, async_responses = await _gather(
-            sync_send(),
-            _gather(
-                *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
-                context=context,
+        responses, *async_responses = await _run_parallel(
+            ParallelEntity(sync_send(), with_context=False),
+            *(
+                ParallelEntity(asend_and_wrap_exception(receiver))
+                for receiver in async_receivers
             ),
             context=context,
         )
