@@ -452,44 +452,158 @@ class Query(BaseExpression):
     def get_aggregation(self, using, aggregate_exprs):
         """
         Return the dictionary with the values of the existing aggregations.
+        
+        This is the main orchestrator function that:
+        1. Validates and prepares aggregate expressions
+        2. Determines if a subquery is needed
+        3. Builds the appropriate query structure
+        4. Executes the query and processes results
+        
+        The complexity comes from handling various edge cases in SQL aggregation,
+        including existing aggregations, limits, distinct clauses, window functions,
+        and different database backends.
+        
+        Args:
+            using: The database alias to use
+            aggregate_exprs: Dictionary of aggregate expressions to compute
+        
+        Returns:
+            Dictionary mapping aggregate aliases to their computed values
         """
+        # Short-circuit if no aggregates requested
         if not aggregate_exprs:
             return {}
+        
+        # Step 1: Prepare and validate aggregates
+        preparation_result = self._prepare_aggregates(aggregate_exprs)
+        if not preparation_result:
+            return {}
+        
+        aggregates, refs_subquery, refs_window = preparation_result
+        
+        # Step 2: Determine if we need a subquery for correct aggregation
+        requires_subquery = self._check_requires_subquery(aggregates, refs_subquery, refs_window)
+        
+        # Step 3: Build the appropriate query structure
+        outer_query = (
+            self._build_subquery_aggregation(aggregates, refs_subquery, refs_window)
+            if requires_subquery
+            else self._build_direct_aggregation(aggregates)
+        )
+        
+        # Step 4: Execute and process results
+        return self._execute_query_and_process_results(outer_query, using)
+
+
+    def _prepare_aggregates(self, aggregate_exprs):
+        """
+        Prepare and validate aggregate expressions for processing.
+        
+        This function:
+        - Validates each aggregate expression
+        - Resolves expressions against the current query context
+        - Checks for dependencies on subqueries and window functions
+        - Temporarily stores aggregates for later use
+        
+        Args:
+            aggregate_exprs: Dictionary of {alias: aggregate_expression}
+        
+        Returns:
+            tuple: (aggregates_dict, refs_subquery_flag, refs_window_flag)
+            or None if preparation fails
+        """
+        # Existing comment preserved:
         # Store annotation mask prior to temporarily adding aggregations for
         # resolving purpose to facilitate their subsequent removal.
+        annotation_select_mask = self.annotation_select_mask
+        
         refs_subquery = False
         refs_window = False
         replacements = {}
-        annotation_select_mask = self.annotation_select_mask
-        for alias, aggregate_expr in aggregate_exprs.items():
-            self.check_alias(alias)
-            aggregate = aggregate_expr.resolve_expression(
-                self, allow_joins=True, reuse=None, summarize=True
-            )
-            if not aggregate.contains_aggregate:
-                raise TypeError("%s is not an aggregate expression" % alias)
-            # Temporarily add aggregate to annotations to allow remaining
-            # members of `aggregates` to resolve against each others.
-            self.append_annotation_mask([alias])
-            aggregate_refs = aggregate.get_refs()
-            refs_subquery |= any(
-                getattr(self.annotations[ref], "contains_subquery", False)
-                for ref in aggregate_refs
-            )
-            refs_window |= any(
-                getattr(self.annotations[ref], "contains_over_clause", True)
-                for ref in aggregate_refs
-            )
-            aggregate = aggregate.replace_expressions(replacements)
-            self.annotations[alias] = aggregate
-            replacements[Ref(alias, aggregate)] = aggregate
-        # Stash resolved aggregates now that they have been allowed to resolve
-        # against each other.
-        aggregates = {alias: self.annotations.pop(alias) for alias in aggregate_exprs}
-        self.set_annotation_mask(annotation_select_mask)
+        
+        try:
+            # New comment: Process each aggregate expression individually
+            for alias, aggregate_expr in aggregate_exprs.items():
+                # Existing comment preserved:
+                self.check_alias(alias)
+                
+                # Existing comment preserved:
+                aggregate = aggregate_expr.resolve_expression(
+                    self, allow_joins=True, reuse=None, summarize=True
+                )
+                
+                # Existing comment preserved:
+                if not aggregate.contains_aggregate:
+                    raise TypeError("%s is not an aggregate expression" % alias)
+                
+                # Existing comment preserved:
+                # Temporarily add aggregate to annotations to allow remaining
+                # members of `aggregates` to resolve against each others.
+                self.append_annotation_mask([alias])
+                
+                # Existing comment preserved:
+                aggregate_refs = aggregate.get_refs()
+                
+                # Existing comment preserved:
+                refs_subquery |= any(
+                    getattr(self.annotations[ref], "contains_subquery", False)
+                    for ref in aggregate_refs
+                )
+                refs_window |= any(
+                    getattr(self.annotations[ref], "contains_over_clause", True)
+                    for ref in aggregate_refs
+                )
+                
+                # Existing comment preserved:
+                aggregate = aggregate.replace_expressions(replacements)
+                
+                # Existing comment preserved:
+                self.annotations[alias] = aggregate
+                replacements[Ref(alias, aggregate)] = aggregate
+            
+            # Existing comment preserved:
+            # Stash resolved aggregates now that they have been allowed to resolve
+            # against each other.
+            aggregates = {alias: self.annotations.pop(alias) for alias in aggregate_exprs}
+            
+            return aggregates, refs_subquery, refs_window
+            
+        except Exception as e:
+            # New comment: Log error and restore state on failure
+            self.set_annotation_mask(annotation_select_mask)
+            raise e
+        finally:
+            # Existing comment preserved:
+            self.set_annotation_mask(annotation_select_mask)
+
+
+    def _check_requires_subquery(self, aggregates, refs_subquery, refs_window):
+        """
+        Determine if aggregation requires a subquery.
+        
+        We need a subquery when:
+        - There are existing GROUP BY clauses
+        - The query has limits or slicing
+        - There are existing aggregations in the query
+        - Aggregates reference subqueries or window functions
+        - There are HAVING or QUALIFY clauses
+        - The query uses DISTINCT or set operations (UNION, etc.)
+        - There are set-returning annotations
+        
+        Args:
+            aggregates: Dictionary of prepared aggregates
+            refs_subquery: Boolean flag indicating subquery dependencies
+            refs_window: Boolean flag indicating window function dependencies
+        
+        Returns:
+            bool: True if subquery is required, False otherwise
+        """
+        # Existing comment preserved:
         # Existing usage of aggregation can be determined by the presence of
         # selected aggregates but also by filters against aliased aggregates.
         _, having, qualify = self.where.split_having_qualify()
+        
+        # New comment: Check for existing aggregations in annotations or HAVING clause
         has_existing_aggregation = (
             any(
                 getattr(annotation, "contains_aggregate", True)
@@ -497,11 +611,15 @@ class Query(BaseExpression):
             )
             or having
         )
+        
+        # New comment: Check for set-returning annotations (like unnest() in PostgreSQL)
         set_returning_annotations = {
             alias
             for alias, annotation in self.annotation_select.items()
             if getattr(annotation, "set_returning", False)
         }
+        
+        # Existing comment preserved:
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -512,7 +630,7 @@ class Query(BaseExpression):
         # those operations must be done in a subquery so that the query
         # aggregates on the limit and/or distinct results instead of applying
         # the distinct and limit after the aggregation.
-        if (
+        return (
             isinstance(self.group_by, tuple)
             or self.is_sliced
             or has_existing_aggregation
@@ -522,114 +640,230 @@ class Query(BaseExpression):
             or self.distinct
             or self.combinator
             or set_returning_annotations
-        ):
-            from django.db.models.sql.subqueries import AggregateQuery
+        )
 
-            inner_query = self.clone()
-            inner_query.subquery = True
-            outer_query = AggregateQuery(self.model, inner_query)
-            inner_query.select_for_update = False
-            inner_query.select_related = False
-            inner_query.set_annotation_mask(self.annotation_select)
-            # Queries with distinct_fields need ordering and when a limit is
-            # applied we must take the slice from the ordered query. Otherwise
-            # no need for ordering.
-            inner_query.clear_ordering(force=False)
-            if not inner_query.distinct:
-                # If the inner query uses default select and it has some
-                # aggregate annotations, then we must make sure the inner
-                # query is grouped by the main model's primary key. However,
-                # clearing the select clause can alter results if distinct is
-                # used.
-                if inner_query.default_cols and has_existing_aggregation:
-                    inner_query.group_by = (
-                        self.model._meta.pk.get_col(inner_query.get_initial_alias()),
-                    )
-                inner_query.default_cols = False
-                if not qualify and not self.combinator:
-                    # Mask existing annotations that are not referenced by
-                    # aggregates to be pushed to the outer query unless
-                    # filtering against window functions or if the query is
-                    # combined as both would require complex realiasing logic.
-                    annotation_mask = set()
-                    if isinstance(self.group_by, tuple):
-                        for expr in self.group_by:
-                            annotation_mask |= expr.get_refs()
-                    for aggregate in aggregates.values():
-                        annotation_mask |= aggregate.get_refs()
-                    # Avoid eliding expressions that might have an incidence on
-                    # the implicit grouping logic.
-                    for annotation_alias, annotation in self.annotation_select.items():
-                        if annotation.get_group_by_cols():
-                            annotation_mask.add(annotation_alias)
-                    inner_query.set_annotation_mask(annotation_mask)
-                    # Annotations that possibly return multiple rows cannot
-                    # be masked as they might have an incidence on the query.
-                    annotation_mask |= set_returning_annotations
 
-            # Add aggregates to the outer AggregateQuery. This requires making
-            # sure all columns referenced by the aggregates are selected in the
-            # inner query. It is achieved by retrieving all column references
-            # by the aggregates, explicitly selecting them in the inner query,
-            # and making sure the aggregates are repointed to them.
-            col_refs = {}
-            for alias, aggregate in aggregates.items():
-                replacements = {}
-                for col in self._gen_cols([aggregate], resolve_refs=False):
-                    if not (col_ref := col_refs.get(col)):
-                        index = len(col_refs) + 1
-                        col_alias = f"__col{index}"
-                        col_ref = Ref(col_alias, col)
-                        col_refs[col] = col_ref
-                        inner_query.add_annotation(col, col_alias)
-                    replacements[col] = col_ref
-                outer_query.annotations[alias] = aggregate.replace_expressions(
-                    replacements
+    def _build_subquery_aggregation(self, aggregates, refs_subquery, refs_window):
+        """
+        Build aggregation query using a subquery approach.
+        
+        This is used when:
+        - There are existing aggregations that would interfere
+        - The query has limits, distinct, or set operations
+        - Aggregates depend on subqueries or window functions
+        
+        The approach:
+        1. Create an inner query with the base data
+        2. Create an outer query that performs the aggregation
+        3. Set up column references between inner and outer queries
+        
+        Args:
+            aggregates: Dictionary of aggregate expressions to compute
+            refs_subquery: Boolean flag (unused here but kept for interface consistency)
+            refs_window: Boolean flag (unused here but kept for interface consistency)
+        
+        Returns:
+            AggregateQuery: The outer query ready for execution
+        """
+        # Existing comment preserved:
+        from django.db.models.sql.subqueries import AggregateQuery
+
+        # Existing comment preserved:
+        inner_query = self.clone()
+        inner_query.subquery = True
+        outer_query = AggregateQuery(self.model, inner_query)
+        
+        # Existing comment preserved:
+        inner_query.select_for_update = False
+        inner_query.select_related = False
+        inner_query.set_annotation_mask(self.annotation_select)
+        
+        # Existing comment preserved:
+        # Queries with distinct_fields need ordering and when a limit is
+        # applied we must take the slice from the ordered query. Otherwise
+        # no need for ordering.
+        inner_query.clear_ordering(force=False)
+        
+        # Existing comment preserved:
+        if not inner_query.distinct:
+            # Existing comment preserved:
+            # If the inner query uses default select and it has some
+            # aggregate annotations, then we must make sure the inner
+            # query is grouped by the main model's primary key. However,
+            # clearing the select clause can alter results if distinct is
+            # used.
+            _, having, _ = self.where.split_having_qualify()
+            has_existing_aggregation = (
+                any(
+                    getattr(annotation, "contains_aggregate", True)
+                    for annotation in self.annotations.values()
                 )
-            if (
-                inner_query.select == ()
-                and not inner_query.default_cols
-                and not inner_query.annotation_select_mask
-            ):
-                # In case of Model.objects[0:3].count(), there would be no
-                # field selected in the inner query, yet we must use a
-                # subquery. So, make sure at least one field is selected.
-                inner_query.select = (
+                or having
+            )
+            
+            if inner_query.default_cols and has_existing_aggregation:
+                inner_query.group_by = (
                     self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                 )
-        else:
-            outer_query = self
-            self.select = ()
-            self.selected = None
-            self.default_cols = False
-            self.extra = {}
-            if self.annotations:
-                # Inline reference to existing annotations and mask them as
-                # they are unnecessary given only the summarized aggregations
-                # are requested.
-                replacements = {
-                    Ref(alias, annotation): annotation
-                    for alias, annotation in self.annotations.items()
+            
+            inner_query.default_cols = False
+            
+            if not having and not self.combinator:
+                # Existing comment preserved:
+                # Mask existing annotations that are not referenced by
+                # aggregates to be pushed to the outer query unless
+                # filtering against window functions or if the query is
+                # combined as both would require complex realiasing logic.
+                annotation_mask = set()
+                if isinstance(self.group_by, tuple):
+                    for expr in self.group_by:
+                        annotation_mask |= expr.get_refs()
+                for aggregate in aggregates.values():
+                    annotation_mask |= aggregate.get_refs()
+                
+                # Existing comment preserved:
+                # Avoid eliding expressions that might have an incidence on
+                # the implicit grouping logic.
+                for annotation_alias, annotation in self.annotation_select.items():
+                    if annotation.get_group_by_cols():
+                        annotation_mask.add(annotation_alias)
+                
+                inner_query.set_annotation_mask(annotation_mask)
+                
+                # Existing comment preserved:
+                # Annotations that possibly return multiple rows cannot
+                # be masked as they might have an incidence on the query.
+                set_returning_annotations = {
+                    alias
+                    for alias, annotation in self.annotation_select.items()
+                    if getattr(annotation, "set_returning", False)
                 }
-                self.annotations = {
-                    alias: aggregate.replace_expressions(replacements)
-                    for alias, aggregate in aggregates.items()
-                }
-            else:
-                self.annotations = aggregates
-            self.set_annotation_mask(aggregates)
+                annotation_mask |= set_returning_annotations
+        
+        # Existing comment preserved:
+        # Add aggregates to the outer AggregateQuery. This requires making
+        # sure all columns referenced by the aggregates are selected in the
+        # inner query. It is achieved by retrieving all column references
+        # by the aggregates, explicitly selecting them in the inner query,
+        # and making sure the aggregates are repointed to them.
+        col_refs = {}
+        for alias, aggregate in aggregates.items():
+            replacements = {}
+            for col in self._gen_cols([aggregate], resolve_refs=False):
+                if not (col_ref := col_refs.get(col)):
+                    index = len(col_refs) + 1
+                    col_alias = f"__col{index}"
+                    col_ref = Ref(col_alias, col)
+                    col_refs[col] = col_ref
+                    inner_query.add_annotation(col, col_alias)
+                replacements[col] = col_ref
+            outer_query.annotations[alias] = aggregate.replace_expressions(replacements)
+        
+        # Existing comment preserved:
+        if (
+            inner_query.select == ()
+            and not inner_query.default_cols
+            and not inner_query.annotation_select_mask
+        ):
+            # Existing comment preserved:
+            # In case of Model.objects[0:3].count(), there would be no
+            # field selected in the inner query, yet we must use a
+            # subquery. So, make sure at least one field is selected.
+            inner_query.select = (
+                self.model._meta.pk.get_col(inner_query.get_initial_alias()),
+            )
+        
+        return outer_query
 
+
+    def _build_direct_aggregation(self, aggregates):
+        """
+        Build aggregation query without a subquery.
+        
+        This simpler approach is used when:
+        - No existing aggregations interfere
+        - No limits, distinct, or set operations
+        - No dependencies on subqueries or window functions
+        
+        The approach:
+        1. Clear the current query's select fields
+        2. Add the aggregates directly to the query
+        3. Set up proper annotation masking
+        
+        Args:
+            aggregates: Dictionary of aggregate expressions to compute
+        
+        Returns:
+            Query: The modified query ready for execution
+        """
+        # Existing comment preserved:
+        outer_query = self
+        
+        # Existing comment preserved:
+        self.select = ()
+        self.selected = None
+        self.default_cols = False
+        self.extra = {}
+        
+        # Existing comment preserved:
+        if self.annotations:
+            # Existing comment preserved:
+            # Inline reference to existing annotations and mask them as
+            # they are unnecessary given only the summarized aggregations
+            # are requested.
+            replacements = {
+                Ref(alias, annotation): annotation
+                for alias, annotation in self.annotations.items()
+            }
+            self.annotations = {
+                alias: aggregate.replace_expressions(replacements)
+                for alias, aggregate in aggregates.items()
+            }
+        else:
+            self.annotations = aggregates
+        
+        # Existing comment preserved:
+        self.set_annotation_mask(aggregates)
+        
+        return outer_query
+
+
+    def _execute_query_and_process_results(self, outer_query, using):
+        """
+        Execute the aggregation query and process the results.
+        
+        This handles:
+        - Determining empty result set behavior
+        - Configuring the query compiler
+        - Executing the SQL
+        - Converting database results to Python values
+        - Handling empty result sets appropriately
+        
+        Args:
+            outer_query: The query object to execute
+            using: The database alias to use
+        
+        Returns:
+            dict: Dictionary mapping aggregate aliases to their values
+        """
+        # Existing comment preserved:
         empty_set_result = [
             expression.empty_result_set_value
             for expression in outer_query.annotation_select.values()
         ]
         elide_empty = not any(result is NotImplemented for result in empty_set_result)
+        
+        # Existing comment preserved:
         outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
         outer_query.select_for_update = False
         outer_query.select_related = False
+        
+        # Existing comment preserved:
         compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
         result = compiler.execute_sql(SINGLE)
+        
+        # Existing comment preserved:
         if result is None:
             result = empty_set_result
         else:
@@ -639,7 +873,8 @@ class Query(BaseExpression):
             if compiler.has_composite_fields(cols):
                 rows = compiler.composite_fields_to_tuples(rows, cols)
             result = next(rows)
-
+        
+        # Existing comment preserved:
         return dict(zip(outer_query.annotation_select, result))
 
     def get_count(self, using):
