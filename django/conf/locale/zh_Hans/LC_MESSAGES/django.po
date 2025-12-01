@@ -30,6 +30,7 @@
 # Wentao Han <wentao.han@gmail.com>, 2018
 # wolf ice <warwolf7677@163.com>, 2020
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
+# DWXXX, 2025
 # Jeff Yin <jifeng.yin@gmail.com>, 2013
 # Zhengyang Wang <sufforest@gmail.com>, 2017
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
@@ -43,8 +44,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
 "Last-Translator: Natalia, 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
@@ -176,6 +177,9 @@ msgstr "克罗地亚语"
 
 msgid "Upper Sorbian"
 msgstr "上索布"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "匈牙利语"
@@ -699,7 +703,7 @@ msgstr "值必须是有效的JSON。"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
-msgstr ""
+msgstr "%(model)s 实例使用 %(field)s %(value)r 不是一个有效的选择。"
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "外键(由相关字段确定)"
@@ -719,8 +723,8 @@ msgid "Many-to-many relationship"
 msgstr "多对多关系"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -871,6 +875,22 @@ msgstr "是"
 
 msgid "No"
 msgstr "否"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"

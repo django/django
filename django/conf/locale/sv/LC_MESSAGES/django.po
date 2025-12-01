@@ -6,6 +6,7 @@
 # Anders Hovmöller <boxed@killingar.net>, 2023
 # Anders Jonsson <transifex@norsjovallen.se>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2014,2021
+# Daniel Nylander <po@danielnylander.se>, 2025
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>, 2021\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +163,9 @@ msgstr "Kroatiska"
 
 msgid "Upper Sorbian"
 msgstr "Högsorbiska"
+
+msgid "Haitian Creole"
+msgstr "Haitisk kreol"
 
 msgid "Hungarian"
 msgstr "Ungerska"
@@ -736,8 +740,8 @@ msgid "Many-to-many relationship"
 msgstr "Många-till-många-samband"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -900,6 +904,22 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Redo"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Kör"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Misslyckades"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Lyckades"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1360,7 +1380,7 @@ msgid "Get started with Django"
 msgstr "Kom igång med Django"
 
 msgid "Django Community"
-msgstr "Djangos community"
+msgstr "Djangos gemenskap"
 
 msgid "Connect, get help, or contribute"
 msgstr "Kontakta, begär hjälp eller bidra"

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"PO-Revision-Date: 2025-12-03 08:09+0000\n"
 "Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
@@ -42,7 +42,7 @@ msgid "Password changed successfully."
 msgstr "Sikeres jelszóváltoztatás."
 
 msgid "Password-based authentication was disabled."
-msgstr ""
+msgstr "Jelszavas bejelentkezés letiltva."
 
 #, python-format
 msgid "Change password: %s"
@@ -92,13 +92,13 @@ msgid ""
 msgstr ""
 
 msgid "Password-based authentication"
-msgstr ""
+msgstr "Jelszavas bejelentkezés"
 
 msgid "Enabled"
-msgstr ""
+msgstr "Engedélyezve"
 
 msgid "Disabled"
-msgstr ""
+msgstr "Letiltva"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see the user’s password."
