@@ -22,9 +22,9 @@ Cache middleware
 
 .. class:: FetchFromCacheMiddleware
 
-Enable the site-wide cache. If these are enabled, each Django-powered page will
-be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
-defines. See the :doc:`cache documentation </topics/cache>`.
+    Enable the site-wide cache. If these are enabled, each Django-powered page will
+    be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
+    defines. See the :doc:`cache documentation </topics/cache>`.
 
 "Common" middleware
 -------------------
@@ -34,57 +34,57 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
 .. class:: CommonMiddleware
 
-    .. attribute:: response_redirect_class
+   .. attribute:: response_redirect_class
 
-        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.
-        Subclass ``CommonMiddleware`` and override the attribute to customize
-        the redirects issued by the middleware.
+       Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.
+       Subclass ``CommonMiddleware`` and override the attribute to customize
+       the redirects issued by the middleware.
 
-Adds a few conveniences for perfectionists:
+   Adds a few conveniences for perfectionists:
 
-* Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
-  setting, which should be a list of compiled regular expression objects.
+   * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
+     setting, which should be a list of compiled regular expression objects.
 
-* Performs URL rewriting based on the :setting:`APPEND_SLASH` and
-  :setting:`PREPEND_WWW` settings.
+   * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
+     :setting:`PREPEND_WWW` settings.
 
-  If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
-  with a slash, and it is not found in the URLconf, then a new URL is
-  formed by appending a slash at the end. If this new URL is found in the
-  URLconf, then Django redirects the request to this new URL. Otherwise,
-  the initial URL is processed as usual.
+     If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
+     with a slash, and it is not found in the URLconf, then a new URL is
+     formed by appending a slash at the end. If this new URL is found in the
+     URLconf, then Django redirects the request to this new URL. Otherwise,
+     the initial URL is processed as usual.
 
-  For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
-  you don't have a valid URL pattern for ``foo.com/bar`` but *do* have a
-  valid pattern for ``foo.com/bar/``.
+     For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
+     you don't have a valid URL pattern for ``foo.com/bar`` but *do* have a
+     valid pattern for ``foo.com/bar/``.
 
-  If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
-  will be redirected to the same URL with a leading "www."
+     If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
+     will be redirected to the same URL with a leading "www."
 
-  Both of these options are meant to normalize URLs. The philosophy is that
-  each URL should exist in one, and only one, place. Technically a URL
-  ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
-  indexer would treat them as separate URLs -- so it's best practice to
-  normalize URLs.
+     Both of these options are meant to normalize URLs. The philosophy is that
+     each URL should exist in one, and only one, place. Technically a URL
+     ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
+     indexer would treat them as separate URLs -- so it's best practice to
+     normalize URLs.
 
-  If necessary, individual views may be excluded from the ``APPEND_SLASH``
-  behavior using the :func:`~django.views.decorators.common.no_append_slash`
-  decorator::
+     If necessary, individual views may be excluded from the ``APPEND_SLASH``
+     behavior using the :func:`~django.views.decorators.common.no_append_slash`
+     decorator::
 
-    from django.views.decorators.common import no_append_slash
+       from django.views.decorators.common import no_append_slash
 
 
-    @no_append_slash
-    def sensitive_fbv(request, *args, **kwargs):
-        """View to be excluded from APPEND_SLASH."""
-        return HttpResponse()
+       @no_append_slash
+       def sensitive_fbv(request, *args, **kwargs):
+           """View to be excluded from APPEND_SLASH."""
+           return HttpResponse()
 
-* Sets the ``Content-Length`` header for non-streaming responses.
+   * Sets the ``Content-Length`` header for non-streaming responses.
 
 .. class:: BrokenLinkEmailsMiddleware
 
-* Sends broken link notification emails to :setting:`MANAGERS` (see
-  :doc:`/howto/error-reporting`).
+    * Sends broken link notification emails to :setting:`MANAGERS` (see
+      :doc:`/howto/error-reporting`).
 
 GZip middleware
 ---------------
@@ -100,44 +100,45 @@ GZip middleware
         to change the maximum number of random bytes that is included with
         compressed responses.
 
-.. note::
+    .. note::
 
-    Security researchers revealed that when compression techniques (including
-    ``GZipMiddleware``) are used on a website, the site may become exposed to a
-    number of possible attacks.
+        Security researchers revealed that when compression techniques
+        (including ``GZipMiddleware``) are used on a website, the site may
+        become exposed to a number of possible attacks.
 
-    To mitigate attacks, Django implements a technique called *Heal The Breach
-    (HTB)*. It adds up to 100 bytes (see
-    :attr:`.max_random_bytes`) of random bytes to each response
-    to make the attacks less effective.
+        To mitigate attacks, Django implements a technique called *Heal The
+        Breach (HTB)*. It adds up to 100 bytes (see
+        :attr:`.max_random_bytes`) of random bytes to each response to make
+        the attacks less effective.
 
-    For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
-    the `Heal The Breach (HTB) paper`_.
+        For more details, see the `BREACH paper (PDF)`_,
+        `breachattack.com`_, and the `Heal The Breach (HTB) paper`_.
 
-    .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: https://www.breachattack.com/
-    .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
+        .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+        .. _breachattack.com: https://www.breachattack.com/
+        .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
 
-The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
-that understand GZip compression (all modern browsers).
+    The ``django.middleware.gzip.GZipMiddleware`` compresses content for
+    browsers that understand GZip compression (all modern browsers).
 
-This middleware should be placed before any other middleware that need to
-read or write the response body so that compression happens afterward.
+    This middleware should be placed before any other middleware that need
+    to read or write the response body so that compression happens
+    afterward.
 
-It will NOT compress content if any of the following are true:
+    It will NOT compress content if any of the following are true:
 
-* The content body is less than 200 bytes long.
+    * The content body is less than 200 bytes long.
 
-* The response has already set the ``Content-Encoding`` header.
+    * The response has already set the ``Content-Encoding`` header.
 
-* The request (the browser) hasn't sent an ``Accept-Encoding`` header
-  containing ``gzip``.
+    * The request (the browser) hasn't sent an ``Accept-Encoding`` header
+      containing ``gzip``.
 
-If the response has an ``ETag`` header, the ETag is made weak to comply with
-:rfc:`9110#section-8.8.1`.
+    If the response has an ``ETag`` header, the ETag is made weak to comply
+    with :rfc:`9110#section-8.8.1`.
 
-You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.gzip.gzip_page` decorator.
+    You can apply GZip compression to individual views using the
+    :func:`~django.views.decorators.gzip.gzip_page` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -147,14 +148,14 @@ Conditional GET middleware
 
 .. class:: ConditionalGetMiddleware
 
-Handles conditional GET operations. If the response doesn't have an ``ETag``
-header, the middleware adds one if needed. If the response has an ``ETag`` or
-``Last-Modified`` header, and the request has ``If-None-Match`` or
-``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpResponseNotModified`.
+    Handles conditional GET operations. If the response doesn't have an
+    ``ETag`` header, the middleware adds one if needed. If the response has
+    an ``ETag`` or ``Last-Modified`` header, and the request has
+    ``If-None-Match`` or ``If-Modified-Since``, the response is replaced by
+    an :class:`~django.http.HttpResponseNotModified`.
 
-You can handle conditional GET operations with individual views using the
-:func:`~django.views.decorators.http.conditional_page` decorator.
+    You can handle conditional GET operations with individual views using
+    the :func:`~django.views.decorators.http.conditional_page` decorator.
 
 Locale middleware
 -----------------
@@ -170,9 +171,9 @@ Locale middleware
         ``LocaleMiddleware`` and override the attribute to customize the
         redirects issued by the middleware.
 
-Enables language selection based on data from the request. It customizes
-content for each user. See the :doc:`internationalization documentation
-</topics/i18n/translation>`.
+    Enables language selection based on data from the request. It
+    customizes content for each user. See the :doc:`internationalization
+    documentation </topics/i18n/translation>`.
 
 Message middleware
 ------------------
@@ -182,8 +183,8 @@ Message middleware
 
 .. class:: MessageMiddleware
 
-Enables cookie- and session-based message support. See the
-:doc:`messages documentation </ref/contrib/messages>`.
+    Enables cookie- and session-based message support. See the
+    :doc:`messages documentation </ref/contrib/messages>`.
 
 .. _security-middleware:
 
@@ -470,8 +471,8 @@ Session middleware
 
 .. class:: SessionMiddleware
 
-Enables session support. See the :doc:`session documentation
-</topics/http/sessions>`.
+    Enables session support. See the :doc:`session documentation
+    </topics/http/sessions>`.
 
 Site middleware
 ---------------
@@ -481,8 +482,9 @@ Site middleware
 
 .. class:: CurrentSiteMiddleware
 
-Adds the ``site`` attribute representing the current site to every incoming
-``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
+    Adds the ``site`` attribute representing the current site to every
+    incoming ``HttpRequest`` object. See the :ref:`sites documentation
+    <site-middleware>`.
 
 Authentication middleware
 -------------------------
@@ -492,14 +494,14 @@ Authentication middleware
 
 .. class:: AuthenticationMiddleware
 
-Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
-<auth-web-requests>`.
+    Adds the ``user`` attribute, representing the currently-logged-in user,
+    to every incoming ``HttpRequest`` object. See :ref:`Authentication in
+    web requests <auth-web-requests>`.
 
 .. class:: LoginRequiredMiddleware
 
-    Subclass the middleware and override the following attributes and methods
-    to customize behavior for unauthenticated requests.
+    Subclass the middleware and override the following attributes and
+    methods to customize behavior for unauthenticated requests.
 
     .. attribute:: redirect_field_name
 
@@ -507,80 +509,84 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
     .. method:: get_login_url()
 
-        Returns the URL that unauthenticated requests will be redirected to.
-        This result is either the ``login_url`` set on the
-        :func:`~django.contrib.auth.decorators.login_required` decorator (if
-        not ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+        Returns the URL that unauthenticated requests will be redirected
+        to. This result is either the ``login_url`` set on the
+        :func:`~django.contrib.auth.decorators.login_required` decorator
+        (if not ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
     .. method:: get_redirect_field_name()
 
-        Returns the name of the query parameter that contains the URL the user
-        should be redirected to after a successful login. This result is either
-        the ``redirect_field_name`` set on the
-        :func:`~.django.contrib.auth.decorators.login_required` decorator (if
-        not ``None``), or :attr:`redirect_field_name`. If ``None`` is returned,
-        a query parameter won't be added.
+        Returns the name of the query parameter that contains the URL the
+        user should be redirected to after a successful login. This result
+        is either the ``redirect_field_name`` set on the
+        :func:`~.django.contrib.auth.decorators.login_required` decorator
+        (if not ``None``), or :attr:`redirect_field_name`. If ``None`` is
+        returned, a query parameter won't be added.
 
-Redirects all unauthenticated requests to a login page, except for views
-excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
-login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
-customized.
+    Redirects all unauthenticated requests to a login page, except for
+    views excluded with
+    :func:`~.django.contrib.auth.decorators.login_not_required`. The login
+    page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
+    customized.
 
-Enable this middleware by adding it to the :setting:`MIDDLEWARE` setting
-**after** :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
+    Enable this middleware by adding it to the :setting:`MIDDLEWARE`
+    setting **after**
+    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE = [
-        "...",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.auth.middleware.LoginRequiredMiddleware",
-        "...",
-    ]
+        MIDDLEWARE = [
+            "...",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.auth.middleware.LoginRequiredMiddleware",
+            "...",
+        ]
 
-Make a view public, allowing unauthenticated requests, with
-:func:`~.django.contrib.auth.decorators.login_not_required`. For example::
+    Make a view public, allowing unauthenticated requests, with
+    :func:`~.django.contrib.auth.decorators.login_not_required`. For
+    example::
 
-       from django.contrib.auth.decorators import login_not_required
-
-
-       @login_not_required
-       def contact_us(request): ...
-
-Customize the login URL or field name for authenticated views with the
-:func:`~.django.contrib.auth.decorators.login_required` decorator to set
-``login_url`` or ``redirect_field_name`` respectively. For example::
-
-    from django.contrib.auth.decorators import login_required
-    from django.utils.decorators import method_decorator
-    from django.views.generic import View
+           from django.contrib.auth.decorators import login_not_required
 
 
-    @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
-    def book_dashboard(request): ...
+           @login_not_required
+           def contact_us(request): ...
+
+    Customize the login URL or field name for authenticated views with the
+    :func:`~.django.contrib.auth.decorators.login_required` decorator to
+    set ``login_url`` or ``redirect_field_name`` respectively. For
+    example::
+
+        from django.contrib.auth.decorators import login_required
+        from django.utils.decorators import method_decorator
+        from django.views.generic import View
 
 
-    @method_decorator(
-        login_required(login_url="/books/login/", redirect_field_name="redirect_to"),
-        name="dispatch",
-    )
-    class BookMetrics(View):
-        pass
+        @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
+        def book_dashboard(request): ...
 
-.. admonition:: Ensure that your login view does not require a login.
 
-    To prevent infinite redirects, ensure you have
-    :ref:`enabled unauthenticated requests
-    <disable-login-required-middleware-for-views>` to your login view.
+        @method_decorator(
+            login_required(login_url="/books/login/", redirect_field_name="redirect_to"),
+            name="dispatch",
+        )
+        class BookMetrics(View):
+            pass
+
+    .. admonition:: Ensure that your login view does not require a login.
+
+        To prevent infinite redirects, ensure you have
+        :ref:`enabled unauthenticated requests
+        <disable-login-required-middleware-for-views>` to your login view.
 
 .. class:: RemoteUserMiddleware
 
-Middleware for utilizing web server provided authentication. See
-:doc:`/howto/auth-remote-user` for usage details.
+    Middleware for utilizing web server provided authentication. See
+    :doc:`/howto/auth-remote-user` for usage details.
 
 .. class:: PersistentRemoteUserMiddleware
 
-Middleware for utilizing web server provided authentication when enabled only
-on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
-details.
+    Middleware for utilizing web server provided authentication when
+    enabled only on the login page. See
+    :ref:`persistent-remote-user-middleware-howto` for usage details.
 
 CSRF protection middleware
 --------------------------
@@ -589,12 +595,13 @@ CSRF protection middleware
 
 .. class:: CsrfViewMiddleware
 
-Adds protection against Cross Site Request Forgeries by adding hidden form
-fields to POST forms and checking requests for the correct value. See the
-:doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
+    Adds protection against Cross Site Request Forgeries by adding hidden
+    form fields to POST forms and checking requests for the correct value.
+    See the :doc:`Cross Site Request Forgery protection documentation
+    </ref/csrf>`.
 
-You can add Cross Site Request Forgery protection to individual views using the
-:func:`~django.views.decorators.csrf.csrf_protect` decorator.
+    You can add Cross Site Request Forgery protection to individual views
+    using the :func:`~django.views.decorators.csrf.csrf_protect` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -603,8 +610,8 @@ You can add Cross Site Request Forgery protection to individual views using the
 
 .. class:: XFrameOptionsMiddleware
 
-Simple :doc:`clickjacking protection via the X-Frame-Options header
-</ref/clickjacking/>`.
+    Simple :doc:`clickjacking protection via the X-Frame-Options header
+    </ref/clickjacking/>`.
 
 Content Security Policy middleware
 ----------------------------------
@@ -613,19 +620,20 @@ Content Security Policy middleware
 
 .. class:: ContentSecurityPolicyMiddleware
 
-.. versionadded:: 6.0
+    .. versionadded:: 6.0
 
-Adds support for Content Security Policy (CSP), which helps mitigate risks such
-as Cross-Site Scripting (XSS) and data injection attacks by controlling the
-sources of content that can be loaded in the browser. See the
-:ref:`csp-overview` documentation for details on configuring policies.
+    Adds support for Content Security Policy (CSP), which helps mitigate
+    risks such as Cross-Site Scripting (XSS) and data injection attacks by
+    controlling the sources of content that can be loaded in the browser.
+    See the :ref:`csp-overview` documentation for details on configuring
+    policies.
 
-This middleware sets the following headers on the response depending on the
-available settings:
+    This middleware sets the following headers on the response depending on
+    the available settings:
 
-* ``Content-Security-Policy``, based on :setting:`SECURE_CSP`.
-* ``Content-Security-Policy-Report-Only``, based on
-  :setting:`SECURE_CSP_REPORT_ONLY`.
+    * ``Content-Security-Policy``, based on :setting:`SECURE_CSP`.
+    * ``Content-Security-Policy-Report-Only``, based on
+      :setting:`SECURE_CSP_REPORT_ONLY`.
 
 .. _middleware-ordering:
 

@@ -420,6 +420,35 @@ documentation:
 * Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
   Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
+* Ensure directive content is properly indented. According to `Sphinx
+  documentation`__, directive descriptions, options, and all inner content must
+  be indented to the same level as the directive content (4 spaces). This
+  ensures the documentation builds correctly and enables proper parsing for
+  features like automatic table of contents generation.
+
+  Correct example:
+
+  .. code-block:: rst
+
+      .. class:: MyClass(arg1, arg2)
+
+          This is the class description, indented 4 spaces.
+
+          .. attribute:: my_attribute
+
+              This is an attribute description, indented 8 spaces (4 spaces
+              for the outer class, plus 4 for the inner attribute).
+
+  Incorrect example (content not indented):
+
+  .. code-block:: rst
+
+      .. class:: MyClass(arg1, arg2)
+
+      This is the class description, not indented. This is incorrect!
+
+  __ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+
 Django-specific markup
 ======================
 
