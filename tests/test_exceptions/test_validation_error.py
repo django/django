@@ -377,17 +377,25 @@ class TestValidationError(unittest.TestCase):
         # Test with a list of strings
         error = ValidationError(["Error 1", "Error 2", "Error 3"])
         self.assertEqual(len(error.error_list), 3)
-        self.assertEqual([str(e.message) for e in error.error_list], ["Error 1", "Error 2", "Error 3"])
+        self.assertEqual(
+            [str(e.message) for e in error.error_list],
+            ["Error 1", "Error 2", "Error 3"],
+        )
 
         # Test with a list of ValidationError instances
         error1 = ValidationError("Nested error 1")
         error2 = ValidationError("Nested error 2")
         error = ValidationError([error1, error2])
         self.assertEqual(len(error.error_list), 2)
-        self.assertEqual([str(e.message) for e in error.error_list], ["Nested error 1", "Nested error 2"])
+        self.assertEqual(
+            [str(e.message) for e in error.error_list],
+            ["Nested error 1", "Nested error 2"],
+        )
 
         # Test with mixed types (strings and ValidationError instances)
-        error = ValidationError(["String error", ValidationError("ValidationError instance")])
+        error = ValidationError(
+            ["String error", ValidationError("ValidationError instance")]
+        )
         self.assertEqual(len(error.error_list), 2)
         messages = [str(e.message) for e in error.error_list]
         self.assertIn("String error", messages)
