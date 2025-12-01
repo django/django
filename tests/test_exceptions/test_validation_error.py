@@ -370,9 +370,9 @@ class TestValidationError(unittest.TestCase):
 
     def test_list_input_processes_all_items(self):
         """
-        Test that ValidationError correctly processes all items in a list input.
-        This test verifies that variable shadowing doesn't cause issues where
-        the loop variable overwrites the parameter.
+        Test that ValidationError correctly processes all items in a list
+        input. This test verifies that variable shadowing doesn't cause
+        issues where the loop variable overwrites the parameter.
         """
         # Test with a list of strings
         error = ValidationError(["Error 1", "Error 2", "Error 3"])
