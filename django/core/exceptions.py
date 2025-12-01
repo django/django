@@ -172,14 +172,14 @@ class ValidationError(Exception):
 
         elif isinstance(message, list):
             self.error_list = []
-            for message in message:
+            for item in message:
                 # Normalize plain strings to instances of ValidationError.
-                if not isinstance(message, ValidationError):
-                    message = ValidationError(message)
-                if hasattr(message, "error_dict"):
-                    self.error_list.extend(sum(message.error_dict.values(), []))
+                if not isinstance(item, ValidationError):
+                    item = ValidationError(item)
+                if hasattr(item, "error_dict"):
+                    self.error_list.extend(sum(item.error_dict.values(), []))
                 else:
-                    self.error_list.extend(message.error_list)
+                    self.error_list.extend(item.error_list)
 
         else:
             self.message = message
