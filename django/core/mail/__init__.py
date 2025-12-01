@@ -21,7 +21,11 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    deprecate_posargs,
+    django_file_prefixes,
+)
 from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
@@ -168,7 +172,7 @@ def _send_server_message(
             f"Using (name, address) pairs in the {setting_name} setting is deprecated."
             " Replace with a list of email address strings.",
             RemovedInDjango70Warning,
-            stacklevel=2,
+            skip_file_prefixes=django_file_prefixes(),
         )
         recipients = [a[1] for a in recipients]
 
