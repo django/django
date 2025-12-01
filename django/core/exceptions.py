@@ -54,7 +54,7 @@ class DisallowedHost(SuspiciousOperation):
 
 
 class DisallowedRedirect(SuspiciousOperation):
-    """Redirect to scheme not in allowed list"""
+    """Redirect was too long or scheme was not in allowed list."""
 
     pass
 
