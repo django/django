@@ -6441,7 +6441,7 @@ class OperationTests(OperationTestBase):
                 "Pony",
                 "modified_pink",
                 models.GeneratedField(
-                    expression=F("pink"),
+                    expression=F("pink") + 2,
                     output_field=models.IntegerField(),
                     db_persist=True,
                 ),
@@ -6450,7 +6450,7 @@ class OperationTests(OperationTestBase):
                 "Pony",
                 "modified_pink",
                 models.GeneratedField(
-                    expression=F("pink"),
+                    expression=F("pink") + 2,
                     output_field=models.IntegerField(),
                     db_persist=False,
                 ),
