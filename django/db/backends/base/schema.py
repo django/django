@@ -452,10 +452,14 @@ class BaseDatabaseSchemaEditor:
             params = []
         return sql % default_sql, params
 
+    def _column_generated_persistency_sql(self, field):
+        """Return the SQL to define the persistency of generated fields."""
+        return "STORED" if field.db_persist else "VIRTUAL"
+
     def _column_generated_sql(self, field):
         """Return the SQL to use in a GENERATED ALWAYS clause."""
         expression_sql, params = field.generated_sql(self.connection)
-        persistency_sql = "STORED" if field.db_persist else "VIRTUAL"
+        persistency_sql = self._column_generated_persistency_sql(field)
         if self.connection.features.requires_literal_defaults:
             expression_sql = expression_sql % tuple(self.quote_value(p) for p in params)
             params = ()
@@ -906,6 +910,15 @@ class BaseDatabaseSchemaEditor:
             else:
                 new_field_sql = new_field.generated_sql(self.connection)
                 modifying_generated_field = old_field_sql != new_field_sql
+                db_features = self.connection.features
+                # Some databases (e.g. Oracle) don't allow altering a data type
+                # for generated columns.
+                if (
+                    not modifying_generated_field
+                    and old_type != new_type
+                    and not db_features.supports_alter_generated_column_data_type
+                ):
+                    modifying_generated_field = True
         if modifying_generated_field:
             raise ValueError(
                 f"Modifying GeneratedFields is not supported - the field {new_field} "

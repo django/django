@@ -263,6 +263,10 @@ Models
   :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
   21c+.
 
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
+
 Pagination
 ~~~~~~~~~~
 
