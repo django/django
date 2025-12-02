@@ -102,6 +102,11 @@ Django now includes a built-in Tasks framework for running code outside the
 HTTP request–response cycle. This enables offloading work, such as sending
 emails or processing data, to background workers.
 
+The framework provides task definition, validation, queuing, and result
+handling. Django guarantees consistent behavior for creating and managing
+tasks, while the responsibility for running them continues to belong to
+external worker processes.
+
 Tasks are defined using the :func:`~django.tasks.task` decorator::
 
     from django.core.mail import send_mail
