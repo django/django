@@ -63,8 +63,8 @@ Using models
 
 Once you have defined your models, you need to tell Django you're going to
 *use* those models. Do this by editing your settings file and changing the
-:setting:`INSTALLED_APPS` setting to add the name of the module that contains
-your ``models.py``.
+:setting:`INSTALLED_APPS` setting to add the name of the package that contains
+your ``models`` module.
 
 For example, if the models for your application live in the module
 ``myapp.models`` (the package structure that is created for an
