@@ -65,10 +65,14 @@ async def streaming_view(request):
 test_filename = __file__
 
 
+def file_view(request):
+    return FileResponse(open(test_filename, "rb"))
+
+
 urlpatterns = [
     path("", hello),
     path("cookie/", hello_cookie),
-    path("file/", lambda x: FileResponse(open(test_filename, "rb"))),
+    path("file/", file_view),
     path("meta/", hello_meta),
     path("post/", post_echo),
     path("wait/", sync_waiter),

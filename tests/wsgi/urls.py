@@ -12,8 +12,12 @@ def cookie(request):
     return response
 
 
+def file_view(request):
+    return FileResponse(open(__file__, "rb"))
+
+
 urlpatterns = [
     path("", helloworld),
     path("cookie/", cookie),
-    path("file/", lambda x: FileResponse(open(__file__, "rb"))),
+    path("file/", file_view),
 ]
