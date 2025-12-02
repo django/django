@@ -266,6 +266,10 @@ Models
 * The new :class:`~django.db.models.functions.UUID4` and
   :class:`~django.db.models.functions.UUID7` database functions were added.
 
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
+
 Pagination
 ~~~~~~~~~~
 
