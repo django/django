@@ -1029,7 +1029,7 @@ class SchemaTests(TransactionTestCase):
         class GeneratedFieldIndexedModel(Model):
             number = IntegerField(default=1)
             generated = GeneratedField(
-                expression=F("number"),
+                expression=F("number") + 1,
                 db_persist=True,
                 output_field=IntegerField(),
             )
@@ -1042,7 +1042,7 @@ class SchemaTests(TransactionTestCase):
 
         old_field = GeneratedFieldIndexedModel._meta.get_field("generated")
         new_field = GeneratedField(
-            expression=F("number"),
+            expression=F("number") + 1,
             db_persist=True,
             db_index=True,
             output_field=IntegerField(),
