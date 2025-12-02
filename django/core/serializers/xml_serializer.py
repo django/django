@@ -153,13 +153,14 @@ class Serializer(base.Serializer):
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
+
             if self.use_natural_foreign_keys and hasattr(
                 field.remote_field.model, "natural_key"
             ):
-                # If the objects in the m2m have a natural key, use it
+                # If the objects in the m2m have a natural key, use it.
                 def handle_m2m(value):
                     natural = value.natural_key()
-                    # Iterable natural keys are rolled out as subelements
+                    # Iterable natural keys are rolled out as subelements.
                     self.xml.startElement("object", {})
                     for key_value in natural:
                         self.xml.startElement("natural", {})
@@ -167,26 +168,31 @@ class Serializer(base.Serializer):
                         self.xml.endElement("natural")
                     self.xml.endElement("object")
 
-                def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name)
-                    chunk_size = (
-                        2000 if getattr(attr, "prefetch_cache_name", None) else None
-                    )
-                    return attr.iterator(chunk_size)
+                def get_default_queryset():
+                    manager = getattr(obj, field.name)
+                    qs = manager.all()
+                    model = field.remote_field.model
+                    # Only apply DB-level pk ordering IF:
+                    # 1. We are using natural keys
+                    # 2. The model has no explicit ordering defined
+                    if not model._meta.ordering:
+                        qs = qs.order_by(model._meta.pk.name)
+                    return qs
 
             else:
 
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
-                def queryset_iterator(obj, field):
-                    query_set = getattr(obj, field.name).select_related(None).only("pk")
-                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                    return query_set.iterator(chunk_size=chunk_size)
+                def get_default_queryset():
+                    manager = getattr(obj, field.name)
+                    # Match Python serializer behavior:
+                    # Avoid selecting unnecessary columns like meta_data_id.
+                    return manager.select_related(None).only("pk")
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
-                queryset_iterator(obj, field),
+                get_default_queryset(),
             )
             for relobj in m2m_iter:
                 handle_m2m(relobj)

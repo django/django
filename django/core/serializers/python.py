@@ -75,10 +75,17 @@ class Serializer(base.Serializer):
 
                 def queryset_iterator(obj, field):
                     attr = getattr(obj, field.name)
+                    qs = attr
+                    model = field.remote_field.model
+                    # If the related model has no explicit ordering, fall back
+                    # to primary key ordering to ensure deterministic DB-level
+                    # ordering of natural-key M2M relations.
+                    if not model._meta.ordering:
+                        qs = qs.order_by(model._meta.pk.name)
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
-                    return attr.iterator(chunk_size)
+                    return qs.iterator(chunk_size=chunk_size)
 
             else:
 
