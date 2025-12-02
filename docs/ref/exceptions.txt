@@ -175,6 +175,8 @@ Django core exception classes are defined in ``django.core.exceptions``.
     Raised when a field would be fetched on-demand and the
     :attr:`~django.db.models.RAISE` fetch mode is active.
 
+    See :doc:`/topics/db/fetch-modes` for more information about fetch modes.
+
 ``ValidationError``
 -------------------
 
