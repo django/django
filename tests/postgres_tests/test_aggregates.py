@@ -176,7 +176,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         self.assertEqual(first_warning.category, RemovedInDjango70Warning)
         self.assertEqual(
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead.",
+            "django.db.models.aggregates.StringAgg instead.",
             str(first_warning.message),
         )
 
