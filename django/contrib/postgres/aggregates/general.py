@@ -82,7 +82,7 @@ class StringAgg(_DeprecatedOrdering, _StringAgg):
 
         warnings.warn(
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead.",
+            "django.db.models.aggregates.StringAgg instead.",
             category=RemovedInDjango70Warning,
             stacklevel=2,
         )
