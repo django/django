@@ -641,7 +641,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_string_agg_deprecation(self):
         msg = (
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead."
+            "django.db.models.aggregates.StringAgg instead."
         )
 
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
