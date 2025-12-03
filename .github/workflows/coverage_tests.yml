@@ -38,7 +38,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip wheel
           python -m pip install -r tests/requirements/py3.txt -e .
-          python -m pip install 'coverage[toml]'
+          python -m pip install 'coverage[toml]' diff-cover
 
       - name: Run tests with coverage
         env:
@@ -58,12 +58,21 @@ jobs:
           python -m coverage report --show-missing
           python -m coverage xml -o tests/coverage.xml
 
-      - name: Upload coverage data
+      - name: Generate diff coverage report
+        if: success()
+        run: |
+          if (Test-Path 'tests/coverage.xml') {
+            diff-cover tests/coverage.xml --compare-branch=origin/main --fail-under=0 > diff-cover-report.md
+          } else {
+            Set-Content -Path diff-cover-report.md -Value 'No coverage data available.'
+          }
+
+      - name: Upload diff coverage report
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-data-${{ github.event.pull_request.number }}
-          path: tests/coverage.xml
+          name: diff-coverage-report-${{ github.event.pull_request.number }}
+          path: diff-cover-report.md
           retention-days: 1
 
       - name: Save PR number
@@ -77,4 +86,3 @@ jobs:
           name: pr-number-${{ github.event.pull_request.number }}
           path: pr_number.txt
           retention-days: 1
-          

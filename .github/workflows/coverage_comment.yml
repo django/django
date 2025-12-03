@@ -19,25 +19,10 @@ jobs:
     name: Post Coverage Comment
     runs-on: windows-latest
     steps:
-      - name: Checkout repository  
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-
-      - name: Install diff-cover
-        run: pip install diff-cover
-
-      - name: Download coverage data
+      - name: Download diff coverage report
         uses: actions/download-artifact@v4
         with:
-          name: coverage-data-${{ github.event.workflow_run.pull_requests[0].number }}
+          name: diff-coverage-report-${{ github.event.workflow_run.pull_requests[0].number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -53,15 +38,6 @@ jobs:
         run: |
           $pr_number = Get-Content pr_number.txt
           echo "pr_number=$pr_number" >> $env:GITHUB_OUTPUT
-
-      - name: Run diff-cover
-        if: success()
-        run: |
-          if (Test-Path 'coverage.xml') {
-            diff-cover coverage.xml --compare-branch=origin/main --fail-under=0 > diff-cover-report.md
-          } else {
-            Set-Content -Path diff-cover-report.md -Value 'No coverage.xml found; skipping diff-cover.'
-          }
 
       - name: Post/update PR comment
         env:
@@ -101,4 +77,3 @@ jobs:
               issue_number: prNumber,
               body: commentBody,
             });
-            
