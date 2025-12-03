@@ -8,17 +8,16 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
 from django.db import connection, migrations, models
+from django.db.migrations import operations
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.functions import Concat, Lower, Upper
+from django.db.models import F, Value
+from django.db.models.functions import Cast, Concat, Lower, Upper
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_lru_cache
-from django.db.models import F, Value
-from django.db.models.functions import Cast
-from django.db.migrations import operations
 
 from .models import FoodManager, FoodQuerySet
 
@@ -1233,6 +1232,8 @@ class AutodetectorTests(BaseAutodetectorTests):
                 ("title", models.CharField(max_length=200)),  # Just some random field
                 (
                     "ref",
+                    # The actual field that causes the issue because
+                    # it references FK author_id
                     models.GeneratedField(
                         expression=Concat(
                             Cast(F("author_id"), output_field=models.TextField()),
@@ -1240,7 +1241,7 @@ class AutodetectorTests(BaseAutodetectorTests):
                         ),
                         output_field=models.CharField(max_length=64),
                         db_persist=True,
-                    ),  # The actual field that causes the issue because it references FK author_id
+                    ),
                 ),
             ],
         )
@@ -1248,9 +1249,12 @@ class AutodetectorTests(BaseAutodetectorTests):
         before = self.make_project_state([])
         after = self.make_project_state(
             [
-                self.author_with_book,  # testapp.Author with FK to otherapp.Book
-                book_with_generated,  # otherapp.Book with FK to testapp.Author + GeneratedField
-                self.attribution,  # otherapp.Attribution (M2M through)
+                # testapp.Author with FK to otherapp.Book
+                self.author_with_book,
+                # otherapp.Book with FK to testapp.Author + GeneratedField
+                book_with_generated,
+                # otherapp.Attribution (M2M through)
+                self.attribution,
             ]
         )
 
@@ -1293,7 +1297,8 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertIn("author", field_names)
         self.assertIn("ref", field_names)
 
-        # There must NOT be any AddField(Book, "author") in *any* otherapp migration.
+        # There must NOT be any AddField(Book, "author")
+        # in *any* otherapp migration.
         self.assertFalse(
             any(
                 isinstance(op, operations.AddField)
