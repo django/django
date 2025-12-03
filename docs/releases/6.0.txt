@@ -7,8 +7,8 @@ Django 6.0 release notes - UNDER DEVELOPMENT
 Welcome to Django 6.0!
 
 These release notes cover the :ref:`new features <whats-new-6.0>`, as well as
-some :ref:`backwards incompatible changes <backwards-incompatible-6.0>` you'll
-want to be aware of when upgrading from Django 5.2 or earlier. We've
+some :ref:`backwards incompatible changes <backwards-incompatible-6.0>` you
+should be aware of when upgrading from Django 5.2 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-6.0>`.
 
@@ -160,6 +160,12 @@ Minor features
 * The new :attr:`.AdminSite.password_change_form` attribute allows customizing
   the form used in the admin site password change view.
 
+* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
+  icons and CSS styling. Previously, both levels shared the same appearance as
+  ``messages.SUCCESS``. Given that :meth:`.ModelAdmin.message_user` uses
+  ``messages.INFO`` by default, set the level to ``messages.SUCCESS`` to keep
+  the previous icon and styling.
+
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -189,6 +195,11 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
+* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
+  inline JavaScript in templates. If you have customized any geometry widgets
+  or their templates, you may need to :ref:`update them
+  <geometry-widgets-customization>` to match the new layout.
+
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -216,6 +227,10 @@ Minor features
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
+
+* The :djadmin:`collectstatic` command now reports only a summary for skipped
+  files (and for deleted files when using ``--clear``) at ``--verbosity`` 1. To
+  see per-file details for either case, set ``--verbosity`` to 2 or higher.
 
 Email
 ~~~~~
@@ -462,28 +477,8 @@ Miscellaneous
   refactored to use Python's :class:`email.message.Message` for parsing.
   Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
 
-* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
-  inline JavaScript in templates. If you have customized any geometry widgets
-  or their templates, you may need to :ref:`update them
-  <geometry-widgets-customization>` to match the new layout.
-
-* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
-  icons and CSS styling in the admin. Previously, these used the same icon and
-  styling as the ``messages.SUCCESS`` level. Since
-  :meth:`.ModelAdmin.message_user` uses the ``messages.INFO`` level by default,
-  set the level to ``messages.SUCCESS`` to retain the previous icon and
-  styling.
-
 * The minimum supported version of ``asgiref`` is increased from 3.8.1 to
   3.9.1.
-
-* The :djadmin:`collectstatic` command now reports only a summary of skipped
-  files due to conflicts when ``--verbosity`` is 1. To see warnings for each
-  conflicting destination path, set the ``--verbosity`` flag to 2 or higher.
-
-* The :option:`collectstatic --clear` command now reports only a summary of
-  deleted files when ``--verbosity`` is 1. To see the details for each file
-  deleted, set the ``--verbosity`` flag to 2 or higher.
 
 .. _deprecated-features-6.0:
 
@@ -516,14 +511,15 @@ Miscellaneous
   available :class:`~django.db.models.StringAgg` class.
 
 * The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
-  ``order_by`` attribute now available on the ``Aggregate`` class.
+  ``order_by`` attribute now available on the
+  :class:`~django.db.models.Aggregate` class.
 
 * The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` will
   change from HTTP to HTTPS in Django 7.0. Set the transitional setting
-  ``URLIZE_ASSUME_HTTPS`` to ``True`` to opt into assuming HTTPS during the
-  Django 6.x release cycle.
+  :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to opt into assuming HTTPS during
+  the Django 6.x release cycle.
 
-* ``URLIZE_ASSUME_HTTPS`` transitional setting is deprecated.
+* The :setting:`URLIZE_ASSUME_HTTPS` transitional setting is deprecated.
 
 * Setting :setting:`ADMINS` or :setting:`MANAGERS` to a list of (name, address)
   tuples is deprecated. Set to a list of email address strings instead. Django
