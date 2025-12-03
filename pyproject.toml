@@ -19,7 +19,7 @@ readme = "README.rst"
 license = "BSD-3-Clause"
 license-files = ["LICENSE", "LICENSE.python"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Framework :: Django",
     "Intended Audience :: Developers",
