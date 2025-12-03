@@ -1710,6 +1710,19 @@ aria-describedby="id_birthday_error">
             },
         )
 
+    def test_add_error_validation_error_dict(self):
+        class FooForm(Form):
+            the_field = CharField(max_length=100)
+
+        exc = ValidationError({"the_field": "Something is wrong with the field."})
+        form = FooForm()
+        msg = (
+            "The argument `field` must be `None` when the `error` argument "
+            "is a ValidationError with an error_dict."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            form.add_error("the_field", exc)
+
     def test_has_error(self):
         class UserRegistration(Form):
             username = CharField(max_length=10)
