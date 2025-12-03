@@ -1165,15 +1165,11 @@ class BaseCacheTests:
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
 
-    async def test_async_uses_specialized_implementation(self):
+    async def test_async_many_uses_specialized_implementation(self):
         methods = [
             "get_many",
             "set_many",
             "delete_many",
-            "get_or_set",
-            "incr",
-            "incr_version",
-            "close",
         ]
 
         for meth in methods:
@@ -1193,6 +1189,48 @@ class BaseCacheTests:
                     with mock.patch.object(cache._class, meth) as mocked:
                         await async_meth([])
                         mocked.assert_called_once()
+
+    async def test_async_kv_uses_specialized_implementation(self):
+        methods = [
+            "get_or_set",
+            "has_key",
+            "incr",
+            "incr_version",
+        ]
+
+        for meth in methods:
+            a_meth = f"a{meth}"
+            sync_meth = getattr(cache, meth)
+            async_meth = getattr(cache, a_meth)
+
+            # If a specialized implementation of sync_meth exists without
+            # async_meth, it is still called.
+            if (
+                sync_meth.__func__ is not getattr(BaseCache, meth)
+                and async_meth.__func__ is getattr(BaseCache, a_meth)
+                and hasattr(cache, "_class")
+                and hasattr(cache._class, meth)
+            ):
+                with self.subTest(async_meth=async_meth, meth=meth):
+                    with mock.patch.object(cache._class, meth) as mocked:
+                        await async_meth("key")
+                        mocked.assert_called_once()
+
+    async def test_async_close_uses_specialized_implementation(self):
+        sync_meth = getattr(cache, "close")
+        async_meth = getattr(cache, "aclose")
+
+        # If a specialized implementation of sync_meth exists without
+        # async_meth, it is still called.
+        if (
+            sync_meth.__func__ is not getattr(BaseCache, "close")
+            and async_meth.__func__ is getattr(BaseCache, "aclose")
+            and hasattr(cache, "_class")
+            and hasattr(cache._class, "close")
+        ):
+            with mock.patch.object(cache._class, sync_meth.__func__) as mocked:
+                await async_meth()
+                mocked.assert_called_once()
 
 
 @override_settings(
