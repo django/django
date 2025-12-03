@@ -1187,7 +1187,7 @@ class BaseCacheTests:
             ):
                 with self.subTest(async_meth=async_meth, meth=meth):
                     with mock.patch.object(cache._class, meth) as mocked:
-                        await async_meth([])
+                        await async_meth([{"key": "value"}, {"key2": "value"}])
                         mocked.assert_called()
 
     async def test_async_kv_uses_specialized_implementation(self):
@@ -1212,7 +1212,7 @@ class BaseCacheTests:
                 and hasattr(cache._class, meth)
             ):
                 with self.subTest(async_meth=async_meth, meth=meth):
-                    with mock.patch.object(cache._class, meth.__func__) as mocked:
+                    with mock.patch.object(cache._class, meth) as mocked:
                         await async_meth("key")
                         mocked.assert_called()
 
