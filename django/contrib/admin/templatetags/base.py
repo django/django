@@ -10,6 +10,8 @@ class InclusionAdminNode(InclusionNode):
     or globally.
     """
 
+    __slots__ = ("template_name",)
+
     def __init__(self, parser, token, func, template_name, takes_context=True):
         self.template_name = template_name
         with lazy_annotations():

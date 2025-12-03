@@ -9,6 +9,8 @@ register = template.Library()
 
 
 class PrefixNode(template.Node):
+    __slots__ = ("varname", "name")
+
     def __repr__(self):
         return "<PrefixNode for %r>" % self.name
 
@@ -93,6 +95,8 @@ def get_media_prefix(parser, token):
 
 
 class StaticNode(template.Node):
+    __slots__ = ("varname", "path")
+
     child_nodelists = ()
 
     def __init__(self, varname=None, path=None):

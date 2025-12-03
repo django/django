@@ -356,6 +356,8 @@ def linebreak_iter(template_source):
 
 
 class Token:
+    __slots__ = ("token_type", "contents", "position", "lineno")
+
     def __init__(self, token_type, contents, position=None, lineno=None):
         """
         A token representing a string from the template.
@@ -404,6 +406,8 @@ class Token:
 
 
 class Lexer:
+    __slots__ = ("template_string", "verbatim")
+
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -465,6 +469,8 @@ class Lexer:
 
 
 class DebugLexer(Lexer):
+    __slots__ = ()
+
     def _tag_re_split_positions(self):
         last = 0
         for match in tag_re.finditer(self.template_string):
@@ -1029,11 +1035,21 @@ class Variable:
 
 
 class Node:
+    __slots__ = ("token", "origin")
+
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False
     child_nodelists = ("nodelist",)
-    token = None
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        # The below attributes cannot be set in __init__() because nearly all
+        # Node subclasses with an __init__() method, including those in Django,
+        # do not call super().__init__().
+        obj.token = None
+        obj.origin = None
+        return obj
 
     def render(self, context):
         """
@@ -1083,9 +1099,13 @@ class Node:
 
 
 class NodeList(list):
-    # Set to True the first time a non-TextNode is inserted by
-    # extend_nodelist().
-    contains_nontext = False
+    __slots__ = ("contains_nontext",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set to True the first time a non-TextNode is inserted by
+        # extend_nodelist().
+        self.contains_nontext = False
 
     def render(self, context):
         return SafeString("".join([node.render_annotated(context) for node in self]))
@@ -1099,6 +1119,8 @@ class NodeList(list):
 
 
 class TextNode(Node):
+    __slots__ = ("s",)
+
     child_nodelists = ()
 
     def __init__(self, s):
@@ -1137,6 +1159,7 @@ def render_value_in_context(value, context):
 
 
 class VariableNode(Node):
+    __slots__ = ("filter_expression",)
     child_nodelists = ()
 
     def __init__(self, filter_expression):

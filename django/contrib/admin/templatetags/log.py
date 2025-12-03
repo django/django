@@ -4,6 +4,8 @@ register = template.Library()
 
 
 class AdminLogNode(template.Node):
+    __slots__ = ("limit", "varname", "user")
+
     def __init__(self, limit, varname, user):
         self.limit = limit
         self.varname = varname
