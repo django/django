@@ -25,7 +25,7 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1164,6 +1164,35 @@ class BaseCacheTests:
             # default value should be returned.
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
+
+    async def test_async_uses_specialized_implementation(self):
+        methods = [
+            "get_many",
+            "set_many",
+            "delete_many",
+            "get_or_set",
+            "incr",
+            "incr_version",
+            "close",
+        ]
+
+        for meth in methods:
+            a_meth = f"a{meth}"
+            sync_meth = getattr(cache, meth)
+            async_meth = getattr(cache, a_meth)
+
+            # If a specialized implementation of sync_meth exists without
+            # async_meth, it is still called.
+            if (
+                sync_meth.__func__ is not getattr(BaseCache, meth)
+                and async_meth.__func__ is getattr(BaseCache, a_meth)
+                and hasattr(cache, "_class")
+                and hasattr(cache._class, meth)
+            ):
+                with self.subTest(async_meth=async_meth, meth=meth):
+                    with mock.patch.object(cache._class, meth) as mocked:
+                        await async_meth([])
+                        mocked.assert_called_once()
 
 
 @override_settings(
