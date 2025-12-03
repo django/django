@@ -1,6 +1,6 @@
 from django.db.models.sql.compiler import (  # isort:skip
     SQLAggregateCompiler,
-    SQLCompiler as BaseSQLCompiler,
+    SQLCompiler,
     SQLDeleteCompiler,
     SQLInsertCompiler as BaseSQLInsertCompiler,
     SQLUpdateCompiler,
@@ -23,15 +23,6 @@ class InsertUnnest(list):
 
     def __str__(self):
         return "UNNEST(%s)" % ", ".join(self)
-
-
-class SQLCompiler(BaseSQLCompiler):
-    def quote_name_unless_alias(self, name):
-        if "$" in name:
-            raise ValueError(
-                "Dollar signs are not permitted in column aliases on PostgreSQL."
-            )
-        return super().quote_name_unless_alias(name)
 
 
 class SQLInsertCompiler(BaseSQLInsertCompiler):

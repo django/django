@@ -553,6 +553,14 @@ class SQLCompiler:
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
         """
+        if (
+            self.connection.features.prohibits_dollar_signs_in_column_aliases
+            and "$" in name
+        ):
+            raise ValueError(
+                "Dollar signs are not permitted in column aliases on "
+                f"{self.connection.display_name}."
+            )
         if name in self.quote_cache:
             return self.quote_cache[name]
         if (
