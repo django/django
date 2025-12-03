@@ -86,6 +86,33 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+
+Multi-line template tags and variables
+--------------------------------------
+
+A new setting :setting:`TEMPLATE_TAGS_MULTILINE` is available to switch to a
+multi-line mode for the template engine. If this is turned on you can use
+newlines inside template tags and variable blocks to improve readability:
+
+.. code-block:: html+django
+
+    {%
+        load
+            static
+            i18n
+    %}
+
+    {{
+        some_variable
+        | filter1
+        | filter2
+    }}
+
+This setting is turned on by default with new projects when using
+:djadmin:`django-admin startproject <startproject>`, and a warning is issued if
+you are using the old behavior.
+
+
 Minor features
 --------------
 
