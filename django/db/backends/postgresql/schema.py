@@ -125,7 +125,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         using_sql = " USING %(column)s::%(type)s"
         new_internal_type = new_field.get_internal_type()
         old_internal_type = old_field.get_internal_type()
-        if new_internal_type == "ArrayField" and new_internal_type == old_internal_type:
+        if new_internal_type == "ArrayField" and old_internal_type == "ArrayField":
             # Compare base data types for array fields.
             if list(self._field_base_data_types(old_field)) != list(
                 self._field_base_data_types(new_field)
