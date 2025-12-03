@@ -1186,7 +1186,7 @@ class BaseCacheTests:
                 and hasattr(cache._class, meth)
             ):
                 with self.subTest(async_meth=async_meth, meth=meth):
-                    with mock.patch.object(cache._class, meth) as mocked:
+                    with mock.patch.object(cache._class, meth.__func__) as mocked:
                         await async_meth([])
                         mocked.assert_called_once()
 
@@ -1212,7 +1212,7 @@ class BaseCacheTests:
                 and hasattr(cache._class, meth)
             ):
                 with self.subTest(async_meth=async_meth, meth=meth):
-                    with mock.patch.object(cache._class, meth) as mocked:
+                    with mock.patch.object(cache._class, meth.__func__) as mocked:
                         await async_meth("key")
                         mocked.assert_called_once()
 
