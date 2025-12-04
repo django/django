@@ -1,7 +1,7 @@
 from django.template.defaultfilters import slugify
 from django.test import SimpleTestCase
 from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -21,14 +21,14 @@ class SlugifyTests(SimpleTestCase):
     )
     def test_slugify01(self):
         output = self.engine.render_to_string(
-            "slugify01", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "slugify01", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "a-b a-amp-b")
 
     @setup({"slugify02": "{{ a|slugify }} {{ b|slugify }}"})
     def test_slugify02(self):
         output = self.engine.render_to_string(
-            "slugify02", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "slugify02", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "a-b a-amp-b")
 

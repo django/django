@@ -1,6 +1,6 @@
 from django.template.defaultfilters import truncatewords
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -17,7 +17,7 @@ class TruncatewordsTests(SimpleTestCase):
     def test_truncatewords01(self):
         output = self.engine.render_to_string(
             "truncatewords01",
-            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")},
+            {"a": "alpha & bravo", "b": SafeString("alpha &amp; bravo")},
         )
         self.assertEqual(output, "alpha & … alpha &amp; …")
 
@@ -25,7 +25,7 @@ class TruncatewordsTests(SimpleTestCase):
     def test_truncatewords02(self):
         output = self.engine.render_to_string(
             "truncatewords02",
-            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")},
+            {"a": "alpha & bravo", "b": SafeString("alpha &amp; bravo")},
         )
         self.assertEqual(output, "alpha &amp; … alpha &amp; …")
 

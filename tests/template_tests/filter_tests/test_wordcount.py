@@ -1,6 +1,6 @@
 from django.template.defaultfilters import wordcount
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -16,14 +16,14 @@ class WordcountTests(SimpleTestCase):
     )
     def test_wordcount01(self):
         output = self.engine.render_to_string(
-            "wordcount01", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "wordcount01", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "3 3")
 
     @setup({"wordcount02": "{{ a|wordcount }} {{ b|wordcount }}"})
     def test_wordcount02(self):
         output = self.engine.render_to_string(
-            "wordcount02", {"a": "a & b", "b": mark_safe("a &amp; b")}
+            "wordcount02", {"a": "a & b", "b": SafeString("a &amp; b")}
         )
         self.assertEqual(output, "3 3")
 

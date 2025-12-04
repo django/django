@@ -3,7 +3,7 @@ from functools import wraps
 
 from django.template.engine import Engine
 from django.test.utils import override_settings
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(ROOT, "templates")
@@ -185,4 +185,4 @@ class UnsafeClass:
 
 class SafeClass:
     def __str__(self):
-        return mark_safe("you &gt; me")
+        return SafeString("you &gt; me")

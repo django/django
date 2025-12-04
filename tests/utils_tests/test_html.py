@@ -22,7 +22,7 @@ from django.utils.html import (
     strip_tags,
     urlize,
 )
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 
 @override_settings(URLIZE_ASSUME_HTTPS=True)
@@ -64,9 +64,9 @@ class TestUtilsHtml(SimpleTestCase):
             format_html(
                 "{} {} {third} {fourth}",
                 "< Dangerous >",
-                mark_safe("<b>safe</b>"),
+                SafeString("<b>safe</b>"),
                 third="< dangerous again",
-                fourth=mark_safe("<i>safe again</i>"),
+                fourth=SafeString("<i>safe again</i>"),
             ),
             "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>",
         )
@@ -357,8 +357,8 @@ class TestUtilsHtml(SimpleTestCase):
     def test_conditional_escape(self):
         s = "<h1>interop</h1>"
         self.assertEqual(conditional_escape(s), "&lt;h1&gt;interop&lt;/h1&gt;")
-        self.assertEqual(conditional_escape(mark_safe(s)), s)
-        self.assertEqual(conditional_escape(lazystr(mark_safe(s))), s)
+        self.assertEqual(conditional_escape(SafeString(s)), s)
+        self.assertEqual(conditional_escape(lazystr(SafeString(s))), s)
 
     def test_html_safe(self):
         @html_safe

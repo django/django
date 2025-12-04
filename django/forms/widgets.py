@@ -17,7 +17,7 @@ from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
@@ -143,7 +143,7 @@ class Media:
         return self.merge(*self._js_lists)
 
     def render(self):
-        return mark_safe(
+        return SafeString(
             "\n".join(
                 chain.from_iterable(
                     getattr(self, "render_" + name)() for name in MEDIA_TYPES
@@ -333,7 +333,7 @@ class Widget(metaclass=MediaDefiningClass):
     def _render(self, template_name, context, renderer=None):
         if renderer is None:
             renderer = get_default_renderer()
-        return mark_safe(renderer.render(template_name, context))
+        return SafeString(renderer.render(template_name, context))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""

@@ -12,7 +12,7 @@ from django.forms.utils import (
     pretty_name,
 )
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy
 
 
@@ -146,7 +146,7 @@ class FormsUtilsTestCase(SimpleTestCase):
             "</li></ul>",
         )
         self.assertHTMLEqual(
-            str(ErrorList([mark_safe(example)])),
+            str(ErrorList([SafeString(example)])),
             '<ul class="errorlist"><li>Example of link: '
             '<a href="http://www.example.com/">example</a></li></ul>',
         )
@@ -157,7 +157,7 @@ class FormsUtilsTestCase(SimpleTestCase):
             "</li></ul>",
         )
         self.assertHTMLEqual(
-            str(ErrorDict({"name": mark_safe(example)})),
+            str(ErrorDict({"name": SafeString(example)})),
             '<ul class="errorlist"><li>nameExample of link: '
             '<a href="http://www.example.com/">example</a></li></ul>',
         )

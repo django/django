@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -8,7 +8,7 @@ class LastTests(SimpleTestCase):
     @setup({"last01": "{{ a|last }} {{ b|last }}"})
     def test_last01(self):
         output = self.engine.render_to_string(
-            "last01", {"a": ["x", "a&b"], "b": ["x", mark_safe("a&b")]}
+            "last01", {"a": ["x", "a&b"], "b": ["x", SafeString("a&b")]}
         )
         self.assertEqual(output, "a&amp;b a&b")
 
@@ -17,7 +17,7 @@ class LastTests(SimpleTestCase):
     )
     def test_last02(self):
         output = self.engine.render_to_string(
-            "last02", {"a": ["x", "a&b"], "b": ["x", mark_safe("a&b")]}
+            "last02", {"a": ["x", "a&b"], "b": ["x", SafeString("a&b")]}
         )
         self.assertEqual(output, "a&b a&b")
 

@@ -1,6 +1,6 @@
 from django.template.defaultfilters import length
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -31,7 +31,7 @@ class LengthTests(SimpleTestCase):
     @setup({"length05": "{% if string|length == 6 %}Pass{% endif %}"})
     def test_length05(self):
         output = self.engine.render_to_string(
-            "length05", {"string": mark_safe("django")}
+            "length05", {"string": SafeString("django")}
         )
         self.assertEqual(output, "Pass")
 
@@ -52,7 +52,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(length("1234"), 4)
 
     def test_safestring(self):
-        self.assertEqual(length(mark_safe("1234")), 4)
+        self.assertEqual(length(SafeString("1234")), 4)
 
     def test_list(self):
         self.assertEqual(length([1, 2, 3, 4]), 4)

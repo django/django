@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 from django import template
 from django.template import defaultfilters
 from django.utils.formats import number_format
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.timezone import is_aware
 from django.utils.translation import gettext as _
 from django.utils.translation import (
@@ -63,7 +63,7 @@ def ordinal(value):
         )
         value = templates[value % 10].format(value)
     # Mark value safe so i18n does not break with <sup> or <sub> see #19988
-    return mark_safe(value)
+    return SafeString(value)
 
 
 @register.filter(is_safe=True)

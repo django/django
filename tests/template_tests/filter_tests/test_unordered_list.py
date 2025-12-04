@@ -1,6 +1,6 @@
 from django.template.defaultfilters import unordered_list
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy
 
 from ..utils import setup
@@ -28,7 +28,7 @@ class UnorderedListTests(SimpleTestCase):
     @setup({"unordered_list03": "{{ a|unordered_list }}"})
     def test_unordered_list03(self):
         output = self.engine.render_to_string(
-            "unordered_list03", {"a": ["x>", [mark_safe("<y")]]}
+            "unordered_list03", {"a": ["x>", [SafeString("<y")]]}
         )
         self.assertEqual(
             output, "\t<li>x&gt;\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>"
@@ -43,7 +43,7 @@ class UnorderedListTests(SimpleTestCase):
     )
     def test_unordered_list04(self):
         output = self.engine.render_to_string(
-            "unordered_list04", {"a": ["x>", [mark_safe("<y")]]}
+            "unordered_list04", {"a": ["x>", [SafeString("<y")]]}
         )
         self.assertEqual(output, "\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>")
 

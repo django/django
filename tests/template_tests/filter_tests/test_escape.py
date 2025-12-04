@@ -1,7 +1,7 @@
 from django.template.defaultfilters import escape
 from django.test import SimpleTestCase
 from django.utils.functional import Promise, lazy
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -15,7 +15,7 @@ class EscapeTests(SimpleTestCase):
     @setup({"escape01": "{{ a|escape }} {{ b|escape }}"})
     def test_escape01(self):
         output = self.engine.render_to_string(
-            "escape01", {"a": "x&y", "b": mark_safe("x&y")}
+            "escape01", {"a": "x&y", "b": SafeString("x&y")}
         )
         self.assertEqual(output, "x&amp;y x&y")
 
@@ -28,7 +28,7 @@ class EscapeTests(SimpleTestCase):
     )
     def test_escape02(self):
         output = self.engine.render_to_string(
-            "escape02", {"a": "x&y", "b": mark_safe("x&y")}
+            "escape02", {"a": "x&y", "b": SafeString("x&y")}
         )
         self.assertEqual(output, "x&amp;y x&y")
 

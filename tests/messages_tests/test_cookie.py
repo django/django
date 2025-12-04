@@ -13,7 +13,7 @@ from django.contrib.messages.storage.cookie import (
 )
 from django.test import SimpleTestCase, override_settings
 from django.utils.crypto import get_random_string
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeString
 
 from .base import BaseTests
 
@@ -187,7 +187,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         retrieved from the message storage.
         """
         self.assertIsInstance(
-            self.encode_decode(mark_safe("<b>Hello Django!</b>")).message,
+            self.encode_decode(SafeString("<b>Hello Django!</b>")).message,
             SafeData,
         )
         self.assertNotIsInstance(

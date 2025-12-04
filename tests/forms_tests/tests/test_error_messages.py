@@ -24,7 +24,7 @@ from django.forms import (
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..models import ChoiceModel
 
@@ -238,7 +238,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
             def as_divs(self):
                 if not self:
                     return ""
-                return mark_safe(
+                return SafeString(
                     '<div class="error">%s</div>'
                     % "".join("<p>%s</p>" % e for e in self)
                 )

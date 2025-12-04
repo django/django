@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.conf import settings
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 
 def format(
@@ -26,7 +26,7 @@ def format(
     * thousand_sep: Thousand separator symbol (for example ",")
     """
     if number is None or number == "":
-        return mark_safe(number)
+        return SafeString(number)
     if use_l10n is None:
         use_l10n = True
     use_grouping = use_l10n and settings.USE_THOUSAND_SEPARATOR
@@ -34,7 +34,7 @@ def format(
     use_grouping = use_grouping and grouping != 0
     # Make the common case fast
     if isinstance(number, int) and not use_grouping and not decimal_pos:
-        return mark_safe(number)
+        return SafeString(number)
     # sign
     sign = ""
     # Treat potentially very large/small floats as Decimals.
