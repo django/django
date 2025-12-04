@@ -15,10 +15,11 @@ to be run elsewhere, potentially at a later date. This keeps requests fast,
 reduces latency, and improves the user experience. For example, a user
 shouldn't have to wait for an email to send before their page finishes loading.
 
-Django's new Tasks framework makes it easy to define and enqueue such work. It
+Django's Tasks framework makes it easy to define and enqueue such work. It
 does not provide a worker mechanism to run Tasks. The actual execution must be
 handled by infrastructure outside Django, such as a separate process or
-service.
+service. Given that, a :ref:`task backend <configuring-a-task-backend>` capable
+of executing tasks on that service should be evaluated and configured.
 
 Background Task fundamentals
 ============================
@@ -41,9 +42,13 @@ Configuring a Task backend
 The Task backend determines how and where Tasks are stored for execution and
 how they are executed. Different Task backends have different characteristics
 and configuration options, which may impact the performance and reliability of
-your application. Django comes with a number of :ref:`built-in backends
-<task-available-backends>`. Django does not provide a generic way to execute
-Tasks, only enqueue them.
+your application. Django comes with :ref:`built-in backends
+<task-available-backends>`, but these are for development and testing only.
+
+Django handles task definition, validation, queuing, and result handling, not
+execution, so production setups need a backend or worker process that actually
+runs queued work. Relevant options are listed in the `Community Ecosystem
+<https://www.djangoproject.com/community/ecosystem/>`__ page.
 
 Task backends are configured using the :setting:`TASKS` setting in your
 settings file. Whilst most applications will only need a single backend,
@@ -103,13 +108,14 @@ Stored results can be cleared using the
     >>> len(default_task_backend.results)
     0
 
-Using a custom backend
-----------------------
+Third-party backends
+--------------------
 
-While Django includes support for a number of Task backends out-of-the-box,
-sometimes you might want to customize the Task backend. To use an external Task
-backend with Django, use the Python import path as the :setting:`BACKEND
-<TASKS-BACKEND>` of the :setting:`TASKS` setting, like so::
+As mentioned at the beginning of this section, Django includes backends
+suitable for development and testing only. Production systems should rely on
+backends that supply a worker process and durable queue implementation. To use
+an external Task backend with Django, use the Python import path as the
+:setting:`BACKEND <TASKS-BACKEND>` of the :setting:`TASKS` setting, like so::
 
     TASKS = {
         "default": {

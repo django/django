@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
 "Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
@@ -330,11 +330,8 @@ msgstr ""
 "Десила се грешка. Пријављена је администраторима сајта преко е-поште и "
 "требало би да ускоро буде исправљена. Хвала Вам на стрпљењу."
 
-msgid "Run the selected action"
-msgstr "Покрени одабрану радњу"
-
-msgid "Go"
-msgstr "Почни"
+msgid "Run"
+msgstr "Покрени"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Изабери све објекте на овој страници."
@@ -444,6 +441,9 @@ msgstr "Прикажи бројање"
 msgid "Clear all filters"
 msgstr "Обриши све филтере"
 
+msgid "Save"
+msgstr "Сачувај"
+
 msgid "Remove from sorting"
 msgstr "Избаци из сортирања"
 
@@ -465,29 +465,29 @@ msgstr "Укључи/искључи тему (тренутна тема: там�
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Уклањање %(object_name)s „%(escaped_object)s“ повлачи уклањање свих објеката "
-"који су повезани са овим објектом, али ваш налог нема дозволе за брисање "
-"следећих типова објеката:"
+"Брисање %(object_name)s “%(escaped_object)s” би резултирало брисањем "
+"повезаних објеката, али ваш налог нема дозволу за брисање следећих типова "
+"објеката:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Да би избрисали изабран %(object_name)s „%(escaped_object)s“ потребно је "
-"брисати и следеће заштићене повезане објекте:"
+"Брисање %(object_name)s “%(escaped_object)s” би захтевало брисање следећих "
+"заштићених повезаних објеката:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Да сигурни да желите да обришете %(object_name)s „%(escaped_object)s“? "
-"Следећи објекти који су у вези са овим објектом ће такође бити обрисани:"
+"Да ли сте сигурни да желите да обришете %(object_name)s "
+"“%(escaped_object)s”? Све следеће повезане ставке ће бити обрисане:"
 
 msgid "Objects"
 msgstr "Објекти"
@@ -595,6 +595,10 @@ msgstr "Корисник"
 msgid "Action"
 msgstr "Радња"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Уноси пагинације %(name)s"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "унос"
@@ -608,14 +612,19 @@ msgstr ""
 "Овај објекат нема забележен историјат измена. Вероватно није додат кроз овај "
 "сајт за администрацију."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Пагинација %(name)s"
+
 msgid "Show all"
 msgstr "Прикажи све"
 
-msgid "Save"
-msgstr "Сачувај"
-
 msgid "Popup closing…"
 msgstr "Попуп се затвара..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Претрага %(name)s"
 
 msgid "Search"
 msgstr "Претрага"

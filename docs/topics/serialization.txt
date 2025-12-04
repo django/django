@@ -173,6 +173,8 @@ Identifier  Information
 .. _jsonl: https://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
+.. _serialization-formats-xml:
+
 XML
 ---
 
@@ -635,6 +637,15 @@ command line flags to generate natural keys.
     Conversely, if (for some strange reason) you want Django to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
+
+Subclasses can opt out of natural key serialization by returning an empty tuple
+(``()``) from ``natural_key()``. This tells the serializer to fall back to
+the standard primary key.
+
+.. versionchanged:: 6.1
+
+   Support for opting out of natural key serialization by returning an empty
+   tuple was added.
 
 .. _natural-keys-and-forward-references:
 
