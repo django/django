@@ -17,7 +17,8 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.repository == 'django/django'
     name: Post Coverage Comment
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Download diff coverage report
         uses: actions/download-artifact@v4
@@ -26,22 +27,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Download PR number
-        uses: actions/download-artifact@v4
-        with:
-          name: pr-number-${{ github.event.workflow_run.pull_requests[0].number }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Read PR number
-        id: pr-metadata
-        run: |
-          $pr_number = Get-Content pr_number.txt
-          echo "pr_number=$pr_number" >> $env:GITHUB_OUTPUT
-
       - name: Post/update PR comment
         env:
-          PR_NUMBER: ${{ steps.pr-metadata.outputs.pr_number }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         uses: actions/github-script@v8
         with:
           script: |

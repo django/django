@@ -2,11 +2,9 @@ name: Coverage Tests
 
 on:
   pull_request:
-    paths:
-      - 'django/**/*.py'
-      - 'tests/**/*.py'
-    branches:
-      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,6 +18,7 @@ jobs:
     if: github.repository == 'django/django'
     name: Coverage Tests (Windows)
     runs-on: windows-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -73,16 +72,4 @@ jobs:
         with:
           name: diff-coverage-report-${{ github.event.pull_request.number }}
           path: diff-cover-report.md
-          retention-days: 1
-
-      - name: Save PR number
-        if: success()
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-
-      - name: Upload PR number
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr-number-${{ github.event.pull_request.number }}
-          path: pr_number.txt
           retention-days: 1
