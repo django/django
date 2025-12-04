@@ -4,6 +4,8 @@ from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import translation
 
+from functools import cached_property
+
 
 class Sitemap:
     # This limit is defined by Google. See the index documentation at
@@ -26,6 +28,10 @@ class Sitemap:
     # Add an alternate/hreflang link with value 'x-default'.
     x_default = False
 
+    def __init__(self):
+        # Cached items
+        self._cached_items = None
+
     def _get(self, name, item, default=None):
         try:
             attr = getattr(self, name)
@@ -41,8 +47,9 @@ class Sitemap:
 
     def get_languages_for_item(self, item):
         """Languages for which this item is displayed."""
-        return self._languages()
+        return self._languages
 
+    @cached_property
     def _languages(self):
         if self.languages is not None:
             return self.languages
@@ -50,15 +57,16 @@ class Sitemap:
 
     def _items(self):
         if self.i18n:
-            # Create (item, lang_code) tuples for all items and languages.
-            # This is necessary to paginate with all languages already
-            # considered.
-            items = [
-                (item, lang_code)
-                for item in self.items()
-                for lang_code in self.get_languages_for_item(item)
-            ]
-            return items
+            cached_items = self.items()
+
+            result = []
+            for item in cached_items:
+                item_languages = self.get_languages_for_item(item)
+                for lang_code in item_languages:
+                    result.append((item, lang_code))
+
+            return result
+
         return self.items()
 
     def _location(self, item, force_lang_code=None):
@@ -72,13 +80,13 @@ class Sitemap:
 
     @property
     def paginator(self):
-        if not hasattr(self, "_paginator"):
-            items = self._items()
-            self._paginator = paginator.Paginator(items, self.limit)
-        return self._paginator
+        return paginator.Paginator(self._items(), self.limit)
 
     def items(self):
-        return []
+        """Return items with caching"""
+        if self._cached_items is None:
+            self._cached_items = [] # Actual items
+        return self._cached_items
 
     def location(self, item):
         return item.get_absolute_url()
@@ -126,14 +134,6 @@ class Sitemap:
 
         paginator_page = self.paginator.page(page)
         for item in paginator_page.object_list:
-            if self.i18n and not hasattr(self, "_i18n_verified_per_item"):
-                # Verify and store i18n info for this item
-                item_for_verification = item[0] if isinstance(item, tuple) else item
-                i18n_info = self._verify_i18n_urls(item_for_verification)
-
-                if not hasattr(self, "_sample_i18n_info"):
-                    self._sample_i18n_info = i18n_info
-
             loc = f"{protocol}://{domain}{self._location(item)}"
             priority = self._get("priority", item)
             lastmod = self._get("lastmod", item)
@@ -181,40 +181,6 @@ class Sitemap:
             self.latest_lastmod = latest_lastmod
 
         return urls
-
-    def _pagination_langs(self, item, lang_code):
-        """
-        Returns string location for a given logical item and lang_code
-        """
-        plain_item = item[0] if self.i18n and isinstance(item, tuple) else item
-
-        with translation.override(lang_code):
-            if self.i18n:
-                return self._get("location", (plain_item, lang_code))
-            else:
-                return self._get("location", plain_item)
-
-    def _verify_i18n_urls(self, item):
-        """
-        Verify which URLs uses i18n patterns and return analysis
-        """
-        languages = self._languages()
-        if len(languages) < 2:
-            return {"uses_i18n": False, "sample_urls": {}}
-
-        base_lang = languages[0]
-        base_loc = self._pagination_langs(item, base_lang)
-        sample_urls = {base_lang: base_loc}
-
-        # Check if URLs differ across languages
-        for lang in languages[1:]:
-            loc = self._pagination_langs(item, lang)
-            sample_urls[lang] = loc
-
-            if loc != base_loc:
-                return {"uses_i18n": True, "sample_urls": sample_urls}
-
-        return {"uses_i18n": False, "sample_urls": sample_urls}
 
 
 class GenericSitemap(Sitemap):

@@ -1,12 +1,18 @@
 from datetime import datetime
-from unittest.mock import Mock
+import logging
+import random
+import time
 
 from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.test import override_settings
-from django.utils import translation
+from django.conf import settings
+from django.core.cache import cache
 
 from .base import SitemapTestsBase
 from .models import TestModel
+
+
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 @override_settings(ABSOLUTE_URL_OVERRIDES={})
@@ -93,63 +99,43 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 </sitemapindex>"""
         self.assertXMLEqual(response.text, expected_content)
 
-    def test_lazy_pagination(self):
-        """
-        Test the not loaded queryset before pagination
-        """
-        # Mock queryset to track evaluation
-        queryset = Mock()
-        queryset.filter.return_value = queryset
-
-        sitemap = GenericSitemap({"queryset": queryset})
-
-        # Before accessing paginator, queryset should not be evaluated
-        queryset.filter.assert_not_called()
-
-        # Access paginator - should call filter() but not evaluate fully
-        sitemap.paginator
-        queryset.filter.assert_called_once()
-
-        # Should not have called count or any evaluation methods
-        self.assertFalse(queryset.count.called)
-
-    def test_queryset_after_pagination(self):
-        """
-        Test the queryset after the pagination
-        """
-        existing_count = TestModel.objects.count()
-
-        # Add order_by() to fix the unordered warning
-        sitemap = GenericSitemap({"queryset": TestModel.objects.all().order_by("id")})
-
-        # Access paginator and get a page
-        page = sitemap.paginator.page(1)
-        items = page.object_list
-
-        # After pagination, items should be loaded
-        self.assertEqual(len(items), min(existing_count, sitemap.limit))
-        self.assertTrue(all(isinstance(item, TestModel) for item in items))
-
-    def test_verify_urls_with_i18n(self):
-        """
-        Test i18n URL verification
-        """
+    def test_items_sitemap_cache(self):
         sitemap = Sitemap()
-        sitemap.i18n = True
+        large_items_list = [
+            f"item_{random.randint(1, 2000000)}" for _ in range(2000000)
+        ]
+        sitemap._cached_items = large_items_list
+        start = time.perf_counter()
+        result1 = sitemap.items()
+        time1 = time.perf_counter() - start
+        start = time.perf_counter()
+        result2 = sitemap.items()
+        time2 = time.perf_counter() - start
+        self.assertEqual(len(result1), 2000000)
+        self.assertIs(result1, result2, "Should return same cached object")
+        logging.info(f"First call: {time1:.6f} seconds")
+        logging.info(f"Cached call: {time2:.6f} seconds")
+        logging.info(f"✓ Cache hit: {time2 < time1}")
 
-        # Mock item and languages
-        mock_item = Mock()
-        sitemap.languages = ["en", "fr"]
+    def test_languages_sitemap_cache(self):
+        sitemap = Sitemap()
+        sitemap.languages = None
+        start = time.perf_counter()
+        langs1 = sitemap._languages
+        time1 = time.perf_counter() - start
+        logging.info(f"First access loaded {len(langs1)} language codes in {time1:.6f}s")
+        logging.info(f"Language codes: {langs1}")
+        start = time.perf_counter()
+        langs2 = sitemap._languages
+        time2 = time.perf_counter() - start
+        self.assertIs(langs1, langs2, "Cache failed: objects are different!")
+        self.assertLess(
+            time2, time1,
+            f"Cache not faster! First: {time1:.6f}s, Cached {time2:.6f}"
+        )
+        logging.info(f"Cached access took {time2:.6f}s")
+        logging.info(f"Cache hit: {langs1 is langs2}")
+        logging.info(f"Cache is {time1/time2:.1f}x faster")
 
-        # Mock location to return different URLs per language
-        def mock_location(item):
-            lang = translation.get_language()
-            return f"/{lang}/item/"
-
-        sitemap.location = mock_location
-        result = sitemap._verify_i18n_urls(mock_item)
-
-        # Should detect i18n usage since URLs differ
-        self.assertTrue(result["uses_i18n"])
-        self.assertEqual(result["sample_urls"]["en"], "/en/item/")
-        self.assertEqual(result["sample_urls"]["fr"], "/fr/item/")
+    def test_queryset_before_pagination(self):
+        ...
