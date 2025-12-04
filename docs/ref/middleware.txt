@@ -147,14 +147,14 @@ Conditional GET middleware
 
 .. class:: ConditionalGetMiddleware
 
-Handles conditional GET operations. If the response doesn't have an ``ETag``
-header, the middleware adds one if needed. If the response has an ``ETag`` or
-``Last-Modified`` header, and the request has ``If-None-Match`` or
-``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpResponseNotModified`.
+    Handles conditional GET operations. If the response doesn't have an
+    ``ETag`` header, the middleware adds one if needed. If the response has an
+    ``ETag`` or ``Last-Modified`` header, and the request has ``If-None-Match``
+    or ``If-Modified-Since``, the response is replaced by an
+    :class:`~django.http.HttpResponseNotModified`.
 
-You can handle conditional GET operations with individual views using the
-:func:`~django.views.decorators.http.conditional_page` decorator.
+    You can handle conditional GET operations with individual views using the
+    :func:`~django.views.decorators.http.conditional_page` decorator.
 
 Locale middleware
 -----------------
@@ -170,9 +170,9 @@ Locale middleware
         ``LocaleMiddleware`` and override the attribute to customize the
         redirects issued by the middleware.
 
-Enables language selection based on data from the request. It customizes
-content for each user. See the :doc:`internationalization documentation
-</topics/i18n/translation>`.
+    Enables language selection based on data from the request. It customizes
+    content for each user. See the :doc:`internationalization documentation
+    </topics/i18n/translation>`.
 
 Message middleware
 ------------------
@@ -182,8 +182,8 @@ Message middleware
 
 .. class:: MessageMiddleware
 
-Enables cookie- and session-based message support. See the
-:doc:`messages documentation </ref/contrib/messages>`.
+    Enables cookie- and session-based message support. See the
+    :doc:`messages documentation </ref/contrib/messages>`.
 
 .. _security-middleware:
 
@@ -202,19 +202,19 @@ Security middleware
 
 .. class:: SecurityMiddleware
 
-The ``django.middleware.security.SecurityMiddleware`` provides several security
-enhancements to the request/response cycle. Each one can be independently
-enabled or disabled with a setting.
+   The ``django.middleware.security.SecurityMiddleware`` provides several
+   security enhancements to the request/response cycle. Each one can be
+   independently enabled or disabled with a setting.
 
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
-* :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
-* :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
-* :setting:`SECURE_HSTS_PRELOAD`
-* :setting:`SECURE_HSTS_SECONDS`
-* :setting:`SECURE_REDIRECT_EXEMPT`
-* :setting:`SECURE_REFERRER_POLICY`
-* :setting:`SECURE_SSL_HOST`
-* :setting:`SECURE_SSL_REDIRECT`
+   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+   * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+   * :setting:`SECURE_HSTS_PRELOAD`
+   * :setting:`SECURE_HSTS_SECONDS`
+   * :setting:`SECURE_REDIRECT_EXEMPT`
+   * :setting:`SECURE_REFERRER_POLICY`
+   * :setting:`SECURE_SSL_HOST`
+   * :setting:`SECURE_SSL_REDIRECT`
 
 .. _http-strict-transport-security:
 
@@ -339,11 +339,13 @@ this setting are:
     Instructs the browser to send the full URL as the referrer for same-origin
     links, and only the origin for cross-origin links.
 
-``same-origin`` Instructs the browser to send a full URL, but only for
-same-origin links. No referrer will be sent for cross-origin links.
+``same-origin``
+    Instructs the browser to send a full URL, but only for
+    same-origin links. No referrer will be sent for cross-origin links.
 
-``strict-origin`` Instructs the browser to send only the origin, not the full
-URL, and to send no referrer when a protocol downgrade occurs.
+``strict-origin``
+    Instructs the browser to send only the origin, not the full
+    URL, and to send no referrer when a protocol downgrade occurs.
 
 ``strict-origin-when-cross-origin``
     Instructs the browser to send the full URL when the link is same-origin and
@@ -470,8 +472,8 @@ Session middleware
 
 .. class:: SessionMiddleware
 
-Enables session support. See the :doc:`session documentation
-</topics/http/sessions>`.
+    Enables session support. See the :doc:`session documentation
+    </topics/http/sessions>`.
 
 Site middleware
 ---------------
@@ -481,8 +483,8 @@ Site middleware
 
 .. class:: CurrentSiteMiddleware
 
-Adds the ``site`` attribute representing the current site to every incoming
-``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
+    Adds the ``site`` attribute representing the current site to every incoming
+    ``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
 
 Authentication middleware
 -------------------------
@@ -492,9 +494,9 @@ Authentication middleware
 
 .. class:: AuthenticationMiddleware
 
-Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
-<auth-web-requests>`.
+    Adds the ``user`` attribute, representing the currently-logged-in user, to
+    every incoming ``HttpRequest`` object. See :ref:`Authentication in web
+    requests <auth-web-requests>`.
 
 .. class:: LoginRequiredMiddleware
 
@@ -573,14 +575,14 @@ Customize the login URL or field name for authenticated views with the
 
 .. class:: RemoteUserMiddleware
 
-Middleware for utilizing web server provided authentication. See
-:doc:`/howto/auth-remote-user` for usage details.
+    Middleware for utilizing web server provided authentication. See
+    :doc:`/howto/auth-remote-user` for usage details.
 
 .. class:: PersistentRemoteUserMiddleware
 
-Middleware for utilizing web server provided authentication when enabled only
-on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
-details.
+    Middleware for utilizing web server provided authentication when enabled
+    only on the login page. See :ref:`persistent-remote-user-middleware-howto`
+    for usage details.
 
 CSRF protection middleware
 --------------------------
@@ -589,12 +591,12 @@ CSRF protection middleware
 
 .. class:: CsrfViewMiddleware
 
-Adds protection against Cross Site Request Forgeries by adding hidden form
-fields to POST forms and checking requests for the correct value. See the
-:doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
+    Adds protection against Cross Site Request Forgeries by adding hidden form
+    fields to POST forms and checking requests for the correct value. See the
+    :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
-You can add Cross Site Request Forgery protection to individual views using the
-:func:`~django.views.decorators.csrf.csrf_protect` decorator.
+    You can add Cross Site Request Forgery protection to individual views
+    using the :func:`~django.views.decorators.csrf.csrf_protect` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -603,8 +605,8 @@ You can add Cross Site Request Forgery protection to individual views using the
 
 .. class:: XFrameOptionsMiddleware
 
-Simple :doc:`clickjacking protection via the X-Frame-Options header
-</ref/clickjacking/>`.
+    Simple :doc:`clickjacking protection via the X-Frame-Options header
+    </ref/clickjacking/>`.
 
 Content Security Policy middleware
 ----------------------------------
