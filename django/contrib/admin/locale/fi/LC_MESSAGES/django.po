@@ -4,16 +4,16 @@
 # Aarni Koskela, 2015,2017,2020-2022,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023,2025
 # Klaus Dahlén, 2012
 # Nikolay Korotkiy <sikmir@disroot.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Aarni Koskela, 2015,2017,2020-2022,2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -325,11 +325,8 @@ msgstr ""
 "Sattui virhe. Virheestä on huomautettu sivuston ylläpitäjille sähköpostitse "
 "ja se korjautunee piakkoin. Kiitos kärsivällisyydestä."
 
-msgid "Run the selected action"
-msgstr "Suorita valittu toiminto"
-
-msgid "Go"
-msgstr "Suorita"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klikkaa tästä valitaksesi kohteet kaikilta sivuilta"
@@ -349,10 +346,10 @@ msgid "Models in the %(name)s application"
 msgstr "Sovelluksen %(name)s mallit"
 
 msgid "Model name"
-msgstr ""
+msgstr "Mallin nimi"
 
 msgid "Add link"
-msgstr ""
+msgstr "Lisää linkki"
 
 msgid "Change or view list link"
 msgstr ""
@@ -367,10 +364,10 @@ msgid "You don’t have permission to view or edit anything."
 msgstr "Sinulla ei ole oikeutta näyttää tai muokata mitään."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
-msgstr ""
+msgstr "Kun olet luonut käyttäjän, voit muokata käyttäjän tietoja."
 
 msgid "Error:"
-msgstr ""
+msgstr "Virhe:"
 
 msgid "Change password"
 msgstr "Vaihda salasana"
@@ -437,6 +434,9 @@ msgstr "Näytä lukumäärät"
 msgid "Clear all filters"
 msgstr "Tyhjennä kaikki suodattimet"
 
+msgid "Save"
+msgstr "Tallenna ja poistu"
+
 msgid "Remove from sorting"
 msgstr "Poista järjestämisestä"
 
@@ -458,29 +458,22 @@ msgstr "Vaihda teemaa (nyt: tumma)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Kohteen '%(escaped_object)s' (%(object_name)s) poisto poistaisi myös siihen "
-"liittyviä kohteita, mutta sinulla ei ole oikeutta näiden kohteiden "
-"poistamiseen:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s': poistettaessa joudutaan poistamaan "
-"myös seuraavat suojatut siihen liittyvät kohteet:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Haluatko varmasti poistaa kohteen \"%(escaped_object)s\" (%(object_name)s)? "
-"Myös seuraavat kohteet poistettaisiin samalla:"
 
 msgid "Objects"
 msgstr "Kohteet"
@@ -565,7 +558,7 @@ msgstr ""
 "sivulle. Haluaisitko kirjautua eri tilille?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "Unohditko kirjautumistietosi?"
 
 msgid "Toggle navigation"
 msgstr "Kytke navigaatio"
@@ -588,6 +581,10 @@ msgstr "Käyttäjä"
 msgid "Action"
 msgstr "Tapahtuma"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "merkintä"
@@ -600,14 +597,19 @@ msgstr ""
 "Tällä kohteella ei ole muutoshistoriaa. Sitä ei ole ilmeisesti lisätty tämän "
 "ylläpitosivun avulla."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Näytä kaikki"
 
-msgid "Save"
-msgstr "Tallenna ja poistu"
-
 msgid "Popup closing…"
 msgstr "Ponnahdusikkuna sulkeutuu..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Haku"
@@ -730,7 +732,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Määrittele uusi salasanasi oheisella sivulla:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Jos unohdit, olet:"
 
 msgid "Thanks for using our site!"
 msgstr "Kiitos vierailustasi sivuillamme!"

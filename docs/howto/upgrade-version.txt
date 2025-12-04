@@ -2,15 +2,21 @@
 How to upgrade Django to a newer version
 ========================================
 
-While it can be a complex process at times, upgrading to the latest Django
-version has several benefits:
+Upgrading Django to the latest version offers several benefits:
 
-* New features and improvements are added.
+* New features and improvements become available.
 * Bugs are fixed.
-* Older version of Django will eventually no longer receive security updates.
+* Older versions of Django eventually stop receiving security updates
   (see :ref:`supported-versions-policy`).
-* Upgrading as each new Django release is available makes future upgrades less
-  painful by keeping your code base up to date.
+* Upgrading with each new release helps keep your code base current and makes
+  future upgrades smoother.
+
+.. admonition:: Tools to help with version upgrades
+
+    Django has a vibrant ecosystem. There are automated upgrade helpers
+    highlighted on the `Community Ecosystem
+    <https://www.djangoproject.com/community/ecosystem/#upgrade-utilities>`__
+    page.
 
 Here are some things to consider to help make your upgrade process as smooth as
 possible.

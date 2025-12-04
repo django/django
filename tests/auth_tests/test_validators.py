@@ -202,24 +202,24 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "email address"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator().validate("example.com", user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "email address"])
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "first name"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator(
                 user_attributes=["first_name"],
                 max_similarity=0.3,
             ).validate("testclient", user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
         # max_similarity=1 doesn't allow passwords that are identical to the
         # attribute's value.
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "first name"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator(
                 user_attributes=["first_name"],
                 max_similarity=1,
             ).validate(user.first_name, user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
         # Very low max_similarity is rejected.
         msg = "max_similarity must be at least 0.1"
         with self.assertRaisesMessage(ValueError, msg):
@@ -240,11 +240,9 @@ class UserAttributeSimilarityValidatorTest(TestCase):
             def username(self):
                 return "foobar"
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = "The password is too similar to the username."
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator().validate("foobar", user=TestUser())
-        self.assertEqual(
-            cm.exception.messages, ["The password is too similar to the username."]
-        )
 
     def test_help_text(self):
         self.assertEqual(
@@ -294,18 +292,16 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         expected_error = "This password is too common."
         self.assertIsNone(CommonPasswordValidator().validate("a-safe-password"))
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error):
             CommonPasswordValidator().validate("godzilla")
-        self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_common_hexed_codes(self):
         expected_error = "This password is too common."
         common_hexed_passwords = ["asdfjkl:", "&#2336:"]
         for password in common_hexed_passwords:
             with self.subTest(password=password):
-                with self.assertRaises(ValidationError) as cm:
+                with self.assertRaisesMessage(ValidationError, expected_error):
                     CommonPasswordValidator().validate(password)
-                self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_validate_custom_list(self):
         path = os.path.join(

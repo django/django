@@ -76,6 +76,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
+        "NumDimensions": "ST_NDims",
         "NumPoints": "ST_NPoints",
         "Reverse": "ST_Reverse",
         "Scale": "ScaleCoords",

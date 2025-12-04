@@ -1,0 +1,12 @@
+===========================
+Django 5.2.10 release notes
+===========================
+
+*Expected January 6, 2026*
+
+Django 5.2.10 fixes several bugs in 5.2.9.
+
+Bugfixes
+========
+
+* ...

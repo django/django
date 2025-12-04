@@ -3,8 +3,9 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2019
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2020-2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -146,6 +147,9 @@ msgstr "kroatisk"
 
 msgid "Upper Sorbian"
 msgstr "øvresorbisk"
+
+msgid "Haitian Creole"
+msgstr "haitisk kreol"
 
 msgid "Hungarian"
 msgstr "ungarsk"
@@ -710,8 +714,8 @@ msgid "Many-to-many relationship"
 msgstr "Mange-til-mange-relation"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -874,6 +878,22 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Klar"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Kørende"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Fejlet"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Vellykket"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"

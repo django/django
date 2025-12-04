@@ -301,7 +301,11 @@ class InspectDBTestCase(TestCase):
             out.getvalue(),
         )
 
-    @skipUnlessDBFeature("can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+        "supports_on_delete_db_null",
+    )
     def test_foreign_key_db_on_delete(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_dbondeletemodel", stdout=out)

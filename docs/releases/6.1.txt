@@ -118,6 +118,11 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   database function are now supported on SpatiaLite.
 
+* The new :lookup:`num_dimensions` lookup and :class:`NumDimensions()
+  <django.contrib.gis.db.models.functions.NumDimensions>` database function
+  allow filtering geometries by the number of dimensions on PostGIS and
+  SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -276,7 +281,10 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Subclasses of models defining the ``natural_key()`` method can now opt out of
+  natural key serialization by overriding the method to return an empty tuple:
+  ``()``. This ensures primary keys are serialized when using
+  :option:`dumpdata --natural-primary`.
 
 Signals
 ~~~~~~~
@@ -339,6 +347,8 @@ backends.
 * Support for PostGIS 3.1 is removed.
 
 * Support for GEOS 3.8 is removed.
+
+* Support for GDAL 3.1 and 3.2 is removed.
 
 :mod:`django.contrib.postgres`
 ------------------------------
