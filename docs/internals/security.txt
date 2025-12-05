@@ -111,9 +111,11 @@ validated::
             return JsonResponse(status=200)
         return JsonResponse(form.errors, status=400)
 
-Similarly, as Django's raw SQL constructs (such as :meth:`~.QuerySet.extra` and
-:class:`.RawSQL` expression) provide developers with full control over the
-query, they are insecure if user input is not properly handled. As explained in
+Similarly, as Django's raw SQL constructs (such as :meth:`~.QuerySet.extra`,
+:class:`.RawSQL`, and :ref:`keyword arguments to database functions
+<avoiding-sql-injection-in-query-expressions>`) provide developers with full
+control over the query, they are insecure if user input is not properly
+handled. As explained in
 our :ref:`security documentation <sql-injection-protection>`, it is the
 developer's responsibility to safely process user input for these functions.
 
