@@ -1785,10 +1785,10 @@ Usage example:
 ``StrIndex``
 ------------
 
-.. class:: StrIndex(string, substring, **extra)
+.. class:: StrIndex(expression, substring, **extra)
 
 Returns a positive integer corresponding to the 1-indexed position of the first
-occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
+occurrence of ``substring`` inside ``expression``, or 0 if ``substring`` is not
 found.
 
 Usage example:
