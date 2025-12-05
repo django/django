@@ -23,6 +23,21 @@ We don't usually recommend allowing ``null=True`` for ``CharField`` since this
 allows the field to have two "empty values", but it's important for the
 ``Coalesce`` example below.
 
+.. _user-input-driven-output-field:
+
+.. warning::
+
+    These classes vary in whether arguments such as ``output_field`` can be
+    supplied positionally or only by keyword. For ``output_field`` and several
+    other cases, the input ultimately reaches :ref:`Func()<func-expressions>`
+    as a keyword argument, so the advice to :ref:`avoid constructing keyword
+    arguments to Func() from unsanitized user input
+    <avoiding-sql-injection-in-query-expressions>` applies as equally to these
+    arguments as it does to ``**extra``.
+
+    Always sanitize user input before using it to dynamically configure a query
+    expression.
+
 .. _comparison-functions:
 
 Comparison and conversion functions
@@ -34,6 +49,8 @@ Comparison and conversion functions
 .. class:: Cast(expression, output_field)
 
 Forces the result type of ``expression`` to be the one from ``output_field``.
+:ref:`Ensure untrusted input is sanitized <user-input-driven-output-field>`
+before using it to construct the output field.
 
 Usage example:
 
