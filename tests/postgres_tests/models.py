@@ -193,10 +193,6 @@ class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
 
 
-class UUIDTestModel(models.Model):
-    uuid = models.UUIDField(default=None, null=True)
-
-
 class Room(models.Model):
     number = models.IntegerField(unique=True)
 
