@@ -432,6 +432,16 @@ replace the attributes of the same name without having to define your own
 class. :ref:`output_field<output-field>` can be used to define the expected
 return type.
 
+.. admonition:: Sanitize input used to configure a query expression
+
+    Built-in database functions (such as
+    :class:`~django.db.models.functions.Cast`) vary in whether arguments such
+    as ``output_field`` can be supplied positionally or only by keyword. For
+    ``output_field`` and several other cases, the input ultimately reaches
+    ``Func()`` as a keyword argument, so the advice to avoid constructing
+    keyword arguments from untrusted user input applies as equally to these
+    arguments as it does to ``**extra``.
+
 ``Aggregate()`` expressions
 ---------------------------
 
