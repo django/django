@@ -2351,15 +2351,15 @@ class Query(BaseExpression):
         Return true if order_by of query is subset of group_by.
         """
         # we don't want to harm original query, so we need to clone it
-        q = self.clone()
-        if q.group_by is False:
+        if self.group_by is False:
             # there is no use case for that, but we need to be sure
             return False
-        if q.group_by in (None, True):
+        if self.group_by in (None, True):
             # it seems like there is no aggregation at all (None)
             # or there are all required groupbies(True) generated automatically
             # from models fields - so, it is safe to clear ordering
             return True
+        q = self.clone()
         order_by_set = set(
             [
                 (
