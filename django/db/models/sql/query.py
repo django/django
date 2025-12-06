@@ -2368,8 +2368,7 @@ class Query(BaseExpression):
                 for order_by in q.order_by
             ]
         ).union(q.extra_order_by)
-        group_by_set = set([group_by.resolve_expression(q) for group_by in q.group_by])
-        return order_by_set.issubset(group_by_set)
+        return order_by_set.issubset(self.group_by)
 
     def clear_ordering(self, force=False, clear_default=True):
         """
