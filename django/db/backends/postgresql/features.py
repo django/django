@@ -79,6 +79,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
     insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"
+    supports_uuid4_function = True
+
+    @cached_property
+    def supports_uuid7_function(self):
+        return self.is_postgresql_18
 
     @cached_property
     def django_test_skips(self):
