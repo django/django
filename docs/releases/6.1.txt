@@ -263,6 +263,32 @@ Models
   :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
   21c+.
 
+* The :class:`.QuerySet` class now allows defining initial filters. For
+  example::
+
+    from django.db import models
+
+
+    class Book(models.Model):
+        published = models.BooleanField()
+        ...
+
+        published_objects = models.QuerySet.filter(published=True).as_manager()
+
+  or::
+
+    from django.db import models
+
+
+    class BookQuerySet(models.QuerySet): ...
+
+
+    class Book(models.Model):
+        published = models.BooleanField()
+        ...
+
+        published_objects = BookQuerySet.filter(published=True).as_manager()
+
 Pagination
 ~~~~~~~~~~
 
