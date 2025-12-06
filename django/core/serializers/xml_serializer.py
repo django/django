@@ -421,7 +421,7 @@ def getInnerText(node):
     return "".join(inner_text_list)
 
 
-def getInnerTextList(node):
+def getInnerTextList(node, max_depth=1, _depth=0):
     """Return a list of the inner texts of a DOM node (recursively)."""
     # inspired by
     # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
@@ -432,10 +432,11 @@ def getInnerTextList(node):
             or child.nodeType == child.CDATA_SECTION_NODE
         ):
             result.append(child.data)
-        elif child.nodeType == child.ELEMENT_NODE:
-            result.extend(getInnerTextList(child))
-        else:
-            pass
+            continue
+        if child.nodeType == child.ELEMENT_NODE:
+            if _depth >= max_depth:
+                continue
+            result.extend(getInnerTextList(child, max_depth, _depth + 1))
     return result
 
 
