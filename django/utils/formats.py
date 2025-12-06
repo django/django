@@ -117,6 +117,10 @@ def get_format(format_type, lang=None, use_l10n=None):
     except KeyError:
         pass
 
+    if format_type == "FIRST_DAY_OF_WEEK":
+        if not settings.USE_I18N:
+            _format_cache[cache_key] = settings.FIRST_DAY_OF_WEEK
+            return settings.FIRST_DAY_OF_WEEK
     # The requested format_type has not been cached yet. Try to find it in any
     # of the format_modules for the given lang if l10n is enabled. If it's not
     # there or if l10n is disabled, fall back to the project settings.
