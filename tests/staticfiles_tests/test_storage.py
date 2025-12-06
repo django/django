@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -766,6 +767,69 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
                 call_command(
                     "collectstatic", interactive=False, verbosity=0, stderr=err
                 )
+
+
+class CustomExtractorStorage(storage.ManifestStaticFilesStorage):
+    """Test storage that extracts custom JS_URL() patterns."""
+
+    def _extract_txt_urls(self, name, content):
+        urls = []
+        for match in re.finditer(r'JS_URL\(["\']([^"\']+)["\']\)', content):
+            urls.append((match.group(1), match.start(1)))
+        return urls
+
+    @property
+    def url_finders(self):
+        return {
+            **super().url_finders,
+            "*.txt": [self._extract_txt_urls],
+        }
+
+
+@override_settings(
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.test_storage.CustomExtractorStorage",
+        },
+    }
+)
+class TestCustomExtractorStorage(CollectionTestCase):
+    """Test the url_finders property for custom URL extraction."""
+
+    hashed_file_path = hashed_file_path
+
+    def _get_filename_path(self, filename):
+        return os.path.join(self._temp_dir, "test", filename)
+
+    def setUp(self):
+        super().setUp()
+        self._temp_dir = temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(temp_dir, "test"))
+        self.addCleanup(shutil.rmtree, temp_dir)
+
+    def test_custom_extractor(self):
+        """Test that custom URL extractors work correctly."""
+        file_contents = (
+            ("image.png", "fake image content"),
+            ("config.txt", 'var icon = JS_URL("image.png");'),
+        )
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), "w") as f:
+                f.write(content)
+
+        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+            finders.get_finder.cache_clear()
+            call_command("collectstatic", interactive=False, verbosity=0)
+
+            # Verify the custom pattern was processed
+            relpath = self.hashed_file_path("test/config.txt")
+            with storage.staticfiles_storage.open(relpath) as relfile:
+                content = relfile.read()
+                # Should contain hashed image reference
+                self.assertIn(b"image.", content)
+                self.assertIn(b".png", content)
+                self.assertNotIn(b'JS_URL("image.png")', content)
 
 
 class CustomManifestStorage(storage.ManifestStaticFilesStorage):
