@@ -539,9 +539,7 @@ class Query(BaseExpression):
                 and not inner_query.distinct_fields
                 and inner_query.orderby_issubset_groupby
             ):
-                inner_query.order_by = ()
-                inner_query.extra_order_by = ()
-                inner_query.default_ordering = False
+                inner_query.clear_ordering(force=True)
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
