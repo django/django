@@ -251,3 +251,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if collation is None and old_collation is not None:
             collation = self._get_default_collation(table_name)
         return super()._collate_sql(collation, old_collation, table_name)
+
+    def _column_generated_persistency_sql(self, field):
+        return "MATERIALIZED" if field.db_persist else "VIRTUAL"
