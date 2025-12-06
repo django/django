@@ -295,15 +295,14 @@ load time for subsequent page visits.
 The storage backend automatically replaces the paths found in the saved
 files matching other saved files with the path of the cached copy (using
 the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
-method). The regular expressions used to find those paths
-(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
+method). This covers:
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
 
 Subclass ``ManifestStaticFilesStorage`` and set the
 ``support_js_module_import_aggregation`` attribute to ``True``, if you want to
-use the experimental regular expressions to cover:
+cover:
 
 * The `modules import`_ in JavaScript.
 * The `modules aggregation`_ in JavaScript.
@@ -349,29 +348,11 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-.. admonition:: References in comments
-
-    ``ManifestStaticFilesStorage`` doesn't ignore paths in statements that are
-    commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
-    You should check and eventually strip comments.
-
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
 
 This attribute provides a single hash that changes whenever a file in the
 manifest changes. This can be useful to communicate to SPAs that the assets on
 the server have changed (due to a new deployment).
-
-.. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
-
-Since static files might reference other static files that need to have their
-paths replaced, multiple passes of replacing paths may be needed until the file
-hashes converge. To prevent an infinite loop due to hashes not converging (for
-example, if ``'foo.css'`` references ``'bar.css'`` which references
-``'foo.css'``) there is a maximum number of passes before post-processing is
-abandoned. In cases with a large number of references, a higher number of
-passes might be needed. Increase the maximum number of passes by subclassing
-``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
-attribute. It defaults to 5.
 
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
