@@ -302,11 +302,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                 try:
                     return self.compose_sql(sql, params)
                 except errors.DataError:
-                    return None
+                    return super().last_executed_query(cursor, sql, params)
             else:
                 if cursor._query and cursor._query.query is not None:
                     return cursor._query.query.decode()
-                return None
+                return super().last_executed_query(cursor, sql, params)
 
     else:
 
@@ -315,7 +315,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # The query attribute is a Psycopg extension to the DB API 2.0.
             if cursor.query is not None:
                 return cursor.query.decode()
-            return None
+            return super().last_executed_query(cursor, sql, params)
 
     if is_psycopg3:
 
