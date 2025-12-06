@@ -2348,7 +2348,6 @@ class Query(BaseExpression):
         """
         Return true if order_by of query is subset of group_by.
         """
-        # we don't want to harm original query, so we need to clone it
         if self.group_by is False:
             # there is no use case for that, but we need to be sure
             return False
@@ -2357,17 +2356,19 @@ class Query(BaseExpression):
             # or there are all required groupbies(True) generated automatically
             # from models fields - so, it is safe to clear ordering
             return True
+        if not (self.order_by or self.group_by):
+            # empty set is necessarily a subset of the group by
+            return True
+        # we don't want to harm original query, so we need to clone it
         q = self.clone()
-        order_by_set = set(
-            [
-                (
-                    order_by.resolve_expression(q)
-                    if hasattr(order_by, "resolve_expression")
-                    else F(order_by).resolve_expression(q)
-                )
-                for order_by in q.order_by
-            ]
-        ).union(q.extra_order_by)
+        order_by_set = {
+            (
+                order_by.resolve_expression(q)
+                if hasattr(order_by, "resolve_expression")
+                else F(order_by).resolve_expression(q)
+            )
+            for order_by in q.order_by
+        }.union(q.extra_order_by)
         return order_by_set.issubset(self.group_by)
 
     def clear_ordering(self, force=False, clear_default=True):
