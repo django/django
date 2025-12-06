@@ -66,10 +66,16 @@ jobs:
             Set-Content -Path diff-cover-report.md -Value 'No coverage data available.'
           }
 
-      - name: Upload diff coverage report
+      - name: Save PR number
+        if: success()
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+
+      - name: Upload artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: diff-coverage-report-${{ github.event.pull_request.number }}
-          path: diff-cover-report.md
+          name: coverage-artifacts
+          path: |
+            diff-cover-report.md
+            pr_number.txt
           retention-days: 1

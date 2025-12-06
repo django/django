@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pull-requests: write
 
 jobs:
@@ -20,16 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Download diff coverage report
+      - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
-          name: diff-coverage-report-${{ github.event.workflow_run.pull_requests[0].number }}
+          name: coverage-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
+      - name: Read PR number
+        id: pr
+        run: |
+          pr_number=$(cat pr_number.txt)
+          echo "number=$pr_number" >> $GITHUB_OUTPUT
+
       - name: Post/update PR comment
         env:
-          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         uses: actions/github-script@v8
         with:
           script: |
