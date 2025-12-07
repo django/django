@@ -5,6 +5,7 @@ from unittest import skipIf
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
+from django.db.models import signals
 from django.test import TestCase
 from django.test.testcases import SerializeMixin
 
@@ -15,15 +16,22 @@ except ImproperlyConfigured:
 
 if Image:
     from .models import (
-        Person, PersonDimensionsFirst, PersonTwoImages, PersonWithHeight,
-        PersonWithHeightAndWidth, TestImageFieldFile, temp_storage_dir,
+        Person,
+        PersonDimensionsFirst,
+        PersonNoReadImage,
+        PersonTwoImages,
+        PersonWithHeight,
+        PersonWithHeightAndWidth,
+        TestImageFieldFile,
+        temp_storage_dir,
     )
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)
     class Person:
         pass
+
     PersonWithHeight = PersonWithHeightAndWidth = PersonDimensionsFirst = Person
-    PersonTwoImages = Person
+    PersonTwoImages = PersonNoReadImage = Person
 
 
 class ImageFieldTestMixin(SerializeMixin):
@@ -48,29 +56,22 @@ class ImageFieldTestMixin(SerializeMixin):
         if os.path.exists(temp_storage_dir):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
+        file_path1 = os.path.join(os.path.dirname(__file__), "4x8.png")
+        self.file1 = self.File(open(file_path1, "rb"), name="4x8.png")
+        self.addCleanup(self.file1.close)
+        file_path2 = os.path.join(os.path.dirname(__file__), "8x4.png")
+        self.file2 = self.File(open(file_path2, "rb"), name="8x4.png")
+        self.addCleanup(self.file2.close)
 
-        file_path1 = os.path.join(os.path.dirname(__file__), '4x8.png')
-        self.file1 = self.File(open(file_path1, 'rb'), name='4x8.png')
-
-        file_path2 = os.path.join(os.path.dirname(__file__), '8x4.png')
-        self.file2 = self.File(open(file_path2, 'rb'), name='8x4.png')
-
-    def tearDown(self):
-        """
-        Removes temp directory and all its contents.
-        """
-        self.file1.close()
-        self.file2.close()
-        shutil.rmtree(temp_storage_dir)
-
-    def check_dimensions(self, instance, width, height, field_name='mugshot'):
+    def check_dimensions(self, instance, width, height, field_name="mugshot"):
         """
         Asserts that the given width and height values match both the
         field's height and width attributes and the height and width fields
         (if defined) the image field is caching to.
 
         Note, this method will check for dimension fields named by adding
-        "_width" or "_height" to the name of the ImageField.  So, the
+        "_width" or "_height" to the name of the ImageField. So, the
         models used in these tests must have their fields named
         accordingly.
 
@@ -81,18 +82,18 @@ class ImageFieldTestMixin(SerializeMixin):
         # Check height/width attributes of field.
         if width is None and height is None:
             with self.assertRaises(ValueError):
-                getattr(field, 'width')
+                getattr(field, "width")
             with self.assertRaises(ValueError):
-                getattr(field, 'height')
+                getattr(field, "height")
         else:
             self.assertEqual(field.width, width)
             self.assertEqual(field.height, height)
 
         # Check height/width fields of model, if defined.
-        width_field_name = field_name + '_width'
+        width_field_name = field_name + "_width"
         if hasattr(instance, width_field_name):
             self.assertEqual(getattr(instance, width_field_name), width)
-        height_field_name = field_name + '_height'
+        height_field_name = field_name + "_height"
         if hasattr(instance, height_field_name):
             self.assertEqual(getattr(instance, height_field_name), height)
 
@@ -137,7 +138,7 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         p.mugshot.save("shot", self.file1)
         p = self.PersonModel.objects.get(name="Joan")
         path = p.mugshot.path
-        shutil.move(path, path + '.moved')
+        shutil.move(path, path + ".moved")
         self.PersonModel.objects.get(name="Joan")
 
     def test_delete_when_missing(self):
@@ -193,11 +194,11 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(p.mugshot.field, loaded_mugshot.field)
 
     def test_defer(self):
-        self.PersonModel.objects.create(name='Joe', mugshot=self.file1)
+        self.PersonModel.objects.create(name="Joe", mugshot=self.file1)
         with self.assertNumQueries(1):
-            qs = list(self.PersonModel.objects.defer('mugshot'))
+            qs = list(self.PersonModel.objects.defer("mugshot"))
         with self.assertNumQueries(0):
-            self.assertEqual(qs[0].name, 'Joe')
+            self.assertEqual(qs[0].name, "Joe")
 
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
@@ -210,7 +211,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
         Tests assigning an image field through the model's constructor.
         """
-        p = self.PersonModel(name='Joe', mugshot=self.file1)
+        p = self.PersonModel(name="Joe", mugshot=self.file1)
         self.check_dimensions(p, 4, 8)
         p.save()
         self.check_dimensions(p, 4, 8)
@@ -219,7 +220,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
         Tests behavior when image is not passed in constructor.
         """
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
         # TestImageField value will default to being an instance of its
         # attr_class, a  TestImageFieldFile, with name == None, which will
         # cause it to evaluate as False.
@@ -227,7 +228,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         self.assertFalse(p.mugshot)
 
         # Test setting a fresh created model instance.
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
         p.mugshot = self.file1
         self.check_dimensions(p, 4, 8)
 
@@ -235,7 +236,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
         Tests assigning an image in Manager.create().
         """
-        p = self.PersonModel.objects.create(name='Joe', mugshot=self.file1)
+        p = self.PersonModel.objects.create(name="Joe", mugshot=self.file1)
         self.check_dimensions(p, 4, 8)
 
     def test_default_value(self):
@@ -252,7 +253,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
         Assigning ImageField to None clears dimensions.
         """
-        p = self.PersonModel(name='Joe', mugshot=self.file1)
+        p = self.PersonModel(name="Joe", mugshot=self.file1)
         self.check_dimensions(p, 4, 8)
 
         # If image assigned to None, dimension fields should be cleared.
@@ -267,7 +268,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         Tests assignment using the field's save method and deletion using
         the field's delete method.
         """
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
         p.mugshot.save("mug", self.file1)
         self.check_dimensions(p, 4, 8)
 
@@ -284,16 +285,16 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         """
         Dimensions are updated correctly in various situations.
         """
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
 
         # Dimensions should get set if file is saved.
         p.mugshot.save("mug", self.file1)
         self.check_dimensions(p, 4, 8)
 
         # Test dimensions after fetching from database.
-        p = self.PersonModel.objects.get(name='Joe')
+        p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.check_dimensions(p, 4, 8)
@@ -321,6 +322,20 @@ class ImageFieldNoDimensionsTests(ImageFieldTwoDimensionsTests):
     """
 
     PersonModel = Person
+
+    def test_post_init_not_connected(self):
+        person_model_id = id(self.PersonModel)
+        self.assertNotIn(
+            person_model_id,
+            [sender_id for (_, sender_id), *_ in signals.post_init.receivers],
+        )
+
+    def test_save_does_not_close_file(self):
+        p = self.PersonModel(name="Joe")
+        p.mugshot.save("mug", self.file1)
+        with p.mugshot as f:
+            # Underlying file object wasn’t closed.
+            self.assertEqual(f.tell(), 0)
 
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
@@ -363,76 +378,76 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_constructor(self):
         p = self.PersonModel(mugshot=self.file1, headshot=self.file2)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
         p.save()
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
 
     def test_create(self):
         p = self.PersonModel.objects.create(mugshot=self.file1, headshot=self.file2)
         self.check_dimensions(p, 4, 8)
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 8, 4, "headshot")
 
     def test_assignment(self):
         p = self.PersonModel()
-        self.check_dimensions(p, None, None, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, None, None, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
 
         p.mugshot = self.file1
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
         p.headshot = self.file2
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
 
         # Clear the ImageFields one at a time.
         p.mugshot = None
-        self.check_dimensions(p, None, None, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, None, None, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
         p.headshot = None
-        self.check_dimensions(p, None, None, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, None, None, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
 
     def test_field_save_and_delete_methods(self):
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
         p.mugshot.save("mug", self.file1)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
         p.headshot.save("head", self.file2)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
 
         # We can use save=True when deleting the image field with null=True
         # dimension fields and the other field has an image.
         p.headshot.delete(save=True)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
         p.mugshot.delete(save=False)
-        self.check_dimensions(p, None, None, 'mugshot')
-        self.check_dimensions(p, None, None, 'headshot')
+        self.check_dimensions(p, None, None, "mugshot")
+        self.check_dimensions(p, None, None, "headshot")
 
     def test_dimensions(self):
         """
         Dimensions are updated correctly in various situations.
         """
-        p = self.PersonModel(name='Joe')
+        p = self.PersonModel(name="Joe")
 
         # Dimensions should get set for the saved file.
         p.mugshot.save("mug", self.file1)
         p.headshot.save("head", self.file2)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
 
         # Test dimensions after fetching from database.
-        p = self.PersonModel.objects.get(name='Joe')
+        p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.assertIs(p.headshot.was_opened, False)
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
         # After checking dimensions on the image fields, the files will
         # have been opened.
         self.assertIs(p.mugshot.was_opened, True)
@@ -441,8 +456,8 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # check dimensions again, the file should not have opened.
         p.mugshot.was_opened = False
         p.headshot.was_opened = False
-        self.check_dimensions(p, 4, 8, 'mugshot')
-        self.check_dimensions(p, 8, 4, 'headshot')
+        self.check_dimensions(p, 4, 8, "mugshot")
+        self.check_dimensions(p, 8, 4, "headshot")
         self.assertIs(p.mugshot.was_opened, False)
         self.assertIs(p.headshot.was_opened, False)
 
@@ -450,8 +465,33 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # update.
         p.mugshot = self.file2
         p.headshot = self.file1
-        self.check_dimensions(p, 8, 4, 'mugshot')
-        self.check_dimensions(p, 4, 8, 'headshot')
+        self.check_dimensions(p, 8, 4, "mugshot")
+        self.check_dimensions(p, 4, 8, "headshot")
         # Dimensions were recalculated, and hence file should have opened.
         self.assertIs(p.mugshot.was_opened, True)
         self.assertIs(p.headshot.was_opened, True)
+
+
+@skipIf(Image is None, "Pillow is required to test ImageField")
+class NoReadTests(ImageFieldTestMixin, TestCase):
+    def test_width_height_correct_name_mangling_correct(self):
+        instance1 = PersonNoReadImage()
+
+        instance1.mugshot.save("mug", self.file1)
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance1.save()
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance2 = PersonNoReadImage()
+        instance2.mugshot.save("mug", self.file1)
+        instance2.save()
+
+        self.assertNotEqual(instance1.mugshot.name, instance2.mugshot.name)
+
+        self.assertEqual(instance1.mugshot_width, instance2.mugshot_width)
+        self.assertEqual(instance1.mugshot_height, instance2.mugshot_height)

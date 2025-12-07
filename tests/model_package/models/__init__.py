@@ -2,4 +2,4 @@
 from .article import Article
 from .publication import Publication
 
-__all__ = ['Article', 'Publication']
+__all__ = ["Article", "Publication"]

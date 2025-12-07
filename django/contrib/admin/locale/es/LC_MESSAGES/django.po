@@ -2,37 +2,47 @@
 #
 # Translators:
 # abraham.martin <abraham.martin@gmail.com>, 2014
+# Alberto MH, 2025
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Ernesto Avilés, 2015-2016
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
+# Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jorge Andres Bravo Meza, 2024
 # Jorge Puente Sarrín <puentesarrin@gmail.com>, 2014-2015
 # José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
+# Miguel Gonzalez <migonzalvar@gmail.com>, 2023
+# Natalia, 2024
 # Pablo, 2015
-# Uriel Medina <urimeba511@gmail.com>, 2020
+# Salomon Herrera, 2023
+# Uriel Medina <urimeba511@gmail.com>, 2020-2025
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-25 17:35+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
-"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2025\n"
+"Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar %(verbose_name_plural)s seleccionado/s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -42,12 +52,8 @@ msgstr "Eliminado/s %(count)d %(items)s satisfactoriamente."
 msgid "Cannot delete %(name)s"
 msgstr "No se puede eliminar %(name)s"
 
-msgid "Are you sure?"
-msgstr "¿Está seguro?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eliminar %(verbose_name_plural)s seleccionado/s"
+msgid "Delete multiple objects"
+msgstr "Eliminar múltiples objetos."
 
 msgid "Administration"
 msgstr "Administración"
@@ -195,6 +201,9 @@ msgstr ""
 "Mantenga presionado \"Control\" o \"Comando\" en una Mac, para seleccionar "
 "más de uno."
 
+msgid "Select this object for an action - {}"
+msgstr "Seleccione este objeto para una acción - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} “{obj}” fue agregado correctamente."
@@ -214,12 +223,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} “{obj}” se cambió correctamente. Puede editarlo nuevamente a "
-"continuación."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"El {name} “{obj}” se agregó correctamente. Puede editarlo nuevamente a "
 "continuación."
 
 #, python-brace-format
@@ -272,23 +275,29 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s fué modificado con éxito."
 msgstr[1] "%(count)s %(name)s fueron modificados con éxito."
+msgstr[2] "%(count)s %(name)s fueron modificados con éxito."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s seleccionado"
 msgstr[1] "%(total_count)s seleccionados en total"
+msgstr[2] "%(total_count)s seleccionados en total"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "seleccionados 0 de %(cnt)s"
 
+msgid "Delete"
+msgstr "Eliminar"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de modificaciones: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -358,9 +367,21 @@ msgstr "Seleccionar todos los %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpiar selección"
 
+msgid "Breadcrumbs"
+msgstr "Guía-rastro"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelos en la aplicación %(name)s"
+
+msgid "Model name"
+msgstr "Nombre del modelo"
+
+msgid "Add link"
+msgstr "Añadir vínculo"
+
+msgid "Change or view list link"
+msgstr "Cambiar o ver el enlace de la lista"
 
 msgid "Add"
 msgstr "Añadir"
@@ -371,30 +392,46 @@ msgstr "Vista"
 msgid "You don’t have permission to view or edit anything."
 msgstr "No cuenta con permiso para ver ni editar nada."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Primero, ingrese un nombre de usuario y contraseña. Luego, podrá editar más "
-"opciones del usuario."
+"Después de haber creado un usuario, podrá editar más opciones del mismo."
 
-msgid "Enter a username and password."
-msgstr "Introduzca un nombre de usuario y contraseña"
+msgid "Error:"
+msgstr "Error:"
 
 msgid "Change password"
 msgstr "Cambiar contraseña"
 
-msgid "Please correct the error below."
-msgstr "Por favor corrija el siguiente error."
+msgid "Set password"
+msgstr "Establecer contraseña"
 
-msgid "Please correct the errors below."
-msgstr "Por favor, corrija los siguientes errores."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor, corrija el siguiente error."
+msgstr[1] "Por favor, corrija los siguientes errores."
+msgstr[2] "Por favor, corrija los siguientes errores."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduzca una nueva contraseña para el usuario <strong>%(username)s</"
 "strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Esta acción <strong>habilitará</strong> la autenticación basada en "
+"contraseña para este usuario."
+
+msgid "Disable password-based authentication"
+msgstr "Deshabilitar la autenticación basada en contraseña"
+
+msgid "Enable password-based authentication"
+msgstr "Habilitar la autenticación basada en contraseña"
+
+msgid "Skip to main content"
+msgstr "Saltar al contenido principal"
 
 msgid "Welcome,"
 msgstr "Bienvenidos,"
@@ -421,6 +458,12 @@ msgstr "Ver en el sitio"
 msgid "Filter"
 msgstr "Filtro"
 
+msgid "Hide counts"
+msgstr "Ocultar recuentos"
+
+msgid "Show counts"
+msgstr "Mostrar recuentos"
+
 msgid "Clear all filters"
 msgstr "Borrar todos los filtros"
 
@@ -434,8 +477,14 @@ msgstr "Prioridad de la ordenación: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Activar la ordenación"
 
-msgid "Delete"
-msgstr "Eliminar"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Cambiar tema (tema actual: automático)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Cambiar tema (tema actual: claro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Cambiar tema (tema actual: oscuro)"
 
 #, python-format
 msgid ""
@@ -460,8 +509,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"¿Está seguro de que quiere borrar los %(object_name)s \"%(escaped_object)s"
-"\"? Se borrarán los siguientes objetos relacionados:"
+"¿Está seguro de que quiere borrar los %(object_name)s "
+"\"%(escaped_object)s\"? Se borrarán los siguientes objetos relacionados:"
 
 msgid "Objects"
 msgstr "Objetos"
@@ -471,9 +520,6 @@ msgstr "Si, estoy seguro"
 
 msgid "No, take me back"
 msgstr "No, llévame atrás"
-
-msgid "Delete multiple objects"
-msgstr "Eliminar múltiples objetos."
 
 #, python-format
 msgid ""
@@ -520,6 +566,15 @@ msgstr "Mis acciones"
 msgid "None available"
 msgstr "Ninguno disponible"
 
+msgid "Added:"
+msgstr "Agregado:"
+
+msgid "Changed:"
+msgstr "Modificado:"
+
+msgid "Deleted:"
+msgstr "Eliminado:"
+
 msgid "Unknown content"
 msgstr "Contenido desconocido"
 
@@ -540,11 +595,20 @@ msgstr ""
 "Se ha autenticado como %(username)s, pero no está autorizado a acceder a "
 "esta página. ¿Desea autenticarse con una cuenta diferente?"
 
-msgid "Forgotten your password or username?"
-msgstr "¿Ha olvidado la contraseña o el nombre de usuario?"
+msgid "Forgotten your login credentials?"
+msgstr "¿Olvidó sus credenciales de inicio de sesión?"
 
 msgid "Toggle navigation"
 msgstr "Activar navegación"
+
+msgid "Sidebar"
+msgstr "Barra lateral"
+
+msgid "Start typing to filter…"
+msgstr "Empiece a escribir para filtrar…"
+
+msgid "Filter navigation items"
+msgstr "Filtrar elementos de navegación"
 
 msgid "Date/time"
 msgstr "Fecha/hora"
@@ -554,6 +618,12 @@ msgstr "Usuario"
 
 msgid "Action"
 msgstr "Acción"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entradas"
+msgstr[2] "entradas"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -579,6 +649,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -611,8 +682,12 @@ msgstr "Añadir otro %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Eliminar %(model)s seleccionada/o"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gracias por el tiempo que ha dedicado hoy al sitio web."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Ver seleccionado %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Gracias por pasar un buen rato con el sitio web hoy."
 
 msgid "Log in again"
 msgstr "Iniciar sesión de nuevo"
@@ -691,8 +766,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor, vaya a la página siguiente y escoja una nueva contraseña."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Su nombre de usuario, en caso de que lo haya olvidado:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Por si lo ha olvidado, usted es:"
 
 msgid "Thanks for using our site!"
 msgstr "¡Gracias por usar nuestro sitio!"
@@ -713,6 +788,9 @@ msgstr "Correo electrónico:"
 
 msgid "Reset my password"
 msgstr "Restablecer mi contraseña"
+
+msgid "Select all objects on this page for an action"
+msgstr "Seleccione todos los objetos de esta página para una acción"
 
 msgid "All dates"
 msgstr "Todas las fechas"

@@ -2,17 +2,17 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
-&rsaquo; {% translate 'Bookmarklets' %}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li><a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a></li>
+<li aria-current="page">{% translate 'Bookmarklets' %}</li>
+</ol>
 {% endblock %}
 {% block title %}{% translate "Documentation bookmarklets" %}{% endblock %}
 
 {% block content %}
 
-<p class="help">{% blocktranslate trimmed %}
+<p class="quiet">{% blocktranslate trimmed %}
 To install bookmarklets, drag the link to your bookmarks toolbar, or right-click
 the link and add it to your bookmarks. Now you can select the bookmarklet
 from any page in the site.

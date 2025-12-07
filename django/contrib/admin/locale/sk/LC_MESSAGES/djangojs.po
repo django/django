@@ -1,20 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Adam Zahradník, 2023
 # Dimitris Glezos <glezos@transifex.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Juraj Bubniak <translations@jbub.eu>, 2012
+# 18f25ad6fa9930fc67cb11aca9d16a27, 2012
 # Marian Andre <marian@andre.sk>, 2012,2015
-# Martin Kosír, 2011
-# Martin Tóth <ezimir@gmail.com>, 2017
+# 29cf7e517570e1bc05a1509565db92ae_2a01508, 2011
+# Martin Tóth <ezimir@gmail.com>, 2017,2023
+# Peter Kuma, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Marian Andre <marian@andre.sk>\n"
-"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Martin Tóth <ezimir@gmail.com>, 2017,2023\n"
+"Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,7 +34,7 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Toto je zoznam dostupných %s. Pre výber je potrebné označiť ich v poli a "
-"následne kliknutím na šípku \"Vybrať\" presunúť."
+"následne kliknutím na šípku „Vybrať“ presunúť."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -64,7 +66,11 @@ msgid ""
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 "Toto je zoznam dostupných %s. Pre vymazanie je potrebné označiť ich v poli a "
-"následne kliknutím na šípku \"Vymazať\" vymazať."
+"následne kliknutím na šípku „Vymazať“ vymazať."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Píšte do tohto poľa pre vyfiltrovanie označených %s."
 
 msgid "Remove all"
 msgstr "Odstrániť všetky"
@@ -72,6 +78,14 @@ msgstr "Odstrániť všetky"
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kliknite sem pre vymazanie vybratých %s naraz."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s označená možnosť sa nezobrazuje"
+msgstr[1] "%s označené možnosti sa nezobrazujú"
+msgstr[2] "%s označených možností sa nezobrazuje"
+msgstr[3] "%s označených možností sa nezobrazuje"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -88,20 +102,20 @@ msgstr ""
 "akciu, vaše zmeny budú stratené."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Vybrali ste akciu, ale neuložili ste jednotlivé polia. Prosím, uložte zmeny "
 "kliknutím na OK. Akciu budete musieť vykonať znova."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Vybrali ste akciu, ale neurobili ste žiadne zmeny v jednotlivých poliach. "
-"Pravdepodobne ste chceli použiť tlačidlo vykonať namiesto uložiť."
+"Pravdepodobne ste chceli použiť tlačidlo Vykonať namiesto Uložiť."
 
 msgid "Now"
 msgstr "Teraz"
@@ -190,6 +204,103 @@ msgstr "november"
 
 msgid "December"
 msgstr "december"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mar."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "máj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jún"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "júl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec."
+
+msgid "Sunday"
+msgstr "nedeľa"
+
+msgid "Monday"
+msgstr "pondelok"
+
+msgid "Tuesday"
+msgstr "utorok"
+
+msgid "Wednesday"
+msgstr "streda"
+
+msgid "Thursday"
+msgstr "štvrtok"
+
+msgid "Friday"
+msgstr "piatok"
+
+msgid "Saturday"
+msgstr "sobota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "ne"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "po"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "ut"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "st"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "št"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "pi"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "so"
 
 msgctxt "one letter Sunday"
 msgid "S"

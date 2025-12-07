@@ -1,4 +1,4 @@
-/*global gettext, interpolate, ngettext*/
+/*global gettext, interpolate, ngettext, Actions*/
 'use strict';
 {
     function show(selector) {
@@ -36,7 +36,10 @@
 
     function clearAcross(options) {
         reset(options);
-        document.querySelector(options.acrossInput).value = 0;
+        const acrossInputs = document.querySelectorAll(options.acrossInput);
+        acrossInputs.forEach(function(acrossInput) {
+            acrossInput.value = 0;
+        });
         document.querySelector(options.actionContainer).classList.remove(options.selectedClass);
     }
 
@@ -107,8 +110,10 @@
         document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
             el.addEventListener('click', function(event) {
                 event.preventDefault();
-                const acrossInput = document.querySelector(options.acrossInput);
-                acrossInput.value = 1;
+                const acrossInputs = document.querySelectorAll(options.acrossInput);
+                acrossInputs.forEach(function(acrossInput) {
+                    acrossInput.value = 1;
+                });
                 showClear(options);
             });
         });
@@ -174,6 +179,9 @@
                 }
             });
         }
+        // Sync counter when navigating to the page, such as through the back
+        // button.
+        window.addEventListener('pageshow', (event) => updateCounter(actionCheckboxes, options));
     };
 
     // Call function fn when the DOM is loaded and ready. If it is already

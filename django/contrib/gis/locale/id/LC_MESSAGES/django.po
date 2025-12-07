@@ -6,16 +6,16 @@
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2015-2016
-# sage <laymonage@gmail.com>, 2019
+# sag᠎e <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-28 05:59+0000\n"
-"Last-Translator: sage <laymonage@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: sag᠎e <laymonage@gmail.com>, 2019\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -78,9 +78,6 @@ msgstr ""
 
 msgid "Delete all Features"
 msgstr "Hapus semua Fitur"
-
-msgid "WKT debugging window:"
-msgstr "Jendela mencari dan memperbaiki kesalahan WKT:"
 
 msgid "Debugging window (serialized value)"
 msgstr "Jendela mencari dan memperbaiki kesalahan (nilai bersambung)"

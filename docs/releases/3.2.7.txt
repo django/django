@@ -1,0 +1,13 @@
+==========================
+Django 3.2.7 release notes
+==========================
+
+*September 1, 2021*
+
+Django 3.2.7 fixes a bug in 3.2.6.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2 that caused the incorrect offset extraction
+  from fixed offset timezones (:ticket:`32992`).

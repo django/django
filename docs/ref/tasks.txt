@@ -1,0 +1,443 @@
+=====
+Tasks
+=====
+
+.. versionadded:: 6.0
+
+.. module:: django.tasks
+   :synopsis: Django's built-in background Task system.
+
+The Task framework provides the contract and plumbing for background work, not
+the engine that runs it. The Tasks API defines how work is described, queued,
+and tracked, but leaves actual execution to external infrastructure.
+
+Task definition
+===============
+
+The ``task`` decorator
+----------------------
+
+.. function:: task(*, priority=0, queue_name="default", backend="default", takes_context=False)
+
+    The ``@task`` decorator defines a :class:`Task` instance. This has the
+    following optional arguments:
+
+    * ``priority``: Sets the :attr:`~Task.priority` of the ``Task``. Defaults
+      to 0.
+    * ``queue_name``: Sets the :attr:`~Task.queue_name` of the ``Task``.
+      Defaults to ``"default"``.
+    * ``backend``: Sets the :attr:`~Task.backend` of the ``Task``. Defaults to
+      ``"default"``.
+    * ``takes_context``: Controls whether the ``Task`` function accepts a
+      :class:`TaskContext`. Defaults to ``False``. See :ref:`Task context
+      <task-context>` for details.
+
+    If the defined ``Task`` is not valid according to the backend,
+    :exc:`~django.tasks.exceptions.InvalidTask` is raised.
+
+    See :ref:`defining tasks <defining-tasks>` for usage examples.
+
+``Task``
+--------
+
+.. class:: Task
+
+    Represents a Task to be run in the background. Tasks should be defined
+    using the :func:`task` decorator.
+
+    Attributes of ``Task`` cannot be modified. See :ref:`modifying Tasks
+    <modifying-tasks>` for details.
+
+    .. attribute:: Task.priority
+
+        The priority of the ``Task``. Priorities must be between -100 and 100,
+        where larger numbers are higher priority, and will be run sooner.
+
+        The backend must have :attr:`.supports_priority` set to ``True`` to use
+        this feature.
+
+    .. attribute:: Task.backend
+
+        The alias of the backend the ``Task`` should be enqueued to. This must
+        match a backend defined in :setting:`BACKEND <TASKS-BACKEND>`.
+
+    .. attribute:: Task.queue_name
+
+        The name of the queue the ``Task`` will be enqueued on to. Defaults to
+        ``"default"``. This must match a queue defined in
+        :setting:`QUEUES <TASKS-QUEUES>`, unless
+        :setting:`QUEUES <TASKS-QUEUES>` is set to ``[]``.
+
+    .. attribute:: Task.run_after
+
+        The earliest time the ``Task`` will be executed. This can be a
+        :class:`timedelta <datetime.timedelta>`, which is used relative to the
+        current time, a timezone-aware :class:`datetime <datetime.datetime>`,
+        or ``None`` if not constrained. Defaults to ``None``.
+
+        The backend must have :attr:`.supports_defer` set to ``True`` to use
+        this feature. Otherwise,
+        :exc:`~django.tasks.exceptions.InvalidTask` is raised.
+
+    .. attribute:: Task.name
+
+        The name of the function decorated with :func:`task`. This name is not
+        necessarily unique.
+
+    .. method:: Task.using(*, priority=None, backend=None, queue_name=None, run_after=None)
+
+        Creates a new ``Task`` with modified defaults. The existing ``Task`` is
+        left unchanged.
+
+        ``using`` allows modifying the following attributes:
+
+        * :attr:`priority <Task.priority>`
+        * :attr:`backend <Task.backend>`
+        * :attr:`queue_name <Task.queue_name>`
+        * :attr:`run_after <Task.run_after>`
+
+        See :ref:`modifying Tasks <modifying-tasks>` for usage examples.
+
+    .. method:: Task.enqueue(*args, **kwargs)
+
+        Enqueues the ``Task`` to the ``Task`` backend for later execution.
+
+        Arguments are passed to the ``Task``'s function after a round-trip
+        through a :func:`json.dumps`/:func:`json.loads` cycle. Hence, all
+        arguments must be JSON-serializable and preserve their type after the
+        round-trip.
+
+        If the ``Task`` is not valid according to the backend,
+        :exc:`~django.tasks.exceptions.InvalidTask` is raised.
+
+        See :ref:`enqueueing Tasks <enqueueing-tasks>` for usage examples.
+
+    .. method:: Task.aenqueue(*args, **kwargs)
+
+        The ``async`` variant of :meth:`enqueue <Task.enqueue>`.
+
+    .. method:: Task.get_result(result_id)
+
+        Retrieves a result by its id.
+
+        If the result does not exist, :exc:`TaskResultDoesNotExist
+        <django.tasks.exceptions.TaskResultDoesNotExist>` is raised. If the
+        result is not the same type as the current Task,
+        :exc:`TaskResultMismatch <django.tasks.exceptions.TaskResultMismatch>`
+        is raised. If the backend does not support ``get_result()``,
+        :exc:`NotImplementedError` is raised.
+
+    .. method:: Task.aget_result(*args, **kwargs)
+
+        The ``async`` variant of :meth:`get_result <Task.get_result>`.
+
+Task context
+============
+
+.. class:: TaskContext
+
+    Contains context for the running :class:`Task`. Context only passed to a
+    ``Task`` if it was defined with ``takes_context=True``.
+
+    Attributes of ``TaskContext`` cannot be modified.
+
+    .. attribute:: TaskContext.task_result
+
+        The :class:`TaskResult` currently being run.
+
+    .. attribute:: TaskContext.attempt
+
+        The number of the current execution attempts for this Task, starting at
+        1.
+
+Task results
+============
+
+.. class:: TaskResultStatus
+
+    An Enum representing the status of a :class:`TaskResult`.
+
+    .. attribute:: TaskResultStatus.READY
+
+        The :class:`Task` has just been enqueued, or is ready to be executed
+        again.
+
+    .. attribute:: TaskResultStatus.RUNNING
+
+        The :class:`Task` is currently being executed.
+
+    .. attribute:: TaskResultStatus.FAILED
+
+        The :class:`Task` raised an exception during execution, or was unable
+        to start.
+
+    .. attribute:: TaskResultStatus.SUCCESSFUL
+
+        The :class:`Task` has finished executing successfully.
+
+.. class:: TaskResult
+
+    The ``TaskResult`` stores the information about a specific execution of a
+    :class:`Task`.
+
+    Attributes of ``TaskResult`` cannot be modified.
+
+    .. attribute:: TaskResult.task
+
+        The :class:`Task` the result was enqueued for.
+
+    .. attribute:: TaskResult.id
+
+        A unique identifier for the result, which can be passed to
+        :meth:`Task.get_result`.
+
+        The format of the id will depend on the backend being used. Task result
+        ids are always strings less than 64 characters.
+
+        See :ref:`Task results <task-results>` for more details.
+
+    .. attribute:: TaskResult.status
+
+        The :class:`status <TaskResultStatus>` of the result.
+
+    .. attribute:: TaskResult.enqueued_at
+
+        The time when the ``Task`` was enqueued.
+
+    .. attribute:: TaskResult.started_at
+
+        The time when the ``Task`` began execution, on its first attempt.
+
+    .. attribute:: TaskResult.last_attempted_at
+
+        The time when the most recent ``Task`` run began execution.
+
+    .. attribute:: TaskResult.finished_at
+
+        The time when the ``Task`` finished execution, whether it failed or
+        succeeded.
+
+    .. attribute:: TaskResult.backend
+
+        The backend the result is from.
+
+    .. attribute:: TaskResult.errors
+
+        A list of :class:`TaskError` instances for the errors raised as part of
+        each execution of the Task.
+
+    .. attribute:: TaskResult.return_value
+
+        The return value from the ``Task`` function.
+
+        If the ``Task`` did not finish successfully, :exc:`ValueError` is
+        raised.
+
+        See :ref:`return values <task-return-values>` for usage examples.
+
+    .. method:: TaskResult.refresh
+
+        Refresh the result's attributes from the queue store.
+
+    .. method:: TaskResult.arefresh
+
+        The ``async`` variant of :meth:`TaskResult.refresh`.
+
+    .. attribute:: TaskResult.is_finished
+
+        Whether the ``Task`` has finished (successfully or not).
+
+    .. attribute:: TaskResult.attempts
+
+        The number of times the Task has been run.
+
+        If the task is currently running, it does not count as an attempt.
+
+    .. attribute:: TaskResult.worker_ids
+
+        The ids of the workers which have executed the Task.
+
+
+Task errors
+-----------
+
+.. class:: TaskError
+
+    Contains information about the error raised during the execution of a
+    ``Task``.
+
+    .. attribute:: TaskError.traceback
+
+        The traceback (as a string) from the raised exception when the ``Task``
+        failed.
+
+    .. attribute:: TaskError.exception_class
+
+        The exception class raised when executing the ``Task``.
+
+Backends
+========
+
+Backends handle how Tasks are stored and executed. All backends share a common
+interface defined by ``BaseTaskBackend``, which specifies the core methods for
+enqueueing Tasks and retrieving results.
+
+Base backend
+------------
+
+.. module:: django.tasks.backends.base
+
+.. class:: BaseTaskBackend
+
+    ``BaseTaskBackend`` is the parent class for all Task backends.
+
+    .. attribute:: BaseTaskBackend.options
+
+        A dictionary of extra parameters for the Task backend. These are
+        provided using the :setting:`OPTIONS <TASKS-OPTIONS>` setting.
+
+    .. method:: BaseTaskBackend.enqueue(task, args, kwargs)
+
+        Task backends which subclass ``BaseTaskBackend`` should implement this
+        method as a minimum.
+
+        When implemented, ``enqueue()`` enqueues the ``task``, a :class:`.Task`
+        instance, for later execution. ``args`` are the positional arguments
+        and ``kwargs`` are the keyword arguments to be passed to the ``task``.
+        Returns a :class:`~django.tasks.TaskResult`.
+
+    .. method:: BaseTaskBackend.aenqueue(task, args, kwargs)
+
+        The ``async`` variant of :meth:`BaseTaskBackend.enqueue`.
+
+    .. method:: BaseTaskBackend.get_result(result_id)
+
+        Retrieve a result by its id. If the result does not exist,
+        :exc:`TaskResultDoesNotExist
+        <django.tasks.exceptions.TaskResultDoesNotExist>` is raised.
+
+        If the backend does not support ``get_result()``,
+        :exc:`NotImplementedError` is raised.
+
+    .. method:: BaseTaskBackend.aget_result(result_id)
+
+        The ``async`` variant of :meth:`BaseTaskBackend.get_result`.
+
+    .. method:: BaseTaskBackend.validate_task(task)
+
+        Validates whether the provided ``Task`` is able to be enqueued using
+        the backend. If the Task is not valid,
+        :exc:`InvalidTask <django.tasks.exceptions.InvalidTask>`
+        is raised.
+
+Feature flags
+~~~~~~~~~~~~~
+
+Some backends may not support all features Django provides. It's possible to
+identify the supported functionality of a backend, and potentially change
+behavior accordingly.
+
+.. attribute:: BaseTaskBackend.supports_defer
+
+    Whether the backend supports enqueueing Tasks to be executed after a
+    specific time using the :attr:`~django.tasks.Task.run_after` attribute.
+
+.. attribute:: BaseTaskBackend.supports_async_task
+
+    Whether the backend supports enqueueing async functions (coroutines).
+
+.. attribute:: BaseTaskBackend.supports_get_result
+
+    Whether the backend supports retrieving ``Task`` results from another
+    thread after they have been enqueued.
+
+.. attribute:: BaseTaskBackend.supports_priority
+
+    Whether the backend supports executing Tasks as ordered by their
+    :attr:`~django.tasks.Task.priority`.
+
+The below table notes which of the :ref:`built-in backends
+<task-available-backends>` support which features:
+
+============================ ======================= ===========================
+Feature                      :class:`.DummyBackend`  :class:`.ImmediateBackend`
+============================ ======================= ===========================
+:attr:`.supports_defer`      Yes                     No
+:attr:`.supports_async_task` Yes                     Yes
+:attr:`.supports_get_result` No                      No [#fnimmediateresult]_
+:attr:`.supports_priority`   Yes [#fndummypriority]_ Yes [#fnimmediatepriority]_
+============================ ======================= ===========================
+
+.. _task-available-backends:
+
+Available backends
+------------------
+
+Django includes only development and testing backends. These support local
+execution and inspection, for production ready backends refer to
+:ref:`configuring-a-task-backend`.
+
+Immediate backend
+~~~~~~~~~~~~~~~~~
+
+.. module:: django.tasks.backends.immediate
+
+.. class:: ImmediateBackend
+
+    The :ref:`immediate backend <immediate-task-backend>` executes Tasks
+    immediately, rather than in the background.
+
+Dummy backend
+~~~~~~~~~~~~~
+
+.. module:: django.tasks.backends.dummy
+
+.. class:: DummyBackend
+
+    The :ref:`dummy backend <dummy-task-backend>` does not execute enqueued
+    Tasks. Instead, it stores task results for later inspection.
+
+    .. attribute:: DummyBackend.results
+
+        A list of results for the enqueued Tasks, in the order they were
+        enqueued.
+
+    .. method:: DummyBackend.clear
+
+        Clears the list of stored results.
+
+Exceptions
+==========
+
+.. module:: django.tasks.exceptions
+
+.. exception:: InvalidTask
+
+    Raised when the :class:`.Task` attempting to be enqueued
+    is invalid.
+
+.. exception:: InvalidTaskBackend
+
+    Raised when the requested :class:`.BaseTaskBackend` is invalid.
+
+.. exception:: TaskResultDoesNotExist
+
+    Raised by :meth:`~django.tasks.backends.base.BaseTaskBackend.get_result`
+    when the provided ``result_id`` does not exist.
+
+.. exception:: TaskResultMismatch
+
+    Raised by :meth:`~django.tasks.Task.get_result` when the provided
+    ``result_id`` is for a different Task than the current Task.
+
+.. rubric:: Footnotes
+.. [#fnimmediateresult] The :class:`.ImmediateBackend` doesn't officially
+    support ``get_result()``, despite implementing the API, since the result
+    cannot be retrieved from a different thread.
+.. [#fndummypriority] The :class:`.DummyBackend` has ``supports_priority=True``
+    so that it can be used as a drop-in replacement in tests. Since this
+    backend never executes Tasks, the ``priority`` value has no effect.
+.. [#fnimmediatepriority] The :class:`.ImmediateBackend` has
+    ``supports_priority=True`` so that it can be used as a drop-in replacement
+    in tests. Because Tasks run as soon as they are scheduled, the ``priority``
+    value has no effect.

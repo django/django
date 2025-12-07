@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019
+# Charl du Plessis <cjdupless@gmail.com>, 2021
+# F Wolff <friedel@translate.org.za>, 2019,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-01-07 08:38+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023,2025\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,15 +46,17 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Neem jou van enige bladsy na die dokumentasie vir die vertooning wat daardie "
+"bladsy genereer."
 
 msgid "Tags"
-msgstr ""
+msgstr "Etikette"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Lys van alle templaat tags en hulle funksies."
 
 msgid "Filters"
-msgstr ""
+msgstr "Filters"
 
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
@@ -61,13 +64,16 @@ msgid ""
 msgstr ""
 
 msgid "Models"
-msgstr ""
+msgstr "Modelle"
 
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Modelle is beskrywings van al die objekte in die stelsel met hulle velde. "
+"Elke model het 'n lys velde wat bereikbaar is as veranderlikes in 'n "
+"sjabloon."
 
 msgid "Views"
 msgstr ""
@@ -77,39 +83,46 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Elke bladsy op die publieke werf word gegenereer deur 'n vertoning. Die "
+"vertoning definiëer watter templaat word gebruik om die bladsy te genereer "
+"en watter objekte is beskikbaar aan daardie templaat."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "Installeer asseblief docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
+"Die admin dokumentasie stelsel benodig Python se <a "
+"href=\"%(link)s\">docutils</a> biblioteek."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Vra asseblief jou administrateurs om <a href=\"%(link)s\">docutils</a> te "
+"installeer."
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Model: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Velde"
 
 msgid "Field"
-msgstr ""
+msgstr "Veld"
 
 msgid "Type"
-msgstr ""
+msgstr "Tipe"
 
 msgid "Description"
-msgstr ""
+msgstr "Beskrywing"
 
 msgid "Methods with arguments"
 msgstr ""
@@ -121,35 +134,35 @@ msgid "Arguments"
 msgstr ""
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Terug na Model dokumentasie"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "Model dokumentasie"
 
 msgid "Model groups"
-msgstr ""
+msgstr "Model groepe"
 
 msgid "Templates"
-msgstr ""
+msgstr "Template"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Templaat: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr ""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Templaat: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr ""
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(bestaan nie)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Terug na Dokumentasie"
 
 msgid "Template filters"
 msgstr ""
@@ -186,22 +199,22 @@ msgid "View: %(name)s"
 msgstr ""
 
 msgid "Context:"
-msgstr ""
+msgstr "Konteks:"
 
 msgid "Templates:"
-msgstr ""
+msgstr "Sjablone:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Terug na Sien dokumentasie"
 
 msgid "View documentation"
-msgstr ""
+msgstr "Sien dokumentasie"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Spring na naamruimte"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Leë naamruimte"
 
 #, python-format
 msgid "Views by namespace %(name)s"
@@ -247,7 +260,7 @@ msgstr ""
 
 #, python-format
 msgid "all %s"
-msgstr ""
+msgstr "alle %s"
 
 #, python-format
 msgid "number of %s"

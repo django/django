@@ -6,10 +6,10 @@ from django.test import SimpleTestCase
 
 
 class AsyncCheckTests(SimpleTestCase):
-    @mock.patch.dict(os.environ, {'DJANGO_ALLOW_ASYNC_UNSAFE': ''})
+    @mock.patch.dict(os.environ, {"DJANGO_ALLOW_ASYNC_UNSAFE": ""})
     def test_no_allowed_async_unsafe(self):
         self.assertEqual(check_async_unsafe(None), [])
 
-    @mock.patch.dict(os.environ, {'DJANGO_ALLOW_ASYNC_UNSAFE': 'true'})
+    @mock.patch.dict(os.environ, {"DJANGO_ALLOW_ASYNC_UNSAFE": "true"})
     def test_allowed_async_unsafe_set(self):
         self.assertEqual(check_async_unsafe(None), [E001])

@@ -1,18 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# Edgars Andersons, 2025
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023,2025
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2020-2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
+# Pēteris Caune, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 22:47+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,53 +30,54 @@ msgstr "Pieejams %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Šis ir saraksts ar pieejamajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izvēlēties"
-"\", lai pārvietotu starp izvēļu sarakstiem."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Jāizvēlas %s ar atlasīšanu un tad jāatlasa bultas poga \"Izvēlēties\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
-"Raksti šajā logā, lai filtrētu zemāk esošo sarakstu ar pieejamajiem %s."
+msgstr "Raksti šajā logā, lai atsijātu sarakstu ar pieejamajiem %s."
 
 msgid "Filter"
 msgstr "Filtrs"
 
-msgid "Choose all"
-msgstr "Izvēlēties visu"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Izvēlēties visus %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Izvēlies, lai pievienotu visas %s izvēles vienā reizē."
+msgid "Choose selected %s"
+msgstr "Izvēlēties atlasītos %s"
 
-msgid "Choose"
-msgstr "Izvēlies"
-
-msgid "Remove"
-msgstr "Izņemt"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Noņemt atzīmētos %s"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Izvēlies %s"
+msgstr "Izvēlēts %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"Šis ir saraksts ar izvēlētajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izņemt\", "
-"lai izņemtu no izvēlēto ierakstu saraksta."
-
-msgid "Remove all"
-msgstr "Izņemt visu"
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "Noņemt %s tos atzīmējot un tad izvēloties \"Noņemt\" bultiņas pogu."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Izvēlies, lai izņemtu visas %s izvēles vienā reizē."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Raksti šajā laukā, lai atsijātu atlasīto %s sarakstu."
+
+msgid "(click to clear)"
+msgstr "(klikšķināt, lai notīrītu)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Noņemt visu %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s atlasīto iespēju nav redzamas"
+msgstr[1] "%s atlasītā iespēja nav redzama"
+msgstr[2] "%s atlasītās iespējas nav redzamas"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -85,24 +89,24 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Jūs neesat saglabājis izmaiņas rediģējamiem laukiem. Ja jūs tagad "
-"izpildīsiet izvēlēto darbību, šīs izmaiņas netiks saglabātas."
+"Atsevišķi labojamiem laukiem ir nesaglabātas izmaiņas. Ja tiks izpildīta "
+"darbība, nesaglabātās izmaiņas tiks zaudētas."
 
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Jūs esiet izvēlējies veikt darbību, bet neesiet saglabājis veiktās izmaiņas. "
-"Lūdzu nospiediet OK, lai saglabātu. Šo darbību jums nāksies izpildīt vēlreiz."
+"Ir atlasīta darbība, bet nav saglabātas laukos veiktās izmaiņas. Lūgums "
+"klikšķināt uz “Labi”, lai saglabātu. Darbība būs jāizpilda vēlreiz."
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Jūs esiet izvēlējies veikt darbību un neesiet mainījis nevienu lauku. Jūs "
-"droši vien meklējiet pogu 'Aiziet' nevis 'Saglabāt'."
+"Tu atlasīji darbību un laukos neveici nekādas izmaiņas. Iespējams, ka meklē "
+"pogu “Aiziet”, nevis “Saglabāt”."
 
 msgid "Now"
 msgstr "Tagad"
@@ -114,7 +118,7 @@ msgid "6 a.m."
 msgstr "06.00"
 
 msgid "Noon"
-msgstr "Pusdienas laiks"
+msgstr "Pusdiena"
 
 msgid "6 p.m."
 msgstr "6:00"
@@ -137,7 +141,7 @@ msgid "Choose a Time"
 msgstr "Izvēlies laiku"
 
 msgid "Choose a time"
-msgstr "Izvēlieties laiku"
+msgstr "Izvēlēties laiku"
 
 msgid "Cancel"
 msgstr "Atcelt"
@@ -238,6 +242,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dec"
 
+msgid "Sunday"
+msgstr "Svētdiena"
+
+msgid "Monday"
+msgstr "Pirmdiena"
+
+msgid "Tuesday"
+msgstr "Otrdiena"
+
+msgid "Wednesday"
+msgstr "Trešdiena"
+
+msgid "Thursday"
+msgstr "Ceturtdiena"
+
+msgid "Friday"
+msgstr "Piektdiena"
+
+msgid "Saturday"
+msgstr "Sestdiena"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Sv"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pr"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ot"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Tr"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Ce"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pi"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Se"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Sv"
@@ -265,9 +318,3 @@ msgstr "Pk"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Se"
-
-msgid "Show"
-msgstr "Parādīt"
-
-msgid "Hide"
-msgstr "Slēpt"

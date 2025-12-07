@@ -17,7 +17,7 @@
             <table id="result_list">
                 <tr>
                     <th>
-                       <input type="checkbox" id="action-toggle">
+                       <input type="checkbox" id="action-toggle" aria-label="Select all objects on this page for an action">
                     </th>
                 </tr>
                 <tr>
@@ -91,8 +91,7 @@
         <div class="app-auth module current-app">
           <table>
             <caption>
-              <a href="/admin/auth/" class="section"
-                 title="Models in the Authentication and Authorization application">
+              <a href="/admin/auth/" class="section">
                     Authentication and Authorization
               </a>
             </caption>
@@ -125,6 +124,7 @@
     <script src='./admin/navigation.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js' data-cover></script>
+    <script src='./admin/RelatedObjectLookups.test.js'></script>
 
     <script src='./admin/DateTimeShortcuts.test.js'></script>
     <script src='../django/contrib/admin/static/admin/js/calendar.js' data-cover></script>
@@ -143,7 +143,6 @@
     <script src='./admin/inlines.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/actions.js' data-cover></script>
-    <script src='../django/contrib/admin/static/admin/js/collapse.js' data-cover></script>
     <script src='../django/contrib/admin/static/admin/js/prepopulate.js' data-cover></script>
     <script src='../django/contrib/admin/static/admin/js/urlify.js' data-cover></script>
     <script src='./admin/URLify.test.js'></script>
@@ -157,7 +156,7 @@
         <textarea id="id_multipolygon" name="multipolygon" class="vSerializedField required"
                   style="display:none;" rows="10" cols="150"></textarea>
     </div>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/ol@v7.2.2/dist/ol.js'></script>
     <script src='../django/contrib/gis/static/gis/js/OLMapWidget.js' data-cover></script>
     <script src='./gis/mapwidget.test.js'></script>
 

@@ -1,6 +1,7 @@
 """
 Creates permissions for all installed apps that need permissions.
 """
+
 import getpass
 import unicodedata
 
@@ -8,7 +9,9 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.utils import IntegrityError
+from django.utils.text import camel_case_to_spaces
 
 
 def _get_all_permissions(opts):
@@ -25,65 +28,164 @@ def _get_builtin_permissions(opts):
     """
     perms = []
     for action in opts.default_permissions:
-        perms.append((
-            get_permission_codename(action, opts),
-            'Can %s %s' % (action, opts.verbose_name_raw)
-        ))
+        perms.append(
+            (
+                get_permission_codename(action, opts),
+                "Can %s %s" % (action, opts.verbose_name_raw),
+            )
+        )
     return perms
 
 
-def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
+def create_permissions(
+    app_config,
+    verbosity=2,
+    interactive=True,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
     if not app_config.models_module:
+        return
+
+    try:
+        Permission = apps.get_model("auth", "Permission")
+    except LookupError:
+        return
+    if not router.allow_migrate_model(using, Permission):
         return
 
     # Ensure that contenttypes are created for this app. Needed if
     # 'django.contrib.auth' is in INSTALLED_APPS before
     # 'django.contrib.contenttypes'.
-    create_contenttypes(app_config, verbosity=verbosity, interactive=interactive, using=using, apps=apps, **kwargs)
+    create_contenttypes(
+        app_config,
+        verbosity=verbosity,
+        interactive=interactive,
+        using=using,
+        apps=apps,
+        **kwargs,
+    )
 
     app_label = app_config.label
     try:
         app_config = apps.get_app_config(app_label)
-        ContentType = apps.get_model('contenttypes', 'ContentType')
-        Permission = apps.get_model('auth', 'Permission')
+        ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         return
 
-    if not router.allow_migrate_model(using, Permission):
-        return
+    models = list(app_config.get_models())
 
-    # This will hold the permissions we're looking for as
-    # (content_type, (codename, name))
-    searched_perms = []
-    # The codenames and ctypes that should exist.
-    ctypes = set()
-    for klass in app_config.get_models():
-        # Force looking up the content types in the current database
-        # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(using).get_for_model(klass, for_concrete_model=False)
-
-        ctypes.add(ctype)
-        for perm in _get_all_permissions(klass._meta):
-            searched_perms.append((ctype, perm))
+    # Grab all the ContentTypes.
+    ctypes = ContentType.objects.db_manager(using).get_for_models(
+        *models, for_concrete_models=False
+    )
 
     # Find all the Permissions that have a content_type for a model we're
-    # looking for.  We don't need to check for codenames since we already have
+    # looking for. We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(Permission.objects.using(using).filter(
-        content_type__in=ctypes,
-    ).values_list(
-        "content_type", "codename"
-    ))
+    all_perms = set(
+        Permission.objects.using(using)
+        .filter(
+            content_type__in=set(ctypes.values()),
+        )
+        .values_list("content_type", "codename")
+    )
 
-    perms = [
-        Permission(codename=codename, name=name, content_type=ct)
-        for ct, (codename, name) in searched_perms
-        if (ct.pk, codename) not in all_perms
-    ]
+    perms = []
+    for model in models:
+        ctype = ctypes[model]
+        for codename, name in _get_all_permissions(model._meta):
+            if (ctype.pk, codename) not in all_perms:
+                permission = Permission()
+                permission._state.db = using
+                permission.codename = codename
+                permission.name = name
+                permission.content_type = ctype
+                perms.append(permission)
+
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
+
+
+class RenamePermission(migrations.RunPython):
+    def __init__(self, app_label, old_model, new_model):
+        self.app_label = app_label
+        self.old_model = old_model
+        self.new_model = new_model
+        super(RenamePermission, self).__init__(
+            self.rename_forward, self.rename_backward
+        )
+
+    def _rename(self, apps, schema_editor, old_model, new_model):
+        ContentType = apps.get_model("contenttypes", "ContentType")
+        # Use the live Permission model instead of the frozen one, since frozen
+        # models do not retain foreign key constraints.
+        from django.contrib.auth.models import Permission
+
+        db = schema_editor.connection.alias
+        ctypes = ContentType.objects.using(db).filter(
+            app_label=self.app_label, model__icontains=old_model.lower()
+        )
+        for permission in Permission.objects.using(db).filter(
+            content_type_id__in=ctypes.values("id")
+        ):
+            prefix = permission.codename.split("_")[0]
+            default_verbose_name = camel_case_to_spaces(new_model)
+
+            new_codename = f"{prefix}_{new_model.lower()}"
+            new_name = f"Can {prefix} {default_verbose_name}"
+
+            if permission.codename != new_codename or permission.name != new_name:
+                permission.codename = new_codename
+                permission.name = new_name
+                try:
+                    with transaction.atomic(using=db):
+                        permission.save(update_fields={"name", "codename"})
+                except IntegrityError:
+                    pass
+
+    def rename_forward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.old_model, self.new_model)
+
+    def rename_backward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.new_model, self.old_model)
+
+
+def rename_permissions(
+    plan,
+    verbosity=2,
+    interactive=True,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
+    """
+    Insert a `RenamePermissionType` operation after every planned `RenameModel`
+    operation.
+    """
+    try:
+        Permission = apps.get_model("auth", "Permission")
+    except LookupError:
+        return
+    else:
+        if not router.allow_migrate_model(using, Permission):
+            return
+
+    for migration, backward in plan:
+        inserts = []
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, migrations.RenameModel):
+                operation = RenamePermission(
+                    migration.app_label,
+                    operation.old_name,
+                    operation.new_name,
+                )
+                inserts.append((index + 1, operation))
+        for inserted, (index, operation) in enumerate(inserts):
+            migration.operations.insert(inserted + index, operation)
 
 
 def get_system_username():
@@ -93,11 +195,13 @@ def get_system_username():
     """
     try:
         result = getpass.getuser()
-    except (ImportError, KeyError):
-        # KeyError will be raised by os.getpwuid() (called by getuser())
-        # if there is no corresponding entry in the /etc/passwd file
-        # (a very restricted chroot environment, for example).
-        return ''
+    except (ImportError, KeyError, OSError):
+        # TODO: Drop ImportError and KeyError when dropping support for PY312.
+        # KeyError (Python <3.13) or OSError (Python 3.13+) will be raised by
+        # os.getpwuid() (called by getuser()) if there is no corresponding
+        # entry in the /etc/passwd file (for example, in a very restricted
+        # chroot environment).
+        return ""
     return result
 
 
@@ -117,23 +221,25 @@ def get_default_username(check_db=True, database=DEFAULT_DB_ALIAS):
     # If the User model has been swapped out, we can't make any assumptions
     # about the default user name.
     if auth_app.User._meta.swapped:
-        return ''
+        return ""
 
     default_username = get_system_username()
     try:
         default_username = (
-            unicodedata.normalize('NFKD', default_username)
-            .encode('ascii', 'ignore').decode('ascii')
-            .replace(' ', '').lower()
+            unicodedata.normalize("NFKD", default_username)
+            .encode("ascii", "ignore")
+            .decode("ascii")
+            .replace(" ", "")
+            .lower()
         )
     except UnicodeDecodeError:
-        return ''
+        return ""
 
     # Run the username validator
     try:
-        auth_app.User._meta.get_field('username').run_validators(default_username)
+        auth_app.User._meta.get_field("username").run_validators(default_username)
     except exceptions.ValidationError:
-        return ''
+        return ""
 
     # Don't return the default username if it is already taken.
     if check_db and default_username:
@@ -144,5 +250,5 @@ def get_default_username(check_db=True, database=DEFAULT_DB_ALIAS):
         except auth_app.User.DoesNotExist:
             pass
         else:
-            return ''
+            return ""
     return default_username

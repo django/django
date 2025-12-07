@@ -33,12 +33,22 @@ def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
 
 
+@transaction.non_atomic_requests(using=None)
+def not_in_transaction_using_none(request):
+    return HttpResponse(str(connection.in_atomic_block))
+
+
+@transaction.non_atomic_requests(using="incorrect")
+def not_in_transaction_using_text(request):
+    return HttpResponse(str(connection.in_atomic_block))
+
+
 def bad_request(request):
     raise BadRequest()
 
 
 def suspicious(request):
-    raise SuspiciousOperation('dubious')
+    raise SuspiciousOperation("dubious")
 
 
 @csrf_exempt
@@ -52,7 +62,16 @@ def httpstatus_enum(request):
 
 
 async def async_regular(request):
-    return HttpResponse(b'regular content')
+    return HttpResponse(b"regular content")
+
+
+async def async_streaming(request):
+    async def async_streaming_generator():
+        yield b"streaming"
+        yield b" "
+        yield b"content"
+
+    return StreamingHttpResponse(async_streaming_generator())
 
 
 class CoroutineClearingView:
@@ -63,7 +82,11 @@ class CoroutineClearingView:
         return self._unawaited_coroutine
 
     def __del__(self):
-        self._unawaited_coroutine.close()
+        try:
+            self._unawaited_coroutine.close()
+        except AttributeError:
+            # View was never called.
+            pass
 
 
 async_unawaited = CoroutineClearingView()

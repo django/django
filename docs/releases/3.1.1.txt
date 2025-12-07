@@ -40,7 +40,7 @@ Bugfixes
   rendering (:ticket:`31865`).
 
 * Fixed a data loss possibility in the
-  :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
+  :meth:`~django.db.models.query.QuerySet.select_for_update`. When using
   related fields pointing to a proxy model in the ``of`` argument, the
   corresponding model was not locked (:ticket:`31866`).
 
@@ -74,7 +74,7 @@ Bugfixes
   grouping by :class:`~django.db.models.JSONField` with a custom
   :attr:`~django.db.models.JSONField.decoder` (:ticket:`31956`). As a
   consequence, fetching a ``JSONField`` with raw SQL now returns a string
-  instead of pre-loaded data. You will need to explicitly call ``json.loads()``
+  instead of preloaded data. You will need to explicitly call ``json.loads()``
   in such cases.
 
 * Fixed a ``QuerySet.delete()`` crash on MySQL, following a performance

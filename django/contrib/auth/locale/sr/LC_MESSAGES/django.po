@@ -1,24 +1,24 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2020
+# Igor Jerosimić, 2020-2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-21 20:38+0000\n"
-"Last-Translator: Igor Jerosimić\n"
-"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2020-2021,2023-2025\n"
+"Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Personal info"
 msgstr "Лични подаци"
@@ -33,12 +33,22 @@ msgstr "Важни датуми"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s објекат са примарним кључем %(key)r не постоји."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Послати су конфликтни подаци из обрасца. Молим вас, покушајте поново."
+
 msgid "Password changed successfully."
 msgstr "Лозинка успешно измењена."
+
+msgid "Password-based authentication was disabled."
+msgstr "Потврда идентитета заснована на лозинки је онемогућена."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Измени лозинку: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Постави лозинку: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Аутентикација и Ауторизација"
@@ -49,11 +59,17 @@ msgstr "лозинка"
 msgid "last login"
 msgstr "последња пријава"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
+
 msgid "No password set."
 msgstr "Лозинка није унета."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
+msgid "Reset password"
+msgstr "Ресетуј лозинку"
+
+msgid "Set password"
+msgstr "Постави лозинку"
 
 msgid "The two password fields didn’t match."
 msgstr "Два поља за лозинке се не поклапају."
@@ -68,12 +84,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Унесите исту лозинку као малопре ради верификације."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Лозинке се не чувају у изворном облику па не постоји могућност приказа "
-"лозинке овог корисника, али можете променити лозинку коришћењем <a href="
-"\"{}\">ове форме</a>."
+"Да ли ће корисник моћи да се аутентификује помоћу лозинке или не. Ако је "
+"онемогућено, можда ће и даље моћи да се аутентификују помоћу других "
+"позадинских делова, као што су једнократно пријављивање (SSO) или LDAP."
+
+msgid "Password-based authentication"
+msgstr "Потврда идентитета заснована на лозинки"
+
+msgid "Enabled"
+msgstr "Омогућено"
+
+msgid "Disabled"
+msgstr "Онемогућено"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Необрађене лозинке се не чувају, тако да не постоји начин да се види "
+"корисничка лозинка."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Омогући аутентификацију засновану на лозинки за овог корисника постављањем "
+"лозинке."
 
 #, python-format
 msgid ""
@@ -100,9 +138,6 @@ msgstr "Ваша стара лознка није правилно унесен�
 
 msgid "Old password"
 msgstr "Стара лозинка"
-
-msgid "Password (again)"
-msgstr "Лозинка (поновите)"
 
 msgid "algorithm"
 msgstr "алгоритам"
@@ -136,6 +171,9 @@ msgstr "фактор сложености"
 
 msgid "checksum"
 msgstr "сума за проверу"
+
+msgid "block size"
+msgstr "величина блока"
 
 msgid "name"
 msgstr "име"
@@ -226,20 +264,12 @@ msgid "users"
 msgstr "корисници"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d карактер."
-msgstr[1] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
-"карактера."
-msgstr[2] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
-"карактера."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Ова лозинка је прекратка. Мора да садржи најмање %d знак."
+msgstr[1] "Ова лозинка је прекратка. Мора да садржи најмање %d знака."
+msgstr[2] "Ова лозинка је прекратка. Мора да садржи најмање %d знакова."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -272,11 +302,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Ресетовање лозинке на сајту %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Унесите исправно корисничко име. Оно може садржати само слова енглеске "
-"абецеде, цифре и карактере @/./+/-/_  ."
+"Унесите исправно корисничко име. Оно може садржати само неакцентована мала "
+"слова a-z и велика слова A-Z, цифре и карактере @/./+/-/_ ."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

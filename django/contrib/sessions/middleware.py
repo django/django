@@ -40,10 +40,10 @@ class SessionMiddleware(MiddlewareMixin):
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
-            patch_vary_headers(response, ('Cookie',))
+            patch_vary_headers(response, ("Cookie",))
         else:
             if accessed:
-                patch_vary_headers(response, ('Cookie',))
+                patch_vary_headers(response, ("Cookie",))
             if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
                 if request.session.get_expire_at_browser_close():
                     max_age = None
@@ -53,8 +53,8 @@ class SessionMiddleware(MiddlewareMixin):
                     expires_time = time.time() + max_age
                     expires = http_date(expires_time)
                 # Save the session data and refresh the client cookie.
-                # Skip session save for 500 responses, refs #3881.
-                if response.status_code != 500:
+                # Skip session save for 5xx responses.
+                if response.status_code < 500:
                     try:
                         request.session.save()
                     except UpdateError:
@@ -65,8 +65,10 @@ class SessionMiddleware(MiddlewareMixin):
                         )
                     response.set_cookie(
                         settings.SESSION_COOKIE_NAME,
-                        request.session.session_key, max_age=max_age,
-                        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                        request.session.session_key,
+                        max_age=max_age,
+                        expires=expires,
+                        domain=settings.SESSION_COOKIE_DOMAIN,
                         path=settings.SESSION_COOKIE_PATH,
                         secure=settings.SESSION_COOKIE_SECURE or None,
                         httponly=settings.SESSION_COOKIE_HTTPONLY or None,

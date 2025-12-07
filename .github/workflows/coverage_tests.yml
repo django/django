@@ -1,0 +1,81 @@
+name: Coverage Tests
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    if: github.repository == 'django/django'
+    name: Coverage Tests (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -e .
+          python -m pip install 'coverage[toml]' diff-cover
+
+      - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}/tests
+          COVERAGE_PROCESS_START: ${{ github.workspace }}/tests/.coveragerc
+          RUNTESTS_DIR: ${{ github.workspace }}/tests
+        run: |
+          python -Wall tests/runtests.py -v2
+
+      - name: Generate coverage report
+        if: success()
+        env:
+          COVERAGE_RCFILE: ${{ github.workspace }}/tests/.coveragerc
+          RUNTESTS_DIR: ${{ github.workspace }}/tests
+        run: |
+          python -m coverage combine
+          python -m coverage report --show-missing
+          python -m coverage xml -o tests/coverage.xml
+
+      - name: Generate diff coverage report
+        if: success()
+        run: |
+          if (Test-Path 'tests/coverage.xml') {
+            diff-cover tests/coverage.xml --compare-branch=origin/main --fail-under=0 > diff-cover-report.md
+          } else {
+            Set-Content -Path diff-cover-report.md -Value 'No coverage data available.'
+          }
+
+      - name: Save PR number
+        if: success()
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: |
+            diff-cover-report.md
+            pr_number.txt
+          retention-days: 1

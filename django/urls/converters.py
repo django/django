@@ -1,9 +1,9 @@
+import functools
 import uuid
-from functools import lru_cache
 
 
 class IntConverter:
-    regex = '[0-9]+'
+    regex = "[0-9]+"
 
     def to_python(self, value):
         return int(value)
@@ -13,7 +13,7 @@ class IntConverter:
 
 
 class StringConverter:
-    regex = '[^/]+'
+    regex = "[^/]+"
 
     def to_python(self, value):
         return value
@@ -23,7 +23,7 @@ class StringConverter:
 
 
 class UUIDConverter:
-    regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    regex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
     def to_python(self, value):
         return uuid.UUID(value)
@@ -33,19 +33,19 @@ class UUIDConverter:
 
 
 class SlugConverter(StringConverter):
-    regex = '[-a-zA-Z0-9_]+'
+    regex = "[-a-zA-Z0-9_]+"
 
 
 class PathConverter(StringConverter):
-    regex = '.+'
+    regex = ".+"
 
 
 DEFAULT_CONVERTERS = {
-    'int': IntConverter(),
-    'path': PathConverter(),
-    'slug': SlugConverter(),
-    'str': StringConverter(),
-    'uuid': UUIDConverter(),
+    "int": IntConverter(),
+    "path": PathConverter(),
+    "slug": SlugConverter(),
+    "str": StringConverter(),
+    "uuid": UUIDConverter(),
 }
 
 
@@ -53,14 +53,16 @@ REGISTERED_CONVERTERS = {}
 
 
 def register_converter(converter, type_name):
+    if type_name in REGISTERED_CONVERTERS or type_name in DEFAULT_CONVERTERS:
+        raise ValueError(f"Converter {type_name!r} is already registered.")
     REGISTERED_CONVERTERS[type_name] = converter()
     get_converters.cache_clear()
 
+    from django.urls.resolvers import _route_to_regex
 
-@lru_cache(maxsize=None)
+    _route_to_regex.cache_clear()
+
+
+@functools.cache
 def get_converters():
     return {**DEFAULT_CONVERTERS, **REGISTERED_CONVERTERS}
-
-
-def get_converter(raw_converter):
-    return get_converters()[raw_converter]

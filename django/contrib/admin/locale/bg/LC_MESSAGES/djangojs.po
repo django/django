@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# arneatec <arneatec@gmail.com>, 2022-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
-"Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:59+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>, 2022-2024\n"
+"Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,8 +29,8 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Това е списък на наличните %s . Можете да изберете някои, като ги изберете в "
-"полето по-долу и след това кликнете върху \"Избор\" стрелка между двете "
-"кутии."
+"полето по-долу и след това кликнете върху стрелката \"Избери\" между двете "
+"полета."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -46,7 +47,7 @@ msgid "Click to choose all %s at once."
 msgstr "Кликнете, за да изберете всички %s наведнъж."
 
 msgid "Choose"
-msgstr "Избирам"
+msgstr "Избери"
 
 msgid "Remove"
 msgstr "Премахни"
@@ -60,9 +61,13 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Това е списък на избрания %s. Можете да премахнете някои, като ги изберете в "
-"полето по-долу и след това щракнете върху \"Премахни\" стрелка между двете "
-"кутии."
+"Това е списък на избраните %s. Можете да премахнете някои, като ги изберете "
+"в полето по-долу и след това щракнете върху стрелката \"Премахни\" между "
+"двете полета."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Въведете в това поле, за да филтрирате списъка на избраните %s."
 
 msgid "Remove all"
 msgstr "Премахване на всички"
@@ -70,6 +75,12 @@ msgstr "Премахване на всички"
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Кликнете, за да премахнете всички избрани %s наведнъж."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s избрана опция не е видима"
+msgstr[1] "%s selected options not visible"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -80,57 +91,57 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Имате незапазени промени по отделни полета за редактиране. Ако започнете "
-"друго, незаписаните промени ще бъдат загубени."
+"Имате незапазени промени по отделни полета за редактиране. Ако изпълните "
+"действие, незаписаните промени ще бъдат загубени."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Вие сте избрали действие, но не сте записали промените по полета. Моля, "
-"кликнете ОК, за да се запишат. Трябва отново да започнете действие."
+"кликнете ОК, за да се запишат. Трябва отново да изпълните действието."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Вие сте избрали дадена дейност, а не сте направили някакви промени по "
-"полетата. Вероятно търсите Go бутон, а не бутона Save."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Бележка: Вие сте %s час напред от времето на сървъра."
-msgstr[1] "Бележка: Вие сте %s часа напред от времето на сървъра"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Внимание: Вие сте %s час назад от времето на сървъра."
-msgstr[1] "Внимание: Вие сте %s часа назад от времето на сървъра."
+"Вие сте избрали действие, но не сте направили промени по полетата. Вероятно "
+"търсите Изпълни бутона, а не бутона Запис."
 
 msgid "Now"
 msgstr "Сега"
-
-msgid "Choose a Time"
-msgstr "Изберете време"
-
-msgid "Choose a time"
-msgstr "Избери време"
 
 msgid "Midnight"
 msgstr "Полунощ"
 
 msgid "6 a.m."
-msgstr "6 a.m."
+msgstr "6 сутринта"
 
 msgid "Noon"
 msgstr "По обяд"
 
 msgid "6 p.m."
 msgstr "6 след обяд"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Бележка: Вие сте %s час напред от времето на сървъра."
+msgstr[1] "Бележка: Вие сте с %s часа напред от времето на сървъра"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Внимание: Вие сте %s час назад от времето на сървъра."
+msgstr[1] "Внимание: Вие сте с %s часа назад от времето на сървъра."
+
+msgid "Choose a Time"
+msgstr "Изберете време"
+
+msgid "Choose a time"
+msgstr "Изберете време"
 
 msgid "Cancel"
 msgstr "Отказ"
@@ -183,6 +194,103 @@ msgstr "Ноември"
 msgid "December"
 msgstr "Декември"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "ян."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "февр."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "март"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "апр."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "юни"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "юли"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "авг."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "септ."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "окт."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "ноем."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "дек."
+
+msgid "Sunday"
+msgstr "неделя"
+
+msgid "Monday"
+msgstr "понеделник"
+
+msgid "Tuesday"
+msgstr "вторник"
+
+msgid "Wednesday"
+msgstr "сряда"
+
+msgid "Thursday"
+msgstr "четвъртък"
+
+msgid "Friday"
+msgstr "петък"
+
+msgid "Saturday"
+msgstr "събота"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "нед"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "пон"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "вт"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "ср"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "чет"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "пет"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "съб"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Н"
@@ -210,9 +318,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Покажи"
-
-msgid "Hide"
-msgstr "Скрий"

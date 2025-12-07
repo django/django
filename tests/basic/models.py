@@ -1,26 +1,21 @@
-"""
-Bare-bones model
-
-This is a basic model with only two non-primary-key fields.
-"""
 import uuid
 
 from django.db import models
 
 
 class Article(models.Model):
-    headline = models.CharField(max_length=100, default='Default headline')
+    headline = models.CharField(max_length=100, default="Default headline")
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('pub_date', 'headline')
+        ordering = ("pub_date", "headline")
 
     def __str__(self):
         return self.headline
 
 
 class FeaturedArticle(models.Model):
-    article = models.OneToOneField(Article, models.CASCADE, related_name='featured')
+    article = models.OneToOneField(Article, models.CASCADE, related_name="featured")
 
 
 class ArticleSelectOnSave(Article):
@@ -31,12 +26,16 @@ class ArticleSelectOnSave(Article):
 
 class SelfRef(models.Model):
     selfref = models.ForeignKey(
-        'self',
+        "self",
         models.SET_NULL,
-        null=True, blank=True,
-        related_name='+',
+        null=True,
+        blank=True,
+        related_name="+",
     )
     article = models.ForeignKey(Article, models.SET_NULL, null=True, blank=True)
+    article_cited = models.ForeignKey(
+        Article, models.SET_NULL, null=True, blank=True, related_name="cited"
+    )
 
     def __str__(self):
         # This method intentionally doesn't work for all cases - part
@@ -46,6 +45,18 @@ class SelfRef(models.Model):
 
 class PrimaryKeyWithDefault(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class PrimaryKeyWithDbDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, db_default=1)
+
+
+class PrimaryKeyWithFalseyDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, default=0)
+
+
+class PrimaryKeyWithFalseyDbDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, db_default=0)
 
 
 class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):

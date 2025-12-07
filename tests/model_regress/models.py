@@ -3,17 +3,17 @@ from django.db import models
 
 class Article(models.Model):
     CHOICES = (
-        (1, 'first'),
-        (2, 'second'),
+        (1, "first"),
+        (2, "second"),
     )
-    headline = models.CharField(max_length=100, default='Default headline')
+    headline = models.CharField(max_length=100, default="Default headline")
     pub_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)
     misc_data = models.CharField(max_length=100, blank=True)
     article_text = models.TextField()
 
     class Meta:
-        ordering = ('pub_date', 'headline')
+        ordering = ("pub_date", "headline")
         # A utf-8 verbose name (Ångström's Articles) to test they are valid.
         verbose_name = "\xc3\x85ngstr\xc3\xb6m's Articles"
 
@@ -55,8 +55,8 @@ class Model1(models.Model):
 
 
 class Model2(models.Model):
-    model1 = models.ForeignKey(Model1, models.CASCADE, unique=True, to_field='pkey')
+    model1 = models.ForeignKey(Model1, models.CASCADE, unique=True, to_field="pkey")
 
 
 class Model3(models.Model):
-    model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field='model1')
+    model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field="model1")

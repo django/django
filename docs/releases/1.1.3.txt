@@ -45,6 +45,6 @@ password hashes.
 To remedy this, ``django.contrib.admin`` will now validate that
 querystring lookup arguments either specify only fields on the model
 being viewed, or cross relations which have been explicitly
-allowed by the application developer using the pre-existing
+allowed by the application developer using the preexisting
 mechanism mentioned above. This is backwards-incompatible for any
 users relying on the prior ability to insert arbitrary lookups.

@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2014-2016,2020-2021
+# Ramiro Morales, 2014-2016,2020-2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-21 12:54+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Ramiro Morales, 2014-2016,2020-2023,2025\n"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,12 +24,8 @@ msgstr "%s disponibles"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Esta es la lista de %s disponibles. Puede elegir algunos/as seleccionándolos/"
-"as en el cuadro de abajo y luego haciendo click en la flecha \"Seleccionar\" "
-"ubicada entre las dos listas."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Elija %s seleccionándolos/as y luego use el botón flecha \"Elegir\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -38,18 +34,17 @@ msgstr "Escriba en esta caja para filtrar la lista de %s disponibles."
 msgid "Filter"
 msgstr "Filtro"
 
-msgid "Choose all"
-msgstr "Seleccionar todos/as"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Elegir todo/as los/as %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Haga click para seleccionar todos/as los/as %s."
+msgid "Choose selected %s"
+msgstr "Elegir %s seleccionados/as"
 
-msgid "Choose"
-msgstr "Seleccionar"
-
-msgid "Remove"
-msgstr "Eliminar"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Eliminar %s seleccionados/as"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -57,24 +52,33 @@ msgstr "%s seleccionados/as"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Esta es la lista de %s seleccionados. Puede deseleccionar algunos de ellos "
-"activándolos en la lista de abajo y luego haciendo click en la flecha "
-"\"Eliminar\" ubicada entre las dos listas."
-
-msgid "Remove all"
-msgstr "Eliminar todos/as"
+"Eliminar %s seleccionándolos/as y luego use el botón flecha \"Eliminar\"."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Haga clic para deselecionar todos/as los/as %s."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Escriba en este cuadro para filtrar la lista de %s seleccionados/as."
+
+msgid "(click to clear)"
+msgstr "(click para limpiar)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Eliminar todo/as los/as %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opción seleccionada no visible"
+msgstr[1] "%s opciones seleccionadas no visibles"
+msgstr[2] "%s opciones seleccionadas no visibles"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
 msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
+msgstr[2] "%(sel)s de %(cnt)s seleccionados/as"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -125,6 +129,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
 "respecto a la del servidor."
+msgstr[2] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
+"respecto a la del servidor."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
@@ -133,6 +140,9 @@ msgstr[0] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s hora atrasada "
 "respecto a la del servidor."
 msgstr[1] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
+"respecto a la del servidor."
+msgstr[2] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
 "respecto a la del servidor."
 
@@ -158,40 +168,40 @@ msgid "Tomorrow"
 msgstr "Mañana"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
@@ -241,6 +251,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dic"
 
+msgid "Sunday"
+msgstr "domingo"
+
+msgid "Monday"
+msgstr "lunes"
+
+msgid "Tuesday"
+msgstr "martes"
+
+msgid "Wednesday"
+msgstr "miércoles"
+
+msgid "Thursday"
+msgstr "jueves"
+
+msgid "Friday"
+msgstr "viernes"
+
+msgid "Saturday"
+msgstr "sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "mié"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "jue"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "vie"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "sáb"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "D"
@@ -268,9 +327,3 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Mostrar"
-
-msgid "Hide"
-msgstr "Ocultar"

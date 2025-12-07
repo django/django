@@ -5,17 +5,17 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011
-# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
 # Tonnes <tonnes.mb@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:54+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2019\n"
+"Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -79,9 +79,6 @@ msgstr ""
 
 msgid "Delete all Features"
 msgstr "Alle kenmerken verwijderen"
-
-msgid "WKT debugging window:"
-msgstr "WKT-debugvenster:"
 
 msgid "Debugging window (serialized value)"
 msgstr "Debugvenster (geserialiseerde waarde)"

@@ -18,8 +18,9 @@ class UserProfile(models.Model):
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(
-        User, models.CASCADE,
-        to_field='username',
+        User,
+        models.CASCADE,
+        to_field="username",
         primary_key=True,
     )
     favorite_number = models.IntegerField()

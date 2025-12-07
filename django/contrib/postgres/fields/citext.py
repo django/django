@@ -1,24 +1,45 @@
 from django.db.models import CharField, EmailField, TextField
 
-__all__ = ['CICharField', 'CIEmailField', 'CIText', 'CITextField']
+__all__ = ["CICharField", "CIEmailField", "CITextField"]
 
 
-class CIText:
-
-    def get_internal_type(self):
-        return 'CI' + super().get_internal_type()
-
-    def db_type(self, connection):
-        return 'citext'
-
-
-class CICharField(CIText, CharField):
-    pass
-
-
-class CIEmailField(CIText, EmailField):
-    pass
+class CICharField(CharField):
+    system_check_removed_details = {
+        "msg": (
+            "django.contrib.postgres.fields.CICharField is removed except for support "
+            "in historical migrations."
+        ),
+        "hint": (
+            'Use CharField(db_collation="…") with a case-insensitive non-deterministic '
+            "collation instead."
+        ),
+        "id": "fields.E905",
+    }
 
 
-class CITextField(CIText, TextField):
-    pass
+class CIEmailField(EmailField):
+    system_check_removed_details = {
+        "msg": (
+            "django.contrib.postgres.fields.CIEmailField is removed except for support "
+            "in historical migrations."
+        ),
+        "hint": (
+            'Use EmailField(db_collation="…") with a case-insensitive '
+            "non-deterministic collation instead."
+        ),
+        "id": "fields.E906",
+    }
+
+
+class CITextField(TextField):
+    system_check_removed_details = {
+        "msg": (
+            "django.contrib.postgres.fields.CITextField is removed except for support "
+            "in historical migrations."
+        ),
+        "hint": (
+            'Use TextField(db_collation="…") with a case-insensitive non-deterministic '
+            "collation instead."
+        ),
+        "id": "fields.E907",
+    }

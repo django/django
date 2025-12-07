@@ -6,8 +6,8 @@ from django.db import models
 # explicitly reversible.
 class SelfRefer(models.Model):
     name = models.CharField(max_length=10)
-    references = models.ManyToManyField('self')
-    related = models.ManyToManyField('self')
+    references = models.ManyToManyField("self")
+    related = models.ManyToManyField("self")
 
     def __str__(self):
         return self.name
@@ -22,7 +22,7 @@ class Tag(models.Model):
 
 # Regression for #11956 -- a many to many to the base class
 class TagCollection(Tag):
-    tags = models.ManyToManyField(Tag, related_name='tag_collections')
+    tags = models.ManyToManyField(Tag, related_name="tag_collections")
 
     def __str__(self):
         return self.name
@@ -39,7 +39,8 @@ class Entry(models.Model):
         return self.name
 
 
-# Two models both inheriting from a base model with a self-referential m2m field
+# Two models both inheriting from a base model with a self-referential m2m
+# field
 class SelfReferChild(SelfRefer):
     pass
 
@@ -48,7 +49,8 @@ class SelfReferChildSibling(SelfRefer):
     pass
 
 
-# Many-to-Many relation between models, where one of the PK's isn't an Autofield
+# Many-to-Many relation between models, where one of the PK's isn't an
+# Autofield
 class Line(models.Model):
     name = models.CharField(max_length=100)
 
@@ -77,18 +79,19 @@ class BadModelWithSplit(models.Model):
         abstract = True
 
     def split(self):
-        raise RuntimeError('split should not be called')
+        raise RuntimeError("split should not be called")
 
 
 class RegressionModelSplit(BadModelWithSplit):
     """
     Model with a split method should not cause an error in add_lazy_relation
     """
-    others = models.ManyToManyField('self')
+
+    others = models.ManyToManyField("self")
 
 
 # Regression for #24505 -- Two ManyToManyFields with the same "to" model
 # and related_name set to '+'.
 class Post(models.Model):
-    primary_lines = models.ManyToManyField(Line, related_name='+')
-    secondary_lines = models.ManyToManyField(Line, related_name='+')
+    primary_lines = models.ManyToManyField(Line, related_name="+")
+    secondary_lines = models.ManyToManyField(Line, related_name="+")

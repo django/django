@@ -3,19 +3,22 @@
 # Translators:
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
-# Jannis Vajen, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2017,2020
-# Jannis Vajen, 2016
+# Florian Apolloner <florian@apolloner.eu>, 2021,2023
+# jnns, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2017,2020,2023
+# jnns, 2016
 # Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
+# Markus Holtermann <info@markusholtermann.eu>, 2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
+# Sarah Boyce, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-17 22:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Sarah Boyce, 2025\n"
+"Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,12 +38,22 @@ msgstr "Wichtige Daten"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-Objekt mit Primärschlüssel %(key)r ist nicht vorhanden."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Passwort erfolgreich geändert."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Passwort ändern: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Authentifizierung und Autorisierung"
@@ -51,11 +64,17 @@ msgstr "Passwort"
 msgid "last login"
 msgstr "Letzte Anmeldung"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ungültiges Passwortformat oder unbekannter Hashing-Algorithmus."
+
 msgid "No password set."
 msgstr "Kein Passwort gesetzt."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ungültiges Passwortformat oder unbekannter Hashing-Algorithmus."
+msgid "Reset password"
+msgstr ""
+
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "Die beiden Passwörter sind nicht identisch."
@@ -70,12 +89,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Bitte das selbe Passwort zur Bestätigung erneut eingeben."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Die Passwörter werden nicht im Klartext gespeichert und können daher nicht "
-"dargestellt, sondern nur mit <a href=\"{}\">diesem Formular</a> geändert "
-"werden."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -102,9 +136,6 @@ msgstr "Das alte Passwort war falsch. Bitte neu eingeben."
 
 msgid "Old password"
 msgstr "Altes Passwort"
-
-msgid "Password (again)"
-msgstr "Passwort (wiederholen)"
 
 msgid "algorithm"
 msgstr "Algorithmus"
@@ -138,6 +169,9 @@ msgstr "Arbeitsfaktor"
 
 msgid "checksum"
 msgstr "Prüfsumme"
+
+msgid "block size"
+msgstr "Blockgröße"
 
 msgid "name"
 msgstr "Name"
@@ -230,18 +264,13 @@ msgid "users"
 msgstr "Benutzer"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Dieses Passwort ist zu kurz. Es muss mindestens %(min_length)d Zeichen "
-"enthalten."
+"Dieses Passwort ist zu kurz. Es muss mindestens %d Zeichen enthalten."
 msgstr[1] ""
-"Dieses Passwort ist zu kurz. Es muss mindestens %(min_length)d Zeichen "
-"enthalten."
+"Dieses Passwort ist zu kurz. Es muss mindestens %d Zeichen enthalten."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -275,11 +304,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Passwort auf %(site_name)s zurücksetzen"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Bitte einen gültigen Benutzernamen eingeben, bestehend aus Buchstaben des "
-"Englischen Alphabets, Ziffern und @/./+/-/_."
+"Bitte einen gültigen Benutzernamen eingeben, bestehend aus kleinen und "
+"großen Buchstaben (A-Z, a-z, ohne Sonderzeichen), Ziffern und @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

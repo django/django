@@ -20,8 +20,8 @@ def client2(request, tag):
 
 
 def template_response_view(request):
-    return TemplateResponse(request, 'response.html', {})
+    return TemplateResponse(request, "response.html", {})
 
 
 def snark(request):
-    return HttpResponse('Found them!')
+    return HttpResponse("Found them!")

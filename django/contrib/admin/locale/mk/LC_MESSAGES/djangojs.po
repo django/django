@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 11:28+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -84,21 +84,31 @@ msgstr ""
 "незачувани промени ќе бидат изгубени."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Избравте акција, но сеуште ги немате зачувано вашите промени на поединечни "
-"полиња. Кликнете ОК за да ги зачувате. Ќе треба повторно да ја извршите "
-"акцијата."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Избравте акција и немате направено промени на поединечни полиња. Веројатно "
-"го барате копчето Оди наместо Зачувај."
+
+msgid "Now"
+msgstr "Сега"
+
+msgid "Midnight"
+msgstr "Полноќ"
+
+msgid "6 a.m."
+msgstr "6 наутро"
+
+msgid "Noon"
+msgstr "Пладне"
+
+msgid "6 p.m."
+msgstr "6 попладне"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -112,26 +122,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Забелешка: Вие сте %s час поназад од времето на серверот."
 msgstr[1] "Забелешка: Вие сте %s часа поназад од времето на серверот."
 
-msgid "Now"
-msgstr "Сега"
-
 msgid "Choose a Time"
 msgstr "Одбери време"
 
 msgid "Choose a time"
 msgstr "Одбери време"
-
-msgid "Midnight"
-msgstr "Полноќ"
-
-msgid "6 a.m."
-msgstr "6 наутро"
-
-msgid "Noon"
-msgstr "Пладне"
-
-msgid "6 p.m."
-msgstr "6 попладне"
 
 msgid "Cancel"
 msgstr "Откажи"
@@ -183,6 +178,54 @@ msgstr "Ноември"
 
 msgid "December"
 msgstr "Декември"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -8,7 +8,7 @@ class EchoNode(Node):
         self.contents = contents
 
     def render(self, context):
-        return ' '.join(self.contents)
+        return " ".join(self.contents)
 
 
 @register.tag
@@ -16,7 +16,7 @@ def echo(parser, token):
     return EchoNode(token.contents.split()[1:])
 
 
-register.tag('other_echo', echo)
+register.tag("other_echo", echo)
 
 
 @register.filter

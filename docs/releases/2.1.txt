@@ -20,7 +20,7 @@ Python compatibility
 ====================
 
 Django 2.1 supports Python 3.5, 3.6, and 3.7. Django 2.0 is the last version to
-support Python 3.4.  We **highly recommend** and only officially support the
+support Python 3.4. We **highly recommend** and only officially support the
 latest release of each series.
 
 .. _whats-new-2.1:
@@ -67,7 +67,7 @@ Minor features
 * The ``admin_order_field`` attribute for elements in
   :attr:`.ModelAdmin.list_display` may now be a query expression.
 
-* The new :meth:`.ModelAdmin.get_deleted_objects()` method allows customizing
+* The new :meth:`.ModelAdmin.get_deleted_objects` method allows customizing
   the deletion process of the delete view and the "delete selected" action.
 
 * The ``actions.html``, ``change_list_results.html``, ``date_hierarchy.html``,
@@ -76,10 +76,11 @@ Minor features
   per model <admin-templates-overridden-per-app-or-model>` (besides overridden
   globally).
 
-* The admin change list and change form object tools can now be :ref:`overridden
-  per app, per model, or globally <admin-templates-overridden-per-app-or-model>`
-  with ``change_list_object_tools.html`` and
-  ``change_form_object_tools.html`` templates.
+* The admin change list and change form object tools can now be
+  :ref:`overridden per app, per model, or globally
+  <admin-templates-overridden-per-app-or-model>` with
+  ``change_list_object_tools.html`` and ``change_form_object_tools.html``
+  templates.
 
 * :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
   as the second positional argument, ``obj``.
@@ -115,7 +116,7 @@ Cache
 * The :ref:`local-memory cache backend <local-memory-caching>` now uses a
   least-recently-used (LRU) culling strategy rather than a pseudo-random one.
 
-* The new :meth:`~django.core.caches.cache.touch` method of the :ref:`low-level
+* The new :meth:`~django.core.cache.cache.touch` method of the :ref:`low-level
   cache API <low-level-cache-api>` updates the timeout of cache keys.
 
 CSRF
@@ -148,8 +149,8 @@ Management Commands
 
 * The :class:`~django.core.management.BaseCommand` class now uses a custom help
   formatter so that the standard options like ``--verbosity`` or ``--settings``
-  appear last in the help output, giving a more prominent position to subclassed
-  command's options.
+  appear last in the help output, giving a more prominent position to
+  subclassed command's options.
 
 Migrations
 ~~~~~~~~~~
@@ -272,15 +273,16 @@ supports PostgreSQL 9.4 and higher.
 Removed ``BCryptPasswordHasher`` from the default ``PASSWORD_HASHERS`` setting
 ------------------------------------------------------------------------------
 
-If you used bcrypt with Django 1.4 or 1.5 (before ``BCryptSHA256PasswordHasher``
-was added in Django 1.6), you might have some passwords that use the
-``BCryptPasswordHasher`` hasher.
+If you used bcrypt with Django 1.4 or 1.5 (before
+``BCryptSHA256PasswordHasher`` was added in Django 1.6), you might have some
+passwords that use the ``BCryptPasswordHasher`` hasher.
 
 You can check if that's the case like this::
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    User.objects.filter(password__startswith='bcrypt$$')
+    User.objects.filter(password__startswith="bcrypt$$")
 
 If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
@@ -381,10 +383,11 @@ Miscellaneous
   conflicts with the class given to model fields named "box".
 
 * Since the admin's ``actions.html``, ``change_list_results.html``,
-  ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
-  ``search_form.html``, and ``submit_line.html`` templates can now be
-  overridden per app or per model, you may need to rename existing templates
-  with those names that were written for a different purpose.
+  ``date_hierarchy.html``, ``pagination.html``,
+  ``prepopulated_fields_js.html``, ``search_form.html``, and
+  ``submit_line.html`` templates can now be overridden per app or per model,
+  you may need to rename existing templates with those names that were written
+  for a different purpose.
 
 * ``QuerySet.raw()`` now caches its results like regular querysets. Use
   ``iterator()`` if you don't want caching.
@@ -407,8 +410,8 @@ Miscellaneous
   suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
   your code to also account for any custom lookups that have been registered.
 
-* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use `bcrypt
-  <https://pypi.org/project/bcrypt/>`_ instead.
+* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use
+  :pypi:`bcrypt` instead.
 
 .. _deprecated-features-2.1:
 

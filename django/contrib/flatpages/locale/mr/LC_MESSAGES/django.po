@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Omkar Parab, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Marathi (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2024-01-24 19:03+0000\n"
+"Last-Translator: Omkar Parab, 2024\n"
+"Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,55 +18,62 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Advanced options"
-msgstr ""
+msgstr "प्रगत पर्याय"
 
 msgid "Flat Pages"
 msgstr ""
 
 msgid "URL"
-msgstr ""
+msgstr "यूआरएल"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr "अग्रगण्य आणि अनुगामी स्लॅश असल्याची खात्री करा. उदाहरण: “/about/contact/”."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
+"या मूल्यामध्ये फक्त अक्षरे, संख्या, ठिपके, अंडरस्कोअर, डॅश, स्लॅश किंवा टिल्ड असणे आवश्यक आहे."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "अग्रगण्य स्लॅश असल्याची खात्री करा. उदाहरण: “/about/contact”. "
 
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "URL मधे अग्रगण्य स्लॅश गहाळ आहे."
 
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "URL मधे अनुगामी स्लॅश गहाळ आहे. "
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr ""
 
 msgid "title"
-msgstr ""
+msgstr "शीर्षक"
 
 msgid "content"
-msgstr ""
+msgstr "सामुग्री"
 
 msgid "enable comments"
-msgstr ""
+msgstr "प्रतिक्रिया सक्षम करा"
 
 msgid "template name"
-msgstr ""
+msgstr "टेम्पलेटचे नाव"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 
 msgid "registration required"
-msgstr ""
+msgstr "नोंदणी आवश्यक"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
+
+msgid "sites"
+msgstr "स्थळे"
 
 msgid "flat page"
 msgstr ""

@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2013-2014,2016
-# sage <laymonage@gmail.com>, 2019
+# sag᠎e <laymonage@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-18 03:39+0000\n"
-"Last-Translator: sage <laymonage@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-09-14 00:30+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -104,11 +104,11 @@ msgstr "Instal docutils."
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Sistem dokumentasi admin membutuhkan pustaka <a href=\"%(link)s\">docutils</"
-"a> dari Python."
+"a> Python."
 
 #, python-format
 msgid ""

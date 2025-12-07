@@ -1,18 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Adam Zahradník, 2023-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Juraj Bubniak <translations@jbub.eu>, 2012-2014
-# Marian Andre <marian@andre.sk>, 2015,2017
-# Martin Tóth <ezimir@gmail.com>, 2017-2018
+# 18f25ad6fa9930fc67cb11aca9d16a27, 2012-2014
+# Marian Andre <marian@andre.sk>, 2015,2017,2025
+# Martin Tóth <ezimir@gmail.com>, 2017-2018,2023
+# Peter Kuma, 2021
+# Richard von Kellner, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-05-03 06:50+0000\n"
-"Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
-"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Marian Andre <marian@andre.sk>, 2015,2017,2025\n"
+"Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,12 +36,22 @@ msgstr "Dôležité dátumy"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Neplatná požiadavka. Skúste to prosím znova."
+
 msgid "Password changed successfully."
 msgstr "Heslo úspešne zmenené."
+
+msgid "Password-based authentication was disabled."
+msgstr "Prihlasovanie pomocou hesla bolo vypnuté."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Zmeniť heslo: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Nastaviť heslo: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentifikácia a autorizácia"
@@ -49,13 +62,19 @@ msgstr "heslo"
 msgid "last login"
 msgstr "naposledy prihlásený"
 
-msgid "No password set."
-msgstr "Žiadne heslo."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neplatný formát hesla alebo neznámy hašovací algoritmus."
 
-msgid "The two password fields didn't match."
+msgid "No password set."
+msgstr "Žiadne heslo."
+
+msgid "Reset password"
+msgstr "Obnoviť heslo"
+
+msgid "Set password"
+msgstr "Nastaviť heslo"
+
+msgid "The two password fields didn’t match."
 msgstr "Heslo a jeho potvrdenie sa nezhodujú."
 
 msgid "Password"
@@ -68,12 +87,33 @@ msgid "Enter the same password as before, for verification."
 msgstr "Kvôli overeniu, znovu zadajte rovnaké heslo."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Heslá v pôvodnom tvare nie sú ukladané, takže neexistuje spôsob zobraziť "
-"heslo užívateľa. Môžete ho však zmeniť pomocou <a href=\"{}\">tohoto "
-"formulára</a>."
+"Určuje, či sa bude používateľ môcť prihlásiť pomocou hesla. Ak je "
+"prihlasovanie pomocou hesla vypnuté, stále sa bude môcť vedieť prihlásiť "
+"pomocou iných metód, ako napríklad Single Sign-On alebo LDAP."
+
+msgid "Password-based authentication"
+msgstr "Prihlasovanie pomocou hesla"
+
+msgid "Enabled"
+msgstr "Povolené"
+
+msgid "Disabled"
+msgstr "Vypnuté"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Nie je možné zobraziť si používateľovo heslo, nakoľko sa samotné heslá "
+"neukladajú."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Nastavením hesla povolíte používateľovi prihlasovanie sa pomocou hesla."
 
 #, python-format
 msgid ""
@@ -100,9 +140,6 @@ msgstr "Nezadali ste správne svoje staré heslo. Napíšte ho znovu, prosím."
 
 msgid "Old password"
 msgstr "Staré heslo"
-
-msgid "Password (again)"
-msgstr "Heslo (znova)"
 
 msgid "algorithm"
 msgstr "algoritmus"
@@ -136,6 +173,9 @@ msgstr "faktor práce"
 
 msgid "checksum"
 msgstr "kontrolný súčet"
+
+msgid "block size"
+msgstr "veľkosť bloku"
 
 msgid "name"
 msgstr "meno"
@@ -224,20 +264,13 @@ msgid "users"
 msgstr "používatelia"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znak."
-msgstr[1] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znaky."
-msgstr[2] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znakov."
-msgstr[3] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znakov."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znak."
+msgstr[1] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znaky."
+msgstr[2] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znakov."
+msgstr[3] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znakov."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -251,19 +284,19 @@ msgstr[3] "Vaše heslo musí obsahovať aspoň %(min_length)d znakov."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Heslo sa príliš podobá na %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Vaše heslo sa nesmie príliš podobať na ostatné osobné informácie."
 
 msgid "This password is too common."
 msgstr "Toto heslo je používané príliš často."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Vaše heslo nemôže byť jedno z často používaných."
+msgid "Your password can’t be a commonly used password."
+msgstr "Vaše heslo nemôže byť jedno z často používaných hesiel."
 
 msgid "This password is entirely numeric."
 msgstr "Toto heslo pozostáva iba z číslic."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Vaše heslo nemôže pozostávať iba z číslic."
 
 #, python-format
@@ -271,11 +304,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Obnovenie hesla pre %(site_name)s "
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Zadajte platné používateľské meno. Táto hodnota môže obsahovať len písmená, "
-"číslice a znaky @/./+/-/_."
+"Zadajte platné používateľské meno. Môže obsahovať len písmená bez "
+"diakritiky, číslice a znaky @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

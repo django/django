@@ -6,18 +6,18 @@ from django.utils.functional import cached_property
 
 
 class File(FileProxyMixin):
-    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
+    DEFAULT_CHUNK_SIZE = 64 * 2**10
 
     def __init__(self, file, name=None):
         self.file = file
         if name is None:
-            name = getattr(file, 'name', None)
+            name = getattr(file, "name", None)
         self.name = name
-        if hasattr(file, 'mode'):
+        if hasattr(file, "mode"):
             self.mode = file.mode
 
     def __str__(self):
-        return self.name or ''
+        return self.name or ""
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")
@@ -30,14 +30,14 @@ class File(FileProxyMixin):
 
     @cached_property
     def size(self):
-        if hasattr(self.file, 'size'):
+        if hasattr(self.file, "size"):
             return self.file.size
-        if hasattr(self.file, 'name'):
+        if hasattr(self.file, "name"):
             try:
                 return os.path.getsize(self.file.name)
             except (OSError, TypeError):
                 pass
-        if hasattr(self.file, 'tell') and hasattr(self.file, 'seek'):
+        if hasattr(self.file, "tell") and hasattr(self.file, "seek"):
             pos = self.file.tell()
             self.file.seek(0, os.SEEK_END)
             size = self.file.tell()
@@ -67,8 +67,8 @@ class File(FileProxyMixin):
         Return ``True`` if you can expect multiple chunks.
 
         NB: If a particular file representation is in memory, subclasses should
-        always return ``False`` -- there's no good reason to read from memory in
-        chunks.
+        always return ``False`` -- there's no good reason to read from memory
+        in chunks.
         """
         return self.size > (chunk_size or self.DEFAULT_CHUNK_SIZE)
 
@@ -105,11 +105,11 @@ class File(FileProxyMixin):
     def __exit__(self, exc_type, exc_value, tb):
         self.close()
 
-    def open(self, mode=None):
+    def open(self, mode=None, *args, **kwargs):
         if not self.closed:
             self.seek(0)
         elif self.name and os.path.exists(self.name):
-            self.file = open(self.name, mode or self.mode)
+            self.file = open(self.name, mode or self.mode, *args, **kwargs)
         else:
             raise ValueError("The file cannot be reopened.")
         return self
@@ -122,13 +122,14 @@ class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.
     """
+
     def __init__(self, content, name=None):
         stream_class = StringIO if isinstance(content, str) else BytesIO
         super().__init__(stream_class(content), name=name)
         self.size = len(content)
 
     def __str__(self):
-        return 'Raw content'
+        return "Raw content"
 
     def __bool__(self):
         return True
@@ -141,20 +142,20 @@ class ContentFile(File):
         pass
 
     def write(self, data):
-        self.__dict__.pop('size', None)  # Clear the computed size.
+        self.__dict__.pop("size", None)  # Clear the computed size.
         return self.file.write(data)
 
 
 def endswith_cr(line):
     """Return True if line (a text or bytestring) ends with '\r'."""
-    return line.endswith('\r' if isinstance(line, str) else b'\r')
+    return line.endswith("\r" if isinstance(line, str) else b"\r")
 
 
 def endswith_lf(line):
     """Return True if line (a text or bytestring) ends with '\n'."""
-    return line.endswith('\n' if isinstance(line, str) else b'\n')
+    return line.endswith("\n" if isinstance(line, str) else b"\n")
 
 
 def equals_lf(line):
     """Return True if line (a text or bytestring) equals '\n'."""
-    return line == ('\n' if isinstance(line, str) else b'\n')
+    return line == ("\n" if isinstance(line, str) else b"\n")

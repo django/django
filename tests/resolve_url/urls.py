@@ -6,5 +6,5 @@ def some_view(request):
 
 
 urlpatterns = [
-    path('some-url/', some_view, name='some-view'),
+    path("some-url/", some_view, name="some-view"),
 ]

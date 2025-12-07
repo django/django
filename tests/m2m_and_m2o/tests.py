@@ -5,9 +5,8 @@ from .models import Issue, StringReferenceModel, User
 
 
 class RelatedObjectTests(TestCase):
-
     def test_related_objects_have_name_attribute(self):
-        for field_name in ('test_issue_client', 'test_issue_cc'):
+        for field_name in ("test_issue_client", "test_issue_cc"):
             obj = User._meta.get_field(field_name)
             self.assertEqual(field_name, obj.field.related_query_name())
 
@@ -29,55 +28,60 @@ class RelatedObjectTests(TestCase):
         i3.save()
         i3.cc.add(r)
 
-        self.assertQuerysetEqual(
-            Issue.objects.filter(client=r.id), [
+        self.assertQuerySetEqual(
+            Issue.objects.filter(client=r.id),
+            [
                 1,
                 2,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
-        self.assertQuerysetEqual(
-            Issue.objects.filter(client=g.id), [
+        self.assertQuerySetEqual(
+            Issue.objects.filter(client=g.id),
+            [
                 3,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
-        self.assertQuerysetEqual(
-            Issue.objects.filter(cc__id__exact=g.id), []
-        )
-        self.assertQuerysetEqual(
-            Issue.objects.filter(cc__id__exact=r.id), [
+        self.assertQuerySetEqual(Issue.objects.filter(cc__id__exact=g.id), [])
+        self.assertQuerySetEqual(
+            Issue.objects.filter(cc__id__exact=r.id),
+            [
                 2,
                 3,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
 
         # These queries combine results from the m2m and the m2o relationships.
         # They're three ways of saying the same thing.
-        self.assertQuerysetEqual(
-            Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id)), [
+        self.assertQuerySetEqual(
+            Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id)),
+            [
                 1,
                 2,
                 3,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
-        self.assertQuerysetEqual(
-            Issue.objects.filter(cc__id__exact=r.id) | Issue.objects.filter(client=r.id), [
+        self.assertQuerySetEqual(
+            Issue.objects.filter(cc__id__exact=r.id)
+            | Issue.objects.filter(client=r.id),
+            [
                 1,
                 2,
                 3,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
-        self.assertQuerysetEqual(
-            Issue.objects.filter(Q(client=r.id) | Q(cc__id__exact=r.id)), [
+        self.assertQuerySetEqual(
+            Issue.objects.filter(Q(client=r.id) | Q(cc__id__exact=r.id)),
+            [
                 1,
                 2,
                 3,
             ],
-            lambda i: i.num
+            lambda i: i.num,
         )
 
 

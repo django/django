@@ -1,6 +1,6 @@
-====================
-Overriding templates
-====================
+=========================
+How to override templates
+=========================
 
 In your project, you might want to override a template in another Django
 application, whether it be a third-party application or a contrib application
@@ -33,16 +33,16 @@ called ``blog``, which provides the templates ``blog/post.html`` and
 
     INSTALLED_APPS = [
         ...,
-        'blog',
+        "blog",
         ...,
     ]
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
-            ...
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -63,7 +63,8 @@ in the ``templates`` directory, and add the template files to that folder:
 
 The template loader first looks for templates in the ``DIRS`` directory. When
 the views in the ``blog`` app ask for the ``blog/post.html`` and
-``blog/list.html`` templates, the loader will return the files you just created.
+``blog/list.html`` templates, the loader will return the files you just
+created.
 
 Overriding from an app's template directory
 ===========================================
@@ -77,9 +78,9 @@ First, make sure your template settings are checking inside app directories::
 
     TEMPLATES = [
         {
-            ...,
-            'APP_DIRS': True,
-            ...
+            # ...
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -111,15 +112,15 @@ reimplement the entire template.
 For example, you can use this technique to add a custom logo to the
 ``admin/base_site.html`` template:
 
-    .. code-block:: html+django
-       :caption: templates/admin/base_site.html
+.. code-block:: html+django
+   :caption: ``templates/admin/base_site.html``
 
-        {% extends "admin/base_site.html" %}
+    {% extends "admin/base_site.html" %}
 
-        {% block branding %}
-            <img src="link/to/logo.png" alt="logo">
-            {{ block.super }}
-        {% endblock %}
+    {% block branding %}
+      <img src="link/to/logo.png" alt="logo">
+      {{ block.super }}
+    {% endblock %}
 
 Key points to note:
 

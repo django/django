@@ -10,7 +10,7 @@ Writing validators
 
 A validator is a callable that takes a value and raises a
 :exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
-criteria. Validators can be useful for re-using validation logic between
+criteria. Validators can be useful for reusing validation logic between
 different types of fields.
 
 For example, here's a validator that only allows even numbers::
@@ -18,17 +18,19 @@ For example, here's a validator that only allows even numbers::
     from django.core.exceptions import ValidationError
     from django.utils.translation import gettext_lazy as _
 
+
     def validate_even(value):
         if value % 2 != 0:
             raise ValidationError(
-                _('%(value)s is not an even number'),
-                params={'value': value},
+                _("%(value)s is not an even number"),
+                params={"value": value},
             )
 
-You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
-argument::
+You can add this to a model field via the field's
+:attr:`~django.db.models.Field.validators` argument::
 
     from django.db import models
+
 
     class MyModel(models.Model):
         even_field = models.IntegerField(validators=[validate_even])
@@ -37,6 +39,7 @@ Because values are converted to Python before validators are run, you can even
 use the same validator with forms::
 
     from django import forms
+
 
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
@@ -130,6 +133,11 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
+    An :class:`EmailValidator` ensures that a value looks like an email
+    address, and raises a :exc:`~django.core.exceptions.ValidationError` with
+    :attr:`message` and :attr:`code` if it doesn't. Values longer than 320
+    characters are always considered invalid.
+
     .. attribute:: message
 
         The error message used by
@@ -151,12 +159,22 @@ to, or in lieu of custom ``field.clean()`` methods.
         validation, so you'd need to add them to the ``allowlist`` as
         necessary.
 
-    .. deprecated:: 3.2
+``DomainNameValidator``
+-----------------------
 
-        The ``whitelist`` parameter is deprecated. Use :attr:`allowlist`
-        instead.
-        The undocumented ``domain_whitelist`` attribute is deprecated. Use
-        ``domain_allowlist`` instead.
+.. class:: DomainNameValidator(accept_idna=True, message=None, code=None)
+
+    A :class:`RegexValidator` subclass that ensures a value looks like a domain
+    name. Values longer than 255 characters are always considered invalid. IP
+    addresses are not accepted as valid domain names.
+
+    In addition to the optional arguments of its parent :class:`RegexValidator`
+    class, ``DomainNameValidator`` accepts an extra optional attribute:
+
+    .. attribute:: accept_idna
+
+        Determines whether to accept internationalized domain names, that is,
+        domain names that contain non-ASCII characters. Defaults to ``True``.
 
 ``URLValidator``
 ----------------
@@ -164,7 +182,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
     A :class:`RegexValidator` subclass that ensures a value looks like a URL,
-    and raises an error code of ``'invalid'`` if it doesn't.
+    and raises an error code of ``'invalid'`` if it doesn't. Values longer than
+    :attr:`max_length` characters are always considered invalid.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
     IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both
@@ -181,12 +200,30 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 
+        .. warning::
+
+            Values starting with ``file:///`` will not pass validation even
+            when the ``file`` scheme is provided. Valid values must contain a
+            host.
+
+    .. attribute:: max_length
+
+        The maximum length of values that could be considered valid. Defaults
+        to 2048 characters.
+
 ``validate_email``
 ------------------
 
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
+
+``validate_domain_name``
+------------------------
+
+.. data:: validate_domain_name
+
+    A :class:`DomainNameValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
@@ -317,7 +354,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     Uses Pillow to ensure that ``value.name`` (``value`` is a
     :class:`~django.core.files.File`) has `a valid image extension
-    <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.
+    <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`__.
 
 ``ProhibitNullCharactersValidator``
 -----------------------------------
@@ -325,7 +362,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: ProhibitNullCharactersValidator(message=None, code=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
-    contains one or more nulls characters (``'\x00'``).
+    contains one or more null characters (``'\x00'``).
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -340,3 +377,17 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"null_characters_not_allowed"``.
+
+``StepValueValidator``
+----------------------
+
+.. class:: StepValueValidator(limit_value, message=None, offset=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'step_size'`` if ``value`` is not an integral multiple of
+    ``limit_value``, which can be a float, integer or decimal value or a
+    callable. When ``offset`` is set, the validation occurs against
+    ``limit_value`` plus ``offset``. For example, for
+    ``StepValueValidator(3, offset=1.4)`` valid values include ``1.4``,
+    ``4.4``, ``7.4``, ``10.4``, and so on.
+

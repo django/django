@@ -1,0 +1,19 @@
+===========================
+Django 4.1.13 release notes
+===========================
+
+*November 1, 2023*
+
+Django 4.1.13 fixes a security issue with severity "moderate" in 4.1.12.
+
+CVE-2023-46695: Potential denial of service vulnerability in ``UsernameField`` on Windows
+=========================================================================================
+
+The :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
+Windows. As a consequence, ``django.contrib.auth.forms.UsernameField`` was
+subject to a potential denial of service attack via certain inputs with a very
+large number of Unicode characters.
+
+In order to avoid the vulnerability, invalid values longer than
+``UsernameField.max_length`` are no longer normalized, since they cannot pass
+validation anyway.

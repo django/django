@@ -8,7 +8,7 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class Restaurant(Place):
@@ -22,7 +22,9 @@ class ItalianRestaurant(Restaurant):
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
+    parent = models.OneToOneField(
+        Place, models.CASCADE, primary_key=True, parent_link=True
+    )
     capacity = models.IntegerField()
 
 
@@ -54,7 +56,9 @@ class Supplier(models.Model):
 
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier, models.CASCADE, related_name='wholesale_supplier')
+    retailer = models.ForeignKey(
+        Supplier, models.CASCADE, related_name="wholesale_supplier"
+    )
 
 
 class Parent(models.Model):
@@ -67,7 +71,7 @@ class Child(Parent):
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
-    self_data = models.ForeignKey('self', models.SET_NULL, null=True)
+    self_data = models.ForeignKey("self", models.SET_NULL, null=True)
 
 
 class SelfRefChild(SelfRefParent):
@@ -79,7 +83,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ("-pub_date", "headline")
 
 
 class ArticleWithAuthor(Article):
@@ -119,7 +123,7 @@ class AuditBase(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name_plural = 'Audits'
+        verbose_name_plural = "Audits"
 
 
 class CertificationAudit(AuditBase):
@@ -136,7 +140,7 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class AbstractEvent(models.Model):
@@ -145,7 +149,7 @@ class AbstractEvent(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class BirthdayParty(AbstractEvent):

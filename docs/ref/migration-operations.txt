@@ -48,7 +48,8 @@ database to match it.
 The field instance should be an unbound field (so just
 ``models.CharField(...)``, rather than a field taken from another model).
 
-``options`` is an optional dictionary of values from the model's ``Meta`` class.
+``options`` is an optional dictionary of values from the model's ``Meta``
+class.
 
 ``bases`` is an optional list of other classes to have this model inherit from;
 it can contain both class objects as well as strings in the format
@@ -88,6 +89,15 @@ lose any data in the old table.
 Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
+``AlterModelTableComment``
+--------------------------
+
+.. class:: AlterModelTableComment(name, table_comment)
+
+Changes the model's table comment (the
+:attr:`~django.db.models.Options.db_table_comment` option on the ``Meta``
+subclass).
+
 ``AlterUniqueTogether``
 -----------------------
 
@@ -102,9 +112,17 @@ subclass).
 
 .. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
-subclass).
+Changes the model's set of custom indexes (the ``index_together`` option on the
+``Meta`` subclass).
+
+.. warning::
+
+    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    migration files. For backward compatibility reasons, it's still part of the
+    public API, and there's no plan to deprecate or remove it, but it should
+    not be used for new migrations. Use
+    :class:`~django.db.migrations.operations.AddIndex` and
+    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
@@ -178,6 +196,13 @@ if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, the operation is irreversible.
 
+.. versionchanged:: 6.0
+
+    :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
+    PostgreSQL backends no longer use ``CASCADE`` to delete dependent related
+    database objects, such as views. Any dependent objects that are not managed
+    by Django may need to be removed manually before running ``RemoveField``.
+
 ``AlterField``
 --------------
 
@@ -222,6 +247,19 @@ Creates an index in the database table for the model with ``model_name``.
 
 Removes the index named ``name`` from the model with ``model_name``.
 
+``RenameIndex``
+---------------
+
+.. class:: RenameIndex(model_name, new_name, old_name=None, old_fields=None)
+
+Renames an index in the database table for the model with ``model_name``.
+Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
+is an iterable of the strings, often corresponding to fields of
+``index_together`` (pre-Django 5.1 option).
+
+On databases that don't support an index renaming statement (SQLite), the
+operation will drop and recreate the index, which can be expensive.
+
 ``AddConstraint``
 -----------------
 
@@ -236,6 +274,14 @@ the model with ``model_name``.
 .. class:: RemoveConstraint(model_name, name)
 
 Removes the constraint named ``name`` from the model with ``model_name``.
+
+``AlterConstraint``
+-------------------
+
+.. class:: AlterConstraint(model_name, name, constraint)
+
+Alters the constraint named ``name`` of the model with ``model_name`` with the
+new ``constraint`` without affecting the database.
 
 Special Operations
 ==================
@@ -264,7 +310,7 @@ queries and parameters in the same way as :ref:`cursor.execute()
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
     migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
-    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
@@ -274,8 +320,8 @@ should undo what is done by the ``sql`` queries. For example, to undo the above
 insertion with a deletion::
 
     migrations.RunSQL(
-        sql=[("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
-        reverse_sql=[("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+        sql=[("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])],
+        reverse_sql=[("DELETE FROM musician where name=%s;", ["Reinhardt"])],
     )
 
 If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
@@ -283,17 +329,18 @@ irreversible.
 
 The ``state_operations`` argument allows you to supply operations that are
 equivalent to the SQL in terms of project state. For example, if you are
-manually creating a column, you should pass in a list containing an ``AddField``
-operation here so that the autodetector still has an up-to-date state of the
-model. If you don't, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again. For example::
+manually creating a column, you should pass in a list containing an
+``AddField`` operation here so that the autodetector still has an up-to-date
+state of the model. If you don't, when you next run ``makemigrations``, it
+won't see any operation that adds that field and so will try to run it again.
+For example::
 
     migrations.RunSQL(
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
         state_operations=[
             migrations.AddField(
-                'musician',
-                'name',
+                "musician",
+                "name",
                 models.CharField(max_length=255),
             ),
         ],
@@ -338,21 +385,26 @@ database hints.
 The optional ``elidable`` argument determines whether or not the operation will
 be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
-You are advised to write the code as a separate function above the ``Migration``
-class in the migration file, and pass it to ``RunPython``. Here's an example of
-using ``RunPython`` to create some initial objects on a ``Country`` model::
+You are advised to write the code as a separate function above the
+``Migration`` class in the migration file, and pass it to ``RunPython``. Here's
+an example of using ``RunPython`` to create some initial objects on a
+``Country`` model::
 
     from django.db import migrations
+
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.using(db_alias).bulk_create([
-            Country(name="USA", code="us"),
-            Country(name="France", code="fr"),
-        ])
+        Country.objects.using(db_alias).bulk_create(
+            [
+                Country(name="USA", code="us"),
+                Country(name="France", code="fr"),
+            ]
+        )
+
 
     def reverse_func(apps, schema_editor):
         # forwards_func() creates two Country instances,
@@ -362,8 +414,8 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
         Country.objects.using(db_alias).filter(name="USA", code="us").delete()
         Country.objects.using(db_alias).filter(name="France", code="fr").delete()
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = []
 
         operations = [
@@ -376,10 +428,10 @@ custom data updates and alterations, and anything else you need access to an
 ORM and/or Python code for.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
-either doing it outside the scope of the Django model system (e.g. triggers)
-or that you use :class:`SeparateDatabaseAndState` to add in operations that will
-reflect your changes to the model state - otherwise, the versioned ORM and
-the autodetector will stop working correctly.
+either doing it outside the scope of the Django model system (e.g. triggers) or
+that you use :class:`SeparateDatabaseAndState` to add in operations that will
+reflect your changes to the model state - otherwise, the versioned ORM and the
+autodetector will stop working correctly.
 
 By default, ``RunPython`` will run its contents inside a transaction on
 databases that do not support DDL transactions (for example, MySQL and
@@ -404,8 +456,8 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
 
 .. warning::
 
-    ``RunPython`` does not magically alter the connection of the models for you;
-    any model methods you call will go to the default database unless you
+    ``RunPython`` does not magically alter the connection of the models for
+    you; any model methods you call will go to the default database unless you
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
@@ -440,6 +492,40 @@ operations.
 For an example using ``SeparateDatabaseAndState``, see
 :ref:`changing-a-manytomanyfield-to-use-a-through-model`.
 
+Operation category
+==================
+
+.. currentmodule:: django.db.migrations.operations.base
+
+.. class:: OperationCategory
+
+    Categories of migration operation used by the :djadmin:`makemigrations`
+    command to display meaningful symbols.
+
+    .. attribute:: ADDITION
+
+        *Symbol*: ``+``
+
+    .. attribute:: REMOVAL
+
+        *Symbol*: ``-``
+
+    .. attribute:: ALTERATION
+
+        *Symbol*: ``~``
+
+    .. attribute:: PYTHON
+
+        *Symbol*: ``p``
+
+    .. attribute:: SQL
+
+        *Symbol*: ``s``
+
+    .. attribute:: MIXED
+
+        *Symbol*: ``?``
+
 .. _writing-your-own-migration-operation:
 
 Writing your own
@@ -451,14 +537,18 @@ structure of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
-    class MyCustomOperation(Operation):
 
+    class MyCustomOperation(Operation):
         # If this is False, it means that this operation will be ignored by
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
 
         # If this is False, Django will refuse to reverse past this operation.
         reversible = False
+
+        # This categorizes the operation. The corresponding symbol will be
+        # displayed by the makemigrations command.
+        category = OperationCategory.ADDITION
 
         def __init__(self, arg1, arg2):
             # Operations are usually instantiated with arguments in migration
@@ -481,7 +571,7 @@ structure of an ``Operation`` looks like this::
             pass
 
         def describe(self):
-            # This is used to describe what the operation does in console output.
+            # This is used to describe what the operation does.
             return "Custom Operation"
 
         @property
@@ -489,10 +579,6 @@ structure of an ``Operation`` looks like this::
             # Optional. A filename part suitable for automatically naming a
             # migration containing this operation, or None if not applicable.
             return "custom_operation_%s_%s" % (self.arg1, self.arg2)
-
-.. versionadded:: 3.2
-
-    The ``migration_name_fragment`` property was added.
 
 You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they cover
@@ -523,7 +609,8 @@ Some things to note:
         ...
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
-  the one that will be the current state once the migration has finished reversing.
+  the one that will be the current state once the migration has finished
+  reversing.
 
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for
@@ -545,8 +632,8 @@ state changes, all it does is run one command::
 
     from django.db.migrations.operations.base import Operation
 
-    class LoadExtension(Operation):
 
+    class LoadExtension(Operation):
         reversible = True
 
         def __init__(self, name):

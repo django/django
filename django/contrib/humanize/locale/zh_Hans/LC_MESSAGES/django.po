@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jenny Qian <jqian@tendenci.com>, 2018
 # Lele Long <schemacs@gmail.com>, 2015
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-01 07:30+0000\n"
-"Last-Translator: Suntravel Chris <chrisfromcn@gmail.com>\n"
+"POT-Creation-Date: 2021-04-07 14:40+0200\n"
+"PO-Revision-Date: 2021-11-22 03:16+0000\n"
+"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -84,19 +85,9 @@ msgid "{}th"
 msgstr "第{}"
 
 #, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f 百万"
-
-#, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] "%(value)s 百万"
-
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f 十亿"
 
 #, python-format
 msgid "%(value)s billion"
@@ -104,19 +95,9 @@ msgid_plural "%(value)s billion"
 msgstr[0] "%(value)s 十亿"
 
 #, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f 万亿"
-
-#, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s 万亿"
-
-#, python-format
-msgid "%(value).1f quadrillion"
-msgid_plural "%(value).1f quadrillion"
-msgstr[0] "%(value).1f 1000的5次方"
 
 #, python-format
 msgid "%(value)s quadrillion"
@@ -124,19 +105,9 @@ msgid_plural "%(value)s quadrillion"
 msgstr[0] "%(value)s 1000的5次方"
 
 #, python-format
-msgid "%(value).1f quintillion"
-msgid_plural "%(value).1f quintillion"
-msgstr[0] "%(value).1f 1000的4次方"
-
-#, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s 1000的4次方"
-
-#, python-format
-msgid "%(value).1f sextillion"
-msgid_plural "%(value).1f sextillion"
-msgstr[0] "%(value).1f 1000的7次方"
 
 #, python-format
 msgid "%(value)s sextillion"
@@ -144,19 +115,9 @@ msgid_plural "%(value)s sextillion"
 msgstr[0] "%(value)s 1000的7次方"
 
 #, python-format
-msgid "%(value).1f septillion"
-msgid_plural "%(value).1f septillion"
-msgstr[0] "%(value).1f 1000的8次方"
-
-#, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s 1000的8次方"
-
-#, python-format
-msgid "%(value).1f octillion"
-msgid_plural "%(value).1f octillion"
-msgstr[0] "%(value).1f 1000的9次方"
 
 #, python-format
 msgid "%(value)s octillion"
@@ -164,29 +125,14 @@ msgid_plural "%(value)s octillion"
 msgstr[0] "%(value)s 1000的9次方"
 
 #, python-format
-msgid "%(value).1f nonillion"
-msgid_plural "%(value).1f nonillion"
-msgstr[0] "%(value).1f 1000的10次方"
-
-#, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s 1000的10次方"
 
 #, python-format
-msgid "%(value).1f decillion"
-msgid_plural "%(value).1f decillion"
-msgstr[0] "%(value).1f 1000的11次方"
-
-#, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s 1000的11次方"
-
-#, python-format
-msgid "%(value).1f googol"
-msgid_plural "%(value).1f googol"
-msgstr[0] "%(value).1f 10的100次方"
 
 #, python-format
 msgid "%(value)s googol"
@@ -289,74 +235,74 @@ msgstr "%(delta)s之后"
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d 年"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d 年"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d月"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d 月"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d 周"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d 周"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d天"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d 日"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小时"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d 小时"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d 分钟"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d 年"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d 年"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d 月"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d 月"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d 周"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d 周"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 天"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d 日"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小时"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d 小时"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d 分钟"

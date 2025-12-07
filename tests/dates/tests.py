@@ -44,42 +44,48 @@ class DatesTests(TestCase):
         c.articles.add(a1, a3)
 
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "year"), [
+            Comment.objects.dates("article__pub_date", "year"),
+            [
                 datetime.date(2005, 1, 1),
                 datetime.date(2010, 1, 1),
             ],
         )
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "month"), [
+            Comment.objects.dates("article__pub_date", "month"),
+            [
                 datetime.date(2005, 7, 1),
                 datetime.date(2010, 7, 1),
             ],
         )
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "week"), [
+            Comment.objects.dates("article__pub_date", "week"),
+            [
                 datetime.date(2005, 7, 25),
                 datetime.date(2010, 7, 26),
             ],
         )
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "day"), [
+            Comment.objects.dates("article__pub_date", "day"),
+            [
                 datetime.date(2005, 7, 28),
                 datetime.date(2010, 7, 28),
             ],
         )
         self.assertSequenceEqual(
-            Article.objects.dates("comments__pub_date", "day"), [
+            Article.objects.dates("comments__pub_date", "day"),
+            [
                 datetime.date(2005, 7, 28),
                 datetime.date(2005, 7, 29),
                 datetime.date(2005, 8, 29),
                 datetime.date(2010, 7, 28),
             ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.dates("comments__approval_date", "day"), []
         )
         self.assertSequenceEqual(
-            Category.objects.dates("articles__pub_date", "day"), [
+            Category.objects.dates("articles__pub_date", "day"),
+            [
                 datetime.date(2005, 7, 28),
             ],
         )
@@ -94,15 +100,16 @@ class DatesTests(TestCase):
             "Cannot resolve keyword 'invalid_field' into field. Choices are: "
             "categories, comments, id, pub_date, pub_datetime, title",
         ):
-            Article.objects.dates('invalid_field', 'year')
+            Article.objects.dates("invalid_field", "year")
 
     def test_dates_fails_when_given_invalid_kind_argument(self):
         msg = "'kind' must be one of 'year', 'month', 'week', or 'day'."
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Article.objects.dates("pub_date", "bad_kind")
 
     def test_dates_fails_when_given_invalid_order_argument(self):
-        with self.assertRaisesMessage(AssertionError, "'order' must be either 'ASC' or 'DESC'."):
+        msg = "'order' must be either 'ASC' or 'DESC'."
+        with self.assertRaisesMessage(ValueError, msg):
             Article.objects.dates("pub_date", "year", order="bad order")
 
     @override_settings(USE_TZ=False)
@@ -117,18 +124,19 @@ class DatesTests(TestCase):
             ]
         )
         self.assertSequenceEqual(
-            Article.objects.dates('pub_datetime', 'day', order='ASC'), [
+            Article.objects.dates("pub_datetime", "day", order="ASC"),
+            [
                 datetime.date(2015, 10, 21),
                 datetime.date(2015, 10, 22),
-            ]
+            ],
         )
 
-    @skipUnless(connection.vendor == 'mysql', "Test checks MySQL query syntax")
+    @skipUnless(connection.vendor == "mysql", "Test checks MySQL query syntax")
     def test_dates_avoid_datetime_cast(self):
         Article.objects.create(pub_date=datetime.date(2015, 10, 21))
-        for kind in ['day', 'month', 'year']:
-            qs = Article.objects.dates('pub_date', kind)
-            if kind == 'day':
-                self.assertIn('DATE(', str(qs.query))
+        for kind in ["day", "month", "year"]:
+            qs = Article.objects.dates("pub_date", kind)
+            if kind == "day":
+                self.assertIn("DATE(", str(qs.query))
             else:
-                self.assertIn(' AS DATE)', str(qs.query))
+                self.assertIn(" AS DATE)", str(qs.query))

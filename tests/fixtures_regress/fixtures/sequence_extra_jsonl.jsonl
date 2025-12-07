@@ -1,0 +1,2 @@
+{"pk": "1", "model": "fixtures_regress.animal", "fields": {"name": "Eagle", "extra_name": "Super Eagle", "latin_name": "Aquila", "count": 3, "weight": 1.2}}
+{"pk": "1", "model": "fixtures_regress.animal_extra", "fields": {"name": "Nonexistent model", "extra_name": "test for ticket #29522", "latin_name": "Aquila", "count": 3, "weight": 1.2}}

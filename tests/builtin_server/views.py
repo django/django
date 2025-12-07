@@ -10,6 +10,6 @@ def file_response(request):
     f2 = BytesIO(b"test2")
     response = FileResponse(f1)
     response._resource_closers.append(f2.close)
-    FILE_RESPONSE_HOLDER['response'] = response
-    FILE_RESPONSE_HOLDER['buffers'] = (f1, f2)
+    FILE_RESPONSE_HOLDER["response"] = response
+    FILE_RESPONSE_HOLDER["buffers"] = (f1, f2)
     return response

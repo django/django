@@ -9,12 +9,13 @@ class SingleObjectMixin(ContextMixin):
     """
     Provide the ability to retrieve a single object for further manipulation.
     """
+
     model = None
     queryset = None
-    slug_field = 'slug'
+    slug_field = "slug"
     context_object_name = None
-    slug_url_kwarg = 'slug'
-    pk_url_kwarg = 'pk'
+    slug_url_kwarg = "slug"
+    pk_url_kwarg = "pk"
     query_pk_and_slug = False
 
     def get_object(self, queryset=None):
@@ -51,8 +52,10 @@ class SingleObjectMixin(ContextMixin):
             # Get the single item from the filtered queryset
             obj = queryset.get()
         except queryset.model.DoesNotExist:
-            raise Http404(_("No %(verbose_name)s found matching the query") %
-                          {'verbose_name': queryset.model._meta.verbose_name})
+            raise Http404(
+                _("No %(verbose_name)s found matching the query")
+                % {"verbose_name": queryset.model._meta.verbose_name}
+            )
         return obj
 
     def get_queryset(self):
@@ -69,9 +72,7 @@ class SingleObjectMixin(ContextMixin):
                 raise ImproperlyConfigured(
                     "%(cls)s is missing a QuerySet. Define "
                     "%(cls)s.model, %(cls)s.queryset, or override "
-                    "%(cls)s.get_queryset()." % {
-                        'cls': self.__class__.__name__
-                    }
+                    "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
                 )
         return self.queryset.all()
 
@@ -92,7 +93,7 @@ class SingleObjectMixin(ContextMixin):
         """Insert the single object into the context dict."""
         context = {}
         if self.object:
-            context['object'] = self.object
+            context["object"] = self.object
             context_object_name = self.get_context_object_name(self.object)
             if context_object_name:
                 context[context_object_name] = self.object
@@ -101,7 +102,12 @@ class SingleObjectMixin(ContextMixin):
 
 
 class BaseDetailView(SingleObjectMixin, View):
-    """A base view for displaying a single object."""
+    """
+    Base view for displaying a single object.
+
+    This requires subclassing to provide a response mixin.
+    """
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
@@ -110,14 +116,15 @@ class BaseDetailView(SingleObjectMixin, View):
 
 class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
     template_name_field = None
-    template_name_suffix = '_detail'
+    template_name_suffix = "_detail"
 
     def get_template_names(self):
         """
         Return a list of template names to be used for the request. May not be
-        called if render_to_response() is overridden. Return the following list:
+        called if render_to_response() is overridden. Return a list containing
+        ``template_name``, if set on the value. Otherwise, return a list
+        containing:
 
-        * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<model_name><template_name_suffix>.html``
@@ -137,26 +144,39 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                 if name:
                     names.insert(0, name)
 
-            # The least-specific option is the default <app>/<model>_detail.html;
-            # only use this if the object in question is a model.
+            # The least-specific option is the default
+            # <app>/<model>_detail.html; only use this if the object in
+            # question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
-                names.append("%s/%s%s.html" % (
-                    object_meta.app_label,
-                    object_meta.model_name,
-                    self.template_name_suffix
-                ))
-            elif getattr(self, 'model', None) is not None and issubclass(self.model, models.Model):
-                names.append("%s/%s%s.html" % (
-                    self.model._meta.app_label,
-                    self.model._meta.model_name,
-                    self.template_name_suffix
-                ))
+                names.append(
+                    "%s/%s%s.html"
+                    % (
+                        object_meta.app_label,
+                        object_meta.model_name,
+                        self.template_name_suffix,
+                    )
+                )
+            elif getattr(self, "model", None) is not None and issubclass(
+                self.model, models.Model
+            ):
+                names.append(
+                    "%s/%s%s.html"
+                    % (
+                        self.model._meta.app_label,
+                        self.model._meta.model_name,
+                        self.template_name_suffix,
+                    )
+                )
 
             # If we still haven't managed to find any template names, we should
             # re-raise the ImproperlyConfigured to alert the user.
             if not names:
-                raise
+                raise ImproperlyConfigured(
+                    "SingleObjectTemplateResponseMixin requires a definition "
+                    "of 'template_name', 'template_name_field', or 'model'; "
+                    "or an implementation of 'get_template_names()'."
+                )
 
         return names
 
@@ -166,5 +186,6 @@ class DetailView(SingleObjectTemplateResponseMixin, BaseDetailView):
     Render a "detail" view of an object.
 
     By default this is a model instance looked up from `self.queryset`, but the
-    view will support display of *any* object by overriding `self.get_object()`.
+    view will support display of *any* object by overriding
+    `self.get_object()`.
     """

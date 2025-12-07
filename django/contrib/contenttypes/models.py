@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -64,9 +65,8 @@ class ContentTypeManager(models.Manager):
         Given *models, return a dictionary mapping {model: content_type}.
         """
         results = {}
-        # Models that aren't already in the cache.
-        needed_app_labels = set()
-        needed_models = set()
+        # Models that aren't already in the cache grouped by app labels.
+        needed_models = defaultdict(set)
         # Mapping of opts to the list of models requiring it.
         needed_opts = defaultdict(list)
         for model in models:
@@ -74,28 +74,28 @@ class ContentTypeManager(models.Manager):
             try:
                 ct = self._get_from_cache(opts)
             except KeyError:
-                needed_app_labels.add(opts.app_label)
-                needed_models.add(opts.model_name)
-                needed_opts[opts].append(model)
+                needed_models[opts.app_label].add(opts.model_name)
+                needed_opts[(opts.app_label, opts.model_name)].append(model)
             else:
                 results[model] = ct
         if needed_opts:
             # Lookup required content types from the DB.
-            cts = self.filter(
-                app_label__in=needed_app_labels,
-                model__in=needed_models
+            condition = Q(
+                *(
+                    Q(("app_label", app_label), ("model__in", models))
+                    for app_label, models in needed_models.items()
+                ),
+                _connector=Q.OR,
             )
+            cts = self.filter(condition)
             for ct in cts:
-                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                opts_models = needed_opts.pop((ct.app_label, ct.model), [])
                 for model in opts_models:
                     results[model] = ct
                 self._add_to_cache(self.db, ct)
         # Create content types that weren't in the cache or DB.
-        for opts, opts_models in needed_opts.items():
-            ct = self.create(
-                app_label=opts.app_label,
-                model=opts.model_name,
-            )
+        for (app_label, model_name), opts_models in needed_opts.items():
+            ct = self.create(app_label=app_label, model=model_name)
             self._add_to_cache(self.db, ct)
             for model in opts_models:
                 results[model] = ct
@@ -123,8 +123,9 @@ class ContentTypeManager(models.Manager):
 
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
-        # Note it's possible for ContentType objects to be stale; model_class() will return None.
-        # Hence, there is no reliance on model._meta.app_label here, just using the model fields instead.
+        # Note it's possible for ContentType objects to be stale; model_class()
+        # will return None. Hence, there is no reliance on
+        # model._meta.app_label here, just using the model fields instead.
         key = (ct.app_label, ct.model)
         self._cache.setdefault(using, {})[key] = ct
         self._cache.setdefault(using, {})[ct.id] = ct
@@ -132,14 +133,14 @@ class ContentTypeManager(models.Manager):
 
 class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
-    model = models.CharField(_('python model class name'), max_length=100)
+    model = models.CharField(_("python model class name"), max_length=100)
     objects = ContentTypeManager()
 
     class Meta:
-        verbose_name = _('content type')
-        verbose_name_plural = _('content types')
-        db_table = 'django_content_type'
-        unique_together = [['app_label', 'model']]
+        verbose_name = _("content type")
+        verbose_name_plural = _("content types")
+        db_table = "django_content_type"
+        unique_together = [["app_label", "model"]]
 
     def __str__(self):
         return self.app_labeled_name
@@ -156,7 +157,10 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return '%s | %s' % (model._meta.app_label, model._meta.verbose_name)
+        return "%s | %s" % (
+            model._meta.app_config.verbose_name,
+            model._meta.verbose_name,
+        )
 
     def model_class(self):
         """Return the model class for this type of content."""
@@ -165,20 +169,20 @@ class ContentType(models.Model):
         except LookupError:
             return None
 
-    def get_object_for_this_type(self, **kwargs):
+    def get_object_for_this_type(self, using=None, **kwargs):
         """
         Return an object of this type for the keyword arguments given.
         Basically, this is a proxy around this object_type's get_object() model
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._base_manager.using(self._state.db).get(**kwargs)
+        return self.model_class()._base_manager.using(using).get(**kwargs)
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
         Return all objects of this type for the keyword arguments given.
         """
-        return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
+        return self.model_class()._base_manager.filter(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)

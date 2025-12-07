@@ -9,10 +9,10 @@ from django.contrib.auth.urls import urlpatterns
 from django.urls import path
 
 # Create a silo'd admin site for just the user/group admins.
-site = admin.AdminSite(name='auth_test_admin')
+site = admin.AdminSite(name="auth_test_admin")
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
 
 urlpatterns += [
-    path('admin/', site.urls),
+    path("admin/", site.urls),
 ]

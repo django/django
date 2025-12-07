@@ -1,7 +1,8 @@
 """
 Dummy database backend for Django.
 
-Django uses this if the database ENGINE setting is empty (None or empty string).
+Django uses this if the database ENGINE setting is empty (None or empty
+string).
 
 Each of these API functions, except connection.close(), raise
 ImproperlyConfigured.
@@ -17,9 +18,11 @@ from django.db.backends.dummy.features import DummyDatabaseFeatures
 
 
 def complain(*args, **kwargs):
-    raise ImproperlyConfigured("settings.DATABASES is improperly configured. "
-                               "Please supply the ENGINE value. Check "
-                               "settings documentation for more details.")
+    raise ImproperlyConfigured(
+        "settings.DATABASES is improperly configured. "
+        "Please supply the ENGINE value. Check "
+        "settings documentation for more details."
+    )
 
 
 def ignore(*args, **kwargs):
@@ -37,6 +40,7 @@ class DatabaseClient(BaseDatabaseClient):
 class DatabaseCreation(BaseDatabaseCreation):
     create_test_db = ignore
     destroy_test_db = ignore
+    serialize_db_to_string = ignore
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -44,7 +48,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_description = complain
     get_relations = complain
     get_indexes = complain
-    get_key_columns = complain
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

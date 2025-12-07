@@ -1,12 +1,11 @@
 """
- This module houses the error-checking routines used by the GDAL
- ctypes prototypes.
+This module houses the error-checking routines used by the GDAL
+ctypes prototypes.
 """
+
 from ctypes import c_void_p, string_at
 
-from django.contrib.gis.gdal.error import (
-    GDALException, SRSException, check_err,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException, check_err
 from django.contrib.gis.gdal.libgdal import lgdal
 
 
@@ -38,9 +37,9 @@ def check_const_string(result, func, cargs, offset=None, cpl=False):
 def check_string(result, func, cargs, offset=-1, str_result=False):
     """
     Check the string output returned from the given function, and free
-    the string pointer allocated by OGR.  The `str_result` keyword
+    the string pointer allocated by OGR. The `str_result` keyword
     may be used when the result is the string pointer, otherwise
-    the OGR error code is assumed.  The `offset` keyword may be used
+    the OGR error code is assumed. The `offset` keyword may be used
     to extract the string pointer passed in by-reference at the given
     slice offset in the function arguments.
     """
@@ -63,6 +62,7 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         lgdal.VSIFree(ptr)
     return s
 
+
 # ### DataSource, Layer error-checking ###
 
 
@@ -80,7 +80,9 @@ def check_geom(result, func, cargs):
     if isinstance(result, int):
         result = c_void_p(result)
     if not result:
-        raise GDALException('Invalid geometry pointer returned from "%s".' % func.__name__)
+        raise GDALException(
+            'Invalid geometry pointer returned from "%s".' % func.__name__
+        )
     return result
 
 
@@ -96,7 +98,9 @@ def check_srs(result, func, cargs):
     if isinstance(result, int):
         result = c_void_p(result)
     if not result:
-        raise SRSException('Invalid spatial reference pointer returned from "%s".' % func.__name__)
+        raise SRSException(
+            'Invalid spatial reference pointer returned from "%s".' % func.__name__
+        )
     return result
 
 
@@ -130,7 +134,7 @@ def check_pointer(result, func, cargs):
 def check_str_arg(result, func, cargs):
     """
     This is for the OSRGet[Angular|Linear]Units functions, which
-    require that the returned string pointer not be freed.  This
+    require that the returned string pointer not be freed. This
     returns both the double and string values.
     """
     dbl = result

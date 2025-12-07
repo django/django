@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2020
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2020-2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-02-25 16:01+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
-"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, "
+"2016-2017,2020-2021,2023-2025\n"
+"Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: dsb\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 msgid "Personal info"
 msgstr "Wósobinske informacije"
@@ -31,12 +32,22 @@ msgstr "Wažne daty"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekt %(name)s z primarnym klucom %(key)r njeeksistěrujo."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Pśeśiwne formularowe daty zapódane. Pšosym wopytajśo hyšći raz."
+
 msgid "Password changed successfully."
 msgstr "Gronidło jo se změniło."
+
+msgid "Password-based authentication was disabled."
+msgstr "Awtentifikacija na zakłaźe gronidła jo se znjemóžniła."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Gronidło změniś: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Nastajone gronidło: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Awtentifikacija a awtorizacija"
@@ -47,11 +58,17 @@ msgstr "gronidło"
 msgid "last login"
 msgstr "slědne pśizjawjenje"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Njepłaśiwy gronidłowy format abo njeznaty kontrolny algoritmus."
+
 msgid "No password set."
 msgstr "Žedno gronidło nastajone."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Njepłaśiwy gronidłowy format abo njeznaty kontrolny algoritmus."
+msgid "Reset password"
+msgstr "Gronidło slědk stajiś"
+
+msgid "Set password"
+msgstr "Gronidło póstajis"
 
 msgid "The two password fields didn’t match."
 msgstr "Dwě gronidlowej póli njejstej jadnakej."
@@ -66,12 +83,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Zapódajśo to samske gronidło, za pśespytanje."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Grube gronidła se njeskładuju, togodla njejo móžno, gronidło wužywarja "
-"wiźeś, ale móžośo gronidło z pomocu <a href=\"{}\">toś togo formulara</a> "
-"změniś."
+"Lěc wužywaŕ móžo z gronidłom awtentificěrowaś abo nic. Jolic to jo "
+"znjemóžnjone, jo hyšći móžno, z pomocu drugich backendami awtentificěrowaś, "
+"na pśikład Single Sign-On abo LDAP."
+
+msgid "Password-based authentication"
+msgstr "Awtentifikacija na zakłaźe gronidła"
+
+msgid "Enabled"
+msgstr "Źmóžnjony"
+
+msgid "Disabled"
+msgstr "Znjemóžnjony"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Gropne gronidła se njeskładuju, njedajo pótakem žednu móžnosć, gronidło "
+"wužywarja wiźeś."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Póstajśo gronidło, aby awtentifkaciju na zakłaźe gronidła za toś togo "
+"wužywarja zmóžnił."
 
 #, python-format
 msgid ""
@@ -99,9 +138,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Stare gronidło"
-
-msgid "Password (again)"
-msgstr "Gronidło (znowego)"
 
 msgid "algorithm"
 msgstr "algoritmus"
@@ -135,6 +171,9 @@ msgstr "źěłowy faktor"
 
 msgid "checksum"
 msgstr "kontrolna suma"
+
+msgid "block size"
+msgstr "blokowa wjelikosć"
 
 msgid "name"
 msgstr "mě"
@@ -225,24 +264,17 @@ msgid "users"
 msgstr "wužywarje"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuško "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuško wopśimowaś."
 msgstr[1] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamušce "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamušce wopśimowaś."
 msgstr[2] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuška "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuška wopśimowaś."
 msgstr[3] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuškow "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuškow wopśimowaś."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -277,11 +309,12 @@ msgid "Password reset on %(site_name)s"
 msgstr "Slědkstajenje gronidła na %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Zapódajśo płaśiwe wužywarske mě. Toś ta gódnota smějo jano engelske pismiki, "
-"licby a znamuška @/./+/-/_  wopśimowaś."
+"Zapódajśo płaśiwe wužywaŕske mě. Toś ta gódnota smějo jano małomismiki a-z a "
+"wjelikopismiki A-Z bźez diakritiskich znamuškow, licby a znamuška @/./+/-/_  "
+"wopśimowaś."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

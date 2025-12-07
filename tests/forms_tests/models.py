@@ -20,7 +20,7 @@ class BoundaryModel(models.Model):
 
 
 class Defaults(models.Model):
-    name = models.CharField(max_length=255, default='class default value')
+    name = models.CharField(max_length=255, default="class default value")
     def_date = models.DateField(default=datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
     callable_default = models.IntegerField(default=callable_default)
@@ -28,45 +28,51 @@ class Defaults(models.Model):
 
 class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
+
     CHOICES = [
-        ('', 'No Preference'),
-        ('f', 'Foo'),
-        ('b', 'Bar'),
+        ("", "No Preference"),
+        ("f", "Foo"),
+        ("b", "Bar"),
     ]
 
     INTEGER_CHOICES = [
-        (None, 'No Preference'),
-        (1, 'Foo'),
-        (2, 'Bar'),
+        (None, "No Preference"),
+        (1, "Foo"),
+        (2, "Bar"),
     ]
 
     STRING_CHOICES_WITH_NONE = [
-        (None, 'No Preference'),
-        ('f', 'Foo'),
-        ('b', 'Bar'),
+        (None, "No Preference"),
+        ("f", "Foo"),
+        ("b", "Bar"),
     ]
 
     name = models.CharField(max_length=10)
     choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
     choice_string_w_none = models.CharField(
-        max_length=2, blank=True, null=True, choices=STRING_CHOICES_WITH_NONE)
+        max_length=2, blank=True, null=True, choices=STRING_CHOICES_WITH_NONE
+    )
     choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True, null=True)
 
 
 class ChoiceOptionModel(models.Model):
-    """Destination for ChoiceFieldModel's ForeignKey.
-    Can't reuse ChoiceModel because error_message tests require that it have no instances."""
+    """
+    Destination for ChoiceFieldModel's ForeignKey.
+    Can't reuse ChoiceModel because error_message tests require that it have no
+    instances.
+    """
+
     name = models.CharField(max_length=10)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
-        return 'ChoiceOption %d' % self.pk
+        return "ChoiceOption %d" % self.pk
 
 
 def choice_default():
-    return ChoiceOptionModel.objects.get_or_create(name='default')[0].pk
+    return ChoiceOptionModel.objects.get_or_create(name="default")[0].pk
 
 
 def choice_default_list():
@@ -84,6 +90,7 @@ def int_list_default():
 class ChoiceFieldModel(models.Model):
     """Model with ForeignKey to another model, for testing ModelForm
     generation with ModelChoiceField."""
+
     choice = models.ForeignKey(
         ChoiceOptionModel,
         models.CASCADE,
@@ -94,19 +101,19 @@ class ChoiceFieldModel(models.Model):
         ChoiceOptionModel,
         models.CASCADE,
         blank=False,
-        related_name='choice_int',
+        related_name="choice_int",
         default=int_default,
     )
     multi_choice = models.ManyToManyField(
         ChoiceOptionModel,
         blank=False,
-        related_name='multi_choice',
+        related_name="multi_choice",
         default=choice_default_list,
     )
     multi_choice_int = models.ManyToManyField(
         ChoiceOptionModel,
         blank=False,
-        related_name='multi_choice_int',
+        related_name="multi_choice_int",
         default=int_list_default,
     )
 
@@ -115,18 +122,18 @@ class OptionalMultiChoiceModel(models.Model):
     multi_choice = models.ManyToManyField(
         ChoiceOptionModel,
         blank=False,
-        related_name='not_relevant',
+        related_name="not_relevant",
         default=choice_default,
     )
     multi_choice_optional = models.ManyToManyField(
         ChoiceOptionModel,
         blank=True,
-        related_name='not_relevant2',
+        related_name="not_relevant2",
     )
 
 
 class FileModel(models.Model):
-    file = models.FileField(storage=temp_storage, upload_to='tests')
+    file = models.FileField(storage=temp_storage, upload_to="tests")
 
 
 class Article(models.Model):

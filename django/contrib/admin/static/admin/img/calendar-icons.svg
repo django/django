@@ -1,14 +1,44 @@
-<svg width="15" height="60" viewBox="0 0 1792 7168" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
+<svg
+  width="15"
+  height="30"
+  viewBox="0 0 512 1024"
+  version="1.1"
+  id="svg5"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns="http://www.w3.org/2000/svg">
+  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+  <defs id="defs2">
     <g id="previous">
-      <path d="M1037 1395l102-102q19-19 19-45t-19-45l-307-307 307-307q19-19 19-45t-19-45l-102-102q-19-19-45-19t-45 19l-454 454q-19 19-19 45t19 45l454 454q19 19 45 19t45-19zm627-499q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"/>
+      <!--
+      Icon Name: circle-chevron-left
+      Icon Family: classic
+      Icon Style: solid
+      -->
+      <path
+          d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"
+          id="path2" />
     </g>
     <g id="next">
-      <path d="M845 1395l454-454q19-19 19-45t-19-45l-454-454q-19-19-45-19t-45 19l-102 102q-19 19-19 45t19 45l307 307-307 307q-19 19-19 45t19 45l102 102q19 19 45 19t45-19zm819-499q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"/>
+      <!--
+      Icon Name: circle-chevron-right
+      Icon Family: classic
+      Icon Style: solid
+      -->
+      <path
+          d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM241 377c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l87-87-87-87c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L345 239c9.4 9.4 9.4 24.6 0 33.9L241 377z"
+          id="path1" />
     </g>
   </defs>
-  <use xlink:href="#previous" x="0" y="0" fill="#333333" />
-  <use xlink:href="#previous" x="0" y="1792" fill="#000000" />
-  <use xlink:href="#next" x="0" y="3584" fill="#333333" />
-  <use xlink:href="#next" x="0" y="5376" fill="#000000" />
+  <use
+      xlink:href="#next"
+      x="0"
+      y="512"
+      fill="#000000"
+      id="use5" />
+  <use
+      xlink:href="#previous"
+      x="0"
+      y="0"
+      fill="#333333"
+      id="use2" />
 </svg>

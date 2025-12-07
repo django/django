@@ -1,4 +1,5 @@
 from django.contrib.gis import gdal
+from django.utils.functional import cached_property
 
 
 class SpatialRefSysMixin:
@@ -6,32 +7,27 @@ class SpatialRefSysMixin:
     The SpatialRefSysMixin is a class used by the database-dependent
     SpatialRefSys objects to reduce redundant code.
     """
-    @property
+
+    @cached_property
     def srs(self):
         """
         Return a GDAL SpatialReference object.
         """
-        # TODO: Is caching really necessary here?  Is complexity worth it?
-        if hasattr(self, '_srs'):
-            # Returning a clone of the cached SpatialReference object.
-            return self._srs.clone()
-        else:
-            # Attempting to cache a SpatialReference object.
+        try:
+            return gdal.SpatialReference(self.wkt)
+        except Exception as e:
+            wkt_error = e
 
-            # Trying to get from WKT first.
-            try:
-                self._srs = gdal.SpatialReference(self.wkt)
-                return self.srs
-            except Exception as e:
-                msg = e
+        try:
+            return gdal.SpatialReference(self.proj4text)
+        except Exception as e:
+            proj4_error = e
 
-            try:
-                self._srs = gdal.SpatialReference(self.proj4text)
-                return self.srs
-            except Exception as e:
-                msg = e
-
-            raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
+        raise Exception(
+            "Could not get OSR SpatialReference.\n"
+            f"Error for WKT '{self.wkt}': {wkt_error}\n"
+            f"Error for PROJ.4 '{self.proj4text}': {proj4_error}"
+        )
 
     @property
     def ellipsoid(self):
@@ -49,12 +45,12 @@ class SpatialRefSysMixin:
     @property
     def spheroid(self):
         "Return the spheroid name for this spatial reference."
-        return self.srs['spheroid']
+        return self.srs["spheroid"]
 
     @property
     def datum(self):
         "Return the datum for this spatial reference."
-        return self.srs['datum']
+        return self.srs["datum"]
 
     @property
     def projected(self):
@@ -117,7 +113,7 @@ class SpatialRefSysMixin:
         """
         srs = gdal.SpatialReference(wkt)
         sphere_params = srs.ellipsoid
-        sphere_name = srs['spheroid']
+        sphere_name = srs["spheroid"]
 
         if not string:
             return sphere_name, sphere_params

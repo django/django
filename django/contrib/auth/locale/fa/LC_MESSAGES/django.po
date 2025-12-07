@@ -4,8 +4,9 @@
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
+# Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kaveh Karimi, 2015
+# cef32bddc4c7e18de7e89af20a3a57ef_18bb97f, 2015
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-08-20 15:54+0000\n"
-"Last-Translator: Ahmad Hosseini <ahmadly.com@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-19 17:35+0000\n"
+"Last-Translator: Farshad Asadpour\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -139,6 +140,9 @@ msgstr "عامل کار"
 
 msgid "checksum"
 msgstr "جمع کنترلی"
+
+msgid "block size"
+msgstr "اندازه بلاک"
 
 msgid "name"
 msgstr "نام"

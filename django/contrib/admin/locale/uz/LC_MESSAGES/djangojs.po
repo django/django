@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Nuriddin Islamov, 2021
 # Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-12-13 21:48+0000\n"
-"Last-Translator: Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-12-15 16:52+0000\n"
+"Last-Translator: Nuriddin Islamov\n"
 "Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,22 +85,16 @@ msgstr ""
 "o'zgarishlaringiz yo'qotiladi."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Siz harakatni tanladingiz, lekin hali ham o'zgartirishlaringizni alohida "
-"maydonlarga saqlamadingiz. Iltimos saqlash uchun OK ni bosing. Harakatni "
-"qayta ishga tushurishingiz kerak bo'ladi."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Siz harakatni tanladingiz va alohida maydonlarda hech qanday o'zgartirishlar "
-"kiritmadingiz. Ehtimol siz Saqlash tugmasini emas, balki O'tish tugmasini "
-"qidirmoqdasiz."
 
 msgid "Now"
 msgstr "Hozir"
@@ -183,36 +178,84 @@ msgstr "Noyabr"
 msgid "December"
 msgstr "Dekabr"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "Ya"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "M"
+msgstr "Du"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "Se"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "W"
+msgstr "Ch"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "Pa"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "Ju"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "S"
+msgstr "Sh"
 
 msgid "Show"
 msgstr "Ko'rsatish"
 
 msgid "Hide"
-msgstr "Yashirish"
+msgstr "Bekitish"

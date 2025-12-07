@@ -5,6 +5,7 @@ objects corresponding to geographic model fields.
 
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
+
 from django.db.models.query_utils import DeferredAttribute
 
 
@@ -37,7 +38,7 @@ class SpatialProxy(DeferredAttribute):
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value
-        elif (geo_value is None) or (geo_value == ''):
+        elif (geo_value is None) or (geo_value == ""):
             geo_obj = None
         else:
             # Otherwise, a geometry or raster object is built using the field's
@@ -57,8 +58,10 @@ class SpatialProxy(DeferredAttribute):
         # The geographic type of the field.
         gtype = self.field.geom_type
 
-        if gtype == 'RASTER' and (value is None or isinstance(value, (str, dict, self._klass))):
-            # For raster fields, assure input is None or a string, dict, or
+        if gtype == "RASTER" and (
+            value is None or isinstance(value, (str, dict, self._klass))
+        ):
+            # For raster fields, ensure input is None or a string, dict, or
             # raster instance.
             pass
         elif isinstance(value, self._klass):
@@ -71,8 +74,10 @@ class SpatialProxy(DeferredAttribute):
             # Set geometries with None, WKT, HEX, or WKB
             pass
         else:
-            raise TypeError('Cannot set %s SpatialProxy (%s) with value of type: %s' % (
-                instance.__class__.__name__, gtype, type(value)))
+            raise TypeError(
+                "Cannot set %s SpatialProxy (%s) with value of type: %s"
+                % (instance.__class__.__name__, gtype, type(value))
+            )
 
         # Setting the objects dictionary with the value, and returning.
         instance.__dict__[self.field.attname] = value

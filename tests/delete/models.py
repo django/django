@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -34,35 +32,115 @@ class RChild(R):
     pass
 
 
+class RProxy(R):
+    class Meta:
+        proxy = True
+
+
 class RChildChild(RChild):
     pass
+
+
+class RelatedDbOptionGrandParent(models.Model):
+    pass
+
+
+class RelatedDbOptionParent(models.Model):
+    p = models.ForeignKey(RelatedDbOptionGrandParent, models.DB_CASCADE, null=True)
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
+
+class CascadeDbModel(models.Model):
+    name = models.CharField(max_length=30)
+    db_cascade = models.ForeignKey(
+        RelatedDbOptionParent, models.DB_CASCADE, related_name="db_cascade_set"
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
+
+class SetNullDbModel(models.Model):
+    db_setnull = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_NULL,
+        null=True,
+        related_name="db_setnull_set",
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_null"}
+
+
+class SetDefaultDbModel(models.Model):
+    db_setdefault = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_DEFAULT,
+        db_default=models.Value(1),
+        related_name="db_setdefault_set",
+    )
+    db_setdefault_none = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_DEFAULT,
+        db_default=None,
+        null=True,
+        related_name="db_setnull_nullable_set",
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_default"}
 
 
 class A(models.Model):
     name = models.CharField(max_length=30)
 
     auto = models.ForeignKey(R, models.CASCADE, related_name="auto_set")
-    auto_nullable = models.ForeignKey(R, models.CASCADE, null=True, related_name='auto_nullable_set')
-    setvalue = models.ForeignKey(R, models.SET(get_default_r), related_name='setvalue')
-    setnull = models.ForeignKey(R, models.SET_NULL, null=True, related_name='setnull_set')
-    setdefault = models.ForeignKey(R, models.SET_DEFAULT, default=get_default_r, related_name='setdefault_set')
-    setdefault_none = models.ForeignKey(
-        R, models.SET_DEFAULT,
-        default=None, null=True, related_name='setnull_nullable_set',
+    auto_nullable = models.ForeignKey(
+        R, models.CASCADE, null=True, related_name="auto_nullable_set"
     )
-    cascade = models.ForeignKey(R, models.CASCADE, related_name='cascade_set')
-    cascade_nullable = models.ForeignKey(R, models.CASCADE, null=True, related_name='cascade_nullable_set')
-    protect = models.ForeignKey(R, models.PROTECT, null=True, related_name='protect_set')
-    restrict = models.ForeignKey(R, models.RESTRICT, null=True, related_name='restrict_set')
-    donothing = models.ForeignKey(R, models.DO_NOTHING, null=True, related_name='donothing_set')
+    setvalue = models.ForeignKey(R, models.SET(get_default_r), related_name="setvalue")
+    setnull = models.ForeignKey(
+        R, models.SET_NULL, null=True, related_name="setnull_set"
+    )
+    setdefault = models.ForeignKey(
+        R, models.SET_DEFAULT, default=get_default_r, related_name="setdefault_set"
+    )
+    setdefault_none = models.ForeignKey(
+        R,
+        models.SET_DEFAULT,
+        default=None,
+        null=True,
+        related_name="setnull_nullable_set",
+    )
+    cascade = models.ForeignKey(R, models.CASCADE, related_name="cascade_set")
+    cascade_nullable = models.ForeignKey(
+        R, models.CASCADE, null=True, related_name="cascade_nullable_set"
+    )
+    protect = models.ForeignKey(
+        R, models.PROTECT, null=True, related_name="protect_set"
+    )
+    restrict = models.ForeignKey(
+        R, models.RESTRICT, null=True, related_name="restrict_set"
+    )
+    donothing = models.ForeignKey(
+        R, models.DO_NOTHING, null=True, related_name="donothing_set"
+    )
     child = models.ForeignKey(RChild, models.CASCADE, related_name="child")
-    child_setnull = models.ForeignKey(RChild, models.SET_NULL, null=True, related_name="child_setnull")
-    cascade_p = models.ForeignKey(P, models.CASCADE, related_name='cascade_p_set', null=True)
+    child_setnull = models.ForeignKey(
+        RChild, models.SET_NULL, null=True, related_name="child_setnull"
+    )
+    cascade_p = models.ForeignKey(
+        P, models.CASCADE, related_name="cascade_p_set", null=True
+    )
 
     # A OneToOneField is just a ForeignKey unique=True, so we don't duplicate
     # all the tests; just one smoke test to ensure on_delete works for it as
     # well.
-    o2o_setnull = models.ForeignKey(R, models.SET_NULL, null=True, related_name="o2o_nullable_set")
+    o2o_setnull = models.ForeignKey(
+        R, models.SET_NULL, null=True, related_name="o2o_nullable_set"
+    )
 
 
 class B(models.Model):
@@ -71,9 +149,20 @@ class B(models.Model):
 
 def create_a(name):
     a = A(name=name)
-    for name in ('auto', 'auto_nullable', 'setvalue', 'setnull', 'setdefault',
-                 'setdefault_none', 'cascade', 'cascade_nullable', 'protect',
-                 'restrict', 'donothing', 'o2o_setnull'):
+    for name in (
+        "auto",
+        "auto_nullable",
+        "setvalue",
+        "setnull",
+        "setdefault",
+        "setdefault_none",
+        "cascade",
+        "cascade_nullable",
+        "protect",
+        "restrict",
+        "donothing",
+        "o2o_setnull",
+    ):
         r = R.objects.create()
         setattr(a, name, r)
     a.child = RChild.objects.create()
@@ -85,7 +174,9 @@ def create_a(name):
 class M(models.Model):
     m2m = models.ManyToManyField(R, related_name="m_set")
     m2m_through = models.ManyToManyField(R, through="MR", related_name="m_through_set")
-    m2m_through_null = models.ManyToManyField(R, through="MRNull", related_name="m_through_null_set")
+    m2m_through_null = models.ManyToManyField(
+        R, through="MRNull", related_name="m_through_null_set"
+    )
 
 
 class MR(models.Model):
@@ -141,11 +232,11 @@ class Base(models.Model):
 
 
 class RelToBase(models.Model):
-    base = models.ForeignKey(Base, models.DO_NOTHING, related_name='rels')
+    base = models.ForeignKey(Base, models.DO_NOTHING, related_name="rels")
 
 
 class Origin(models.Model):
-    pass
+    r_proxy = models.ForeignKey("RProxy", models.CASCADE, null=True)
 
 
 class Referrer(models.Model):
@@ -157,13 +248,13 @@ class Referrer(models.Model):
 class SecondReferrer(models.Model):
     referrer = models.ForeignKey(Referrer, models.CASCADE)
     other_referrer = models.ForeignKey(
-        Referrer, models.CASCADE, to_field='unique_field', related_name='+'
+        Referrer, models.CASCADE, to_field="unique_field", related_name="+"
     )
 
 
 class DeleteTop(models.Model):
-    b1 = GenericRelation('GenericB1')
-    b2 = GenericRelation('GenericB2')
+    b1 = GenericRelation("GenericB1")
+    b2 = GenericRelation("GenericB2")
 
 
 class B1(models.Model):
@@ -186,14 +277,14 @@ class DeleteBottom(models.Model):
 class GenericB1(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    generic_delete_top = GenericForeignKey('content_type', 'object_id')
+    generic_delete_top = GenericForeignKey("content_type", "object_id")
 
 
 class GenericB2(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    generic_delete_top = GenericForeignKey('content_type', 'object_id')
-    generic_delete_bottom = GenericRelation('GenericDeleteBottom')
+    generic_delete_top = GenericForeignKey("content_type", "object_id")
+    generic_delete_bottom = GenericRelation("GenericDeleteBottom")
 
 
 class GenericDeleteBottom(models.Model):
@@ -204,4 +295,6 @@ class GenericDeleteBottom(models.Model):
 
 
 class GenericDeleteBottomParent(models.Model):
-    generic_delete_bottom = models.ForeignKey(GenericDeleteBottom, on_delete=models.CASCADE)
+    generic_delete_bottom = models.ForeignKey(
+        GenericDeleteBottom, on_delete=models.CASCADE
+    )

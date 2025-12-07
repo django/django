@@ -10,12 +10,14 @@ class PasswordResetTokenGenerator:
     Strategy object used to generate and check tokens for the password
     reset mechanism.
     """
+
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     algorithm = None
     _secret = None
+    _secret_fallbacks = None
 
     def __init__(self):
-        self.algorithm = self.algorithm or 'sha256'
+        self.algorithm = self.algorithm or "sha256"
 
     def _get_secret(self):
         return self._secret or settings.SECRET_KEY
@@ -25,12 +27,26 @@ class PasswordResetTokenGenerator:
 
     secret = property(_get_secret, _set_secret)
 
+    def _get_fallbacks(self):
+        if self._secret_fallbacks is None:
+            return settings.SECRET_KEY_FALLBACKS
+        return self._secret_fallbacks
+
+    def _set_fallbacks(self, fallbacks):
+        self._secret_fallbacks = fallbacks
+
+    secret_fallbacks = property(_get_fallbacks, _set_fallbacks)
+
     def make_token(self, user):
         """
         Return a token that can be used once to do a password reset
         for the given user.
         """
-        return self._make_token_with_timestamp(user, self._num_seconds(self._now()))
+        return self._make_token_with_timestamp(
+            user,
+            self._num_seconds(self._now()),
+            self.secret,
+        )
 
     def check_token(self, user, token):
         """
@@ -50,7 +66,13 @@ class PasswordResetTokenGenerator:
             return False
 
         # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(self._make_token_with_timestamp(user, ts), token):
+        for secret in [self.secret, *self.secret_fallbacks]:
+            if constant_time_compare(
+                self._make_token_with_timestamp(user, ts, secret),
+                token,
+            ):
+                break
+        else:
             return False
 
         # Check the timestamp is within limit.
@@ -59,16 +81,18 @@ class PasswordResetTokenGenerator:
 
         return True
 
-    def _make_token_with_timestamp(self, user, timestamp):
+    def _make_token_with_timestamp(self, user, timestamp, secret):
         # timestamp is number of seconds since 2001-1-1. Converted to base 36,
         # this gives us a 6 digit string until about 2069.
         ts_b36 = int_to_base36(timestamp)
         hash_string = salted_hmac(
             self.key_salt,
             self._make_hash_value(user, timestamp),
-            secret=self.secret,
+            secret=secret,
             algorithm=self.algorithm,
-        ).hexdigest()[::2]  # Limit to shorten the URL.
+        ).hexdigest()[
+            ::2
+        ]  # Limit to shorten the URL.
         return "%s-%s" % (ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
@@ -88,10 +112,14 @@ class PasswordResetTokenGenerator:
         """
         # Truncate microseconds so that tokens are consistent even if the
         # database doesn't support microseconds.
-        login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
+        login_timestamp = (
+            ""
+            if user.last_login is None
+            else user.last_login.replace(microsecond=0, tzinfo=None)
+        )
         email_field = user.get_email_field_name()
-        email = getattr(user, email_field, '') or ''
-        return f'{user.pk}{user.password}{login_timestamp}{timestamp}{email}'
+        email = getattr(user, email_field, "") or ""
+        return f"{user.pk}{user.password}{login_timestamp}{timestamp}{email}"
 
     def _num_seconds(self, dt):
         return int((dt - datetime(2001, 1, 1)).total_seconds())

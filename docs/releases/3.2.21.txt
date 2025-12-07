@@ -1,0 +1,14 @@
+===========================
+Django 3.2.21 release notes
+===========================
+
+*September 4, 2023*
+
+Django 3.2.21 fixes a security issue with severity "moderate" in 3.2.20.
+
+CVE-2023-41164: Potential denial of service vulnerability in ``django.utils.encoding.uri_to_iri()``
+===================================================================================================
+
+``django.utils.encoding.uri_to_iri()`` was subject to potential denial of
+service attack via certain inputs with a very large number of Unicode
+characters.

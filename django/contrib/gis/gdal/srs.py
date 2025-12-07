@@ -1,37 +1,38 @@
 """
-  The Spatial Reference class, represents OGR Spatial Reference objects.
+The Spatial Reference class, represents OGR Spatial Reference objects.
 
-  Example:
-  >>> from django.contrib.gis.gdal import SpatialReference
-  >>> srs = SpatialReference('WGS84')
-  >>> print(srs)
-  GEOGCS["WGS 84",
-      DATUM["WGS_1984",
-          SPHEROID["WGS 84",6378137,298.257223563,
-              AUTHORITY["EPSG","7030"]],
-          TOWGS84[0,0,0,0,0,0,0],
-          AUTHORITY["EPSG","6326"]],
-      PRIMEM["Greenwich",0,
-          AUTHORITY["EPSG","8901"]],
-      UNIT["degree",0.01745329251994328,
-          AUTHORITY["EPSG","9122"]],
-      AUTHORITY["EPSG","4326"]]
-  >>> print(srs.proj)
-  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> print(srs.ellipsoid)
-  (6378137.0, 6356752.3142451793, 298.25722356300003)
-  >>> print(srs.projected, srs.geographic)
-  False True
-  >>> srs.import_epsg(32140)
-  >>> print(srs.name)
-  NAD83 / Texas South Central
+Example:
+>>> from django.contrib.gis.gdal import SpatialReference
+>>> srs = SpatialReference('WGS84')
+>>> print(srs)
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.01745329251994328,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4326"]]
+>>> print(srs.proj)
++proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+>>> print(srs.ellipsoid)
+(6378137.0, 6356752.3142451793, 298.25722356300003)
+>>> print(srs.projected, srs.geographic)
+False True
+>>> srs.import_epsg(32140)
+>>> print(srs.name)
+NAD83 / Texas South Central
 """
+
 from ctypes import byref, c_char_p, c_int
 from enum import IntEnum
+from types import NoneType
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import srs as capi
 from django.utils.encoding import force_bytes, force_str
 
@@ -43,80 +44,83 @@ class AxisOrder(IntEnum):
 
 class SpatialReference(GDALBase):
     """
-    A wrapper for the OGRSpatialReference object.  According to the GDAL Web site,
-    the SpatialReference object "provide[s] services to represent coordinate
-    systems (projections and datums) and to transform between them."
+    A wrapper for the OGRSpatialReference object. According to the GDAL web
+    site, the SpatialReference object "provide[s] services to represent
+    coordinate systems (projections and datums) and to transform between them."
     """
+
     destructor = capi.release_srs
 
-    def __init__(self, srs_input='', srs_type='user', axis_order=None):
+    def __init__(self, srs_input="", srs_type="user", axis_order=None):
         """
         Create a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
         EPSG code, a PROJ string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        if not isinstance(axis_order, (type(None), AxisOrder)):
+        if not isinstance(axis_order, (NoneType, AxisOrder)):
             raise ValueError(
-                'SpatialReference.axis_order must be an AxisOrder instance.'
+                "SpatialReference.axis_order must be an AxisOrder instance."
             )
         self.axis_order = axis_order or AxisOrder.TRADITIONAL
-        if srs_type == 'wkt':
-            self.ptr = capi.new_srs(c_char_p(b''))
+        if srs_type == "wkt":
+            self.ptr = capi.new_srs(c_char_p(b""))
             self.import_wkt(srs_input)
-            if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
+            if self.axis_order == AxisOrder.TRADITIONAL:
                 capi.set_axis_strategy(self.ptr, self.axis_order)
-            elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
-                raise ValueError('%s is not supported in GDAL < 3.0.' % self.axis_order)
             return
         elif isinstance(srs_input, str):
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
                 srid = int(srs_input)
-                srs_input = 'EPSG:%d' % srid
+                srs_input = "EPSG:%d" % srid
             except ValueError:
                 pass
         elif isinstance(srs_input, int):
             # EPSG integer code was input.
-            srs_type = 'epsg'
+            srs_type = "epsg"
         elif isinstance(srs_input, self.ptr_type):
             srs = srs_input
-            srs_type = 'ogr'
+            srs_type = "ogr"
         else:
             raise TypeError('Invalid SRS type "%s"' % srs_type)
 
-        if srs_type == 'ogr':
+        if srs_type == "ogr":
             # Input is already an SRS pointer.
             srs = srs_input
         else:
             # Creating a new SRS pointer, using the string buffer.
-            buf = c_char_p(b'')
+            buf = c_char_p(b"")
             srs = capi.new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException('Could not create spatial reference from: %s' % srs_input)
+            raise SRSException(
+                "Could not create spatial reference from: %s" % srs_input
+            )
         else:
             self.ptr = srs
 
-        if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
+        if self.axis_order == AxisOrder.TRADITIONAL:
             capi.set_axis_strategy(self.ptr, self.axis_order)
-        elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
-            raise ValueError('%s is not supported in GDAL < 3.0.' % self.axis_order)
         # Importing from either the user input string or an integer SRID.
-        if srs_type == 'user':
+        if srs_type == "user":
             self.import_user_input(srs_input)
-        elif srs_type == 'epsg':
+        elif srs_type == "epsg":
             self.import_epsg(srs_input)
 
     def __getitem__(self, target):
         """
         Return the value of the given string attribute node, None if the node
-        doesn't exist.  Can also take a tuple as a parameter, (target, child),
-        where child is the index of the attribute in the WKT.  For example:
+        doesn't exist. Can also take a tuple as a parameter, (target, child),
+        where child is the index of the attribute in the WKT. For example:
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
+        >>> wkt = (
+        ...     'GEOGCS["WGS 84",'
+        ...     '  DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]'
+        ...     ']'
+        ... )
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
         >>> print(srs['GEOGCS'])
         WGS 84
@@ -128,7 +132,8 @@ class SpatialReference(GDALBase):
         4326
         >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
         0
-        >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbole.
+        >>> # For the units authority, have to use the pipe symbole.
+        >>> print(srs['UNIT|AUTHORITY'])
         EPSG
         >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
         9122
@@ -145,8 +150,8 @@ class SpatialReference(GDALBase):
     # #### SpatialReference Methods ####
     def attr_value(self, target, index=0):
         """
-        The attribute value for the given target node (e.g. 'PROJCS'). The index
-        keyword specifies an index of the child node to return.
+        The attribute value for the given target node (e.g. 'PROJCS'). The
+        index keyword specifies an index of the child node to return.
         """
         if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
@@ -154,11 +159,15 @@ class SpatialReference(GDALBase):
 
     def auth_name(self, target):
         "Return the authority name for the given string target node."
-        return capi.get_auth_name(self.ptr, force_bytes(target))
+        return capi.get_auth_name(
+            self.ptr, target if target is None else force_bytes(target)
+        )
 
     def auth_code(self, target):
         "Return the authority code for the given string target node."
-        return capi.get_auth_code(self.ptr, force_bytes(target))
+        return capi.get_auth_code(
+            self.ptr, target if target is None else force_bytes(target)
+        )
 
     def clone(self):
         "Return a clone of this SpatialReference object."
@@ -188,11 +197,11 @@ class SpatialReference(GDALBase):
     def name(self):
         "Return the name of this Spatial Reference."
         if self.projected:
-            return self.attr_value('PROJCS')
+            return self.attr_value("PROJCS")
         elif self.geographic:
-            return self.attr_value('GEOGCS')
+            return self.attr_value("GEOGCS")
         elif self.local:
-            return self.attr_value('LOCAL_CS')
+            return self.attr_value("LOCAL_CS")
         else:
             return None
 
@@ -200,7 +209,7 @@ class SpatialReference(GDALBase):
     def srid(self):
         "Return the SRID of top-level authority, or None if undefined."
         try:
-            return int(self.attr_value('AUTHORITY', 1))
+            return int(self.auth_code(target=None))
         except (TypeError, ValueError):
             return None
 
@@ -279,7 +288,9 @@ class SpatialReference(GDALBase):
 
     @property
     def local(self):
-        "Return True if this SpatialReference is local (root node is LOCAL_CS)."
+        """
+        Return True if this SpatialReference is local (root node is LOCAL_CS).
+        """
         return bool(capi.islocal(self.ptr))
 
     @property
@@ -333,19 +344,22 @@ class SpatialReference(GDALBase):
         return self.proj
 
     @property
-    def xml(self, dialect=''):
+    def xml(self, dialect=""):
         "Return the XML representation of this Spatial Reference."
         return capi.to_xml(self.ptr, byref(c_char_p()), force_bytes(dialect))
 
 
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."
+
     destructor = capi.destroy_ct
 
     def __init__(self, source, target):
         "Initialize on a source and target SpatialReference objects."
-        if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
-            raise TypeError('source and target must be of type SpatialReference')
+        if not isinstance(source, SpatialReference) or not isinstance(
+            target, SpatialReference
+        ):
+            raise TypeError("source and target must be of type SpatialReference")
         self.ptr = capi.new_ct(source._ptr, target._ptr)
         self._srs1_name = source.name
         self._srs2_name = target.name

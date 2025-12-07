@@ -8,7 +8,7 @@ def fromfile(file_h):
     """
     # If given a file name, get a real handle.
     if isinstance(file_h, str):
-        with open(file_h, 'rb') as file_h:
+        with open(file_h, "rb") as file_h:
             buf = file_h.read()
     else:
         buf = file_h.read()

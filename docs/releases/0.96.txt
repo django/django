@@ -98,19 +98,19 @@ Backslash escaping changed
 --------------------------
 
 The Django database API now escapes backslashes given as query parameters. If
-you have any database API code that matches backslashes, and it was working before
-(despite the lack of escaping), you'll have to change your code to "unescape" the
-slashes one level.
+you have any database API code that matches backslashes, and it was working
+before (despite the lack of escaping), you'll have to change your code to
+"unescape" the slashes one level.
 
 For example, this used to work::
 
     # Find text containing a single backslash
-    MyModel.objects.filter(text__contains='\\\\')
+    MyModel.objects.filter(text__contains="\\\\")
 
 The above is now incorrect, and should be rewritten as::
 
     # Find text containing a single backslash
-    MyModel.objects.filter(text__contains='\\')
+    MyModel.objects.filter(text__contains="\\")
 
 Removed ENABLE_PSYCO setting
 ----------------------------
@@ -119,7 +119,7 @@ The ``ENABLE_PSYCO`` setting no longer exists. If your settings file includes
 ``ENABLE_PSYCO`` it will have no effect; to use Psyco_, we recommend
 writing a middleware class to activate it.
 
-.. _psyco: http://psyco.sourceforge.net/
+.. _psyco: https://psyco.sourceforge.net/
 
 What's new in 0.96?
 ===================
@@ -133,7 +133,7 @@ New forms library
 
 ``django.newforms`` is Django's new form-handling library. It's a
 replacement for ``django.forms``, the old form/manipulator/validation
-framework.  Both APIs are available in 0.96, but over the next two
+framework. Both APIs are available in 0.96, but over the next two
 releases we plan to switch completely to the new forms system, and
 deprecate and remove the old system.
 
@@ -142,11 +142,11 @@ There are three elements to this transition:
 * We've copied the current ``django.forms`` to
   ``django.oldforms``. This allows you to upgrade your code *now*
   rather than waiting for the backwards-incompatible change and
-  rushing to fix your code after the fact.  Just change your
+  rushing to fix your code after the fact. Just change your
   import statements like this::
 
-      from django import forms             # 0.95-style
-      from django import oldforms as forms # 0.96-style
+      from django import forms  # 0.95-style
+      from django import oldforms as forms  # 0.96-style
 
 * The next official release of Django will move the current
   ``django.newforms`` to ``django.forms``. This will be a
@@ -173,18 +173,14 @@ natural use of URLconfs. For example, this URLconf::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('',
-        ('^myview/$', 'mysite.myapp.views.myview')
-    )
+    urlpatterns = patterns("", ("^myview/$", "mysite.myapp.views.myview"))
 
 can now be rewritten as::
 
     from django.conf.urls.defaults import *
     from mysite.myapp.views import myview
 
-    urlpatterns = patterns('',
-        ('^myview/$', myview)
-    )
+    urlpatterns = patterns("", ("^myview/$", myview))
 
 One useful application of this can be seen when using decorators; this
 change allows you to apply decorators to views *in your
@@ -197,12 +193,10 @@ easily::
     from mysite.myapp.models import MyModel
 
     info = {
-        "queryset" : MyModel.objects.all(),
+        "queryset": MyModel.objects.all(),
     }
 
-    urlpatterns = patterns('',
-        ('^myview/$', login_required(object_list), info)
-    )
+    urlpatterns = patterns("", ("^myview/$", login_required(object_list), info))
 
 Note that both syntaxes (strings and callables) are valid, and will continue to
 be valid for the foreseeable future.
@@ -212,14 +206,16 @@ The test framework
 
 Django now includes a test framework so you can start transmuting fear into
 boredom (with apologies to Kent Beck). You can write tests based on
-:mod:`doctest` or :mod:`unittest` and test your views with a simple test client.
+:mod:`doctest` or :mod:`unittest` and test your views with a simple test
+client.
 
 There is also new support for "fixtures" -- initial data, stored in any of the
 supported :doc:`serialization formats </topics/serialization>`, that will be
 loaded into your database at the start of your tests. This makes testing with
 real data much easier.
 
-See :doc:`the testing documentation </topics/testing/index>` for the full details.
+See :doc:`the testing documentation </topics/testing/index>` for the full
+details.
 
 Improvements to the admin interface
 -----------------------------------

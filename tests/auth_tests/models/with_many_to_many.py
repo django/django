@@ -21,18 +21,18 @@ class CustomUserWithM2M(AbstractBaseUser):
 
     custom_objects = CustomUserWithM2MManager()
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['orgs']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["orgs"]
 
 
 class CustomUserWithM2MThrough(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True)
-    orgs = models.ManyToManyField(Organization, through='Membership')
+    orgs = models.ManyToManyField(Organization, through="Membership")
 
     custom_objects = CustomUserWithM2MManager()
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['orgs']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["orgs"]
 
 
 class Membership(models.Model):

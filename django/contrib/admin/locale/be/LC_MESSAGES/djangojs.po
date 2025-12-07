@@ -2,23 +2,23 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020-2021
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 18:10+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
-"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025\n"
+"Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -26,11 +26,9 @@ msgstr "Даступныя %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Сьпіс даступных %s. Каб нешта абраць, пазначце патрэбнае ў полі ніжэй і "
-"пстрыкніце па стрэлцы «Абраць» між двума палямі."
+"Абярыце %s, выбраўшы іх, а потым націсніце кнопку са стрэлкай «Абраць»."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +37,17 @@ msgstr "Каб прасеяць даступныя %s, друкуйце ў гэ�
 msgid "Filter"
 msgstr "Прасеяць"
 
-msgid "Choose all"
-msgstr "Абраць усе"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Абраць усе %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Каб абраць усе %s, пстрыкніце тут."
+msgid "Choose selected %s"
+msgstr "Змяніць абраныя %s"
 
-msgid "Choose"
-msgstr "Абраць"
-
-msgid "Remove"
-msgstr "Прыбраць"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Выдаліць абраныя %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,18 +55,28 @@ msgstr "Абралі %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Сьпіс абраных %s. Каб нешта прыбраць, пазначце патрэбнае ў полі ніжэй і "
-"пстрыкніце па стрэлцы «Прыбраць» між двума палямі."
-
-msgid "Remove all"
-msgstr "Прыбраць усё"
+"Выдаліце ​​%s, выбраўшы іх, а потым націсніце кнопку са стрэлкай «Выдаліць»."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Каб прыбраць усе %s, пстрыкніце тут."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Друкуйце ў гэтым полі, каб прасеяць спіс выбраных %s."
+
+msgid "(click to clear)"
+msgstr "(націсніце каб ачысьціць)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Прыбраць усе %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s абраная можнасьць нябачна"
+msgstr[1] "%s абраныя можнасьці нябачны"
+msgstr[2] "%s абраныя можнасьці нябачны"
+msgstr[3] "%s абраныя можнасьці нябачны"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -237,6 +244,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Сне"
 
+msgid "Sunday"
+msgstr "Нядзеля"
+
+msgid "Monday"
+msgstr "Панядзелак"
+
+msgid "Tuesday"
+msgstr "Аўторак"
+
+msgid "Wednesday"
+msgstr "Серада"
+
+msgid "Thursday"
+msgstr "Чацьвер"
+
+msgid "Friday"
+msgstr "Пятніца"
+
+msgid "Saturday"
+msgstr "Субота"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Нд"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Пн"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Аўт"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Ср"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Чц"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Пт"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Сб"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Н"
@@ -264,9 +320,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Паказаць"
-
-msgid "Hide"
-msgstr "Схаваць"

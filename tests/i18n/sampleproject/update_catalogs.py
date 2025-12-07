@@ -13,7 +13,8 @@ blocktranslate. This issue is difficult to debug, it could be a problem with
 extraction, interpolation, or both.
 
 How this script helps:
- * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to templates.
+ * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to
+   templates.
  * Run this script.
  * Test extraction - verify the new msgid in sampleproject's django.po.
  * Add a translation to sampleproject's django.po.
@@ -31,7 +32,7 @@ import re
 import sys
 
 proj_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(proj_dir, '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(proj_dir, "..", "..", "..")))
 
 
 def update_translation_catalogs():
@@ -41,16 +42,16 @@ def update_translation_catalogs():
     prev_cwd = os.getcwd()
 
     os.chdir(proj_dir)
-    call_command('makemessages')
-    call_command('compilemessages')
+    call_command("makemessages")
+    call_command("compilemessages")
 
     # keep the diff friendly - remove 'POT-Creation-Date'
-    pofile = os.path.join(proj_dir, 'locale', 'fr', 'LC_MESSAGES', 'django.po')
+    pofile = os.path.join(proj_dir, "locale", "fr", "LC_MESSAGES", "django.po")
 
     with open(pofile) as f:
         content = f.read()
-    content = re.sub(r'^"POT-Creation-Date.+$\s', '', content, flags=re.MULTILINE)
-    with open(pofile, 'w') as f:
+    content = re.sub(r'^"POT-Creation-Date.+$\s', "", content, flags=re.MULTILINE)
+    with open(pofile, "w") as f:
         f.write(content)
 
     os.chdir(prev_cwd)

@@ -5,6 +5,7 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
+
 from django.db import models
 
 
@@ -76,15 +77,17 @@ class Pointer(models.Model):
 
 
 class Pointer2(models.Model):
-    other = models.OneToOneField(Target, models.CASCADE, related_name='second_pointer')
+    other = models.OneToOneField(Target, models.CASCADE, related_name="second_pointer")
 
 
 class HiddenPointer(models.Model):
-    target = models.OneToOneField(Target, models.CASCADE, related_name='hidden+')
+    target = models.OneToOneField(Target, models.CASCADE, related_name="hidden+")
 
 
 class ToFieldPointer(models.Model):
-    target = models.OneToOneField(Target, models.CASCADE, to_field='name', primary_key=True)
+    target = models.OneToOneField(
+        Target, models.CASCADE, to_field="name", primary_key=True
+    )
 
 
 # Test related objects visibility.

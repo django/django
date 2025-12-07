@@ -36,8 +36,16 @@ class ForeignObjectRel(FieldCacheMixin):
     null = True
     empty_strings_allowed = False
 
-    def __init__(self, field, to, related_name=None, related_query_name=None,
-                 limit_choices_to=None, parent_link=False, on_delete=None):
+    def __init__(
+        self,
+        field,
+        to,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        parent_link=False,
+        on_delete=None,
+    ):
         self.field = field
         self.model = to
         self.related_name = related_name
@@ -55,7 +63,8 @@ class ForeignObjectRel(FieldCacheMixin):
     # AttributeError
     @cached_property
     def hidden(self):
-        return self.is_hidden()
+        """Should the related object be hidden?"""
+        return bool(self.related_name) and self.related_name[-1] == "+"
 
     @cached_property
     def name(self):
@@ -71,16 +80,20 @@ class ForeignObjectRel(FieldCacheMixin):
         When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
-        target_fields = self.get_path_info()[-1].target_fields
+        target_fields = self.path_infos[-1].target_fields
         if len(target_fields) > 1:
-            raise exceptions.FieldError("Can't use target_field for multicolumn relations.")
+            raise exceptions.FieldError(
+                "Can't use target_field for multicolumn relations."
+            )
         return target_fields[0]
 
     @cached_property
     def related_model(self):
         if not self.field.model:
             raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class has been called.")
+                "This property can't be accessed before self.field.contribute_to_class "
+                "has been called."
+            )
         return self.field.model
 
     @cached_property
@@ -102,6 +115,12 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_lookup(self, lookup_name):
         return self.field.get_lookup(lookup_name)
 
+    def get_lookups(self):
+        return self.field.get_lookups()
+
+    def get_transform(self, name):
+        return self.field.get_transform(name)
+
     def get_internal_type(self):
         return self.field.get_internal_type()
 
@@ -110,7 +129,7 @@ class ForeignObjectRel(FieldCacheMixin):
         return self.field.db_type
 
     def __repr__(self):
-        return '<%s: %s.%s>' % (
+        return "<%s: %s.%s>" % (
             type(self).__name__,
             self.related_model._meta.app_label,
             self.related_model._meta.model_name,
@@ -138,9 +157,24 @@ class ForeignObjectRel(FieldCacheMixin):
     def __hash__(self):
         return hash(self.identity)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Delete the path_infos cached property because it can be recalculated
+        # at first invocation after deserialization. The attribute must be
+        # removed because subclasses like ManyToOneRel may have a PathInfo
+        # which contains an intermediate M2M table that's been dynamically
+        # created and doesn't exist in the .models module.
+        # This is a reverse relation, so there is no reverse_path_infos to
+        # delete.
+        state.pop("path_infos", None)
+        return state
+
     def get_choices(
-        self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-        limit_choices_to=None, ordering=(),
+        self,
+        include_blank=True,
+        blank_choice=BLANK_CHOICE_DASH,
+        limit_choices_to=None,
+        ordering=(),
     ):
         """
         Return choices with a default blank choices included, for use
@@ -153,19 +187,13 @@ class ForeignObjectRel(FieldCacheMixin):
         qs = self.related_model._default_manager.complex_filter(limit_choices_to)
         if ordering:
             qs = qs.order_by(*ordering)
-        return (blank_choice if include_blank else []) + [
-            (x.pk, str(x)) for x in qs
-        ]
+        return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
 
-    def is_hidden(self):
-        """Should the related object be hidden?"""
-        return bool(self.related_name) and self.related_name[-1] == '+'
+    def get_joining_fields(self):
+        return self.field.get_reverse_joining_fields()
 
-    def get_joining_columns(self):
-        return self.field.get_reverse_joining_columns()
-
-    def get_extra_restriction(self, where_class, alias, related_alias):
-        return self.field.get_extra_restriction(where_class, related_alias, alias)
+    def get_extra_restriction(self, alias, related_alias):
+        return self.field.get_extra_restriction(related_alias, alias)
 
     def set_field_name(self):
         """
@@ -177,6 +205,10 @@ class ForeignObjectRel(FieldCacheMixin):
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
 
+    @cached_property
+    def accessor_name(self):
+        return self.get_accessor_name()
+
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
@@ -187,22 +219,31 @@ class ForeignObjectRel(FieldCacheMixin):
         opts = model._meta if model else self.related_model._meta
         model = model or self.related_model
         if self.multiple:
-            # If this is a symmetrical m2m relation on self, there is no reverse accessor.
+            # If this is a symmetrical m2m relation on self, there is no
+            # reverse accessor.
             if self.symmetrical and model == self.model:
                 return None
         if self.related_name:
             return self.related_name
-        return opts.model_name + ('_set' if self.multiple else '')
+        return opts.model_name + ("_set" if self.multiple else "")
 
     def get_path_info(self, filtered_relation=None):
-        return self.field.get_reverse_path_info(filtered_relation)
+        if filtered_relation:
+            return self.field.get_reverse_path_info(filtered_relation)
+        else:
+            return self.field.reverse_path_infos
 
-    def get_cache_name(self):
+    @cached_property
+    def path_infos(self):
+        return self.get_path_info()
+
+    @cached_property
+    def cache_name(self):
         """
         Return the name of the cache key to use for storing an instance of the
         forward model on the reverse model.
         """
-        return self.get_accessor_name()
+        return self.accessor_name
 
 
 class ManyToOneRel(ForeignObjectRel):
@@ -220,10 +261,20 @@ class ManyToOneRel(ForeignObjectRel):
     reverse relations into actual fields.
     """
 
-    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-                 limit_choices_to=None, parent_link=False, on_delete=None):
+    def __init__(
+        self,
+        field,
+        to,
+        field_name,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        parent_link=False,
+        on_delete=None,
+    ):
         super().__init__(
-            field, to,
+            field,
+            to,
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
@@ -234,13 +285,13 @@ class ManyToOneRel(ForeignObjectRel):
         self.field_name = field_name
 
     def __getstate__(self):
-        state = self.__dict__.copy()
-        state.pop('related_model', None)
+        state = super().__getstate__()
+        state.pop("related_model", None)
         return state
 
     @property
     def identity(self):
-        return super().identity + (self.field_name,)
+        return (*super().identity, self.field_name)
 
     def get_related_field(self):
         """
@@ -248,7 +299,9 @@ class ManyToOneRel(ForeignObjectRel):
         """
         field = self.model._meta.get_field(self.field_name)
         if not field.concrete:
-            raise exceptions.FieldDoesNotExist("No related field named '%s'" % self.field_name)
+            raise exceptions.FieldDoesNotExist(
+                "No related field named '%s'" % self.field_name
+            )
         return field
 
     def set_field_name(self):
@@ -263,10 +316,21 @@ class OneToOneRel(ManyToOneRel):
     flags for the reverse relation.
     """
 
-    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-                 limit_choices_to=None, parent_link=False, on_delete=None):
+    def __init__(
+        self,
+        field,
+        to,
+        field_name,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        parent_link=False,
+        on_delete=None,
+    ):
         super().__init__(
-            field, to, field_name,
+            field,
+            to,
+            field_name,
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
@@ -285,11 +349,21 @@ class ManyToManyRel(ForeignObjectRel):
     flags for the reverse relation.
     """
 
-    def __init__(self, field, to, related_name=None, related_query_name=None,
-                 limit_choices_to=None, symmetrical=True, through=None,
-                 through_fields=None, db_constraint=True):
+    def __init__(
+        self,
+        field,
+        to,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        symmetrical=True,
+        through=None,
+        through_fields=None,
+        db_constraint=True,
+    ):
         super().__init__(
-            field, to,
+            field,
+            to,
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
@@ -308,9 +382,10 @@ class ManyToManyRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (
+        return (
+            *super().identity,
             self.through,
-            self.through_fields,
+            make_hashable(self.through_fields),
             self.db_constraint,
         )
 
@@ -324,7 +399,7 @@ class ManyToManyRel(ForeignObjectRel):
             field = opts.get_field(self.through_fields[0])
         else:
             for field in opts.fields:
-                rel = getattr(field, 'remote_field', None)
+                rel = getattr(field, "remote_field", None)
                 if rel and rel.model == self.model:
                     break
         return field.foreign_related_fields[0]

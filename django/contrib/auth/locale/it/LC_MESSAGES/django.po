@@ -1,21 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Davide Targa <davide.targa@gmail.com>, 2021
 # Federico Capoano <federico.capoano@teletu.it>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # palmux <palmux@gmail.com>, 2015,2019
+# Paolo Melchiorre <paolo@melchiorre.org>, 2023
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-24 08:45+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -76,8 +78,8 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Le password grezze non vengono salvate, quindi non è possibile visualizzare "
-"la password di questo utente, ma è possibile modificarla utilizzando <a href="
-"\"{}\">questo form</a>."
+"la password di questo utente, ma è possibile modificarla utilizzando <a "
+"href=\"{}\">questo form</a>."
 
 #, python-format
 msgid ""
@@ -141,6 +143,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr "dimensione del blocco"
 
 msgid "name"
 msgstr "nome"
@@ -242,12 +247,16 @@ msgstr[0] ""
 msgstr[1] ""
 "Questa password è troppo corta. Deve contenere almeno %(min_length)d "
 "caratteri."
+msgstr[2] ""
+"Questa password è troppo corta. Deve contenere almeno %(min_length)d "
+"caratteri."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "La tua password deve contenere almeno %(min_length)d carattere."
 msgstr[1] "La tua password deve contenere almeno %(min_length)d caratteri."
+msgstr[2] "La tua password deve contenere almeno %(min_length)d caratteri."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -275,11 +284,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Password reset su %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Immetti un nome utente valido. Questo campo può contenere solo lettere "
-"dell'alfabeto inglese, numeri e caratteri @/./+/-/_ ."
+"Inserisci un nome utente valido. Questo valore può contenere solo lettere "
+"non accentate minuscole a-z e maiuscole A-Z, numeri ed i caratteri @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

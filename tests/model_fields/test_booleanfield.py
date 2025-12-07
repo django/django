@@ -9,10 +9,10 @@ from .models import BooleanModel, FksToBooleans, NullBooleanModel
 class BooleanFieldTests(TestCase):
     def _test_get_prep_value(self, f):
         self.assertIs(f.get_prep_value(True), True)
-        self.assertIs(f.get_prep_value('1'), True)
+        self.assertIs(f.get_prep_value("1"), True)
         self.assertIs(f.get_prep_value(1), True)
         self.assertIs(f.get_prep_value(False), False)
-        self.assertIs(f.get_prep_value('0'), False)
+        self.assertIs(f.get_prep_value("0"), False)
         self.assertIs(f.get_prep_value(0), False)
         self.assertIsNone(f.get_prep_value(None))
 
@@ -37,7 +37,7 @@ class BooleanFieldTests(TestCase):
         BooleanField with choices and defaults doesn't generate a formfield
         with the blank option (#9640, #10549).
         """
-        choices = [(1, 'Si'), (2, 'No')]
+        choices = [(1, "Si"), (2, "No")]
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
@@ -46,9 +46,9 @@ class BooleanFieldTests(TestCase):
         BooleanField with choices and no default should generated a formfield
         with the blank option.
         """
-        choices = [(1, 'Si'), (2, 'No')]
+        choices = [(1, "Si"), (2, "No")]
         f = models.BooleanField(choices=choices)
-        self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
+        self.assertEqual(f.formfield().choices, [("", "---------")] + choices)
 
     def test_nullbooleanfield_formfield(self):
         f = models.BooleanField(null=True)
@@ -71,11 +71,6 @@ class BooleanFieldTests(TestCase):
         b4.refresh_from_db()
         self.assertIs(b4.nbfield, False)
 
-        # When an extra clause exists, the boolean conversions are applied with
-        # an offset (#13293).
-        b5 = BooleanModel.objects.all().extra(select={'string_col': 'string'})[0]
-        self.assertNotIsInstance(b5.pk, bool)
-
     def test_select_related(self):
         """
         Boolean fields retrieved via select_related() should return booleans.
@@ -88,7 +83,7 @@ class BooleanFieldTests(TestCase):
         m2 = FksToBooleans.objects.create(bf=bmf, nbf=nbmf)
 
         # select_related('fk_field_name')
-        ma = FksToBooleans.objects.select_related('bf').get(pk=m1.id)
+        ma = FksToBooleans.objects.select_related("bf").get(pk=m1.id)
         self.assertIs(ma.bf.bfield, True)
         self.assertIs(ma.nbf.nbfield, True)
 
@@ -104,7 +99,7 @@ class BooleanFieldTests(TestCase):
         """
         A BooleanField defaults to None, which isn't a valid value (#15124).
         """
-        boolean_field = BooleanModel._meta.get_field('bfield')
+        boolean_field = BooleanModel._meta.get_field("bfield")
         self.assertFalse(boolean_field.has_default())
         b = BooleanModel()
         self.assertIsNone(b.bfield)
@@ -118,7 +113,6 @@ class BooleanFieldTests(TestCase):
 
 
 class ValidationTest(SimpleTestCase):
-
     def test_boolean_field_doesnt_accept_empty_input(self):
         f = models.BooleanField()
         with self.assertRaises(ValidationError):

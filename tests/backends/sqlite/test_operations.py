@@ -1,13 +1,14 @@
+import sqlite3
 import unittest
 
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase
 
 from ..models import Person, Tag
 
 
-@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests.")
 class SQLiteOperationsTests(TestCase):
     def test_sql_flush(self):
         self.assertEqual(
@@ -34,7 +35,7 @@ class SQLiteOperationsTests(TestCase):
                 'DELETE FROM "backends_person";',
                 'DELETE FROM "backends_tag";',
                 'DELETE FROM "backends_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzz'
-                'zzzzzzzzzzzzzzzzzzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzz'
+                "zzzzzzzzzzzzzzzzzzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzz"
                 'zzzzzzzzzzzzzzzzzzzzzzz";',
             ],
         )
@@ -50,7 +51,7 @@ class SQLiteOperationsTests(TestCase):
                 'DELETE FROM "backends_person";',
                 'DELETE FROM "backends_tag";',
                 'UPDATE "sqlite_sequence" SET "seq" = 0 WHERE "name" IN '
-                '(\'backends_person\', \'backends_tag\');',
+                "('backends_person', 'backends_tag');",
             ],
         )
 
@@ -68,13 +69,16 @@ class SQLiteOperationsTests(TestCase):
                 'DELETE FROM "backends_person";',
                 'DELETE FROM "backends_tag";',
                 'DELETE FROM "backends_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzz'
-                'zzzzzzzzzzzzzzzzzzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzz'
+                "zzzzzzzzzzzzzzzzzzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzz"
                 'zzzzzzzzzzzzzzzzzzzzzzz";',
             ],
         )
-        self.assertIs(statements[-1].startswith(
-            'UPDATE "sqlite_sequence" SET "seq" = 0 WHERE "name" IN ('
-        ), True)
+        self.assertIs(
+            statements[-1].startswith(
+                'UPDATE "sqlite_sequence" SET "seq" = 0 WHERE "name" IN ('
+            ),
+            True,
+        )
         self.assertIn("'backends_person'", statements[-1])
         self.assertIn("'backends_tag'", statements[-1])
         self.assertIn(
@@ -82,4 +86,56 @@ class SQLiteOperationsTests(TestCase):
             "zzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
             "zzz'",
             statements[-1],
+        )
+
+    def test_bulk_batch_size(self):
+        self.assertEqual(connection.ops.bulk_batch_size([], [Person()]), 1)
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        self.assertEqual(
+            connection.ops.bulk_batch_size([first_name_field], [Person()]),
+            connection.features.max_query_params,
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], [Person()]
+            ),
+            connection.features.max_query_params // 2,
+        )
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [composite_pk, first_name_field], [Person()]
+            ),
+            connection.features.max_query_params // 3,
+        )
+
+    def test_bulk_batch_size_respects_variable_limit(self):
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        limit_name = sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER
+        current_limit = connection.features.max_query_params
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], [Person()]
+            ),
+            current_limit // 2,
+        )
+        new_limit = min(42, current_limit)
+        try:
+            connection.connection.setlimit(limit_name, new_limit)
+            self.assertEqual(
+                connection.ops.bulk_batch_size(
+                    [first_name_field, last_name_field], [Person()]
+                ),
+                new_limit // 2,
+            )
+        finally:
+            connection.connection.setlimit(limit_name, current_limit)
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], [Person()]
+            ),
+            current_limit // 2,
         )

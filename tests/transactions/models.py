@@ -6,6 +6,7 @@ each transaction upon a write, but you can decorate a function to get
 commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
+
 from django.db import models
 
 
@@ -15,7 +16,7 @@ class Reporter(models.Model):
     email = models.EmailField()
 
     class Meta:
-        ordering = ('first_name', 'last_name')
+        ordering = ("first_name", "last_name")
 
     def __str__(self):
         return ("%s %s" % (self.first_name, self.last_name)).strip()

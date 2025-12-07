@@ -62,7 +62,7 @@ class name.
 
 .. class:: Debug(msg, hint=None, obj=None, id=None)
 .. class:: Info(msg, hint=None, obj=None, id=None)
-.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Warning(msg, hint=None, obj=None, id=None)
 .. class:: Error(msg, hint=None, obj=None, id=None)
 .. class:: Critical(msg, hint=None, obj=None, id=None)
 
@@ -77,11 +77,12 @@ Django's system checks are organized using the following tags:
 * ``async_support``: Checks asynchronous-related configuration.
 * ``caches``: Checks cache related configuration.
 * ``compatibility``: Flags potential problems with version upgrades.
+* ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
-  are not run by default because they do more than static code analysis as
-  regular checks do. They are only run by the :djadmin:`migrate` command or if
-  you specify configured database aliases using the ``--database`` option when
-  calling the :djadmin:`check` command.
+  are not run by default because they do more than only static code analysis as
+  most regular checks do. They are only run by the :djadmin:`migrate` command
+  or if you specify configured database aliases using the ``--database`` option
+  when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -93,14 +94,6 @@ Django's system checks are organized using the following tags:
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
-
-.. versionchanged:: 3.2
-
-    The ``sites`` tag was added.
-
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
 
 Core system checks
 ==================
@@ -161,8 +154,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 Managing files
 --------------
 
-.. versionadded:: 4.0
-
 The following checks verify your setup for :doc:`/topics/files`:
 
 * **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
@@ -175,9 +166,11 @@ Model fields
 * **fields.E002**: Field names must not contain ``"__"``.
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
-* **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable returning ``(actual value,
-  human readable name)`` tuples.
+* **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
+  ordered iterable (e.g. a list or tuple, but not a set).
+* **fields.E005**: ``choices`` must be a mapping of actual values to human
+  readable names or an iterable containing ``(actual value, human readable
+  name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
@@ -185,6 +178,10 @@ Model fields
   ``choices`` (``<count>`` characters).
 * **fields.E010**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances.
+* **fields.E011**: ``<database>`` does not support default database values with
+  expressions (``db_default``).
+* **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
+* **fields.E013**: ``CompositePrimaryKey`` must be named ``pk``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -192,25 +189,38 @@ Model fields
 * **fields.E121**: ``max_length`` must be a positive integer.
 * **fields.W122**: ``max_length`` is ignored when used with
   ``<integer field type>``.
-* **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
+* **fields.E130**: ``DecimalField``\s must define a ``decimal_places``
+  attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
-* **fields.E133**: ``max_digits`` must be a non-negative integer.
-* **fields.E134**: ``max_digits`` must be greater or equal to ``decimal_places``.
+* **fields.E133**: ``max_digits`` must be a positive integer.
+* **fields.E134**: ``max_digits`` must be greater or equal to
+  ``decimal_places``.
+* **fields.E135**: ``DecimalField``’s ``max_digits`` and ``decimal_places``
+  must both be defined or both omitted.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
-* **fields.E150**: ``GenericIPAddressField``\s cannot accept blank values if
-  null values are not allowed, as blank values are stored as nulls.
+* **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if
+  ``null=False``, as blank values are stored as nulls.
 * **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default``
   are mutually exclusive. Only one of these options may be present.
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.W163**: ``<database>`` does not support comments on columns
+  (``db_comment``).
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
 * **fields.E180**: ``<database>`` does not support ``JSONField``\s.
 * **fields.E190**: ``<database>`` does not support a database collation on
   ``<field_type>``\s.
+* **fields.E220**: ``<database>`` does not support ``GeneratedField``\s.
+* **fields.E221**: ``<database>`` does not support non-persisted
+  ``GeneratedField``\s.
+* **fields.E222**: ``<database>`` does not support persisted
+  ``GeneratedField``\s.
+* **fields.E223**: ``GeneratedField.output_field`` has errors: ...
+* **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -233,6 +243,21 @@ Model fields
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
   except for support in historical migrations.
+* **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E905**: ``django.contrib.postgres.fields.CICharField`` is removed
+  except for support in historical migrations.
+* **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E906**: ``django.contrib.postgres.fields.CIEmailField`` is removed
+  except for support in historical migrations.
+* **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E907**: ``django.contrib.postgres.fields.CITextField`` is removed
+  except for support for historical migrations.
 
 File fields
 ~~~~~~~~~~~
@@ -251,17 +276,18 @@ Related fields
   either not installed, or is abstract.
 * **fields.E301**: Field defines a relation with the model
   ``<app_label>.<model>`` which has been swapped out.
-* **fields.E302**: Accessor for field ``<app_label>.<model>.<field name>``
-  clashes with field ``<app_label>.<model>.<field name>``.
-* **fields.E303**: Reverse query name for field
-  ``<app_label>.<model>.<field name>`` clashes with field
+* **fields.E302**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with field name
   ``<app_label>.<model>.<field name>``.
-* **fields.E304**: Field name ``<app_label>.<model>.<field name>`` clashes with
-  accessor for ``<app_label>.<model>.<field name>``.
-* **fields.E305**: Field name ``<app_label>.<model>.<field name>`` clashes with
-  reverse query name for ``<app_label>.<model>.<field name>``.
-* **fields.E306**: Related name must be a valid Python identifier or end with
-  a ``'+'``.
+* **fields.E303**: Reverse query name for ``<app_label>.<model>.<field name>``
+  clashes with field name ``<app_label>.<model>.<field name>``.
+* **fields.E304**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with reverse accessor for
+  ``<app_label>.<model>.<field name>``.
+* **fields.E305**: Reverse query name for ``<app_label>.<model>.<field name>``
+  clashes with reverse query name for ``<app_label>.<model>.<field name>``.
+* **fields.E306**: The name ``<name>`` is invalid ``related_name`` for field
+  ``<model>.<field name>``.
 * **fields.E307**: The field ``<app label>.<model>.<field name>`` was declared
   with a lazy reference to ``<app label>.<model>``, but app ``<app label>``
   isn't installed or doesn't provide model ``<model>``.
@@ -275,9 +301,16 @@ Related fields
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
   related model ``<app label>.<model>``.
-* **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
-* **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
-  default value.
+* **fields.E320**: Field specifies ``on_delete=<set null option>``, but cannot
+  be null.
+* **fields.E321**: Field specifies ``on_delete=SET_DEFAULT``, but has no
+  ``default`` value.
+* **fields.E322**: Field specifies ``on_delete=DB_SET_DEFAULT``, but has no
+  ``db_default`` value.
+* **fields.E323**: Field specifies database/Python-level on_delete variant, but
+  referenced model uses python/database-level variant.
+* **fields.E324**: ``<database>`` does not support
+  ``<database delete option>``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
@@ -302,7 +335,8 @@ Related fields
   ``<model>``.
 * **fields.E338**: The intermediary model ``<through model>`` has no field
   ``<field name>``.
-* **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
+* **fields.E339**: ``<model>.<field name>`` is not a foreign key to
+  ``<model>``.
 * **fields.E340**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W340**: ``null`` has no effect on ``ManyToManyField``.
@@ -310,9 +344,16 @@ Related fields
 * **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
   effect as using a ``OneToOneField``.
 * **fields.W343**: ``limit_choices_to`` has no effect on ``ManyToManyField``
-  with a ``through`` model.
+  with a ``through`` model. *This check appeared before Django 4.0.*
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
+* **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
+  symmetrical relationship, e.g. to "self".
+* **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
+* **fields.E347**: Field defines a relation involving model ``<model>`` which
+  has a ``CompositePrimaryKey`` and such relations are not supported.
+* **fields.E348**: Related name ``<related_name>`` for ``<model>.<field name>``
+  clashes with the name of a model manager.
 
 Models
 ------
@@ -326,32 +367,35 @@ Models
   sets ``primary_key=True``.
 * **models.E005**: The field ``<field name>`` from parent model ``<model>``
   clashes with the field ``<field name>`` from parent model ``<model>``.
-* **models.E006**: The field clashes with the field ``<field name>`` from model
-  ``<model>``.
+* **models.E006**: The field ``<field name>`` clashes with the field
+  ``<field name>`` from model ``<model>``.
 * **models.E007**: Field ``<field name>`` has column name ``<column name>``
   that is used by another field.
-* **models.E008**: ``index_together`` must be a list or tuple.
+* **models.E008**: ``index_together`` must be a list or tuple. *This check
+  appeared before Django 5.1.*
 * **models.E009**: All ``index_together`` elements must be lists or tuples.
+  *This check appeared before Django 5.1.*
 * **models.E010**: ``unique_together`` must be a list or tuple.
 * **models.E011**: All ``unique_together`` elements must be lists or tuples.
-* **models.E012**: ``constraints/indexes/index_together/unique_together``
-  refers to the nonexistent field ``<field name>``.
-* **models.E013**: ``constraints/indexes/index_together/unique_together``
-  refers to a ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s
-  are not supported for that option.
+* **models.E012**: ``constraints/indexes/unique_together`` refers to the
+  nonexistent field ``<field name>``.
+* **models.E013**: ``constraints/indexes/unique_together`` refers to a
+  ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s are not
+  supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
 * **models.E015**: ``ordering`` refers to the nonexistent field, related field,
   or lookup ``<field name>``.
-* **models.E016**: ``constraints/indexes/index_together/unique_together``
-  refers to field ``<field_name>`` which is not local to model ``<model>``.
+* **models.E016**: ``constraints/indexes/unique_together`` refers to field
+  ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
 * **models.E018**: Autogenerated column name too long for field ``<field>``.
   Maximum length is ``<maximum length>`` for database ``<alias>``.
 * **models.E019**: Autogenerated column name too long for M2M field
   ``<M2M field>``. Maximum length is ``<maximum length>`` for database
   ``<alias>``.
-* **models.E020**: The ``<model>.check()`` class method is currently overridden.
+* **models.E020**: The ``<model>.check()`` class method is currently
+  overridden.
 * **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
   together.
 * **models.E022**: ``<function>`` contains a lazy reference to
@@ -391,11 +435,37 @@ Models
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
 * **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
+* **models.E042**: ``<field name>`` cannot be included in the composite
+  primary key.
 * **models.W042**: Auto-created primary key used when not defining a primary
-  key type, by default ``django.db.models.AutoField``.
+  key type, by default ``django.db.models.AutoField``. *This check appeared in
+  Django 3.2 - 5.2*.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
+* **models.W046**: ``<database>`` does not support comments on tables
+  (``db_table_comment``).
+* **models.W047**: ``<database>`` does not support unique constraints with
+  nulls distinct.
+* **models.E048**: ``constraints/indexes/unique_together`` refers to a
+  ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
+  not supported for that option.
+* **models.E049**: ``constraints/indexes/unique_together`` refers to a
+  ``ForeignObject`` ``<field name>`` with multiple ``from_fields``, which is
+  not supported for that option.
+* **models.E050**: The model cannot have related fields with both
+  database-level and Python-level ``on_delete`` variants.
+
+Management Commands
+-------------------
+
+The following checks verify custom management commands are correctly
+configured:
+
+* **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
+  the same ``autodetector``.
 
 Security
 --------
@@ -439,12 +509,13 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W005**: You have not set the
   :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
   your site is potentially vulnerable to attack via an insecure connection to a
-  subdomain. Only set this to ``True`` if you are certain that all subdomains of
-  your domain should be served exclusively via SSL.
+  subdomain. Only set this to ``True`` if you are certain that all subdomains
+  of your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
   ``'X-Content-Type-Options: nosniff'`` header. You should consider enabling
-  this header to prevent the browser from identifying content types incorrectly.
+  this header to prevent the browser from identifying content types
+  incorrectly.
 * **security.W007**: Your ``SECURE_BROWSER_XSS_FILTER`` setting is not
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
@@ -454,12 +525,13 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
-  a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
+  a load balancer or reverse-proxy server  to redirect all connections to
+  HTTPS.
 * **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters,
   less than 5 unique characters, or it's prefixed with ``'django-insecure-'``
   indicating that it was generated automatically by Django. Please generate a
-  long and random ``SECRET_KEY``, otherwise many of Django's security-critical
-  features will be vulnerable to attack.
+  long and random value, otherwise many of Django's security-critical features
+  will be vulnerable to attack.
 * **security.W010**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS` but you have not set
   :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
@@ -471,18 +543,19 @@ The following checks are run if you use the :option:`check --deploy` option:
   to ``True``. Using a secure-only session cookie makes it more difficult for
   network traffic sniffers to hijack user sessions.
 * **security.W012**: :setting:`SESSION_COOKIE_SECURE` is not set to ``True``.
-  Using a secure-only session cookie makes it more difficult for network traffic
-  sniffers to hijack user sessions.
+  Using a secure-only session cookie makes it more difficult for network
+  traffic sniffers to hijack user sessions.
 * **security.W013**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS`, but you have not set
   :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
-  cookie makes it more difficult for cross-site scripting attacks to hijack user
-  sessions.
+  cookie makes it more difficult for cross-site scripting attacks to hijack
+  user sessions.
 * **security.W014**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE`, but you have not set :setting:`SESSION_COOKIE_HTTPONLY`
-  to ``True``. Using an ``HttpOnly`` session cookie makes it more difficult for
-  cross-site scripting attacks to hijack user sessions.
+  :setting:`MIDDLEWARE`, but you have not set
+  :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
+  cookie makes it more difficult for cross-site scripting attacks to hijack
+  user sessions.
 * **security.W015**: :setting:`SESSION_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` session cookie makes it more difficult for cross-site
   scripting attacks to hijack user sessions.
@@ -512,6 +585,14 @@ The following checks are run if you use the :option:`check --deploy` option:
   to an invalid value.
 * **security.E024**: You have set the
   :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to an invalid value.
+* **security.W025**: Your
+  :setting:`SECRET_KEY_FALLBACKS[n] <SECRET_KEY_FALLBACKS>` has less than 50
+  characters, less than 5 unique characters, or it's prefixed with
+  ``'django-insecure-'`` indicating that it was generated automatically by
+  Django. Please generate a long and random value, otherwise many of Django's
+  security-critical features will be vulnerable to attack.
+* **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
+  (got ``<value>`` instead).
 
 The following checks verify that your security-related settings are correctly
 configured:
@@ -527,8 +608,8 @@ Signals
 -------
 
 * **signals.E001**: ``<handler>`` was connected to the ``<signal>`` signal with
-  a lazy reference to the sender ``<app label>.<model>``, but app ``<app label>``
-  isn't installed or doesn't provide model ``<model>``.
+  a lazy reference to the sender ``<app label>.<model>``, but app
+  ``<app label>`` isn't installed or doesn't provide model ``<model>``.
 
 Templates
 ---------
@@ -538,10 +619,17 @@ configured:
 
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
-  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option. *This check is
+  removed in Django 5.1 as system checks may now raise*
+  ``ImproperlyConfigured`` *instead.*
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
+* **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``. *This check was changed to* ``templates.W003`` *in Django
+  4.1.2*.
+* **templates.W003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``.
 
 Translation
 -----------
@@ -584,6 +672,10 @@ The following checks are performed on your URL configuration:
   take the correct number of arguments (…).
 * **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
   imported.
+* **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
+  ``<view>.as_view()`` instead of ``<view>``.
+* **urls.W010**: Your URL pattern ``<pattern>`` has an unmatched
+  ``<angle bracket>``.
 
 ``contrib`` app checks
 ======================
@@ -612,9 +704,10 @@ with the admin site:
 * **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
-* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
-  relationship model.
+* **admin.E013**: The value of
+  ``fields[n]/filter_horizontal[n]/filter_vertical[n]/fieldsets[n][m]`` cannot
+  include the ``ManyToManyField`` ``<field name>``, because that field manually
+  specifies a relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
 * **admin.E016**: The value of ``form`` must inherit from ``BaseModelForm``.
@@ -650,8 +743,9 @@ with the admin site:
 * **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
   is not a field of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
-* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
-  attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E035**: The value of ``readonly_fields[n]`` refers to
+  ``<field_name>``, which is not a callable, an attribute of
+  ``<ModelAdmin class>``, or an attribute of ``<model>``.
 * **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
 * **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
   ``<field name>``, which is not a field of ``<model>``.
@@ -678,11 +772,11 @@ with the admin site:
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
-  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
-  attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField`` field.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which
+  is not a callable or attribute of ``<ModelAdmin class>``, or an attribute,
+  method, or field on ``<model>``.
+* **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
+  field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
@@ -747,11 +841,11 @@ The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
 registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 
-* **admin.E301**: ``'ct_field'`` references ``<label>``, which is not a field
+* **admin.E301**: ``<model>`` has no ``GenericForeignKey``.
+* **admin.E302**: ``'ct_field'`` references ``<label>``, which is not a field
   on ``<model>``.
-* **admin.E302**: ``'ct_fk_field'`` references ``<label>``, which is not a
+* **admin.E303**: ``'ct_fk_field'`` references ``<label>``, which is not a
   field on ``<model>``.
-* **admin.E303**: ``<model>`` has no ``GenericForeignKey``.
 * **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
   field ``<field name>`` and object ID field ``<field name>``.
 
@@ -800,8 +894,8 @@ The following checks are performed on the default
   unique.
 * **auth.E005**: The permission codenamed ``<codename>`` clashes with a builtin
   permission for model ``<model>``.
-* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for model
-  ``<model>``.
+* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for
+  model ``<model>``.
 * **auth.E007**: The :attr:`verbose_name
   <django.db.models.Options.verbose_name>` of model ``<model>`` must be at most
   244 characters for its builtin permission names
@@ -818,6 +912,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------
@@ -834,18 +932,25 @@ The following checks are performed when a model contains a
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
 * **contenttypes.E005**: Model names must be at most 100 characters.
+* **contenttypes.E006**: ``<field>`` cannot use the database-level
+  ``on_delete`` variant.
 
 ``postgres``
 ------------
 
 The following checks are performed on :mod:`django.contrib.postgres` model
-fields:
+fields, indexes, and constraints:
 
 * **postgres.E001**: Base field for array has errors: ...
 * **postgres.E002**: Base field for array cannot be a related field.
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
+* **postgres.W004**: Base field for array has warnings: ...
+* **postgres.E005**: ``'django.contrib.postgres'`` must be in
+  ``INSTALLED_APPS`` in order to use ``<django.contrib.postgres feature>``.
+
+.. _sites-system-checks:
 
 ``sites``
 ---------
@@ -877,3 +982,5 @@ configured:
   :setting:`STATICFILES_DIRS` setting must not end with a slash.
 * **staticfiles.W004**: The directory ``<directory>`` in the
   :setting:`STATICFILES_DIRS` does not exist.
+* **staticfiles.E005**: The :setting:`STORAGES` setting must define a
+  ``staticfiles`` storage.

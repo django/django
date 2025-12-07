@@ -1,0 +1,17 @@
+- pk: "1"
+  model: fixtures_regress.animal
+  fields:
+    name: Cat
+    extra_name: Super Cat
+    latin_name: Felis catus
+    count: 3
+    weight: 1.2
+
+- pk: "1"
+  model: fixtures_regress.animal_extra
+  fields:
+    name: Nonexistent model
+    extra_name: test for ticket \#29522
+    latin_name: Felis catus
+    count: 3
+    weight: 1.2

@@ -24,6 +24,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
         from django.views.decorators.http import require_http_methods
 
+
         @require_http_methods(["GET", "POST"])
         def my_view(request):
             # I can assume now that only GET or POST requests make it this far
@@ -62,6 +63,11 @@ control caching behavior on particular views.
 
 .. function:: condition(etag_func=None, last_modified_func=None)
 
+.. function:: conditional_page()
+
+    This decorator provides the conditional GET operation handling of
+    :class:`~django.middleware.http.ConditionalGetMiddleware` to a view.
+
 .. function:: etag(etag_func)
 
 .. function:: last_modified(last_modified_func)
@@ -96,8 +102,8 @@ caching based on specific request headers.
 
 .. function:: vary_on_headers(*headers)
 
-    The ``Vary`` header defines which request headers a cache mechanism should take
-    into account when building its cache key.
+    The ``Vary`` header defines which request headers a cache mechanism should
+    take into account when building its cache key.
 
     See :ref:`using vary headers <using-vary-headers>`.
 
@@ -118,16 +124,18 @@ client-side caching.
 
 .. function:: never_cache(view_func)
 
+    This decorator adds an ``Expires`` header to the current date/time.
+
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
+
+    Each header is only added if it isn't already set.
 
 .. module:: django.views.decorators.common
 
 Common
 ======
-
-.. versionadded:: 3.2
 
 The decorators in :mod:`django.views.decorators.common` allow per-view
 customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
@@ -136,3 +144,4 @@ customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
 
     This decorator allows individual views to be excluded from
     :setting:`APPEND_SLASH` URL normalization.
+

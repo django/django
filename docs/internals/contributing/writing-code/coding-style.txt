@@ -12,7 +12,7 @@ Pre-commit checks
 `pre-commit <https://pre-commit.com>`_ is a framework for managing pre-commit
 hooks. These hooks help to identify simple issues before committing code for
 review. By checking for these issues before code review it allows the reviewer
-to focus on the change itself, and it can also help to reduce the number CI
+to focus on the change itself, and it can also help to reduce the number of CI
 runs.
 
 To use the tool, first install ``pre-commit`` and then the git hooks:
@@ -25,82 +25,59 @@ To use the tool, first install ``pre-commit`` and then the git hooks:
 On the first commit ``pre-commit`` will install the hooks, these are
 installed in their own environments and will take a short while to
 install on the first run. Subsequent checks will be significantly faster.
-If the an error is found an appropriate error message will be displayed.
-If the error was with ``isort`` then the tool will go ahead and fix them for
-you. Review the changes and re-stage for commit if you are happy with
-them.
+If an error is found an appropriate error message will be displayed.
+If the error was with ``black`` or ``isort`` then the tool will go ahead and
+fix them for you. Review the changes and re-stage for commit if you are happy
+with them.
 
 .. _coding-style-python:
 
 Python style
 ============
 
-* Please conform to the indentation style dictated in the ``.editorconfig``
-  file. We recommend using a text editor with `EditorConfig`_ support to avoid
-  indentation and whitespace issues. The Python files use 4 spaces for
-  indentation and the HTML files use 2 spaces.
+* All files should be formatted using the :pypi:`black` auto-formatter. This
+  will be run by ``pre-commit`` if that is configured.
+
+* The project repository includes an ``.editorconfig`` file. We recommend using
+  a text editor with `EditorConfig`_ support to avoid indentation and
+  whitespace issues. The Python files use 4 spaces for indentation and the HTML
+  files use 2 spaces.
 
 * Unless otherwise specified, follow :pep:`8`.
 
-  Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
-  file contains some excluded files (deprecated modules we don't care about
-  cleaning up and some third-party code that Django vendors) as well as some
-  excluded errors that we don't consider as gross violations. Remember that
-  :pep:`8` is only a guide, so respect the style of the surrounding code as a
-  primary goal.
+  Use :pypi:`flake8` to check for problems in this area. Note that our
+  ``.flake8`` file excludes some errors that we don't consider as gross
+  violations. Remember that :pep:`8` is only a guide, so respect the style of
+  the surrounding code as a primary goal.
 
-  An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
-  code to 79 characters if it means the code looks significantly uglier or is
-  harder to read. We allow up to 119 characters as this is the width of GitHub
-  code review; anything longer requires horizontal scrolling which makes review
-  more difficult. This check is included when you run ``flake8``. Documentation,
-  comments, and docstrings should be wrapped at 79 characters, even though
-  :pep:`8` suggests 72.
-
-* Use four spaces for indentation.
-
-* Use four space hanging indentation rather than vertical alignment::
-
-    raise AttributeError(
-        'Here is a multiline error message '
-        'shortened for clarity.'
-    )
-
-  Instead of::
-
-      raise AttributeError('Here is a multiline error message '
-                           'shortened for clarity.')
-
-  This makes better use of space and avoids having to realign strings if the
-  length of the first line changes.
-
-* Use single quotes for strings, or a double quote if the string contains a
-  single quote. Don't waste time doing unrelated refactoring of existing code
-  to conform to this style.
+  An exception to :pep:`8` is our rules on line lengths. We allow up to 88
+  characters in code, as this is the line length used by ``black``.
+  Documentation, comments, and docstrings should be wrapped at 79 characters.
+  These limits are checked when ``flake8`` is run.
 
 * String variable interpolation may use
-  :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
-  <f-strings>`, or :py:meth:`str.format` as appropriate, with the goal of
+  :ref:`%-formatting <old-string-formatting>`, :ref:`f-strings
+  <f-strings>`, or :meth:`str.format` as appropriate, with the goal of
   maximizing code readability.
 
   Final judgments of readability are left to the Merger's discretion. As a
   guide, f-strings should use only plain variable and property access, with
   prior local variable assignment for more complex cases::
 
-    # Allowed
-    f'hello {user}'
-    f'hello {user.name}'
-    f'hello {self.user.name}'
+    # Allowed
+    f"hello {user}"
+    f"hello {user.name}"
+    f"hello {self.user.name}"
 
     # Disallowed
-    f'hello {get_user()}'
-    f'you are {user.age * 365.25} days old'
+    f"hello {get_user()}"
+    f"you are {user.age * 365.25} days old"
 
     # Allowed with local variable assignment
     user = get_user()
-    f'hello {user}'
+    f"hello {user}"
     user_days_old = user.age * 365.25
-    f'you are {user_days_old} days old'
+    f"you are {user_days_old} days old"
 
   f-strings should not be used for any string that may require translation,
   including error and logging messages. In general ``format()`` is more
@@ -119,13 +96,12 @@ Python style
 
 * In docstrings, follow the style of existing docstrings and :pep:`257`.
 
-* In tests, use
-  :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
-  :meth:`~django.test.SimpleTestCase.assertWarnsMessage`
-  instead of :meth:`~unittest.TestCase.assertRaises` and
-  :meth:`~unittest.TestCase.assertWarns` so you can check the
-  exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
-  and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
+  :meth:`~django.test.SimpleTestCase.assertWarnsMessage` instead of
+  :meth:`~unittest.TestCase.assertRaises` and
+  :meth:`~unittest.TestCase.assertWarns` so you can check the exception or
+  warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex` and
+  :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
   expression matching.
 
   Use :meth:`assertIs(…, True/False)<unittest.TestCase.assertIs>` for testing
@@ -146,20 +122,23 @@ Python style
         """
         ...
 
+* Where applicable, use unpacking generalizations compliant with :pep:`448`,
+  such as merging mappings (``{**x, **y}``) or sequences (``[*a, *b]``). This
+  improves performance, readability, and maintainability while reducing errors.
+
 .. _coding-style-imports:
 
 Imports
 =======
 
-* Use `isort <https://github.com/PyCQA/isort#readme>`_ to automate import
-  sorting using the guidelines below.
+* Use :pypi:`isort` to automate import sorting using the guidelines below.
 
   Quick start:
 
   .. console::
 
-      $ python -m pip install isort >= 5.1.0
-      $ isort -rc .
+      $ python -m pip install "isort >= 7.0.0"
+      $ isort .
 
   This runs ``isort`` recursively from your current directory, modifying any
   files that don't conform to the guidelines. If you need to have imports out
@@ -169,9 +148,11 @@ Imports
 
 * Put imports in these groups: future, standard library, third-party libraries,
   other Django components, local Django component, try/excepts. Sort lines in
-  each group alphabetically by the full module name. Place all ``import module``
-  statements before ``from module import objects`` in each section. Use absolute
-  imports for other Django components and relative imports for local components.
+  each group alphabetically by the full module name. Place all
+  ``import module`` statements before ``from module import objects`` in each
+  section. Use absolute imports for other Django components and a one-dot
+  relative import (``from .foo import Bar``) for local components. Avoid
+  multi-dot relative imports.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lowercase items.
@@ -186,7 +167,7 @@ Imports
   For example (comments are for explanatory purposes only):
 
   .. code-block:: python
-      :caption: django/contrib/admin/example.py
+      :caption: ``django/contrib/admin/example.py``
 
       # future
       from __future__ import unicode_literals
@@ -201,7 +182,10 @@ Imports
       # Django
       from django.http import Http404
       from django.http.response import (
-          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          Http404,
+          HttpResponse,
+          HttpResponseNotAllowed,
+          StreamingHttpResponse,
           cookie,
       )
 
@@ -214,13 +198,13 @@ Imports
       except ImportError:
           yaml = None
 
-      CONSTANT = 'foo'
+      CONSTANT = "foo"
 
 
-      class Example:
-          # ...
+      class Example: ...
 
-* Use convenience imports whenever available. For example, do this::
+* Use convenience imports whenever available. For example, do this
+  ::
 
       from django.views import View
 
@@ -231,20 +215,149 @@ Imports
 Template style
 ==============
 
-* In Django template code, put one (and only one) space between the curly
-  brackets and the tag contents.
+Follow the below rules in Django template code.
+
+* ``{% extends %}`` should be the first non-comment line.
 
   Do this:
 
   .. code-block:: html+django
 
-      {{ foo }}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+  Or this:
+
+  .. code-block:: html+django
+
+      {# This is a comment #}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
 
   Don't do this:
 
   .. code-block:: html+django
 
-      {{foo}}
+      {% load i18n %}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+* Put exactly one space between ``{{``, variable contents, and ``}}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {{ user }}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {{user}}
+
+* In ``{% load ... %}``, list libraries in alphabetical order.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load i18n l10 tz %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% load l10 i18n tz %}
+
+* Put exactly one space between ``{%``, tag contents, and ``%}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load humanize %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {%load humanize%}
+
+* Put the ``{% block %}`` tag name in the ``{% endblock %}`` tag if it is not
+  on the same line.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock header %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock %}
+
+* Inside curly braces, separate tokens by single spaces, except for around the
+  ``.`` for attribute access and the ``|`` for a filter.
+
+  Do this:
+
+  .. code-block:: html+django
+
+    {% if user.name|lower == "admin" %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+    {% if user . name | lower  ==  "admin" %}
+
+    {{ user.name | upper }}
+
+* Within a template using ``{% extends %}``, avoid indenting top-level
+  ``{% block %}`` tags.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+      {% block content %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+        {% block content %}
+        ...
 
 View style
 ==========
@@ -254,13 +367,11 @@ View style
 
   Do this::
 
-      def my_view(request, foo):
-          # ...
+      def my_view(request, foo): ...
 
   Don't do this::
 
-      def my_view(req, foo):
-          # ...
+      def my_view(req, foo): ...
 
 Model style
 ===========
@@ -290,21 +401,13 @@ Model style
           last_name = models.CharField(max_length=40)
 
           class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
   Don't do this::
 
       class Person(models.Model):
-          first_name = models.CharField(max_length=20)
-          last_name = models.CharField(max_length=40)
           class Meta:
-              verbose_name_plural = 'people'
-
-  Don't do this, either::
-
-      class Person(models.Model):
-          class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
@@ -315,22 +418,29 @@ Model style
   * All database fields
   * Custom manager attributes
   * ``class Meta``
-  * ``def __str__()``
+  * ``def __str__()`` and other Python magic methods
   * ``def save()``
   * ``def get_absolute_url()``
   * Any custom methods
 
 * If ``choices`` is defined for a given model field, define each choice as a
-  list of tuples, with an all-uppercase name as a class attribute on the model.
+  mapping, with an all-uppercase name as a class attribute on the model.
   Example::
 
     class MyModel(models.Model):
-        DIRECTION_UP = 'U'
-        DIRECTION_DOWN = 'D'
-        DIRECTION_CHOICES = [
-            (DIRECTION_UP, 'Up'),
-            (DIRECTION_DOWN, 'Down'),
-        ]
+        DIRECTION_UP = "U"
+        DIRECTION_DOWN = "D"
+        DIRECTION_CHOICES = {
+            DIRECTION_UP: "Up",
+            DIRECTION_DOWN: "Down",
+        }
+
+  Alternatively, consider using :ref:`field-choices-enum-types`::
+
+    class MyModel(models.Model):
+        class Direction(models.TextChoices):
+            UP = "U", "Up"
+            DOWN = "D", "Down"
 
 Use of ``django.conf.settings``
 ===============================
@@ -345,7 +455,7 @@ as follows::
 
     from django.conf import settings
 
-    settings.configure({}, SOME_SETTING='foo')
+    settings.configure({}, SOME_SETTING="foo")
 
 However, if any setting is accessed before the ``settings.configure`` line,
 this will not work. (Internally, ``settings`` is a ``LazyObject`` which
@@ -375,8 +485,8 @@ Miscellaneous
   documentation </topics/i18n/index>` for details.
 
 * Remove ``import`` statements that are no longer used when you change code.
-  `flake8`_ will identify these imports for you. If an unused import needs to
-  remain for backwards-compatibility, mark the end of with ``# NOQA`` to
+  :pypi:`flake8` will identify these imports for you. If an unused import needs
+  to remain for backwards-compatibility, mark the end of with ``# NOQA`` to
   silence the flake8 warning.
 
 * Systematically remove all trailing whitespaces from your code as those
@@ -395,7 +505,6 @@ JavaScript style
 ================
 
 For details about the JavaScript code style used by Django, see
-:doc:`javascript`.
+:doc:`/internals/contributing/writing-code/javascript`.
 
 .. _editorconfig: https://editorconfig.org/
-.. _flake8: https://pypi.org/project/flake8/

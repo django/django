@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019-2020
+# F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-20 17:08+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +30,22 @@ msgstr "Belangrike datums"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objek met primêre sleutel %(key)r bestaan nie."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Ingediende vormdata stem nie ooreen nie. Probeer gerus weer."
+
 msgid "Password changed successfully."
 msgstr "Wagwoord is suksesvol verander."
+
+msgid "Password-based authentication was disabled."
+msgstr "Wagwoordgebaseerde aanmelding is gedeaktiveer."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Verander wagwoord: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Stel wagwoord: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Waarmerking en magtiging"
@@ -46,11 +56,17 @@ msgstr "wagwoord"
 msgid "last login"
 msgstr "laas aangemeld"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
+
 msgid "No password set."
 msgstr "Geen wagwoord gestel nie."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
+msgid "Reset password"
+msgstr "Herstel wagwoord"
+
+msgid "Set password"
+msgstr "Stel wagwoord"
 
 msgid "The two password fields didn’t match."
 msgstr "Die twee wagwoordvelde stem nie ooreen nie"
@@ -65,12 +81,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Tik die wagwoord net soos tevore om te bevestig."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Of die gebruiker met ’n wagwoord kan aanmeld of nie. ’n Gebruiker kan dalk "
+"steeds aanmeld op ’n ander manier indien gedeaktiveer, soos bv. LDAP of "
+"enkele aanmelding (Single Sign-On)."
+
+msgid "Password-based authentication"
+msgstr "Wagwoordgebaseerde aanmelding"
+
+msgid "Enabled"
+msgstr "Geaktiveer"
+
+msgid "Disabled"
+msgstr "Gedeaktiveer"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
 "Rou wagwoorde word nie gestoor nie, dus is daar geen manier om die gebruiker "
-"se wagwoord te sien nie, maar die wagwoord kan gewysig word met <a href="
-"\"{}\">hierdie vorm</a>."
+"se wagwoord te sien nie."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktiveer wagwoordgebaseerde aanmelding vir dié gebruiker deur ’n wagwoord te "
+"stel."
 
 #, python-format
 msgid ""
@@ -97,9 +135,6 @@ msgstr "Die ou wagwoord is verkeerd ingetik. Tik dit asb. weer in."
 
 msgid "Old password"
 msgstr "Ou wagwoord"
-
-msgid "Password (again)"
-msgstr "Wagwoord (weer)"
 
 msgid "algorithm"
 msgstr "algoritme"
@@ -133,6 +168,9 @@ msgstr "werkfaktor"
 
 msgid "checksum"
 msgstr "kontrolesom"
+
+msgid "block size"
+msgstr "blokgrootte"
 
 msgid "name"
 msgstr "naam"
@@ -224,16 +262,12 @@ msgid "users"
 msgstr "gebruikers"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Dié wagwoord is te kort. Dit moet ten minste %(min_length)d karakter bevat."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Dié wagwoord is te kort. Dit moet ten minste %d karakter lank wees."
 msgstr[1] ""
-"Dié wagwoord is te kort. Dit moet ten minste %(min_length)d karakters bevat."
+"Dié wagwoord is te kort. Dit moet ten minste %d karakters lank wees."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -266,11 +300,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Wagwoordherstel op %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Tik 'n geldige gebruikernaam. Dié waarde mag slegs alfabetletters, syfers en "
-"die karakters @/./+/-/_ bevat."
+"Tik ’n geldige gebruikernaam. Dié waarde mag slegs hoof- en kleinletters "
+"sonder aksente, syfers en die karakters @/./+/-/_ bevat."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

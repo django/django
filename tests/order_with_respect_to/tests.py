@@ -15,20 +15,19 @@ class OrderWithRespectToBaseTests(BaseOrderWithRespectToTests, TestCase):
 
 
 class OrderWithRespectToTests(SimpleTestCase):
-
-    @isolate_apps('order_with_respect_to')
+    @isolate_apps("order_with_respect_to")
     def test_duplicate_order_field(self):
         class Bar(models.Model):
             class Meta:
-                app_label = 'order_with_respect_to'
+                app_label = "order_with_respect_to"
 
         class Foo(models.Model):
             bar = models.ForeignKey(Bar, models.CASCADE)
             order = models.OrderWrt()
 
             class Meta:
-                order_with_respect_to = 'bar'
-                app_label = 'order_with_respect_to'
+                order_with_respect_to = "bar"
+                app_label = "order_with_respect_to"
 
         count = 0
         for field in Foo._meta.local_fields:
@@ -45,4 +44,6 @@ class TestOrderWithRespectToOneToOnePK(TestCase):
         c1 = d.component_set.create()
         c2 = d.component_set.create()
         d.set_component_order([c1.id, c2.id])
-        self.assertQuerysetEqual(d.component_set.all(), [c1.id, c2.id], attrgetter('pk'))
+        self.assertQuerySetEqual(
+            d.component_set.all(), [c1.id, c2.id], attrgetter("pk")
+        )

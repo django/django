@@ -1,0 +1,495 @@
+========================
+Django 5.2 release notes
+========================
+
+*April 2, 2025*
+
+Welcome to Django 5.2!
+
+These release notes cover the :ref:`new features <whats-new-5.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.2>` you
+should be aware of when upgrading from Django 5.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 5.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 4.2, will
+end in April 2026.
+
+Python compatibility
+====================
+
+Django 5.2 supports Python 3.10, 3.11, 3.12, 3.13, and 3.14 (as of 5.2.8). We
+**highly recommend** and only officially support the latest release of each
+series.
+
+.. _whats-new-5.2:
+
+What's new in Django 5.2
+========================
+
+Automatic models import in the ``shell``
+----------------------------------------
+
+The :djadmin:`shell` management command now automatically imports models from
+all installed apps. You can view further details of the imported objects by
+setting the ``--verbosity`` flag to 2 or more:
+
+.. console::
+
+    $ python -Wall manage.py shell --verbosity=2
+    6 objects imported automatically, including:
+
+      from django.contrib.admin.models import LogEntry
+      from django.contrib.auth.models import Group, Permission, User
+      from django.contrib.contenttypes.models import ContentType
+      from django.contrib.sessions.models import Session
+
+This :ref:`behavior can be customized <customizing-shell-auto-imports>` to add
+or remove automatic imports.
+
+Composite Primary Keys
+----------------------
+
+The new :class:`django.db.models.CompositePrimaryKey` allows tables to be
+created with a primary key consisting of multiple fields.
+
+To use a composite primary key, when defining a model set the ``pk`` attribute
+to be a ``CompositePrimaryKey``::
+
+    from django.db import models
+
+
+    class Release(models.Model):
+        pk = models.CompositePrimaryKey("version", "name")
+        version = models.IntegerField()
+        name = models.CharField(max_length=20)
+
+See :doc:`/topics/composite-primary-key` for more details.
+
+Simplified override of :class:`~django.forms.BoundField`
+--------------------------------------------------------
+
+Prior to version 5.2, overriding :meth:`.Field.get_bound_field` was the only
+option to use a custom :class:`~django.forms.BoundField`. Django now supports
+specifying the following attributes to customize form rendering:
+
+* :attr:`.BaseRenderer.bound_field_class` at the project level,
+* :attr:`.Form.bound_field_class` at the form level, and
+* :attr:`.Field.bound_field_class` at the field level.
+
+For example, to customize the ``BoundField`` of a ``Form`` class::
+
+    from django import forms
+
+
+    class CustomBoundField(forms.BoundField):
+
+        custom_class = "custom"
+
+        def css_classes(self, extra_classes=None):
+            result = super().css_classes(extra_classes)
+            if self.custom_class not in result:
+                result += f" {self.custom_class}"
+            return result.strip()
+
+
+    class CustomForm(forms.Form):
+        bound_field_class = CustomBoundField
+
+        name = forms.CharField(
+            label="Your Name",
+            max_length=100,
+            required=False,
+            widget=forms.TextInput(attrs={"class": "name-input-class"}),
+        )
+        email = forms.EmailField(label="Your Email")
+
+
+When rendering a ``CustomForm`` instance, the following HTML is included:
+
+.. code:: html
+
+    <div class="custom">
+      <label for="id_name">Your Name:</label>
+      <input type="text" name="name" class="name-input-class" maxlength="100" id="id_name">
+    </div>
+
+    <div class="custom">
+      <label for="id_email">Your Email:</label>
+      <input type="email" name="email" maxlength="320" required="" id="id_email">
+    </div>
+
+
+See :ref:`custom-boundfield` for more details about this feature.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
+
+* The value of a :class:`~django.db.models.URLField` now renders as a link.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Links to components in docstrings now supports custom link text, using the
+  format ``:role:`link text <link>```. See :ref:`documentation helpers
+  <admindocs-helpers>` for more details.
+
+* The :ref:`model pages <admindocs-model-reference>` are now restricted to
+  users with the corresponding view or change permissions.
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  870,000 to 1,000,000.
+
+* The following new asynchronous methods are now provided, using an ``a``
+  prefix:
+
+  * :meth:`.UserManager.acreate_user`
+  * :meth:`.UserManager.acreate_superuser`
+  * :meth:`.BaseUserManager.aget_by_natural_key`
+  * :meth:`.User.aget_user_permissions`
+  * :meth:`.User.aget_all_permissions`
+  * :meth:`.User.aget_group_permissions`
+  * :meth:`.User.ahas_perm`
+  * :meth:`.User.ahas_perms`
+  * :meth:`.User.ahas_module_perms`
+  * :meth:`.ModelBackend.aauthenticate`
+  * :meth:`.ModelBackend.aget_user_permissions`
+  * :meth:`.ModelBackend.aget_group_permissions`
+  * :meth:`.ModelBackend.aget_all_permissions`
+  * :meth:`.ModelBackend.ahas_perm`
+  * :meth:`.ModelBackend.ahas_module_perms`
+  * :meth:`.RemoteUserBackend.aauthenticate`
+  * :meth:`.RemoteUserBackend.aconfigure_user`
+
+* Auth backends can now provide async implementations which are used when
+  calling async auth functions (e.g.
+  :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching
+  which improves performance. See :ref:`adding an async interface
+  <writing-authentication-backends-async-interface>` for more details.
+
+* The :ref:`password validator classes <included-password-validators>`
+  now have a new method ``get_error_message()``, which can be overridden in
+  subclasses to customize the error messages.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* GDAL now supports curved geometries ``CurvePolygon``, ``CompoundCurve``,
+  ``CircularString``, ``MultiSurface``, and ``MultiCurve`` via the new
+  :attr:`.OGRGeometry.has_curve` property, and the
+  :meth:`.OGRGeometry.get_linear_geometry` and
+  :meth:`.OGRGeometry.get_curve_geometry` methods.
+
+* :lookup:`coveredby` and :lookup:`covers` lookup are now supported on MySQL.
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* All :class:`~django.utils.feedgenerator.SyndicationFeed` classes now support
+  a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
+  processing instruction will be added to the top of the document for each
+  stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* MySQL connections now default to using the ``utf8mb4`` character set,
+  instead of ``utf8``, which is an alias for the deprecated character set
+  ``utf8mb3``.
+
+* Oracle backends now support :ref:`connection pools <oracle-pool>`, by setting
+  ``"pool"`` in the :setting:`OPTIONS` part of your database configuration.
+
+Decorators
+~~~~~~~~~~
+
+* :func:`~django.utils.decorators.method_decorator` now supports wrapping
+  asynchronous view methods.
+
+Email
+~~~~~
+
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
+
+* The new :meth:`~django.core.mail.EmailMultiAlternatives.body_contains` method
+  returns a boolean indicating whether a provided text is contained in the
+  email ``body`` and in all attached MIME type ``text/*`` alternatives.
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* The attribute :attr:`.SafeExceptionReporterFilter.hidden_settings` now
+  treats values as sensitive if their name includes ``AUTH``.
+
+Forms
+~~~~~
+
+* The new :class:`~django.forms.ColorInput` form widget is for entering a color
+  in ``rrggbb`` hexadecimal format and renders as ``<input type="color" ...>``.
+  Some browsers support a visual color picker interface for this input type.
+
+* The new :class:`~django.forms.SearchInput` form widget is for entering search
+  queries and renders as ``<input type="search" ...>``.
+
+* The new :class:`~django.forms.TelInput` form widget is for entering telephone
+  numbers and renders as ``<input type="tel" ...>``.
+
+* The new ``field_id`` argument for :class:`~django.forms.ErrorList` allows an
+  HTML ``id`` attribute to be added in the error template. See
+  :attr:`.ErrorList.field_id` for details.
+
+* An :attr:`~django.forms.BoundField.aria_describedby` property is added to
+  ``BoundField`` to ease use of this HTML attribute in templates.
+
+* To improve accessibility for screen reader users ``aria-describedby`` is used
+  to associate form fields with their error messages. See
+  :ref:`how form errors are displayed <form-error-display>` for details.
+
+* The new asset object :class:`~django.forms.Script` is available for adding
+  custom HTML-attributes to JavaScript in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* A new warning is displayed when running :djadmin:`runserver`, indicating that
+  it is unsuitable for production. This warning can be suppressed by setting
+  the :envvar:`DJANGO_RUNSERVER_HIDE_WARNING` environment variable to
+  ``"true"``.
+
+* The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
+  ``Command.autodetector`` attribute for subclasses to override in order to use
+  a custom autodetector class.
+
+* The new :meth:`.BaseCommand.get_check_kwargs` method can be overridden in
+  custom commands to control the running of system checks, e.g. to opt into
+  database-dependent checks.
+
+Migrations
+~~~~~~~~~~
+
+* The new operation :class:`.AlterConstraint` is a no-op operation that alters
+  constraints without dropping and recreating constraints in the database.
+
+Models
+~~~~~~
+
+* The ``SELECT`` clause generated when using :meth:`.QuerySet.values` and
+  :meth:`.QuerySet.values_list` now matches the specified order of the
+  referenced expressions. Previously, the order was based on a set of
+  counterintuitive rules which made query combination through methods such as
+  :meth:`.QuerySet.union` unpredictable.
+
+* Added support for validation of model constraints which use a
+  :class:`~django.db.models.GeneratedField`.
+
+* The new :attr:`.Expression.set_returning` attribute specifies that the
+  expression contains a set-returning function, enforcing subquery evaluation.
+  This is necessary for many Postgres set-returning functions.
+
+* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+  longer required to be set on SQLite, which supports unlimited ``VARCHAR``
+  columns.
+
+* :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
+  options on PostgreSQL 17+.
+
+* The new :class:`~django.db.models.functions.JSONArray` database function
+  accepts a list of field names or expressions and returns a JSON array
+  containing those values.
+
+* The new :attr:`.Expression.allows_composite_expressions` attribute specifies
+  that the expression allows composite expressions, for example, to support
+  :ref:`composite primary keys <cpk-and-database-functions>`.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :attr:`.HttpResponse.text` property provides the string
+  representation of :attr:`.HttpResponse.content`.
+
+* The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
+  the preferred media type the client accepts.
+
+* The new ``preserve_request`` argument for
+  :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect`
+  determines whether the HTTP status codes 302/307 or 301/308 are used,
+  respectively.
+
+* The new ``preserve_request`` argument for
+  :func:`~django.shortcuts.redirect` allows to instruct the user agent to reuse
+  the HTTP method and body during redirection using specific status codes.
+
+Serialization
+~~~~~~~~~~~~~
+
+* Each serialization format now defines a ``Deserializer`` class, rather than a
+  function, to improve extensibility when defining a
+  :ref:`custom serialization format <custom-serialization-formats>`.
+
+Templates
+~~~~~~~~~
+
+* The new :meth:`~django.template.Library.simple_block_tag` decorator enables
+  the creation of simple block tags, which can accept and use a section of the
+  template.
+
+Tests
+~~~~~
+
+* Stack frames from Django's custom assertions are now hidden. This makes test
+  failures easier to read and enables :option:`test --pdb` to directly enter
+  into the failing test method.
+
+* Data loaded from :attr:`~django.test.TransactionTestCase.fixtures` and from
+  migrations enabled with :ref:`serialized_rollback=True
+  <test-case-serialized-rollback>` are now available during
+  ``TransactionTestCase.setUpClass()``.
+
+URLs
+~~~~
+
+* :func:`~django.urls.reverse` and :func:`~django.urls.reverse_lazy` now accept
+  ``query`` and ``fragment`` keyword arguments, allowing the addition of a
+  query string and/or fragment identifier in the generated URL, respectively.
+
+Utilities
+~~~~~~~~~
+
+* :class:`~django.utils.safestring.SafeString` now returns
+  :data:`NotImplemented` in ``__add__`` for non-string right-hand side
+  values. This aligns with the :class:`str` addition behavior and allows
+  ``__radd__`` to be used if available.
+
+* :func:`~django.utils.html.format_html_join` now supports taking an iterable
+  of mappings, passing their contents as keyword arguments to
+  :func:`~django.utils.html.format_html`.
+
+.. _backwards-incompatible-5.2:
+
+Backwards incompatible changes in 5.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The new :meth:`Model._is_pk_set() <django.db.models.Model._is_pk_set>` method
+  allows checking if a Model instance's primary key is defined.
+
+* ``BaseDatabaseOperations.adapt_decimalfield_value()`` is now a no-op, simply
+  returning the given value.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.0 is removed.
+
+* Support for GDAL 3.0 is removed.
+
+Dropped support for PostgreSQL 13
+---------------------------------
+
+Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
+PostgreSQL 14 and higher.
+
+Changed MySQL connection character set default
+----------------------------------------------
+
+MySQL connections now default to using the ``utf8mb4`` character set, instead
+of ``utf8``, which is an alias for the deprecated character set ``utf8mb3``.
+``utf8mb3`` can be specified in the ``OPTIONS`` part of the ``DATABASES``
+setting, if needed for legacy databases.
+
+Miscellaneous
+-------------
+
+* Adding :attr:`.EmailMultiAlternatives.alternatives` is now only supported via
+  the :meth:`~.EmailMultiAlternatives.attach_alternative` method.
+
+* The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
+
+* ``HttpRequest.accepted_types`` is now sorted by the client's preference,
+  based on the request's ``Accept`` header.
+
+* The attributes :attr:`.UniqueConstraint.violation_error_code` and
+  :attr:`.UniqueConstraint.violation_error_message` are now always used when
+  provided. Previously, they were ignored if :attr:`.UniqueConstraint.fields`
+  was set without a :attr:`.UniqueConstraint.condition`.
+
+* The :func:`~django.template.context_processors.debug` context processor is no
+  longer included in the default project template.
+
+* The following methods now have ``alters_data=True`` set to prevent side
+  effects when :ref:`rendering a template context <alters-data-description>`:
+
+  * :meth:`.UserManager.create_user`
+  * :meth:`.UserManager.acreate_user`
+  * :meth:`.UserManager.create_superuser`
+  * :meth:`.UserManager.acreate_superuser`
+  * :meth:`.QuerySet.create`
+  * :meth:`.QuerySet.acreate`
+  * :meth:`.QuerySet.bulk_create`
+  * :meth:`.QuerySet.abulk_create`
+  * :meth:`.QuerySet.get_or_create`
+  * :meth:`.QuerySet.aget_or_create`
+  * :meth:`.QuerySet.update_or_create`
+  * :meth:`.QuerySet.aupdate_or_create`
+
+* The minimum supported version of ``oracledb`` is increased from 1.3.2 to
+  2.3.0.
+
+* Built-in aggregate functions accepting only one argument (``Avg``, ``Count``,
+  ``Max``, ``Min``, ``StdDev``, ``Sum``, and ``Variance``) now raise
+  :exc:`TypeError` when called with an incorrect number of arguments.
+
+.. _deprecated-features-5.2:
+
+Features deprecated in 5.2
+==========================
+
+Miscellaneous
+-------------
+
+* The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
+  function is deprecated in favor of the ``find_all`` argument.
+
+* Fallbacks to ``request.user`` and ``request.auser()`` when ``user`` is
+  ``None`` in ``django.contrib.auth.login()`` and
+  ``django.contrib.auth.alogin()``, respectively, are deprecated.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
+  of the ``order_by`` argument.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` is
+  deprecated.

@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013
+# Sivert Olstad, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-10-21 18:49+0000\n"
+"Last-Translator: Sivert Olstad\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Content Types"
-msgstr ""
+msgstr "Innhaldstypar"
 
 msgid "python model class name"
 msgstr "python-modell klassenamn"
@@ -35,9 +36,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Innhaldstype %(ct_id)s-objektet har ingen modell knytta til seg"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr "Innhaldstype %(ct_id)s-objektet med id %(obj_id)s finst ikkje"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "Innhaldstype %(ct_id)s-objekt %(obj_id)s eksisterer ikkje"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "%(ct_name)s-objekt har ingen get_absolute_url()-metode"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "%(ct_name)s-objekt har ikkje ein get_absolute_url() metode"

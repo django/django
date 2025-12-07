@@ -6,6 +6,7 @@ class RequestSite:
 
     The save() and delete() methods raise NotImplementedError.
     """
+
     def __init__(self, request):
         self.domain = self.name = request.get_host()
 
@@ -13,7 +14,7 @@ class RequestSite:
         return self.domain
 
     def save(self, force_insert=False, force_update=False):
-        raise NotImplementedError('RequestSite cannot be saved.')
+        raise NotImplementedError("RequestSite cannot be saved.")
 
     def delete(self):
-        raise NotImplementedError('RequestSite cannot be deleted.')
+        raise NotImplementedError("RequestSite cannot be deleted.")

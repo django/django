@@ -1,8 +1,11 @@
 import sys
 import unittest
 from contextlib import contextmanager
+from functools import wraps
+from pathlib import Path
 
-from django.test import LiveServerTestCase, tag
+from django.conf import settings
+from django.test import LiveServerTestCase, override_settings, tag
 from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -26,8 +29,11 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         multiple browsers specs are provided (e.g. --selenium=firefox,chrome).
         """
         test_class = super().__new__(cls, name, bases, attrs)
-        # If the test class is either browser-specific or a test base, return it.
-        if test_class.browser or not any(name.startswith('test') and callable(value) for name, value in attrs.items()):
+        # If the test class is either browser-specific or a test base, return
+        # it.
+        if test_class.browser or not any(
+            name.startswith("test") and callable(value) for name, value in attrs.items()
+        ):
             return test_class
         elif test_class.browsers:
             # Reuse the created test class to make it browser-specific.
@@ -37,7 +43,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             first_browser = test_class.browsers[0]
             test_class.browser = first_browser
             # Listen on an external interface if using a selenium hub.
-            host = test_class.host if not test_class.selenium_hub else '0.0.0.0'
+            host = test_class.host if not test_class.selenium_hub else "0.0.0.0"
             test_class.host = host
             test_class.external_host = cls.external_host
             # Create subclasses for each of the remaining browsers and expose
@@ -49,16 +55,17 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                     "%s%s" % (capfirst(browser), name),
                     (test_class,),
                     {
-                        'browser': browser,
-                        'host': host,
-                        'external_host': cls.external_host,
-                        '__module__': test_class.__module__,
-                    }
+                        "browser": browser,
+                        "host": host,
+                        "external_host": cls.external_host,
+                        "__module__": test_class.__module__,
+                    },
                 )
                 setattr(module, browser_test_class.__name__, browser_test_class)
             return test_class
-        # If no browsers were specified, skip this class (it'll still be discovered).
-        return unittest.skip('No browsers specified.')(test_class)
+        # If no browsers were specified, skip this class (it'll still be
+        # discovered).
+        return unittest.skip("No browsers specified.")(test_class)
 
     @classmethod
     def import_webdriver(cls, browser):
@@ -66,42 +73,92 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
     @classmethod
     def import_options(cls, browser):
-        return import_string('selenium.webdriver.%s.options.Options' % browser)
+        return import_string("selenium.webdriver.%s.options.Options" % browser)
 
     @classmethod
     def get_capability(cls, browser):
-        from selenium.webdriver.common.desired_capabilities import (
-            DesiredCapabilities,
-        )
-        return getattr(DesiredCapabilities, browser.upper())
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+        caps = getattr(DesiredCapabilities, browser.upper())
+        if browser == "chrome":
+            caps["goog:loggingPrefs"] = {"browser": "ALL"}
+
+        return caps
 
     def create_options(self):
         options = self.import_options(self.browser)()
+        if self.browser == "chrome":
+            # Disable Google Password Manager "Data Breach" alert pop-ups.
+            options.add_argument("--guest")
+            options.add_argument("--disable-infobars")
         if self.headless:
-            try:
-                options.headless = True
-            except AttributeError:
-                pass  # Only Chrome and Firefox support the headless mode.
+            match self.browser:
+                case "chrome" | "edge":
+                    options.add_argument("--headless=new")
+                case "firefox":
+                    options.add_argument("-headless")
         return options
 
     def create_webdriver(self):
+        options = self.create_options()
         if self.selenium_hub:
             from selenium import webdriver
-            return webdriver.Remote(
-                command_executor=self.selenium_hub,
-                desired_capabilities=self.get_capability(self.browser),
-            )
-        return self.import_webdriver(self.browser)(options=self.create_options())
+
+            for key, value in self.get_capability(self.browser).items():
+                options.set_capability(key, value)
+
+            return webdriver.Remote(command_executor=self.selenium_hub, options=options)
+        return self.import_webdriver(self.browser)(options=options)
 
 
-@tag('selenium')
+class ChangeWindowSize:
+    def __init__(self, width, height, selenium):
+        self.selenium = selenium
+        self.new_size = (width, height)
+
+    def __enter__(self):
+        self.old_size = self.selenium.get_window_size()
+        self.selenium.set_window_size(*self.new_size)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.selenium.set_window_size(self.old_size["width"], self.old_size["height"])
+
+
+@tag("selenium")
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
+    screenshots = False
+
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not cls.screenshots:
+            return
+
+        for name, func in list(cls.__dict__.items()):
+            if not hasattr(func, "_screenshot_cases"):
+                continue
+            # Remove the main test.
+            delattr(cls, name)
+            # Add separate tests for each screenshot type.
+            for screenshot_case in getattr(func, "_screenshot_cases"):
+
+                @wraps(func)
+                def test(self, *args, _func=func, _case=screenshot_case, **kwargs):
+                    with getattr(self, _case)():
+                        return _func(self, *args, **kwargs)
+
+                test.__name__ = f"{name}_{screenshot_case}"
+                test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                test._screenshot_name = name
+                test._screenshot_case = screenshot_case
+                setattr(cls, test.__name__, test)
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (cls.external_host or cls.host, cls.server_thread.port)
+        return "http://%s:%s" % (cls.external_host or cls.host, cls.server_thread.port)
 
     @classproperty
     def allowed_host(cls):
@@ -112,15 +169,102 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium = cls.create_webdriver()
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
+        cls.addClassCleanup(cls._quit_selenium)
+
+    @contextmanager
+    def desktop_size(self):
+        with ChangeWindowSize(1280, 720, self.selenium):
+            yield
+
+    @contextmanager
+    def small_screen_size(self):
+        with ChangeWindowSize(1024, 768, self.selenium):
+            yield
+
+    @contextmanager
+    def mobile_size(self):
+        with ChangeWindowSize(360, 800, self.selenium):
+            yield
+
+    @contextmanager
+    def rtl(self):
+        with self.desktop_size():
+            with override_settings(LANGUAGE_CODE=settings.LANGUAGES_BIDI[-1]):
+                yield
+
+    @contextmanager
+    def dark(self):
+        # Navigate to a page before executing a script.
+        self.selenium.get(self.live_server_url)
+        self.selenium.execute_script("localStorage.setItem('theme', 'dark');")
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.selenium.execute_script("localStorage.removeItem('theme');")
+
+    def set_emulated_media(self, *, media=None, features=None):
+        if self.browser not in {"chrome", "edge"}:
+            self.skipTest(
+                "Emulation.setEmulatedMedia is only supported on Chromium and "
+                "Chrome-based browsers. See https://chromedevtools.github.io/devtools-"
+                "protocol/1-3/Emulation/#method-setEmulatedMedia for more details."
+            )
+        params = {}
+        if media is not None:
+            params["media"] = media
+        if features is not None:
+            params["features"] = features
+
+        # Not using .execute_cdp_cmd() as it isn't supported by the remote web
+        # driver when using --selenium-hub.
+        self.selenium.execute(
+            driver_command="executeCdpCommand",
+            params={"cmd": "Emulation.setEmulatedMedia", "params": params},
+        )
+
+    @contextmanager
+    def high_contrast(self):
+        self.set_emulated_media(features=[{"name": "forced-colors", "value": "active"}])
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.set_emulated_media(
+                    features=[{"name": "forced-colors", "value": "none"}]
+                )
+
+    def take_screenshot(self, name):
+        if not self.screenshots:
+            return
+        test = getattr(self, self._testMethodName)
+        filename = f"{test._screenshot_name}--{name}--{test._screenshot_case}.png"
+        path = Path.cwd() / "screenshots" / filename
+        path.parent.mkdir(exist_ok=True, parents=True)
+        self.selenium.save_screenshot(path)
+
+    def get_browser_logs(self, source=None, level="ALL"):
+        """
+        Return Chrome console logs filtered by level and optionally source.
+        """
+        try:
+            logs = self.selenium.get_log("browser")
+        except AttributeError:
+            logs = []
+        return [
+            log
+            for log in logs
+            if (level == "ALL" or log["level"] == level)
+            and (source is None or log["source"] == source)
+        ]
 
     @classmethod
-    def _tearDownClassInternal(cls):
+    def _quit_selenium(cls):
         # quit() the WebDriver before attempting to terminate and join the
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
-        if hasattr(cls, 'selenium'):
+        if hasattr(cls, "selenium"):
             cls.selenium.quit()
-        super()._tearDownClassInternal()
 
     @contextmanager
     def disable_implicit_wait(self):
@@ -130,3 +274,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             yield
         finally:
             self.selenium.implicitly_wait(self.implicit_wait)
+
+
+def screenshot_cases(method_names):
+    if isinstance(method_names, str):
+        method_names = method_names.split(",")
+
+    def wrapper(func):
+        func._screenshot_cases = method_names
+        setattr(func, "tags", {"screenshot"}.union(getattr(func, "tags", set())))
+        return func
+
+    return wrapper

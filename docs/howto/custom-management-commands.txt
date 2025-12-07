@@ -1,6 +1,6 @@
-========================================
-Writing custom ``django-admin`` commands
-========================================
+==============================================
+How to create custom ``django-admin`` commands
+==============================================
 
 .. module:: django.core.management
 
@@ -12,7 +12,9 @@ command for the ``polls`` application from the
 
 To do this, add a ``management/commands`` directory to the application. Django
 will register a ``manage.py`` command for each Python module in that directory
-whose name doesn't begin with an underscore. For example::
+whose name doesn't begin with an underscore. For example:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -26,8 +28,8 @@ whose name doesn't begin with an underscore. For example::
         tests.py
         views.py
 
-In this example, the ``closepoll`` command will be made available to any project
-that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
+In this example, the ``closepoll`` command will be made available to any
+project that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 
 The ``_private.py`` module will not be available as a management command.
 
@@ -47,14 +49,15 @@ look like this::
     from django.core.management.base import BaseCommand, CommandError
     from polls.models import Question as Poll
 
+
     class Command(BaseCommand):
-        help = 'Closes the specified poll for voting'
+        help = "Closes the specified poll for voting"
 
         def add_arguments(self, parser):
-            parser.add_argument('poll_ids', nargs='+', type=int)
+            parser.add_argument("poll_ids", nargs="+", type=int)
 
         def handle(self, *args, **options):
-            for poll_id in options['poll_ids']:
+            for poll_id in options["poll_ids"]:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
@@ -63,20 +66,21 @@ look like this::
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
+                self.stdout.write(
+                    self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
+                )
 
 .. _management-commands-output:
 
 .. note::
-    When you are using management commands and wish to provide console
-    output, you should write to ``self.stdout`` and ``self.stderr``,
-    instead of printing to ``stdout`` and ``stderr`` directly. By
-    using these proxies, it becomes much easier to test your custom
-    command. Note also that you don't need to end messages with a newline
-    character, it will be added automatically, unless you specify the ``ending``
-    parameter::
+    When you are using management commands and wish to provide console output,
+    you should write to ``self.stdout`` and ``self.stderr``, instead of
+    printing to ``stdout`` and ``stderr`` directly. By using these proxies, it
+    becomes much easier to test your custom command. Note also that you don't
+    need to end messages with a newline character, it will be added
+    automatically, unless you specify the ``ending`` parameter::
 
-        self.stdout.write("Unterminated line", ending='')
+        self.stdout.write("Unterminated line", ending="")
 
 The new custom command can be called using ``python manage.py closepoll
 <poll_ids>``.
@@ -94,28 +98,29 @@ Accepting optional arguments
 
 The same ``closepoll`` could be easily modified to delete a given poll instead
 of closing it by accepting additional command line options. These custom
-options can be added in the :meth:`~BaseCommand.add_arguments` method like this::
+options can be added in the :meth:`~BaseCommand.add_arguments` method like
+this::
 
     class Command(BaseCommand):
         def add_arguments(self, parser):
             # Positional arguments
-            parser.add_argument('poll_ids', nargs='+', type=int)
+            parser.add_argument("poll_ids", nargs="+", type=int)
 
             # Named (optional) arguments
             parser.add_argument(
-                '--delete',
-                action='store_true',
-                help='Delete poll instead of closing it',
+                "--delete",
+                action="store_true",
+                help="Delete poll instead of closing it",
             )
 
         def handle(self, *args, **options):
             # ...
-            if options['delete']:
+            if options["delete"]:
                 poll.delete()
             # ...
 
 The option (``delete`` in our example) is available in the options dict
-parameter of the handle method. See the :py:mod:`argparse` Python documentation
+parameter of the handle method. See the :mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
@@ -136,12 +141,12 @@ decorator on your :meth:`~BaseCommand.handle` method::
 
     from django.core.management.base import BaseCommand, no_translations
 
+
     class Command(BaseCommand):
         ...
 
         @no_translations
-        def handle(self, *args, **options):
-            ...
+        def handle(self, *args, **options): ...
 
 Since translation deactivation requires access to configured settings, the
 decorator can't be used for commands that work without configured settings.
@@ -151,6 +156,8 @@ Testing
 
 Information on how to test custom management commands can be found in the
 :ref:`testing docs <topics-testing-management-commands>`.
+
+.. _overriding-commands:
 
 Overriding commands
 ===================
@@ -201,7 +208,7 @@ All attributes can be set in your derived class and can be used in
 
     If your command defines mandatory positional arguments, you can customize
     the message error returned in the case of missing arguments. The default is
-    output by :py:mod:`argparse` ("too few arguments").
+    output by :mod:`argparse` ("too few arguments").
 
 .. attribute:: BaseCommand.output_transaction
 
@@ -223,17 +230,12 @@ All attributes can be set in your derived class and can be used in
     ``'__all__'`` can be used to specify that all system checks should be
     performed. Default value is ``'__all__'``.
 
-    .. versionchanged:: 3.2
-
-        In older versions, the ``requires_system_checks`` attribute expects a
-        boolean value instead of a list or tuple of tags.
-
 .. attribute:: BaseCommand.style
 
     An instance attribute that helps create colored output when writing to
     ``stdout`` or ``stderr``. For example::
 
-        self.stdout.write(self.style.SUCCESS('...'))
+        self.stdout.write(self.style.SUCCESS("..."))
 
     See :ref:`syntax-coloring` to learn how to modify the color palette and to
     see the available styles (use uppercased versions of the "roles" described
@@ -241,6 +243,12 @@ All attributes can be set in your derived class and can be used in
 
     If you pass the :option:`--no-color` option when running your command, all
     ``self.style()`` calls will return the original string uncolored.
+
+.. attribute:: BaseCommand.suppressed_base_arguments
+
+    The default command options to suppress in the help output. This should be
+    a set of option names (e.g. ``'--verbosity'``). The default values for the
+    suppressed options are still passed.
 
 Methods
 -------
@@ -265,7 +273,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     Django.
 
     You can customize the instance by overriding this method and calling
-    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
+    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser`
+    parameters.
 
 .. method:: BaseCommand.add_arguments(parser)
 
@@ -284,7 +293,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Tries to execute this command, performing system checks if needed (as
     controlled by the :attr:`requires_system_checks` attribute). If the command
-    raises a :exc:`CommandError`, it's intercepted and printed to stderr.
+    raises a :exc:`CommandError`, it's intercepted and printed to ``stderr``.
 
 .. admonition:: Calling a management command in your code
 
@@ -298,15 +307,33 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     It may return a string which will be printed to ``stdout`` (wrapped
     by ``BEGIN;`` and ``COMMIT;`` if :attr:`output_transaction` is ``True``).
 
-.. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
+.. method:: BaseCommand.check(app_configs=None, tags=None,display_num_errors=False, include_deployment_checks=False, fail_level=checks.ERROR, databases=None)
 
     Uses the system check framework to inspect the entire Django project for
     potential problems. Serious problems are raised as a :exc:`CommandError`;
-    warnings are output to stderr; minor notifications are output to stdout.
+    warnings are output to ``stderr``; minor notifications are output to
+    ``stdout``.
 
     If ``app_configs`` and ``tags`` are both ``None``, all system checks are
-    performed. ``tags`` can be a list of check tags, like ``compatibility`` or
-    ``models``.
+    performed except deployment and database related checks. ``tags`` can be a
+    list of check tags, like ``compatibility`` or ``models``.
+
+    You can pass ``include_deployment_checks=True`` to also perform deployment
+    checks, and list of database aliases in the ``databases`` to run database
+    related checks against them.
+
+.. method:: BaseCommand.get_check_kwargs(options)
+
+    Supplies kwargs for the call to :meth:`check`, including transforming the
+    value of :attr:`requires_system_checks` to the ``tag`` kwarg.
+
+    Override this method to change the values supplied to :meth:`check`. For
+    example, to opt into database related checks you can override
+    ``get_check_kwargs()`` as follows::
+
+        def get_check_kwargs(self, options):
+            kwargs = super().get_check_kwargs(options)
+            return {**kwargs, "databases": [options["database"]]}
 
 .. _ref-basecommand-subclasses:
 
@@ -356,11 +383,11 @@ Exception class indicating a problem while executing a management command.
 
 If this exception is raised during the execution of a management command from a
 command line console, it will be caught and turned into a nicely-printed error
-message to the appropriate output stream (i.e., stderr); as a result, raising
-this exception (with a sensible description of the error) is the preferred way
-to indicate that something has gone wrong in the execution of a command. It
-accepts the optional ``returncode`` argument to customize the exit status for
-the management command to exit with, using :func:`sys.exit`.
+message to the appropriate output stream (i.e., ``stderr``); as a result,
+raising this exception (with a sensible description of the error) is the
+preferred way to indicate that something has gone wrong in the execution of a
+command. It accepts the optional ``returncode`` argument to customize the exit
+status for the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the

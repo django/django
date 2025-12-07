@@ -8,6 +8,7 @@ class SessionStore(SessionBase):
     The session key is actually the session data, pickled and encoded.
     This means that saving the session will change the session key.
     """
+
     def __init__(self, session_key=None):
         super().__init__(session_key)
 

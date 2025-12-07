@@ -5,21 +5,25 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RegexPatternTests(SimpleTestCase):
-
     def test_str(self):
-        self.assertEqual(str(RegexPattern(_('^translated/$'))), '^translated/$')
+        self.assertEqual(str(RegexPattern(_("^translated/$"))), "^translated/$")
 
 
 class RoutePatternTests(SimpleTestCase):
-
     def test_str(self):
-        self.assertEqual(str(RoutePattern(_('translated/'))), 'translated/')
+        self.assertEqual(str(RoutePattern(_("translated/"))), "translated/")
+
+    def test_has_converters(self):
+        self.assertEqual(len(RoutePattern("translated/").converters), 0)
+        self.assertEqual(len(RoutePattern(_("translated/")).converters), 0)
+        self.assertEqual(len(RoutePattern("translated/<int:foo>").converters), 1)
+        self.assertEqual(len(RoutePattern(_("translated/<int:foo>")).converters), 1)
 
 
 class ResolverCacheTests(SimpleTestCase):
-    @override_settings(ROOT_URLCONF='urlpatterns.path_urls')
+    @override_settings(ROOT_URLCONF="urlpatterns.path_urls")
     def test_resolver_cache_default__root_urlconf(self):
         # resolver for a default URLconf (passing no argument) and for the
         # settings.ROOT_URLCONF is the same cached object.
-        self.assertIs(get_resolver(), get_resolver('urlpatterns.path_urls'))
-        self.assertIsNot(get_resolver(), get_resolver('urlpatterns.path_dynamic_urls'))
+        self.assertIs(get_resolver(), get_resolver("urlpatterns.path_urls"))
+        self.assertIsNot(get_resolver(), get_resolver("urlpatterns.path_dynamic_urls"))

@@ -4,38 +4,59 @@ File storage API
 
 .. module:: django.core.files.storage
 
-Getting the current storage class
+Getting the default storage class
 =================================
 
-Django provides two convenient ways to access the current storage class:
+Django provides convenient ways to access the default storage class:
+
+.. data:: storages
+
+    A dictionary-like object that allows retrieving a storage instance using
+    its alias as defined by :setting:`STORAGES`.
+
+    ``storages`` has an attribute ``backends``, which defaults to the raw value
+    provided in :setting:`STORAGES`.
+
+    Additionally, ``storages`` provides a ``create_storage()`` method that
+    accepts the dictionary used in :setting:`STORAGES` for a backend, and
+    returns a storage instance based on that backend definition. This may be
+    useful for third-party packages needing to instantiate storages in tests:
+
+    .. code-block:: pycon
+
+        >>> from django.core.files.storage import storages
+        >>> storages.backends
+        {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+         'custom': {'BACKEND': 'package.storage.CustomStorage'}}
+        >>> storage_instance = storages.create_storage({"BACKEND": "package.storage.CustomStorage"})
 
 .. class:: DefaultStorage
 
     :class:`~django.core.files.storage.DefaultStorage` provides
-    lazy access to the current default storage system as defined by
-    :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
-    :func:`~django.core.files.storage.get_storage_class` internally.
+    lazy access to the default storage system as defined by ``default`` key in
+    :setting:`STORAGES`. :class:`DefaultStorage` uses
+    :data:`~django.core.files.storage.storages` internally.
 
-.. function:: get_storage_class(import_path=None)
+.. data:: default_storage
 
-    Returns a class or module which implements the storage API.
-
-    When called without the ``import_path`` parameter ``get_storage_class``
-    will return the current default storage system as defined by
-    :setting:`DEFAULT_FILE_STORAGE`. If ``import_path`` is provided,
-    ``get_storage_class`` will attempt to import the class or module from the
-    given path and will return it if successful. An exception will be
-    raised if the import is unsuccessful.
+    :data:`~django.core.files.storage.default_storage` is an instance of the
+    :class:`~django.core.files.storage.DefaultStorage`.
 
 The ``FileSystemStorage`` class
 ===============================
 
-.. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
+.. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None, allow_overwrite=False)
 
     The :class:`~django.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
     :class:`~django.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
+
+    .. note::
+
+        The ``FileSystemStorage.delete()`` method will not raise an exception
+        if the given file name does not exist.
 
     .. attribute:: location
 
@@ -57,10 +78,10 @@ The ``FileSystemStorage`` class
         The file system permissions that the directory will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
 
-    .. note::
+    .. attribute:: allow_overwrite
 
-        The ``FileSystemStorage.delete()`` method will not raise
-        an exception if the given file name does not exist.
+        Flag to control allowing saving a new file over an existing one.
+        Defaults to ``False``.
 
     .. method:: get_created_time(name)
 
@@ -68,6 +89,37 @@ The ``FileSystemStorage`` class
         :func:`os.path.getctime`. On some systems (like Unix), this is the
         time of the last metadata change, and on others (like Windows), it's
         the creation time of the file.
+
+The ``InMemoryStorage`` class
+=============================
+
+.. class:: InMemoryStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
+
+    The :class:`~django.core.files.storage.InMemoryStorage` class implements
+    a memory-based file storage. It has no persistence, but can be useful for
+    speeding up tests by avoiding disk access.
+
+    .. attribute:: location
+
+        Absolute path to the directory name assigned to files. Defaults to the
+        value of your :setting:`MEDIA_ROOT` setting.
+
+    .. attribute:: base_url
+
+        URL that serves the files stored at this location.
+        Defaults to the value of your :setting:`MEDIA_URL` setting.
+
+    .. attribute:: file_permissions_mode
+
+        The file system permissions assigned to files, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_PERMISSIONS`.
+
+    .. attribute:: directory_permissions_mode
+
+        The file system permissions assigned to directories, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
 
 The ``Storage`` class
 =====================
@@ -93,8 +145,7 @@ The ``Storage`` class
     .. method:: exists(name)
 
         Returns ``True`` if a file referenced by the given name already exists
-        in the storage system, or ``False`` if the name is available for a new
-        file.
+        in the storage system.
 
     .. method:: get_accessed_time(name)
 
@@ -150,12 +201,12 @@ The ``Storage`` class
 
     .. method:: generate_filename(filename)
 
-        Validates the ``filename`` by calling :attr:`get_valid_name()` and
+        Validates the ``filename`` by calling :attr:`get_valid_name` and
         returns a filename to be passed to the :meth:`save` method.
 
         The ``filename`` argument may include a path as returned by
         :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`.
-        In that case, the path won't be passed to :attr:`get_valid_name()` but
+        In that case, the path won't be passed to :attr:`get_valid_name` but
         will be prepended back to the resulting name.
 
         The default implementation uses :mod:`os.path` operations. Override
@@ -206,3 +257,12 @@ The ``Storage`` class
         Returns the URL where the contents of the file referenced by ``name``
         can be accessed. For storage systems that don't support access by URL
         this will raise ``NotImplementedError`` instead.
+
+.. admonition:: There are community-maintained solutions too!
+
+    Django has a vibrant ecosystem. There are storage backends
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Storage Backends grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#storage-and-static-files
+.. _Storage Backends grid: https://djangopackages.org/grids/g/storage-backends/

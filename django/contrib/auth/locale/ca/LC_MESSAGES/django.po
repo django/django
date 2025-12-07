@@ -1,20 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2015,2017
+# Antoni Aloy <aaloy@apsl.net>, 2015,2017,2021
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014-2015
+# Carles Pina Estany, 2022
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Marc Compte <marc@compte.cat>, 2021
 # Roger Pons <rogerpons@gmail.com>, 2015
 # Xavier RG <xavirodgal@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2021-01-25 09:00+0000\n"
-"Last-Translator: Xavier RG <xavirodgal@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-07-25 08:09+0000\n"
+"Last-Translator: Carles Pina Estany\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +143,9 @@ msgstr "factor de treball"
 msgid "checksum"
 msgstr "suma de comprovació"
 
+msgid "block size"
+msgstr "mida de bloc"
+
 msgid "name"
 msgstr "nom"
 
@@ -245,7 +250,7 @@ msgstr[1] ""
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "La contrasenya és ha de tenir al menys %(min_length)d caràcter."
-msgstr[1] "La contrasenya és ha de tenir un mínim de %(min_length)d caràcters."
+msgstr[1] "La contrasenya ha de tenir un mínim de %(min_length)d caràcters."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

@@ -1,7 +1,8 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}">
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
 {{ form.media }}
 {% endblock %}
 
@@ -15,12 +16,12 @@
 
 {% block content_title %}{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
 
 {% block content %}
 {% if form.errors and not form.non_field_errors %}
 <p class="errornote">
-{% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+{% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
 </p>
 {% endif %}
 
@@ -56,7 +57,7 @@
   {% url 'admin_password_reset' as password_reset_url %}
   {% if password_reset_url %}
   <div class="password-reset-link">
-    <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+    <a href="{{ password_reset_url }}">{% translate 'Forgotten your login credentials?' %}</a>
   </div>
   {% endif %}
   <div class="submit-row">

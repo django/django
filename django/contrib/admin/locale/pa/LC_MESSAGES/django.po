@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# A S Alam <alam.yellow@gmail.com>, 2018
+# A S Alam, 2018
+# A S Alam, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Satnam S Virdi <satnam10virdi@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 01:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: A S Alam, 2022\n"
 "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
 "language/pa/)\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +19,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pa\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "ਚੁਣੇ %(verbose_name_plural)s ਹਟਾਓ"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -29,12 +35,8 @@ msgstr "%(name)s ਨੂੰ ਹਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਦਾ"
 msgid "Are you sure?"
 msgstr "ਕੀ ਤੁਸੀਂ ਇਹ ਚਾਹੁੰਦੇ ਹੋ?"
 
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "ਚੁਣੇ %(verbose_name_plural)s ਹਟਾਓ"
-
 msgid "Administration"
-msgstr "ਪਰਸ਼ਾਸ਼ਨ"
+msgstr "ਪ੍ਰਸ਼ਾਸਨ"
 
 msgid "All"
 msgstr "ਸਭ"
@@ -64,9 +66,15 @@ msgid "This year"
 msgstr "ਇਹ ਸਾਲ"
 
 msgid "No date"
-msgstr ""
+msgstr "ਕੋਈ ਮਿਤੀ ਨਹੀਂ"
 
 msgid "Has date"
+msgstr "ਮਿਤੀ ਹੈ"
+
+msgid "Empty"
+msgstr "ਖਾਲੀ"
+
+msgid "Not empty"
 msgstr ""
 
 #, python-format
@@ -107,7 +115,7 @@ msgid "object id"
 msgstr "ਆਬਜੈਕਟ id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ਆਬਜੈਕਟ repr"
 
@@ -124,22 +132,22 @@ msgid "log entries"
 msgstr "ਲਾਗ ਐਂਟਰੀਆਂ"
 
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr ""
 
 msgid "LogEntry Object"
 msgstr ""
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -149,7 +157,7 @@ msgid "and"
 msgstr "ਅਤੇ"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -157,7 +165,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -166,12 +174,11 @@ msgstr "ਕੋਈ ਖੇਤਰ ਨਹੀਂ ਬਦਲਿਆ।"
 msgid "None"
 msgstr "ਕੋਈ ਨਹੀਂ"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
 msgid "You may edit it again below."
@@ -179,28 +186,26 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -212,11 +217,11 @@ msgid "No action selected."
 msgstr "ਕੋਈ ਕਾਰਵਾਈ ਨਹੀਂ ਚੁਣੀ ਗਈ।"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਇਆ ਗਿਆ ਹੈ।"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -229,7 +234,7 @@ msgstr "%s ਬਦਲੋ"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "%s ਵੇਖੋ"
 
 msgid "Database error"
 msgstr "ਡਾਟਾਬੇਸ ਗਲਤੀ"
@@ -254,8 +259,9 @@ msgstr ""
 msgid "Change history: %s"
 msgstr "ਅਤੀਤ ਬਦਲੋ: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
@@ -285,8 +291,8 @@ msgstr ""
 msgid "Page not found"
 msgstr "ਸਫ਼ਾ ਨਹੀਂ ਲੱਭਿਆ"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "ਸਾਨੂੰ ਅਫਸੋਸ ਹੈ, ਪਰ ਅਸੀਂ ਮੰਗਿਆ ਗਿਆ ਸਫ਼ਾ ਨਹੀਂ ਲੱਭ ਸਕੇ।"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "ਘਰ"
@@ -301,7 +307,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "ਸਰਵਰ ਗਲਤੀ <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
@@ -321,10 +327,23 @@ msgstr "ਸਭ %(total_count)s %(module_name)s ਚੁਣੋ"
 msgid "Clear selection"
 msgstr "ਚੋਣ ਸਾਫ਼ ਕਰੋ"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "ਸ਼ਾਮਲ"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
-msgstr "ਪਹਿਲਾਂ ਆਪਣਾ ਯੂਜ਼ਰ ਨਾਂ ਤੇ ਪਾਸਵਰਡ ਦਿਉ। ਫੇਰ ਤੁਸੀਂ ਹੋਰ ਯੂਜ਼ਰ ਚੋਣਾਂ ਨੂੰ ਸੋਧ ਸਕਦੇ ਹੋ।"
+msgstr ""
 
 msgid "Enter a username and password."
 msgstr ""
@@ -333,14 +352,16 @@ msgid "Change password"
 msgstr "ਪਾਸਵਰਡ ਬਦਲੋ"
 
 msgid "Please correct the error below."
-msgstr ""
-
-msgid "Please correct the errors below."
-msgstr ""
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ਯੂਜ਼ਰ <strong>%(username)s</strong> ਲਈ ਨਵਾਂ ਪਾਸਵਰਡ ਦਿਓ।"
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "ਜੀ ਆਇਆਂ ਨੂੰ, "
@@ -353,6 +374,9 @@ msgstr "ਡੌਕੂਮੈਂਟੇਸ਼ਨ"
 
 msgid "Log out"
 msgstr "ਲਾਗ ਆਉਟ"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -367,6 +391,9 @@ msgstr "ਸਾਈਟ ਉੱਤੇ ਜਾਓ"
 msgid "Filter"
 msgstr "ਫਿਲਟਰ"
 
+msgid "Clear all filters"
+msgstr ""
+
 msgid "Remove from sorting"
 msgstr ""
 
@@ -375,6 +402,15 @@ msgid "Sorting priority: %(priority_number)s"
 msgstr ""
 
 msgid "Toggle sorting"
+msgstr ""
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
 msgstr ""
 
 msgid "Delete"
@@ -402,8 +438,8 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "ਹਾਂ, ਮੈਂ ਚਾਹੁੰਦਾ ਹਾਂ"
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
 msgstr ""
@@ -430,9 +466,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "View"
-msgstr ""
-
 msgid "Delete?"
 msgstr "ਹਟਾਉਣਾ?"
 
@@ -441,16 +474,6 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s ਵਲੋਂ "
 
 msgid "Summary"
-msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "ਸ਼ਾਮਲ"
-
-msgid "You don't have permission to view or edit anything."
 msgstr ""
 
 msgid "Recent actions"
@@ -466,7 +489,7 @@ msgid "Unknown content"
 msgstr "ਅਣਜਾਣ ਸਮੱਗਰੀ"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -480,6 +503,18 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr ""
 
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "ਮਿਤੀ/ਸਮਾਂ"
 
@@ -489,8 +524,13 @@ msgstr "ਯੂਜ਼ਰ"
 msgid "Action"
 msgstr "ਕਾਰਵਾਈ"
 
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 
@@ -500,23 +540,7 @@ msgstr "ਸਭ ਵੇਖੋ"
 msgid "Save"
 msgstr "ਸੰਭਾਲੋ"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
@@ -547,8 +571,24 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "ਅੱਜ ਵੈੱਬਸਾਈਟ ਨੂੰ ਕੁਝ ਚੰਗਾ ਸਮਾਂ ਦੇਣ ਲਈ ਧੰਨਵਾਦ ਹੈ।"
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "ਫੇਰ ਲਾਗਇਨ ਕਰੋ"
@@ -560,11 +600,9 @@ msgid "Your password was changed."
 msgstr "ਤੁਹਾਡਾ ਪਾਸਵਰਡ ਬਦਲਿਆ ਗਿਆ ਹੈ।"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"ਸੁਰੱਖਿਆ ਲਈ ਪਹਿਲਾਂ ਆਪਣਾ ਪੁਰਾਣਾ ਪਾਸਵਰਡ ਦਿਉ, ਅਤੇ ਫੇਰ ਆਪਣਾ ਨਵਾਂ ਪਾਸਵਰਡ ਦੋ ਵਰਾ ਦਿਉ ਤਾਂ ਕਿ "
-"ਅਸੀਂ ਜਾਂਚ ਸਕੀਏ ਕਿ ਤੁਸੀਂ ਇਹ ਠੀਕ ਤਰ੍ਹਾਂ ਲਿਖਿਆ ਹੈ।"
 
 msgid "Change my password"
 msgstr "ਮੇਰਾ ਪਾਸਵਰਡ ਬਦਲੋ"
@@ -598,12 +636,12 @@ msgstr ""
 "ਸੈੱਟ ਲਈ ਬੇਨਤੀ ਭੇਜੋ ਜੀ।"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 
@@ -616,8 +654,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "ਅੱਗੇ ਦਿੱਤੇ ਸਫ਼ੇ ਉੱਤੇ ਜਾਉ ਤੇ ਨਵਾਂ ਪਾਸਵਰਡ ਚੁਣੋ:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "ਤੁਹਾਡਾ ਯੂਜ਼ਰ ਨਾਂ, ਜੇ ਕਿਤੇ ਗਲਤੀ ਨਾਲ ਭੁੱਲ ਗਏ ਹੋਵੋ:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "ਸਾਡੀ ਸਾਈਟ ਵਰਤਣ ਲਈ ਧੰਨਵਾਦ ਜੀ!"
@@ -627,7 +665,7 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s ਟੀਮ"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 

@@ -1,7 +1,8 @@
-from urllib.parse import unquote, urlsplit, urlunsplit
+from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from asgiref.local import Local
 
+from django.http import QueryDict
 from django.utils.functional import lazy
 from django.utils.translation import override
 
@@ -24,7 +25,16 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
+def reverse(
+    viewname,
+    urlconf=None,
+    args=None,
+    kwargs=None,
+    current_app=None,
+    *,
+    query=None,
+    fragment=None,
+):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
@@ -36,16 +46,16 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if not isinstance(viewname, str):
         view = viewname
     else:
-        *path, view = viewname.split(':')
+        *path, view = viewname.split(":")
 
         if current_app:
-            current_path = current_app.split(':')
+            current_path = current_app.split(":")
             current_path.reverse()
         else:
             current_path = None
 
         resolved_path = []
-        ns_pattern = ''
+        ns_pattern = ""
         ns_converters = {}
         for ns in path:
             current_ns = current_path.pop() if current_path else None
@@ -70,20 +80,32 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
             try:
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
-                ns_pattern = ns_pattern + extra
+                ns_pattern += extra
                 ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
-                        "%s is not a registered namespace inside '%s'" %
-                        (key, ':'.join(resolved_path))
+                        "%s is not a registered namespace inside '%s'"
+                        % (key, ":".join(resolved_path))
                     )
                 else:
                     raise NoReverseMatch("%s is not a registered namespace" % key)
         if ns_pattern:
-            resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
+            resolver = get_ns_resolver(
+                ns_pattern, resolver, tuple(ns_converters.items())
+            )
 
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    if query is not None:
+        if isinstance(query, QueryDict):
+            query_string = query.urlencode()
+        else:
+            query_string = urlencode(query, doseq=True)
+        if query_string:
+            resolved_url += "?" + query_string
+    if fragment is not None:
+        resolved_url += "#" + fragment
+    return resolved_url
 
 
 reverse_lazy = lazy(reverse, str)
@@ -99,8 +121,8 @@ def set_script_prefix(prefix):
     """
     Set the script prefix for the current thread.
     """
-    if not prefix.endswith('/'):
-        prefix += '/'
+    if not prefix.endswith("/"):
+        prefix += "/"
     _prefixes.value = prefix
 
 
@@ -110,7 +132,7 @@ def get_script_prefix():
     wishes to construct their own URLs manually (although accessing the request
     instance is normally going to be a lot cleaner).
     """
-    return getattr(_prefixes, "value", '/')
+    return getattr(_prefixes, "value", "/")
 
 
 def clear_script_prefix():
@@ -125,8 +147,9 @@ def clear_script_prefix():
 
 def set_urlconf(urlconf_name):
     """
-    Set the URLconf for the current thread (overriding the default one in
-    settings). If urlconf_name is None, revert back to the default.
+    Set the URLconf for the current thread or asyncio task (overriding the
+    default one in settings). If urlconf_name is None, revert back to the
+    default.
     """
     if urlconf_name:
         _urlconfs.value = urlconf_name
@@ -137,8 +160,8 @@ def set_urlconf(urlconf_name):
 
 def get_urlconf(default=None):
     """
-    Return the root URLconf to use for the current thread if it has been
-    changed from the default one.
+    Return the root URLconf to use for the current thread or asyncio task if it
+    has been changed from the default one.
     """
     return getattr(_urlconfs, "value", default)
 
@@ -168,12 +191,18 @@ def translate_url(url, lang_code):
     except Resolver404:
         pass
     else:
-        to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
+        to_be_reversed = (
+            "%s:%s" % (match.namespace, match.url_name)
+            if match.namespace
+            else match.url_name
+        )
         with override(lang_code):
             try:
                 url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
             except NoReverseMatch:
                 pass
             else:
-                url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+                url = urlunsplit(
+                    (parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment)
+                )
     return url

@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Martin Tóth <ezimir@gmail.com>, 2017-2018
+# Adam Zahradník, 2023
+# Martin Tóth <ezimir@gmail.com>, 2017-2018,2023
 # Peter Stríž <petulak8@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-12-14 18:42+0000\n"
-"Last-Translator: Peter Stríž <petulak8@gmail.com>\n"
-"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-12-04 09:22+0000\n"
+"Last-Translator: Martin Tóth <ezimir@gmail.com>, 2017-2018,2023\n"
+"Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,7 +34,7 @@ msgstr "Mapovanie reťazcov na reťazce/NULL"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr "Hodnota s kľúčom \"%(key)s\" nie je reťazec ani NULL."
+msgstr "Hodnota s kľúčom „%(key)s“ nie je reťazec ani NULL."
 
 msgid "Could not load JSON data."
 msgstr "Údaje typu JSON sa nepodarilo načítať."
@@ -109,11 +110,12 @@ msgstr "Boli zadané neznáme kľúče: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Hodnota rozsahu musí byť celá menšia alebo rovná %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
+"Uistite sa, že horná hranica rozsahu nie je väčšia ako %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "Hodnota rozsahu musí byť celá väčšia alebo rovná %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr ""
+"Uistite sa, že dolná hranica rozsahu nie je menšia ako %(limit_value)s."

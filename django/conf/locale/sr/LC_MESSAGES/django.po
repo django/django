@@ -2,24 +2,25 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018-2019
-# Igor Jerosimić, 2019-2021
+# Igor Jerosimić, 2019-2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 17:16+0000\n"
-"Last-Translator: Igor Jerosimić\n"
-"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023-2025\n"
+"Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Afrikaans"
 msgstr "африкански"
@@ -53,6 +54,9 @@ msgstr "босански"
 
 msgid "Catalan"
 msgstr "каталонски"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "централнокурдски (сорани)"
 
 msgid "Czech"
 msgstr "чешки"
@@ -141,6 +145,9 @@ msgstr "хрватски"
 msgid "Upper Sorbian"
 msgstr "горњолужичкосрпски"
 
+msgid "Haitian Creole"
+msgstr "Хаићански креолски"
+
 msgid "Hungarian"
 msgstr "мађарски"
 
@@ -209,6 +216,9 @@ msgstr "монголски"
 
 msgid "Marathi"
 msgstr "маратхи"
+
+msgid "Malay"
+msgstr "малајски"
 
 msgid "Burmese"
 msgstr "бурмански"
@@ -291,6 +301,9 @@ msgstr "татарски"
 msgid "Udmurt"
 msgstr "удмуртски"
 
+msgid "Uyghur"
+msgstr "Ујгури"
+
 msgid "Ukrainian"
 msgstr "украјински"
 
@@ -338,6 +351,9 @@ msgstr "Тражена страна не садржи резултате"
 msgid "Enter a valid value."
 msgstr "Унесите исправну вредност."
 
+msgid "Enter a valid domain name."
+msgstr "Унесите исправно име домена."
+
 msgid "Enter a valid URL."
 msgstr "Унесите исправан URL."
 
@@ -361,14 +377,18 @@ msgstr ""
 "Унесите исправан \"слаг\", који се састоји од Уникод слова, бројки, доњих "
 "црта или цртица."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Унесите исправну IPv4 адресу."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Унесите исправну адресу %(protocol)s."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Унесите исправну IPv6 адресу."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Унесите исправну IPv4 или IPv6 адресу."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 или IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Унесите само цифре раздвојене запетама."
@@ -384,6 +404,19 @@ msgstr "Ова вредност мора да буде мања од %(limit_val
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ова вредност мора бити већа од %(limit_value)s или тачно толико."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Ова вредност мора да умножак величине корака %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Уверите се да је ова вредност вишекратник величине корака %(limit_value)s, "
+"почевши од %(offset)s, нпр. %(offset)s, %(valid_value1)s, %(valid_value2)s, "
+"и тако даље."
 
 #, python-format
 msgid ""
@@ -464,6 +497,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s са пољем %(field_labels)s већ постоји."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Ограничење „%(name)s“ је прекршено."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Вредност %(value)r није валидна."
 
@@ -477,8 +514,8 @@ msgstr "Ово поље не може да остане празно."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s са пољем %(field_label)s већ постоји."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -504,6 +541,9 @@ msgstr "Булова вредност (True или False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Стринг са макс. дужином %(max_length)s"
+
+msgid "String (unlimited)"
+msgstr "Стринг (неограниченo)"
 
 msgid "Comma-separated integers"
 msgstr "Цели бројеви раздвојени запетама"
@@ -664,8 +704,8 @@ msgid "Value must be valid JSON."
 msgstr "Вредност мора бити исправан JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s инстанца са вредношћу %(value)r у пољу %(field)s не постоји."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s инстанца са %(field)s %(value)r није исправан избор."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Спољни кључ (тип је одређен асоцираном колоном)"
@@ -685,8 +725,8 @@ msgid "Many-to-many relationship"
 msgstr "Релација више на више"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -777,18 +817,18 @@ msgstr ""
 "настави."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Молим проследите највише %d форму."
-msgstr[1] "Молим проследите највише %d форме."
-msgstr[2] "Молим проследите највише %d форми."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Молим проследите највише %(num)d форму."
+msgstr[1] "Молим проследите највише %(num)d форме."
+msgstr[2] "Молим проследите највише %(num)d форми."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Молим проследите најмање %d форму."
-msgstr[1] "Молим проследите најмање %d форме."
-msgstr[2] "Молим проследите најмање %d форми."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Молим проследите најмање %(num)d форму."
+msgstr[1] "Молим проследите најмање %(num)d форме."
+msgstr[2] "Молим проследите најмање %(num)d форми."
 
 msgid "Order"
 msgstr "Редослед"
@@ -852,6 +892,22 @@ msgstr "Да"
 
 msgid "No"
 msgstr "Не"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Спремно"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Покренуто"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Неуспешно"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Успешно"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1118,7 +1174,7 @@ msgstr "Ово није валидна IPv6 адреса."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "или"
@@ -1128,46 +1184,46 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d година"
-msgstr[1] "%d године"
-msgstr[2] "%d година"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d година"
+msgstr[1] "%(num)d године"
+msgstr[2] "%(num)d година"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d месец"
-msgstr[1] "%d месеца"
-msgstr[2] "%d месеци"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d месец"
+msgstr[1] "%(num)d месеца"
+msgstr[2] "%(num)d месеци"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d недеља"
-msgstr[1] "%d недеље"
-msgstr[2] "%d недеља"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d недеља"
+msgstr[1] "%(num)d недеље"
+msgstr[2] "%(num)d недеља"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d дан"
-msgstr[1] "%d дана"
-msgstr[2] "%d дана"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d дан"
+msgstr[1] "%(num)d дана"
+msgstr[2] "%(num)d дана"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-msgstr[2] "%d часова"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d сат"
+msgstr[1] "%(num)d сата"
+msgstr[2] "%(num)d сати"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минут"
-msgstr[1] "%d минута"
-msgstr[2] "%d минута"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d минут"
+msgstr[1] "%(num)d минута"
+msgstr[2] "%(num)d минута"
 
 msgid "Forbidden"
 msgstr "Забрањено"
@@ -1177,7 +1233,7 @@ msgstr "CSRF верификација није прошла. Захтев одб
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
@@ -1192,21 +1248,21 @@ msgid ""
 "origin” requests."
 msgstr ""
 "Ако сте подесили интернет прегледач да не шаље \"Referer\" заглавља, поново "
-"их укључите, барем за овај сајт, или за HTTPS конекције, или за \"same-origin"
-"\" захтеве."
+"их укључите, барем за овај сајт, или за HTTPS конекције, или за \"same-"
+"origin\" захтеве."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Ако користите <meta name=\"referrer\" content=\"no-referrer\"> таг или "
 "\"Referrer-Policy: no-referrer\" заглавље, молимо да их уклоните. CSRF "
 "заштита захтева \"Referer\" заглавље да би се обавила стриктна \"referrer\" "
-"провера. Уколико вас брине приватност, користите алтернативе као <a rel="
-"\"noreferrer\" ...> за линкове ка другим сајтовима."
+"провера. Уколико вас брине приватност, користите алтернативе као <a "
+"rel=\"noreferrer\" ...> за линкове ка другим сајтовима."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1299,13 +1355,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Ова страна је приказана јер је <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали ниједан URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали "
+"ниједан URL."
 
 msgid "Django Documentation"
 msgstr "Ђанго документација"

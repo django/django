@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015,2017,2019
+# Besnik Bleta <besnik@programeshqip.org>, 2011,2015
+# Besnik Bleta <besnik@programeshqip.org>, 2023-2025
+# Besnik Bleta <besnik@programeshqip.org>, 2015,2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:36+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
-"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023-2025\n"
+"Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,24 +20,34 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Personal info"
-msgstr "Të dhëna personale"
+msgstr "Hollësi personale"
 
 msgid "Permissions"
 msgstr "Leje"
 
 msgid "Important dates"
-msgstr "Të dhëna të rëndësishme"
+msgstr "Data të rëndësishme"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "S’ekziston objekt %(name)s me kyç parësor %(key)r."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "U parashtruan të dhëna formulari me përplasje. Ju lutemi, riprovoni."
+
 msgid "Password changed successfully."
 msgstr "Fjalëkalimi u ndryshua me sukses."
+
+msgid "Password-based authentication was disabled."
+msgstr "Mirëfilltësimi me bazë fjalëkalimin u çaktivizua."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ndryshoni fjalëkalimin: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Caktoni fjalëkalim: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Mirëfilltësim dhe Autorizim"
@@ -47,11 +58,17 @@ msgstr "fjalëkalim"
 msgid "last login"
 msgstr "hyrja e fundit"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Format i pavlefshëm fjalëkalimi, ose algoritëm i panjohur hashi."
+
 msgid "No password set."
 msgstr "S’ka fjalëkalim të caktuar."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
+msgid "Reset password"
+msgstr "Ricaktoni fjalëkalim"
+
+msgid "Set password"
+msgstr "Caktoni fjalëkalim"
 
 msgid "The two password fields didn’t match."
 msgstr "Dy fushat për fjalëkalim s’u përputhën."
@@ -66,12 +83,35 @@ msgid "Enter the same password as before, for verification."
 msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më parë."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Nuk depozitohen fjalëkalime të papërpunuar, ndaj s’ka ndonjë mënyrë për të "
-"parë fjalëkalimin e këtij përdoruesi, por mund ta ndryshoni fjalëkalimin "
-"duke përdorur <a href=\"{}\">këtë formular</a>."
+"Do të jetë apo jo në gjendje përdoruesi të bëjë mirëfilltësimin me "
+"fjalëkalim. Në u çaktivizoftë, prapë mund të jetë në gjendje të bëjë "
+"mirëfilltësimin duke përdorur mekanizma të tjera, fjala vjen, Hyrje Njëshe "
+"(Single Sign-On), ose LDAP."
+
+msgid "Password-based authentication"
+msgstr "Mirëfilltësim me bazë fjalëkalimin"
+
+msgid "Enabled"
+msgstr "I aktivizuar"
+
+msgid "Disabled"
+msgstr "I çaktivizuar"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Nuk ruhen fjalëkalime shqeto, ndaj s’ka ndonjë rrugë për të parë "
+"fjalëkalimin e përdoruesit."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktivizoni mirëfilltësim me bazë fjalëkalime për këtë përdorues, duke "
+"caktuar një fjalëkalim."
 
 #, python-format
 msgid ""
@@ -100,9 +140,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Fjalëkalim i vjetër"
-
-msgid "Password (again)"
-msgstr "Fjalëkalim (sërish)"
 
 msgid "algorithm"
 msgstr "algoritëm"
@@ -135,7 +172,10 @@ msgid "work factor"
 msgstr ""
 
 msgid "checksum"
-msgstr "checksum"
+msgstr ""
+
+msgid "block size"
+msgstr "madhësi blloku"
 
 msgid "name"
 msgstr "emër"
@@ -172,7 +212,7 @@ msgid ""
 "each of their groups."
 msgstr ""
 "Grupet te të cilët bën pjesë ky përdorues. Një përdorues do të gëzojë krejt "
-"lejet e akorduara secilit te këto grupe."
+"lejet e akorduara secilit nga këto grupe."
 
 msgid "user permissions"
 msgstr "leje përdoruesi"
@@ -185,7 +225,7 @@ msgstr "emër përdoruesi"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"E domosdoshme. 150 ose më pak shenja. Vetëm shkronja, shifra, dhe @/./+/-/_ ."
+"E domosdoshme. 150 ose më pak shenja. Vetëm shkronja, shifra dhe @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Ka tashmë një emër të tillë përdoruesi."
@@ -206,7 +246,7 @@ msgid "Designates whether the user can log into this admin site."
 msgstr "Përcakton nëse mund të hyjë ose jo përdoruesi te ky sajt administrimi."
 
 msgid "active"
-msgstr "veprues"
+msgstr "aktiv"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
@@ -225,18 +265,11 @@ msgid "users"
 msgstr "përdorues"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Ky fjalëkalim është shumë i shkurtër. Duhet të përmbajë të paktën "
-"%(min_length)d shenjë."
 msgstr[1] ""
-"Ky fjalëkalim është shumë i shkurtër. Duhet të përmbajë të paktën "
-"%(min_length)d shenja."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -250,7 +283,7 @@ msgstr "Fjalëkalimi është shumë i ngjashëm me %(verbose_name)s."
 
 msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Fjalëkalimi juaj s’mund të jetë shumë i ngjashëm me të dhëna të tjera tuajat "
+"Fjalëkalimi juaj s’mund të jetë shumë i ngjashëm me hollësi të tjera tuajat "
 "personale."
 
 msgid "This password is too common."
@@ -270,11 +303,12 @@ msgid "Password reset on %(site_name)s"
 msgstr "Ricaktim fjalëkalimi për te %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 "Jepni një emër përdoruesi të vlefshëm. Kjo vlerë mund të përmbajë vetëm "
-"shkronja anglishtje, numra dhe shenjat @/./+/-/_ ."
+"shkronja pa theks, me të vogla, a-z dhe të mëdha, A-Z, numra dhe shenjat @/./"
+"+/-/_ ."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

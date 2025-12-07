@@ -1,43 +1,48 @@
 """
- The OGRGeometry is a wrapper for using the OGR Geometry class
- (see https://www.gdal.org/classOGRGeometry.html).  OGRGeometry
- may be instantiated when reading geometries from OGR Data Sources
- (e.g. SHP files), or when given OGC WKT (a string).
+The OGRGeometry is a wrapper for using the OGR Geometry class
+(see https://gdal.org/api/ogrgeometry_cpp.html#_CPPv411OGRGeometry).
+OGRGeometry may be instantiated when reading geometries from OGR Data Sources
+(e.g. SHP files), or when given OGC WKT (a string).
 
- While the 'full' API is not present yet, the API is "pythonic" unlike
- the traditional and "next-generation" OGR Python bindings.  One major
- advantage OGR Geometries have over their GEOS counterparts is support
- for spatial reference systems and their transformation.
+While the 'full' API is not present yet, the API is "pythonic" unlike
+the traditional and "next-generation" OGR Python bindings. One major
+advantage OGR Geometries have over their GEOS counterparts is support
+for spatial reference systems and their transformation.
 
- Example:
-  >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
-  >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
-  >>> pnt = OGRGeometry(wkt1)
-  >>> print(pnt)
-  POINT (-90 30)
-  >>> mpnt = OGRGeometry(OGRGeomType('MultiPoint'), SpatialReference('WGS84'))
-  >>> mpnt.add(wkt1)
-  >>> mpnt.add(wkt1)
-  >>> print(mpnt)
-  MULTIPOINT (-90 30,-90 30)
-  >>> print(mpnt.srs.name)
-  WGS 84
-  >>> print(mpnt.srs.proj)
-  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform(SpatialReference('NAD27'))
-  >>> print(mpnt.proj)
-  +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
-  >>> print(mpnt)
-  MULTIPOINT (-89.999930378602485 29.999797886557641,-89.999930378602485 29.999797886557641)
+Example:
+ >>> from django.contrib.gis.gdal import (
+ ...     OGRGeometry, OGRGeomType, SpatialReference
+ ... )
+ >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
+ >>> pnt = OGRGeometry(wkt1)
+ >>> print(pnt)
+ POINT (-90 30)
+ >>> mpnt = OGRGeometry(OGRGeomType('MultiPoint'), SpatialReference('WGS84'))
+ >>> mpnt.add(wkt1)
+ >>> mpnt.add(wkt1)
+ >>> print(mpnt)
+ MULTIPOINT (-90 30,-90 30)
+ >>> print(mpnt.srs.name)
+ WGS 84
+ >>> print(mpnt.srs.proj)
+ +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+ >>> mpnt.transform(SpatialReference('NAD27'))
+ >>> print(mpnt.proj)
+ +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
+ >>> print(mpnt)
+ MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248
+ 29.99979788655764)
 
-  The OGRGeomType class is to make it easy to specify an OGR geometry type:
-  >>> from django.contrib.gis.gdal import OGRGeomType
-  >>> gt1 = OGRGeomType(3) # Using an integer for the type
-  >>> gt2 = OGRGeomType('Polygon') # Using a string
-  >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
-  >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
-  True True
+ The OGRGeomType class is to make it easy to specify an OGR geometry type:
+ >>> from django.contrib.gis.gdal import OGRGeomType
+ >>> gt1 = OGRGeomType(3) # Using an integer for the type
+ >>> gt2 = OGRGeomType('Polygon') # Using a string
+ >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
+ >>> # Equivalence works w/non-OGRGeomType objects:
+ >>> print(gt1 == 3, gt1 == 'Polygon')
+ True True
 """
+
 import sys
 from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
@@ -46,19 +51,22 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
+from django.contrib.gis.gdal.prototypes import geom as capi
+from django.contrib.gis.gdal.prototypes import srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.utils.encoding import force_bytes
 
 
 # For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):
     """Encapsulate an OGR geometry."""
+
     destructor = capi.destroy_geom
+    geos_support = True
 
     def __init__(self, geom_input, srs=None):
         """Initialize Geometry on either WKT or an OGR pointer as input."""
@@ -74,16 +82,18 @@ class OGRGeometry(GDALBase):
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
-                if wkt_m['srid']:
+                if wkt_m["srid"]:
                     # If there's EWKT, set the SRS w/value of the SRID.
-                    srs = int(wkt_m['srid'])
-                if wkt_m['type'].upper() == 'LINEARRING':
+                    srs = int(wkt_m["srid"])
+                if wkt_m["type"].upper() == "LINEARRING":
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See https://trac.osgeo.org/gdal/ticket/1992.
-                    g = capi.create_geom(OGRGeomType(wkt_m['type']).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m['wkt'].encode())))
+                    g = capi.create_geom(OGRGeomType(wkt_m["type"]).num)
+                    capi.import_wkt(g, byref(c_char_p(wkt_m["wkt"].encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m['wkt'].encode())), None, byref(c_void_p()))
+                    g = capi.from_wkt(
+                        byref(c_char_p(wkt_m["wkt"].encode())), None, byref(c_void_p())
+                    )
             elif json_m:
                 g = self._from_json(geom_input.encode())
             else:
@@ -101,12 +111,17 @@ class OGRGeometry(GDALBase):
             # OGR pointer (c_void_p) was the input.
             g = geom_input
         else:
-            raise GDALException('Invalid input type for OGR Geometry construction: %s' % type(geom_input))
+            raise GDALException(
+                "Invalid input type for OGR Geometry construction: %s"
+                % type(geom_input)
+            )
 
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
-            raise GDALException('Cannot create OGR Geometry from input: %s' % geom_input)
+            raise GDALException(
+                "Cannot create OGR Geometry from input: %s" % geom_input
+            )
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
@@ -114,7 +129,9 @@ class OGRGeometry(GDALBase):
             self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type
-        self.__class__ = GEO_CLASSES[self.geom_type.num]
+        if (geo_class := GEO_CLASSES.get(self.geom_type.num)) is None:
+            raise TypeError(f"Unsupported geometry type: {self.geom_type}")
+        self.__class__ = geo_class
 
     # Pickle routines
     def __getstate__(self):
@@ -129,13 +146,15 @@ class OGRGeometry(GDALBase):
         wkb, srs = state
         ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
         if not ptr:
-            raise GDALException('Invalid OGRGeometry loaded from pickled state.')
+            raise GDALException("Invalid OGRGeometry loaded from pickled state.")
         self.ptr = ptr
         self.srs = srs
 
     @classmethod
     def _from_wkb(cls, geom_input):
-        return capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+        return capi.from_wkb(
+            bytes(geom_input), None, byref(c_void_p()), len(geom_input)
+        )
 
     @staticmethod
     def _from_json(geom_input):
@@ -145,8 +164,10 @@ class OGRGeometry(GDALBase):
     def from_bbox(cls, bbox):
         "Construct a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
-            x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+        return OGRGeometry(
+            "POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))"
+            % (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0)
+        )
 
     @staticmethod
     def from_json(geom_input):
@@ -191,17 +212,10 @@ class OGRGeometry(GDALBase):
         "Return 0 for points, 1 for lines, and 2 for surfaces."
         return capi.get_dims(self.ptr)
 
-    def _get_coord_dim(self):
+    @property
+    def coord_dim(self):
         "Return the coordinate dimension of the Geometry."
         return capi.get_coord_dim(self.ptr)
-
-    def _set_coord_dim(self, dim):
-        "Set the coordinate dimension of this Geometry."
-        if dim not in (2, 3):
-            raise ValueError('Geometry dimension must be either 2 or 3')
-        capi.set_coord_dim(self.ptr, dim)
-
-    coord_dim = property(_get_coord_dim, _set_coord_dim)
 
     @property
     def geom_count(self):
@@ -235,7 +249,10 @@ class OGRGeometry(GDALBase):
 
     @property
     def area(self):
-        "Return the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
+        """
+        Return the area for a LinearRing, Polygon, or MultiPolygon; 0
+        otherwise.
+        """
         return capi.get_area(self.ptr)
 
     @property
@@ -252,6 +269,49 @@ class OGRGeometry(GDALBase):
     def extent(self):
         "Return the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
+
+    @property
+    def is_3d(self):
+        """Return True if the geometry has Z coordinates."""
+        return capi.is_3d(self.ptr)
+
+    def set_3d(self, value):
+        """Set if this geometry has Z coordinates."""
+        if value is True:
+            capi.set_3d(self.ptr, 1)
+        elif value is False:
+            capi.set_3d(self.ptr, 0)
+        else:
+            raise ValueError(f"Input to 'set_3d' must be a boolean, got '{value!r}'.")
+
+    @property
+    def is_measured(self):
+        """Return True if the geometry has M coordinates."""
+        return capi.is_measured(self.ptr)
+
+    def set_measured(self, value):
+        """Set if this geometry has M coordinates."""
+        if value is True:
+            capi.set_measured(self.ptr, 1)
+        elif value is False:
+            capi.set_measured(self.ptr, 0)
+        else:
+            raise ValueError(
+                f"Input to 'set_measured' must be a boolean, got '{value!r}'."
+            )
+
+    @property
+    def has_curve(self):
+        """Return True if the geometry is or has curve geometry."""
+        return capi.has_curve_geom(self.ptr, 0)
+
+    def get_linear_geometry(self):
+        """Return a linear version of this geometry."""
+        return OGRGeometry(capi.get_linear_geom(self.ptr, 0, None))
+
+    def get_curve_geometry(self):
+        """Return a curve version of this geometry."""
+        return OGRGeometry(capi.get_curve_geom(self.ptr, None))
 
     # #### SpatialReference-related Properties ####
 
@@ -278,7 +338,9 @@ class OGRGeometry(GDALBase):
         elif srs is None:
             srs_ptr = None
         else:
-            raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
+            raise TypeError(
+                "Cannot assign spatial reference with object of type: %s" % type(srs)
+            )
         capi.assign_srs(self.ptr, srs_ptr)
 
     srs = property(_get_srs, _set_srs)
@@ -294,20 +356,27 @@ class OGRGeometry(GDALBase):
         if isinstance(srid, int) or srid is None:
             self.srs = srid
         else:
-            raise TypeError('SRID must be set with an integer.')
+            raise TypeError("SRID must be set with an integer.")
 
     srid = property(_get_srid, _set_srid)
 
     # #### Output Methods ####
     def _geos_ptr(self):
         from django.contrib.gis.geos import GEOSGeometry
+
         return GEOSGeometry._from_wkb(self.wkb)
 
     @property
     def geos(self):
         "Return a GEOSGeometry object from this OGRGeometry."
-        from django.contrib.gis.geos import GEOSGeometry
-        return GEOSGeometry(self._geos_ptr(), self.srid)
+        if self.geos_support:
+            from django.contrib.gis.geos import GEOSGeometry
+
+            return GEOSGeometry(self._geos_ptr(), self.srid)
+        else:
+            from django.contrib.gis.geos import GEOSException
+
+            raise GEOSException(f"GEOS does not support {self.__class__.__qualname__}.")
 
     @property
     def gml(self):
@@ -325,6 +394,7 @@ class OGRGeometry(GDALBase):
         Return the GeoJSON representation of this Geometry.
         """
         return capi.to_json(self.ptr)
+
     geojson = json
 
     @property
@@ -340,28 +410,37 @@ class OGRGeometry(GDALBase):
     @property
     def wkb(self):
         "Return the WKB representation of the Geometry."
-        if sys.byteorder == 'little':
+        if sys.byteorder == "little":
             byteorder = 1  # wkbNDR (from ogr_core.h)
         else:
             byteorder = 0  # wkbXDR
         sz = self.wkb_size
-        # Creating the unsigned character buffer, and passing it in by reference.
+        # Creating the unsigned character buffer, and passing it in by
+        # reference.
         buf = (c_ubyte * sz)()
-        capi.to_wkb(self.ptr, byteorder, byref(buf))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkb12OGRGeometryH15OGRwkbByteOrderPh
+        to_wkb = capi.to_iso_wkb if self.is_measured else capi.to_wkb
+        to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
         "Return the WKT representation of the Geometry."
-        return capi.to_wkt(self.ptr, byref(c_char_p()))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkt12OGRGeometryHPPc
+        to_wkt = capi.to_iso_wkt if self.is_measured else capi.to_wkt
+        return to_wkt(self.ptr, byref(c_char_p()))
 
     @property
     def ewkt(self):
         "Return the EWKT representation of the Geometry."
         srs = self.srs
         if srs and srs.srid:
-            return 'SRID=%s;%s' % (srs.srid, self.wkt)
+            return "SRID=%s;%s" % (srs.srid, self.wkt)
         else:
             return self.wkt
 
@@ -383,7 +462,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID. By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """
@@ -402,15 +481,19 @@ class OGRGeometry(GDALBase):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
-            raise TypeError('Transform only accepts CoordTransform, '
-                            'SpatialReference, string, and integer objects.')
+            raise TypeError(
+                "Transform only accepts CoordTransform, "
+                "SpatialReference, string, and integer objects."
+            )
 
     # #### Topology Methods ####
     def _topology(self, func, other):
-        """A generalized function for topology operations, takes a GDAL function and
-        the other geometry to perform the operation on."""
+        """A generalized function for topology operations, takes a GDAL
+        function and the other geometry to perform the operation on."""
         if not isinstance(other, OGRGeometry):
-            raise TypeError('Must use another OGRGeometry object for topology operations!')
+            raise TypeError(
+                "Must use another OGRGeometry object for topology operations!"
+            )
 
         # Returning the output of the given function with the other geometry's
         # pointer.
@@ -497,17 +580,25 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+    @property
+    def centroid(self):
+        """Return the centroid (a Point) of this Polygon."""
+        # The centroid is a Point, create a geometry for this.
+        p = OGRGeometry(OGRGeomType("Point"))
+        capi.get_centroid(self.ptr, p.ptr)
+        return p
+
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
-
     def _geos_ptr(self):
         from django.contrib.gis import geos
+
         return geos.Point._create_empty() if self.empty else super()._geos_ptr()
 
     @classmethod
     def _create_empty(cls):
-        return capi.create_geom(OGRGeomType('point').num)
+        return capi.create_geom(OGRGeomType("point").num)
 
     @property
     def x(self):
@@ -522,35 +613,50 @@ class Point(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinate for this Point."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return capi.getz(self.ptr, 0)
+
+    @property
+    def m(self):
+        """Return the M coordinate for this Point."""
+        if self.is_measured:
+            return capi.getm(self.ptr, 0)
 
     @property
     def tuple(self):
         "Return the tuple of this point."
-        if self.coord_dim == 2:
-            return (self.x, self.y)
-        elif self.coord_dim == 3:
-            return (self.x, self.y, self.z)
+        if self.is_3d and self.is_measured:
+            return self.x, self.y, self.z, self.m
+        if self.is_3d:
+            return self.x, self.y, self.z
+        if self.is_measured:
+            return self.x, self.y, self.m
+        return self.x, self.y
+
     coords = tuple
 
 
 class LineString(OGRGeometry):
-
     def __getitem__(self, index):
         "Return the Point at the given index."
         if 0 <= index < self.point_count:
-            x, y, z = c_double(), c_double(), c_double()
-            capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
+            x, y, z, m = c_double(), c_double(), c_double(), c_double()
+            capi.get_point(self.ptr, index, byref(x), byref(y), byref(z), byref(m))
+            if self.is_3d and self.is_measured:
+                return x.value, y.value, z.value, m.value
+            if self.is_3d:
+                return x.value, y.value, z.value
+            if self.is_measured:
+                return x.value, y.value, m.value
             dim = self.coord_dim
             if dim == 1:
                 return (x.value,)
             elif dim == 2:
                 return (x.value, y.value)
-            elif dim == 3:
-                return (x.value, y.value, z.value)
         else:
-            raise IndexError('Index out of range when accessing points of a line string: %s.' % index)
+            raise IndexError(
+                "Index out of range when accessing points of a line string: %s." % index
+            )
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -560,6 +666,7 @@ class LineString(OGRGeometry):
     def tuple(self):
         "Return the tuple representation of this LineString."
         return tuple(self[i] for i in range(len(self)))
+
     coords = tuple
 
     def _listarr(self, func):
@@ -582,8 +689,14 @@ class LineString(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinates in a list."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return self._listarr(capi.getz)
+
+    @property
+    def m(self):
+        """Return the M coordinates in a list."""
+        if self.is_measured:
+            return self._listarr(capi.getm)
 
 
 # LinearRings are used in Polygons.
@@ -592,7 +705,6 @@ class LinearRing(LineString):
 
 
 class Polygon(OGRGeometry):
-
     def __len__(self):
         "Return the number of interior rings in this Polygon."
         return self.geom_count
@@ -600,21 +712,27 @@ class Polygon(OGRGeometry):
     def __getitem__(self, index):
         "Get the ring at the specified index."
         if 0 <= index < self.geom_count:
-            return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+            return OGRGeometry(
+                capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs
+            )
         else:
-            raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
+            raise IndexError(
+                "Index out of range when accessing rings of a polygon: %s." % index
+            )
 
     # Polygon Properties
     @property
     def shell(self):
         "Return the shell of this Polygon."
         return self[0]  # First ring is the shell
+
     exterior_ring = shell
 
     @property
     def tuple(self):
         "Return a tuple of LinearRing coordinate tuples."
         return tuple(self[i].tuple for i in range(self.geom_count))
+
     coords = tuple
 
     @property
@@ -623,13 +741,17 @@ class Polygon(OGRGeometry):
         # Summing up the number of points in each ring of the Polygon.
         return sum(self[i].point_count for i in range(self.geom_count))
 
-    @property
-    def centroid(self):
-        "Return the centroid (a Point) of this Polygon."
-        # The centroid is a Point, create a geometry for this.
-        p = OGRGeometry(OGRGeomType('Point'))
-        capi.get_centroid(self.ptr, p.ptr)
-        return p
+
+class CircularString(LineString):
+    geos_support = False
+
+
+class CurvePolygon(Polygon):
+    geos_support = False
+
+
+class CompoundCurve(OGRGeometry):
+    geos_support = False
 
 
 # Geometry Collection base class.
@@ -639,9 +761,14 @@ class GeometryCollection(OGRGeometry):
     def __getitem__(self, index):
         "Get the Geometry at the specified index."
         if 0 <= index < self.geom_count:
-            return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+            return OGRGeometry(
+                capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs
+            )
         else:
-            raise IndexError('Index out of range when accessing geometry in a collection: %s.' % index)
+            raise IndexError(
+                "Index out of range when accessing geometry in a collection: %s."
+                % index
+            )
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."
@@ -659,7 +786,7 @@ class GeometryCollection(OGRGeometry):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:
-            raise GDALException('Must add an OGRGeometry.')
+            raise GDALException("Must add an OGRGeometry.")
 
     @property
     def point_count(self):
@@ -671,6 +798,7 @@ class GeometryCollection(OGRGeometry):
     def tuple(self):
         "Return a tuple representation of this Geometry Collection."
         return tuple(self[i].tuple for i in range(self.geom_count))
+
     coords = tuple
 
 
@@ -687,6 +815,14 @@ class MultiPolygon(GeometryCollection):
     pass
 
 
+class MultiSurface(GeometryCollection):
+    geos_support = False
+
+
+class MultiCurve(GeometryCollection):
+    geos_support = False
+
+
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {
     1: Point,
@@ -696,12 +832,46 @@ GEO_CLASSES = {
     5: MultiLineString,
     6: MultiPolygon,
     7: GeometryCollection,
+    8: CircularString,
+    9: CompoundCurve,
+    10: CurvePolygon,
+    11: MultiCurve,
+    12: MultiSurface,
     101: LinearRing,
-    1 + OGRGeomType.wkb25bit: Point,
-    2 + OGRGeomType.wkb25bit: LineString,
-    3 + OGRGeomType.wkb25bit: Polygon,
-    4 + OGRGeomType.wkb25bit: MultiPoint,
-    5 + OGRGeomType.wkb25bit: MultiLineString,
-    6 + OGRGeomType.wkb25bit: MultiPolygon,
-    7 + OGRGeomType.wkb25bit: GeometryCollection,
+    1008: CircularString,  # CIRCULARSTRING Z
+    1009: CompoundCurve,  # COMPOUNDCURVE Z
+    1010: CurvePolygon,  # CURVEPOLYGON Z
+    1011: MultiCurve,  # MULTICURVE Z
+    1012: MultiSurface,  # MULTICURVE Z
+    2001: Point,  # POINT M
+    2002: LineString,  # LINESTRING M
+    2003: Polygon,  # POLYGON M
+    2004: MultiPoint,  # MULTIPOINT M
+    2005: MultiLineString,  # MULTILINESTRING M
+    2006: MultiPolygon,  # MULTIPOLYGON M
+    2007: GeometryCollection,  # GEOMETRYCOLLECTION M
+    2008: CircularString,  # CIRCULARSTRING M
+    2009: CompoundCurve,  # COMPOUNDCURVE M
+    2010: CurvePolygon,  # CURVEPOLYGON M
+    2011: MultiCurve,  # MULTICURVE M
+    2012: MultiSurface,  # MULTICURVE M
+    3001: Point,  # POINT ZM
+    3002: LineString,  # LINESTRING ZM
+    3003: Polygon,  # POLYGON ZM
+    3004: MultiPoint,  # MULTIPOINT ZM
+    3005: MultiLineString,  # MULTILINESTRING ZM
+    3006: MultiPolygon,  # MULTIPOLYGON ZM
+    3007: GeometryCollection,  # GEOMETRYCOLLECTION ZM
+    3008: CircularString,  # CIRCULARSTRING ZM
+    3009: CompoundCurve,  # COMPOUNDCURVE ZM
+    3010: CurvePolygon,  # CURVEPOLYGON ZM
+    3011: MultiCurve,  # MULTICURVE ZM
+    3012: MultiSurface,  # MULTISURFACE ZM
+    1 + OGRGeomType.wkb25bit: Point,  # POINT Z
+    2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
+    3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z
+    4 + OGRGeomType.wkb25bit: MultiPoint,  # MULTIPOINT Z
+    5 + OGRGeomType.wkb25bit: MultiLineString,  # MULTILINESTRING Z
+    6 + OGRGeomType.wkb25bit: MultiPolygon,  # MULTIPOLYGON Z
+    7 + OGRGeomType.wkb25bit: GeometryCollection,  # GEOMETRYCOLLECTION Z
 }

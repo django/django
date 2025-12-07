@@ -27,7 +27,7 @@ Available ``Meta`` options
     If a model is defined outside of an application in
     :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
-        app_label = 'myapp'
+        app_label = "myapp"
 
     If you want to represent a model with the format ``app_label.object_name``
     or ``app_label.model_name`` you can use ``model._meta.label``
@@ -48,7 +48,7 @@ Available ``Meta`` options
 
     The name of the database table to use for the model::
 
-        db_table = 'music_album'
+        db_table = "music_album"
 
 .. _table-names:
 
@@ -68,9 +68,9 @@ a database table named ``bookstore_book``.
 To override the database table name, use the ``db_table`` parameter in
 ``class Meta``.
 
-If your database table name is an SQL reserved word, or contains characters that
-aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
-Django quotes column and table names behind the scenes.
+If your database table name is an SQL reserved word, or contains characters
+that aren't allowed in Python variable names -- notably, the hyphen -- that's
+OK. Django quotes column and table names behind the scenes.
 
 .. admonition:: Use lowercase table names for MariaDB and MySQL
 
@@ -90,6 +90,22 @@ Django quotes column and table names behind the scenes.
    Such quoted names can also be used with Django's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
+
+``db_table_comment``
+--------------------
+
+.. attribute:: Options.db_table_comment
+
+The comment on the database table to use for this model. It is useful for
+documenting database tables for individuals with direct database access who may
+not be looking at your Django code. For example::
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE)
+        answer = models.TextField()
+
+        class Meta:
+            db_table_comment = "Question answers"
 
 ``db_tablespace``
 -----------------
@@ -114,8 +130,8 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_related_name
 
-    The name that will be used by default for the relation from a related object
-    back to this one. The default is ``<model_name>_set``.
+    The name that will be used by default for the relation from a related
+    object back to this one. The default is ``<model_name>_set``.
 
     This option also sets :attr:`~ForeignKey.related_query_name`.
 
@@ -143,7 +159,7 @@ Django quotes column and table names behind the scenes.
         get_latest_by = "order_date"
 
         # Latest by priority descending, order_date ascending.
-        get_latest_by = ['-priority', 'order_date']
+        get_latest_by = ["-priority", "order_date"]
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
@@ -165,7 +181,7 @@ Django quotes column and table names behind the scenes.
     includes
 
     #. Adding an automatic primary key field to the model if you don't
-       declare it.  To avoid confusion for later code readers, it's
+       declare it. To avoid confusion for later code readers, it's
        recommended to specify all the columns from the database table you
        are modeling when using unmanaged models.
 
@@ -183,9 +199,10 @@ Django quotes column and table names behind the scenes.
     For tests involving models with ``managed=False``, it's up to you to ensure
     the correct tables are created as part of the test setup.
 
-    If you're interested in changing the Python-level behavior of a model class,
-    you *could* use ``managed=False`` and create a copy of an existing model.
-    However, there's a better approach for that situation: :ref:`proxy-models`.
+    If you're interested in changing the Python-level behavior of a model
+    class, you *could* use ``managed=False`` and create a copy of an existing
+    model. However, there's a better approach for that situation:
+    :ref:`proxy-models`.
 
 ``order_with_respect_to``
 -------------------------
@@ -200,36 +217,44 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Question(models.Model):
             text = models.TextField()
             # ...
+
 
         class Answer(models.Model):
             question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
-                order_with_respect_to = 'question'
+                order_with_respect_to = "question"
 
-    When ``order_with_respect_to`` is set, two additional methods are provided to
-    retrieve and to set the order of the related objects: ``get_RELATED_order()``
-    and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
-    example, assuming that a ``Question`` object has multiple related ``Answer``
-    objects, the list returned contains the primary keys of the related ``Answer``
-    objects::
+    When ``order_with_respect_to`` is set, two additional methods are provided
+    to retrieve and to set the order of the related objects:
+    ``get_RELATED_order()`` and ``set_RELATED_order()``, where ``RELATED`` is
+    the lowercased model name. For example, assuming that a ``Question`` object
+    has multiple related ``Answer`` objects, the list returned contains the
+    primary keys of the related ``Answer`` objects:
+
+    .. code-block:: pycon
 
         >>> question = Question.objects.get(id=1)
         >>> question.get_answer_order()
         [1, 2, 3]
 
-    The order of a ``Question`` object's related ``Answer`` objects can be set by
-    passing in a list of ``Answer`` primary keys::
+    The order of a ``Question`` object's related ``Answer`` objects can be set
+    by passing in a list of ``Answer`` primary keys:
+
+    .. code-block:: pycon
 
         >>> question.set_answer_order([3, 1, 2])
 
     The related objects also get two methods, ``get_next_in_order()`` and
-    ``get_previous_in_order()``, which can be used to access those objects in their
-    proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+    ``get_previous_in_order()``, which can be used to access those objects in
+    their proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+
+    .. code-block:: pycon
 
         >>> answer = Answer.objects.get(id=2)
         >>> answer.get_next_in_order()
@@ -257,9 +282,10 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.ordering
 
-    The default ordering for the object, for use when obtaining lists of objects::
+    The default ordering for the object, for use when obtaining lists of
+    objects::
 
-        ordering = ['-order_date']
+        ordering = ["-order_date"]
 
     This is a tuple or list of strings and/or query expressions. Each string is
     a field name with an optional "-" prefix, which indicates descending order.
@@ -268,22 +294,29 @@ Django quotes column and table names behind the scenes.
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
-        ordering = ['pub_date']
+        ordering = ["pub_date"]
 
     To order by ``pub_date`` descending, use this::
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
-    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+    To order by ``pub_date`` descending, then by ``author`` ascending, use
+    this::
 
-        ordering = ['-pub_date', 'author']
+        ordering = ["-pub_date", "author"]
 
     You can also use :doc:`query expressions </ref/models/expressions>`. To
     order by ``author`` ascending and make null values sort last, use this::
 
         from django.db.models import F
 
-        ordering = [F('author').asc(nulls_last=True)]
+        ordering = [F("author").asc(nulls_last=True)]
+
+.. admonition:: Default ordering and GROUP BY
+
+    In :ref:`GROUP BY queries <aggregation-ordering-interaction>` (for example,
+    those using :meth:`~.QuerySet.values` and :meth:`~.QuerySet.annotate`), the
+    default ordering is not applied.
 
 .. warning::
 
@@ -302,11 +335,12 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.permissions
 
-    Extra permissions to enter into the permissions table when creating this object.
-    Add, change, delete, and view permissions are automatically created for each
-    model. This example specifies an extra permission, ``can_deliver_pizzas``::
+    Extra permissions to enter into the permissions table when creating this
+    object. Add, change, delete, and view permissions are automatically created
+    for each model. This example specifies an extra permission,
+    ``can_deliver_pizzas``::
 
-        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+        permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -327,8 +361,8 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.proxy
 
-    If ``proxy = True``, a model which subclasses another model will be treated as
-    a :ref:`proxy model <proxy-models>`.
+    If ``proxy = True``, a model which subclasses another model will be treated
+    as a :ref:`proxy model <proxy-models>`.
 
 ``required_db_features``
 ------------------------
@@ -349,8 +383,8 @@ Django quotes column and table names behind the scenes.
 
     Name of a supported database vendor that this model is specific to. Current
     built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
-    ``oracle``. If this attribute is not empty and the current connection vendor
-    doesn't match it, the model will not be synchronized.
+    ``oracle``. If this attribute is not empty and the current connection
+    vendor doesn't match it, the model will not be synchronized.
 
 ``select_on_save``
 ------------------
@@ -358,7 +392,7 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.select_on_save
 
     Determines if Django will use the pre-1.6
-    :meth:`django.db.models.Model.save()` algorithm. The old algorithm
+    :meth:`django.db.models.Model.save` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
     The new algorithm tries an ``UPDATE`` directly. In some rare cases the
     ``UPDATE`` of an existing row isn't visible to Django. An example is the
@@ -369,7 +403,7 @@ Django quotes column and table names behind the scenes.
     Usually there is no need to set this attribute. The default is
     ``False``.
 
-    See :meth:`django.db.models.Model.save()` for more about the old and
+    See :meth:`django.db.models.Model.save` for more about the old and
     new saving algorithm.
 
 ``indexes``
@@ -382,14 +416,15 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Customer(models.Model):
             first_name = models.CharField(max_length=100)
             last_name = models.CharField(max_length=100)
 
             class Meta:
                 indexes = [
-                    models.Index(fields=['last_name', 'first_name']),
-                    models.Index(fields=['first_name'], name='first_name_idx'),
+                    models.Index(fields=["last_name", "first_name"]),
+                    models.Index(fields=["first_name"], name="first_name_idx"),
                 ]
 
 ``unique_together``
@@ -405,51 +440,26 @@ Django quotes column and table names behind the scenes.
 
     Sets of field names that, taken together, must be unique::
 
-        unique_together = [['driver', 'restaurant']]
+        unique_together = [["driver", "restaurant"]]
 
     This is a list of lists that must be unique when considered together.
-    It's used in the Django admin and is enforced at the database level (i.e., the
-    appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
+    It's used in the Django admin and is enforced at the database level (i.e.,
+    the appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
     For convenience, ``unique_together`` can be a single list when dealing with
     a single set of fields::
 
-        unique_together = ['driver', 'restaurant']
+        unique_together = ["driver", "restaurant"]
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
-    unique_together. (It's not clear what that would even mean!) If you
+    ``unique_together``. (It's not clear what that would even mean!) If you
     need to validate uniqueness related to a
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
     The ``ValidationError`` raised during model validation when the constraint
     is violated has the ``unique_together`` error code.
-
-``index_together``
-------------------
-
-.. attribute:: Options.index_together
-
-    .. admonition:: Use the :attr:`~Options.indexes` option instead.
-
-        The newer :attr:`~Options.indexes` option provides more functionality
-        than ``index_together``. ``index_together`` may be deprecated in the
-        future.
-
-    Sets of field names that, taken together, are indexed::
-
-        index_together = [
-            ["pub_date", "deadline"],
-        ]
-
-    This list of fields will be indexed together (i.e. the appropriate
-    ``CREATE INDEX`` statement will be issued.)
-
-    For convenience, ``index_together`` can be a single list when dealing with a single
-    set of fields::
-
-        index_together = ["pub_date", "deadline"]
 
 ``constraints``
 ---------------
@@ -461,12 +471,13 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Customer(models.Model):
             age = models.IntegerField()
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+                    models.CheckConstraint(condition=models.Q(age__gte=18), name="age_gte_18"),
                 ]
 
 ``verbose_name``
@@ -490,7 +501,8 @@ Django quotes column and table names behind the scenes.
 
         verbose_name_plural = "stories"
 
-    If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+    If this isn't given, Django will use :attr:`~Options.verbose_name` +
+    ``"s"``.
 
 Read-only ``Meta`` attributes
 =============================

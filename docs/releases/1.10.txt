@@ -92,9 +92,10 @@ Minor features
   it easier to add custom tools in this case.
 
 * The :class:`~django.contrib.admin.models.LogEntry` model now stores change
-  messages in a JSON structure so that the message can be dynamically translated
-  using the current active language. A new ``LogEntry.get_change_message()``
-  method is now the preferred way of retrieving the change message.
+  messages in a JSON structure so that the message can be dynamically
+  translated using the current active language. A new
+  ``LogEntry.get_change_message()`` method is now the preferred way of
+  retrieving the change message.
 
 * Selected objects for fields in ``ModelAdmin.raw_id_fields`` now have a link
   to object's change form.
@@ -242,7 +243,7 @@ CSRF
   changes the form token value on every request (while keeping an invariant
   secret which can be used to validate the different tokens).
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -286,10 +287,10 @@ Forms
   a ``minlength`` attribute if the field has a ``min_length``.
 
 * Required form fields now have the ``required`` HTML attribute. Set the new
-  :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
-  attribute to ``False`` to disable it. The ``required`` attribute isn't
-  included on forms of formsets because the browser validation may not be
-  correct when adding and deleting formsets.
+  :attr:`Form.use_required_attribute
+  <django.forms.Form.use_required_attribute>` attribute to ``False`` to disable
+  it. The ``required`` attribute isn't included on forms of formsets because
+  the browser validation may not be correct when adding and deleting formsets.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -387,12 +388,12 @@ Models
 * Reverse foreign keys from proxy models are now propagated to their
   concrete class. The reverse relation attached by a
   :class:`~django.db.models.ForeignKey` pointing to a proxy model is now
-  accessible as a descriptor on the proxied model class and may be referenced in
-  queryset filtering.
+  accessible as a descriptor on the proxied model class and may be referenced
+  in queryset filtering.
 
 * The new :meth:`Field.rel_db_type() <django.db.models.Field.rel_db_type>`
-  method returns the database column data type for fields such as ``ForeignKey``
-  and ``OneToOneField`` that point to another field.
+  method returns the database column data type for fields such as
+  ``ForeignKey`` and ``OneToOneField`` that point to another field.
 
 * The :attr:`~django.db.models.Func.arity` class attribute is added to
   :class:`~django.db.models.Func`. This attribute can be used to set the number
@@ -445,9 +446,9 @@ Requests and Responses
 * Added ``request.user`` to the debug view.
 
 * Added :class:`~django.http.HttpResponse` methods
-  :meth:`~django.http.HttpResponse.readable()` and
-  :meth:`~django.http.HttpResponse.seekable()` to make an instance a
-  stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
+  :meth:`~django.http.HttpResponse.readable` and
+  :meth:`~django.http.HttpResponse.seekable` to make an instance a
+  stream-like object and allow wrapping it with :class:`io.TextIOWrapper`.
 
 * Added the :attr:`HttpRequest.content_type
   <django.http.HttpRequest.content_type>` and
@@ -498,7 +499,7 @@ Tests
 URLs
 ~~~~
 
-* An addition in :func:`django.setup()` allows URL resolving that happens
+* An addition in :func:`django.setup` allows URL resolving that happens
   outside of the request/response cycle (e.g. in management commands and
   standalone scripts) to take :setting:`FORCE_SCRIPT_NAME` into account when it
   is set.
@@ -545,16 +546,20 @@ Database backend API
 ``select_related()`` prohibits non-relational fields for nested relations
 -------------------------------------------------------------------------
 
-Django 1.8 added validation for non-relational fields in ``select_related()``::
+Django 1.8 added validation for non-relational fields in ``select_related()``:
 
-    >>> Book.objects.select_related('title')
+.. code-block:: pycon
+
+    >>> Book.objects.select_related("title")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'title'
 
-But it didn't prohibit nested non-relation fields as it does now::
+But it didn't prohibit nested non-relation fields as it does now:
 
-    >>> Book.objects.select_related('author__name')
+.. code-block:: pycon
+
+    >>> Book.objects.select_related("author__name")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'name'
@@ -577,7 +582,7 @@ to generate and apply a database migration for your user model.
 
 We considered an increase to 254 characters to more easily allow the use of
 email addresses (which are limited to 254 characters) as usernames but rejected
-it due to a MySQL limitation.  When using the ``utf8mb4`` encoding (recommended
+it due to a MySQL limitation. When using the ``utf8mb4`` encoding (recommended
 for proper Unicode support), MySQL can only create unique indexes with 191
 characters by default. Therefore, if you need a longer length, please use a
 custom user model.
@@ -587,10 +592,11 @@ when creating a user or changing usernames::
 
     from django.contrib.auth.forms import UserCreationForm
 
+
     class MyUserCreationForm(UserCreationForm):
         username = forms.CharField(
             max_length=30,
-            help_text='Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.',
+            help_text="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         )
 
 If you wish to keep this restriction in the admin, set ``UserAdmin.add_form``
@@ -599,8 +605,10 @@ to use this form::
     from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
+
     class UserAdmin(BaseUserAdmin):
         add_form = MyUserCreationForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
@@ -620,26 +628,29 @@ disable Django's logging configuration or override it with your own, you'll
 need to add the appropriate logging configuration if you want to see that
 output::
 
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
-        }
-    },
-    'handlers': {
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
-        },
-    },
-    'loggers': {
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
-        }
-    }
+  LOGGING = {
+      # ...
+      "formatters": {
+          "django.server": {
+              "()": "django.utils.log.ServerFormatter",
+              "format": "[%(server_time)s] %(message)s",
+          }
+      },
+      "handlers": {
+          "django.server": {
+              "level": "INFO",
+              "class": "logging.StreamHandler",
+              "formatter": "django.server",
+          },
+      },
+      "loggers": {
+          "django.server": {
+              "handlers": ["django.server"],
+              "level": "INFO",
+              "propagate": False,
+          }
+      },
+  }
 
 ``auth.CustomUser`` and ``auth.ExtensionUser`` test models were removed
 -----------------------------------------------------------------------
@@ -677,13 +688,13 @@ If you have an old Django project with MD5 or SHA1 (even salted) encoded
 passwords, be aware that these can be cracked fairly easily with today's
 hardware. To make Django users acknowledge continued use of weak hashers, the
 following hashers are removed from the default :setting:`PASSWORD_HASHERS`
-setting::
+setting:
 
-    'django.contrib.auth.hashers.SHA1PasswordHasher'
-    'django.contrib.auth.hashers.MD5PasswordHasher'
-    'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
-    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
-    'django.contrib.auth.hashers.CryptPasswordHasher'
+* ``"django.contrib.auth.hashers.SHA1PasswordHasher"``
+* ``"django.contrib.auth.hashers.MD5PasswordHasher"``
+* ``"django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"``
+* ``"django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"``
+* ``"django.contrib.auth.hashers.CryptPasswordHasher"``
 
 Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>` to
 strengthen the hashes in your database. If that's not feasible, add the
@@ -693,19 +704,21 @@ that you need.
 You can check if your database has any of the removed hashers like this::
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
 
     # Unsalted MD5/SHA1:
-    User.objects.filter(password__startswith='md5$$')
-    User.objects.filter(password__startswith='sha1$$')
+    User.objects.filter(password__startswith="md5$$")
+    User.objects.filter(password__startswith="sha1$$")
     # Salted MD5/SHA1:
-    User.objects.filter(password__startswith='md5$').exclude(password__startswith='md5$$')
-    User.objects.filter(password__startswith='sha1$').exclude(password__startswith='sha1$$')
+    User.objects.filter(password__startswith="md5$").exclude(password__startswith="md5$$")
+    User.objects.filter(password__startswith="sha1$").exclude(password__startswith="sha1$$")
     # Crypt hasher:
-    User.objects.filter(password__startswith='crypt$$')
+    User.objects.filter(password__startswith="crypt$$")
 
     from django.db.models import CharField
     from django.db.models.functions import Length
+
     CharField.register_lookup(Length)
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
@@ -719,13 +732,15 @@ custom lookup for it. For example::
     from django.db.models import Field
     from django.db.models.lookups import Exact
 
-    class MyField(Field):
-        ...
+
+    class MyField(Field): ...
+
 
     class MyFieldExact(Exact):
         def get_prep_lookup(self):
             # do_custom_stuff_for_myfield
-            ....
+            ...
+
 
     MyField.register_lookup(MyFieldExact)
 
@@ -741,10 +756,9 @@ custom lookup for it. For example::
   aggregate function now returns a ``float`` instead of ``decimal.Decimal``.
   (It's still wrapped in a measure of square meters.)
 
-* The default :class:`~django.contrib.gis.geos.GEOSGeometry` representation (WKT
-  output) is trimmed by default. That is, instead of
-  ``POINT (23.0000000000000000 5.5000000000000000)``, you'll get
-  ``POINT (23 5.5)``.
+* The default :class:`~django.contrib.gis.geos.GEOSGeometry` representation
+  (WKT output) is trimmed by default. That is, instead of ``POINT
+  (23.0000000000000000 5.5000000000000000)``, you'll get ``POINT (23 5.5)``.
 
 Maximum size of a request body and the number of GET/POST parameters is limited
 -------------------------------------------------------------------------------
@@ -752,7 +766,7 @@ Maximum size of a request body and the number of GET/POST parameters is limited
 Two new settings help mitigate denial-of-service attacks via large requests:
 
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limits the size that a request body
-  may be. File uploads don't count towards this limit.
+  may be. File uploads don't count toward this limit.
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` limits the number of GET/POST
   parameters that are parsed.
 
@@ -825,9 +839,9 @@ Miscellaneous
   in :setting:`AUTHENTICATION_BACKENDS` instead.
 
 * In light of the previous change, the test client's
-  :meth:`~django.test.Client.login()` method no longer always rejects inactive
+  :meth:`~django.test.Client.login` method no longer always rejects inactive
   users but instead delegates this decision to the authentication backend.
-  :meth:`~django.test.Client.force_login()` also delegates the decision to the
+  :meth:`~django.test.Client.force_login` also delegates the decision to the
   authentication backend, so if you're using the default backends, you need to
   use an active user.
 
@@ -836,7 +850,7 @@ Miscellaneous
 
 * The ``base_field`` attribute of
   :class:`~django.contrib.postgres.fields.RangeField` is now a type of field,
-  not an instance of a field.  If you have created a custom subclass of
+  not an instance of a field. If you have created a custom subclass of
   :class:`~django.contrib.postgres.fields.RangeField`, you should change the
   ``base_field`` attribute.
 
@@ -864,7 +878,7 @@ Miscellaneous
 
 * The WSGI handler no longer removes content of responses from ``HEAD``
   requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
-  Web servers already implement this behavior. Responses retrieved using the
+  web servers already implement this behavior. Responses retrieved using the
   Django test client continue to have these "response fixes" applied.
 
 * ``Model.__init__()`` now receives ``django.db.models.DEFERRED`` as the value
@@ -889,8 +903,8 @@ Miscellaneous
   might be possible to use :attr:`~django.db.models.FileField.upload_to` also.
 
 * The subject of mail sent by ``AdminEmailHandler`` is no longer truncated at
-  989 characters. If you were counting on a limited length, truncate the subject
-  yourself.
+  989 characters. If you were counting on a limited length, truncate the
+  subject yourself.
 
 * Private expressions ``django.db.models.expressions.Date`` and ``DateTime``
   are removed. The new :class:`~django.db.models.functions.Trunc` expressions
@@ -918,7 +932,7 @@ Miscellaneous
   To adapt, move the fragment outside the template tag:
   ``{% static 'img.svg' %}#fragment``.
 
-* When :setting:`USE_L10N` is ``True``, localization is now applied for the
+* When ``USE_L10N`` is ``True``, localization is now applied for the
   :tfilter:`date` and :tfilter:`time` filters when no format string is
   specified. The ``DATE_FORMAT`` and ``TIME_FORMAT`` specifiers from the active
   locale are used instead of the settings of the same name.
@@ -931,13 +945,17 @@ Features deprecated in 1.10
 Direct assignment to a reverse foreign key or many-to-many relation
 -------------------------------------------------------------------
 
-Instead of assigning related objects using direct assignment::
+Instead of assigning related objects using direct assignment:
+
+.. code-block:: pycon
 
     >>> new_list = [obj1, obj2, obj3]
     >>> e.related_set = new_list
 
 Use the :meth:`~django.db.models.fields.related.RelatedManager.set` method
-added in Django 1.9::
+added in Django 1.9:
+
+.. code-block:: pycon
 
         >>> e.related_set.set([obj1, obj2, obj3])
 
@@ -991,6 +1009,7 @@ validator::
     from django.core.validators import validate_comma_separated_integer_list
     from django.db import models
 
+
     class MyModel(models.Model):
         numbers = models.CharField(..., validators=[validate_comma_separated_integer_list])
 
@@ -1010,24 +1029,30 @@ Assume the following models::
 
     from django.db import models
 
+
     class Foo(models.Model):
         pass
+
 
     class Bar(models.Model):
         foo = models.ForeignKey(Foo)
 
         class Meta:
-            default_related_name = 'bars'
+            default_related_name = "bars"
 
 In older versions, :attr:`~django.db.models.Options.default_related_name`
 couldn't be used as a query lookup. This is fixed and support for the old
 lookup name is deprecated. For example, since ``default_related_name`` is set
-in model ``Bar``, instead of using the model name ``bar`` as the lookup::
+in model ``Bar``, instead of using the model name ``bar`` as the lookup:
+
+.. code-block:: pycon
 
     >>> bar = Bar.objects.get(pk=1)
     >>> Foo.objects.get(bar=bar)
 
-use the default_related_name ``bars``::
+use the default_related_name ``bars``:
+
+.. code-block:: pycon
 
     >>> Foo.objects.get(bars=bar)
 
@@ -1041,14 +1066,16 @@ features, is deprecated. Replace it with a custom lookup::
 
     from django.db import models
 
+
     class Search(models.Lookup):
-        lookup_name = 'search'
+        lookup_name = "search"
 
         def as_mysql(self, compiler, connection):
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
             params = lhs_params + rhs_params
-            return 'MATCH (%s) AGAINST (%s IN BOOLEAN MODE)' % (lhs, rhs), params
+            return "MATCH (%s) AGAINST (%s IN BOOLEAN MODE)" % (lhs, rhs), params
+
 
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
@@ -1069,9 +1096,9 @@ For example, if you use
 to know whether the user is currently logged-in you would use::
 
     if request.user.is_authenticated:
-        ... # Do something for logged-in users.
+        ...  # Do something for logged-in users.
     else:
-        ... # Do something for anonymous users.
+        ...  # Do something for anonymous users.
 
 instead of ``request.user.is_authenticated()``.
 
@@ -1290,7 +1317,7 @@ to remove usage of these features.
   :func:`~django.template.loader.get_template` and
   :func:`~django.template.loader.select_template` no longer accept a
   :class:`~django.template.Context` in their
-  :meth:`~django.template.backends.base.Template.render()` method.
+  :meth:`~django.template.backends.base.Template.render` method.
 
 * :doc:`Template response APIs </ref/template-response>` enforce the use of
   :class:`dict` and backend-dependent template objects instead of

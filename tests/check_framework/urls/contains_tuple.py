@@ -1,3 +1,3 @@
 urlpatterns = [
-    (r'^tuple/$', lambda x: x),
+    (r"^tuple/$", lambda x: x),
 ]

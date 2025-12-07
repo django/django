@@ -1,12 +1,13 @@
 "File-based cache backend"
+
 import glob
-import hashlib
 import os
 import pickle
 import random
 import tempfile
 import time
 import zlib
+from hashlib import md5
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files import locks
@@ -14,7 +15,7 @@ from django.core.files.move import file_move_safe
 
 
 class FileBasedCache(BaseCache):
-    cache_suffix = '.djcache'
+    cache_suffix = ".djcache"
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def __init__(self, dir, params):
@@ -31,7 +32,7 @@ class FileBasedCache(BaseCache):
     def get(self, key, default=None, version=None):
         fname = self._key_to_file(key, version)
         try:
-            with open(fname, 'rb') as f:
+            with open(fname, "rb") as f:
                 if not self._is_expired(f):
                     return pickle.loads(zlib.decompress(f.read()))
         except FileNotFoundError:
@@ -50,7 +51,7 @@ class FileBasedCache(BaseCache):
         fd, tmp_path = tempfile.mkstemp(dir=self._dir)
         renamed = False
         try:
-            with open(fd, 'wb') as f:
+            with open(fd, "wb") as f:
                 self._write_content(f, timeout, value)
             file_move_safe(tmp_path, fname, allow_overwrite=True)
             renamed = True
@@ -60,7 +61,7 @@ class FileBasedCache(BaseCache):
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         try:
-            with open(self._key_to_file(key, version), 'r+b') as f:
+            with open(self._key_to_file(key, version), "r+b") as f:
                 try:
                     locks.lock(f, locks.LOCK_EX)
                     if self._is_expired(f):
@@ -90,10 +91,11 @@ class FileBasedCache(BaseCache):
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)
-        if os.path.exists(fname):
-            with open(fname, 'rb') as f:
+        try:
+            with open(fname, "rb") as f:
                 return not self._is_expired(f)
-        return False
+        except FileNotFoundError:
+            return False
 
     def _cull(self):
         """
@@ -108,8 +110,7 @@ class FileBasedCache(BaseCache):
         if self._cull_frequency == 0:
             return self.clear()  # Clear the cache when CULL_FREQUENCY = 0
         # Delete a random selection of entries
-        filelist = random.sample(filelist,
-                                 int(num_entries / self._cull_frequency))
+        filelist = random.sample(filelist, int(num_entries / self._cull_frequency))
         for fname in filelist:
             self._delete(fname)
 
@@ -127,10 +128,16 @@ class FileBasedCache(BaseCache):
         Convert a key into a cache file path. Basically this is the
         root cache path joined with the md5sum of the key and a suffix.
         """
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-        return os.path.join(self._dir, ''.join(
-            [hashlib.md5(key.encode()).hexdigest(), self.cache_suffix]))
+        key = self.make_and_validate_key(key, version=version)
+        return os.path.join(
+            self._dir,
+            "".join(
+                [
+                    md5(key.encode(), usedforsecurity=False).hexdigest(),
+                    self.cache_suffix,
+                ]
+            ),
+        )
 
     def clear(self):
         """
@@ -160,5 +167,5 @@ class FileBasedCache(BaseCache):
         """
         return [
             os.path.join(self._dir, fname)
-            for fname in glob.glob1(self._dir, '*%s' % self.cache_suffix)
+            for fname in glob.glob(f"*{self.cache_suffix}", root_dir=self._dir)
         ]

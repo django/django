@@ -3,23 +3,27 @@
 # Translators:
 # Christopher Penkin, 2012
 # Christopher Penkin, 2012
-# F Wolff <friedel@translate.org.za>, 2019-2020
+# F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025
 # Pi Delport <pjdelport@gmail.com>, 2012
 # Pi Delport <pjdelport@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-20 17:06+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: af\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Skrap gekose %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -29,12 +33,8 @@ msgstr "Het %(count)d %(items)s suksesvol geskrap."
 msgid "Cannot delete %(name)s"
 msgstr "Kan %(name)s nie skrap nie"
 
-msgid "Are you sure?"
-msgstr "Is u seker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Skrap gekose %(verbose_name_plural)s"
+msgid "Delete multiple objects"
+msgstr "Skrap meerdere objekte"
 
 msgid "Administration"
 msgstr "Administrasie"
@@ -180,6 +180,9 @@ msgstr "Geen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hou “Control” in (of “Command” op ’n Mac) om meer as een te kies."
 
+msgid "Select this object for an action - {}"
+msgstr "Kies dié objek vir ’n aksie - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Die {name} “{obj}” is suksesvol bygevoeg."
@@ -198,11 +201,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "Die {name} “{obj}” is suksesvol gewysig. Redigeer dit gerus weer onder."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Die {name} “{obj}” is suksesvol bygevoeg. Redigeer dit gerus weer onder."
 
 #, python-brace-format
 msgid ""
@@ -264,12 +262,16 @@ msgstr[1] "Al %(total_count)s gekies"
 msgid "0 of %(cnt)s selected"
 msgstr "0 uit %(cnt)s gekies"
 
+msgid "Delete"
+msgstr "Skrap"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Verander geskiedenis: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -339,9 +341,21 @@ msgstr "Kies al %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Verwyder keuses"
 
+msgid "Breadcrumbs"
+msgstr "Broodkrummels"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelle in die %(name)s-toepassing"
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr "Voeg skakel by"
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Voeg by"
@@ -350,30 +364,45 @@ msgid "View"
 msgstr "Bekyk"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr ""
+msgstr "U het nie regte om enigiets te sien of te redigeer nie."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Gee eerstens ’n gebruikernaam en wagwoord. Daarna kan meer gebruikervelde "
-"geredigeer word."
+"Nadat ’n gebruiker geskep is, kan meer gebruikerkeuses geredigeer word."
 
-msgid "Enter a username and password."
-msgstr "Vul ’n gebruikersnaam en wagwoord in."
+msgid "Error:"
+msgstr "Fout:"
 
 msgid "Change password"
 msgstr "Verander wagwoord"
 
-msgid "Please correct the error below."
-msgstr "Maak die onderstaande fout asb. reg."
+msgid "Set password"
+msgstr "Stel wagwoord"
 
-msgid "Please correct the errors below."
-msgstr "Maak die onderstaande foute asb. reg."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Korrigeer asb. die fout hier onder."
+msgstr[1] "Korrigeer asb. die foute hier onder."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Vul ’n nuwe wagwoord vir gebruiker <strong>%(username)s</strong> in."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Dié aksie sal wagwoordgebaseerde aanmelding <strong>aktiveer</strong> vir "
+"dié gebruiker."
+
+msgid "Disable password-based authentication"
+msgstr "Deaktiveer wagwoordgebaseerde aanmelding"
+
+msgid "Enable password-based authentication"
+msgstr "Aktiveer wagwoordgebaseerde aanmelding"
+
+msgid "Skip to main content"
+msgstr "Gaan direk na hoofinhoud"
 
 msgid "Welcome,"
 msgstr "Welkom,"
@@ -400,8 +429,14 @@ msgstr "Bekyk op werf"
 msgid "Filter"
 msgstr "Filtreer"
 
+msgid "Hide counts"
+msgstr "Versteek tellings"
+
+msgid "Show counts"
+msgstr "Wys tellings"
+
 msgid "Clear all filters"
-msgstr ""
+msgstr "Verwyder alle filters"
 
 msgid "Remove from sorting"
 msgstr "Verwyder uit sortering"
@@ -413,8 +448,14 @@ msgstr "Sorteerprioriteit: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Wissel sortering"
 
-msgid "Delete"
-msgstr "Skrap"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Wissel tema (tans: outomaties)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Wissel tema (tans: lig)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Wissel tema (tans: donker)"
 
 #, python-format
 msgid ""
@@ -450,9 +491,6 @@ msgstr "Ja, ek is seker"
 
 msgid "No, take me back"
 msgstr "Nee, ek wil teruggaan"
-
-msgid "Delete multiple objects"
-msgstr "Skrap meerdere objekte"
 
 #, python-format
 msgid ""
@@ -498,6 +536,15 @@ msgstr "My aksies"
 msgid "None available"
 msgstr "Niks beskikbaar nie"
 
+msgid "Added:"
+msgstr "Bygevoeg:"
+
+msgid "Changed:"
+msgstr "Gewysig:"
+
+msgid "Deleted:"
+msgstr "Geskrap:"
+
 msgid "Unknown content"
 msgstr "Onbekende inhoud"
 
@@ -518,11 +565,20 @@ msgstr ""
 "U is aangemeld as %(username)s, maar het nie toegang tot hierdie bladsy nie. "
 "Wil u met ’n ander rekening aanmeld?"
 
-msgid "Forgotten your password or username?"
-msgstr "Wagwoord of gebruikersnaam vergeet?"
+msgid "Forgotten your login credentials?"
+msgstr "Aanmeldinligting vergeet?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Navigasie aan/af"
+
+msgid "Sidebar"
+msgstr "Kantbalk"
+
+msgid "Start typing to filter…"
+msgstr "Tik om te filtreer..."
+
+msgid "Filter navigation items"
+msgstr "Filtreer navigasie-items"
 
 msgid "Date/time"
 msgstr "Datum/tyd"
@@ -532,6 +588,11 @@ msgstr "Gebruiker"
 
 msgid "Action"
 msgstr "Aksie"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "inskrywing"
+msgstr[1] "inskrywings"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,7 +650,11 @@ msgstr "Voeg nog ’n %(model)s by"
 msgid "Delete selected %(model)s"
 msgstr "Skrap gekose %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Wys gekose %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
 "Dankie vir die kwaliteittyd wat u met die webwerf deurgebring het vandag."
 
@@ -666,8 +731,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gaan asseblief na die volgende bladsy en kies ’n nuwe wagwoord:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "U gebruikernaam vir ingeval u vergeet het:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Vir ingeval u vergeet het, u is:"
 
 msgid "Thanks for using our site!"
 msgstr "Dankie vir die gebruik van ons webwerf!"
@@ -688,6 +753,9 @@ msgstr "E-posadres:"
 
 msgid "Reset my password"
 msgstr "Herstel my wagwoord"
+
+msgid "Select all objects on this page for an action"
+msgstr "Kies alle objekte op dié bladsy vir ’n aksie"
 
 msgid "All dates"
 msgstr "Alle datums"

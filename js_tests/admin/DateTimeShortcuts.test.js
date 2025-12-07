@@ -30,13 +30,30 @@ QUnit.test('custom time shortcuts', function(assert) {
     assert.equal($('.clockbox').find('a').first().text(), '3 a.m.');
 });
 
-QUnit.test('time zone offset warning', function(assert) {
+QUnit.test('time zone offset warning - single field', function(assert) {
     const $ = django.jQuery;
     const savedOffset = $('body').attr('data-admin-utc-offset');
-    const timeField = $('<input type="text" name="time_test" class="vTimeField">');
+    // Single date or time field.
+    const timeField = $('<input id="id_updated_at" type="text" name="updated_at" class="vTimeField">');
     $('#qunit-fixture').append(timeField);
     $('body').attr('data-admin-utc-offset', new Date().getTimezoneOffset() * -60 + 3600);
     DateTimeShortcuts.init();
     $('body').attr('data-admin-utc-offset', savedOffset);
     assert.equal($('.timezonewarning').text(), 'Note: You are 1 hour behind server time.');
+    assert.equal($('.timezonewarning').attr("id"), "id_updated_at_timezone_warning_helptext");
+});
+
+QUnit.test('time zone offset warning - date and time field', function(assert) {
+    const $ = django.jQuery;
+    const savedOffset = $('body').attr('data-admin-utc-offset');
+    // DateTimeField with fieldset containing date and time inputs.
+    const dateTimeField = '<p class="datetime">' +
+    '<input id="id_updated_at_0" type="text" name="updated_at_0" class="vDateField">' +
+    '<input id="id_updated_at_1" type="text" name="updated_at_1" class="vTimeField">' +
+    '</p>';
+    $('#qunit-fixture').append($(dateTimeField));
+    $('body').attr('data-admin-utc-offset', new Date().getTimezoneOffset() * -60 + 3600);
+    DateTimeShortcuts.init();
+    $('body').attr('data-admin-utc-offset', savedOffset);
+    assert.equal($('.timezonewarning').attr("id"), "id_updated_at_timezone_warning_helptext");
 });

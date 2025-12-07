@@ -110,7 +110,7 @@ perform appropriate manual type conversions prior to executing queries.
 ==============================================
 
 Historically, queries that use
-:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+:meth:`~django.db.models.query.QuerySet.select_for_update` could be
 executed in autocommit mode, outside of a transaction. Before Django
 1.6, Django's automatic transactions mode allowed this to be used to
 lock records until the next write operation. Django 1.6 introduced
@@ -172,8 +172,8 @@ Other bugfixes and changes
 * Wrapped database exceptions in ``_set_autocommit``
   (:ticket:`22321`).
 
-* Fixed atomicity when closing a database connection or when the database server
-  disconnects (:ticket:`21239` and :ticket:`21202`)
+* Fixed atomicity when closing a database connection or when the database
+  server disconnects (:ticket:`21239` and :ticket:`21202`)
 
 * Fixed regression in ``prefetch_related`` that caused the related objects
   query to include an unnecessary join

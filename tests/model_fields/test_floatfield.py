@@ -5,7 +5,6 @@ from .models import FloatModel
 
 
 class TestFloatField(TestCase):
-
     def test_float_validates_object(self):
         instance = FloatModel(size=2.5)
         # Try setting float field to unsaved object
@@ -20,8 +19,8 @@ class TestFloatField(TestCase):
         # Set field to object on saved instance
         instance.size = instance
         msg = (
-            'Tried to update field model_fields.FloatModel.size with a model '
-            'instance, %r. Use a value compatible with FloatField.'
+            "Tried to update field model_fields.FloatModel.size with a model "
+            "instance, %r. Use a value compatible with FloatField."
         ) % instance
         with transaction.atomic():
             with self.assertRaisesMessage(TypeError, msg):
@@ -40,8 +39,8 @@ class TestFloatField(TestCase):
             (TypeError, set()),
             (TypeError, object()),
             (TypeError, complex()),
-            (ValueError, 'non-numeric string'),
-            (ValueError, b'non-numeric byte-string'),
+            (ValueError, "non-numeric string"),
+            (ValueError, b"non-numeric byte-string"),
         ]
         for exception, value in tests:
             with self.subTest(value):

@@ -1,9 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2020
+# BouRock, 2015-2025
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@protonmail.com>, 2013
+# Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Cihan Okyay <cihan.okyay@linux.org.tr>, 2014
@@ -15,16 +15,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 08:30+0000\n"
-"Last-Translator: BouRock\n"
-"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: BouRock, 2015-2025\n"
+"Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Seçilen %(verbose_name_plural)s nesnelerini sil"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,12 +38,8 @@ msgstr "%(count)d adet %(items)s başarılı olarak silindi."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s silinemiyor"
 
-msgid "Are you sure?"
-msgstr "Emin misiniz?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Seçili %(verbose_name_plural)s nesnelerini sil"
+msgid "Delete multiple objects"
+msgstr "Birden fazla nesneyi sil"
 
 msgid "Administration"
 msgstr "Yönetim"
@@ -186,6 +186,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Birden fazla seçmek için “Ctrl” veya Mac’teki “Command” tuşuna basılı tutun."
 
+msgid "Select this object for an action - {}"
+msgstr "Bir eylem için bu nesneyi seç - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” başarılı olarak eklendi."
@@ -206,11 +209,6 @@ msgid ""
 msgstr ""
 "{name} “{obj}” başarılı olarak değiştirildi. Aşağıda tekrar "
 "düzenleyebilirsiniz."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
@@ -273,12 +271,16 @@ msgstr[1] "Tüm %(total_count)s nesne seçildi"
 msgid "0 of %(cnt)s selected"
 msgstr "0 / %(cnt)s nesne seçildi"
 
+msgid "Delete"
+msgstr "Sil"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Değişiklik geçmişi: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -332,11 +334,8 @@ msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta yoluyla bildirildi ve kısa süre "
 "içinde düzeltilecektir. Sabrınız için teşekkür ederiz."
 
-msgid "Run the selected action"
-msgstr "Seçilen eylemi çalıştır"
-
-msgid "Go"
-msgstr "Git"
+msgid "Run"
+msgstr "Çalıştır"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Tüm sayfalardaki nesneleri seçmek için buraya tıklayın"
@@ -348,9 +347,21 @@ msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 msgid "Clear selection"
 msgstr "Seçimi temizle"
 
+msgid "Breadcrumbs"
+msgstr "İçerik haritaları"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s uygulamasındaki modeller"
+
+msgid "Model name"
+msgstr "Model adı"
+
+msgid "Add link"
+msgstr "Bağlantı ekle"
+
+msgid "Change or view list link"
+msgstr "Liste bağlantısını değiştir veya görüntüle"
 
 msgid "Add"
 msgstr "Ekle"
@@ -361,28 +372,44 @@ msgstr "Göster"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Önce, bir kullanıcı adı ve parola girin. Ondan sonra, daha fazla kullanıcı "
-"seçeneğini düzenleyebileceksiniz."
+"Bir kullanıcı oluşturduktan sonra, daha fazla kullanıcı seçeneğini "
+"düzenleyebileceksiniz."
 
-msgid "Enter a username and password."
-msgstr "Kullanıcı adı ve parola girin."
+msgid "Error:"
+msgstr "Hata:"
 
 msgid "Change password"
 msgstr "Parolayı değiştir"
 
-msgid "Please correct the error below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
+msgid "Set password"
+msgstr "Parola ayarla"
 
-msgid "Please correct the errors below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Lütfen aşağıdaki hatayı düzeltin."
+msgstr[1] "Lütfen aşağıdaki hataları düzeltin."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> kullanıcısı için yeni bir parola girin."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Bu eylem, bu kullanıcı için parola tabanlı kimlik doğrulaması "
+"<strong>etkinleştirecektir</strong>."
+
+msgid "Disable password-based authentication"
+msgstr "Parola tabanlı kimlik doğrulamasını etkisizleştir"
+
+msgid "Enable password-based authentication"
+msgstr "Parola tabanlı kimlik doğrulamasını etkinleştir"
+
+msgid "Skip to main content"
+msgstr "Ana içeriğe atla"
 
 msgid "Welcome,"
 msgstr "Hoş Geldiniz,"
@@ -409,8 +436,17 @@ msgstr "Sitede görüntüle"
 msgid "Filter"
 msgstr "Süz"
 
+msgid "Hide counts"
+msgstr "Sayıları gizle"
+
+msgid "Show counts"
+msgstr "Sayıları göster"
+
 msgid "Clear all filters"
 msgstr "Tüm süzgeçleri temizle"
+
+msgid "Save"
+msgstr "Kaydet"
 
 msgid "Remove from sorting"
 msgstr "Sıralamadan kaldır"
@@ -422,33 +458,39 @@ msgstr "Sıralama önceliği: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Sıralamayı değiştir"
 
-msgid "Delete"
-msgstr "Sil"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Temayı değiştir (şu anki tema: otomatik)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Temayı değiştir (şu anki tema: açık)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Temayı değiştir (şu anki tema: koyu)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' nesnesinin silinmesi, ilgili nesnelerin "
-"silinmesi ile sonuçlanacak, ancak hesabınız aşağıdaki nesnelerin türünü "
-"silmek için izine sahip değil."
+"%(object_name)s “%(escaped_object)s” nesnesinin silinmesi, ilgili nesnelerin "
+"silinmesi ile sonuçlanacak, ancak hesabınız aşağıdaki nesne türlerini silmek "
+"için izne sahip değil:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' nesnesinin silinmesi, aşağıda korunan "
+"%(object_name)s “%(escaped_object)s” nesnesinin silinmesi, aşağıda korunan "
 "ilgili nesnelerin silinmesini gerektirecek:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"%(object_name)s \"%(escaped_object)s\" nesnesini silmek istediğinize emin "
+"%(object_name)s “%(escaped_object)s” nesnesini silmek istediğinize emin "
 "misiniz? Aşağıdaki ilgili öğelerin tümü silinecektir:"
 
 msgid "Objects"
@@ -460,9 +502,6 @@ msgstr "Evet, eminim"
 msgid "No, take me back"
 msgstr "Hayır, beni geri götür"
 
-msgid "Delete multiple objects"
-msgstr "Birden fazla nesneyi sil"
-
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -470,8 +509,8 @@ msgid ""
 "types of objects:"
 msgstr ""
 "Seçilen %(objects_name)s nesnelerinin silinmesi, ilgili nesnelerin silinmesi "
-"ile sonuçlanacak, ancak hesabınız aşağıdaki nesnelerin türünü silmek için "
-"izine sahip değil."
+"ile sonuçlanacak, ancak hesabınız aşağıdaki nesne türlerini silmek için izne "
+"sahip değil:"
 
 #, python-format
 msgid ""
@@ -508,6 +547,15 @@ msgstr "Eylemlerim"
 msgid "None available"
 msgstr "Mevcut değil"
 
+msgid "Added:"
+msgstr "Eklendi:"
+
+msgid "Changed:"
+msgstr "Değiştirildi:"
+
+msgid "Deleted:"
+msgstr "Silindi:"
+
 msgid "Unknown content"
 msgstr "Bilinmeyen içerik"
 
@@ -528,11 +576,20 @@ msgstr ""
 "%(username)s olarak kimlik doğrulamanız yapıldı, ancak bu sayfaya erişmek "
 "için yetkili değilsiniz. Farklı bir hesapla oturum açmak ister misiniz?"
 
-msgid "Forgotten your password or username?"
-msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
+msgid "Forgotten your login credentials?"
+msgstr "Oturum açma kimlik bilgilerinizi mi unuttunuz?"
 
 msgid "Toggle navigation"
 msgstr "Gezinmeyi aç/kapat"
+
+msgid "Sidebar"
+msgstr "Kenar çubuğu"
+
+msgid "Start typing to filter…"
+msgstr "Süzmek için yazmaya başlayın..."
+
+msgid "Filter navigation items"
+msgstr "Gezinti öğelerini süz"
 
 msgid "Date/time"
 msgstr "Tarih/saat"
@@ -543,6 +600,15 @@ msgstr "Kullanıcı"
 msgid "Action"
 msgstr "Eylem"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "%(name)s girişlerini sayfalandırma"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "giriş"
+msgstr[1] "giriş"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -550,14 +616,19 @@ msgstr ""
 "Bu nesne değişme geçmişine sahip değil. Muhtemelen bu yönetici sitesi "
 "aracılığıyla eklenmedi."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "%(name)s sayfalandırma"
+
 msgid "Show all"
 msgstr "Tümünü göster"
 
-msgid "Save"
-msgstr "Kaydet"
-
 msgid "Popup closing…"
 msgstr "Açılır pencere kapanıyor…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "%(name)s ara"
 
 msgid "Search"
 msgstr "Ara"
@@ -599,8 +670,12 @@ msgstr "Başka bir %(model)s ekle"
 msgid "Delete selected %(model)s"
 msgstr "Seçilen %(model)s sil"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Bugün Web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Seçilen %(model)s görüntüle"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Bugün web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."
 
 msgid "Log in again"
 msgstr "Tekrar oturum aç"
@@ -675,8 +750,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lütfen şurada belirtilen sayfaya gidin ve yeni bir parola seçin:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Unutma ihtimalinize karşı, kullanıcı adınız:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Unutmuş olmanız durumunda, siz:"
 
 msgid "Thanks for using our site!"
 msgstr "Sitemizi kullandığınız için teşekkürler!"
@@ -697,6 +772,9 @@ msgstr "E-posta adresi:"
 
 msgid "Reset my password"
 msgstr "Parolamı sıfırla"
+
+msgid "Select all objects on this page for an action"
+msgstr "Bir eylem için bu sayfadaki tüm nesneleri seç"
 
 msgid "All dates"
 msgstr "Tüm tarihler"

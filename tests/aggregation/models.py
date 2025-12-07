@@ -4,7 +4,7 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-    friends = models.ManyToManyField('self', blank=True)
+    friends = models.ManyToManyField("self", blank=True)
     rating = models.FloatField(null=True)
 
     def __str__(self):
@@ -27,7 +27,7 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
 
@@ -43,3 +43,10 @@ class Store(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Employee(models.Model):
+    work_day_preferences = models.JSONField()
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

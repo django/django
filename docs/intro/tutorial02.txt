@@ -3,8 +3,8 @@ Writing your first Django app, part 2
 =====================================
 
 This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off.
-We'll setup the database, create your first model, and get a quick introduction
-to Django's automatically-generated admin site.
+We'll set up the database, create your first model, and get a quick
+introduction to Django's automatically-generated admin site.
 
 .. admonition:: Where to get help:
 
@@ -17,48 +17,15 @@ Database setup
 Now, open up :file:`mysite/settings.py`. It's a normal Python module with
 module-level variables representing Django settings.
 
-By default, the configuration uses SQLite. If you're new to databases, or
-you're just interested in trying Django, this is the easiest choice. SQLite is
-included in Python, so you won't need to install anything else to support your
-database. When starting your first real project, however, you may want to use a
-more scalable database like PostgreSQL, to avoid database-switching headaches
-down the road.
+By default, the :setting:`DATABASES` configuration uses SQLite. If you're new
+to databases, or you're just interested in trying Django, this is the easiest
+choice. SQLite is included in Python, so you won't need to install anything
+else to support your database. When starting your first real project, however,
+you may want to use a more scalable database like PostgreSQL, to avoid
+database-switching headaches down the road.
 
-If you wish to use another database, install the appropriate :ref:`database
-bindings <database-installation>` and change the following keys in the
-:setting:`DATABASES` ``'default'`` item to match your database connection
-settings:
-
-* :setting:`ENGINE <DATABASE-ENGINE>` -- Either
-  ``'django.db.backends.sqlite3'``,
-  ``'django.db.backends.postgresql'``,
-  ``'django.db.backends.mysql'``, or
-  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
-  <third-party-notes>`.
-
-* :setting:`NAME` -- The name of your database. If you're using SQLite, the
-  database will be a file on your computer; in that case, :setting:`NAME`
-  should be the full absolute path, including filename, of that file. The
-  default value, ``BASE_DIR / 'db.sqlite3'``, will store the file in your
-  project directory.
-
-If you are not using SQLite as your database, additional settings such as
-:setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
-For more details, see the reference documentation for :setting:`DATABASES`.
-
-.. admonition:: For databases other than SQLite
-
-    If you're using a database besides SQLite, make sure you've created a
-    database by this point. Do that with "``CREATE DATABASE database_name;``"
-    within your database's interactive prompt.
-
-    Also make sure that the database user provided in :file:`mysite/settings.py`
-    has "create database" privileges. This allows automatic creation of a
-    :ref:`test database <the-test-database>` which will be needed in a later
-    tutorial.
-
-    If you're using SQLite, you don't need to create anything beforehand - the
-    database file will be created automatically when it is needed.
+If you wish to use another database, see :ref:`details to customize and get
+your database running <database-installation>`.
 
 While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
 your time zone.
@@ -84,7 +51,8 @@ come with Django:
 * :mod:`django.contrib.staticfiles` -- A framework for managing
   static files.
 
-These applications are included by default as a convenience for the common case.
+These applications are included by default as a convenience for the common
+case.
 
 Some of these applications make use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
@@ -95,13 +63,13 @@ that, run the following command:
     $ python manage.py migrate
 
 The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
-and creates any necessary database tables according to the database settings
-in your :file:`mysite/settings.py` file and the database migrations shipped
-with the app (we'll cover those later). You'll see a message for each
-migration it applies. If you're interested, run the command-line client for your
-database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MariaDB, MySQL),
-``.schema`` (SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to
-display the tables Django created.
+and creates any necessary database tables according to the database settings in
+your :file:`mysite/settings.py` file and the database migrations shipped with
+the app (we'll cover those later). You'll see a message for each migration it
+applies. If you're interested, run the command-line client for your database
+and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MariaDB, MySQL), ``.tables``
+(SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to display the
+tables Django created.
 
 .. admonition:: For the minimalists
 
@@ -122,13 +90,13 @@ additional metadata.
 
 .. admonition:: Philosophy
 
-   A model is the single, definitive source of truth about your data. It contains
-   the essential fields and behaviors of the data you're storing. Django follows
-   the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
-   place and automatically derive things from it.
+   A model is the single, definitive source of information about your data. It
+   contains the essential fields and behaviors of the data you're storing.
+   Django follows the :ref:`DRY Principle <dry>`. The goal is to define your
+   data model in one place and automatically derive things from it.
 
-   This includes the migrations - unlike in Ruby On Rails, for example, migrations
-   are entirely derived from your models file, and are essentially a
+   This includes the migrations - unlike in Ruby On Rails, for example,
+   migrations are entirely derived from your models file, and are essentially a
    history that Django can roll through to update your database schema to
    match your current models.
 
@@ -141,14 +109,14 @@ These concepts are represented by Python classes. Edit the
 :file:`polls/models.py` file so it looks like this:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     from django.db import models
 
 
     class Question(models.Model):
         question_text = models.CharField(max_length=200)
-        pub_date = models.DateTimeField('date published')
+        pub_date = models.DateTimeField("date published")
 
 
     class Choice(models.Model):
@@ -171,12 +139,12 @@ format. You'll use this value in your Python code, and your database will use
 it as the column name.
 
 You can use an optional first positional argument to a
-:class:`~django.db.models.Field` to designate a human-readable name. That's used
-in a couple of introspective parts of Django, and it doubles as documentation.
-If this field isn't provided, Django will use the machine-readable name. In this
-example, we've only defined a human-readable name for ``Question.pub_date``.
-For all other fields in this model, the field's machine-readable name will
-suffice as its human-readable name.
+:class:`~django.db.models.Field` to designate a human-readable name. That's
+used in a couple of introspective parts of Django, and it doubles as
+documentation. If this field isn't provided, Django will use the
+machine-readable name. In this example, we've only defined a human-readable
+name for ``Question.pub_date``. For all other fields in this model, the field's
+machine-readable name will suffice as its human-readable name.
 
 Some :class:`~django.db.models.Field` classes have required arguments.
 :class:`~django.db.models.CharField`, for example, requires that you give it a
@@ -199,7 +167,8 @@ That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
 * Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python database-access API for accessing ``Question`` and ``Choice`` objects.
+* Create a Python database-access API for accessing ``Question`` and ``Choice``
+  objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
@@ -217,16 +186,16 @@ add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
 this:
 
 .. code-block:: python
-    :caption: mysite/settings.py
+    :caption: ``mysite/settings.py``
 
     INSTALLED_APPS = [
-        'polls.apps.PollsConfig',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
+        "polls.apps.PollsConfig",
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
     ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
@@ -241,8 +210,8 @@ You should see something similar to the following:
 
     Migrations for 'polls':
       polls/migrations/0001_initial.py
-        - Create model Question
-        - Create model Choice
+        + Create model Question
+        + Create model Choice
 
 By running ``makemigrations``, you're telling Django that you've made
 some changes to your models (in this case, you've made new ones) and that
@@ -256,8 +225,8 @@ they're designed to be human-editable in case you want to manually tweak how
 Django changes things.
 
 There's a command that will run the migrations for you and manage your database
-schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
-moment - but first, let's see what SQL that migration would run. The
+schema automatically - that's called :djadmin:`migrate`, and we'll come to it
+in a moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
 .. console::
@@ -274,7 +243,7 @@ readability):
     -- Create model Question
     --
     CREATE TABLE "polls_question" (
-        "id" serial NOT NULL PRIMARY KEY,
+        "id" bigint NOT NULL PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY,
         "question_text" varchar(200) NOT NULL,
         "pub_date" timestamp with time zone NOT NULL
     );
@@ -282,10 +251,10 @@ readability):
     -- Create model Choice
     --
     CREATE TABLE "polls_choice" (
-        "id" serial NOT NULL PRIMARY KEY,
+        "id" bigint NOT NULL PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY,
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL,
-        "question_id" integer NOT NULL
+        "question_id" bigint NOT NULL
     );
     ALTER TABLE "polls_choice"
       ADD CONSTRAINT "polls_choice_question_id_c5b4b260_fk_polls_question_id"
@@ -315,10 +284,10 @@ Note the following:
   PostgreSQL to not enforce the foreign key until the end of the transaction.
 
 * It's tailored to the database you're using, so database-specific field types
-  such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
-  primary key autoincrement`` (SQLite) are handled for you automatically. Same
-  goes for the quoting of field names -- e.g., using double quotes or
-  single quotes.
+  such as ``auto_increment`` (MySQL), ``bigint PRIMARY KEY GENERATED BY DEFAULT
+  AS IDENTITY`` (PostgreSQL), or ``integer primary key autoincrement`` (SQLite)
+  are handled for you automatically. Same goes for the quoting of field names
+  -- e.g., using double quotes or single quotes.
 
 * The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
   database - instead, it prints it to the screen so that you can see what SQL
@@ -330,7 +299,8 @@ If you're interested, you can also run
 :djadmin:`python manage.py check <check>`; this checks for any problems in
 your project without making migrations or touching the database.
 
-Now, run :djadmin:`migrate` again to create those model tables in your database:
+Now, run :djadmin:`migrate` again to create those model tables in your
+database:
 
 .. console::
 
@@ -380,10 +350,12 @@ API Django gives you. To invoke the Python shell, use this command:
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
+By default, the :djadmin:`shell` command automatically imports the models from
+your :setting:`INSTALLED_APPS`.
 
-Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
+Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 
-    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
+.. code-block:: pycon
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -407,7 +379,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
-    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.UTC)
 
     # Change values by changing the attributes, then calling save().
     >>> q.question_text = "What's up?"
@@ -424,14 +396,16 @@ representation of this object. Let's fix that by editing the ``Question`` model
 ``Choice``:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     from django.db import models
+
 
     class Question(models.Model):
         # ...
         def __str__(self):
             return self.question_text
+
 
     class Choice(models.Model):
         # ...
@@ -448,7 +422,7 @@ automatically-generated admin.
 Let's also add a custom method to this model:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     import datetime
 
@@ -467,10 +441,15 @@ time-zone-related utilities in :mod:`django.utils.timezone`, respectively. If
 you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
-Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again::
+Save these changes and start a new Python interactive shell. (If a
+three-chevron prompt (>>>) indicates you are still in the shell, you need to
+exit first using ``exit()``). Run ``python manage.py shell`` again to reload
+the models.
 
-    >>> from polls.models import Choice, Question
+.. RemovedInDjango70Warning: When Python 3.12 is no longer supported,
+  ``exit()`` can be replaced with ``exit``.
+
+.. code-block:: pycon
 
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()
@@ -480,7 +459,7 @@ Save these changes and start a new Python interactive shell by running
     # keyword arguments.
     >>> Question.objects.filter(id=1)
     <QuerySet [<Question: What's up?>]>
-    >>> Question.objects.filter(question_text__startswith='What')
+    >>> Question.objects.filter(question_text__startswith="What")
     <QuerySet [<Question: What's up?>]>
 
     # Get the question that was published this year.
@@ -509,8 +488,8 @@ Save these changes and start a new Python interactive shell by running
     # Give the Question a couple of Choices. The create call constructs a new
     # Choice object, does the INSERT statement, adds the choice to the set
     # of available choices and returns the new Choice object. Django creates
-    # a set to hold the "other side" of a ForeignKey relation
-    # (e.g. a question's choice) which can be accessed via the API.
+    # a set (defined as "choice_set") to hold the "other side" of a ForeignKey
+    # relation (e.g. a question's choice) which can be accessed via the API.
     >>> q = Question.objects.get(pk=1)
 
     # Display any choices from the related object set -- none so far.
@@ -518,11 +497,11 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet []>
 
     # Create three choices.
-    >>> q.choice_set.create(choice_text='Not much', votes=0)
+    >>> q.choice_set.create(choice_text="Not much", votes=0)
     <Choice: Not much>
-    >>> q.choice_set.create(choice_text='The sky', votes=0)
+    >>> q.choice_set.create(choice_text="The sky", votes=0)
     <Choice: The sky>
-    >>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+    >>> c = q.choice_set.create(choice_text="Just hacking again", votes=0)
 
     # Choice objects have API access to their related Question objects.
     >>> c.question
@@ -543,7 +522,7 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
     # Let's delete one of the choices. Use delete() for that.
-    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+    >>> c = q.choice_set.filter(choice_text__startswith="Just hacking")
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects
@@ -563,8 +542,8 @@ Introducing the Django Admin
 
     Django was written in a newsroom environment, with a very clear separation
     between "content publishers" and the "public" site. Site managers use the
-    system to add news stories, events, sports scores, etc., and that content is
-    displayed on the public site. Django solves the problem of creating a
+    system to add news stories, events, sports scores, etc., and that content
+    is displayed on the public site. Django solves the problem of creating a
     unified interface for site administrators to edit content.
 
     The admin isn't intended to be used by site visitors. It's for site
@@ -613,7 +592,7 @@ If the server is not running start it like so:
 
     $ python manage.py runserver
 
-Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
+Now, open a web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: _images/admin01.png
@@ -626,8 +605,8 @@ given language (if Django has appropriate translations).
 Enter the admin site
 --------------------
 
-Now, try logging in with the superuser account you created in the previous step.
-You should see the Django admin index page:
+Now, try logging in with the superuser account you created in the previous
+step. You should see the Django admin index page:
 
 .. image:: _images/admin02.png
    :alt: Django admin index page
@@ -646,7 +625,7 @@ have an admin interface. To do this, open the :file:`polls/admin.py` file, and
 edit it to look like this:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
@@ -657,15 +636,15 @@ edit it to look like this:
 Explore the free admin functionality
 ------------------------------------
 
-Now that we've registered ``Question``, Django knows that it should be displayed on
-the admin index page:
+Now that we've registered ``Question``, Django knows that it should be
+displayed on the admin index page:
 
 .. image:: _images/admin03t.png
    :alt: Django admin index page, now with polls displayed
 
-Click "Questions". Now you're at the "change list" page for questions. This page
-displays all the questions in the database and lets you choose one to change it.
-There's the "What's up?" question we created earlier:
+Click "Questions". Now you're at the "change list" page for questions. This
+page displays all the questions in the database and lets you choose one to
+change it. There's the "What's up?" question we created earlier:
 
 .. image:: _images/admin04t.png
    :alt: Polls change list page

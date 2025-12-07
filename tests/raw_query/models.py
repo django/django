@@ -12,8 +12,9 @@ class Author(models.Model):
         # this'll make the test suite get angry if annotations aren't
         # treated differently than fields.
         for k in kwargs:
-            assert k in [f.attname for f in self._meta.fields], \
+            assert k in [f.attname for f in self._meta.fields], (
                 "Author.__init__ got an unexpected parameter: %s" % k
+            )
 
 
 class Book(models.Model):
@@ -24,7 +25,9 @@ class Book(models.Model):
 
 
 class BookFkAsPk(models.Model):
-    book = models.ForeignKey(Book, models.CASCADE, primary_key=True, db_column="not_the_default")
+    book = models.ForeignKey(
+        Book, models.CASCADE, primary_key=True, db_column="not_the_default"
+    )
 
 
 class Coffee(models.Model):
@@ -33,7 +36,7 @@ class Coffee(models.Model):
 
 
 class MixedCaseIDColumn(models.Model):
-    id = models.AutoField(primary_key=True, db_column='MiXeD_CaSe_Id')
+    id = models.AutoField(primary_key=True, db_column="MiXeD_CaSe_Id")
 
 
 class Reviewer(models.Model):

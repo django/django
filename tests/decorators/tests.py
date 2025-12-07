@@ -1,31 +1,34 @@
+import asyncio
 from functools import update_wrapper, wraps
 from unittest import TestCase
 
+from asgiref.sync import iscoroutinefunction
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (
-    login_required, permission_required, user_passes_test,
+    login_required,
+    permission_required,
+    user_passes_test,
 )
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
-from django.views.decorators.cache import (
-    cache_control, cache_page, never_cache,
-)
-from django.views.decorators.clickjacking import (
-    xframe_options_deny, xframe_options_exempt, xframe_options_sameorigin,
-)
+from django.views.decorators.cache import cache_control, cache_page, never_cache
 from django.views.decorators.http import (
-    condition, require_GET, require_http_methods, require_POST, require_safe,
+    condition,
+    require_GET,
+    require_http_methods,
+    require_POST,
+    require_safe,
 )
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 
 
 def fully_decorated(request):
     """Expected __doc__"""
-    return HttpResponse('<html><body>dummy</body></html>')
+    return HttpResponse("<html><body>dummy</body></html>")
 
 
 fully_decorated.anything = "Expected __dict__"
@@ -40,6 +43,7 @@ def compose(*functions):
         for f in functions[1:]:
             result = f(result)
         return result
+
     return _inner
 
 
@@ -50,30 +54,24 @@ full_decorator = compose(
     require_POST,
     require_safe,
     condition(lambda r: None, lambda r: None),
-
     # django.views.decorators.vary
-    vary_on_headers('Accept-language'),
+    vary_on_headers("Accept-language"),
     vary_on_cookie,
-
     # django.views.decorators.cache
     cache_page(60 * 15),
     cache_control(private=True),
     never_cache,
-
     # django.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
     user_passes_test(lambda u: True),
     login_required,
-    permission_required('change_world'),
-
+    permission_required("change_world"),
     # django.contrib.admin.views.decorators
     staff_member_required,
-
     # django.utils.functional
     keep_lazy(HttpResponse),
     keep_lazy_text,
     lazy,
-
     # django.utils.safestring
     mark_safe,
 )
@@ -82,25 +80,25 @@ fully_decorated = full_decorator(fully_decorated)
 
 
 class DecoratorsTest(TestCase):
-
     def test_attributes(self):
         """
         Built-in decorators set certain attributes of the wrapped function.
         """
-        self.assertEqual(fully_decorated.__name__, 'fully_decorated')
-        self.assertEqual(fully_decorated.__doc__, 'Expected __doc__')
-        self.assertEqual(fully_decorated.__dict__['anything'], 'Expected __dict__')
+        self.assertEqual(fully_decorated.__name__, "fully_decorated")
+        self.assertEqual(fully_decorated.__doc__, "Expected __doc__")
+        self.assertEqual(fully_decorated.__dict__["anything"], "Expected __dict__")
 
     def test_user_passes_test_composition(self):
         """
         The user_passes_test decorator can be applied multiple times (#9474).
         """
+
         def test1(user):
-            user.decorators_applied.append('test1')
+            user.decorators_applied.append("test1")
             return True
 
         def test2(user):
-            user.decorators_applied.append('test2')
+            user.decorators_applied.append("test2")
             return True
 
         def callback(request):
@@ -120,53 +118,28 @@ class DecoratorsTest(TestCase):
         request.user.decorators_applied = []
         response = callback(request)
 
-        self.assertEqual(response, ['test2', 'test1'])
-
-    def test_cache_page(self):
-        def my_view(request):
-            return "response"
-        my_view_cached = cache_page(123)(my_view)
-        self.assertEqual(my_view_cached(HttpRequest()), "response")
-        my_view_cached2 = cache_page(123, key_prefix="test")(my_view)
-        self.assertEqual(my_view_cached2(HttpRequest()), "response")
-
-    def test_require_safe_accepts_only_safe_methods(self):
-        """
-        Test for the require_safe decorator.
-        A view returns either a response or an exception.
-        Refs #15637.
-        """
-        def my_view(request):
-            return HttpResponse("OK")
-        my_safe_view = require_safe(my_view)
-        request = HttpRequest()
-        request.method = 'GET'
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = 'HEAD'
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = 'POST'
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = 'PUT'
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = 'DELETE'
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
+        self.assertEqual(response, ["test2", "test1"])
 
 
 # For testing method_decorator, a decorator that assumes a single argument.
 # We will get type arguments if there is a mismatch in the number of arguments.
 def simple_dec(func):
+    @wraps(func)
     def wrapper(arg):
         return func("test:" + arg)
-    return wraps(func)(wrapper)
+
+    return wrapper
 
 
 simple_dec_m = method_decorator(simple_dec)
 
 
-# For testing method_decorator, two decorators that add an attribute to the function
+# For testing method_decorator, two decorators that add an attribute to the
+# function
 def myattr_dec(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     wrapper.myattr = True
     return wrapper
 
@@ -177,6 +150,7 @@ myattr_dec_m = method_decorator(myattr_dec)
 def myattr2_dec(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     wrapper.myattr2 = True
     return wrapper
 
@@ -189,16 +163,17 @@ class ClsDec:
         self.myattr = myattr
 
     def __call__(self, f):
-
-        def wrapped():
+        def wrapper():
             return f() and self.myattr
-        return update_wrapper(wrapped, f)
+
+        return update_wrapper(wrapper, f)
 
 
 class MethodDecoratorTests(SimpleTestCase):
     """
     Tests for method_decorator
     """
+
     def test_preserve_signature(self):
         class Test:
             @simple_dec_m
@@ -212,20 +187,22 @@ class MethodDecoratorTests(SimpleTestCase):
         @myattr_dec
         def func():
             pass
-        self.assertIs(getattr(func, 'myattr', False), True)
+
+        self.assertIs(getattr(func, "myattr", False), True)
 
         @myattr2_dec
         def func():
             pass
-        self.assertIs(getattr(func, 'myattr2', False), True)
+
+        self.assertIs(getattr(func, "myattr2", False), True)
 
         @myattr_dec
         @myattr2_dec
         def func():
             pass
 
-        self.assertIs(getattr(func, 'myattr', False), True)
-        self.assertIs(getattr(func, 'myattr2', False), False)
+        self.assertIs(getattr(func, "myattr", False), True)
+        self.assertIs(getattr(func, "myattr2", False), False)
 
         # Decorate using method_decorator() on the method.
         class TestPlain:
@@ -246,7 +223,7 @@ class MethodDecoratorTests(SimpleTestCase):
                 pass
 
         # Decorate using an iterable of function decorators.
-        @method_decorator((myattr_dec, myattr2_dec), 'method')
+        @method_decorator((myattr_dec, myattr2_dec), "method")
         class TestFunctionIterable:
             def method(self):
                 "A method"
@@ -261,18 +238,24 @@ class MethodDecoratorTests(SimpleTestCase):
                 "A method"
                 pass
 
-        tests = (TestPlain, TestMethodAndClass, TestFunctionIterable, TestMethodIterable)
+        tests = (
+            TestPlain,
+            TestMethodAndClass,
+            TestFunctionIterable,
+            TestMethodIterable,
+        )
         for Test in tests:
             with self.subTest(Test=Test):
-                self.assertIs(getattr(Test().method, 'myattr', False), True)
-                self.assertIs(getattr(Test().method, 'myattr2', False), True)
-                self.assertIs(getattr(Test.method, 'myattr', False), True)
-                self.assertIs(getattr(Test.method, 'myattr2', False), True)
-                self.assertEqual(Test.method.__doc__, 'A method')
-                self.assertEqual(Test.method.__name__, 'method')
+                self.assertIs(getattr(Test().method, "myattr", False), True)
+                self.assertIs(getattr(Test().method, "myattr2", False), True)
+                self.assertIs(getattr(Test.method, "myattr", False), True)
+                self.assertIs(getattr(Test.method, "myattr2", False), True)
+                self.assertEqual(Test.method.__doc__, "A method")
+                self.assertEqual(Test.method.__name__, "method")
 
     def test_new_attribute(self):
         """A decorator that sets a new attribute on the method."""
+
         def decorate(func):
             func.x = 1
             return func
@@ -290,6 +273,7 @@ class MethodDecoratorTests(SimpleTestCase):
         decorators = {myattr_dec_m, myattr2_dec_m}
         msg = "'set' object is not subscriptable"
         with self.assertRaisesMessage(TypeError, msg):
+
             @method_decorator(decorators, "method")
             class TestIterable:
                 def method(self):
@@ -306,7 +290,6 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertIs(Test().method(), False)
 
     def test_descriptors(self):
-
         def original_dec(wrapped):
             def _wrapped(arg):
                 return wrapped(arg)
@@ -346,9 +329,11 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         @method_decorator can be used to decorate a class and its methods.
         """
+
         def deco(func):
             def _wrapper(*args, **kwargs):
                 return True
+
             return _wrapper
 
         @method_decorator(deco, name="method")
@@ -362,14 +347,17 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         @method_decorator can accept a tuple of decorators.
         """
+
         def add_question_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "?"
+
             return _wrapper
 
         def add_exclamation_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "!"
+
             return _wrapper
 
         # The order should be consistent with the usual order in which
@@ -402,6 +390,7 @@ class MethodDecoratorTests(SimpleTestCase):
             "<class 'Test'> (1)"
         )
         with self.assertRaisesMessage(TypeError, msg):
+
             @method_decorator(lambda: None, name="prop")
             class Test:
                 prop = 1
@@ -419,91 +408,292 @@ class MethodDecoratorTests(SimpleTestCase):
             "decorated class: <class 'Test'>. Got 'nonexistent_method' instead"
         )
         with self.assertRaisesMessage(ValueError, msg):
-            @method_decorator(lambda: None, name='nonexistent_method')
+
+            @method_decorator(lambda: None, name="nonexistent_method")
             class Test:
                 @classmethod
                 def __module__(cls):
                     return "tests"
 
+    def test_wrapper_assignments(self):
+        """@method_decorator preserves wrapper assignments."""
+        func_name = None
+        func_module = None
 
-class XFrameOptionsDecoratorsTests(TestCase):
+        def decorator(func):
+            @wraps(func)
+            def inner(*args, **kwargs):
+                nonlocal func_name, func_module
+                func_name = getattr(func, "__name__", None)
+                func_module = getattr(func, "__module__", None)
+                return func(*args, **kwargs)
+
+            return inner
+
+        class Test:
+            @method_decorator(decorator)
+            def method(self):
+                return "tests"
+
+        Test().method()
+        self.assertEqual(func_name, "method")
+        self.assertIsNotNone(func_module)
+
+
+def async_simple_dec(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        result = await func(*args, **kwargs)
+        return f"returned: {result}"
+
+    return wrapper
+
+
+async_simple_dec_m = method_decorator(async_simple_dec)
+
+
+class AsyncMethodDecoratorTests(SimpleTestCase):
     """
-    Tests for the X-Frame-Options decorators.
+    Tests for async method_decorator
     """
-    def test_deny_decorator(self):
-        """
-        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
-        """
-        @xframe_options_deny
-        def a_view(request):
-            return HttpResponse()
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
-    def test_sameorigin_decorator(self):
-        """
-        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
-        header.
-        """
-        @xframe_options_sameorigin
-        def a_view(request):
-            return HttpResponse()
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
+    async def test_preserve_signature(self):
+        class Test:
+            @async_simple_dec_m
+            async def say(self, msg):
+                return f"Saying {msg}"
 
-    def test_exempt_decorator(self):
-        """
-        Ensures @xframe_options_exempt properly instructs the
-        XFrameOptionsMiddleware to NOT set the header.
-        """
-        @xframe_options_exempt
-        def a_view(request):
-            return HttpResponse()
-        req = HttpRequest()
-        resp = a_view(req)
-        self.assertIsNone(resp.get('X-Frame-Options', None))
-        self.assertTrue(resp.xframe_options_exempt)
+        self.assertEqual(await Test().say("hello"), "returned: Saying hello")
 
-        # Since the real purpose of the exempt decorator is to suppress
-        # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware(a_view)(req)
-        self.assertIsNone(r.get('X-Frame-Options', None))
+    def test_preserve_attributes(self):
+        async def func(*args, **kwargs):
+            await asyncio.sleep(0.01)
+            return args, kwargs
 
+        def myattr_dec(func):
+            async def wrapper(*args, **kwargs):
+                return await func(*args, **kwargs)
 
-class NeverCacheDecoratorTest(SimpleTestCase):
-    def test_never_cache_decorator(self):
-        @never_cache
-        def a_view(request):
-            return HttpResponse()
-        r = a_view(HttpRequest())
-        self.assertEqual(
-            set(r.headers['Cache-Control'].split(', ')),
-            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
+            wrapper.myattr = True
+            return wrapper
+
+        def myattr2_dec(func):
+            async def wrapper(*args, **kwargs):
+                return await func(*args, **kwargs)
+
+            wrapper.myattr2 = True
+            return wrapper
+
+        # Sanity check myattr_dec and myattr2_dec
+        func = myattr_dec(func)
+
+        self.assertIs(getattr(func, "myattr", False), True)
+
+        func = myattr2_dec(func)
+        self.assertIs(getattr(func, "myattr2", False), True)
+
+        func = myattr_dec(myattr2_dec(func))
+        self.assertIs(getattr(func, "myattr", False), True)
+        self.assertIs(getattr(func, "myattr2", False), False)
+
+        myattr_dec_m = method_decorator(myattr_dec)
+        myattr2_dec_m = method_decorator(myattr2_dec)
+
+        # Decorate using method_decorator() on the async method.
+        class TestPlain:
+            @myattr_dec_m
+            @myattr2_dec_m
+            async def method(self):
+                "A method"
+
+        # Decorate using method_decorator() on both the class and the method.
+        # The decorators applied to the methods are applied before the ones
+        # applied to the class.
+        @method_decorator(myattr_dec_m, "method")
+        class TestMethodAndClass:
+            @method_decorator(myattr2_dec_m)
+            async def method(self):
+                "A method"
+
+        # Decorate using an iterable of function decorators.
+        @method_decorator((myattr_dec, myattr2_dec), "method")
+        class TestFunctionIterable:
+            async def method(self):
+                "A method"
+
+        # Decorate using an iterable of method decorators.
+        @method_decorator((myattr_dec_m, myattr2_dec_m), "method")
+        class TestMethodIterable:
+            async def method(self):
+                "A method"
+
+        tests = (
+            TestPlain,
+            TestMethodAndClass,
+            TestFunctionIterable,
+            TestMethodIterable,
         )
+        for Test in tests:
+            with self.subTest(Test=Test):
+                self.assertIs(getattr(Test().method, "myattr", False), True)
+                self.assertIs(getattr(Test().method, "myattr2", False), True)
+                self.assertIs(getattr(Test.method, "myattr", False), True)
+                self.assertIs(getattr(Test.method, "myattr2", False), True)
+                self.assertEqual(Test.method.__doc__, "A method")
+                self.assertEqual(Test.method.__name__, "method")
 
-    def test_never_cache_decorator_http_request(self):
+    async def test_new_attribute(self):
+        """A decorator that sets a new attribute on the method."""
+
+        def decorate(func):
+            func.x = 1
+            return func
+
         class MyClass:
-            @never_cache
-            def a_view(self, request):
-                return HttpResponse()
-        msg = (
-            "never_cache didn't receive an HttpRequest. If you are decorating "
-            "a classmethod, be sure to use @method_decorator."
-        )
+            @method_decorator(decorate)
+            async def method(self):
+                return True
+
+        obj = MyClass()
+        self.assertEqual(obj.method.x, 1)
+        self.assertIs(await obj.method(), True)
+
+    def test_bad_iterable(self):
+        decorators = {async_simple_dec}
+        msg = "'set' object is not subscriptable"
         with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequest())
 
+            @method_decorator(decorators, "method")
+            class TestIterable:
+                async def method(self):
+                    await asyncio.sleep(0.01)
 
-class CacheControlDecoratorTest(SimpleTestCase):
-    def test_cache_control_decorator_http_request(self):
-        class MyClass:
-            @cache_control(a='b')
-            def a_view(self, request):
-                return HttpResponse()
+    async def test_argumented(self):
 
-        msg = (
-            "cache_control didn't receive an HttpRequest. If you are "
-            "decorating a classmethod, be sure to use @method_decorator."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequest())
+        class ClsDecAsync:
+            def __init__(self, myattr):
+                self.myattr = myattr
+
+            def __call__(self, f):
+                async def wrapper():
+                    result = await f()
+                    return f"{result} appending {self.myattr}"
+
+                return update_wrapper(wrapper, f)
+
+        class Test:
+            @method_decorator(ClsDecAsync(False))
+            async def method(self):
+                return True
+
+        self.assertEqual(await Test().method(), "True appending False")
+
+    async def test_descriptors(self):
+        class bound_wrapper:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
+                self.__name__ = wrapped.__name__
+
+            async def __call__(self, *args, **kwargs):
+                return await self.wrapped(*args, **kwargs)
+
+            def __get__(self, instance, cls=None):
+                return self
+
+        class descriptor_wrapper:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
+                self.__name__ = wrapped.__name__
+
+            def __get__(self, instance, cls=None):
+                return bound_wrapper(self.wrapped.__get__(instance, cls))
+
+        class Test:
+            @async_simple_dec_m
+            @descriptor_wrapper
+            async def method(self, arg):
+                return arg
+
+        self.assertEqual(await Test().method(1), "returned: 1")
+
+    async def test_class_decoration(self):
+        """
+        @method_decorator can be used to decorate a class and its methods.
+        """
+
+        @method_decorator(async_simple_dec, name="method")
+        class Test:
+            async def method(self):
+                return False
+
+            async def not_method(self):
+                return "a string"
+
+        self.assertEqual(await Test().method(), "returned: False")
+        self.assertEqual(await Test().not_method(), "a string")
+
+    async def test_tuple_of_decorators(self):
+        """
+        @method_decorator can accept a tuple of decorators.
+        """
+
+        def add_question_mark(func):
+            async def _wrapper(*args, **kwargs):
+                await asyncio.sleep(0.01)
+                return await func(*args, **kwargs) + "?"
+
+            return _wrapper
+
+        def add_exclamation_mark(func):
+            async def _wrapper(*args, **kwargs):
+                await asyncio.sleep(0.01)
+                return await func(*args, **kwargs) + "!"
+
+            return _wrapper
+
+        decorators = (add_exclamation_mark, add_question_mark)
+
+        @method_decorator(decorators, name="method")
+        class TestFirst:
+            async def method(self):
+                return "hello world"
+
+        class TestSecond:
+            @method_decorator(decorators)
+            async def method(self):
+                return "world hello"
+
+        self.assertEqual(await TestFirst().method(), "hello world?!")
+        self.assertEqual(await TestSecond().method(), "world hello?!")
+
+    async def test_wrapper_assignments(self):
+        """@method_decorator preserves wrapper assignments."""
+        func_data = {}
+
+        def decorator(func):
+            @wraps(func)
+            async def inner(*args, **kwargs):
+                func_data["func_name"] = getattr(func, "__name__", None)
+                func_data["func_module"] = getattr(func, "__module__", None)
+                return await func(*args, **kwargs)
+
+            return inner
+
+        class Test:
+            @method_decorator(decorator)
+            async def method(self):
+                return "tests"
+
+        await Test().method()
+        expected = {"func_name": "method", "func_module": "decorators.tests"}
+        self.assertEqual(func_data, expected)
+
+    async def test_markcoroutinefunction_applied(self):
+        class Test:
+            @async_simple_dec_m
+            async def method(self):
+                return "tests"
+
+        method = Test().method
+        self.assertIs(iscoroutinefunction(method), True)
+        self.assertEqual(await method(), "returned: tests")

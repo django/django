@@ -18,7 +18,7 @@ def _simple_domain_name_validator(value):
     if any(checks):
         raise ValidationError(
             _("The domain name cannot contain any spaces or tabs."),
-            code='invalid',
+            code="invalid",
         )
 
 
@@ -53,14 +53,15 @@ class SiteManager(models.Manager):
         retrieved from the database.
         """
         from django.conf import settings
-        if getattr(settings, 'SITE_ID', ''):
+
+        if getattr(settings, "SITE_ID", ""):
             site_id = settings.SITE_ID
             return self._get_site_by_id(site_id)
         elif request:
             return self._get_site_by_request(request)
 
         raise ImproperlyConfigured(
-            "You're using the Django \"sites framework\" without having "
+            'You\'re using the Django "sites framework" without having '
             "set the SITE_ID setting. Create a site in your database and "
             "set the SITE_ID setting or pass a request to "
             "Site.objects.get_current() to fix this error."
@@ -76,22 +77,21 @@ class SiteManager(models.Manager):
 
 
 class Site(models.Model):
-
     domain = models.CharField(
-        _('domain name'),
+        _("domain name"),
         max_length=100,
         validators=[_simple_domain_name_validator],
         unique=True,
     )
-    name = models.CharField(_('display name'), max_length=50)
+    name = models.CharField(_("display name"), max_length=50)
 
     objects = SiteManager()
 
     class Meta:
-        db_table = 'django_site'
-        verbose_name = _('site')
-        verbose_name_plural = _('sites')
-        ordering = ['domain']
+        db_table = "django_site"
+        verbose_name = _("site")
+        verbose_name_plural = _("sites")
+        ordering = ["domain"]
 
     def __str__(self):
         return self.domain
@@ -104,8 +104,8 @@ def clear_site_cache(sender, **kwargs):
     """
     Clear the cache (if primed) each time a site is saved or deleted.
     """
-    instance = kwargs['instance']
-    using = kwargs['using']
+    instance = kwargs["instance"]
+    using = kwargs["using"]
     try:
         del SITE_CACHE[instance.pk]
     except KeyError:

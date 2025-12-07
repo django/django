@@ -2,11 +2,15 @@
 
 from functools import partial, update_wrapper, wraps
 
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+
 
 class classonlymethod(classmethod):
     def __get__(self, instance, cls=None):
         if instance is not None:
-            raise AttributeError("This method is available only on the class, not on instances.")
+            raise AttributeError(
+                "This method is available only on the class, not on instances."
+            )
         return super().__get__(instance, cls)
 
 
@@ -16,6 +20,7 @@ def _update_method_wrapper(_wrapper, decorator):
     @decorator
     def dummy(*args, **kwargs):
         pass
+
     update_wrapper(_wrapper, dummy)
 
 
@@ -24,7 +29,7 @@ def _multi_decorate(decorators, method):
     Decorate `method` with one or more function decorators. `decorators` can be
     a single decorator or an iterable of decorators.
     """
-    if hasattr(decorators, '__iter__'):
+    if hasattr(decorators, "__iter__"):
         # Apply a list/tuple of decorators if 'decorators' is one. Decorator
         # functions are applied so that the call order is the same as the
         # order in which they appear in the iterable.
@@ -37,7 +42,7 @@ def _multi_decorate(decorators, method):
         # 'self' argument, but it's a closure over self so it can call
         # 'func'. Also, wrap method.__get__() in a function because new
         # attributes can't be set on bound method objects, only on functions.
-        bound_method = partial(method.__get__(self, type(self)))
+        bound_method = wraps(method)(partial(method.__get__(self, type(self))))
         for dec in decorators:
             bound_method = dec(bound_method)
         return bound_method(*args, **kwargs)
@@ -47,13 +52,18 @@ def _multi_decorate(decorators, method):
         _update_method_wrapper(_wrapper, dec)
     # Preserve any existing attributes of 'method', including the name.
     update_wrapper(_wrapper, method)
+
+    if iscoroutinefunction(method):
+        markcoroutinefunction(_wrapper)
+
     return _wrapper
 
 
-def method_decorator(decorator, name=''):
+def method_decorator(decorator, name=""):
     """
     Convert a function decorator into a method decorator
     """
+
     # 'obj' can be a class or a function. If 'obj' is a function at the time it
     # is passed to _dec,  it will eventually be a method of the class it is
     # defined on. If 'obj' is a class, the 'name' is required to be the name
@@ -78,11 +88,11 @@ def method_decorator(decorator, name=''):
 
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
-    if not hasattr(decorator, '__iter__'):
+    if not hasattr(decorator, "__iter__"):
         update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
-    obj = decorator if hasattr(decorator, '__name__') else decorator.__class__
-    _dec.__name__ = 'method_decorator(%s)' % obj.__name__
+    obj = decorator if hasattr(decorator, "__name__") else decorator.__class__
+    _dec.__name__ = "method_decorator(%s)" % obj.__name__
     return _dec
 
 
@@ -116,39 +126,79 @@ def make_middleware_decorator(middleware_class):
         def _decorator(view_func):
             middleware = middleware_class(view_func, *m_args, **m_kwargs)
 
-            @wraps(view_func)
-            def _wrapped_view(request, *args, **kwargs):
-                if hasattr(middleware, 'process_request'):
+            def _pre_process_request(request, *args, **kwargs):
+                if hasattr(middleware, "process_request"):
                     result = middleware.process_request(request)
                     if result is not None:
                         return result
-                if hasattr(middleware, 'process_view'):
+                if hasattr(middleware, "process_view"):
                     result = middleware.process_view(request, view_func, args, kwargs)
                     if result is not None:
                         return result
-                try:
-                    response = view_func(request, *args, **kwargs)
-                except Exception as e:
-                    if hasattr(middleware, 'process_exception'):
-                        result = middleware.process_exception(request, e)
-                        if result is not None:
-                            return result
-                    raise
-                if hasattr(response, 'render') and callable(response.render):
-                    if hasattr(middleware, 'process_template_response'):
-                        response = middleware.process_template_response(request, response)
-                    # Defer running of process_response until after the template
-                    # has been rendered:
-                    if hasattr(middleware, 'process_response'):
+                return None
+
+            def _process_exception(request, exception):
+                if hasattr(middleware, "process_exception"):
+                    result = middleware.process_exception(request, exception)
+                    if result is not None:
+                        return result
+                raise
+
+            def _post_process_request(request, response):
+                if hasattr(response, "render") and callable(response.render):
+                    if hasattr(middleware, "process_template_response"):
+                        response = middleware.process_template_response(
+                            request, response
+                        )
+                    # Defer running of process_response until after the
+                    # template has been rendered:
+                    if hasattr(middleware, "process_response"):
+
                         def callback(response):
                             return middleware.process_response(request, response)
+
                         response.add_post_render_callback(callback)
                 else:
-                    if hasattr(middleware, 'process_response'):
+                    if hasattr(middleware, "process_response"):
                         return middleware.process_response(request, response)
                 return response
-            return _wrapped_view
+
+            if iscoroutinefunction(view_func):
+
+                async def _view_wrapper(request, *args, **kwargs):
+                    result = _pre_process_request(request, *args, **kwargs)
+                    if result is not None:
+                        return result
+
+                    try:
+                        response = await view_func(request, *args, **kwargs)
+                    except Exception as e:
+                        result = _process_exception(request, e)
+                        if result is not None:
+                            return result
+
+                    return _post_process_request(request, response)
+
+            else:
+
+                def _view_wrapper(request, *args, **kwargs):
+                    result = _pre_process_request(request, *args, **kwargs)
+                    if result is not None:
+                        return result
+
+                    try:
+                        response = view_func(request, *args, **kwargs)
+                    except Exception as e:
+                        result = _process_exception(request, e)
+                        if result is not None:
+                            return result
+
+                    return _post_process_request(request, response)
+
+            return wraps(view_func)(_view_wrapper)
+
         return _decorator
+
     return _make_decorator
 
 

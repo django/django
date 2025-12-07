@@ -13,7 +13,7 @@ th {
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink {
+.viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
@@ -26,7 +26,12 @@ th {
 }
 
 .object-tools {
-    float: left;
+    text-align: left;
+}
+
+.object-tools li + li {
+    margin-right: 15px;
+    margin-left: 0;
 }
 
 thead th:first-child,
@@ -107,23 +112,25 @@ thead th.sorted .text {
     border-left: none;
 }
 
+.paginator ul {
+    margin-left: 6px;
+    margin-right: 0;
+}
+
+.paginator input {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 /* FORMS */
 
 .aligned label {
     padding: 0 0 3px 1em;
-    float: right;
 }
 
-.submit-row {
-    text-align: left
-}
-
-.submit-row p.deletelink-box {
-    float: right;
-}
-
-.submit-row input.default {
+.submit-row a.deletelink {
     margin-left: 0;
+    margin-right: auto;
 }
 
 .vDateField, .vTimeField {
@@ -134,13 +141,11 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
-form .aligned p.help, form .aligned div.help {
-    clear: right;
-}
-
 form .aligned ul {
     margin-right: 163px;
+    padding-right: 10px;
     margin-left: 0;
+    padding-left: 0;
 }
 
 form ul.inline li {
@@ -149,12 +154,34 @@ form ul.inline li {
     padding-left: 7px;
 }
 
-input[type=submit].default, .submit-row input.default {
-    float: left;
+form .aligned p.help,
+form .aligned div.help {
+    margin-left: 0;
+    margin-right: 160px;
+    padding-right: 10px;
+}
+
+form div.help ul,
+form .aligned .checkbox-row + .help,
+form .aligned p.date div.help.timezonewarning,
+form .aligned p.datetime div.help.timezonewarning,
+form .aligned p.time div.help.timezonewarning {
+    margin-right: 0;
+    padding-right: 0;
+}
+
+form .wide p.help,
+form .wide ul.errorlist,
+form .wide div.help {
+    padding-left: 0;
+    padding-right: 50px;
+}
+
+.submit-row {
+    text-align: right;
 }
 
 fieldset .fieldBox {
-    float: right;
     margin-left: 20px;
     margin-right: 0;
 }
@@ -175,12 +202,14 @@ fieldset .fieldBox {
     top: 0;
     left: auto;
     right: 10px;
+    background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
 .calendarnav-next {
     top: 0;
     right: auto;
     left: 10px;
+    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
 .calendar caption, .calendarbox h2 {
@@ -193,6 +222,32 @@ fieldset .fieldBox {
 
 .selector .selector-filter {
     text-align: right;
+}
+
+.selector-add {
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-size: 24px auto;
+}
+
+:enabled.selector-add:focus, :enabled.selector-add:hover {
+    background-position: 0 -120px;
+}
+
+.selector-remove {
+    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background-size: 24px auto;
+}
+
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    background-position: 0 -168px;
+}
+
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
+    background-position: 100% -144px;
+}
+
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
+    background-position: 0 -176px;
 }
 
 .inline-deletelink {
@@ -224,4 +279,17 @@ form .form-row p.datetime {
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
+}
+
+.inline-group .tabular td.original p {
+    right: 0;
+}
+
+.selector .selector-chooser {
+    margin: 0;
+}
+
+ul.messagelist li {
+    padding: 10px 65px 10px 10px;
+    background-position-x: calc(100% - 40px);
 }

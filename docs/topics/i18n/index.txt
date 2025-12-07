@@ -13,7 +13,7 @@ Internationalization and localization
 Overview
 ========
 
-The goal of internationalization and localization is to allow a single Web
+The goal of internationalization and localization is to allow a single web
 application to offer its content in languages and formats tailored to the
 audience.
 
@@ -23,9 +23,9 @@ Django has full support for :doc:`translation of text
 
 Essentially, Django does two things:
 
-* It allows developers and template authors to specify which parts of their apps
-  should be translated or formatted for local languages and cultures.
-* It uses these hooks to localize Web apps for particular users according to
+* It allows developers and template authors to specify which parts of their
+  apps should be translated or formatted for local languages and cultures.
+* It uses these hooks to localize web apps for particular users according to
   their preferences.
 
 Translation depends on the target language, and formatting usually depends on
@@ -46,7 +46,8 @@ here's a simplified definition:
     localization
       Writing the translations and local formats. Usually done by translators.
 
-More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikipedia article`_ or the `GNU gettext documentation`_.
+More details can be found in the `W3C Web Internationalization FAQ`_, the
+`Wikipedia article`_ or the `GNU gettext documentation`_.
 
 .. _W3C Web Internationalization FAQ: https://www.w3.org/International/questions/qa-i18n
 .. _GNU gettext documentation: https://www.gnu.org/software/gettext/manual/gettext.html#Concepts
@@ -54,10 +55,9 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 
 .. warning::
 
-    Translation and formatting are controlled by :setting:`USE_I18N` and
-    :setting:`USE_L10N` settings respectively. However, both features involve
-    internationalization and localization. The names of the settings are an
-    unfortunate result of Django's history.
+    Translation is controlled by the :setting:`USE_I18N` setting. However, it
+    involves internationalization and localization. The name of the setting is
+    an unfortunate result of Django's history.
 
 Here are some other terms that will help us to handle a common language:
 
@@ -88,5 +88,5 @@ Here are some other terms that will help us to handle a common language:
       A literal that can be translated.
 
     format file
-      A format file is a Python module that defines the data formats for a given
-      locale.
+      A format file is a Python module that defines the data formats for a
+      given locale.

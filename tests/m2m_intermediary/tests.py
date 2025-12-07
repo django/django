@@ -17,12 +17,13 @@ class M2MIntermediaryTests(TestCase):
         w1 = Writer.objects.create(reporter=r1, article=a, position="Main writer")
         w2 = Writer.objects.create(reporter=r2, article=a, position="Contributor")
 
-        self.assertQuerysetEqual(
-            a.writer_set.select_related().order_by("-position"), [
+        self.assertQuerySetEqual(
+            a.writer_set.select_related().order_by("-position"),
+            [
                 ("John Smith", "Main writer"),
                 ("Jane Doe", "Contributor"),
             ],
-            lambda w: (str(w.reporter), w.position)
+            lambda w: (str(w.reporter), w.position),
         )
         self.assertEqual(w1.reporter, r1)
         self.assertEqual(w2.reporter, r2)
@@ -30,9 +31,8 @@ class M2MIntermediaryTests(TestCase):
         self.assertEqual(w1.article, a)
         self.assertEqual(w2.article, a)
 
-        self.assertQuerysetEqual(
-            r1.writer_set.all(), [
-                ("John Smith", "Main writer")
-            ],
-            lambda w: (str(w.reporter), w.position)
+        self.assertQuerySetEqual(
+            r1.writer_set.all(),
+            [("John Smith", "Main writer")],
+            lambda w: (str(w.reporter), w.position),
         )

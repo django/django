@@ -36,7 +36,9 @@ I'm getting a ``UnicodeDecodeError``. What am I doing wrong?
 
 This class of errors happen when a bytestring containing non-ASCII sequences is
 transformed into a Unicode string and the specified encoding is incorrect. The
-output generally looks like this::
+output generally looks like this:
+
+.. code-block:: pytb
 
     UnicodeDecodeError: 'ascii' codec can't decode byte 0x?? in position ?:
     ordinal not in range(128)

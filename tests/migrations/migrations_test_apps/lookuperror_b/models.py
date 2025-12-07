@@ -6,7 +6,7 @@ class B1(models.Model):
 
 
 class B2(models.Model):
-    a1 = models.ForeignKey('lookuperror_a.A1', models.CASCADE)
+    a1 = models.ForeignKey("lookuperror_a.A1", models.CASCADE)
 
 
 class B3(models.Model):

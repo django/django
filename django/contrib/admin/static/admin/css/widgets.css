@@ -1,39 +1,67 @@
 /* SELECTOR (FILTER INTERFACE) */
 
 .selector {
-    width: 800px;
-    float: left;
+    display: flex;
+    flex: 1;
+    gap: 0 10px;
 }
 
 .selector select {
-    width: 380px;
     height: 17.2em;
+    flex: 1 0 auto;
+    overflow: scroll;
+    width: 100%;
 }
 
 .selector-available, .selector-chosen {
-    float: left;
-    width: 380px;
-    text-align: center;
-    margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
 }
 
-.selector-chosen select {
-    border-top: none;
-}
-
-.selector-available h2, .selector-chosen h2 {
+.selector-available-title, .selector-chosen-title {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
 }
 
-.selector-chosen h2 {
-    background: var(--primary);
-    color: var(--header-link-color);
+.selector .helptext {
+    font-size: 0.6875rem;
 }
 
-.selector .selector-available h2 {
+.selector-chosen .list-footer-display {
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin: 0 0 10px;
+    padding: 8px;
+    text-align: center;
+    background: var(--primary);
+    color: var(--header-link-color);
+    cursor: pointer;
+}
+.selector-chosen .list-footer-display__clear {
+    color: var(--breadcrumbs-fg);
+}
+
+.selector-chosen-title {
+    background: var(--secondary);
+    color: var(--header-link-color);
+    padding: 8px;
+}
+
+.selector-chosen-title label {
+    color: var(--header-link-color);
+    width: 100%;
+}
+
+.selector-available-title {
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
+    padding: 8px;
+}
+
+.selector-available-title label {
+    width: 100%;
 }
 
 .selector .selector-filter {
@@ -41,9 +69,11 @@
     border-width: 0 1px;
     padding: 8px;
     color: var(--body-quiet-color);
-    font-size: 10px;
+    font-size: 0.625rem;
     margin: 0;
     text-align: left;
+    display: flex;
+    gap: 8px;
 }
 
 .selector .selector-filter label,
@@ -55,20 +85,21 @@
     padding: 0;
     overflow: hidden;
     line-height: 1;
+    min-width: auto;
 }
 
-.selector .selector-available input {
-    width: 320px;
-    margin-left: 8px;
+.selector-filter input {
+    flex-grow: 1;
 }
 
 .selector ul.selector-chooser {
-    float: left;
-    width: 22px;
+    align-self: center;
+    width: 30px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 10em 5px 0 5px;
+    margin: 0;
     padding: 0;
+    transform: translateY(-17px);
 }
 
 .selector-chooser li {
@@ -82,84 +113,85 @@
     margin: 0 0 10px;
     border-radius: 0 0 4px 4px;
 }
+.selector .selector-chosen--with-filtered select {
+    margin: 0;
+    border-radius: 0;
+    height: 14em;
+}
+
+.selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
+    display: none;
+}
 
 .selector-add, .selector-remove {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     display: block;
     text-indent: -3000px;
     overflow: hidden;
     cursor: default;
     opacity: 0.55;
+    border: none;
 }
 
-.active.selector-add, .active.selector-remove {
+:enabled.selector-add, :enabled.selector-remove {
     opacity: 1;
 }
 
-.active.selector-add:hover, .active.selector-remove:hover {
+:enabled.selector-add:hover, :enabled.selector-remove:hover {
     cursor: pointer;
 }
 
 .selector-add {
-    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
-    background-position: 0 -112px;
+:enabled.selector-add:focus, :enabled.selector-add:hover {
+    background-position: 0 -168px;
 }
 
 .selector-remove {
-    background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
-    background-position: 0 -80px;
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    background-position: 0 -120px;
 }
 
-a.selector-chooseall, a.selector-clearall {
+.selector-chooseall, .selector-clearall {
     display: inline-block;
-    height: 16px;
     text-align: left;
-    margin: 1px auto 3px;
+    padding: 4px 5px;
+    margin: 0 auto;
     overflow: hidden;
-    font-weight: bold;
-    line-height: 16px;
-    color: var(--body-quiet-color);
+    color: var(--button-fg);
+    background-color: var(--button-bg);
     text-decoration: none;
     opacity: 0.55;
+    border: none;
+    border-radius: 4px;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
-    color: var(--link-fg);
+:enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
+    background-color: var(--button-hover-bg);
 }
 
-a.active.selector-chooseall, a.active.selector-clearall {
+:enabled.selector-chooseall, :enabled.selector-clearall {
     opacity: 1;
 }
 
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
     cursor: pointer;
 }
 
-a.selector-chooseall {
-    padding: 0 18px 0 0;
-    background: url(../img/selector-icons.svg) right -160px no-repeat;
-    cursor: default;
-}
-
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
-a.selector-clearall {
-    padding: 0 0 0 18px;
-    background: url(../img/selector-icons.svg) 0 -128px no-repeat;
-    cursor: default;
-}
-
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
@@ -168,6 +200,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .stacked {
     float: left;
     width: 490px;
+    display: block;
 }
 
 .stacked select {
@@ -188,11 +221,13 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked ul.selector-chooser {
-    height: 22px;
-    width: 50px;
+    display: flex;
+    height: 30px;
+    width: 64px;
     margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
+    transform: none;
 }
 
 .stacked .selector-chooser li {
@@ -205,32 +240,34 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .selector-add {
-    background: url(../img/selector-icons.svg) 0 -32px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -48px no-repeat;
+    background-size: 24px auto;
     cursor: default;
 }
 
-.stacked .active.selector-add {
-    background-position: 0 -32px;
+.stacked :enabled.selector-add {
+    background-position: 0 -48px;
     cursor: pointer;
 }
 
-.stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
-    background-position: 0 -48px;
+.stacked :enabled.selector-add:focus, .stacked :enabled.selector-add:hover {
+    background-position: 0 -72px;
     cursor: pointer;
 }
 
 .stacked .selector-remove {
     background: url(../img/selector-icons.svg) 0 0 no-repeat;
+    background-size: 24px auto;
     cursor: default;
 }
 
-.stacked .active.selector-remove {
+.stacked :enabled.selector-remove {
     background-position: 0 0px;
     cursor: pointer;
 }
 
-.stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
-    background-position: 0 -16px;
+.stacked :enabled.selector-remove:focus, .stacked :enabled.selector-remove:hover {
+    background-position: 0 -24px;
     cursor: pointer;
 }
 
@@ -250,8 +287,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 18px;
-    width: 18px;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -264,10 +301,14 @@ p.datetime {
     font-weight: bold;
 }
 
+p.datetime label {
+    display: inline;
+}
+
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -277,7 +318,7 @@ p.datetime {
 }
 
 table p.datetime {
-    font-size: 11px;
+    font-size: 0.6875rem;
     margin-left: 0;
     padding-left: 0;
 }
@@ -286,32 +327,34 @@ table p.datetime {
     position: relative;
     display: inline-block;
     vertical-align: middle;
-    height: 16px;
-    width: 16px;
+    height: 24px;
+    width: 24px;
     overflow: hidden;
 }
 
 .datetimeshortcuts .clock-icon {
     background: url(../img/icon-clock.svg) 0 0 no-repeat;
+    background-size: 24px auto;
 }
 
 .datetimeshortcuts a:focus .clock-icon,
 .datetimeshortcuts a:hover .clock-icon {
-    background-position: 0 -16px;
+    background-position: 0 -24px;
 }
 
 .datetimeshortcuts .date-icon {
     background: url(../img/icon-calendar.svg) 0 0 no-repeat;
+    background-size: 24px auto;
     top: -1px;
 }
 
 .datetimeshortcuts a:focus .date-icon,
 .datetimeshortcuts a:hover .date-icon {
-    background-position: 0 -16px;
+    background-position: 0 -24px;
 }
 
 .timezonewarning {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -322,7 +365,7 @@ p.url {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -337,12 +380,8 @@ p.file-upload {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
-}
-
-.aligned p.file-upload {
-    margin-left: 170px;
 }
 
 .file-upload a {
@@ -355,7 +394,7 @@ p.file-upload {
 
 span.clearable-file-input label {
     color: var(--body-fg);
-    font-size: 11px;
+    font-size: 0.6875rem;
     display: inline;
     float: none;
 }
@@ -364,7 +403,7 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 12px;
+    font-size: 0.75rem;
     width: 19em;
     text-align: center;
     background: var(--body-bg);
@@ -398,7 +437,7 @@ span.clearable-file-input label {
     text-align: center;
     border-top: none;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #333;
     background: var(--accent);
 }
@@ -408,14 +447,14 @@ span.clearable-file-input label {
     background: var(--darkened-bg);
     border-bottom: 1px solid var(--border-color);
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     color: var(--body-quiet-color);
 }
 
 .calendar td {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     padding: 0;
     border-top: 1px solid var(--hairline-color);
@@ -423,7 +462,7 @@ span.clearable-file-input label {
 }
 
 .calendar td.selected a {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--button-fg);
 }
 
@@ -455,7 +494,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav {
-    font-size: 10px;
+    font-size: 0.625rem;
     text-align: center;
     color: #ccc;
     margin: 0;
@@ -470,8 +509,8 @@ span.clearable-file-input label {
 .calendar-shortcuts {
     background: var(--body-bg);
     color: var(--body-quiet-color);
-    font-size: 11px;
-    line-height: 11px;
+    font-size: 0.6875rem;
+    line-height: 0.6875rem;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
 }
@@ -491,36 +530,26 @@ span.clearable-file-input label {
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
-.calendarbox .calendarnav-previous:focus,
-.calendarbox .calendarnav-previous:hover {
-    background-position: 0 -15px;
-}
-
 .calendarnav-next {
     right: 10px;
-    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
-}
-
-.calendarbox .calendarnav-next:focus,
-.calendarbox .calendarnav-next:hover {
-    background-position: 0 -45px;
+    background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
 .calendar-cancel {
     margin: 0;
     padding: 4px 0;
-    font-size: 12px;
-    background: #eee;
+    font-size: 0.75rem;
+    background: var(--close-button-bg);
     border-top: 1px solid var(--border-color);
-    color: var(--body-fg);
+    color: var(--button-fg);
 }
 
 .calendar-cancel:focus, .calendar-cancel:hover {
-    background: #ddd;
+    background: var(--close-button-hover-bg);
 }
 
 .calendar-cancel a {
-    color: black;
+    color: var(--button-fg);
     display: block;
 }
 
@@ -539,10 +568,12 @@ ul.timelist, .timelist li {
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
-    background: url(../img/inline-delete.svg) 0 0 no-repeat;
-    width: 16px;
-    height: 16px;
+    background: url(../img/inline-delete.svg) center center no-repeat;
+    background-size: contain;
+    width: 1.5rem;
+    height: 1.5rem;
     border: 0px none;
+    margin-bottom: .25rem;
 }
 
 .inline-deletelink:focus, .inline-deletelink:hover {
@@ -551,24 +582,25 @@ ul.timelist, .timelist li {
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
-    overflow: hidden;  /* clear floated contents */
+    display: flex;
+    gap: 0 10px;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
 .related-widget-wrapper-link {
-    opacity: 0.3;
+    opacity: .6;
+    filter: grayscale(1);
 }
 
 .related-widget-wrapper-link:link {
-    opacity: .8;
-}
-
-.related-widget-wrapper-link:link:focus,
-.related-widget-wrapper-link:link:hover {
     opacity: 1;
+    filter: grayscale(0);
 }
 
-select + .related-widget-wrapper-link,
-.related-widget-wrapper-link + .related-widget-wrapper-link {
-    margin-left: 7px;
+/* GIS MAPS */
+.dj_map {
+    width: 600px;
+    height: 400px;
 }

@@ -2,23 +2,23 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2023\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "Пашырэнні PostgreSQL"
@@ -110,13 +110,11 @@ msgstr "Дадзены нейкія невядомыя ключы: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Упэўніцеся, что ўсе элементы гэтага інтэрвалу менш ці раўны %(limit_value)s."
+"Пераканайцеся, што верхняя мяжа дыяпазону не перавышае %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr ""
-"Упэўніцеся, что ўсе элементы гэтага інтэрвалу больш ці раўны %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "Пераканайцеся, што ніжняя мяжа дыяпазону не менш за %(limit_value)s."

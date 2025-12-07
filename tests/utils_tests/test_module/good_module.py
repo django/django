@@ -1,1 +1,1 @@
-content = 'Good Module'
+content = "Good Module"

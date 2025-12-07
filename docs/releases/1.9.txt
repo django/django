@@ -37,10 +37,8 @@ after a database transaction is successfully committed. This is useful for
 tasks such as sending notification emails, creating queued tasks, or
 invalidating caches.
 
-This functionality from the `django-transaction-hooks`_ package has been
+This functionality from the :pypi:`django-transaction-hooks` package has been
 integrated into Django.
-
-.. _django-transaction-hooks: https://pypi.org/project/django-transaction-hooks/
 
 Password validation
 -------------------
@@ -67,16 +65,16 @@ the included auth forms for your project, you could set, for example::
 
     AUTH_PASSWORD_VALIDATORS = [
         {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+            "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+            "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+            "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
         },
     ]
 
@@ -105,16 +103,18 @@ implementation, though:
   method does not take a ``request`` argument. The current request is available
   in ``self.request``.
 
-* The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
-  does not take a ``user`` argument. The current user is available in
-  ``self.request.user``.
+* The custom ``test_func()`` of
+  :class:`~django.contrib.auth.mixins.UserPassesTestMixin` does not take a
+  ``user`` argument. The current user is available in ``self.request.user``.
 
-* The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
+* The
+  :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
   attribute supports a string (defining one permission) or a list/tuple of
   strings (defining multiple permissions) that need to be fulfilled to grant
   access.
 
-* The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
+* The new
+  :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
   attribute allows passing a message to the ``PermissionDenied`` exception.
 
 .. _django-braces: https://django-braces.readthedocs.io/en/latest/index.html
@@ -209,10 +209,11 @@ Minor features
   Django 1.9).
 
 * The permission argument of
-  :func:`~django.contrib.auth.decorators.permission_required()` accepts all
+  :func:`~django.contrib.auth.decorators.permission_required` accepts all
   kinds of iterables, not only list and tuples.
 
-* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+* The new
+  :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
@@ -359,14 +360,14 @@ Forms
 
 * :class:`~django.forms.CharField` now accepts a
   :attr:`~django.forms.CharField.strip` argument to strip input data of leading
-  and trailing whitespace.  As this defaults to ``True`` this is different
+  and trailing whitespace. As this defaults to ``True`` this is different
   behavior from previous releases.
 
 * Form fields now support the :attr:`~django.forms.Field.disabled` argument,
   allowing the field widget to be displayed disabled by browsers.
 
 * It's now possible to customize bound fields by overriding a field's
-  :meth:`~django.forms.Field.get_bound_field()` method.
+  :meth:`~django.forms.Field.get_bound_field` method.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -406,8 +407,8 @@ Internationalization
   project and it will find all the app message files that were created by
   :djadmin:`makemessages`.
 
-* :djadmin:`makemessages` now calls xgettext once per locale directory rather
-  than once per translatable file. This speeds up localization builds.
+* :djadmin:`makemessages` now calls ``xgettext`` once per locale directory
+  rather than once per translatable file. This speeds up localization builds.
 
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
@@ -591,7 +592,7 @@ Requests and Responses
 
 * The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` now
   ignores 404s when the referer is equal to the requested URL. To circumvent
-  the empty referer check already implemented, some Web bots set the referer to
+  the empty referer check already implemented, some web bots set the referer to
   the requested URL.
 
 Templates
@@ -644,10 +645,10 @@ Tests
 * Added the :meth:`json() <django.test.Response.json>` method to test client
   responses to give access to the response body as JSON.
 
-* Added the :meth:`~django.test.Client.force_login()` method to the test
+* Added the :meth:`~django.test.Client.force_login` method to the test
   client. Use this method to simulate the effect of a user logging into the
   site while skipping the authentication and verification steps of
-  :meth:`~django.test.Client.login()`.
+  :meth:`~django.test.Client.login`.
 
 URLs
 ~~~~
@@ -743,9 +744,9 @@ lists and tuples. All settings that were formerly tuples are now lists.
 Django template loaders previously required an ``is_usable`` attribute to be
 defined. If a loader was configured in the template settings and this attribute
 was ``False``, the loader would be silently ignored. In practice, this was only
-used by the egg loader to detect if setuptools was installed. The ``is_usable``
-attribute is now removed and the egg loader instead fails at runtime if
-setuptools is not installed.
+used by the egg loader to detect if ``setuptools`` was installed. The
+``is_usable`` attribute is now removed and the egg loader instead fails at
+runtime if ``setuptools`` is not installed.
 
 Related set direct assignment
 -----------------------------
@@ -769,8 +770,9 @@ behavior.
 Filesystem-based template loaders catch more specific exceptions
 ----------------------------------------------------------------
 
-When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
-or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+When using the
+:class:`filesystem.Loader <django.template.loaders.filesystem.Loader>` or
+:class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
 template loaders, earlier versions of Django raised a
 :exc:`~django.template.TemplateDoesNotExist` error if a template source existed
 but was unreadable. This could happen under many circumstances, such as if
@@ -800,8 +802,8 @@ version of Apache with ``mod_scgi`` that interprets a relative redirect as an
 
     class LocationHeaderFix(object):
         def process_response(self, request, response):
-            if 'Location' in response:
-                response['Location'] = request.build_absolute_uri(response['Location'])
+            if "Location" in response:
+                response["Location"] = request.build_absolute_uri(response["Location"])
             return response
 
 Dropped support for PostgreSQL 9.0
@@ -892,6 +894,7 @@ If you're passing aware :class:`~datetime.datetime` parameters to such
 queries, you should turn them into naive datetimes in UTC::
 
     from django.utils import timezone
+
     param = timezone.make_naive(param, timezone.utc)
 
 If you fail to do so, the conversion will be performed as in earlier versions
@@ -902,6 +905,7 @@ If you're reading :class:`~datetime.datetime` values from the results, they
 will be naive instead of aware. You can compensate as follows::
 
     from django.utils import timezone
+
     value = timezone.make_aware(value, timezone.utc)
 
 You don't need any of this if you're querying the database through the ORM,
@@ -935,8 +939,8 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 ``simple_tag`` now wraps tag output in ``conditional_escape``
 -------------------------------------------------------------
 
-In general, template tags do not autoescape their contents, and this behavior is
-:ref:`documented <tags-auto-escaping>`. For tags like
+In general, template tags do not autoescape their contents, and this behavior
+is :ref:`documented <tags-auto-escaping>`. For tags like
 :class:`~django.template.Library.inclusion_tag`, this is not a problem because
 the included template will perform autoescaping. For ``assignment_tag()``,
 the output will be escaped when it is used as a variable in the template.
@@ -947,7 +951,7 @@ exploit. For example::
 
     @register.simple_tag(takes_context=True)
     def greeting(context):
-        return "Hello {0}!".format(context['request'].user.first_name)
+        return "Hello {0}!".format(context["request"].user.first_name)
 
 In older versions of Django, this will be an XSS issue because
 ``user.first_name`` is not escaped.
@@ -1018,7 +1022,9 @@ to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
 Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
 file size. If you need to support IE8 and must also use the latest version of
 Django, you can override the admin's copy of jQuery with your own by creating
-a Django application with this structure::
+a Django application with this structure:
+
+.. code-block:: text
 
     app/static/admin/js/vendor/
         jquery.js
@@ -1026,10 +1032,12 @@ a Django application with this structure::
 
 .. _syntax-error-old-setuptools-django-19:
 
-``SyntaxError`` when installing Django setuptools 5.5.x
--------------------------------------------------------
+``SyntaxError`` when installing Django ``setuptools`` 5.5.x
+-----------------------------------------------------------
 
-When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
+When installing Django 1.9 or 1.9.1 with ``setuptools`` 5.5.x, you'll see:
+
+.. code-block:: shell
 
     Compiling django/conf/app_template/apps.py ...
       File "django/conf/app_template/apps.py", line 4
@@ -1044,10 +1052,10 @@ When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
     SyntaxError: invalid syntax
 
 It's safe to ignore these errors (Django will still install just fine), but you
-can avoid them by upgrading setuptools to a more recent version. If you're
+can avoid them by upgrading ``setuptools`` to a more recent version. If you're
 using pip, you can upgrade pip using ``python -m pip install -U pip`` which
-will also upgrade setuptools. This is resolved in later versions of Django as
-described in the :doc:`/releases/1.9.2`.
+will also upgrade ``setuptools``. This is resolved in later versions of Django
+as described in the :doc:`/releases/1.9.2`.
 
 Miscellaneous
 -------------
@@ -1061,8 +1069,8 @@ Miscellaneous
 
 * ``django.http.responses.REASON_PHRASES`` and
   ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
-  Python's stdlib instead: :data:`http.client.responses` for Python 3 and
-  `httplib.responses`_ for Python 2.
+  Python's Standard Library instead: :data:`http.client.responses` for Python
+  3 and `httplib.responses`_ for Python 2.
 
   .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
 
@@ -1131,7 +1139,8 @@ Miscellaneous
 
 * The ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``
   as it's unused by the application. If your project or a third-party app makes
-  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it back.
+  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it
+  back.
 
 * The return value of
   :meth:`~django.test.runner.DiscoverRunner.setup_databases` and the first
@@ -1240,21 +1249,24 @@ has been replaced by passing the ``namespace`` argument to ``include()``. For
 example::
 
     polls_patterns = [
-         url(...),
+        url(...),
     ]
 
     urlpatterns = [
-        url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
+        url(r"^polls/", include((polls_patterns, "polls", "author-polls"))),
     ]
 
 becomes::
 
-    polls_patterns = ([
-         url(...),
-    ], 'polls')  # 'polls' is the app_name
+    polls_patterns = (
+        [
+            url(...),
+        ],
+        "polls",
+    )  # 'polls' is the app_name
 
     urlpatterns = [
-        url(r'^polls/', include(polls_patterns, namespace='author-polls')),
+        url(r"^polls/", include(polls_patterns, namespace="author-polls")),
     ]
 
 The ``app_name`` argument to ``include()`` has been replaced by passing a
@@ -1264,27 +1276,24 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
-    urlpatterns = [
-        url(r'^polls/', include('polls.urls', namespace="polls")),
-        ...
-    ]
+    urlpatterns = [url(r"^polls/", include("polls.urls", namespace="polls")), ...]
 
 to:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
     urlpatterns = [
-        url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
-        ...
+        url(r"^polls/", include("polls.urls")),  # 'namespace="polls"' removed
+        ...,
     ]
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
-    app_name = 'polls'  # added
+    app_name = "polls"  # added
     urlpatterns = [...]
 
 This change also means that the old way of including an ``AdminSite`` instance
@@ -1292,13 +1301,13 @@ is deprecated. Instead, pass ``admin.site.urls`` directly to
 ``django.conf.urls.url()``:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.conf.urls import url
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        url(r"^admin/", admin.site.urls),
     ]
 
 URL application namespace required if setting an instance namespace
@@ -1313,7 +1322,9 @@ the included URLconf sets an application namespace.
 ``current_app`` parameter to ``contrib.auth`` views
 ---------------------------------------------------
 
-All views in ``django.contrib.auth.views`` have the following structure::
+All views in ``django.contrib.auth.views`` have the following structure:
+
+.. code-block:: text
 
     def view(request, ..., current_app=None, ...):
 
@@ -1343,8 +1354,8 @@ Miscellaneous
 
 * The ``check_aggregate_support()`` method of
   ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
-  will be removed in Django 2.0. The more general ``check_expression_support()``
-  should be used instead.
+  will be removed in Django 2.0. The more general
+  ``check_expression_support()`` should be used instead.
 
 * ``django.forms.extras`` is deprecated. You can find
   :class:`~django.forms.SelectDateWidget` in ``django.forms.widgets``

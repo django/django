@@ -12,7 +12,6 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-
     def __init__(self, engine, loaders):
         self.get_template_cache = {}
         self.loaders = engine.get_template_loaders(loaders)
@@ -57,7 +56,9 @@ class Loader(BaseLoader):
         try:
             template = super().get_template(template_name, skip)
         except TemplateDoesNotExist as e:
-            self.get_template_cache[key] = copy_exception(e) if self.engine.debug else TemplateDoesNotExist
+            self.get_template_cache[key] = (
+                copy_exception(e) if self.engine.debug else TemplateDoesNotExist
+            )
             raise
         else:
             self.get_template_cache[key] = template
@@ -80,17 +81,19 @@ class Loader(BaseLoader):
             y -> a -> a
             z -> a -> a
         """
-        skip_prefix = ''
+        skip_prefix = ""
 
         if skip:
-            matching = [origin.name for origin in skip if origin.template_name == template_name]
+            matching = [
+                origin.name for origin in skip if origin.template_name == template_name
+            ]
             if matching:
                 skip_prefix = self.generate_hash(matching)
 
-        return '-'.join(s for s in (str(template_name), skip_prefix) if s)
+        return "-".join(s for s in (str(template_name), skip_prefix) if s)
 
     def generate_hash(self, values):
-        return hashlib.sha1('|'.join(values).encode()).hexdigest()
+        return hashlib.sha1("|".join(values).encode()).hexdigest()
 
     def reset(self):
         "Empty the template cache."

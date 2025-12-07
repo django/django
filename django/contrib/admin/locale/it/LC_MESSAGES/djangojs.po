@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Andrea Guerra, 2024
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
@@ -8,15 +9,16 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
 # palmux <palmux@gmail.com>, 2015,2021
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 15:58+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Andrea Guerra, 2024\n"
+"Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +32,8 @@ msgstr "%s disponibili"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Questa è la lista dei %s disponibili. Puoi sceglierne alcuni selezionandoli "
-"nella casella qui sotto e poi facendo clic sulla freccia \"Scegli\" tra le "
-"due caselle."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -44,18 +42,17 @@ msgstr "Scrivi in questa casella per filtrare l'elenco dei %s disponibili."
 msgid "Filter"
 msgstr "Filtro"
 
-msgid "Choose all"
-msgstr "Scegli tutto"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Fai clic per scegliere tutti i %s in una volta."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Scegli"
-
-msgid "Remove"
-msgstr "Elimina"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -63,24 +60,32 @@ msgstr "%s scelti"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Questa è la lista dei %s scelti. Puoi eliminarne alcuni selezionandoli nella "
-"casella qui sotto e poi facendo clic sulla freccia \"Elimina\" tra le due "
-"caselle."
-
-msgid "Remove all"
-msgstr "Elimina tutti"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Fai clic per eliminare tutti i %s in una volta."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Scrivi in questa casella per filtrare l'elenco dei %s selezionati."
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opzione selezionata non visibile"
+msgstr[1] "%s opzioni selezionate non visibili"
+msgstr[2] "%s opzioni selezionate non visibili"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s di %(cnt)s selezionato"
 msgstr[1] "%(sel)s di %(cnt)s selezionati"
+msgstr[2] "%(sel)s di %(cnt)s selezionati"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -125,12 +130,14 @@ msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
 msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
+msgstr[2] "Nota: Sei %s ore in anticipo rispetto al server."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
 msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
+msgstr[2] "Nota: Sei %s ore in ritardo rispetto al server."
 
 msgid "Choose a Time"
 msgstr "Scegli un orario"
@@ -237,6 +244,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dic"
 
+msgid "Sunday"
+msgstr "Domenica"
+
+msgid "Monday"
+msgstr "Lunedì"
+
+msgid "Tuesday"
+msgstr "Martedì"
+
+msgid "Wednesday"
+msgstr "Mercoledì"
+
+msgid "Thursday"
+msgstr "Giovedì"
+
+msgid "Friday"
+msgstr "Venerdì"
+
+msgid "Saturday"
+msgstr "Sabato"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Mer"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Gio"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Ven"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sab"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "D"
@@ -264,9 +320,3 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Mostra"
-
-msgid "Hide"
-msgstr "Nascondi"

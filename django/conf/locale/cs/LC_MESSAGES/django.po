@@ -3,20 +3,22 @@
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jan Papež <honyczek@centrum.cz>, 2012
+# Jan Papež <honyczek@centrum.cz>, 2012,2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
-# trendspotter, 2020
+# Jiří Podhorecký <jirka.p@volny.cz>, 2020
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2021
+# Vláďa Macek <macek@sandbox.cz>, 2015-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-10 16:05+0200\n"
-"PO-Revision-Date: 2021-03-18 23:20+0000\n"
-"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"Last-Translator: Jan Papež <honyczek@centrum.cz>, 2012,2024\n"
+"Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -56,6 +58,9 @@ msgstr "bosensky"
 
 msgid "Catalan"
 msgstr "katalánsky"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Střední kurdština (soranština)"
 
 msgid "Czech"
 msgstr "česky"
@@ -213,6 +218,9 @@ msgstr "mongolsky"
 msgid "Marathi"
 msgstr "marathi"
 
+msgid "Malay"
+msgstr "malajštinou"
+
 msgid "Burmese"
 msgstr "barmštinou"
 
@@ -294,6 +302,9 @@ msgstr "tatarsky"
 msgid "Udmurt"
 msgstr "udmurtsky"
 
+msgid "Uyghur"
+msgstr "Ujgurština"
+
 msgid "Ukrainian"
 msgstr "ukrajinsky"
 
@@ -341,6 +352,9 @@ msgstr "Stránka je bez výsledků"
 msgid "Enter a valid value."
 msgstr "Zadejte platnou hodnotu."
 
+msgid "Enter a valid domain name."
+msgstr "Zadejte platný název domény."
+
 msgid "Enter a valid URL."
 msgstr "Zadejte platnou adresu URL."
 
@@ -364,14 +378,18 @@ msgstr ""
 "Zadejte platný identifikátor složený pouze z písmen, čísel, podtržítek a "
 "pomlček typu Unicode."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Zadejte platnou adresu typu IPv4."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Zadejte platnou %(protocol)s adresu."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Zadejte platnou adresu typu IPv6."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Zadejte platnou adresu typu IPv4 nebo IPv6."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 nebo IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Zadejte pouze číslice oddělené čárkami."
@@ -387,6 +405,20 @@ msgstr "Hodnota musí být menší nebo rovna %(limit_value)s."
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Hodnota musí být větší nebo rovna %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Ujistěte se, že tato hodnota je násobkem velikosti kroku %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Zajistěte, aby tato hodnota byla %(limit_value)s násobkem velikosti kroku , "
+"počínaje %(offset)s, např. %(offset)s, %(valid_value1)s, %(valid_value2)s, a "
+"tak dále."
 
 #, python-format
 msgid ""
@@ -478,6 +510,10 @@ msgstr ""
 "již existuje."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Omezení \"%(name)s\" je porušeno."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Hodnota %(value)r není platná možnost."
 
@@ -492,8 +528,8 @@ msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
 "Položka %(model_name)s s touto hodnotou v poli %(field_label)s již existuje."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -519,6 +555,9 @@ msgstr "Pravdivost (buď Ano (True), nebo Ne (False))"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Řetězec (max. %(max_length)s znaků)"
+
+msgid "String (unlimited)"
+msgstr "Řetězec (neomezený)"
 
 msgid "Comma-separated integers"
 msgstr "Celá čísla oddělená čárkou"
@@ -791,20 +830,20 @@ msgstr ""
 "problém ohlásit."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Odešlete nejvýše %d formulář."
-msgstr[1] "Odešlete nejvýše %d formuláře."
-msgstr[2] "Odešlete nejvýše %d formuláře."
-msgstr[3] "Odešlete nejvýše %d formulářů."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Odešlete prosím nejvíce %(num)d formulář."
+msgstr[1] "Odešlete prosím nejvíce %(num)d formuláře."
+msgstr[2] "Odešlete prosím nejvíce %(num)d formulářů."
+msgstr[3] "Odešlete prosím nejvíce %(num)d formulářů."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Odešlete nejméně %d formulář."
-msgstr[1] "Odešlete nejméně %d formuláře."
-msgstr[2] "Odešlete nejméně %d formuláře."
-msgstr[3] "Odešlete nejméně %d formulářů."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Odešlete prosím alespoň %(num)d formulář."
+msgstr[1] "Odešlete prosím alespoň %(num)d formuláře."
+msgstr[2] "Odešlete prosím alespoň %(num)d formulářů."
+msgstr[3] "Odešlete prosím alespoň %(num)d formulářů."
 
 msgid "Order"
 msgstr "Pořadí"
@@ -1198,14 +1237,14 @@ msgstr "Selhalo ověření typu CSRF. Požadavek byl zadržen."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Tato zpráva se zobrazuje, protože tento web na protokolu HTTPS požaduje "
-"záhlaví \"Referer\" od vašeho webového prohlížeče. Záhlaví je požadováno z "
-"bezpečnostních důvodů, aby se zajistilo, že vašeho prohlížeče se nezmocnil "
-"někdo další."
+"Tuto zprávu vidíte, protože tento web na protokolu HTTPS vyžaduje, aby váš "
+"prohlížeč zaslal v požadavku záhlaví \"Referer\", k čemuž nedošlo. Záhlaví "
+"je požadováno z bezpečnostních důvodů pro kontrolu toho, že prohlížeče se "
+"nezmocnila třetí strana."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1220,8 +1259,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Pokud používáte značku <meta name=\"referrer\" content=\"no-referrer\"> nebo "
 "záhlaví \"Referrer-Policy: no-referrer\", odeberte je. Ochrana typu CSRF "
@@ -1321,13 +1360,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Tuto zprávu vidíte, protože máte v nastavení Djanga zapnutý vývojový režim "
-"<a href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug"
-"\" target=\"_blank\" rel=\"noopener\">DEBUG=True</a> a zatím nemáte "
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/"
+"#debug\" target=\"_blank\" rel=\"noopener\">DEBUG=True</a> a zatím nemáte "
 "nastavena žádná URL."
 
 msgid "Django Documentation"

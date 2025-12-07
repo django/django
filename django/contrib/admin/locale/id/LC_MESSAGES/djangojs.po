@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2020
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 11:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2025\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,12 +27,9 @@ msgstr "%s yang tersedia"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Berikut adalah daftar %s yang tersedia. Anda dapat memilih satu atau lebih "
-"dengan memilihnya pada kotak di bawah, lalu mengeklik tanda panah \"Pilih\" "
-"di antara kedua kotak."
+"Pilih %s dengan memilih mereka dan kemudian memilih tombol panah \"Choose\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -41,18 +38,17 @@ msgstr "Ketik pada kotak ini untuk menyaring daftar %s yang tersedia."
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Choose all"
-msgstr "Pilih semua"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Pilih semua %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Pilih untuk memilih seluruh %s sekaligus."
+msgid "Choose selected %s"
+msgstr "Pilih terpilih %s"
 
-msgid "Choose"
-msgstr "Pilih"
-
-msgid "Remove"
-msgstr "Hapus"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Pindahkan terpilih %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,19 +56,26 @@ msgstr "%s terpilih"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Berikut adalah daftar %s yang terpilih. Anda dapat menghapus satu atau lebih "
-"dengan memilihnya pada kotak di bawah, lalu mengeklik tanda panah \"Hapus\" "
-"di antara kedua kotak."
-
-msgid "Remove all"
-msgstr "Hapus semua"
+"Pindahkan%s dengan memilih mereka dan kemudian memilih tombol panah "
+"\"Remove\"."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klik untuk menghapus semua pilihan %s sekaligus."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Ketik di dalam kotak utnuk menyaring daftar dar %s terpilih."
+
+msgid "(click to clear)"
+msgstr "(klik untuk membersihkan)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Pindahkan semua %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s pilihan terpilih tidak muncul"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -186,51 +189,100 @@ msgstr "Desember"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 msgctxt "abbrev. month February"
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 msgctxt "abbrev. month March"
 msgid "Mar"
-msgstr ""
+msgstr "Mar"
 
 msgctxt "abbrev. month April"
 msgid "Apr"
-msgstr ""
+msgstr "Apr"
 
 msgctxt "abbrev. month May"
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 msgctxt "abbrev. month June"
 msgid "Jun"
-msgstr ""
+msgstr "Jun"
 
 msgctxt "abbrev. month July"
 msgid "Jul"
-msgstr ""
+msgstr "Jul"
 
 msgctxt "abbrev. month August"
 msgid "Aug"
-msgstr ""
+msgstr "Agu"
 
 msgctxt "abbrev. month September"
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 msgctxt "abbrev. month October"
 msgid "Oct"
-msgstr ""
+msgstr "Okt"
 
 msgctxt "abbrev. month November"
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 msgctxt "abbrev. month December"
 msgid "Dec"
-msgstr ""
+msgstr "Des"
+
+msgid "Sunday"
+msgstr "Ahad"
+
+msgid "Monday"
+msgstr "Senin"
+
+msgid "Tuesday"
+msgstr "Selasa"
+
+msgid "Wednesday"
+msgstr "Rabu"
+
+msgid "Thursday"
+msgstr "Kamis"
+
+msgid "Friday"
+msgstr "Jum'at"
+
+msgid "Saturday"
+msgstr "Sabtu"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Ahd"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Sen"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Sel"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Rab"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Kam"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Jum"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sab"
 
 msgctxt "one letter Sunday"
 msgid "S"
@@ -259,9 +311,3 @@ msgstr "J"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Bentangkan"
-
-msgid "Hide"
-msgstr "Ciutkan"

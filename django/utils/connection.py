@@ -8,8 +8,8 @@ class ConnectionProxy:
     """Proxy for accessing a connection object's attributes."""
 
     def __init__(self, connections, alias):
-        self.__dict__['_connections'] = connections
-        self.__dict__['_alias'] = alias
+        self.__dict__["_connections"] = connections
+        self.__dict__["_alias"] = alias
 
     def __getattr__(self, item):
         return getattr(self._connections[self._alias], item)
@@ -51,7 +51,7 @@ class BaseConnectionHandler:
         return settings
 
     def create_connection(self, alias):
-        raise NotImplementedError('Subclasses must implement create_connection().')
+        raise NotImplementedError("Subclasses must implement create_connection().")
 
     def __getitem__(self, alias):
         try:
@@ -72,5 +72,14 @@ class BaseConnectionHandler:
     def __iter__(self):
         return iter(self.settings)
 
-    def all(self):
-        return [self[alias] for alias in self]
+    def all(self, initialized_only=False):
+        return [
+            self[alias]
+            for alias in self
+            # If initialized_only is True, return only initialized connections.
+            if not initialized_only or hasattr(self._connections, alias)
+        ]
+
+    def close_all(self):
+        for conn in self.all(initialized_only=True):
+            conn.close()

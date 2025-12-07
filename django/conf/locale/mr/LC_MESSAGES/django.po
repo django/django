@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Omkar Parab, 2024
 # Suraj Kawade, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Marathi (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2024-01-20 06:49+0000\n"
+"Last-Translator: Omkar Parab, 2024\n"
+"Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,8 +24,11 @@ msgstr "अफ्रिकान्स"
 msgid "Arabic"
 msgstr "अरेबिक"
 
+msgid "Algerian Arabic"
+msgstr "अल्जेरियन अरेबिक"
+
 msgid "Asturian"
-msgstr ""
+msgstr "अस्टूरियन"
 
 msgid "Azerbaijani"
 msgstr "अझरबैजानी"
@@ -33,7 +37,7 @@ msgid "Bulgarian"
 msgstr "बल्गेरियन"
 
 msgid "Belarusian"
-msgstr "बेलारूसी"
+msgstr "बेलारशियन"
 
 msgid "Bengali"
 msgstr "बंगाली"
@@ -46,6 +50,9 @@ msgstr "बोस्नियन"
 
 msgid "Catalan"
 msgstr "कॅटलान"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "मध्य कुर्दिश (सोरानी)"
 
 msgid "Czech"
 msgstr "झेक"
@@ -60,7 +67,7 @@ msgid "German"
 msgstr "जर्मन"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "लोअर सोर्बियन"
 
 msgid "Greek"
 msgstr "ग्रीक"
@@ -69,7 +76,7 @@ msgid "English"
 msgstr "इंग्रजी"
 
 msgid "Australian English"
-msgstr ""
+msgstr "ऑस्ट्रेलियन इंग्रजी"
 
 msgid "British English"
 msgstr "ब्रिटिश इंग्रजी"
@@ -84,277 +91,310 @@ msgid "Argentinian Spanish"
 msgstr "अर्जेन्टिनाची स्पॅनिश"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "कोलंबियन स्पॅनिश"
 
 msgid "Mexican Spanish"
 msgstr "मेक्सिकन स्पॅनिश"
 
 msgid "Nicaraguan Spanish"
-msgstr ""
+msgstr "निकारागुआन स्पॅनिश"
 
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "व्हेनेझुएलन स्पॅनिश"
 
 msgid "Estonian"
-msgstr ""
+msgstr "एस्टोनियन"
 
 msgid "Basque"
-msgstr ""
+msgstr "बास्क"
 
 msgid "Persian"
-msgstr ""
+msgstr "पर्शियन"
 
 msgid "Finnish"
-msgstr ""
+msgstr "फिनिश"
 
 msgid "French"
-msgstr ""
+msgstr "फ्रेंच"
 
 msgid "Frisian"
-msgstr ""
+msgstr "फ्रिसियन"
 
 msgid "Irish"
-msgstr ""
+msgstr "आयरिश"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "स्कॉटिश गेलिक"
 
 msgid "Galician"
-msgstr ""
+msgstr "गॅलिशियन"
 
 msgid "Hebrew"
-msgstr ""
+msgstr "हिब्रू"
 
 msgid "Hindi"
-msgstr ""
+msgstr "हिंदी"
 
 msgid "Croatian"
-msgstr ""
+msgstr "क्रोएशियन"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "अप्पर सोर्बियन"
 
 msgid "Hungarian"
-msgstr ""
+msgstr "हंगेरियन"
 
 msgid "Armenian"
-msgstr ""
+msgstr "अर्मेनियन"
 
 msgid "Interlingua"
-msgstr ""
+msgstr "इंटरलिंगुआ"
 
 msgid "Indonesian"
-msgstr ""
+msgstr "इंडोनेशियन"
+
+msgid "Igbo"
+msgstr "इग्बो"
 
 msgid "Ido"
-msgstr ""
+msgstr "इदो"
 
 msgid "Icelandic"
-msgstr ""
+msgstr "आयलँडिक"
 
 msgid "Italian"
-msgstr ""
+msgstr "इटालियन"
 
 msgid "Japanese"
-msgstr ""
+msgstr "जपानी"
 
 msgid "Georgian"
-msgstr ""
+msgstr "जॉर्जियन"
 
 msgid "Kabyle"
-msgstr ""
+msgstr "कबायल"
 
 msgid "Kazakh"
-msgstr ""
+msgstr "कझाक"
 
 msgid "Khmer"
-msgstr ""
+msgstr "ख्मेर"
 
 msgid "Kannada"
-msgstr ""
+msgstr "कन्नड"
 
 msgid "Korean"
-msgstr ""
+msgstr "कोरियन"
+
+msgid "Kyrgyz"
+msgstr "किर्गिझ"
 
 msgid "Luxembourgish"
-msgstr ""
+msgstr "लक्झेंबर्गिश"
 
 msgid "Lithuanian"
-msgstr ""
+msgstr "लिथुआनियन"
 
 msgid "Latvian"
-msgstr ""
+msgstr "लाटव्हिअन"
 
 msgid "Macedonian"
-msgstr ""
+msgstr "मॅसेडोनिअन"
 
 msgid "Malayalam"
-msgstr ""
+msgstr "मल्याळम"
 
 msgid "Mongolian"
-msgstr ""
+msgstr "मंगोलियन"
 
 msgid "Marathi"
-msgstr ""
+msgstr "मराठी"
+
+msgid "Malay"
+msgstr "मलय"
 
 msgid "Burmese"
-msgstr ""
+msgstr "बर्मीस"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "नॉर्वेजियन बोकमाल"
 
 msgid "Nepali"
-msgstr ""
+msgstr "नेपाळी"
 
 msgid "Dutch"
-msgstr ""
+msgstr "डच"
 
 msgid "Norwegian Nynorsk"
-msgstr ""
+msgstr "नॉर्वेजिअन निनॉर्स्क "
 
 msgid "Ossetic"
-msgstr ""
+msgstr "ओस्सेटिक"
 
 msgid "Punjabi"
-msgstr ""
+msgstr "पंजाबी"
 
 msgid "Polish"
-msgstr ""
+msgstr "पॉलिश"
 
 msgid "Portuguese"
-msgstr ""
+msgstr "पोर्तुगीज"
 
 msgid "Brazilian Portuguese"
-msgstr ""
+msgstr "ब्रझिलियन पोर्तुगीज"
 
 msgid "Romanian"
-msgstr ""
+msgstr "रोमेनियन"
 
 msgid "Russian"
-msgstr ""
+msgstr "रशियन"
 
 msgid "Slovak"
-msgstr ""
+msgstr "स्लोवाक"
 
 msgid "Slovenian"
-msgstr ""
+msgstr "स्लोवेनियन"
 
 msgid "Albanian"
-msgstr ""
+msgstr "अल्बेनियन"
 
 msgid "Serbian"
-msgstr ""
+msgstr "सर्बियन"
 
 msgid "Serbian Latin"
-msgstr ""
+msgstr "सर्बियन लॅटिन"
 
 msgid "Swedish"
-msgstr ""
+msgstr "स्वीडिश"
 
 msgid "Swahili"
-msgstr ""
+msgstr "स्वाहिली"
 
 msgid "Tamil"
-msgstr ""
+msgstr "तमिळ"
 
 msgid "Telugu"
-msgstr ""
+msgstr "तेलुगु"
+
+msgid "Tajik"
+msgstr "ताजिक"
 
 msgid "Thai"
-msgstr ""
+msgstr "थाई"
+
+msgid "Turkmen"
+msgstr "तुर्कमेन"
 
 msgid "Turkish"
-msgstr ""
+msgstr "तुर्की"
 
 msgid "Tatar"
-msgstr ""
+msgstr "टाटर"
 
 msgid "Udmurt"
-msgstr ""
+msgstr "उदमर्त"
+
+msgid "Uyghur"
+msgstr "उईघुर"
 
 msgid "Ukrainian"
-msgstr ""
+msgstr "युक्रेनियन"
 
 msgid "Urdu"
-msgstr ""
+msgstr "उर्दू"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "उझबेक"
 
 msgid "Vietnamese"
-msgstr ""
+msgstr "व्हिएतनामी"
 
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "सोपी चायनिज"
 
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "पारंपारिक चायनिज"
 
 msgid "Messages"
-msgstr ""
+msgstr "संदेश"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "संकेतस्थळ नकाशे"
 
 msgid "Static Files"
-msgstr ""
+msgstr "स्थिर फाइल्स"
 
 msgid "Syndication"
-msgstr ""
+msgstr "सिंडिकेशन"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "..."
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "तो पान क्रमांक पूर्णांक नाही."
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "तो पान क्रमांक 1 पेक्षा कमी आहे"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "त्या पानावर कोणतेही परिणाम नाहीत."
 
 msgid "Enter a valid value."
-msgstr ""
+msgstr "वैध मूल्य टाका."
 
 msgid "Enter a valid URL."
-msgstr ""
+msgstr "एक योग्य युआरएल टाका करा."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "योग्य पूर्णांक टाका."
 
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "योग्य विपत्र पत्ता टाका."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
-msgstr ""
+msgstr "अक्षरे, संख्या, अंडरस्कोर किंवा हायफनसह असलेला योग्य \"स्लग\" टाका."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr ""
+msgstr "योग्य \"स्लग\" टाका ज्यामध्ये यूनिकोड अक्षरे, अंक, अंडरस्कोर किंवा हायफन असतात."
 
 msgid "Enter a valid IPv4 address."
-msgstr ""
+msgstr "योग्य IPv4 पत्ता टाका."
 
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "योग्य IPv6 पत्ता टाका."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "योग्य IPv4 किंवा IPv6 पत्ता नमूद करा."
 
 msgid "Enter only digits separated by commas."
-msgstr ""
+msgstr "स्वल्पविरामाने वेगळे केलेले अंकच फक्त नमूद करा."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
+msgstr "हे मूल्य%(limit_value)s(%(show_value)s) आहे याची खात्री करा."
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr ""
+msgstr "हे मूल्य %(limit_value)sया मर्यादेइतके किंवा त्यापेक्षा कमी आहे याची काळजी घ्या."
 
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "हे मूल्य %(limit_value)sया मर्यादेइतके किंवा त्यापेक्षा जास्त आहे याची काळजी घ्या."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "हे मूल्य पायरी आकार %(limit_value)s चा गुणाकार असल्याची खात्री करा."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -378,7 +418,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Enter a number."
-msgstr ""
+msgstr "अंक टाका."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -407,31 +447,35 @@ msgid ""
 msgstr ""
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "शून्य वर्णांना परवानगी नाही."
 
 msgid "and"
-msgstr ""
+msgstr "आणि"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s सह %(field_labels)s हे अगोदरच अस्तित्वात आहे."
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "\"%(name)s\" च्या मर्यादेचं उल्लंघन आहे."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Value %(value)r हा योग्य पर्याय नाही."
 
 msgid "This field cannot be null."
-msgstr ""
+msgstr "हे क्षेत्र रिक्त असू शकत नाही."
 
 msgid "This field cannot be blank."
-msgstr ""
+msgstr "हे क्षेत्र रिक्त असू शकत नाही."
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr ""
+msgstr "%(model_name)s %(field_label)s ने अगोदरच अस्तित्वात आहे."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -439,25 +483,28 @@ msgstr ""
 
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "क्षेत्राचा प्रकार: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "“%(value)s” मूल्य सत्य किंवा असत्य असावा."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr ""
+msgstr "“%(value)s” मूल्य सत्य, असत्य किंवा कोणतेही नसावेत."
 
 msgid "Boolean (Either True or False)"
-msgstr ""
+msgstr "बूलियन (सत्य किंवा असत्य)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr ""
 
-msgid "Comma-separated integers"
+msgid "String (unlimited)"
 msgstr ""
+
+msgid "Comma-separated integers"
+msgstr "स्वल्पविरामाने वेगळे केलेले पूर्णांक"
 
 #, python-format
 msgid ""
@@ -472,7 +519,7 @@ msgid ""
 msgstr ""
 
 msgid "Date (without time)"
-msgstr ""
+msgstr "दिनांक (वेळेशिवाय)"
 
 #, python-format
 msgid ""
@@ -487,7 +534,7 @@ msgid ""
 msgstr ""
 
 msgid "Date (with time)"
-msgstr ""
+msgstr "दिनांक (वेळेसह)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
@@ -503,13 +550,13 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "कालावधी"
 
 msgid "Email address"
-msgstr ""
+msgstr "विपत्र पत्ता"
 
 msgid "File path"
-msgstr ""
+msgstr "दस्तऐवज मार्ग"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
@@ -523,39 +570,42 @@ msgid "“%(value)s” value must be an integer."
 msgstr ""
 
 msgid "Integer"
-msgstr ""
+msgstr "पूर्णांक"
 
 msgid "Big (8 byte) integer"
 msgstr ""
 
+msgid "Small integer"
+msgstr "लहान पूर्णांक"
+
 msgid "IPv4 address"
-msgstr ""
+msgstr "IPv4 पत्ता"
 
 msgid "IP address"
-msgstr ""
+msgstr "IP पत्ता"
 
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
 
 msgid "Boolean (Either True, False or None)"
-msgstr ""
+msgstr "बुलियन (एकतर खरे, असत्य किंवा काहीही नाही)"
+
+msgid "Positive big integer"
+msgstr "सकारात्मक मोठा पूर्णांक"
 
 msgid "Positive integer"
-msgstr ""
+msgstr "सकारात्मक पूर्णांक"
 
 msgid "Positive small integer"
-msgstr ""
+msgstr "सकारात्मक लहान पूर्णांक"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr ""
 
-msgid "Small integer"
-msgstr ""
-
 msgid "Text"
-msgstr ""
+msgstr "मजकूर"
 
 #, python-format
 msgid ""
@@ -570,26 +620,32 @@ msgid ""
 msgstr ""
 
 msgid "Time"
-msgstr ""
+msgstr "वेळ"
 
 msgid "URL"
 msgstr ""
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "कच्चा बायनरी डेटा"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
 msgid "Universally unique identifier"
-msgstr ""
+msgstr "सार्वत्रिक अद्वितीय ओळखकर्ता"
 
 msgid "File"
-msgstr ""
+msgstr "फाइल"
 
 msgid "Image"
+msgstr "चित्र "
+
+msgid "A JSON object"
 msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr "मूल्य योग्य JSON असणे आवश्यक."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -619,35 +675,35 @@ msgid ":?.!"
 msgstr ":?.!"
 
 msgid "This field is required."
-msgstr ""
+msgstr "हे क्षेत्र आवश्यक आहे."
 
 msgid "Enter a whole number."
-msgstr ""
+msgstr "पूर्ण संख्या प्रविष्ट करा."
 
 msgid "Enter a valid date."
-msgstr ""
+msgstr "योग्य दिनांक नमूद करा."
 
 msgid "Enter a valid time."
-msgstr ""
+msgstr "योग्य वेळ नमूद करा."
 
 msgid "Enter a valid date/time."
-msgstr ""
+msgstr "योग्य दिनांक/वेळ नमूद करा."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "योग्य कालावधी नमूद करा."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "दिवसांची संख्या {min_days} आणि {max_days} च्या मधे असावी."
 
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
+msgstr "कोणताही दस्तऐवज सुपूर्त केलेला नाही. अर्जावरील एन्कोडिंग प्रकार तपासा."
 
 msgid "No file was submitted."
-msgstr ""
+msgstr "कोणताही दस्तऐवज सुपूर्त केलेला नाही."
 
 msgid "The submitted file is empty."
-msgstr ""
+msgstr "सुपूर्त केलेला दस्तऐवज रिकामी आहे."
 
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
@@ -657,25 +713,28 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "कृपया एकतर फाइल सबमिट करा किंवा स्पष्ट चेकबॉक्स चेक करा, दोन्ही नाही."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr ""
+msgstr "एक वैध प्रतिमा अपलोड करा. तुम्ही अपलोड केलेली फाइल चित्र किंवा दूषित चित्र नव्हते."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
 msgid "Enter a list of values."
-msgstr ""
+msgstr "मूल्यांची यादी नमूद करा."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "पूर्ण मूल्य नमूद करा."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "योग्य UUID नमूद करा."
+
+msgid "Enter a valid JSON."
+msgstr "योग्य JSON नमूद करा."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -685,30 +744,33 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
 
-msgid "ManagementForm data is missing or has been tampered with"
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
 
 #, python-format
-msgid "Please submit %d or fewer forms."
-msgid_plural "Please submit %d or fewer forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "Please submit %d or more forms."
-msgid_plural "Please submit %d or more forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
 msgid "Order"
-msgstr ""
+msgstr "क्रम"
 
 msgid "Delete"
-msgstr ""
+msgstr "घालवा"
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr ""
+msgstr "कृपया %(field)s साठी दुय्यम माहिती प्रत सुधारा."
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
@@ -721,17 +783,17 @@ msgid ""
 msgstr ""
 
 msgid "Please correct the duplicate values below."
-msgstr ""
+msgstr "कृपया खालील नकली मूल्ये सुधारा."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "इनलाइन मूल्य मूळ उदाहरणाशी जुळत नाही."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr ""
+msgstr "तो पर्याय उपलब्ध पर्यायांपैकी एक नाही. योग्य पर्याय निवडा. "
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr ""
+msgstr "“%(pk)s” हे वैध मूल्य नाही."
 
 #, python-format
 msgid ""
@@ -740,34 +802,26 @@ msgid ""
 msgstr ""
 
 msgid "Clear"
-msgstr ""
+msgstr "साफ करा"
 
 msgid "Currently"
-msgstr ""
+msgstr "सध्या"
 
 msgid "Change"
-msgstr ""
+msgstr "बदला"
 
 msgid "Unknown"
-msgstr ""
+msgstr "अज्ञात"
 
 msgid "Yes"
-msgstr ""
+msgstr "होय"
 
 msgid "No"
-msgstr ""
+msgstr "नाही"
 
-msgid "Year"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr ""
+msgstr "होय,नाही,कदाचित"
 
 #, python-format
 msgid "%(size)d byte"
@@ -777,254 +831,254 @@ msgstr[1] ""
 
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s केबी"
 
 #, python-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s एमबी"
 
 #, python-format
 msgid "%s GB"
-msgstr ""
+msgstr "%s जीबी"
 
 #, python-format
 msgid "%s TB"
-msgstr ""
+msgstr "%s टिबी"
 
 #, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s पीबी"
 
 msgid "p.m."
-msgstr ""
+msgstr "म.उ."
 
 msgid "a.m."
-msgstr ""
+msgstr "म.पू."
 
 msgid "PM"
-msgstr ""
+msgstr "मउ"
 
 msgid "AM"
-msgstr ""
+msgstr "मपू"
 
 msgid "midnight"
-msgstr ""
+msgstr "मध्यरात्री"
 
 msgid "noon"
-msgstr ""
+msgstr "दुपारी"
 
 msgid "Monday"
-msgstr ""
+msgstr "सोमवार"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "मंगळवार"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "बुधवार"
 
 msgid "Thursday"
-msgstr ""
+msgstr "गुरुवार"
 
 msgid "Friday"
-msgstr ""
+msgstr "शुक्रवार"
 
 msgid "Saturday"
-msgstr ""
+msgstr "शनिवार"
 
 msgid "Sunday"
-msgstr ""
+msgstr "रविवार"
 
 msgid "Mon"
-msgstr ""
+msgstr "सोम"
 
 msgid "Tue"
-msgstr ""
+msgstr "मंगळ"
 
 msgid "Wed"
-msgstr ""
+msgstr "बुध"
 
 msgid "Thu"
-msgstr ""
+msgstr "गुरु"
 
 msgid "Fri"
-msgstr ""
+msgstr "शुक्र"
 
 msgid "Sat"
-msgstr ""
+msgstr "शनि"
 
 msgid "Sun"
-msgstr ""
+msgstr "रवि"
 
 msgid "January"
-msgstr ""
+msgstr "जानेवारी"
 
 msgid "February"
-msgstr ""
+msgstr "फेब्रुवारी"
 
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgid "August"
-msgstr ""
+msgstr "ऑगस्ट"
 
 msgid "September"
-msgstr ""
+msgstr "सप्टेंबर"
 
 msgid "October"
-msgstr ""
+msgstr "ऑक्टोबर"
 
 msgid "November"
-msgstr ""
+msgstr "नोव्हेंबर"
 
 msgid "December"
-msgstr ""
+msgstr "डिसेंबर"
 
 msgid "jan"
-msgstr ""
+msgstr "जान"
 
 msgid "feb"
-msgstr ""
+msgstr "फेब"
 
 msgid "mar"
-msgstr ""
+msgstr "मार"
 
 msgid "apr"
-msgstr ""
+msgstr "एप्रि"
 
 msgid "may"
-msgstr ""
+msgstr "मे"
 
 msgid "jun"
-msgstr ""
+msgstr "जून"
 
 msgid "jul"
-msgstr ""
+msgstr "जुल"
 
 msgid "aug"
-msgstr ""
+msgstr "ऑग"
 
 msgid "sep"
-msgstr ""
+msgstr "सप"
 
 msgid "oct"
-msgstr ""
+msgstr "ऑक्ट"
 
 msgid "nov"
-msgstr ""
+msgstr "नोव्ह"
 
 msgid "dec"
-msgstr ""
+msgstr "डिस"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr ""
+msgstr "जान."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr ""
+msgstr "फेब."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr ""
+msgstr "ऑग."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "सप्ट."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr ""
+msgstr "ऑक्ट."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr ""
+msgstr "नोव्ह."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr ""
+msgstr "डिस."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr ""
+msgstr "जानेवारी"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr ""
+msgstr "फेब्रुवारी"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr ""
+msgstr "ऑगस्ट"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr ""
+msgstr "सप्टेंबर"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr ""
+msgstr "ऑक्टोबर"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr ""
+msgstr "नोव्हेंबर"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr ""
+msgstr "डिसेंबर"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "हा योग्य IPv6 पत्ता नाही."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1032,110 +1086,121 @@ msgid "%(truncated_text)s…"
 msgstr ""
 
 msgid "or"
-msgstr ""
+msgstr "किंवा"
 
 #. Translators: This string is used as a separator between list elements
 msgid ", "
-msgstr ""
+msgstr ","
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "0 minutes"
-msgstr ""
 
 msgid "Forbidden"
-msgstr ""
+msgstr "निषिद्ध"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF चाचणी अयशस्वी झाली. विनंती रद्द केली."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"तुम्हाला हा सनदेश दिसत आहे कारण या HTTPS संकेतस्थळाला तुमच्या वेब ब्राउझरद्वारे \"रेफरर "
+"हेडर\" पाठवण्याची आवश्यकता आहे, परंतु कोणतेही पाठवले नाही. तुमचा ब्राउझर तृतीय पक्षांकडून "
+"हायजॅक केला जात नाही याची खात्री करण्यासाठी सुरक्षिततेच्या दृष्टीने हे शीर्षलेख आवश्यक आहे."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
+"किमान या साइटसाठी किंवा HTTPS कनेक्शनसाठी किंवा “समान-मूळ” विनंत्यांसाठी, तुम्ही तुमचे "
+"ब्राउझर “रेफरर” हेडर अक्षम केले असल्यास, कृपया ते पुन्हा-सक्षम करा."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
+"तुम्ही जोडणी वापरत असल्यास किंवा \"रेफरर-पॉलिसी: नो-रेफरर\" हेडर समाविष्ट करत "
+"असल्यास, कृपया ते काढून टाका. CSRF संरक्षणासाठी \"रेफरर\" हेडर कठोर रेफरर तपासणी करणे "
+"आवश्यक आहे. तुम्हाला गोपनीयतेबद्दल काळजी वाटत असल्यास, तृतीय-पक्ष स्थळाच्या दुव्यासाठी <a "
+"rel=\"noreferrer\" …> सारखे पर्याय वापरा."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"तुम्हाला हा संदेश दिसत आहे कारण अर्ज सुपूर्त करताना या स्थळाला CSRF कुकी आवश्यक आहे. तुमचा "
+"ब्राउझर तृतीय पक्षांकडून हायजॅक केला जात नाही याची खात्री करण्यासाठी ही कुकी "
+"सुरक्षिततेच्या कारणांसाठी आवश्यक आहे."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
+"किमान या साइटसाठी किंवा \"समान-मूळ\" विनंत्यांसाठी, कृपया अक्षम केलेल्या ब्राउझर कुकीज "
+"पुन्हा सक्षम करा."
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "अधिक माहिती DEBUG=True सह उपलब्ध आहे."
 
 msgid "No year specified"
-msgstr ""
+msgstr "कोणतेही वर्ष नमूद केलेले नाही"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "पल्ल्याच्या बाहेरची दिनांक"
 
 msgid "No month specified"
-msgstr ""
+msgstr "कोणताही महिना निर्दिष्ट केलेला नाही"
 
 msgid "No day specified"
-msgstr ""
+msgstr "कोणताही दिवस निर्दिष्ट केलेला नाही"
 
 msgid "No week specified"
-msgstr ""
+msgstr "कोणताही आठवडा निर्दिष्ट केलेला नाही"
 
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr ""
+msgstr "कोणतेही %(verbose_name_plural)s उपलब्ध नाहीत"
 
 #, python-format
 msgid ""
@@ -1149,64 +1214,67 @@ msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr ""
+msgstr "क्वेरीसह जुळणारे कोणतेही %(verbose_name)s सापडले नाही"
 
 msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "अवैध पान (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
 
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "डिरेक्टरी निर्देशकांना येथे परवानगी नाही."
 
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr ""
+msgstr "“%(path)s” अस्तित्वात नाही"
 
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "%(directory)s चे निर्देशांक"
 
-msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgid "The install worked successfully! Congratulations!"
+msgstr "इंस्टॉलेशनने यशस्वीरित्या कार्य केले! अभिनंदन!"
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-
-msgid "The install worked successfully! Congratulations!"
-msgstr ""
+"<text_to_translate>डिजांगो %(version)s साठी <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" "
+"rel=\"noopener\">प्रदर्शित संदेश </a> पहा</text_to_translate>"
 
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
+"तुम्ही हे पान पाहत आहात कारण तुमच्या सेटिंग्ज फाइलमध्ये <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> आहे आणि तुम्ही कोणतीही URL कॉन्फिगर केलेली नाही."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "जांगो दस्तऐवजीकरण"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr ""
+msgstr "विषय, संदर्भ, आणि कसे करावे"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "शिकवणी: मतदान अ‍ॅप"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "जॅंगो सोबत सुरवात करा"
 
 msgid "Django Community"
-msgstr ""
+msgstr "जॅंगो समुदाय"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "जोडा, मदत मिळवा किंवा हातभार लावा"

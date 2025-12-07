@@ -49,8 +49,6 @@ namespace.
 The Django template language
 ============================
 
-.. highlight:: html+django
-
 Syntax
 ------
 
@@ -75,17 +73,23 @@ Variables
 A variable outputs a value from the context, which is a dict-like object
 mapping keys to values.
 
-Variables are surrounded by ``{{`` and ``}}`` like this::
+Variables are surrounded by ``{{`` and ``}}`` like this:
+
+.. code-block:: html+django
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
 With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this template
-renders to::
+renders to:
+
+.. code-block:: html+django
 
     My first name is John. My last name is Doe.
 
 Dictionary lookup, attribute lookup and list-index lookups are implemented with
-a dot notation::
+a dot notation:
+
+.. code-block:: html+django
 
     {{ my_dict.key }}
     {{ my_object.attribute }}
@@ -103,15 +107,21 @@ This definition is deliberately vague. For example, a tag can output content,
 serve as a control structure e.g. an "if" statement or a "for" loop, grab
 content from a database, or even enable access to other template tags.
 
-Tags are surrounded by ``{%`` and ``%}`` like this::
+Tags are surrounded by ``{%`` and ``%}`` like this:
+
+.. code-block:: html+django
 
     {% csrf_token %}
 
-Most tags accept arguments::
+Most tags accept arguments:
+
+.. code-block:: html+django
 
     {% cycle 'odd' 'even' %}
 
-Some tags require beginning and ending tags::
+Some tags require beginning and ending tags:
+
+.. code-block:: html+django
 
     {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
 
@@ -124,16 +134,22 @@ Filters
 
 Filters transform the values of variables and tag arguments.
 
-They look like this::
+They look like this:
+
+.. code-block:: html+django
 
      {{ django|title }}
 
 With a context of ``{'django': 'the web framework for perfectionists with
-deadlines'}``, this template renders to::
+deadlines'}``, this template renders to:
+
+.. code-block:: html+django
 
     The Web Framework For Perfectionists With Deadlines
 
-Some filters take an argument::
+Some filters take an argument:
+
+.. code-block:: html+django
 
     {{ my_date|date:"Y-m-d" }}
 
@@ -144,7 +160,9 @@ available as well as :ref:`instructions for writing custom filters
 Comments
 ~~~~~~~~
 
-Comments look like this::
+Comments look like this:
+
+.. code-block:: html+django
 
     {# this won't be rendered #}
 
@@ -219,8 +237,6 @@ and you can implement your own additional context processors, too.
 Support for template engines
 ============================
 
-.. highlight:: python
-
 Configuration
 -------------
 
@@ -231,10 +247,10 @@ more useful value::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'APP_DIRS': True,
-            'OPTIONS': {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": True,
+            "OPTIONS": {
                 # ... some options here ...
             },
         },
@@ -261,10 +277,10 @@ backend with different options. In that case you should define a unique
 
 :setting:`OPTIONS <TEMPLATES-OPTIONS>` contains backend-specific settings.
 
+.. _template-loading:
+
 Usage
 -----
-
-.. _template-loading:
 
 .. module:: django.template.loader
 
@@ -289,6 +305,33 @@ The ``django.template.loader`` module defines two functions to load templates.
 
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
+
+    **Partial loading:**
+
+    When using the :class:`~django.template.backends.django.DjangoTemplates`
+    backend, a specific fragment from a template can be loaded by name. This
+    fragment should have been previously defined using the :ttag:`partialdef`
+    template tag::
+
+        from django.template.loader import get_template
+
+        # Load an entire template.
+        template = get_template("template.html")
+
+        # Load a specific fragment from a template.
+        partial = get_template("template.html#partial_name")
+
+    When loading a partial, the returned object behaves like a regular
+    ``Template`` but contains only the partial's content.
+
+    See :ref:`template-partials` for more information about defining and using
+    template fragments.
+
+    .. versionchanged:: 6.0
+
+        Support for loading template partials when using the
+        :class:`~django.template.backends.django.DjangoTemplates` backend was
+        added.
 
 .. function:: select_template(template_name_list, using=None)
 
@@ -338,25 +381,26 @@ must provide a ``render()`` method with the following signature:
     If ``context`` is provided, it must be a :class:`dict`. If it isn't
     provided, the engine will render the template with an empty context.
 
-    If ``request`` is provided, it must be an :class:`~django.http.HttpRequest`.
-    Then the engine must make it, as well as the CSRF token, available in the
-    template. How this is achieved is up to each backend.
+    If ``request`` is provided, it must be an
+    :class:`~django.http.HttpRequest`. Then the engine must make it, as well as
+    the CSRF token, available in the template. How this is achieved is up to
+    each backend.
 
 Here's an example of the search algorithm. For this example the
 :setting:`TEMPLATES` setting is::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                '/home/html/example.com',
-                '/home/html/default',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [
+                "/home/html/example.com",
+                "/home/html/default",
             ],
         },
         {
-            'BACKEND': 'django.template.backends.jinja2.Jinja2',
-            'DIRS': [
-                '/home/html/jinja2',
+            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "DIRS": [
+                "/home/html/jinja2",
             ],
         },
     ]
@@ -368,8 +412,8 @@ will look for, in order:
 * ``/home/html/default/story_detail.html`` (``'django'`` engine)
 * ``/home/html/jinja2/story_detail.html`` (``'jinja2'`` engine)
 
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+If you call ``select_template(['story_253_detail.html',
+'story_detail.html'])``, here's what Django will look for:
 
 * ``/home/html/example.com/story_253_detail.html`` (``'django'`` engine)
 * ``/home/html/default/story_253_detail.html`` (``'django'`` engine)
@@ -380,9 +424,9 @@ here's what Django will look for:
 
 When Django finds a template that exists, it stops looking.
 
-.. admonition:: Tip
+.. admonition:: Use ``django.template.loader.select_template()`` for more flexibility
 
-    You can use :func:`~django.template.loader.select_template()` for flexible
+    You can use :func:`~django.template.loader.select_template` for flexible
     template loading. For example, if you've written a news story and want
     some stories to have custom templates, use something like
     ``select_template(['story_%s_detail.html' % story.id,
@@ -400,7 +444,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
-    get_template('news/story_detail.html')
+    get_template("news/story_detail.html")
 
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
@@ -439,10 +483,11 @@ templates, Django provides a shortcut function which automates the process.
     Usage example::
 
         from django.template.loader import render_to_string
-        rendered = render_to_string('my_template.html', {'foo': 'bar'})
 
-See also the :func:`~django.shortcuts.render()` shortcut which calls
-:func:`render_to_string()` and feeds the result into an
+        rendered = render_to_string("my_template.html", {"foo": "bar"})
+
+See also the :func:`~django.shortcuts.render` shortcut which calls
+:func:`render_to_string` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
@@ -453,7 +498,7 @@ Finally, you can use configured engines directly:
 
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
         template = django_engine.from_string("Hello {{ name }}!")
 
     The lookup key — ``'django'`` in this example — is the engine's
@@ -530,10 +575,10 @@ applications. This generic name was kept for backwards-compatibility.
   tag modules to register with the template engine. This can be used to add
   new libraries or provide alternate labels for existing ones. For example::
 
-      OPTIONS={
-          'libraries': {
-              'myapp_tags': 'path.to.myapp.tags',
-              'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+      OPTIONS = {
+          "libraries": {
+              "myapp_tags": "path.to.myapp.tags",
+              "admin.urls": "django.contrib.admin.templatetags.admin_urls",
           },
       }
 
@@ -543,8 +588,8 @@ applications. This generic name was kept for backwards-compatibility.
 * ``'builtins'``: A list of dotted Python paths of template tag modules to
   add to :doc:`built-ins </ref/templates/builtins>`. For example::
 
-      OPTIONS={
-          'builtins': ['myapp.builtins'],
+      OPTIONS = {
+          "builtins": ["myapp.builtins"],
       }
 
   Tags and filters from built-in libraries can be used without first calling
@@ -590,12 +635,12 @@ adds defaults that differ from Jinja2's for a few options:
 
   .. admonition:: Using context processors with Jinja2 templates is discouraged.
 
-    Context processors are useful with Django templates because Django templates
-    don't support calling functions with arguments. Since Jinja2 doesn't have
-    that limitation, it's recommended to put the function that you would use as a
-    context processor in the global variables available to the template using
-    ``jinja2.Environment`` as described below. You can then call that function in
-    the template:
+    Context processors are useful with Django templates because Django
+    templates don't support calling functions with arguments. Since Jinja2
+    doesn't have that limitation, it's recommended to put the function that you
+    would use as a context processor in the global variables available to the
+    template using ``jinja2.Environment`` as described below. You can then call
+    that function in the template:
 
     .. code-block:: jinja
 
@@ -611,11 +656,11 @@ adds defaults that differ from Jinja2's for a few options:
     * Needing the result in every template.
     * Using the result multiple times in each template.
 
-    Unless all of these conditions are met, passing a function to the template is
-    more in line with the design of Jinja2.
+    Unless all of these conditions are met, passing a function to the template
+    is more in line with the design of Jinja2.
 
 The default configuration is purposefully kept to a minimum. If a template is
-rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
+rendered with a request (e.g. when using :func:`~django.shortcuts.render`),
 the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
 ``csrf_token`` to the context. Apart from that, this backend doesn't create a
 Django-flavored environment. It doesn't know about Django filters and tags.
@@ -632,10 +677,12 @@ For example, you can create ``myproject/jinja2.py`` with this content::
 
     def environment(**options):
         env = Environment(**options)
-        env.globals.update({
-            'static': static,
-            'url': reverse,
-        })
+        env.globals.update(
+            {
+                "static": static,
+                "url": reverse,
+            }
+        )
         return env
 
 and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.

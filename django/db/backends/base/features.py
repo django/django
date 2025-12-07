@@ -3,13 +3,18 @@ from django.utils.functional import cached_property
 
 
 class BaseDatabaseFeatures:
+    # An optional tuple indicating the minimum supported database version.
+    minimum_database_version = None
     gis_enabled = False
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True
-    allows_group_by_pk = False
     allows_group_by_selected_pks = False
+    allows_group_by_select_index = True
     empty_fetchmany_value = []
     update_can_self_select = True
+    # Does the backend support self-reference subqueries in the DELETE
+    # statement?
+    delete_can_self_reference_subquery = True
 
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
@@ -22,12 +27,18 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+
+    # Does the backend supports specifying whether NULL values should be
+    # considered distinct in unique constraints?
+    supports_nulls_distinct_unique_constraints = False
+
     # Does the backend support initially deferrable unique constraints?
     supports_deferrable_unique_constraints = False
 
     can_use_chunked_reads = True
     can_return_columns_from_insert = False
     can_return_rows_from_bulk_insert = False
+    can_return_rows_from_update = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
@@ -63,6 +74,9 @@ class BaseDatabaseFeatures:
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
     supports_subqueries_in_group_by = True
+
+    # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
+    ignores_unnecessary_order_by_in_subqueries = True
 
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
@@ -109,9 +123,6 @@ class BaseDatabaseFeatures:
     # deferred
     can_defer_constraint_checks = False
 
-    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
-    supports_mixed_date_datetime_comparisons = True
-
     # Does the backend support tablespaces? Default to False because it isn't
     # in the SQL standard.
     supports_tablespaces = False
@@ -130,21 +141,21 @@ class BaseDatabaseFeatures:
     # Map fields which some backends may not be able to differentiate to the
     # field it's introspected as.
     introspected_field_types = {
-        'AutoField': 'AutoField',
-        'BigAutoField': 'BigAutoField',
-        'BigIntegerField': 'BigIntegerField',
-        'BinaryField': 'BinaryField',
-        'BooleanField': 'BooleanField',
-        'CharField': 'CharField',
-        'DurationField': 'DurationField',
-        'GenericIPAddressField': 'GenericIPAddressField',
-        'IntegerField': 'IntegerField',
-        'PositiveBigIntegerField': 'PositiveBigIntegerField',
-        'PositiveIntegerField': 'PositiveIntegerField',
-        'PositiveSmallIntegerField': 'PositiveSmallIntegerField',
-        'SmallAutoField': 'SmallAutoField',
-        'SmallIntegerField': 'SmallIntegerField',
-        'TimeField': 'TimeField',
+        "AutoField": "AutoField",
+        "BigAutoField": "BigAutoField",
+        "BigIntegerField": "BigIntegerField",
+        "BinaryField": "BinaryField",
+        "BooleanField": "BooleanField",
+        "CharField": "CharField",
+        "DurationField": "DurationField",
+        "GenericIPAddressField": "GenericIPAddressField",
+        "IntegerField": "IntegerField",
+        "PositiveBigIntegerField": "PositiveBigIntegerField",
+        "PositiveIntegerField": "PositiveIntegerField",
+        "PositiveSmallIntegerField": "PositiveSmallIntegerField",
+        "SmallAutoField": "SmallAutoField",
+        "SmallIntegerField": "SmallIntegerField",
+        "TimeField": "TimeField",
     }
 
     # Can the backend introspect the column order (ASC/DESC) for indexes?
@@ -162,8 +173,7 @@ class BaseDatabaseFeatures:
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
-    # Does it support operations requiring references rename in a transaction?
-    supports_atomic_references_rename = True
+    schema_editor_uses_clientside_param_binding = False
 
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
@@ -174,6 +184,9 @@ class BaseDatabaseFeatures:
     # Can it create foreign key constraints inline when adding columns?
     can_create_inline_fk = True
 
+    # Can an index be renamed?
+    can_rename_index = False
+
     # Does it automatically index foreign keys?
     indexes_foreign_keys = True
 
@@ -183,34 +196,47 @@ class BaseDatabaseFeatures:
     # Does the backend support introspection of CHECK constraints?
     can_introspect_check_constraints = True
 
-    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # Does the backend support 'pyformat' style:
+    # ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
     # supported by the Python driver
     supports_paramstyle_pyformat = True
 
-    # Does the backend require literal defaults, rather than parameterized ones?
+    # Does the backend require literal defaults, rather than parameterized
+    # ones?
     requires_literal_defaults = False
 
-    # Does the backend require a connection reset after each material schema change?
+    # Does the backend support functions in defaults?
+    supports_expression_defaults = True
+
+    # Does the backend support the DEFAULT keyword in insert queries?
+    supports_default_keyword_in_insert = True
+
+    # Does the backend support the DEFAULT keyword in bulk insert queries?
+    supports_default_keyword_in_bulk_insert = True
+
+    # Does the backend require a connection reset after each material schema
+    # change?
     connection_persists_old_columns = False
 
     # What kind of error does the backend throw when accessing closed cursor?
     closed_cursor_error_class = ProgrammingError
 
     # Does 'a' LIKE 'A' match?
-    has_case_insensitive_like = True
+    has_case_insensitive_like = False
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
-    bare_select_suffix = ''
+    bare_select_suffix = ""
 
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
 
-    # Does the backend support "select for update" queries with limit (and offset)?
+    # Does the backend support "select for update" queries with limit (and
+    # offset)?
     supports_select_for_update_with_limit = True
 
-    # Does the backend ignore null expressions in GREATEST and LEAST queries unless
-    # every expression is null?
+    # Does the backend ignore null expressions in GREATEST and LEAST queries
+    # unless every expression is null?
     greatest_least_ignores_nulls = False
 
     # Can the backend clone databases for parallel test execution?
@@ -230,10 +256,23 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
     supports_parentheses_in_compound = True
+    requires_compound_order_by_subquery = False
 
     # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
     # expressions?
     supports_aggregate_filter_clause = False
+
+    # Does the database support ORDER BY in aggregate expressions?
+    supports_aggregate_order_by_clause = False
+
+    # Does the database backend support DISTINCT when using multiple arguments
+    # in an aggregate expression? For example, Sqlite treats the "delimiter"
+    # argument of STRING_AGG/GROUP_CONCAT as an extra argument and does not
+    # allow using a custom delimiter along with DISTINCT.
+    supports_aggregate_distinct_multiple_argument = True
+
+    # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
+    supports_any_value = False
 
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
@@ -241,6 +280,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
@@ -261,16 +301,16 @@ class BaseDatabaseFeatures:
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
 
-    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
-    # unknown kwargs are passed to QuerySet.explain()?
-    validates_explain_options = True
-
     # Does the backend support the default parameter in lead() and lag()?
     supports_default_in_lead_lag = True
 
     # Does the backend support ignoring constraint or uniqueness errors during
     # INSERT?
     supports_ignore_conflicts = True
+    # Does the backend support updating rows on constraint or uniqueness errors
+    # during INSERT?
+    supports_update_conflicts = False
+    supports_update_conflicts_with_target = False
 
     # Does this backend require casting the results of CASE expressions used
     # in UPDATE statements to ensure the expression has the correct type?
@@ -293,6 +333,9 @@ class BaseDatabaseFeatures:
     # Does the backend support boolean expressions in SELECT and GROUP BY
     # clauses?
     supports_boolean_expr_in_select_clause = True
+    # Does the backend support comparing boolean expressions in WHERE clauses?
+    # Eg: WHERE (price > 0) IS NOT NULL
+    supports_comparing_boolean_expr = True
 
     # Does the backend support JSONField?
     supports_json_field = True
@@ -312,6 +355,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON array indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -319,13 +364,60 @@ class BaseDatabaseFeatures:
     # Does the backend support non-deterministic collations?
     supports_non_deterministic_collations = True
 
+    # Does the backend support column and table comments?
+    supports_comments = False
+    # Does the backend support column comments in ADD COLUMN statements?
+    supports_comments_inline = False
+
+    # Does the backend support stored generated columns?
+    supports_stored_generated_columns = False
+    # Does the backend support virtual generated columns?
+    supports_virtual_generated_columns = False
+
+    # Does the backend support the logical XOR operator?
+    supports_logical_xor = False
+
+    # Set to (exception, message) if null characters in text are disallowed.
+    prohibits_null_characters_in_text_exception = None
+
+    # Does the backend support unlimited character columns?
+    supports_unlimited_charfield = False
+
+    # Does the backend support numeric columns with no precision?
+    supports_no_precision_decimalfield = False
+
+    # Does the backend support native tuple lookups (=, >, <, IN)?
+    supports_tuple_lookups = True
+
+    # Does the backend support native tuple gt(e), lt(e) comparisons against
+    # subqueries?
+    supports_tuple_comparison_against_subquery = True
+
+    # Does the backend support CASCADE, DEFAULT, NULL as delete options?
+    supports_on_delete_db_cascade = True
+    supports_on_delete_db_default = True
+    supports_on_delete_db_null = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
-        'ci': None,  # Case-insensitive.
-        'cs': None,  # Case-sensitive.
-        'non_default': None,  # Non-default.
-        'swedish_ci': None  # Swedish case-insensitive.
+        "ci": None,  # Case-insensitive.
+        "cs": None,  # Case-sensitive.
+        "non_default": None,  # Non-default.
+        "swedish_ci": None,  # Swedish case-insensitive.
+        "virtual": None,  # A collation that can be used for virtual columns.
     }
+    # SQL template override for tests.aggregation.tests.NowUTC
+    test_now_utc_template = None
+
+    # SQL to create a model instance using the database defaults.
+    insert_test_table_with_defaults = None
+
+    # Does the Round() database function round to even?
+    rounds_to_even = False
+
+    # Should dollar signs be prohibited in column aliases to prevent SQL
+    # injection?
+    prohibits_dollar_signs_in_column_aliases = False
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
@@ -337,6 +429,9 @@ class BaseDatabaseFeatures:
     def __init__(self, connection):
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     @cached_property
     def supports_explaining_query_execution(self):
         """Does this backend support explaining query execution?"""
@@ -346,14 +441,14 @@ class BaseDatabaseFeatures:
     def supports_transactions(self):
         """Confirm support for transactions."""
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            cursor.execute("CREATE TABLE ROLLBACK_TEST (X INT)")
             self.connection.set_autocommit(False)
-            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            cursor.execute("INSERT INTO ROLLBACK_TEST (X) VALUES (8)")
             self.connection.rollback()
             self.connection.set_autocommit(True)
-            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-            count, = cursor.fetchone()
-            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            cursor.execute("SELECT COUNT(X) FROM ROLLBACK_TEST")
+            (count,) = cursor.fetchone()
+            cursor.execute("DROP TABLE ROLLBACK_TEST")
         return count == 0
 
     def allows_group_by_selected_pks_on_model(self, model):

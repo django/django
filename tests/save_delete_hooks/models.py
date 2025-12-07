@@ -4,6 +4,7 @@ Adding hooks before/after saving and deleting
 To execute arbitrary code around ``save()`` and ``delete()``, just subclass
 the methods.
 """
+
 from django.db import models
 
 

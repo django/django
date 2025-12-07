@@ -28,7 +28,7 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name + ' is owned by ' + str(self.owner)
+        return self.name + " is owned by " + str(self.owner)
 
 
 class Absolute(models.Model):
@@ -39,7 +39,7 @@ class Parent(models.Model):
     name = models.CharField(max_length=10)
 
     class Meta:
-        ordering = ('id',)
+        ordering = ("id",)
 
 
 class Child(Parent):
@@ -56,7 +56,7 @@ class Article(models.Model):
     channels = models.ManyToManyField(Channel)
 
     class Meta:
-        ordering = ('id',)
+        ordering = ("id",)
 
 
 # Subclass of a model with a ManyToManyField for test_ticket_20820
@@ -66,7 +66,6 @@ class SpecialArticle(Article):
 
 # Models to regression test #22421
 class CommonFeature(Article):
-
     class Meta:
         abstract = True
 
@@ -80,7 +79,7 @@ class Widget(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -99,12 +98,12 @@ class TestManager(models.Manager):
 
 class Store(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    main = models.ForeignKey('self', models.SET_NULL, null=True)
+    main = models.ForeignKey("self", models.SET_NULL, null=True)
 
     objects = TestManager()
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -119,7 +118,7 @@ class Person(models.Model):
     objects = TestManager()
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -128,7 +127,8 @@ class Person(models.Model):
     # one to test the behavior of the dependency resolution algorithm.
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.store']
+
+    natural_key.dependencies = ["fixtures_regress.store"]
 
 
 class Book(models.Model):
@@ -137,14 +137,34 @@ class Book(models.Model):
     stores = models.ManyToManyField(Store)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
-        return '%s by %s (available at %s)' % (
+        return "%s by %s (available at %s)" % (
             self.name,
             self.author.name,
-            ', '.join(s.name for s in self.stores.all())
+            ", ".join(s.name for s in self.stores.all()),
         )
+
+
+class NaturalKeyWithFKDependencyManager(models.Manager):
+    def get_by_natural_key(self, name, author):
+        return self.get(name=name, author__name=author)
+
+
+class NaturalKeyWithFKDependency(models.Model):
+    name = models.CharField(max_length=255)
+    author = models.ForeignKey(Person, models.CASCADE)
+
+    objects = NaturalKeyWithFKDependencyManager()
+
+    class Meta:
+        unique_together = ["name", "author"]
+
+    def natural_key(self):
+        return (self.name,) + self.author.natural_key()
+
+    natural_key.dependencies = ["fixtures_regress.Person"]
 
 
 class NKManager(models.Manager):
@@ -160,19 +180,19 @@ class NKChild(Parent):
         return (self.data,)
 
     def __str__(self):
-        return 'NKChild %s:%s' % (self.name, self.data)
+        return "NKChild %s:%s" % (self.name, self.data)
 
 
 class RefToNKChild(models.Model):
     text = models.CharField(max_length=10)
-    nk_fk = models.ForeignKey(NKChild, models.CASCADE, related_name='ref_fks')
-    nk_m2m = models.ManyToManyField(NKChild, related_name='ref_m2ms')
+    nk_fk = models.ForeignKey(NKChild, models.CASCADE, related_name="ref_fks")
+    nk_m2m = models.ManyToManyField(NKChild, related_name="ref_m2ms")
 
     def __str__(self):
-        return '%s: Reference to %s [%s]' % (
+        return "%s: Reference to %s [%s]" % (
             self.text,
             self.nk_fk,
-            ', '.join(str(o) for o in self.nk_m2m.all())
+            ", ".join(str(o) for o in self.nk_m2m.all()),
         )
 
 
@@ -182,7 +202,8 @@ class Circle1(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle2']
+
+    natural_key.dependencies = ["fixtures_regress.circle2"]
 
 
 class Circle2(models.Model):
@@ -190,7 +211,8 @@ class Circle2(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle1']
+
+    natural_key.dependencies = ["fixtures_regress.circle1"]
 
 
 class Circle3(models.Model):
@@ -198,7 +220,8 @@ class Circle3(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle3']
+
+    natural_key.dependencies = ["fixtures_regress.circle3"]
 
 
 class Circle4(models.Model):
@@ -206,7 +229,8 @@ class Circle4(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle5']
+
+    natural_key.dependencies = ["fixtures_regress.circle5"]
 
 
 class Circle5(models.Model):
@@ -214,7 +238,8 @@ class Circle5(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle6']
+
+    natural_key.dependencies = ["fixtures_regress.circle6"]
 
 
 class Circle6(models.Model):
@@ -222,7 +247,8 @@ class Circle6(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.circle4']
+
+    natural_key.dependencies = ["fixtures_regress.circle4"]
 
 
 class ExternalDependency(models.Model):
@@ -230,7 +256,8 @@ class ExternalDependency(models.Model):
 
     def natural_key(self):
         return (self.name,)
-    natural_key.dependencies = ['fixtures_regress.book']
+
+    natural_key.dependencies = ["fixtures_regress.book"]
 
 
 # Model for regression test of #11101
@@ -246,6 +273,7 @@ class BaseNKModel(models.Model):
     """
     Base model with a natural_key and a manager with `get_by_natural_key`
     """
+
     data = models.CharField(max_length=20, unique=True)
 
     objects = NKManager()
@@ -290,18 +318,21 @@ class M2MThroughAB(BaseNKModel):
 
 
 class M2MComplexCircular1A(BaseNKModel):
-    b_set = models.ManyToManyField("M2MComplexCircular1B",
-                                   through="M2MCircular1ThroughAB")
+    b_set = models.ManyToManyField(
+        "M2MComplexCircular1B", through="M2MCircular1ThroughAB"
+    )
 
 
 class M2MComplexCircular1B(BaseNKModel):
-    c_set = models.ManyToManyField("M2MComplexCircular1C",
-                                   through="M2MCircular1ThroughBC")
+    c_set = models.ManyToManyField(
+        "M2MComplexCircular1C", through="M2MCircular1ThroughBC"
+    )
 
 
 class M2MComplexCircular1C(BaseNKModel):
-    a_set = models.ManyToManyField("M2MComplexCircular1A",
-                                   through="M2MCircular1ThroughCA")
+    a_set = models.ManyToManyField(
+        "M2MComplexCircular1A", through="M2MCircular1ThroughCA"
+    )
 
 
 class M2MCircular1ThroughAB(BaseNKModel):
@@ -320,13 +351,15 @@ class M2MCircular1ThroughCA(BaseNKModel):
 
 
 class M2MComplexCircular2A(BaseNKModel):
-    b_set = models.ManyToManyField("M2MComplexCircular2B",
-                                   through="M2MCircular2ThroughAB")
+    b_set = models.ManyToManyField(
+        "M2MComplexCircular2B", through="M2MCircular2ThroughAB"
+    )
 
 
 class M2MComplexCircular2B(BaseNKModel):
     def natural_key(self):
         return (self.data,)
+
     # Fake the dependency for a circularity
     natural_key.dependencies = ["fixtures_regress.M2MComplexCircular2A"]
 

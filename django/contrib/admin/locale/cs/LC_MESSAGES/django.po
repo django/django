@@ -2,25 +2,32 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jan Papež <honyczek@centrum.cz>, 2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2013-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2020
+# Vláďa Macek <macek@sandbox.cz>, 2015-2020,2022
 # yedpodtrzitko <yed@vanyli.net>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-20 09:24+0000\n"
-"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Jan Papež <honyczek@centrum.cz>, 2024\n"
+"Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Odstranit vybrané položky typu %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,10 +39,6 @@ msgstr "Nelze smazat %(name)s"
 
 msgid "Are you sure?"
 msgstr "Jste si jisti?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Odstranit vybrané položky typu %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Správa"
@@ -183,6 +186,9 @@ msgstr ""
 "Výběr více než jedné položky je možný přidržením klávesy \"Control\", na "
 "Macu \"Command\"."
 
+msgid "Select this object for an action - {}"
+msgstr "Vyberte tento objekt pro akci - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Položka typu {name} \"{obj}\" byla úspěšně přidána."
@@ -202,12 +208,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "Položka typu {name} \"{obj}\" byla úspěšně změněna. Níže ji můžete dále "
-"upravovat."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Položka \"{obj}\" typu {name} byla úspěšně přidána. Níže ji můžete dále "
 "upravovat."
 
 #, python-brace-format
@@ -279,8 +279,9 @@ msgstr "Vybraných je 0 položek z celkem %(cnt)s."
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s: %(instance)s"
@@ -350,6 +351,9 @@ msgstr "Vybrat všechny položky typu %(module_name)s, celkem %(total_count)s."
 msgid "Clear selection"
 msgstr "Zrušit výběr"
 
+msgid "Breadcrumbs"
+msgstr "Drobečky"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modely v aplikaci %(name)s"
@@ -376,15 +380,35 @@ msgstr "Zadejte uživatelské jméno a heslo."
 msgid "Change password"
 msgstr "Změnit heslo"
 
-msgid "Please correct the error below."
-msgstr "Opravte níže uvedenou chybu."
+msgid "Set password"
+msgstr "Nastavit heslo"
 
-msgid "Please correct the errors below."
-msgstr "Opravte níže uvedené chyby."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Opravte prosím níže uvedenou chybu."
+msgstr[1] "Opravte prosím níže uvedené chyby."
+msgstr[2] "Opravte prosím níže uvedené chyby."
+msgstr[3] "Opravte prosím níže uvedené chyby."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Zadejte nové heslo pro uživatele <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Tato akce <strong>povolí</strong> pro tohoto uživatele ověřování na základě "
+"hesla."
+
+msgid "Disable password-based authentication"
+msgstr "Zakázat ověřování pomocí hesla"
+
+msgid "Enable password-based authentication"
+msgstr "Povolit ověřování pomocí hesla"
+
+msgid "Skip to main content"
+msgstr "Přeskočit na hlavní obsah"
 
 msgid "Welcome,"
 msgstr "Vítejte, uživateli"
@@ -411,6 +435,12 @@ msgstr "Zobrazení na webu"
 msgid "Filter"
 msgstr "Filtr"
 
+msgid "Hide counts"
+msgstr "Skrýt počty"
+
+msgid "Show counts"
+msgstr "Zobrazit počty"
+
 msgid "Clear all filters"
 msgstr "Zrušit všechny filtry"
 
@@ -423,6 +453,15 @@ msgstr "Priorita řazení: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Přehodit řazení"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Přepnout motiv (aktuální motiv: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Přepnout motiv (aktuální motiv: světlý)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Přepnout motiv (aktuální motiv: tmavý)"
 
 msgid "Delete"
 msgstr "Odstranit"
@@ -510,6 +549,15 @@ msgstr "Moje akce"
 msgid "None available"
 msgstr "Nic"
 
+msgid "Added:"
+msgstr "Přidáno:"
+
+msgid "Changed:"
+msgstr "Změněno:"
+
+msgid "Deleted:"
+msgstr "Smazáno:"
+
 msgid "Unknown content"
 msgstr "Neznámý obsah"
 
@@ -536,6 +584,15 @@ msgstr "Zapomněli jste heslo nebo uživatelské jméno?"
 msgid "Toggle navigation"
 msgstr "Přehodit navigaci"
 
+msgid "Sidebar"
+msgstr "Boční panel"
+
+msgid "Start typing to filter…"
+msgstr "Filtrovat začnete vepsáním textu..."
+
+msgid "Filter navigation items"
+msgstr "Filtrace položek navigace"
+
 msgid "Date/time"
 msgstr "Datum a čas"
 
@@ -544,6 +601,13 @@ msgstr "Uživatel"
 
 msgid "Action"
 msgstr "Operace"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "položka"
+msgstr[1] "položky"
+msgstr[2] "položek"
+msgstr[3] "položek"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -603,8 +667,12 @@ msgstr "Přidat další %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Odstranit vybrané položky typu %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Děkujeme za čas strávený s tímto webem."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Zobrazení vybraných %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Děkujeme za dnešní čas strávený s tímto neobyčejným webem."
 
 msgid "Log in again"
 msgstr "Přihlaste se znovu"
@@ -700,6 +768,9 @@ msgstr "E-mailová adresa:"
 
 msgid "Reset my password"
 msgstr "Obnovit heslo"
+
+msgid "Select all objects on this page for an action"
+msgstr "Vyberte všechny objekty na této stránce pro akci"
 
 msgid "All dates"
 msgstr "Všechna data"

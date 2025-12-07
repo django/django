@@ -4,13 +4,14 @@
 # fonso <fonzzo@gmail.com>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
+# X Bello <xbello@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2023-04-24 20:19+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Documentación administrativa"
 
 msgid "Home"
 msgstr "Inicio"
@@ -39,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Para instalar os bookmarklets, arrastre o enlace á súa barra de marcadores, "
+"ou pinche co botón dereito no enlace e engádao ós marcadores. Agora poderá "
+"seleccionar o bookmarklet desde calquera páxina do sitio."
 
 msgid "Documentation for this page"
 msgstr "Documentación para esta páxina"
@@ -52,7 +56,7 @@ msgid "Tags"
 msgstr "Etiquetas"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Listado de todas as etiquetas de plantilla e as súas funcións."
 
 msgid "Filters"
 msgstr "Filtros"
@@ -61,6 +65,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Os filtros son accións que poden aplicarse a variables nunha plantilla para "
+"modificar a salida."
 
 msgid "Models"
 msgstr "Modelos"
@@ -70,6 +76,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Os modelos son descripcións de tódos os obxetos no sistema e os seus campos "
+"asociados. Cada modelo ten unha lista de campos ós que pode accederse como "
+"variables de plantilla."
 
 msgid "Views"
 msgstr "Vistas"
@@ -79,30 +88,39 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Cada páxina no sitio público é xerada por unha vista. A vista define qué "
+"plantilla se usa para xerar a páxina, e qué obxetos están dispoñibles nesa "
+"plantilla."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Ferramentas para o navegador para acceder rápidamente á funcionalidade de "
+"administración."
 
 msgid "Please install docutils"
-msgstr "instale docutils"
+msgstr "Por favor instale docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
+"O sistema de documentación de admin require da librería de Python <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Por favor pídalle ós administradores que instalen <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid "Model: %(name)s"
 msgstr "Modelo: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Campos"
 
 msgid "Field"
 msgstr "Campo"
@@ -114,38 +132,38 @@ msgid "Description"
 msgstr "Descrición"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Métodos con argumentos"
 
 msgid "Method"
-msgstr ""
+msgstr "Método"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Argumentos"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Volver á documentación do Modelo"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "Documentación do modelo"
 
 msgid "Model groups"
-msgstr ""
+msgstr "Modelos dos grupos"
 
 msgid "Templates"
 msgstr "Patróns"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Plantilla: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr ""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Plantilla: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Rutas de busca para a plantilla <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(non existe)"
@@ -154,34 +172,38 @@ msgid "Back to Documentation"
 msgstr "Volver á documentación"
 
 msgid "Template filters"
-msgstr ""
+msgstr "Filtros de plantilla"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Documentación dos filtros de plantilla"
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "Filtros incluidos"
 
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Para usar estes filtros, poña <code>%(code)s</code> na plantilla antes de "
+"usar o filtro."
 
 msgid "Template tags"
-msgstr ""
+msgstr "Etiquetas de plantilla"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Documentación das etiquetas de plantilla"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "Etiquetas  incluidas"
 
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Para usar estas etiquetas, poña <code>%(code)s</code> na plantilla antes de "
+"usar a etiqueta."
 
 #, python-format
 msgid "View: %(name)s"
@@ -191,26 +213,26 @@ msgid "Context:"
 msgstr "Contexto:"
 
 msgid "Templates:"
-msgstr ""
+msgstr "Plantillas:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Volver á documentación da Vista"
 
 msgid "View documentation"
-msgstr ""
+msgstr "Ver documentación"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Saltar ó espacio de nomes"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Baleirar espacio de nomes"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Vistas por espacio de nomes %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Vustas por espacio de nomes baleiro"
 
 #, python-format
 msgid ""
@@ -218,6 +240,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"Función de vista: <code>%(full_name)s</code>. Nome <code>%(url_name)s</"
+"code>.\n"
 
 msgid "tag:"
 msgstr "etiqueta:"
@@ -230,7 +255,7 @@ msgstr "vista:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Non se atopa a aplicación %(app_label)r"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
@@ -245,7 +270,7 @@ msgstr "o obxecto relacionado `%(app_label)s.%(data_type)s`"
 
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "os obxectos relacionados `%(app_label)s.%(object_name)s`"
+msgstr "obxectos relacionados `%(app_label)s.%(object_name)s`"
 
 #, python-format
 msgid "all %s"

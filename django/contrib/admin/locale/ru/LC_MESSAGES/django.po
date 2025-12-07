@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alex Ibragimov, 2021
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
@@ -9,25 +10,29 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025
 # Дмитрий <nerosketch@gmail.com>, 2019
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
+# Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-21 09:32+0000\n"
-"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025\n"
+"Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Удалить выбранные %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -37,12 +42,8 @@ msgstr "Успешно удалены %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не удается удалить %(name)s"
 
-msgid "Are you sure?"
-msgstr "Вы уверены?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Удалить выбранные %(verbose_name_plural)s"
+msgid "Delete multiple objects"
+msgstr "Удалить несколько объектов"
 
 msgid "Administration"
 msgstr "Администрирование"
@@ -190,6 +191,9 @@ msgstr ""
 "Удерживайте “Control“ (или “Command“ на Mac), чтобы выбрать несколько "
 "значений."
 
+msgid "Select this object for an action - {}"
+msgstr "Выбрать этот объект, чтобы применить к нему действие - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" был успешно добавлен."
@@ -208,12 +212,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "{name} “{obj}“ был изменен успешно. Вы можете отредактировать его снова ниже."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}“ был успешно добавлен. Вы можете отредактировать его еще раз "
-"ниже."
 
 #, python-brace-format
 msgid ""
@@ -278,12 +276,16 @@ msgstr[3] "Выбраны все %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Выбрано 0 объектов из %(cnt)s "
 
+msgid "Delete"
+msgstr "Удалить"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "История изменений: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -353,9 +355,21 @@ msgstr "Выбрать все %(module_name)s (%(total_count)s)"
 msgid "Clear selection"
 msgstr "Снять выделение"
 
+msgid "Breadcrumbs"
+msgstr "Хлебные крошки"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Модели в приложении %(name)s"
+
+msgid "Model name"
+msgstr "Имя модели"
+
+msgid "Add link"
+msgstr "Добавить"
+
+msgid "Change or view list link"
+msgstr "Просмотреть или редактировать"
 
 msgid "Add"
 msgstr "Добавить"
@@ -366,28 +380,46 @@ msgstr "Просмотреть"
 msgid "You don’t have permission to view or edit anything."
 msgstr "У вас недостаточно полномочий для просмотра или изменения чего либо."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Сначала введите имя пользователя и пароль. Затем вы сможете ввести больше "
-"информации о пользователе."
+"После того, как вы создадите пользователя, у вас появится больше "
+"возможностей по редактированию."
 
-msgid "Enter a username and password."
-msgstr "Введите имя пользователя и пароль."
+msgid "Error:"
+msgstr "Ошибка:"
 
 msgid "Change password"
 msgstr "Изменить пароль"
 
-msgid "Please correct the error below."
-msgstr "Пожалуйста, исправьте ошибку ниже."
+msgid "Set password"
+msgstr "Задать пароль"
 
-msgid "Please correct the errors below."
-msgstr "Пожалуйста, исправьте ошибки ниже."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Пожалуйста, исправьте ошибку ниже."
+msgstr[1] "Пожалуйста, исправьте ошибки ниже."
+msgstr[2] "Пожалуйста, исправьте ошибки ниже."
+msgstr[3] "Пожалуйста, исправьте ошибки ниже."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Введите новый пароль для пользователя <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Это действие <strong>разрешит</strong> парольную аутентификацию для этого "
+"пользователя."
+
+msgid "Disable password-based authentication"
+msgstr "Запретить аутентификацию по паролю"
+
+msgid "Enable password-based authentication"
+msgstr "Разрешить аутентификацию по паролю"
+
+msgid "Skip to main content"
+msgstr "К основному"
 
 msgid "Welcome,"
 msgstr "Добро пожаловать,"
@@ -414,6 +446,12 @@ msgstr "Смотреть на сайте"
 msgid "Filter"
 msgstr "Фильтр"
 
+msgid "Hide counts"
+msgstr "Скрыть счётчики"
+
+msgid "Show counts"
+msgstr "Показать счётчики"
+
 msgid "Clear all filters"
 msgstr "Сбросить все фильтры"
 
@@ -427,8 +465,14 @@ msgstr "Приоритет сортировки: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Сортировать в другом направлении"
 
-msgid "Delete"
-msgstr "Удалить"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Переключить тему (текущая: выбрана автоматически)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Переключить тему (текущая: светлая)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Переключить тему (текущая: тёмная)"
 
 #, python-format
 msgid ""
@@ -464,9 +508,6 @@ msgstr "Да, я уверен"
 
 msgid "No, take me back"
 msgstr "Нет, отменить и вернуться к выбору"
-
-msgid "Delete multiple objects"
-msgstr "Удалить несколько объектов"
 
 #, python-format
 msgid ""
@@ -512,6 +553,15 @@ msgstr "Мои действия"
 msgid "None available"
 msgstr "Недоступно"
 
+msgid "Added:"
+msgstr "Создано:"
+
+msgid "Changed:"
+msgstr "Изменено:"
+
+msgid "Deleted:"
+msgstr "Удалено:"
+
 msgid "Unknown content"
 msgstr "Неизвестный тип"
 
@@ -533,11 +583,20 @@ msgstr ""
 "просмотра данной страницы. Возможно, вы хотели бы войти в систему, используя "
 "другую учётную запись?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыли свой пароль или имя пользователя?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыли пароль?"
 
 msgid "Toggle navigation"
 msgstr "Переключить навигацию"
+
+msgid "Sidebar"
+msgstr "Боковая панель"
+
+msgid "Start typing to filter…"
+msgstr "Начните печатать для фильтрации..."
+
+msgid "Filter navigation items"
+msgstr "Фильтр элементов навигации"
 
 msgid "Date/time"
 msgstr "Дата и время"
@@ -547,6 +606,13 @@ msgstr "Пользователь"
 
 msgid "Action"
 msgstr "Действие"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "запись"
+msgstr[1] "записи"
+msgstr[2] "записей"
+msgstr[3] "записей"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -606,7 +672,11 @@ msgstr "Добавить ещё один объект типа \"%(model)s\""
 msgid "Delete selected %(model)s"
 msgstr "Удалить выбранный объект типа \"%(model)s\""
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Просмотреть выбранный объект типа \"%(model)s\""
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Благодарим вас за время, проведенное на этом сайте."
 
 msgid "Log in again"
@@ -684,8 +754,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Пожалуйста, перейдите на эту страницу и введите новый пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Ваше имя пользователя (на случай, если вы его забыли):"
+msgid "In case you’ve forgotten, you are:"
+msgstr "На случай, если вы забыли, вы: "
 
 msgid "Thanks for using our site!"
 msgstr "Спасибо, что используете наш сайт!"
@@ -706,6 +776,9 @@ msgstr "Адрес электронной почты:"
 
 msgid "Reset my password"
 msgstr "Восстановить мой пароль"
+
+msgid "Select all objects on this page for an action"
+msgstr "Выбрать все объекты на этой странице, чтобы применить к ним действие"
 
 msgid "All dates"
 msgstr "Все даты"

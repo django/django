@@ -1,4 +1,16 @@
+import enum
+
 from django.db import router
+from django.utils.inspect import get_func_args
+
+
+class OperationCategory(str, enum.Enum):
+    ADDITION = "+"
+    REMOVAL = "-"
+    ALTERATION = "~"
+    PYTHON = "p"
+    SQL = "s"
+    MIXED = "?"
 
 
 class Operation:
@@ -33,11 +45,23 @@ class Operation:
 
     serialization_expand_args = []
 
+    category = None
+
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
         self = object.__new__(cls)
         self._constructor_args = (args, kwargs)
         return self
+
+    def __replace__(self, /, **changes):
+        args = [
+            changes.pop(name, value)
+            for name, value in zip(
+                get_func_args(self.__class__),
+                self._constructor_args[0],
+            )
+        ]
+        return self.__class__(*args, **(self._constructor_args[1] | changes))
 
     def deconstruct(self):
         """
@@ -56,14 +80,18 @@ class Operation:
         Take the state from the previous migration, and mutate it
         so that it matches what this migration would perform.
         """
-        raise NotImplementedError('subclasses of Operation must provide a state_forwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a state_forwards() method"
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         """
         Perform the mutation on the database schema in the normal
         (forwards) direction.
         """
-        raise NotImplementedError('subclasses of Operation must provide a database_forwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a database_forwards() method"
+        )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """
@@ -71,13 +99,22 @@ class Operation:
         direction - e.g. if this were CreateModel, it would in fact
         drop the model's table.
         """
-        raise NotImplementedError('subclasses of Operation must provide a database_backwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a database_backwards() method"
+        )
 
     def describe(self):
         """
         Output a brief summary of what the action does.
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
+
+    def formatted_description(self):
+        """Output a description prefixed by a category symbol."""
+        description = self.describe()
+        if self.category is None:
+            return f"{OperationCategory.MIXED.value} {description}"
+        return f"{self.category.value} {description}"
 
     @property
     def migration_name_fragment(self):

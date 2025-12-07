@@ -2,6 +2,8 @@
 Backend for test environment.
 """
 
+import copy
+
 from django.core import mail
 from django.core.mail.backends.base import BaseEmailBackend
 
@@ -15,9 +17,10 @@ class EmailBackend(BaseEmailBackend):
 
     The dummy outbox is accessible through the outbox instance attribute.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not hasattr(mail, 'outbox'):
+        if not hasattr(mail, "outbox"):
             mail.outbox = []
 
     def send_messages(self, messages):
@@ -25,6 +28,6 @@ class EmailBackend(BaseEmailBackend):
         msg_count = 0
         for message in messages:  # .message() triggers header validation
             message.message()
-            mail.outbox.append(message)
+            mail.outbox.append(copy.deepcopy(message))
             msg_count += 1
         return msg_count

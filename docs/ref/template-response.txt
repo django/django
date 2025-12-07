@@ -33,7 +33,7 @@ Attributes
 
     The name of the template to be rendered. Accepts a backend-dependent
     template object (such as those returned by
-    :func:`~django.template.loader.get_template()`), the name of a template,
+    :func:`~django.template.loader.get_template`), the name of a template,
     or a list of template names.
 
     Example: ``['foo.html', 'path/to/bar.html']``
@@ -65,7 +65,7 @@ Methods
 
     ``template``
         A backend-dependent template object (such as those returned by
-        :func:`~django.template.loader.get_template()`), the name of a template,
+        :func:`~django.template.loader.get_template`), the name of a template,
         or a list of template names.
 
     ``context``
@@ -93,10 +93,6 @@ Methods
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
 
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
-
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
     Preprocesses context data that will be used for rendering a template.
@@ -109,7 +105,7 @@ Methods
 
     Resolves the template instance to use for rendering. Accepts a
     backend-dependent template object (such as those returned by
-    :func:`~django.template.loader.get_template()`), the name of a template,
+    :func:`~django.template.loader.get_template`), the name of a template,
     or a list of template names.
 
     Returns the backend-dependent template object instance to be rendered.
@@ -167,7 +163,7 @@ Methods
 
     ``template``
         A backend-dependent template object (such as those returned by
-        :func:`~django.template.loader.get_template()`), the name of a template,
+        :func:`~django.template.loader.get_template`), the name of a template,
         or a list of template names.
 
     ``context``
@@ -195,10 +191,6 @@ Methods
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
 
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
-
 The rendering process
 =====================
 
@@ -211,7 +203,7 @@ There are three circumstances under which a ``TemplateResponse`` will be
 rendered:
 
 * When the ``TemplateResponse`` instance is explicitly rendered, using
-  the :meth:`SimpleTemplateResponse.render()` method.
+  the :meth:`SimpleTemplateResponse.render` method.
 
 * When the content of the response is explicitly set by assigning
   ``response.content``.
@@ -225,18 +217,20 @@ subsequent rendering calls do not change the response content.
 
 However, when ``response.content`` is explicitly assigned, the
 change is always applied. If you want to force the content to be
-re-rendered, you can re-evaluate the rendered content, and assign
-the content of the response manually::
+re-rendered, you can reevaluate the rendered content, and assign
+the content of the response manually:
+
+.. code-block:: pycon
 
     # Set up a rendered TemplateResponse
     >>> from django.template.response import TemplateResponse
-    >>> t = TemplateResponse(request, 'original.html', {})
+    >>> t = TemplateResponse(request, "original.html", {})
     >>> t.render()
     >>> print(t.content)
     Original content
 
     # Re-rendering doesn't change content
-    >>> t.template_name = 'new.html'
+    >>> t.template_name = "new.html"
     >>> t.render()
     >>> print(t.content)
     Original content
@@ -273,13 +267,15 @@ the template response::
 
     from django.template.response import TemplateResponse
 
+
     def my_render_callback(response):
         # Do content-sensitive processing
         do_post_processing()
 
+
     def my_view(request):
         # Create a response
-        response = TemplateResponse(request, 'mytemplate.html', {})
+        response = TemplateResponse(request, "mytemplate.html", {})
         # Register the callback
         response.add_post_render_callback(my_render_callback)
         # Return the response
@@ -297,12 +293,15 @@ Using ``TemplateResponse`` and ``SimpleTemplateResponse``
 
 A :class:`TemplateResponse` object can be used anywhere that a normal
 :class:`django.http.HttpResponse` can be used. It can also be used as an
-alternative to calling :func:`~django.shortcuts.render()`.
+alternative to calling :func:`~django.shortcuts.render`.
 
 For example, the following view returns a :class:`TemplateResponse` with a
 template and a context containing a queryset::
 
     from django.template.response import TemplateResponse
 
+
     def blog_index(request):
-        return TemplateResponse(request, 'entry_list.html', {'entries': Entry.objects.all()})
+        return TemplateResponse(
+            request, "entry_list.html", {"entries": Entry.objects.all()}
+        )

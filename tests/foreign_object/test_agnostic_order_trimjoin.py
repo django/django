@@ -6,7 +6,6 @@ from .models import Address, Contact, Customer
 
 
 class TestLookupQuery(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.address = Address.objects.create(company=1, customer_id=20)
@@ -14,15 +13,15 @@ class TestLookupQuery(TestCase):
         cls.contact1 = Contact.objects.create(company_code=1, customer_code=20)
 
     def test_deep_mixed_forward(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Address.objects.filter(customer__contacts=self.contact1),
             [self.address.id],
-            attrgetter('id')
+            attrgetter("id"),
         )
 
     def test_deep_mixed_backward(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Contact.objects.filter(customer__address=self.address),
             [self.contact1.id],
-            attrgetter('id')
+            attrgetter("id"),
         )

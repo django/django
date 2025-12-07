@@ -4,15 +4,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2013
+# tinnguyen121221, 2021
 # Vuong Nguyen <autalpha@gmail.com>, 2011
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-12-23 17:25+0000\n"
+"Last-Translator: tinnguyen121221\n"
 "Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
@@ -84,21 +85,35 @@ msgstr ""
 "chỉnh sửa chưa được lưu sẽ bị mất."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Bạn đã lựa chọn một hành động, nhưng bạn không lưu thay đổi của bạn đến các "
-"lĩnh vực cá nhân được nêu ra. Xin vui lòng click OK để lưu lại. Bạn sẽ cần "
-"phải chạy lại các hành động."
+"Bạn đã chọn một hành động, nhưng bạn chưa lưu các thay đổi trên các trường. "
+"Vui lòng bấm OK để lưu lại. Bạn sẽ cần chạy lại hành dộng."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Bạn đã lựa chọn một hành động, và bạn đã không thực hiện bất kỳ thay đổi nào "
-"trên các trường. Có lẽ bạn đang tìm kiếm nút bấm Go thay vì nút bấm Save."
+"Bạn đã chọn một hành động và bạn đã không thực hiện bất kỳ thay đổi nào trên "
+"các trường. Có lẽ bạn nên bấm nút Đi đến hơn là nút Lưu lại."
+
+msgid "Now"
+msgstr "Bây giờ"
+
+msgid "Midnight"
+msgstr "Nửa đêm"
+
+msgid "6 a.m."
+msgstr "6 giờ sáng"
+
+msgid "Noon"
+msgstr "Buổi trưa"
+
+msgid "6 p.m."
+msgstr "6 giờ chiều"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -113,26 +128,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
 "Lưu ý: Hiện tại bạn đang thấy thời gian sau %s giờ so với thời gian máy chủ."
 
-msgid "Now"
-msgstr "Bây giờ"
-
 msgid "Choose a Time"
-msgstr ""
+msgstr "Chọn Thời gian"
 
 msgid "Choose a time"
 msgstr "Chọn giờ"
-
-msgid "Midnight"
-msgstr "Nửa đêm"
-
-msgid "6 a.m."
-msgstr "6 giờ sáng"
-
-msgid "Noon"
-msgstr "Buổi trưa"
-
-msgid "6 p.m."
-msgstr ""
 
 msgid "Cancel"
 msgstr "Hủy bỏ"
@@ -141,7 +141,7 @@ msgid "Today"
 msgstr "Hôm nay"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Chọn Ngày"
 
 msgid "Yesterday"
 msgstr "Hôm qua"
@@ -150,68 +150,116 @@ msgid "Tomorrow"
 msgstr "Ngày mai"
 
 msgid "January"
-msgstr ""
+msgstr "Tháng Một"
 
 msgid "February"
-msgstr ""
+msgstr "Tháng Hai"
 
 msgid "March"
-msgstr ""
+msgstr "Tháng Ba"
 
 msgid "April"
-msgstr ""
+msgstr "Tháng Tư"
 
 msgid "May"
-msgstr ""
+msgstr "Tháng Năm"
 
 msgid "June"
-msgstr ""
+msgstr "Tháng Sáu"
 
 msgid "July"
-msgstr ""
+msgstr "Tháng Bảy"
 
 msgid "August"
-msgstr ""
+msgstr "Tháng Tám"
 
 msgid "September"
-msgstr ""
+msgstr "Tháng Chín"
 
 msgid "October"
-msgstr ""
+msgstr "Tháng Mười"
 
 msgid "November"
-msgstr ""
+msgstr "Tháng Mười Một"
 
 msgid "December"
-msgstr ""
+msgstr "Tháng Mười Hai"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Tháng Một"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Tháng Hai"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Tháng Ba"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Tháng Tư"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Tháng Năm"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Tháng Sáu"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Tháng Bảy"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Tháng Tám"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Tháng Chín"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Tháng Mười"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Tháng Mười Một"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Tháng Mười Hai"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "CN"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "2"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "3"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "4"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "5"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "6"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "7"
 
 msgid "Show"
 msgstr "Hiện ra"

@@ -1,8 +1,10 @@
+from collections import defaultdict
 from importlib import import_module
 from pkgutil import walk_packages
 
 from django.apps import apps
 from django.conf import settings
+from django.core.checks import Error, Warning
 from django.template import TemplateDoesNotExist
 from django.template.context import make_context
 from django.template.engine import Engine
@@ -12,19 +14,62 @@ from .base import BaseEngine
 
 
 class DjangoTemplates(BaseEngine):
-
-    app_dirname = 'templates'
+    app_dirname = "templates"
 
     def __init__(self, params):
         params = params.copy()
-        options = params.pop('OPTIONS').copy()
-        options.setdefault('autoescape', True)
-        options.setdefault('debug', settings.DEBUG)
-        options.setdefault('file_charset', 'utf-8')
-        libraries = options.get('libraries', {})
-        options['libraries'] = self.get_templatetag_libraries(libraries)
+        options = params.pop("OPTIONS").copy()
+        options.setdefault("autoescape", True)
+        options.setdefault("debug", settings.DEBUG)
+        options.setdefault("file_charset", "utf-8")
+        libraries = options.get("libraries", {})
+        options["libraries"] = self.get_templatetag_libraries(libraries)
         super().__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)
+
+    def check(self, **kwargs):
+        return [
+            *self._check_string_if_invalid_is_string(),
+            *self._check_for_template_tags_with_the_same_name(),
+        ]
+
+    def _check_string_if_invalid_is_string(self):
+        value = self.engine.string_if_invalid
+        if not isinstance(value, str):
+            return [
+                Error(
+                    "'string_if_invalid' in TEMPLATES OPTIONS must be a string but "
+                    "got: %r (%s)." % (value, type(value)),
+                    obj=self,
+                    id="templates.E002",
+                )
+            ]
+        return []
+
+    def _check_for_template_tags_with_the_same_name(self):
+        libraries = defaultdict(set)
+
+        for module_name, module_path in get_template_tag_modules():
+            libraries[module_name].add(module_path)
+
+        for module_name, module_path in self.engine.libraries.items():
+            libraries[module_name].add(module_path)
+
+        errors = []
+
+        for library_name, items in libraries.items():
+            if len(items) > 1:
+                items = ", ".join(repr(item) for item in sorted(items))
+                errors.append(
+                    Warning(
+                        f"{library_name!r} is used for multiple template tag modules: "
+                        f"{items}",
+                        obj=self,
+                        id="templates.W003",
+                    )
+                )
+
+        return errors
 
     def from_string(self, template_code):
         return Template(self.engine.from_string(template_code), self)
@@ -46,7 +91,6 @@ class DjangoTemplates(BaseEngine):
 
 
 class Template:
-
     def __init__(self, template, backend):
         self.template = template
         self.backend = backend
@@ -56,7 +100,9 @@ class Template:
         return self.template.origin
 
     def render(self, context=None, request=None):
-        context = make_context(context, request, autoescape=self.backend.engine.autoescape)
+        context = make_context(
+            context, request, autoescape=self.backend.engine.autoescape
+        )
         try:
             return self.template.render(context)
         except TemplateDoesNotExist as exc:
@@ -71,7 +117,7 @@ def copy_exception(exc, backend=None):
     """
     backend = backend or exc.backend
     new = exc.__class__(*exc.args, tried=exc.tried, backend=backend, chain=exc.chain)
-    if hasattr(exc, 'template_debug'):
+    if hasattr(exc, "template_debug"):
         new.template_debug = exc.template_debug
     return new
 
@@ -84,18 +130,15 @@ def reraise(exc, backend):
     raise new from exc
 
 
-def get_installed_libraries():
+def get_template_tag_modules():
     """
-    Return the built-in template tag libraries and those from installed
-    applications. Libraries are stored in a dictionary where keys are the
-    individual module names, not the full module paths. Example:
-    django.templatetags.i18n is stored as i18n.
+    Yield (module_name, module_path) pairs for all installed template tag
+    libraries.
     """
-    libraries = {}
-    candidates = ['django.templatetags']
+    candidates = ["django.templatetags"]
     candidates.extend(
-        '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs())
+        f"{app_config.name}.templatetags" for app_config in apps.get_app_configs()
+    )
 
     for candidate in candidates:
         try:
@@ -104,11 +147,21 @@ def get_installed_libraries():
             # No templatetags package defined. This is safe to ignore.
             continue
 
-        if hasattr(pkg, '__path__'):
+        if hasattr(pkg, "__path__"):
             for name in get_package_libraries(pkg):
-                libraries[name[len(candidate) + 1:]] = name
+                yield name.removeprefix(candidate).lstrip("."), name
 
-    return libraries
+
+def get_installed_libraries():
+    """
+    Return the built-in template tag libraries and those from installed
+    applications. Libraries are stored in a dictionary where keys are the
+    individual module names, not the full module paths. Example:
+    django.templatetags.i18n is stored as i18n.
+    """
+    return {
+        module_name: full_name for module_name, full_name in get_template_tag_modules()
+    }
 
 
 def get_package_libraries(pkg):
@@ -116,7 +169,7 @@ def get_package_libraries(pkg):
     Recursively yield template tag libraries defined in submodules of a
     package.
     """
-    for entry in walk_packages(pkg.__path__, pkg.__name__ + '.'):
+    for entry in walk_packages(pkg.__path__, pkg.__name__ + "."):
         try:
             module = import_module(entry[1])
         except ImportError as e:
@@ -125,5 +178,5 @@ def get_package_libraries(pkg):
                 "trying to load '%s': %s" % (entry[1], e)
             ) from e
 
-        if hasattr(module, 'register'):
+        if hasattr(module, "register"):
             yield entry[1]

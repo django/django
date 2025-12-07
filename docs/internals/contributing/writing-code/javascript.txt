@@ -1,6 +1,6 @@
-==========
-JavaScript
-==========
+===============
+JavaScript code
+===============
 
 While most of Django core is Python, the ``admin`` and ``gis`` contrib apps
 contain JavaScript code.
@@ -17,8 +17,8 @@ Code style
   for indentation, but there are some exceptions.
 
 * When naming variables, use ``camelCase`` instead of ``underscore_case``.
-  Different JavaScript files sometimes use a different code style. Please try to
-  conform to the code style of each file.
+  Different JavaScript files sometimes use a different code style. Please try
+  to conform to the code style of each file.
 
 * Use the `ESLint`_ code linter to check your code for bugs and style errors.
   ESLint will be run when you run the JavaScript tests. We also recommended
@@ -45,7 +45,7 @@ JavaScript tests
 ================
 
 Django's JavaScript tests can be run in a browser or from the command line.
-The tests are located in a top level ``js_tests`` directory.
+The tests are located in a top level :source:`js_tests` directory.
 
 Writing tests
 -------------
@@ -78,7 +78,7 @@ Django's JavaScript tests use `QUnit`_. Here is an example test module:
     });
 
 
-Please consult the QUnit documentation for information on the types of
+Please consult the ``QUnit`` documentation for information on the types of
 `assertions supported by QUnit <https://api.qunitjs.com/assert/>`_.
 
 Running tests
@@ -89,8 +89,8 @@ The JavaScript tests may be run from a web browser or from the command line.
 Testing from a web browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run the tests from a web browser, open up ``js_tests/tests.html`` in your
-browser.
+To run the tests from a web browser, open up :source:`js_tests/tests.html` in
+your browser.
 
 To measure code coverage when running the tests, you need to view that file
 over HTTP. To view code coverage:

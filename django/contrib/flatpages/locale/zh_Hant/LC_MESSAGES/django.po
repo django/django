@@ -5,14 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 619e61dbdb61c57213f62815aaf60e01, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016,2019
+# YAO WEN LIANG, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 09:03+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"PO-Revision-Date: 2024-08-07 19:03+0000\n"
+"Last-Translator: YAO WEN LIANG, 2024\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgid "Advanced options"
 msgstr "進階選項"
 
 msgid "Flat Pages"
-msgstr "簡平頁面"
+msgstr "靜態頁面"
 
 msgid "URL"
 msgstr "URL"
@@ -50,7 +51,7 @@ msgstr "URL 缺少一個斜線。"
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "網站 %(site)s 已經存在一個浮動頁面，其位址為 %(url)s。"
+msgstr "網站 %(site)s 已經存在一個靜態頁面，其 url 為 %(url)s。"
 
 msgid "title"
 msgstr "標題"
@@ -68,8 +69,8 @@ msgid ""
 "Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
 "will use “flatpages/default.html”."
 msgstr ""
-"例如：「flatpages/contact_page.html」。若不提供，系統會使用「flatpages/"
-"default.html」。"
+"例如：\"flatpages/contact_page.html\"。若未提供，系統會使用 \"flatpages/"
+"default.html\"。"
 
 msgid "registration required"
 msgstr "請先註冊"
@@ -81,7 +82,7 @@ msgid "sites"
 msgstr "網站"
 
 msgid "flat page"
-msgstr "簡平頁面"
+msgstr "靜態頁面"
 
 msgid "flat pages"
-msgstr "簡平頁面"
+msgstr "靜態頁面"

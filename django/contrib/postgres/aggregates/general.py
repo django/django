@@ -1,68 +1,82 @@
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, Value
+import warnings
 
-from .mixins import OrderableAggMixin
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import Aggregate, BooleanField, JSONField
+from django.db.models import StringAgg as _StringAgg
+from django.db.models import Value
+from django.utils.deprecation import RemovedInDjango70Warning
 
 __all__ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
+    "ArrayAgg",
+    "BitAnd",
+    "BitOr",
+    "BitXor",
+    "BoolAnd",
+    "BoolOr",
+    "JSONBAgg",
+    "StringAgg",  # RemovedInDjango70Warning.
 ]
 
 
-class ArrayAgg(OrderableAggMixin, Aggregate):
-    function = 'ARRAY_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+class ArrayAgg(Aggregate):
+    function = "ARRAY_AGG"
     allow_distinct = True
+    allow_order_by = True
 
     @property
     def output_field(self):
         return ArrayField(self.source_expressions[0].output_field)
 
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return []
-        return value
-
 
 class BitAnd(Aggregate):
-    function = 'BIT_AND'
+    function = "BIT_AND"
 
 
 class BitOr(Aggregate):
-    function = 'BIT_OR'
+    function = "BIT_OR"
+
+
+class BitXor(Aggregate):
+    function = "BIT_XOR"
 
 
 class BoolAnd(Aggregate):
-    function = 'BOOL_AND'
+    function = "BOOL_AND"
     output_field = BooleanField()
 
 
 class BoolOr(Aggregate):
-    function = 'BOOL_OR'
+    function = "BOOL_OR"
     output_field = BooleanField()
 
 
-class JSONBAgg(OrderableAggMixin, Aggregate):
-    function = 'JSONB_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+class JSONBAgg(Aggregate):
+    function = "JSONB_AGG"
     allow_distinct = True
+    allow_order_by = True
     output_field = JSONField()
 
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return '[]'
-        return value
 
-
-class StringAgg(OrderableAggMixin, Aggregate):
-    function = 'STRING_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
-    allow_distinct = True
+# RemovedInDjango70Warning: When the deprecation ends, remove completely.
+class StringAgg(_StringAgg):
 
     def __init__(self, expression, delimiter, **extra):
-        delimiter_expr = Value(str(delimiter))
-        super().__init__(expression, delimiter_expr, **extra)
+        if isinstance(delimiter, str):
+            warnings.warn(
+                "delimiter: str will be resolved as a field reference instead "
+                "of a string literal on Django 7.0. Pass "
+                f"`delimiter=Value({delimiter!r})` to preserve the previous behavior.",
+                category=RemovedInDjango70Warning,
+                stacklevel=2,
+            )
 
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return ''
-        return value
+            delimiter = Value(delimiter)
+
+        warnings.warn(
+            "The PostgreSQL specific StringAgg function is deprecated. Use "
+            "django.db.models.aggregates.StringAgg instead.",
+            category=RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+
+        super().__init__(expression, delimiter, **extra)

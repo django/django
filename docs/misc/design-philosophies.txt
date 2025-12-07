@@ -20,31 +20,31 @@ A fundamental goal of Django's stack is `loose coupling and tight cohesion`_.
 The various layers of the framework shouldn't "know" about each other unless
 absolutely necessary.
 
-For example, the template system knows nothing about Web requests, the database
+For example, the template system knows nothing about web requests, the database
 layer knows nothing about data display and the view system doesn't care which
 template system a programmer uses.
 
 Although Django comes with a full stack for convenience, the pieces of the
 stack are independent of another wherever possible.
 
-.. _`loose coupling and tight cohesion`: http://wiki.c2.com/?CouplingAndCohesion
+.. _`loose coupling and tight cohesion`: https://wiki.c2.com/?CouplingAndCohesion
 
 .. _less-code:
 
 Less code
 ---------
 
-Django apps should use as little code as possible; they should lack boilerplate.
-Django should take full advantage of Python's dynamic capabilities, such as
-introspection.
+Django apps should use as little code as possible; they should lack
+boilerplate. Django should take full advantage of Python's dynamic
+capabilities, such as introspection.
 
 .. _quick-development:
 
 Quick development
 -----------------
 
-The point of a Web framework in the 21st century is to make the tedious aspects
-of Web development fast. Django should allow for incredibly quick Web
+The point of a web framework in the 21st century is to make the tedious aspects
+of web development fast. Django should allow for incredibly quick web
 development.
 
 .. _dry:
@@ -66,7 +66,7 @@ as possible.
 
     The `discussion of DRY on the Portland Pattern Repository`__
 
-    __ http://wiki.c2.com/?DontRepeatYourself
+    __ https://wiki.c2.com/?DontRepeatYourself
 
 .. _explicit-is-better-than-implicit:
 
@@ -173,7 +173,7 @@ Encourage best practices
 The framework should make it just as easy (or even easier) for a developer to
 design pretty URLs than ugly ones.
 
-File extensions in Web-page URLs should be avoided.
+File extensions in web-page URLs should be avoided.
 
 Vignette-style commas in URLs deserve severe punishment.
 
@@ -185,7 +185,7 @@ Definitive URLs
 .. index:: urls; definitive
 
 Technically, ``foo.com/bar`` and ``foo.com/bar/`` are two different URLs, and
-search-engine robots (and some Web traffic-analyzing tools) would treat them as
+search-engine robots (and some web traffic-analyzing tools) would treat them as
 separate pages. Django should make an effort to "normalize" URLs so that
 search-engine robots don't get confused.
 
@@ -254,10 +254,6 @@ enough programming-esque functionality, such as branching and looping, that is
 essential for making presentation-related decisions. The :ref:`Django Template
 Language (DTL) <template-language-intro>` aims to avoid advanced logic.
 
-The Django template system recognizes that templates are most often written by
-*designers*, not *programmers*, and therefore should not assume Python
-knowledge.
-
 Safety and security
 -------------------
 
@@ -314,7 +310,7 @@ The core goals of Django's :doc:`cache framework </topics/cache>` are:
 Less code
 ---------
 
-A cache should be as fast as possible.  Hence, all framework code surrounding
+A cache should be as fast as possible. Hence, all framework code surrounding
 the cache backend should be kept to the absolute minimum, especially for
 ``get()`` operations.
 

@@ -183,10 +183,6 @@ Date-based mixins
         it to ``'%W'`` or ``'%V'`` (ISO 8601 week) if your week starts on
         Monday.
 
-        .. versionadded:: 3.2
-
-            Support for the ``'%V'`` week format was added.
-
     .. attribute:: week
 
         **Optional** The value for the week, as a string. By default, set to

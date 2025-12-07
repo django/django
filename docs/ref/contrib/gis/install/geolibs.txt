@@ -2,46 +2,64 @@
 Installing Geospatial libraries
 ===============================
 
+.. _geolibs-list:
+
+Geospatial libraries
+====================
+
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-========================  ====================================  ================================  =================================
-Program                   Description                           Required                          Supported Versions
-========================  ====================================  ================================  =================================
-:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.9, 3.8, 3.7, 3.6
-`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  8.x, 7.x, 6.x, 5.x, 4.x
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.2, 3.1, 3.0, 2.4, 2.3, 2.2, 2.1
-:doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
-`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.0, 2.5, 2.4
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 5.0, 4.3
-========================  ====================================  ================================  =================================
+==============================  ====================================  ================================  ===================================================
+Program                         Description                           Required                          Supported Versions
+==============================  ====================================  ================================  ===================================================
+:ref:`GEOS <geos-overview>`     Geometry Engine Open Source           Yes                               3.14, 3.13, 3.12, 3.11, 3.10, 3.9
+`PROJ`_                         Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x
+:ref:`GDAL <gdal-overview>`     Geospatial Data Abstraction Library   Yes                               3.12, 3.11, 3.10, 3.9, 3.8, 3.7, 3.6, 3.5, 3.4, 3.3
+:ref:`GeoIP <geoip2-overview>`  IP-based geolocation library          No                                2
+`PostGIS`__                     Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.6, 3.5, 3.4, 3.3, 3.2
+`SpatiaLite`__                  Spatial extensions for SQLite         Yes (SQLite only)                 5.1, 5.0, 4.3
+==============================  ====================================  ================================  ===================================================
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
 
 ..
     Libs release dates:
-    GEOS 3.6.0 2016-10-25
-    GEOS 3.7.0 2018-09-10
-    GEOS 3.8.0 2019-10-10
     GEOS 3.9.0 2020-12-14
-    GDAL 2.1.0 2016-04
-    GDAL 2.2.0 2017-05
-    GDAL 2.3.0 2018-05
-    GDAL 2.4.0 2018-12
-    GDAL 3.0.0 2019-05
-    GDAL 3.1.0 2020-05-07
-    GDAL 3.2.0 2020-11-02
-    PostGIS 2.4.0 2017-09-30
-    PostGIS 2.5.0 2018-09-23
-    PostGIS 3.0.0 2019-10-20
+    GEOS 3.10.0 2021-10-20
+    GEOS 3.11.0 2022-07-01
+    GEOS 3.12.0 2023-06-27
+    GEOS 3.13.0 2024-09-06
+    GEOS 3.14.0 2025-08-21
+    GDAL 3.3.0 2021-05-03
+    GDAL 3.4.0 2021-11-04
+    GDAL 3.5.0 2022-05-13
+    GDAL 3.6.0 2022-11-03
+    GDAL 3.7.0 2023-05-10
+    GDAL 3.8.0 2023-11-13
+    GDAL 3.9.0 2024-05-10
+    GDAL 3.10.0 2024-11-06
+    GDAL 3.11.0 2025-05-09
+    GDAL 3.12.0 2025-11-07
+    PostGIS 3.2.0 2021-12-18
+    PostGIS 3.3.0 2022-08-27
+    PostGIS 3.4.0 2023-08-15
+    PostGIS 3.5.0 2024-09-25
+    PostGIS 3.6.0 2025-09-02
+    PROJ 9.0.0 2022-03-01
+    PROJ 8.0.0 2021-03-01
+    PROJ 8.0.0 2021-03-01
+    PROJ 7.0.0 2020-02-25
+    PROJ 6.0.0 2019-02-26
     SpatiaLite 4.3.0 2015-09-07
     SpatiaLite 5.0.0 2020-08-23
+    SpatiaLite 5.1.0 2023-08-04
 
 .. note::
 
     The GeoDjango interfaces to GEOS, GDAL, and GeoIP may be used
-    independently of Django.  In other words, no database or settings file
+    independently of Django. In other words, no database or settings file
     required -- import them as normal from :mod:`django.contrib.gis`.
 
 .. _PROJ: https://proj.org/
@@ -66,13 +84,15 @@ Building from source
 
 When installing from source on UNIX and GNU/Linux systems, please follow
 the installation instructions carefully, and install the libraries in the
-given order.  If using MySQL or Oracle as the spatial database, only GEOS
+given order. If using MySQL or Oracle as the spatial database, only GEOS
 is required.
 
 .. note::
 
     On Linux platforms, it may be necessary to run the ``ldconfig`` command
-    after installing each library. For example::
+    after installing each library. For example:
+
+    .. code-block:: shell
 
         $ sudo make install
         $ sudo ldconfig
@@ -90,22 +110,32 @@ GEOS
 
 GEOS is a C++ library for performing geometric operations, and is the default
 internal geometry representation used by GeoDjango (it's behind the "lazy"
-geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
+geometries). Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS from the GEOS website and untar the source archive::
+First, download GEOS from the GEOS website and untar the source archive:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
     $ tar xjf geos-X.Y.Z.tar.bz2
 
-Next, change into the directory where GEOS was unpacked, run the configure
-script, compile, and install::
+Then step into the GEOS directory, create a ``build`` folder, and step into
+it:
+
+.. code-block:: shell
 
     $ cd geos-X.Y.Z
-    $ ./configure
-    $ make
-    $ sudo make install
-    $ cd ..
+    $ mkdir build
+    $ cd build
+
+Then build and install the package:
+
+.. code-block:: shell
+
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
 
 Troubleshooting
 ~~~~~~~~~~~~~~~
@@ -119,10 +149,11 @@ When GeoDjango can't find GEOS, this error is raised:
 
     ImportError: Could not find the GEOS library (tried "geos_c"). Try setting GEOS_LIBRARY_PATH in your settings.
 
-The most common solution is to properly configure your :ref:`libsettings` *or* set
-:ref:`geoslibrarypath` in your settings.
+The most common solution is to properly configure your :ref:`libsettings` *or*
+set :ref:`geoslibrarypath` in your settings.
 
-If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binutils`.
+If using a binary package of GEOS (e.g., on Ubuntu), you may need to
+:ref:`binutils`.
 
 .. _geoslibrarypath:
 
@@ -132,7 +163,9 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to the
-GEOS C library.  For example::
+GEOS C library. For example:
+
+.. code-block:: shell
 
     GEOS_LIBRARY_PATH = '/home/bob/local/lib/libgeos_c.so'
 
@@ -141,7 +174,8 @@ GEOS C library.  For example::
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
 
-See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-logfile>`.
+See also :ref:`My logs are filled with GEOS-related errors
+<geos-exceptions-in-logfile>`.
 
 .. _proj4:
 
@@ -151,30 +185,51 @@ PROJ
 `PROJ`_ is a library for converting geospatial data to different coordinate
 reference systems.
 
-First, download the PROJ source code::
+First, download the PROJ source code:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
 
 ... and datum shifting files (download ``proj-datumgrid-X.Y.tar.gz`` for
-PROJ < 7.x) [#]_::
+PROJ < 7.x) [#]_:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
 
-Next, untar the source code archive, and extract the datum shifting files in the
-``data`` subdirectory (use ``nad`` subdirectory for PROJ < 6.x). This must be
-done *prior* to configuration::
+Next, untar the source code archive, and extract the datum shifting files in
+the ``data`` subdirectory. This must be done *prior* to configuration:
+
+.. code-block:: shell
 
     $ tar xzf proj-X.Y.Z.tar.gz
     $ cd proj-X.Y.Z/data
     $ tar xzf ../../proj-data-X.Y.tar.gz
-    $ cd ..
+    $ cd ../..
 
-Finally, configure, make and install PROJ::
+For PROJ 9.x and greater, releases only support builds using ``CMake`` (see
+`PROJ RFC-7`_).
 
-    $ ./configure
-    $ make
-    $ sudo make install
-    $ cd ..
+To build with ``CMake`` ensure your system meets the `build requirements`_.
+Then create a ``build`` folder in the PROJ directory, and step into it:
+
+.. code-block:: shell
+
+    $ cd proj-X.Y.Z
+    $ mkdir build
+    $ cd build
+
+Finally, configure, make and install PROJ:
+
+.. code-block:: shell
+
+    $ cmake ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
+
+.. _PROJ RFC-7: https://proj.org/community/rfc/rfc-7.html#rfc7
+.. _build requirements: https://proj.org/install.html#build-requirements
 
 .. _gdalbuild:
 
@@ -182,35 +237,39 @@ GDAL
 ----
 
 `GDAL`__ is an excellent open source geospatial library that has support for
-reading most vector and raster spatial data formats.  Currently, GeoDjango only
-supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
+reading most vector and raster spatial data formats. Currently, GeoDjango only
+supports :ref:`GDAL's vector data <gdal_vector_data>` capabilities [#]_.
 :ref:`geosbuild` and :ref:`proj4` should be installed prior to building GDAL.
 
-First download the latest GDAL release version and untar the archive::
+First download the latest GDAL release version and untar the archive:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
     $ tar xzf gdal-X.Y.Z.tar.gz
+
+For GDAL 3.6.x and greater, releases only support builds using ``CMake``. To
+build with ``CMake`` create a ``build`` folder in the GDAL directory, and step
+into it:
+
+.. code-block:: shell
+
     $ cd gdal-X.Y.Z
+    $ mkdir build
+    $ cd build
 
-Configure, make and install::
+Finally, configure, make and install GDAL:
 
-    $ ./configure
-    $ make # Go get some coffee, this takes a while.
-    $ sudo make install
-    $ cd ..
+.. code-block:: shell
 
-.. note::
-
-    Because GeoDjango has its own Python interface, the preceding instructions
-    do not build GDAL's own Python bindings. The bindings may be built by
-    adding the ``--with-python`` flag when running ``configure``. See
-    `GDAL/OGR In Python`__ for more information on GDAL's bindings.
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
 
 If you have any problems, please see the troubleshooting section below for
 suggestions and solutions.
 
-__ https://trac.osgeo.org/gdal/
-__ https://trac.osgeo.org/gdal/wiki/GdalOgrInPython
+__ https://gdal.org/
 
 .. _gdaltrouble:
 
@@ -231,7 +290,9 @@ When GeoDjango can't find the GDAL library, configure your :ref:`libsettings`
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to
-the GDAL library.  For example::
+the GDAL library. For example:
+
+.. code-block:: shell
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
 
@@ -239,10 +300,10 @@ the GDAL library.  For example::
 .. [#] The datum shifting files are needed for converting data to and from
        certain projections.
        For example, the PROJ string for the `Google projection (900913 or 3857)
-       <https://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
-       ``null`` grid file only included in the extra datum shifting files.
-       It is easier to install the shifting files now, then to have debug a
-       problem caused by their absence later.
+       <https://spatialreference.org/ref/epsg/3857/>`_ requires the ``null``
+       grid file only included in the extra datum shifting files. It is easier
+       to install the shifting files now, then to have debug a problem caused
+       by their absence later.
 .. [#] Specifically, GeoDjango provides support for the `OGR
        <https://gdal.org/user/vector_data_model.html>`_ library, a component of
        GDAL.

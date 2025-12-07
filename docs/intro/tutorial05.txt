@@ -3,7 +3,7 @@ Writing your first Django app, part 5
 =====================================
 
 This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
-We've built a Web-poll application, and we'll now create some automated tests
+We've built a web-poll application, and we'll now create some automated tests
 for it.
 
 .. admonition:: Where to get help:
@@ -111,7 +111,7 @@ There are many ways to approach writing tests.
 
 Some programmers follow a discipline called "`test-driven development`_"; they
 actually write their tests before they write their code. This might seem
-counter-intuitive, but in fact it's similar to what most people will often do
+counterintuitive, but in fact it's similar to what most people will often do
 anyway: they describe a problem, then create some code to solve it. Test-driven
 development formalizes the problem in a Python test case.
 
@@ -122,7 +122,8 @@ tests earlier, but it's never too late to get started.
 Sometimes it's difficult to figure out where to get started with writing tests.
 If you have written several thousand lines of Python, choosing something to
 test might not be easy. In such a case, it's fruitful to write your first test
-the next time you make a change, either when you add a new feature or fix a bug.
+the next time you make a change, either when you add a new feature or fix a
+bug.
 
 So let's do that right away.
 
@@ -135,9 +136,10 @@ We identify a bug
 -----------------
 
 Fortunately, there's a little bug in the ``polls`` application for us to fix
-right away: the ``Question.was_published_recently()`` method returns ``True`` if
-the ``Question`` was published within the last day (which is correct) but also if
-the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
+right away: the ``Question.was_published_recently()`` method returns ``True``
+if the ``Question`` was published within the last day (which is correct) but
+also if the ``Question``’s ``pub_date`` field is in the future (which certainly
+isn't).
 
 Confirm the bug by using the :djadmin:`shell` to check the method on a question
 whose date lies in the future:
@@ -150,7 +152,6 @@ whose date lies in the future:
 
     >>> import datetime
     >>> from django.utils import timezone
-    >>> from polls.models import Question
     >>> # create a Question instance with pub_date 30 days in the future
     >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
@@ -172,7 +173,7 @@ whose name begins with ``test``.
 Put the following in the ``tests.py`` file in the ``polls`` application:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     import datetime
 
@@ -183,7 +184,6 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
 
     class QuestionModelTests(TestCase):
-
         def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() returns False for questions whose pub_date
@@ -193,9 +193,9 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
-Here we have created a :class:`django.test.TestCase` subclass with a method that
-creates a ``Question`` instance with a ``pub_date`` in the future. We then check
-the output of ``was_published_recently()`` - which *ought* to be False.
+Here we have created a :class:`django.test.TestCase` subclass with a method
+that creates a ``Question`` instance with a ``pub_date`` in the future. We then
+check the output of ``was_published_recently()`` - which *ought* to be False.
 
 Running tests
 -------------
@@ -206,7 +206,9 @@ In the terminal, we can run our test:
 
     $ python manage.py test polls
 
-and you'll see something like::
+and you'll see something like:
+
+.. code-block:: shell
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -215,7 +217,7 @@ and you'll see something like::
     FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionModelTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_question
+      File "/path/to/djangotutorial/polls/tests.py", line 16, in test_was_published_recently_with_future_question
         self.assertIs(future_question.was_published_recently(), False)
     AssertionError: True is not False
 
@@ -242,8 +244,8 @@ What happened is this:
 
 * it looked for test methods - ones whose names begin with ``test``
 
-* in ``test_was_published_recently_with_future_question`` it created a ``Question``
-  instance whose ``pub_date`` field is 30 days in the future
+* in ``test_was_published_recently_with_future_question`` it created a
+  ``Question`` instance whose ``pub_date`` field is 30 days in the future
 
 * ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
@@ -255,19 +257,21 @@ occurred.
 Fixing the bug
 --------------
 
-We already know what the problem is: ``Question.was_published_recently()`` should
-return ``False`` if its ``pub_date`` is in the future. Amend the method in
-``models.py``, so that it will only return ``True`` if the date is also in the
-past:
+We already know what the problem is: ``Question.was_published_recently()``
+should return ``False`` if its ``pub_date`` is in the future. Amend the method
+in ``models.py``, so that it will only return ``True`` if the date is also in
+the past:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     def was_published_recently(self):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
-and run the test again::
+and run the test again:
+
+.. code-block:: pytb
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -290,14 +294,14 @@ More comprehensive tests
 ------------------------
 
 While we're here, we can further pin down the ``was_published_recently()``
-method; in fact, it would be positively embarrassing if in fixing one bug we had
-introduced another.
+method; in fact, it would be positively embarrassing if in fixing one bug we
+had introduced another.
 
 Add two more test methods to the same class, to test the behavior of the method
 more comprehensively:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     def test_was_published_recently_with_old_question(self):
         """
@@ -308,6 +312,7 @@ more comprehensively:
         old_question = Question(pub_date=time)
         self.assertIs(old_question.was_published_recently(), False)
 
+
     def test_was_published_recently_with_recent_question(self):
         """
         was_published_recently() returns True for questions whose pub_date
@@ -317,8 +322,9 @@ more comprehensively:
         recent_question = Question(pub_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
 
-And now we have three tests that confirm that ``Question.was_published_recently()``
-returns sensible values for past, recent, and future questions.
+And now we have three tests that confirm that
+``Question.was_published_recently()`` returns sensible values for past, recent,
+and future questions.
 
 Again, ``polls`` is a minimal application, but however complex it grows in the
 future and whatever other code it interacts with, we now have some guarantee
@@ -349,7 +355,7 @@ The Django test client
 ----------------------
 
 Django provides a test :class:`~django.test.Client` to simulate a user
-interacting with the code at the view level.  We can use it in ``tests.py``
+interacting with the code at the view level. We can use it in ``tests.py``
 or even in the :djadmin:`shell`.
 
 We will start again with the :djadmin:`shell`, where we need to do a couple of
@@ -368,7 +374,7 @@ environment in the :djadmin:`shell`:
 :meth:`~django.test.utils.setup_test_environment` installs a template renderer
 which will allow us to examine some additional attributes on responses such as
 ``response.context`` that otherwise wouldn't be available. Note that this
-method *does not* setup a test database, so the following will be run against
+method *does not* set up a test database, so the following will be run against
 the existing database and the output may differ slightly depending on what
 questions you already created. You might get unexpected results if your
 ``TIME_ZONE`` in ``settings.py`` isn't correct. If you don't remember setting
@@ -376,16 +382,20 @@ it earlier, check it before continuing.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
-this won't be required)::
+this won't be required):
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
-With that ready, we can ask the client to do some work for us::
+With that ready, we can ask the client to do some work for us:
+
+.. code-block:: pycon
 
     >>> # get a response from '/'
-    >>> response = client.get('/')
+    >>> response = client.get("/")
     Not Found: /
     >>> # we should expect a 404 from that address; if you instead see an
     >>> # "Invalid HTTP_HOST header" error and a 400 response, you probably
@@ -395,12 +405,12 @@ With that ready, we can ask the client to do some work for us::
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
     >>> from django.urls import reverse
-    >>> response = client.get(reverse('polls:index'))
+    >>> response = client.get(reverse("polls:index"))
     >>> response.status_code
     200
     >>> response.content
     b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#x27;s up?</a></li>\n    \n    </ul>\n\n'
-    >>> response.context['latest_question_list']
+    >>> response.context["latest_question_list"]
     <QuerySet [<Question: What's up?>]>
 
 Improving our view
@@ -413,57 +423,57 @@ In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     class IndexView(generic.ListView):
-        template_name = 'polls/index.html'
-        context_object_name = 'latest_question_list'
+        template_name = "polls/index.html"
+        context_object_name = "latest_question_list"
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by("-pub_date")[:5]
 
 We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
 an import:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.utils import timezone
 
 and then we must amend the ``get_queryset`` method like so:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     def get_queryset(self):
         """
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
+            :5
+        ]
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
-is, earlier than or equal to - ``timezone.now``.
+is, earlier than or equal to - ``timezone.now()``.
 
 Testing our new view
 --------------------
 
 Now you can satisfy yourself that this behaves as expected by firing up
-``runserver``, loading the site in your browser, creating ``Questions`` with
-dates in the past and future, and checking that only those that have been
-published are listed. You don't want to have to do that *every single time you
-make any change that might affect this* - so let's also create a test, based on
-our :djadmin:`shell` session above.
+``runserver``, loading the site in your browser, creating a few ``Question``
+entries with dates in the past and future, and checking that only those that
+have been published are listed. You don't want to have to do that *every single
+time you make any change that might affect this* - so let's also create a test,
+based on our :djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     from django.urls import reverse
 
@@ -471,7 +481,7 @@ and we'll create a shortcut function to create questions as well as a new test
 class:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     def create_question(question_text, days):
         """
@@ -488,10 +498,10 @@ class:
             """
             If no questions exist, an appropriate message is displayed.
             """
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_past_question(self):
             """
@@ -499,9 +509,9 @@ class:
             index page.
             """
             question = create_question(question_text="Past question.", days=-30)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -511,9 +521,9 @@ class:
             the index page.
             """
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_future_question_and_past_question(self):
             """
@@ -522,9 +532,9 @@ class:
             """
             question = create_question(question_text="Past question.", days=-30)
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -534,9 +544,9 @@ class:
             """
             question1 = create_question(question_text="Past question 1.", days=-30)
             question2 = create_question(question_text="Past question 2.", days=-5)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question2, question1],
             )
 
@@ -550,8 +560,8 @@ repetition out of the process of creating questions.
 "No polls are available." and verifies the ``latest_question_list`` is empty.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.TransactionTestCase.assertQuerySetEqual`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
@@ -572,10 +582,11 @@ the *index*, users can still reach them if they know or guess the right URL. So
 we need to add a similar  constraint to ``DetailView``:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     class DetailView(generic.DetailView):
         ...
+
         def get_queryset(self):
             """
             Excludes any questions that aren't published yet.
@@ -587,7 +598,7 @@ is in the past can be displayed, and that one with a ``pub_date`` in the future
 is not:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     class QuestionDetailViewTests(TestCase):
         def test_future_question(self):
@@ -595,8 +606,8 @@ is not:
             The detail view of a question with a pub_date in the future
             returns a 404 not found.
             """
-            future_question = create_question(question_text='Future question.', days=5)
-            url = reverse('polls:detail', args=(future_question.id,))
+            future_question = create_question(question_text="Future question.", days=5)
+            url = reverse("polls:detail", args=(future_question.id,))
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -605,8 +616,8 @@ is not:
             The detail view of a question with a pub_date in the past
             displays the question's text.
             """
-            past_question = create_question(question_text='Past Question.', days=-5)
-            url = reverse('polls:detail', args=(past_question.id,))
+            past_question = create_question(question_text="Past Question.", days=-5)
+            url = reverse("polls:detail", args=(past_question.id,))
             response = self.client.get(url)
             self.assertContains(response, past_question.question_text)
 
@@ -618,14 +629,14 @@ create a new test class for that view. It'll be very similar to what we have
 just created; in fact there will be a lot of repetition.
 
 We could also improve our application in other ways, adding tests along the
-way. For example, it's silly that ``Questions`` can be published on the site
-that have no ``Choices``. So, our views could check for this, and exclude such
-``Questions``. Our tests would create a ``Question`` without ``Choices`` and
-then test that it's not published, as well as create a similar ``Question``
-*with* ``Choices``, and test that it *is* published.
+way. For example, it's pointless that a ``Question`` with no related ``Choice``
+can be published on the site. So, our views could check for this, and exclude
+such ``Question`` objects. Our tests would create a ``Question`` without a
+``Choice``, and then test that it's not published, as well as create a similar
+``Question`` *with* at least one ``Choice``, and test that it *is* published.
 
-Perhaps logged-in admin users should be allowed to see unpublished
-``Questions``, but not ordinary visitors. Again: whatever needs to be added to
+Perhaps logged-in admin users should be allowed to see unpublished ``Question``
+entries, but not ordinary visitors. Again: whatever needs to be added to
 the software to accomplish this should be accompanied by a test, whether you
 write the test first and then make the code pass the test, or work out the
 logic in your code first and then write a test to prove it.
@@ -636,18 +647,19 @@ code is suffering from test bloat, which brings us to:
 When testing, more is better
 ============================
 
-It might seem that our tests are growing out of control. At this rate there will
-soon be more code in our tests than in our application, and the repetition
+It might seem that our tests are growing out of control. At this rate there
+will soon be more code in our tests than in our application, and the repetition
 is unaesthetic, compared to the elegant conciseness of the rest of our code.
 
 **It doesn't matter**. Let them grow. For the most part, you can write a test
 once and then forget about it. It will continue performing its useful function
 as you continue to develop your program.
 
-Sometimes tests will need to be updated. Suppose that we amend our views so that
-only ``Questions`` with ``Choices`` are published. In that case, many of our
-existing tests will fail - *telling us exactly which tests need to be amended to
-bring them up to date*, so to that extent tests help look after themselves.
+Sometimes tests will need to be updated. Suppose that we amend our views so
+that only ``Question`` entries with associated ``Choice`` instances are
+published. In that case, many of our existing tests will fail - *telling us
+exactly which tests need to be amended to bring them up to date*, so to that
+extent tests help look after themselves.
 
 At worst, as you continue developing, you might find that you have some tests
 that are now redundant. Even that's not a problem; in testing redundancy is

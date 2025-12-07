@@ -71,9 +71,9 @@ The new features and changes introduced in 0.95 include:
   URLconfs/views on their own. Previously, the framework required that a
   database be configured, regardless of whether you actually used it.
 
-* It's now more explicit and natural to override save() and delete()
-  methods on models, rather than needing to hook into the pre_save() and
-  post_save() method hooks.
+* It's now more explicit and natural to override ``save()`` and ``delete()``
+  methods on models, rather than needing to hook into the ``pre_save()`` and
+  ``post_save()`` method hooks.
 
 * Individual pieces of the framework now can be configured without
   requiring the setting of an environment variable. This permits use of,

@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2013-2017,2019
+# Ramiro Morales, 2013-2017,2019,2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-01 10:21+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Ramiro Morales, 2013-2017,2019,2021,2023-2025\n"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,12 +31,22 @@ msgstr "Fechas importantes"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "No existe un objeto %(name)s con una clave primaria %(key)r."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Los datos enviados se contradicen. Por favor intente de nuevo."
+
 msgid "Password changed successfully."
 msgstr "Cambio de contraseña exitoso"
+
+msgid "Password-based authentication was disabled."
+msgstr "La autenticación basada en contraseñas fue desactivada."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Cambiar contraseña: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Establecer contraseña: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticación y Autorización"
@@ -47,11 +57,17 @@ msgstr "contraseña"
 msgid "last login"
 msgstr "último ingreso"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formato de contraseña inválido o algoritmo de hashing desconocido."
+
 msgid "No password set."
 msgstr "No se ha establecido una contraseña."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Formato de contraseña inválido o algoritmo de hashing desconocido."
+msgid "Reset password"
+msgstr "Restablecer contraseña"
+
+msgid "Set password"
+msgstr "Establecer contraseña"
 
 msgid "The two password fields didn’t match."
 msgstr "Los dos campos de contraseñas no coinciden entre si."
@@ -67,12 +83,34 @@ msgstr ""
 "Introduzca la misma contraseña nuevamente, para poder verificar la misma."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"El sistema no almacena las contraseñas originales por lo cual no es posible "
-"visualizar la contraseña de este usuario, pero puede modificarla usando <a "
-"href=\"{}\">este formulario</a>."
+"Determina si el usuario podrá autenticarse usando una contraseña. Si está "
+"desactivado, el usuario aún podría autenticarse mediante otros métodos, como "
+"Single Sign-On o LDAP."
+
+msgid "Password-based authentication"
+msgstr "Autenticación basada en contraseñas"
+
+msgid "Enabled"
+msgstr "Activo"
+
+msgid "Disabled"
+msgstr "Inactivo"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Las contraseñas en texto plano no se almacenan, por lo que no se puede ver "
+"la contraseña del usuario."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Active la autenticación por contraseña para este usuario estableciendo una "
+"contraseña."
 
 #, python-format
 msgid ""
@@ -101,9 +139,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Contraseña antigua"
-
-msgid "Password (again)"
-msgstr "Contraseña (de nuevo)"
 
 msgid "algorithm"
 msgstr "algoritmo"
@@ -137,6 +172,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "suma de verificación"
+
+msgid "block size"
+msgstr "tamaño de bloque"
 
 msgid "name"
 msgstr "nombre"
@@ -228,24 +266,22 @@ msgid "users"
 msgstr "usuarios"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
-"caracter."
+"La contraseña es demasiado corta. Debe contener por lo menos %d carácter."
 msgstr[1] ""
-"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
-"caracteres."
+"La contraseña es demasiado corta. Debe contener por lo menos %d caracteres."
+msgstr[2] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %d caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d caracter."
+msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d carácter."
 msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
+msgstr[2] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -273,11 +309,12 @@ msgid "Password reset on %(site_name)s"
 msgstr "Reinicio de contraseña en %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 "Introduzca un nombre de usuario válido. Este valor solo puede contener "
-"letras del alfabeto inglés, números y los caracteres @/./+/-/_."
+"letras mayúsculas y minúsculas de la A la Z (excepto las acentuadas), "
+"números y los caracteres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

@@ -9,24 +9,26 @@
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panasoft, 2021
-# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015
+# Pavel Kutsenko <zebartcoc@gmail.com>, 2025
+# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023,2025
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-16 22:55+0000\n"
-"Last-Translator: Panasoft\n"
-"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
+"2012,2014-2015,2022-2023,2025\n"
+"Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -34,11 +36,10 @@ msgstr "Доступные %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Это список всех доступных %s. Вы можете выбрать некоторые из них, выделив их "
-"в поле ниже и кликнув \"Выбрать\", либо двойным щелчком."
+"Выделите элементы в списке \"%s\" и нажмите кнопку со стрелкой вправо, чтобы "
+"добавить их к выбранным."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -48,18 +49,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Фильтр"
 
-msgid "Choose all"
-msgstr "Выбрать все"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Выбрать все %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Нажмите, чтобы выбрать все %s сразу."
+msgid "Choose selected %s"
+msgstr "Выбрать отмеченные %s"
 
-msgid "Choose"
-msgstr "Выбрать"
-
-msgid "Remove"
-msgstr "Удалить"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Удалить отмеченные %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -67,18 +67,30 @@ msgstr "Выбранные %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Это список выбранных %s. Вы можете удалить некоторые из них, выделив их в "
-"поле ниже и кликнув \"Удалить\", либо двойным щелчком."
-
-msgid "Remove all"
-msgstr "Удалить все"
+"Выделите элементы в списке \"%s\" и и нажмите стрелку влево, чтобы убрать их "
+"из выбранных."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Нажмите чтобы удалить все %s сразу."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+"Набирайте символы в этом поле, чтобы отфильтровать список выбранных %s."
+
+msgid "(click to clear)"
+msgstr "(нажмите, чтобы очистить)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Удалить все %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s выбранный объект не виден"
+msgstr[1] "%s выбранных объекта не видны"
+msgstr[2] "%s выбранных объектов не видны"
+msgstr[3] "%s выбранных объектов не видны"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -252,6 +264,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Дек"
 
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Вс"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Пн"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Вт"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Ср"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Чт"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Пт"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Сб"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "В"
@@ -279,9 +340,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Показать"
-
-msgid "Hide"
-msgstr "Скрыть"

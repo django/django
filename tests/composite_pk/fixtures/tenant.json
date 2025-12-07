@@ -1,0 +1,84 @@
+[
+    {
+        "pk": 1,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 1,
+            "name": "Tenant 1"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 2,
+            "name": "Tenant 2"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 3,
+            "name": "Tenant 3"
+        }
+    },
+    {
+        "pk": [1, 1],
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 1,
+            "id": 1,
+            "email": "user0001@example.com"
+        }
+    },
+    {
+        "pk": [1, 2],
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 1,
+            "id": 2,
+            "email": "user0002@example.com"
+        }
+    },
+    {
+        "pk": [2, 3],
+        "model": "composite_pk.user",
+        "fields": {
+            "email": "user0003@example.com"
+        }
+    },
+    {
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 2,
+            "id": 4,
+            "email": "user0004@example.com"
+        }
+    },
+    {
+        "pk": [2, "11111111-1111-1111-1111-111111111111"],
+        "model": "composite_pk.post",
+        "fields": {
+            "tenant_id": 2,
+            "id": "11111111-1111-1111-1111-111111111111"
+        }
+    },
+    {
+        "pk": [2, "ffffffff-ffff-ffff-ffff-ffffffffffff"],
+        "model": "composite_pk.post",
+        "fields": {
+            "tenant_id": 2,
+            "id": "ffffffff-ffff-ffff-ffff-ffffffffffff"
+        }
+    },
+    {
+        "pk": [1, "2022-01-12T05:55:14.956"],
+        "model": "composite_pk.timestamped",
+        "fields": {
+            "id": 1,
+            "created": "2022-01-12T05:55:14.956",
+            "text": ""
+        }
+    }
+]

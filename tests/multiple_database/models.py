@@ -1,7 +1,5 @@
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -13,7 +11,7 @@ class Review(models.Model):
     content_object = GenericForeignKey()
 
     class Meta:
-        ordering = ('source',)
+        ordering = ("source",)
 
     def __str__(self):
         return self.source
@@ -30,7 +28,7 @@ class Person(models.Model):
     objects = PersonManager()
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -52,14 +50,16 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     published = models.DateField()
     authors = models.ManyToManyField(Person)
-    editor = models.ForeignKey(Person, models.SET_NULL, null=True, related_name='edited')
+    editor = models.ForeignKey(
+        Person, models.SET_NULL, null=True, related_name="edited"
+    )
     reviews = GenericRelation(Review)
     pages = models.IntegerField(default=100)
 
     objects = BookManager()
 
     class Meta:
-        ordering = ('title',)
+        ordering = ("title",)
 
     def __str__(self):
         return self.title
@@ -70,7 +70,7 @@ class Pet(models.Model):
     owner = models.ForeignKey(Person, models.CASCADE)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class UserProfile(models.Model):
@@ -78,4 +78,4 @@ class UserProfile(models.Model):
     flavor = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('flavor',)
+        ordering = ("flavor",)

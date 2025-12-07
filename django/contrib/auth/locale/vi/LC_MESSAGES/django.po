@@ -5,14 +5,15 @@
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2012
+# tinnguyen121221, 2021
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-12-23 17:49+0000\n"
+"Last-Translator: tinnguyen121221\n"
 "Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +33,7 @@ msgstr "Những ngày quan trọng"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr " Đối tượng %(name)s  với khóa chính %(key)r không tồn tại."
 
 msgid "Password changed successfully."
 msgstr "Mật khẩu thay đổi thành công"
@@ -56,8 +57,8 @@ msgstr "Chưa đặt mật khẩu"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Định dạng của mật khẩu không đúng hoặc thuật toán hash chưa rõ ràng."
 
-msgid "The two password fields didn't match."
-msgstr "Hai trường mật khẩu không giống nhau"
+msgid "The two password fields didn’t match."
+msgstr "Hai trường mật khẩu không giống nhau."
 
 msgid "Password"
 msgstr "Mật khẩu"
@@ -66,12 +67,15 @@ msgid "Password confirmation"
 msgstr "Xác nhận mật khẩu"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Nhập lại mật khẩu để xác nhận."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Mật khẩu không được lưu trữ, vì vậy không có cách nào để xem mật khẩu của "
+"người dùng, nhưng bạn có thể dùng <a href=\"{}\">biểu mẫu</a> này để thay "
+"đổi."
 
 #, python-format
 msgid ""
@@ -115,19 +119,19 @@ msgid "hash"
 msgstr "băm"
 
 msgid "variety"
-msgstr ""
+msgstr "variety"
 
 msgid "version"
-msgstr ""
+msgstr "version"
 
 msgid "memory cost"
-msgstr ""
+msgstr "memory cost"
 
 msgid "time cost"
-msgstr ""
+msgstr "time cost"
 
 msgid "parallelism"
-msgstr ""
+msgstr "parallelism"
 
 msgid "work factor"
 msgstr "yếu tố công việc"
@@ -135,11 +139,14 @@ msgstr "yếu tố công việc"
 msgid "checksum"
 msgstr "kiểm tra"
 
+msgid "block size"
+msgstr "block size"
+
 msgid "name"
 msgstr "Tên"
 
 msgid "content type"
-msgstr ""
+msgstr "kiểu nội dung"
 
 msgid "codename"
 msgstr "tên mã"
@@ -170,6 +177,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Các nhóm người dùng này thuộc về. Người dùng sẽ nhận được tất cả các quyền "
+"được cấp cho mỗi nhóm."
 
 msgid "user permissions"
 msgstr "quyền của người sử dụng"
@@ -181,7 +190,7 @@ msgid "username"
 msgstr "Tên đăng nhập"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Yêu cầu. 150 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Tên đăng nhập đã được sử dụng"
@@ -227,31 +236,31 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] ""
+msgstr[0] "Mật khẩu quá ngắn. Nó phải chứa ít nhất %(min_length)d ký tự."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
+msgstr[0] "Mật khẩu của bạn phải chứa ít nhất %(min_length)d ký tự."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Mật khẩu quá giống với %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Mật khẩu của bạn không được quá giống với thông tin cá nhân khác."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Mật khẩu này quá phổ biến."
 
-msgid "Your password can't be a commonly used password."
-msgstr ""
+msgid "Your password can’t be a commonly used password."
+msgstr "Mật khẩu của bạn không được là mật khẩu được dùng phổ biến."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Mật khẩu này hoàn toàn là số."
 
-msgid "Your password can't be entirely numeric."
-msgstr ""
+msgid "Your password can’t be entirely numeric."
+msgstr "Mật khẩu của bạn không được hoàn toàn bằng số."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -261,11 +270,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Điền tên đăng nhập hợp lệ. Giá trị này chỉ có thể chứa các chữ cái tiếng "
+"Anh, số, và các ký tự @/./+/-/_"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Điền tên đăng nhập hợp lệ. Giá trị này chỉ có thể chứa các chữ cái, số, và "
+"các ký tự @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Đã thoát"
@@ -274,7 +287,7 @@ msgid "Password reset"
 msgstr "Đặt lại mật khẩu"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Đã gửi hướng dẫn đặt lại mật khẩu"
 
 msgid "Enter new password"
 msgstr "Nhập mật khẩu mới"

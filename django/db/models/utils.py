@@ -38,11 +38,32 @@ def unpickle_named_row(names, values):
     return create_namedtuple_class(*names)(*values)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def create_namedtuple_class(*names):
-    # Cache type() with @lru_cache() since it's too slow to be called for every
+    # Cache type() with @lru_cache since it's too slow to be called for every
     # QuerySet evaluation.
     def __reduce__(self):
         return unpickle_named_row, (names, tuple(self))
 
-    return type('Row', (namedtuple('Row', names),), {'__reduce__': __reduce__})
+    return type(
+        "Row",
+        (namedtuple("Row", names),),
+        {"__reduce__": __reduce__, "__slots__": ()},
+    )
+
+
+class AltersData:
+    """
+    Make subclasses preserve the alters_data attribute on overridden methods.
+    """
+
+    def __init_subclass__(cls, **kwargs):
+        for fn_name, fn in vars(cls).items():
+            if callable(fn) and not hasattr(fn, "alters_data"):
+                for base in cls.__bases__:
+                    if base_fn := getattr(base, fn_name, None):
+                        if hasattr(base_fn, "alters_data"):
+                            fn.alters_data = base_fn.alters_data
+                        break
+
+        super().__init_subclass__(**kwargs)

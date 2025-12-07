@@ -48,8 +48,9 @@ Bugfixes
 
 * Fixed ``isnull`` lookup for ``HStoreField`` (:ticket:`24751`).
 
-* Fixed a MySQL crash when a migration removes a combined index (unique_together
-  or index_together) containing a foreign key (:ticket:`24757`).
+* Fixed a MySQL crash when a migration removes a combined index (
+  ``unique_together`` or ``index_together``) containing a foreign key
+  (:ticket:`24757`).
 
 * Fixed session cookie deletion when using :setting:`SESSION_COOKIE_DOMAIN`
   (:ticket:`24799`).

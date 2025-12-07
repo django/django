@@ -1,8 +1,9 @@
 """
 Parser and utilities for the smart 'if' tag
 """
+
 # Using a simple top down parser, as described here:
-#    http://effbot.org/zone/simple-top-down-parsing.htm.
+# https://11l-lang.org/archive/simple-top-down-parsing/
 # 'led' = left denotation
 # 'nud' = null denotation
 # 'bp' = binding power (left = lbp, right = rbp)
@@ -10,9 +11,10 @@ Parser and utilities for the smart 'if' tag
 
 class TokenBase:
     """
-    Base class for operators and literals, mainly for debugging and for throwing
-    syntax errors.
+    Base class for operators and literals, mainly for debugging and for
+    throwing syntax errors.
     """
+
     id = None  # node/token type name
     value = None  # used by literals
     first = second = None  # used by tree nodes
@@ -45,6 +47,7 @@ def infix(bp, func):
     Create an infix operator, given a binding power and a function that
     evaluates the node.
     """
+
     class Operator(TokenBase):
         lbp = bp
 
@@ -57,9 +60,10 @@ def infix(bp, func):
             try:
                 return func(context, self.first, self.second)
             except Exception:
-                # Templates shouldn't throw exceptions when rendering.  We are
-                # most likely to get exceptions for things like {% if foo in bar
-                # %} where 'bar' does not support 'in', so default to False
+                # Templates shouldn't throw exceptions when rendering. We are
+                # most likely to get exceptions for things like:
+                # {% if foo in bar %}
+                # where 'bar' does not support 'in', so default to False.
                 return False
 
     return Operator
@@ -70,6 +74,7 @@ def prefix(bp, func):
     Create a prefix operator, given a binding power and a function that
     evaluates the node.
     """
+
     class Operator(TokenBase):
         lbp = bp
 
@@ -91,19 +96,19 @@ def prefix(bp, func):
 # We defer variable evaluation to the lambda to ensure that terms are
 # lazily evaluated using Python's boolean parsing logic.
 OPERATORS = {
-    'or': infix(6, lambda context, x, y: x.eval(context) or y.eval(context)),
-    'and': infix(7, lambda context, x, y: x.eval(context) and y.eval(context)),
-    'not': prefix(8, lambda context, x: not x.eval(context)),
-    'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
-    'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
-    'is': infix(10, lambda context, x, y: x.eval(context) is y.eval(context)),
-    'is not': infix(10, lambda context, x, y: x.eval(context) is not y.eval(context)),
-    '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
-    '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
-    '>': infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),
-    '>=': infix(10, lambda context, x, y: x.eval(context) >= y.eval(context)),
-    '<': infix(10, lambda context, x, y: x.eval(context) < y.eval(context)),
-    '<=': infix(10, lambda context, x, y: x.eval(context) <= y.eval(context)),
+    "or": infix(6, lambda context, x, y: x.eval(context) or y.eval(context)),
+    "and": infix(7, lambda context, x, y: x.eval(context) and y.eval(context)),
+    "not": prefix(8, lambda context, x: not x.eval(context)),
+    "in": infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
+    "not in": infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
+    "is": infix(10, lambda context, x, y: x.eval(context) is y.eval(context)),
+    "is not": infix(10, lambda context, x, y: x.eval(context) is not y.eval(context)),
+    "==": infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
+    "!=": infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
+    ">": infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),
+    ">=": infix(10, lambda context, x, y: x.eval(context) >= y.eval(context)),
+    "<": infix(10, lambda context, x, y: x.eval(context) < y.eval(context)),
+    "<=": infix(10, lambda context, x, y: x.eval(context) <= y.eval(context)),
 }
 
 # Assign 'id' to each:
@@ -115,6 +120,7 @@ class Literal(TokenBase):
     """
     A basic self-resolvable object similar to a Django template variable.
     """
+
     # IfParser uses Literal in create_var, but TemplateIfParser overrides
     # create_var so that a proper implementation that actually resolves
     # variables, filters etc. is used.
@@ -190,8 +196,9 @@ class IfParser:
         retval = self.expression()
         # Check that we have exhausted all the tokens
         if self.current_token is not EndToken:
-            raise self.error_class("Unused '%s' at end of if expression." %
-                                   self.current_token.display())
+            raise self.error_class(
+                "Unused '%s' at end of if expression." % self.current_token.display()
+            )
         return retval
 
     def expression(self, rbp=0):

@@ -2,23 +2,28 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2020
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 01:22+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
-"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016-2017,2019-2021,2023-2025\n"
+"Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Выдаліць абраныя %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -28,12 +33,8 @@ msgstr "Выдалілі %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не ўдаецца выдаліць %(name)s"
 
-msgid "Are you sure?"
-msgstr "Ці ўпэўненыя вы?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Выдаліць абраныя %(verbose_name_plural)s"
+msgid "Delete multiple objects"
+msgstr "Выдаліць некалькі аб’ектаў"
 
 msgid "Administration"
 msgstr "Адміністрацыя"
@@ -181,6 +182,9 @@ msgstr ""
 "Утрымлівайце націснутай кнопку“Control”, або “Command” на Mac, каб вылучыць "
 "больш за адзін."
 
+msgid "Select this object for an action - {}"
+msgstr "Абярыце гэты аб'ект для дзеяньня - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Пасьпяхова дадалі {name} “{obj}”."
@@ -197,10 +201,6 @@ msgstr "Пасьпяхова дадалі {name} \"{obj}\". Ніжэй можн�
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "Пасьпяхова зьмянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Пасьпяхова дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
 #, python-brace-format
 msgid ""
@@ -265,12 +265,16 @@ msgstr[3] "Абралі ўсе %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Абралі 0 аб’ектаў з %(cnt)s"
 
+msgid "Delete"
+msgstr "Выдаліць"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Гісторыя зьменаў: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -341,9 +345,21 @@ msgstr "Абраць усе %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Не абіраць нічога"
 
+msgid "Breadcrumbs"
+msgstr "Навігацыйны ланцужок"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Мадэлі ў %(name)s праграме"
+
+msgid "Model name"
+msgstr "Назва мадэлі"
+
+msgid "Add link"
+msgstr "Дадаць спасылку"
+
+msgid "Change or view list link"
+msgstr "Змяніць ці праглядзець спіс спасылак"
 
 msgid "Add"
 msgstr "Дадаць"
@@ -354,28 +370,46 @@ msgstr "Праглядзець"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Спачатку пазначце імя карыстальніка ды пароль. Потым можна будзе наставіць "
-"іншыя можнасьці."
+"Пасля стварэння карыстальніка вы зможаце рэдагаваць дадатковыя параметры "
+"карыстальніка."
 
-msgid "Enter a username and password."
-msgstr "Пазначце імя карыстальніка ды пароль."
+msgid "Error:"
+msgstr "Памылка:"
 
 msgid "Change password"
 msgstr "Зьмяніць пароль"
 
-msgid "Please correct the error below."
-msgstr "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
+msgid "Set password"
+msgstr "Усталяваць пароль"
 
-msgid "Please correct the errors below."
-msgstr "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Калі ласка, выпраўце памылкy, адзначаную ніжэй."
+msgstr[1] "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
+msgstr[2] "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
+msgstr[3] "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Пазначце пароль для карыстальніка «<strong>%(username)s</strong>»."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Гэта дзеянне <strong>ўключыць</strong> аўтэнтыфікацыю на аснове пароля для "
+"гэтага карыстальніка."
+
+msgid "Disable password-based authentication"
+msgstr "Адключыць аўтэнтыфікацыю на аснове пароля"
+
+msgid "Enable password-based authentication"
+msgstr "Уключыць аўтэнтыфікацыю на аснове пароля"
+
+msgid "Skip to main content"
+msgstr "Перайсці да асноўнага зместу"
 
 msgid "Welcome,"
 msgstr "Вітаем,"
@@ -402,6 +436,12 @@ msgstr "Зірнуць на пляцоўцы"
 msgid "Filter"
 msgstr "Прасеяць"
 
+msgid "Hide counts"
+msgstr "Схаваць падлік"
+
+msgid "Show counts"
+msgstr "Паказаць падлік"
+
 msgid "Clear all filters"
 msgstr "Ачысьціць усе фільтры"
 
@@ -415,8 +455,14 @@ msgstr "Парадак: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Парадкаваць наадварот"
 
-msgid "Delete"
-msgstr "Выдаліць"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Пераключыць тэму (бягучая тэма: аўтаматычная)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Пераключыць тэму (бягучая тэма: светлая)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Пераключыць тэму (бягучая тэма: цёмная)"
 
 #, python-format
 msgid ""
@@ -451,9 +497,6 @@ msgstr "Так, я ўпэўнены"
 
 msgid "No, take me back"
 msgstr "Не, вярнуцца назад"
-
-msgid "Delete multiple objects"
-msgstr "Выдаліць некалькі аб’ектаў"
 
 #, python-format
 msgid ""
@@ -499,6 +542,15 @@ msgstr "Мае дзеяньні"
 msgid "None available"
 msgstr "Недаступнае"
 
+msgid "Added:"
+msgstr "Дадалі:"
+
+msgid "Changed:"
+msgstr "Зьмянілі:"
+
+msgid "Deleted:"
+msgstr "Выдалены:"
+
 msgid "Unknown content"
 msgstr "Невядомае зьмесьціва"
 
@@ -518,11 +570,20 @@ msgstr ""
 "Вы апазнаны як %(username)s але не аўтарызаваны для доступу гэтай бачыны. Не "
 "жадаеце лі вы ўвайсці пад іншым карыстальнікам?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыліся на імя ці пароль?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыліся на імя?"
 
 msgid "Toggle navigation"
 msgstr "Пераключыць навігацыю"
+
+msgid "Sidebar"
+msgstr "бакавая панэль"
+
+msgid "Start typing to filter…"
+msgstr "Пачніце ўводзіць, каб адфільтраваць..."
+
+msgid "Filter navigation items"
+msgstr "Фільтраваць элементы навігацыі"
 
 msgid "Date/time"
 msgstr "Час, дата"
@@ -532,6 +593,13 @@ msgstr "Карыстальнік"
 
 msgid "Action"
 msgstr "Дзеяньне"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "запіс"
+msgstr[1] "запісы"
+msgstr[2] "запісы"
+msgstr[3] "запісы"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -591,7 +659,11 @@ msgstr "Дадаць яшчэ %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Выдаліць абраныя %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Праглядзець абраныя %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."
 
 msgid "Log in again"
@@ -666,8 +738,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Перайдзіце да наступнае бачыны ды абярыце новы пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Імя карыстальніка, калі раптам вы забыліся:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Калі вы забыліся, то вы:"
 
 msgid "Thanks for using our site!"
 msgstr "Дзякуем, што карыстаецеся нашаю пляцоўкаю!"
@@ -688,6 +760,9 @@ msgstr "Адрас электроннай пошты:"
 
 msgid "Reset my password"
 msgstr "Узнавіць пароль"
+
+msgid "Select all objects on this page for an action"
+msgstr "Абяраць усе аб'екты на гэтай старонцы для дзеяньня"
 
 msgid "All dates"
 msgstr "Усе даты"

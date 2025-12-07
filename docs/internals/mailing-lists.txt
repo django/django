@@ -1,97 +1,38 @@
-=============
-Mailing lists
-=============
+=======================
+Mailing lists and Forum
+=======================
 
 .. Important::
 
     Please report security issues **only** to
-    security@djangoproject.com.  This is a private list only open to
+    ``security@djangoproject.com``. This is a private list only open to
     long-time, highly trusted Django developers, and its archives are
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-Django has several official mailing lists on Google Groups that are open to
-anyone.
+Django Forum
+============
 
-.. _django-users-mailing-list:
+Django has an `official Forum`_ where you can input and ask questions.
 
-``django-users``
-================
+There are several categories of discussion including:
 
-This is the right place if you are looking to ask any question regarding the
-installation, usage, or debugging of Django.
-
-.. note::
-
-    If it's the first time you send an email to this list, your email must be
-    accepted first so don't worry if :ref:`your message does not appear
-    <message-does-not-appear-on-django-users>` instantly.
-
-* `django-users mailing archive`_
-* `django-users subscription email address`_
-* `django-users posting email`_
-
-.. _django-users mailing archive: https://groups.google.com/g/django-users
-.. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
-.. _django-users posting email: mailto:django-users@googlegroups.com
-
-.. _django-core-mentorship-mailing-list:
-
-``django-core-mentorship``
-==========================
-
-The Django Core Mentorship list is intended to provide a welcoming
-introductory environment for community members interested in contributing to
-the Django Project.
-
-* `django-core-mentorship mailing archive`_
-* `django-core-mentorship subscription email address`_
-* `django-core-mentorship posting email`_
-
-.. _django-core-mentorship mailing archive: https://groups.google.com/g/django-core-mentorship
-.. _django-core-mentorship subscription email address: mailto:django-core-mentorship+subscribe@googlegroups.com
-.. _django-core-mentorship posting email: mailto:django-core-mentorship@googlegroups.com
-
-.. _django-developers-mailing-list:
-
-``django-developers``
-=====================
-
-The discussion about the development of Django itself takes place here.
-
-Before asking a question about how to contribute, read
-:doc:`/internals/contributing/index`. Many frequently asked questions are
-answered there.
+* `Using Django`_: to ask any question regarding the installation, usage, or
+  debugging of Django.
+* `Internals`_: for discussion of the development of Django itself.
 
 .. note::
 
-    Please make use of
-    :ref:`django-users mailing list <django-users-mailing-list>` if you want
-    to ask for tech support, doing so in this list is inappropriate.
+    Before asking a question about how to contribute, read
+    :doc:`/internals/contributing/index`. Many frequently asked questions are
+    answered there.
 
-* `django-developers mailing archive`_
-* `django-developers subscription email address`_
-* `django-developers posting email`_
+.. _official Forum: https://forum.djangoproject.com
+.. _Internals: https://forum.djangoproject.com/c/internals/5
+.. _Using Django: https://forum.djangoproject.com/c/users/6
 
-.. _django-developers mailing archive: https://groups.google.com/g/django-developers
-.. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
-.. _django-developers posting email: mailto:django-developers@googlegroups.com
-
-.. _django-i18n-mailing-list:
-
-``django-i18n``
-===============
-
-This is the place to discuss the internationalization and localization of
-Django's components.
-
-* `django-i18n mailing archive`_
-* `django-i18n subscription email address`_
-* `django-i18n posting email`_
-
-.. _django-i18n mailing archive: https://groups.google.com/g/django-i18n
-.. _django-i18n subscription email address: mailto:django-i18n+subscribe@googlegroups.com
-.. _django-i18n posting email: mailto:django-i18n@googlegroups.com
+In addition, Django has several official mailing lists on Google Groups that
+are open to anyone.
 
 .. _django-announce-mailing-list:
 
@@ -124,3 +65,42 @@ by developers and interested community members.
 .. _django-updates mailing archive: https://groups.google.com/g/django-updates
 .. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
 .. _django-updates posting email: mailto:django-updates@googlegroups.com
+
+Archived mailing lists
+======================
+
+The following mailing lists are archived and no longer active. These are still
+available as a historical resource.
+
+.. _django-users-mailing-list:
+
+``django-users``
+----------------
+
+.. note::
+
+    The `Using Django`_ category of the `official Forum`_ is now the preferred
+    venue for asking usage questions.
+
+This was used for questions regarding the installation, usage, or debugging of
+Django projects.
+
+* `django-users mailing archive`_
+
+.. _django-users mailing archive: https://groups.google.com/g/django-users
+
+.. _django-developers-mailing-list:
+
+``django-developers``
+---------------------
+
+.. note::
+
+    The `Internals`_ category of the `official Forum`_ is now the preferred
+    venue for discussing the development of Django.
+
+This was used for discussions about the development of Django itself.
+
+* `django-developers mailing archive`_
+
+.. _django-developers mailing archive: https://groups.google.com/g/django-developers

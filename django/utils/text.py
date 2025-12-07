@@ -1,13 +1,25 @@
-import html.entities
+import gzip
 import re
+import secrets
+import textwrap
 import unicodedata
+from collections import deque
 from gzip import GzipFile
+from gzip import compress as gzip_compress
+from html import escape
+from html.parser import HTMLParser
 from io import BytesIO
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
+from django.utils.functional import (
+    SimpleLazyObject,
+    cached_property,
+    keep_lazy_text,
+    lazy,
+)
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.translation import gettext as _, gettext_lazy, pgettext
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy, pgettext
 
 
 @keep_lazy_text
@@ -21,11 +33,8 @@ def capfirst(x):
 
 
 # Set up regular expressions
-re_words = _lazy_re_compile(r'<[^>]+?>|([^<>\s]+)', re.S)
-re_chars = _lazy_re_compile(r'<[^>]+?>|(.)', re.S)
-re_tag = _lazy_re_compile(r'<(/)?(\S+?)(?:(\s*/)|\s.*?)?>', re.S)
-re_newlines = _lazy_re_compile(r'\r\n|\r')  # Used in normalize_newlines
-re_camel_case = _lazy_re_compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
+re_newlines = _lazy_re_compile(r"\r\n|\r")  # Used in normalize_newlines
+re_camel_case = _lazy_re_compile(r"(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))")
 
 
 @keep_lazy_text
@@ -40,46 +49,151 @@ def wrap(text, width):
     Don't wrap long words, thus the output text may have lines longer than
     ``width``.
     """
-    def _generator():
-        for line in text.splitlines(True):  # True keeps trailing linebreaks
-            max_width = min((line.endswith('\n') and width + 1 or width), width)
-            while len(line) > max_width:
-                space = line[:max_width + 1].rfind(' ') + 1
-                if space == 0:
-                    space = line.find(' ') + 1
-                    if space == 0:
-                        yield line
-                        line = ''
-                        break
-                yield '%s\n' % line[:space - 1]
-                line = line[space:]
-                max_width = min((line.endswith('\n') and width + 1 or width), width)
-            if line:
-                yield line
-    return ''.join(_generator())
+
+    wrapper = textwrap.TextWrapper(
+        width=width,
+        break_long_words=False,
+        break_on_hyphens=False,
+        replace_whitespace=False,
+    )
+    result = []
+    for line in text.splitlines():
+        wrapped = wrapper.wrap(line)
+        if not wrapped:
+            # If `line` contains only whitespaces that are dropped, restore it.
+            result.append(line)
+        else:
+            result.extend(wrapped)
+    if text.endswith("\n"):
+        # If `text` ends with a newline, preserve it.
+        result.append("")
+    return "\n".join(result)
+
+
+def add_truncation_text(text, truncate=None):
+    if truncate is None:
+        truncate = pgettext(
+            "String to return when truncating text", "%(truncated_text)s…"
+        )
+    if "%(truncated_text)s" in truncate:
+        return truncate % {"truncated_text": text}
+    # The truncation text didn't contain the %(truncated_text)s string
+    # replacement argument so just append it to the text.
+    if text.endswith(truncate):
+        # But don't append the truncation text if the current text already ends
+        # in this.
+        return text
+    return f"{text}{truncate}"
+
+
+def calculate_truncate_chars_length(length, replacement):
+    truncate_len = length
+    for char in add_truncation_text("", replacement):
+        if not unicodedata.combining(char):
+            truncate_len -= 1
+            if truncate_len == 0:
+                break
+    return truncate_len
+
+
+class TruncateHTMLParser(HTMLParser):
+    class TruncationCompleted(Exception):
+        pass
+
+    def __init__(self, *, length, replacement, convert_charrefs=True):
+        super().__init__(convert_charrefs=convert_charrefs)
+        self.tags = deque()
+        self.output = []
+        self.remaining = length
+        self.replacement = replacement
+
+    @cached_property
+    def void_elements(self):
+        from django.utils.html import VOID_ELEMENTS
+
+        return VOID_ELEMENTS
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in self.void_elements:
+            self.handle_endtag(tag)
+
+    def handle_starttag(self, tag, attrs):
+        self.output.append(self.get_starttag_text())
+        if tag not in self.void_elements:
+            self.tags.appendleft(tag)
+
+    def handle_endtag(self, tag):
+        if tag not in self.void_elements:
+            self.output.append(f"</{tag}>")
+            try:
+                self.tags.remove(tag)
+            except ValueError:
+                pass
+
+    def handle_data(self, data):
+        data, output = self.process(data)
+        data_len = len(data)
+        if self.remaining < data_len:
+            self.remaining = 0
+            self.output.append(add_truncation_text(output, self.replacement))
+            raise self.TruncationCompleted
+        self.remaining -= data_len
+        self.output.append(output)
+
+    def feed(self, data):
+        try:
+            super().feed(data)
+        except self.TruncationCompleted:
+            self.output.extend([f"</{tag}>" for tag in self.tags])
+            self.tags.clear()
+            self.reset()
+        else:
+            # No data was handled.
+            self.reset()
+
+
+class TruncateCharsHTMLParser(TruncateHTMLParser):
+    def __init__(self, *, length, replacement, convert_charrefs=True):
+        self.length = length
+        self.processed_chars = 0
+        super().__init__(
+            length=calculate_truncate_chars_length(length, replacement),
+            replacement=replacement,
+            convert_charrefs=convert_charrefs,
+        )
+
+    def process(self, data):
+        self.processed_chars += len(data)
+        if (self.processed_chars == self.length) and (
+            sum(len(p) for p in self.output) + len(data) == len(self.rawdata)
+        ):
+            self.output.append(data)
+            raise self.TruncationCompleted
+        output = escape("".join(data[: self.remaining]))
+        return data, output
+
+
+class TruncateWordsHTMLParser(TruncateHTMLParser):
+    def process(self, data):
+        data = re.split(r"(?<=\S)\s+(?=\S)", data)
+        output = escape(" ".join(data[: self.remaining]))
+        return data, output
 
 
 class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
+
+    When truncating HTML text (either chars or words), input will be limited to
+    at most `MAX_LENGTH_HTML` characters.
     """
+
+    # 5 million characters are approximately 4000 text pages or 3 web pages.
+    MAX_LENGTH_HTML = 5_000_000
+
     def __init__(self, text):
         super().__init__(lambda: str(text))
-
-    def add_truncation_text(self, text, truncate=None):
-        if truncate is None:
-            truncate = pgettext(
-                'String to return when truncating text',
-                '%(truncated_text)s…')
-        if '%(truncated_text)s' in truncate:
-            return truncate % {'truncated_text': text}
-        # The truncation text didn't contain the %(truncated_text)s string
-        # replacement argument so just append it to the text.
-        if text.endswith(truncate):
-            # But don't append the truncation text if the current text already
-            # ends in this.
-            return text
-        return '%s%s' % (text, truncate)
 
     def chars(self, num, truncate=None, html=False):
         """
@@ -91,21 +205,20 @@ class Truncator(SimpleLazyObject):
         """
         self._setup()
         length = int(num)
-        text = unicodedata.normalize('NFC', self._wrapped)
+        if length <= 0:
+            return ""
+        text = unicodedata.normalize("NFC", self._wrapped)
 
-        # Calculate the length to truncate to (max length - end_text length)
-        truncate_len = length
-        for char in self.add_truncation_text('', truncate):
-            if not unicodedata.combining(char):
-                truncate_len -= 1
-                if truncate_len == 0:
-                    break
         if html:
-            return self._truncate_html(length, truncate, text, truncate_len, False)
-        return self._text_chars(length, truncate, text, truncate_len)
+            parser = TruncateCharsHTMLParser(length=length, replacement=truncate)
+            parser.feed(text)
+            parser.close()
+            return "".join(parser.output)
+        return self._text_chars(length, truncate, text)
 
-    def _text_chars(self, length, truncate, text, truncate_len):
+    def _text_chars(self, length, truncate, text):
         """Truncate a string after a certain number of chars."""
+        truncate_len = calculate_truncate_chars_length(length, truncate)
         s_len = 0
         end_index = None
         for i, char in enumerate(text):
@@ -118,8 +231,7 @@ class Truncator(SimpleLazyObject):
                 end_index = i
             if s_len > length:
                 # Return the truncated string
-                return self.add_truncation_text(text[:end_index or 0],
-                                                truncate)
+                return add_truncation_text(text[: end_index or 0], truncate)
 
         # Return the original string since no truncation was necessary
         return text
@@ -132,8 +244,13 @@ class Truncator(SimpleLazyObject):
         """
         self._setup()
         length = int(num)
+        if length <= 0:
+            return ""
         if html:
-            return self._truncate_html(length, truncate, self._wrapped, length, True)
+            parser = TruncateWordsHTMLParser(length=length, replacement=truncate)
+            parser.feed(self._wrapped)
+            parser.close()
+            return "".join(parser.output)
         return self._text_words(length, truncate)
 
     def _text_words(self, length, truncate):
@@ -145,80 +262,8 @@ class Truncator(SimpleLazyObject):
         words = self._wrapped.split()
         if len(words) > length:
             words = words[:length]
-            return self.add_truncation_text(' '.join(words), truncate)
-        return ' '.join(words)
-
-    def _truncate_html(self, length, truncate, text, truncate_len, words):
-        """
-        Truncate HTML to a certain number of chars (not counting tags and
-        comments), or, if words is True, then to a certain number of words.
-        Close opened tags if they were correctly closed in the given HTML.
-
-        Preserve newlines in the HTML.
-        """
-        if words and length <= 0:
-            return ''
-
-        html4_singlets = (
-            'br', 'col', 'link', 'base', 'img',
-            'param', 'area', 'hr', 'input'
-        )
-
-        # Count non-HTML chars/words and keep note of open tags
-        pos = 0
-        end_text_pos = 0
-        current_len = 0
-        open_tags = []
-
-        regex = re_words if words else re_chars
-
-        while current_len <= length:
-            m = regex.search(text, pos)
-            if not m:
-                # Checked through whole string
-                break
-            pos = m.end(0)
-            if m[1]:
-                # It's an actual non-HTML word or char
-                current_len += 1
-                if current_len == truncate_len:
-                    end_text_pos = pos
-                continue
-            # Check for tag
-            tag = re_tag.match(m[0])
-            if not tag or current_len >= truncate_len:
-                # Don't worry about non tags or tags after our truncate point
-                continue
-            closing_tag, tagname, self_closing = tag.groups()
-            # Element names are always case-insensitive
-            tagname = tagname.lower()
-            if self_closing or tagname in html4_singlets:
-                pass
-            elif closing_tag:
-                # Check for match in open tags list
-                try:
-                    i = open_tags.index(tagname)
-                except ValueError:
-                    pass
-                else:
-                    # SGML: An end tag closes, back to the matching start tag,
-                    # all unclosed intervening start tags with omitted end tags
-                    open_tags = open_tags[i + 1:]
-            else:
-                # Add it to the start of the open tags list
-                open_tags.insert(0, tagname)
-
-        if current_len <= length:
-            return text
-        out = text[:end_text_pos]
-        truncate_text = self.add_truncation_text('', truncate)
-        if truncate_text:
-            out += truncate_text
-        # Close any tags still open
-        for tag in open_tags:
-            out += '</%s>' % tag
-        # Return string
-        return out
+            return add_truncation_text(" ".join(words), truncate)
+        return " ".join(words)
 
 
 @keep_lazy_text
@@ -231,15 +276,15 @@ def get_valid_filename(name):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = str(name).strip().replace(' ', '_')
-    s = re.sub(r'(?u)[^-\w.]', '', s)
-    if s in {'', '.', '..'}:
+    s = str(name).strip().replace(" ", "_")
+    s = re.sub(r"(?u)[^-\w.]", "", s)
+    if s in {"", ".", ".."}:
         raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
     return s
 
 
 @keep_lazy_text
-def get_text_list(list_, last_word=gettext_lazy('or')):
+def get_text_list(list_, last_word=gettext_lazy("or")):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
@@ -253,40 +298,74 @@ def get_text_list(list_, last_word=gettext_lazy('or')):
     ''
     """
     if not list_:
-        return ''
+        return ""
     if len(list_) == 1:
         return str(list_[0])
-    return '%s %s %s' % (
+    return "%s %s %s" % (
         # Translators: This string is used as a separator between list elements
-        _(', ').join(str(i) for i in list_[:-1]), str(last_word), str(list_[-1])
+        _(", ").join(str(i) for i in list_[:-1]),
+        str(last_word),
+        str(list_[-1]),
     )
 
 
 @keep_lazy_text
 def normalize_newlines(text):
     """Normalize CRLF and CR newlines to just LF."""
-    return re_newlines.sub('\n', str(text))
+    return re_newlines.sub("\n", str(text))
 
 
 @keep_lazy_text
 def phone2numeric(phone):
     """Convert a phone number with letters into its numeric equivalent."""
     char2number = {
-        'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3', 'g': '4',
-        'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6', 'n': '6',
-        'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8', 'u': '8',
-        'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9',
+        "a": "2",
+        "b": "2",
+        "c": "2",
+        "d": "3",
+        "e": "3",
+        "f": "3",
+        "g": "4",
+        "h": "4",
+        "i": "4",
+        "j": "5",
+        "k": "5",
+        "l": "5",
+        "m": "6",
+        "n": "6",
+        "o": "6",
+        "p": "7",
+        "q": "7",
+        "r": "7",
+        "s": "7",
+        "t": "8",
+        "u": "8",
+        "v": "8",
+        "w": "9",
+        "x": "9",
+        "y": "9",
+        "z": "9",
     }
-    return ''.join(char2number.get(c, c) for c in phone.lower())
+    return "".join(char2number.get(c, c) for c in phone.lower())
 
 
-# From http://www.xhaus.com/alan/python/httpcomp.html#gzip
-# Used with permission.
-def compress_string(s):
-    zbuf = BytesIO()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
-        zfile.write(s)
-    return zbuf.getvalue()
+def _get_random_filename(max_random_bytes):
+    return b"a" * secrets.randbelow(max_random_bytes)
+
+
+def compress_string(s, *, max_random_bytes=None):
+    compressed_data = gzip_compress(s, compresslevel=6, mtime=0)
+
+    if not max_random_bytes:
+        return compressed_data
+
+    compressed_view = memoryview(compressed_data)
+    header = bytearray(compressed_view[:10])
+    header[3] = gzip.FNAME
+
+    filename = _get_random_filename(max_random_bytes) + b"\x00"
+
+    return bytes(header) + filename + compressed_view[10:]
 
 
 class StreamingBuffer(BytesIO):
@@ -298,9 +377,12 @@ class StreamingBuffer(BytesIO):
 
 
 # Like compress_string, but for iterators of strings.
-def compress_sequence(sequence):
+def compress_sequence(sequence, *, max_random_bytes=None):
     buf = StreamingBuffer()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=buf, mtime=0) as zfile:
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
         # Output headers...
         yield buf.read()
         for item in sequence:
@@ -311,9 +393,26 @@ def compress_sequence(sequence):
     yield buf.read()
 
 
+async def acompress_sequence(sequence, *, max_random_bytes=None):
+    buf = StreamingBuffer()
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
+        # Output headers...
+        yield buf.read()
+        async for item in sequence:
+            zfile.write(item)
+            data = buf.read()
+            if data:
+                yield data
+    yield buf.read()
+
+
 # Expression to match some_token and some_token="with spaces" (and similarly
 # for single-quoted strings).
-smart_split_re = _lazy_re_compile(r"""
+smart_split_re = _lazy_re_compile(
+    r"""
     ((?:
         [^\s'"]*
         (?:
@@ -321,7 +420,9 @@ smart_split_re = _lazy_re_compile(r"""
             [^\s'"]*
         )+
     ) | \S+)
-""", re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 def smart_split(text):
@@ -343,28 +444,6 @@ def smart_split(text):
         yield bit[0]
 
 
-def _replace_entity(match):
-    text = match[1]
-    if text[0] == '#':
-        text = text[1:]
-        try:
-            if text[0] in 'xX':
-                c = int(text[1:], 16)
-            else:
-                c = int(text)
-            return chr(c)
-        except ValueError:
-            return match[0]
-    else:
-        try:
-            return chr(html.entities.name2codepoint[text])
-        except KeyError:
-            return match[0]
-
-
-_entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
-
-
 @keep_lazy_text
 def unescape_string_literal(s):
     r"""
@@ -380,10 +459,10 @@ def unescape_string_literal(s):
         >>> unescape_string_literal("'\'ab\' c'")
         "'ab' c"
     """
-    if s[0] not in "\"'" or s[-1] != s[0]:
+    if not s or s[0] not in "\"'" or s[-1] != s[0]:
         raise ValueError("Not a string literal: %r" % s)
     quote = s[0]
-    return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
+    return s[1:-1].replace(r"\%s" % quote, quote).replace(r"\\", "\\")
 
 
 @keep_lazy_text
@@ -396,18 +475,22 @@ def slugify(value, allow_unicode=False):
     """
     value = str(value)
     if allow_unicode:
-        value = unicodedata.normalize('NFKC', value)
+        value = unicodedata.normalize("NFKC", value)
     else:
-        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value.lower())
-    return re.sub(r'[-\s]+', '-', value).strip('-_')
+        value = (
+            unicodedata.normalize("NFKD", value)
+            .encode("ascii", "ignore")
+            .decode("ascii")
+        )
+    value = re.sub(r"[^\w\s-]", "", value.lower())
+    return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
 def camel_case_to_spaces(value):
     """
     Split CamelCase and convert to lowercase. Strip surrounding whitespace.
     """
-    return re_camel_case.sub(r' \1', value).strip().lower()
+    return re_camel_case.sub(r" \1", value).strip().lower()
 
 
 def _format_lazy(format_string, *args, **kwargs):

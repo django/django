@@ -12,7 +12,7 @@ def feed(x, y):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('migrations', '0004_fourth'),
+        ("migrations", "0004_fourth"),
     ]
 
     operations = [

@@ -1,0 +1,14 @@
+===========================
+Django 4.2.19 release notes
+===========================
+
+*February 5, 2025*
+
+Django 4.2.19 fixes a regression in 4.2.18.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2.18 that caused ``validate_ipv6_address()``
+  and ``validate_ipv46_address()`` to crash when handling non-string values
+  (:ticket:`36098`).

@@ -10,10 +10,15 @@ class Parent(models.Model):
 
 
 class Child(models.Model):
-    mother = models.ForeignKey(Parent, models.CASCADE, related_name='mothers_children')
-    father = models.ForeignKey(Parent, models.CASCADE, related_name='fathers_children')
+    mother = models.ForeignKey(Parent, models.CASCADE, related_name="mothers_children")
+    father = models.ForeignKey(Parent, models.CASCADE, related_name="fathers_children")
     school = models.ForeignKey(School, models.CASCADE)
     name = models.CharField(max_length=100)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("mother", "father", name="unique_parents"),
+        ]
 
 
 class Poet(models.Model):
@@ -28,7 +33,7 @@ class Poem(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ('poet', 'name')
+        unique_together = ("poet", "name")
 
     def __str__(self):
         return self.name

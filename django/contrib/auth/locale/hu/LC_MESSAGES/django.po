@@ -2,6 +2,7 @@
 #
 # Translators:
 # András Veres-Szentkirályi, 2016-2017
+# Balázs R, 2023,2025
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2014
@@ -10,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-18 09:27+0000\n"
-"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
-"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-12-03 08:09+0000\n"
+"Last-Translator: Balázs R, 2023,2025\n"
+"Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +35,22 @@ msgstr "Fontos dátumok"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Sikeres jelszóváltoztatás."
+
+msgid "Password-based authentication was disabled."
+msgstr "Jelszavas bejelentkezés letiltva."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Jelszó megváltoztatása: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Jelszó beállítása: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Hitelesítés és engedélyezés"
@@ -50,11 +61,17 @@ msgstr "jelszó"
 msgid "last login"
 msgstr "utolsó bejelentkezés"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Érvénytelen jelszóformátum vagy ismeretlen hash-algoritmus."
+
 msgid "No password set."
 msgstr "Nincs jelszó beállítva."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Érvénytelen jelszóformátum vagy ismeretlen hash-algoritmus."
+msgid "Reset password"
+msgstr ""
+
+msgid "Set password"
+msgstr "Jelszó beállítása"
 
 msgid "The two password fields didn’t match."
 msgstr "A beírt két jelszó nem egyezik."
@@ -69,11 +86,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Írja be az előbb megadott jelszót, ellenőrzés céljából."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"A jelszavakat olvasható formában nem tároljuk, így egy felhasználó jelszavát "
-"nem lehet mgnézni, de át lehet állítani <a href=\"{}\">ezzel az űrlappal</a>."
+
+msgid "Password-based authentication"
+msgstr "Jelszavas bejelentkezés"
+
+msgid "Enabled"
+msgstr "Engedélyezve"
+
+msgid "Disabled"
+msgstr "Letiltva"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -100,9 +133,6 @@ msgstr "A régi jelszó hibásan lett megadva. Írja be újra."
 
 msgid "Old password"
 msgstr "Régi jelszó"
-
-msgid "Password (again)"
-msgstr "Jelszó újra"
 
 msgid "algorithm"
 msgstr "algoritmus"
@@ -136,6 +166,9 @@ msgstr "erősség"
 
 msgid "checksum"
 msgstr "ellenőrző összeg"
+
+msgid "block size"
+msgstr "blokk méret"
 
 msgid "name"
 msgstr "név"
@@ -227,16 +260,11 @@ msgid "users"
 msgstr "felhasználók"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Ez a jelszó túl rövid. Legalább %(min_length)d karakter hosszú legyen."
-msgstr[1] ""
-"Ez a jelszó túl rövid. Legalább %(min_length)d karakter hosszú legyen."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Ez a jelszó túl rövid. Legalább %d karakter hosszú legyen."
+msgstr[1] "Ez a jelszó túl rövid. Legalább %d karakter hosszú legyen."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -270,8 +298,8 @@ msgid "Password reset on %(site_name)s"
 msgstr "Jelszó újragenerálása ezen az oldalon: %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 "Írjon be egy érvényes felhasználónevet, mely csak ékezetmentes betűket, "
 "számokat és @/./+/-/_ karaktereket tartalmazhat."

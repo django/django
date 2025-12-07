@@ -14,7 +14,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, models.CASCADE)
 
     class Meta:
-        order_with_respect_to = 'question'
+        order_with_respect_to = "question"
 
     def __str__(self):
         return self.text
@@ -22,7 +22,9 @@ class Answer(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
-    parent = models.ForeignKey("self", models.SET_NULL, related_name="children", null=True)
+    parent = models.ForeignKey(
+        "self", models.SET_NULL, related_name="children", null=True
+    )
 
     class Meta:
         order_with_respect_to = "parent"
@@ -37,11 +39,11 @@ class Entity(models.Model):
 
 
 class Dimension(models.Model):
-    entity = models.OneToOneField('Entity', primary_key=True, on_delete=models.CASCADE)
+    entity = models.OneToOneField("Entity", primary_key=True, on_delete=models.CASCADE)
 
 
 class Component(models.Model):
-    dimension = models.ForeignKey('Dimension', on_delete=models.CASCADE)
+    dimension = models.ForeignKey("Dimension", on_delete=models.CASCADE)
 
     class Meta:
-        order_with_respect_to = 'dimension'
+        order_with_respect_to = "dimension"

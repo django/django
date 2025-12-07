@@ -17,7 +17,7 @@ class Song(models.Model):
     original_release = models.DateField(editable=False)
 
     class Meta:
-        ordering = ('title',)
+        ordering = ("title",)
 
     def __str__(self):
         return self.title
@@ -41,7 +41,7 @@ class Book(models.Model):
     name = models.CharField(max_length=100)
     subtitle = models.CharField(max_length=100)
     price = models.FloatField()
-    authors = models.ManyToManyField(Author, through='AuthorsBooks')
+    authors = models.ManyToManyField(Author, through="AuthorsBooks")
 
 
 class AuthorsBooks(models.Model):
@@ -63,4 +63,4 @@ class Influence(models.Model):
 
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
