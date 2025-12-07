@@ -39,15 +39,12 @@ class StaticFilesHandlerMixin:
         * the path contains a special character (':' or '|')
         """
 
-        valid_path_nt_platform = (
-            os.name == 'nt' and ':' not in path and '|' not in path
-        )
+        valid_path_nt_platform = os.name == "nt" and ":" not in path and "|" not in path
         return (
             path.startswith(self.base_url.path)
             and not self.base_url.netloc
             and valid_path_nt_platform
         )
-
 
     def file_path(self, url):
         """
