@@ -1327,18 +1327,22 @@ def querystring(context, *args, **kwargs):
                 "querystring requires mappings for positional arguments (got "
                 "%r instead)." % d
             )
-        for key, value in d.items():
-            if not isinstance(key, str):
-                raise TemplateSyntaxError(
-                    "querystring requires strings for mapping keys (got %r "
-                    "instead)." % key
-                )
-            if value is None:
-                params.pop(key, None)
-            elif isinstance(value, Iterable) and not isinstance(value, str):
-                params.setlist(key, value)
-            else:
-                params[key] = value
+        if isinstance(d, QueryDict):
+            for key, values in d.lists():
+                params.setlist(key, values)
+        else:
+            for key, value in d.items():
+                if not isinstance(key, str):
+                    raise TemplateSyntaxError(
+                        "querystring requires strings for mapping keys (got %r "
+                        "instead)." % key
+                    )
+                if value is None:
+                    params.pop(key, None)
+                elif isinstance(value, Iterable) and not isinstance(value, str):
+                    params.setlist(key, value)
+                else:
+                    params[key] = value
     query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
