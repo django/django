@@ -85,29 +85,25 @@ class GEOSCoordSeq(GEOSBase):
         if dim < 0 or dim > 3:
             raise GEOSException(f'Invalid ordinate dimension: "{dim:d}"')
 
-    def _get_x(self, index):
-        return capi.cs_getx(self.ptr, index, byref(c_double()))
-
-    def _get_y(self, index):
-        return capi.cs_gety(self.ptr, index, byref(c_double()))
-
-    def _get_z(self, index):
-        return capi.cs_getz(self.ptr, index, byref(c_double()))
-
     def _get_m(self, index):
         return capi.cs_getm(self.ptr, index, byref(c_double()))
 
-    def _set_x(self, index, value):
-        capi.cs_setx(self.ptr, index, value)
+    def _get_xy(self, index):
+        return capi.cs_getxy(self.ptr, index, byref(c_double()), byref(c_double()))
 
-    def _set_y(self, index, value):
-        capi.cs_sety(self.ptr, index, value)
-
-    def _set_z(self, index, value):
-        capi.cs_setz(self.ptr, index, value)
+    def _get_xyz(self, index):
+        return capi.cs_getxyz(
+            self.ptr, index, byref(c_double()), byref(c_double()), byref(c_double())
+        )
 
     def _set_m(self, index, value):
         capi.cs_setm(self.ptr, index, value)
+
+    def _set_xy(self, index, x_value, y_value):
+        capi.cs_setxy(self.ptr, index, x_value, y_value)
+
+    def _set_xyz(self, index, x_value, y_value, z_value):
+        capi.cs_setxyz(self.ptr, index, x_value, y_value, z_value)
 
     @property
     def _point_getter(self):
@@ -120,44 +116,33 @@ class GEOSCoordSeq(GEOSBase):
         return self._get_point_2d
 
     def _get_point_2d(self, index):
-        return (self._get_x(index), self._get_y(index))
+        return self._get_xy(index)
 
     def _get_point_3d(self, index):
-        return (self._get_x(index), self._get_y(index), self._get_z(index))
+        return self._get_xyz(index)
 
     def _get_point_3d_m(self, index):
-        return (self._get_x(index), self._get_y(index), self._get_m(index))
+        return *self._get_xy(index), self._get_m(index)
 
     def _get_point_4d(self, index):
-        return (
-            self._get_x(index),
-            self._get_y(index),
-            self._get_z(index),
-            self._get_m(index),
-        )
+        return *self._get_xyz(index), self._get_m(index)
 
     def _set_point_2d(self, index, value):
         x, y = value
-        self._set_x(index, x)
-        self._set_y(index, y)
+        self._set_xy(index, x, y)
 
     def _set_point_3d(self, index, value):
         x, y, z = value
-        self._set_x(index, x)
-        self._set_y(index, y)
-        self._set_z(index, z)
+        self._set_xyz(index, x, y, z)
 
     def _set_point_3d_m(self, index, value):
         x, y, m = value
-        self._set_x(index, x)
-        self._set_y(index, y)
+        self._set_xy(index, x, y)
         self._set_m(index, m)
 
     def _set_point_4d(self, index, value):
         x, y, z, m = value
-        self._set_x(index, x)
-        self._set_y(index, y)
-        self._set_z(index, z)
+        self._set_xyz(index, x, y, z)
         self._set_m(index, m)
 
     # #### Ordinate getting and setting routines ####

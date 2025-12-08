@@ -1,4 +1,5 @@
 from ctypes import POINTER, c_byte, c_double, c_int, c_uint
+from functools import partial
 
 from django.contrib.gis.geos.libgeos import (
     CS_PTR,
@@ -21,11 +22,13 @@ def check_cs_op(result, func, cargs):
         return result
 
 
-def check_cs_get(result, func, cargs):
+def check_cs_get(result, func, cargs, num_ordinates=1):
     "Check the coordinate sequence retrieval."
     check_cs_op(result, func, cargs)
     # Object in by reference, return its value.
-    return last_arg_byref(cargs)
+    if num_ordinates == 1:
+        return last_arg_byref(cargs)
+    return tuple(cargs[-num_ordinates + i]._obj.value for i in range(num_ordinates))
 
 
 # ## Coordinate sequence prototype factory classes. ##
@@ -42,10 +45,10 @@ class CsOperation(GEOSFuncFactory):
 
     restype = c_int
 
-    def __init__(self, *args, ordinate=False, get=False, **kwargs):
+    def __init__(self, *args, ordinate=False, get=False, num_ordinates=1, **kwargs):
         if get:
             # Get routines have double parameter passed-in by reference.
-            errcheck = check_cs_get
+            errcheck = partial(check_cs_get, num_ordinates=num_ordinates)
             dbl_param = POINTER(c_double)
         else:
             errcheck = check_cs_op
@@ -53,9 +56,9 @@ class CsOperation(GEOSFuncFactory):
 
         if ordinate:
             # Get/Set ordinate routines have an extra uint parameter.
-            argtypes = [CS_PTR, c_uint, c_uint, dbl_param]
+            argtypes = [CS_PTR, c_uint, c_uint] + [dbl_param] * num_ordinates
         else:
-            argtypes = [CS_PTR, c_uint, dbl_param]
+            argtypes = [CS_PTR, c_uint] + [dbl_param] * num_ordinates
 
         super().__init__(
             *args, **{**kwargs, "errcheck": errcheck, "argtypes": argtypes}
@@ -93,16 +96,14 @@ cs_getordinate = CsOperation("GEOSCoordSeq_getOrdinate", ordinate=True, get=True
 cs_setordinate = CsOperation("GEOSCoordSeq_setOrdinate", ordinate=True)
 
 # For getting, x, y, z, m
-cs_getx = CsOperation("GEOSCoordSeq_getX", get=True)
-cs_gety = CsOperation("GEOSCoordSeq_getY", get=True)
-cs_getz = CsOperation("GEOSCoordSeq_getZ", get=True)
 cs_getm = CsOperation("GEOSCoordSeq_getM", get=True)
+cs_getxy = CsOperation("GEOSCoordSeq_getXY", get=True, num_ordinates=2)
+cs_getxyz = CsOperation("GEOSCoordSeq_getXYZ", get=True, num_ordinates=3)
 
 # For setting, x, y, z, m
-cs_setx = CsOperation("GEOSCoordSeq_setX")
-cs_sety = CsOperation("GEOSCoordSeq_setY")
-cs_setz = CsOperation("GEOSCoordSeq_setZ")
 cs_setm = CsOperation("GEOSCoordSeq_setM")
+cs_setxy = CsOperation("GEOSCoordSeq_setXY", num_ordinates=2)
+cs_setxyz = CsOperation("GEOSCoordSeq_setXYZ", num_ordinates=3)
 
 # These routines return size & dimensions.
 cs_getsize = CsInt("GEOSCoordSeq_getSize")
