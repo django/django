@@ -36,15 +36,13 @@ class StaticFilesHandlerMixin:
         Check if the path should be handled. Ignore the path if:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
-        * the path contains a special character (':' or '|')
+        * the path contains a special character (':' or '|') on Windows systems
         """
 
-        valid_path_nt_platform = os.name == "nt" and ":" not in path and "|" not in path
-        return (
-            path.startswith(self.base_url.path)
-            and not self.base_url.netloc
-            and valid_path_nt_platform
-        )
+        if os.name == "nt" and (":" in path or "|" in path):
+            return False
+
+        return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
         """
