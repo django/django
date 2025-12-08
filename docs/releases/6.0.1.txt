@@ -9,4 +9,6 @@ Django 6.0.1 fixes several bugs in 6.0.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.0 where :ttag:`querystring` mishandled
+  multi-value :class:`~django.http.QueryDict` keys, both by only preserving the
+  last value and by incorrectly handling ``None`` values (:ticket:`36783`).
