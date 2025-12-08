@@ -73,22 +73,25 @@
             }
 
             let message;
+            const browserTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
             if (timezoneOffset > 0) {
                 message = ngettext(
-                    'Note: You are %s hour ahead of server time.',
-                    'Note: You are %s hours ahead of server time.',
-                    timezoneOffset
+                    'Note: Times displayed in %s (%s hour ahead of server).',
+                    'Note: Times displayed in %s (%s hours ahead of server).',
+                    Math.floor(timezoneOffset)
                 );
+                message = interpolate(message, [browserTZ, timezoneOffset]);
             }
             else {
-                timezoneOffset *= -1;
+                const hours = Math.abs(timezoneOffset);
                 message = ngettext(
-                    'Note: You are %s hour behind server time.',
-                    'Note: You are %s hours behind server time.',
-                    timezoneOffset
+                    'Note: Times displayed in %s (%s hour behind server).',
+                    'Note: Times displayed in %s (%s hours behind server).',
+                    Math.floor(hours)
                 );
+                message = interpolate(message, [browserTZ, hours]);
             }
-            message = interpolate(message, [timezoneOffset]);
 
             const warning = document.createElement('div');
             const id = inp.id;
