@@ -2192,3 +2192,24 @@ support the ``stdout`` and ``stderr`` options. For example, you could write::
 
     with open("/path/to/command_output", "w") as f:
         management.call_command("dumpdata", stdout=f)
+
+generate_secret_key
+-------------------
+
+
+Generates a new, cryptographically secure value suitable for use as the
+:setting:`SECRET_KEY` setting.
+
+This command uses the same algorithm as :func:`django.core.management.utils.get_random_secret_key`.
+
+Example::
+
+    $ python manage.py generate_secret_key
+    l8#u8o&4p$1=2t!q9u!3h9k@3$#w@p$7&2b!_k+2u(1v
+
+This is useful when creating new Django projects, rotating keys in existing
+deployments, or provisioning automated environments where a secret key must be
+generated programmatically.
+
+The command prints the generated key to ``stdout``. It does not modify any files
+or settings automatically.
