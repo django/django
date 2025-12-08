@@ -494,6 +494,9 @@ class ModelState:
         state.pop("peers", None)
         return state
 
+    def __del__(self):
+        self.fields_cache.clear()
+
 
 class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
