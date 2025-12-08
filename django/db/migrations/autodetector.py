@@ -215,8 +215,8 @@ class MigrationAutodetector:
         self.generate_removed_altered_unique_together()
         # Generate field operations.
         self.generate_removed_fields()
-        self.generate_added_fields()
         self.generate_altered_fields()
+        self.generate_added_fields()
         self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
         self.generate_added_indexes()
