@@ -28,3 +28,10 @@ repos:
     rev: v1.16.3 
     hooks:
     - id: zizmor
+  - repo: local
+    hooks:
+    - id: check-commit-prefix
+      stages: [prepare-commit-msg]
+      name: Check commit prefix
+      entry: scripts/check_commit_prefix.py
+      language: python
