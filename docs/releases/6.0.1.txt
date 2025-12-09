@@ -10,4 +10,5 @@ Bugfixes
 ========
 
 * Fixed a regression in Django 6.0 where :ttag:`querystring` only preserved the
-  last value for multi-value ``QueryDict`` keys (:ticket:`36783`).
+  last value for multi-value :class:`~django.http.QueryDict` keys
+  (:ticket:`36783`).
