@@ -84,5 +84,5 @@ def admin_actions(context):
 @register.tag(name="admin_actions")
 def admin_actions_tag(parser, token):
     return InclusionAdminNode(
-        parser, token, func=admin_actions, template_name="actions.html"
+        "admin_actions", parser, token, func=admin_actions, template_name="actions.html"
     )
