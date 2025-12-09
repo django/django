@@ -184,7 +184,8 @@ class Command(BaseCommand):
         print(
             f"{now}\n"
             f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
-            f"Starting development server at {self.protocol}://{addr}:{server_port}/\n"
+            f"Starting WSGI development server at "
+            f"{self.protocol}://{addr}:{server_port}/\n"
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )
@@ -192,9 +193,10 @@ class Command(BaseCommand):
         if os.environ.get("DJANGO_RUNSERVER_HIDE_WARNING") != "true":
             self.stdout.write(
                 self.style.WARNING(
-                    "WARNING: This is a development server. Do not use it in a "
-                    "production setting. Use a production WSGI or ASGI server "
-                    "instead.\nFor more information on production servers see: "
+                    "WARNING: This is a development server. "
+                    "Do not use this in a production setting. "
+                    "Use a production WSGI or ASGI server instead.\n"
+                    "For more information on production servers see: "
                     f"https://docs.djangoproject.com/en/{docs_version}/howto/"
                     "deployment/"
                 )
