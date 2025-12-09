@@ -416,27 +416,17 @@ class Deserializer(base.Deserializer):
 
 
 def getInnerText(node):
-    """Get all the inner text of a DOM node (recursively)."""
-    inner_text_list = getInnerTextList(node)
-    return "".join(inner_text_list)
-
-
-def getInnerTextList(node):
-    """Return a list of the inner texts of a DOM node (recursively)."""
+    """Get the inner text of a DOM node and any children one level deep."""
     # inspired by
     # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
-    result = []
-    for child in node.childNodes:
-        if (
-            child.nodeType == child.TEXT_NODE
-            or child.nodeType == child.CDATA_SECTION_NODE
-        ):
-            result.append(child.data)
-        elif child.nodeType == child.ELEMENT_NODE:
-            result.extend(getInnerTextList(child))
-        else:
-            pass
-    return result
+    return "".join(
+        [
+            element.data
+            for child in node.childNodes
+            for element in (child, *child.childNodes)
+            if element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+        ]
+    )
 
 
 # Below code based on Christian Heimes' defusedxml
