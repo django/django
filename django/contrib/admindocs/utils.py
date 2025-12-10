@@ -7,7 +7,7 @@ from inspect import cleandoc
 
 from django.urls import reverse
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString, mark_safe
 
 try:
     import docutils.core
@@ -265,4 +265,4 @@ def remove_non_capturing_groups(pattern):
 
 
 def strip_p_tags(value):
-    return mark_safe(value.replace("<p>", "").replace("</p>", ""))
+    return SafeString(value.replace("<p>", "").replace("</p>", ""))

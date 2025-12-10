@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -12,7 +12,7 @@ class ChainingTests(SimpleTestCase):
     @setup({"chaining01": '{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}'})
     def test_chaining01(self):
         output = self.engine.render_to_string(
-            "chaining01", {"a": "a < b", "b": mark_safe("a < b")}
+            "chaining01", {"a": "a < b", "b": SafeString("a < b")}
         )
         self.assertEqual(output, " A &lt; b . A < b ")
 
@@ -26,7 +26,7 @@ class ChainingTests(SimpleTestCase):
     )
     def test_chaining02(self):
         output = self.engine.render_to_string(
-            "chaining02", {"a": "a < b", "b": mark_safe("a < b")}
+            "chaining02", {"a": "a < b", "b": SafeString("a < b")}
         )
         self.assertEqual(output, " A < b . A < b ")
 
@@ -34,7 +34,7 @@ class ChainingTests(SimpleTestCase):
     @setup({"chaining03": '{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}'})
     def test_chaining03(self):
         output = self.engine.render_to_string(
-            "chaining03", {"a": "a < b", "b": mark_safe("a < b")}
+            "chaining03", {"a": "a < b", "b": SafeString("a < b")}
         )
         self.assertEqual(output, "A &lt; .A < ")
 
@@ -48,7 +48,7 @@ class ChainingTests(SimpleTestCase):
     )
     def test_chaining04(self):
         output = self.engine.render_to_string(
-            "chaining04", {"a": "a < b", "b": mark_safe("a < b")}
+            "chaining04", {"a": "a < b", "b": SafeString("a < b")}
         )
         self.assertEqual(output, "A < .A < ")
 

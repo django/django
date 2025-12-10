@@ -45,7 +45,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from . import jinja2_tests
 
@@ -1409,7 +1409,7 @@ aria-describedby="id_birthday_error">
         # Validation errors are HTML-escaped when output as HTML.
         class EscapingForm(Form):
             special_name = CharField(label="<em>Special</em> Field")
-            special_safe_name = CharField(label=mark_safe("<em>Special</em> Field"))
+            special_safe_name = CharField(label=SafeString("<em>Special</em> Field"))
 
             def clean_special_name(self):
                 raise ValidationError(
@@ -1418,7 +1418,7 @@ aria-describedby="id_birthday_error">
 
             def clean_special_safe_name(self):
                 raise ValidationError(
-                    mark_safe(
+                    SafeString(
                         "'<b>%s</b>' is a safe string"
                         % self.cleaned_data["special_safe_name"]
                     )
@@ -4208,7 +4208,7 @@ aria-describedby="id_age_error"></td></tr>""",
                 "<legend>custom&amp;:</legend>",
             ),
             (
-                (mark_safe("custom&"),),
+                (SafeString("custom&"),),
                 {},
                 '<label for="id_field">custom&:</label>',
                 "<legend>custom&:</legend>",

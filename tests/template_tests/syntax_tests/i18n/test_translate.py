@@ -7,7 +7,7 @@ from django.template import Context, Template, TemplateSyntaxError
 from django.templatetags.l10n import LocalizeNode
 from django.test import SimpleTestCase, override_settings
 from django.utils import translation
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import trans_real
 
 from ...utils import setup as base_setup
@@ -79,7 +79,7 @@ class I18nTransTagTests(SimpleTestCase):
 
     @setup({"i18n22": "{% load i18n %}{% translate andrew %}"})
     def test_i18n22(self):
-        output = self.engine.render_to_string("i18n22", {"andrew": mark_safe("a & b")})
+        output = self.engine.render_to_string("i18n22", {"andrew": SafeString("a & b")})
         self.assertEqual(output, "a & b")
 
     @setup(

@@ -3,7 +3,7 @@ from decimal import Decimal, localcontext
 from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
 from django.utils import translation
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 from django.utils.version import PYPY
 
 from ..utils import setup
@@ -20,14 +20,14 @@ class FloatformatTests(SimpleTestCase):
     )
     def test_floatformat01(self):
         output = self.engine.render_to_string(
-            "floatformat01", {"a": "1.42", "b": mark_safe("1.42")}
+            "floatformat01", {"a": "1.42", "b": SafeString("1.42")}
         )
         self.assertEqual(output, "1.4 1.4")
 
     @setup({"floatformat02": "{{ a|floatformat }} {{ b|floatformat }}"})
     def test_floatformat02(self):
         output = self.engine.render_to_string(
-            "floatformat02", {"a": "1.42", "b": mark_safe("1.42")}
+            "floatformat02", {"a": "1.42", "b": SafeString("1.42")}
         )
         self.assertEqual(output, "1.4 1.4")
 

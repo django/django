@@ -1,6 +1,6 @@
 from django.template.defaultfilters import first
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -9,7 +9,7 @@ class FirstTests(SimpleTestCase):
     @setup({"first01": "{{ a|first }} {{ b|first }}"})
     def test_first01(self):
         output = self.engine.render_to_string(
-            "first01", {"a": ["a&b", "x"], "b": [mark_safe("a&b"), "x"]}
+            "first01", {"a": ["a&b", "x"], "b": [SafeString("a&b"), "x"]}
         )
         self.assertEqual(output, "a&amp;b a&b")
 
@@ -22,7 +22,7 @@ class FirstTests(SimpleTestCase):
     )
     def test_first02(self):
         output = self.engine.render_to_string(
-            "first02", {"a": ["a&b", "x"], "b": [mark_safe("a&b"), "x"]}
+            "first02", {"a": ["a&b", "x"], "b": [SafeString("a&b"), "x"]}
         )
         self.assertEqual(output, "a&b a&b")
 
