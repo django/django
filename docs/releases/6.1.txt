@@ -240,7 +240,11 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The :class:`~django.db.migrations.operations.DeleteModel` operation no longer uses
+  ``CASCADE`` on PostgreSQL and MySQL. This prevents implicit deletion of foreign key
+  constraints on referencing tables. Attempting to delete a model referenced by other
+  tables will now raise a :exc:`~django.db.DatabaseError`, requiring the referencing
+  field to be removed first.
 
 Models
 ~~~~~~
