@@ -71,7 +71,7 @@ msgid "Catalan"
 msgstr "کاتالونیایی"
 
 msgid "Central Kurdish (Sorani)"
-msgstr ""
+msgstr "کردی مرکزی (سورانی)"
 
 msgid "Czech"
 msgstr "چکی"
@@ -314,7 +314,7 @@ msgid "Udmurt"
 msgstr "ادمورت"
 
 msgid "Uyghur"
-msgstr ""
+msgstr "ویغور"
 
 msgid "Ukrainian"
 msgstr "اکراینی"
@@ -364,7 +364,7 @@ msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
 
 msgid "Enter a valid domain name."
-msgstr ""
+msgstr "یک دامنه معتبر وارد کنید"
 
 msgid "Enter a valid URL."
 msgstr "یک نشانی اینترنتی معتبر وارد کنید."
@@ -390,7 +390,7 @@ msgstr ""
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
-msgstr ""
+msgstr "یک آدرس ٪(protocol)s معتبر وارد کنید."
 
 msgid "IPv4"
 msgstr ""
@@ -399,7 +399,7 @@ msgid "IPv6"
 msgstr ""
 
 msgid "IPv4 or IPv6"
-msgstr ""
+msgstr "IPv4 یا IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "فقط ارقام جدا شده با کاما وارد کنید."
@@ -418,13 +418,13 @@ msgstr "مطمئن شوید این مقدار بزرگتر و یا مساوی %(
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr ""
+msgstr "اطمینان حاصل کنید که این مقدار مضربی از اندازه گام ٪(limit_value)s باشد."
 
 #, python-format
 msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
-msgstr ""
+msgstr "اطمینان حاصل کنید که این مقدار مضربی از اندازهٔ گام %(limit_value)s است و از %(offset)s شروع می‌شود؛ مثلاً %(offset)s، %(valid_value1)s، %(valid_value2)s و غیره."
 
 #, python-format
 msgid ""
@@ -497,7 +497,7 @@ msgstr "‏%(model_name)s با این %(field_labels)s وجود دارد."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "محدودیت «٪(name)s» نقض شده است."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -703,7 +703,7 @@ msgstr "مقدار، باید یک JSON معتبر باشد."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
-msgstr ""
+msgstr "نمونه ٪(model)s با ٪(field)s ٪(value)r انتخاب معتبری نیست."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "کلید خارجی ( نوع بر اساس فیلد رابط مشخص میشود )"
