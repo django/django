@@ -183,8 +183,16 @@ The ``ContentTypeManager``
         :class:`~django.contrib.contenttypes.models.ContentType` to keep track
         of models for which it has created
         :class:`~django.contrib.contenttypes.models.ContentType` instances. You
-        probably won't ever need to call this method yourself; Django will call
-        it automatically when it's needed.
+        probably won't need to call this method in application code yourself;
+        Django will call it automatically when it's needed.
+
+        You may need to clear the cache when testing, to reset between tests,
+        or after preparing test state. For example::
+
+            class ContentTypesTests(TestCase):
+                def setUp(self):
+                    ContentType.objects.clear_cache()
+                    self.addCleanup(ContentType.objects.clear_cache)
 
     .. method:: get_for_id(id)
 
