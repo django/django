@@ -111,7 +111,7 @@ instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
     This warning doesn't apply to ``RemoteUserMiddleware`` in its default
     configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
     start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
-    server, not directly from an HTTP request header.
+    or ASGI server, not directly from an HTTP request header.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
