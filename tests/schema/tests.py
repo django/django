@@ -159,7 +159,7 @@ class SchemaTests(TransactionTestCase):
         if self.isolated_local_models:
             with connection.schema_editor() as editor:
                 for model in self.isolated_local_models:
-                    editor.delete_model(model)
+                    editor.delete_model(model, cascade=True)
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
@@ -174,7 +174,7 @@ class SchemaTests(TransactionTestCase):
                 if connection.features.ignores_table_name_case:
                     tbl = tbl.lower()
                 if tbl in table_names:
-                    editor.delete_model(model)
+                    editor.delete_model(model, cascade=True)
                     table_names.remove(tbl)
             connection.enable_constraint_checking()
 
