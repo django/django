@@ -1,3 +1,4 @@
+import math
 import os
 import sys
 from datetime import datetime
@@ -124,7 +125,7 @@ class TestUtilsHtml(SimpleTestCase):
         # old and new results. The check below is temporary until all supported
         # Python versions and CI workers include the fix. See:
         # https://github.com/python/cpython/commit/6eb6c5db
-        min_fixed = {
+        min_fixed_security = {
             (3, 14): (3, 14),
             (3, 13): (3, 13, 6),
             (3, 12): (3, 12, 12),
@@ -132,7 +133,28 @@ class TestUtilsHtml(SimpleTestCase):
             (3, 10): (3, 10, 19),
             (3, 9): (3, 9, 24),
         }
-        htmlparser_fixed = sys.version_info >= min_fixed[sys.version_info[:2]]
+        htmlparser_fixed_security = (
+            sys.version_info >= min_fixed_security[sys.version_info[:2]]
+        )
+        # Similarly, there was a fix for terminating incomplete entities. See:
+        # https://github.com/python/cpython/commit/95296a9d
+        min_fixed_incomplete_entities = {
+            (3, 14): (3, 14, 1),
+            (3, 13): (3, 13, 10),
+            # Not fixed in the following versions.
+            (3, 12): (3, 12, math.inf),
+            (3, 11): (3, 11, math.inf),
+            (3, 10): (3, 10, math.inf),
+            (3, 9): (3, 9, math.inf),
+        }
+        major_version = sys.version_info[:2]
+        htmlparser_fixed_security = sys.version_info >= min_fixed_security.get(
+            major_version, major_version
+        )
+        htmlparser_fixed_incomplete_entities = (
+            sys.version_info
+            >= min_fixed_incomplete_entities.get(major_version, major_version)
+        )
         items = (
             (
                 "<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>",
@@ -159,16 +181,19 @@ class TestUtilsHtml(SimpleTestCase):
             # https://bugs.python.org/issue20288
             ("&gotcha&#;<>", "&gotcha&#;<>"),
             ("<sc<!-- -->ript>test<<!-- -->/script>", "ript>test"),
-            ("<script>alert()</script>&h", "alert()h"),
+            (
+                "<script>alert()</script>&h",
+                "alert()&h;" if htmlparser_fixed_incomplete_entities else "alert()h",
+            ),
             (
                 "><!" + ("&" * 16000) + "D",
-                ">" if htmlparser_fixed else "><!" + ("&" * 16000) + "D",
+                ">" if htmlparser_fixed_security else "><!" + ("&" * 16000) + "D",
             ),
             ("X<<<<br>br>br>br>X", "XX"),
             ("<" * 50 + "a>" * 50, ""),
             (
                 ">" + "<a" * 500 + "a",
-                ">" if htmlparser_fixed else ">" + "<a" * 500 + "a",
+                ">" if htmlparser_fixed_security else ">" + "<a" * 500 + "a",
             ),
             ("<a" * 49 + "a" * 951, "<a" * 49 + "a" * 951),
             ("<" + "a" * 1_002, "<" + "a" * 1_002),
