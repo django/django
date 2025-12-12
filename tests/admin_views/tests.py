@@ -58,7 +58,6 @@ from .models import (
     Book,
     Bookmark,
     Box,
-    CascadeRefCoverLetter,
     Category,
     Chapter,
     ChapterXtra1,
@@ -110,7 +109,6 @@ from .models import (
     Post,
     PrePopulatedPost,
     Promo,
-    ProtectRefCoverLetter,
     Question,
     ReadablePizza,
     ReadOnlyPizza,
@@ -3585,234 +3583,107 @@ class AdminViewPermissionsTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
-class AdminObjectStringWithNBSPDisplayTest(TestCase):
+class AdminConsecutiveWhiteSpaceObjectDisplayTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="user",
-            password="secret",
-            is_staff=True,
+        cls.user = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
         )
-        cl_permission = Permission.objects.filter(
-            content_type=ContentType.objects.get_for_model(CoverLetter)
+        cls.obj = CoverLetter.objects.create(author="             ")
+        cls.change_link = reverse(
+            "admin:admin_views_coverletter_change", args=(cls.obj.pk,)
         )
-        cls.user.user_permissions.add(*cl_permission)
-        cases = [
-            "   ",
-            "pizza ",
-            "     pizza",
-            "  pizza  ",
-            "p  i z   z a",
-            "  p i  z   z   a",
-        ]
-        objs = [CoverLetter.objects.create(author=author) for author in cases]
-        # It holds a test object and the value to be displayed for that object.
-        # e.g. [(obj, obj_display_value), ...]
-        cls.cases = list(
-            zip(
-                objs,
-                [
-                    "   ",
-                    "pizza ",
-                    "     pizza",
-                    "  pizza  ",
-                    "p  i z   z a",
-                    "  p i  z   z   a",
-                ],
-            )
-        )
-        cls.change_link = "/test_admin/admin/admin_views/coverletter/%d/change/"
 
     def setUp(self):
         self.client.force_login(self.user)
 
-    def add_quote(self, value, expect_value):
-        if value.strip() != value:
-            expect_value = f"“{expect_value}”"
-        return expect_value
-
-    def test_breadcrumbs_with_nbsp_in_object_string(self):
-        base_breadcrumbs = (
-            '<ol class="breadcrumbs">'
-            '<li><a href="/test_admin/admin/">Home</a></li>'
-            '<li><a href="/test_admin/admin/admin_views/">Admin_Views</a></li>'
-            '<li><a href="/test_admin/admin/admin_views/coverletter/">'
+    def test_display_consecutive_whitespace_object_in_breadcrumbs(self):
+        response = self.client.get(self.change_link)
+        self.assertContains(
+            response,
+            '<li><a href="/test_admin/admin/admin_views/coverletter/">Cover letters'
+            '</a></li><li aria-current="page">-</li>',
+            html=True,
         )
-        for obj, expect_display_value in self.cases:
-            expect_display_value = self.add_quote(str(obj), expect_display_value)
-            with self.subTest(obj=obj):
-                url = reverse("admin:admin_views_coverletter_change", args=(obj.pk,))
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    base_breadcrumbs
-                    + 'Cover letters</a></li><li aria-current="page">%s</li></ol>'
-                    % expect_display_value,
-                    html=True,
-                )
-                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    base_breadcrumbs
-                    + 'Cover letters</a></li><li><a href="%s">%s</a></li>'
-                    '<li aria-current="page">Delete</li></ol>'
-                    % (self.change_link % obj.pk, expect_display_value),
-                    html=True,
-                )
-                url = reverse("admin:admin_views_coverletter_history", args=(obj.pk,))
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    base_breadcrumbs
-                    + 'Cover letters</a></li><li><a href="%s">%s</a></li>'
-                    '<li aria-current="page">History</li></ol>'
-                    % (self.change_link % obj.pk, expect_display_value),
-                    html=True,
-                )
 
-    def test_deleted_objects_with_nbsp_in_object_string(self):
-        for obj, expect_display_value in self.cases:
-            expect_display_value = self.add_quote(str(obj), expect_display_value)
-            with self.subTest(obj=obj):
-                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    '<ul id="deleted-objects">'
-                    '<li>Cover letter: <a href="%s">%s</a></li></ul>'
-                    % (self.change_link % obj.pk, expect_display_value),
-                    html=True,
-                )
+    def test_display_consecutive_whitespace_object_in_changelist(self):
+        response = self.client.get(reverse("admin:admin_views_coverletter_changelist"))
+        self.assertContains(response, f'<a href="{self.change_link}">-</a>')
 
-    def test_delete_confirmation_message_with_nbsp_in_object_string(self):
-        for obj, expect_display_value in self.cases:
-            with self.subTest(obj=obj):
-                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    "<p>Are you sure you want to delete the cover letter “%s”?"
-                    % expect_display_value,
-                )
-                forbidden_obj = CoverLetter.objects.create(author=obj.author)
-                CascadeRefCoverLetter.objects.create(coverletter=forbidden_obj)
-                url = reverse(
-                    "admin:admin_views_coverletter_delete", args=(forbidden_obj.pk,)
-                )
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    "<p>Deleting the cover letter “%s” would result in"
-                    % expect_display_value,
-                )
-                protected_obj = CoverLetter.objects.create(author=obj.author)
-                ProtectRefCoverLetter.objects.create(coverletter=protected_obj)
-                url = reverse(
-                    "admin:admin_views_coverletter_delete", args=(protected_obj.pk,)
-                )
-                response = self.client.get(url)
-                self.assertContains(
-                    response,
-                    "<p>Deleting the cover letter “%s” would require deleting"
-                    % expect_display_value,
-                )
+    def test_display_consecutive_whitespace_object_in_deleted_object(self):
+        response = self.client.get(
+            reverse("admin:admin_views_coverletter_delete", args=(self.obj.pk,))
+        )
+        self.assertContains(
+            response,
+            '<ul id="deleted-objects">'
+            f'<li>Cover letter: <a href="{self.change_link}">-</a></li></ul>',
+            html=True,
+        )
 
-    def test_logentry_with_nbsp_in_object_string(self):
-        for obj, expect_display_value in self.cases:
-            expect_display_value = self.add_quote(str(obj), expect_display_value)
-            with self.subTest(obj=obj):
-                LogEntry.objects.log_actions(
-                    user_id=self.user.pk,
-                    queryset=[obj],
-                    action_flag=ADDITION,
-                    change_message=[],
-                    single_object=True,
-                )
-                LogEntry.objects.log_actions(
-                    user_id=self.user.pk,
-                    queryset=[obj],
-                    action_flag=DELETION,
-                    change_message=[],
-                    single_object=True,
-                )
-                # index page recent actions sidebar
-                response = self.client.get(reverse("admin:index"))
-                self.assertContains(
-                    response,
-                    '<li class="addlink">'
-                    '<span class="visually-hidden">Added:</span><a href="%s">%s</a>'
-                    '<br><span class="mini quiet">Cover letter</span></li>'
-                    % (self.change_link % obj.pk, expect_display_value),
-                    html=True,
-                )
-                self.assertContains(
-                    response,
-                    '<li class="deletelink">'
-                    '<span class="visually-hidden">Deleted:</span>%s'
-                    '<br><span class="mini quiet">Cover letter</span></li>'
-                    % expect_display_value,
-                    html=True,
-                )
-                # history page title
-                response = self.client.get(
-                    reverse("admin:admin_views_coverletter_history", args=(obj.pk,))
-                )
-                self.assertContains(
-                    response, "<h1>Change history: %s</h1>" % expect_display_value
-                )
+    def test_display_consecutive_whitespace_object_in_recent_action(self):
+        for action in [ADDITION, DELETION]:
+            LogEntry.objects.log_actions(
+                user_id=self.user.pk,
+                queryset=[self.obj],
+                action_flag=action,
+                change_message=[],
+                single_object=True,
+            )
 
-    def test_messages_with_nbsp_in_object_string(self):
-        """
-        Test the nbsp contain object string that appears in the message
-        when an object is added, changed or deleted.
-        """
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(
+            response,
+            '<li class="addlink"><span class="visually-hidden">Added:</span>'
+            f'<a href="{self.change_link}">-</a><br><span class="mini quiet">'
+            "Cover letter</span></li>",
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<li class="deletelink">'
+            '<span class="visually-hidden">Deleted:</span>-'
+            '<br><span class="mini quiet">Cover letter</span></li>',
+            html=True,
+        )
+
+    def test_display_consecutive_whitespace_object_in_messages(self):
         buttons = ["_save", "_continue", "_addanother"]
         for button in buttons:
-            for obj, expect_display_value in self.cases:
-                body = {"author": obj.author, button: "1"}
-                with self.subTest(obj=obj, button=button):
-                    # Add
-                    response = self.client.post(
-                        reverse("admin:admin_views_coverletter_add"), body, follow=True
-                    )
-                    latest_cl = CoverLetter.objects.latest("id")
-                    self.assertContains(
-                        response,
-                        'The cover letter “<a href="%s">%s</a>” was added successfully.'
-                        % (self.change_link % latest_cl.pk, expect_display_value),
-                    )
-                    # Change
-                    response = self.client.post(
-                        reverse(
-                            "admin:admin_views_coverletter_change", args=(latest_cl.pk,)
-                        ),
-                        {**body, "author": " " * 10},
-                        follow=True,
-                    )
-                    self.assertContains(
-                        response,
-                        'The cover letter “<a href="%s">%s</a>” was '
-                        "changed successfully."
-                        % (
-                            self.change_link % latest_cl.pk,
-                            (" " * 10),
-                        ),
-                    )
-        # Delete
-        for obj, expect_display_value in self.cases:
-            obj = CoverLetter.objects.create(author=obj.author)
-            with self.subTest(obj=obj):
+            body = {"author": self.obj.author, button: "1"}
+            with self.subTest(obj=self.obj, button=button):
                 response = self.client.post(
-                    reverse("admin:admin_views_coverletter_delete", args=(obj.pk,)),
-                    {"post": "yes"},
+                    reverse("admin:admin_views_coverletter_add"), body, follow=True
+                )
+                latest_cl = CoverLetter.objects.latest("id")
+                change_link = reverse(
+                    "admin:admin_views_coverletter_change", args=(latest_cl.pk,)
+                )
+                self.assertContains(
+                    response,
+                    f'The cover letter “<a href="{change_link}">-</a>” '
+                    "was added successfully.",
+                )
+                response = self.client.post(
+                    reverse(
+                        "admin:admin_views_coverletter_change", args=(latest_cl.pk,)
+                    ),
+                    {**body, "author": "             "},
                     follow=True,
                 )
                 self.assertContains(
                     response,
-                    "The cover letter “%s” was deleted successfully."
-                    % expect_display_value,
+                    f'The cover letter “<a href="{change_link}">-</a>” '
+                    "was changed successfully.",
                 )
+
+        new_obj = CoverLetter.objects.create(author=self.obj.author)
+        response = self.client.post(
+            reverse("admin:admin_views_coverletter_delete", args=(new_obj.pk,)),
+            {"post": "yes"},
+            follow=True,
+        )
+        self.assertContains(response, "The cover letter “-” was deleted successfully.")
 
 
 @override_settings(

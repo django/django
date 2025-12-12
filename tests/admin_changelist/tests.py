@@ -1193,29 +1193,6 @@ class ChangeListTests(TestCase):
             "http://blues_history.com</a>" % g.pk,
         )
 
-    def test_blank_str_display_links(self):
-        self.client.force_login(self.superuser)
-        cases = [
-            ("     ", "“     ”"),
-            ("Antoliny    ", "“Antoliny    ”"),
-            ("    Antoliny", "“    Antoliny”"),
-            ("   Antoliny   ", "“   Antoliny   ”"),
-            ("Anto      liny", "Anto      liny"),
-            ("A n t o l i n y", "A n t o l i n y"),
-            ("A  n  t  o  l  i  n  y", "A  n  t  o  l  i  n  y"),
-        ]
-        for value, expect_display_value in cases:
-            with self.subTest(value=value):
-                gc = GrandChild.objects.create(name=value)
-            response = self.client.get(
-                reverse("admin:admin_changelist_grandchild_changelist")
-            )
-            self.assertContains(
-                response,
-                '<a href="/admin/admin_changelist/grandchild/%s/change/">%s</a>'
-                % (gc.pk, expect_display_value),
-            )
-
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
         url = reverse("admin:auth_user_changelist")

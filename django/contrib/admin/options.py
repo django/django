@@ -1396,7 +1396,7 @@ class ModelAdmin(BaseModelAdmin):
             current_app=self.admin_site.name,
         )
         # Add a link to the object's change form if the user can edit the obj.
-        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING, avoid_quote=True)
+        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
         if self.has_change_permission(request, obj):
             obj_repr = format_html(
                 '<a href="{}">{}</a>', urlquote(obj_url), obj_display
@@ -1550,7 +1550,7 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
-        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING, avoid_quote=True)
+        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
         msg_dict = {
             "name": opts.verbose_name,
             "obj": format_html(
@@ -1734,9 +1734,7 @@ class ModelAdmin(BaseModelAdmin):
             _("The %(name)s “%(obj)s” was deleted successfully.")
             % {
                 "name": self.opts.verbose_name,
-                "obj": display_for_value(
-                    str(obj_display), EMPTY_VALUE_STRING, avoid_quote=True
-                ),
+                "obj": display_for_value(str(obj_display), EMPTY_VALUE_STRING),
             },
             messages.SUCCESS,
         )
@@ -2260,9 +2258,7 @@ class ModelAdmin(BaseModelAdmin):
             "subtitle": None,
             "object_name": object_name,
             "object": obj,
-            "escaped_object": display_for_value(
-                str(obj), EMPTY_VALUE_STRING, avoid_quote=True
-            ),
+            "escaped_object": display_for_value(str(obj), EMPTY_VALUE_STRING),
             "deleted_objects": deleted_objects,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
