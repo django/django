@@ -331,6 +331,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
+                    if isinstance(value, int):
+                        return decimal.Decimal(value)
+
                     return create_decimal(value).quantize(
                         quantize_value, context=expression.output_field.context
                     )
