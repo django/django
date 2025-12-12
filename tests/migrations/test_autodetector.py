@@ -5543,7 +5543,6 @@ class AutodetectorTests(BaseAutodetectorTests):
             preserve_default=True,
         )
 
-
     def test_m2m_target_change_generates_remove_and_add(self):
         # Initial state: Author has M2M to Book
         before = [
