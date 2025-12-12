@@ -3598,13 +3598,26 @@ class AdminConsecutiveWhiteSpaceObjectDisplayTest(TestCase):
         self.client.force_login(self.user)
 
     def test_display_consecutive_whitespace_object_in_breadcrumbs(self):
-        response = self.client.get(self.change_link)
-        self.assertContains(
-            response,
-            '<li><a href="/test_admin/admin/admin_views/coverletter/">Cover letters'
-            '</a></li><li aria-current="page">-</li>',
-            html=True,
-        )
+        cases = [
+            (
+                self.change_link,
+                '<li><a href="/test_admin/admin/admin_views/coverletter/">'
+                'Cover letters</a></li><li aria-current="page">-</li>',
+            ),
+            (
+                reverse("admin:admin_views_coverletter_delete", args=(self.obj.pk,)),
+                f'<li><a href="{self.change_link}">-</a></li><li aria-current="page">'
+                "Delete</li>",
+            ),
+            (
+                reverse("admin:admin_views_coverletter_history", args=(self.obj.pk,)),
+                f'<li><a href="{self.change_link}">-</a></li><li aria-current="page">'
+                "History</li>",
+            ),
+        ]
+        for url, expected_breadcrumbs in cases:
+            response = self.client.get(url)
+            self.assertContains(response, expected_breadcrumbs, html=True)
 
     def test_display_consecutive_whitespace_object_in_changelist(self):
         response = self.client.get(reverse("admin:admin_views_coverletter_changelist"))
