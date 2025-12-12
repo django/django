@@ -2836,7 +2836,9 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>Select article to view</h1>")
         self.assertEqual(response.context["title"], "Select article to view")
         response = self.client.get(article_change_url)
-        self.assertContains(response, "<title>View article | Django site admin</title>")
+        self.assertContains(
+            response, "<title>- | View article | Django site admin</title>"
+        )
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
@@ -2865,7 +2867,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.context["title"], "Change article")
         self.assertContains(
             response,
-            "<title>Change article | Django site admin</title>",
+            "<title>- | Change article | Django site admin</title>",
         )
         self.assertContains(response, "<h1>Change article</h1>")
         post = self.client.post(article_change_url, change_dict)
@@ -2990,7 +2992,9 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.viewuser)
         response = self.client.get(change_url)
         self.assertEqual(response.context["title"], "View article")
-        self.assertContains(response, "<title>View article | Django site admin</title>")
+        self.assertContains(
+            response, "<title>- | View article | Django site admin</title>"
+        )
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
