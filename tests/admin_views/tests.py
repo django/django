@@ -3685,6 +3685,10 @@ class AdminConsecutiveWhiteSpaceObjectDisplayTest(TestCase):
         )
         self.assertContains(response, "The cover letter “-” was deleted successfully.")
 
+    def test_display_consecutive_whitespace_object_in_sub_title(self):
+        response = self.client.get(self.change_link)
+        self.assertContains(response, "<h2>-</h2>")
+
 
 @override_settings(
     ROOT_URLCONF="admin_views.urls",

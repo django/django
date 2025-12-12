@@ -1957,7 +1957,9 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             "title": title % self.opts.verbose_name,
-            "subtitle": str(obj) if obj else None,
+            "subtitle": (
+                display_for_value(str(obj), EMPTY_VALUE_STRING) if obj else None
+            ),
             "adminform": admin_form,
             "object_id": object_id,
             "original": obj,
