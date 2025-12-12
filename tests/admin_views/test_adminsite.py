@@ -53,6 +53,7 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(ctx["site_title"], "Django site admin")
         self.assertEqual(ctx["site_url"], "/")
         self.assertIs(ctx["has_permission"], True)
+        self.assertIn("server_timezone", ctx)
 
     def test_custom_admin_titles(self):
         request = self.request_factory.get(reverse("test_custom_adminsite:index"))
