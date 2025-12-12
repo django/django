@@ -35,7 +35,6 @@ from .models import (
     Box,
     CamelCaseModel,
     CamelCaseRelatedModel,
-    CascadeRefCoverLetter,
     Category,
     Chapter,
     ChapterXtra1,
@@ -1246,7 +1245,6 @@ site.register(Reservation)
 site.register(FoodDelivery, FoodDeliveryAdmin)
 site.register(RowLevelChangePermissionModel, RowLevelChangePermissionModelAdmin)
 site.register(Paper, PaperAdmin)
-site.register(CascadeRefCoverLetter)
 site.register(CoverLetter, CoverLetterAdmin)
 site.register(ShortMessage, ShortMessageAdmin)
 site.register(Telegram, TelegramAdmin)

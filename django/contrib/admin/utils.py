@@ -16,8 +16,9 @@ from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
 from django.utils.hashable import make_hashable
-from django.utils.html import format_html, strip_tags
+from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.safestring import SafeString
 from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
@@ -428,40 +429,6 @@ def help_text_for_field(name, model):
     return help_text
 
 
-def convert_to_nbsp(value):
-    """
-    Converts spaces in a string to non-breaking spaces (nbsp)
-    for visual preservation.
-
-    Exactly leading and trailing spaces, as well as consecutive
-    spaces between words, are converted to non-breaking spaces.
-    """
-    result = ""
-    nbsp = "\xa0"
-    if not value.strip():
-        return value.replace(" ", nbsp)
-
-    value_length = len(value)
-    left_space_length = value_length - len(value.lstrip())
-    right_space_length = value_length - len(value.rstrip())
-    left = left_space_length * nbsp
-    right = right_space_length * nbsp
-    space_cnt = 0
-    for char in value.strip():
-        if char == " ":
-            space_cnt += 1
-        else:
-            # Consecutive spaces between words, replaced with nbsp
-            if space_cnt > 1:
-                result = result[:-space_cnt]
-                nbsps = space_cnt * nbsp
-                result += nbsps
-            space_cnt = 0
-        result += char
-    result = left + result + right
-    return result
-
-
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
@@ -503,12 +470,14 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
         return display_for_value(value, empty_value_display)
 
 
-def display_for_value(value, empty_value_display, boolean=False, avoid_quote=False):
+def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if boolean:
         return _boolean_icon(value)
-    elif value in EMPTY_VALUES:
+    if isinstance(value, str) and not isinstance(value, SafeString):
+        value = value.strip()
+    if value in EMPTY_VALUES:
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)
@@ -520,11 +489,6 @@ def display_for_value(value, empty_value_display, boolean=False, avoid_quote=Fal
         return formats.number_format(value)
     elif isinstance(value, (list, tuple)):
         return ", ".join(str(v) for v in value)
-    elif strip_tags(value) == value and isinstance(value, str):
-        converted_value = convert_to_nbsp(value)
-        if value.strip() != value and not avoid_quote:
-            return f"“{converted_value}”"
-        return converted_value
     else:
         return str(value)
 
