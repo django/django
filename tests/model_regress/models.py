@@ -60,3 +60,11 @@ class Model2(models.Model):
 
 class Model3(models.Model):
     model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field="model1")
+
+
+class CycleParent(models.Model):
+    pass
+
+
+class CycleChild(models.Model):
+    parent = models.OneToOneField(CycleParent, on_delete=models.CASCADE)
