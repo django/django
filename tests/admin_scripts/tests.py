@@ -1624,14 +1624,17 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
         self.assertIn(
-            "WARNING: This is a development server. Do not use it in a "
-            "production setting. Use a production WSGI or ASGI server instead."
-            "\nFor more information on production servers see: "
+            "WARNING: This is a development server running in WSGI mode "
+            "(sync only). "
+            "Only middleware compatible with WSGI/sync mode will run properly. "
+            "Do not use this in a production setting. "
+            "Use a production WSGI or ASGI server instead.\n"
+            "For more information on production servers see: "
             f"https://docs.djangoproject.com/en/{docs_version}/howto/"
             "deployment/",
             self.output.getvalue(),
@@ -1643,14 +1646,17 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("14437")
         self.assertIn(
-            "Starting development server at http://127.0.0.1:14437/",
+            "Starting WSGI development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
         self.assertIn(
-            "WARNING: This is a development server. Do not use it in a "
-            "production setting. Use a production WSGI or ASGI server instead."
-            "\nFor more information on production servers see: "
+            "WARNING: This is a development server running in WSGI mode "
+            "(sync only). "
+            "Only middleware compatible with WSGI/sync mode will run properly. "
+            "Do not use this in a production setting. "
+            "Use a production WSGI or ASGI server instead.\n"
+            "For more information on production servers see: "
             f"https://docs.djangoproject.com/en/{docs_version}/howto/"
             "deployment/",
             self.output.getvalue(),
@@ -1662,7 +1668,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
