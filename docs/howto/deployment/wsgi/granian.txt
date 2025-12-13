@@ -1,5 +1,6 @@
 How to use Django with Granian (WSGI)
-------------------------------------
+-------------------------------------
+
 
 Granian is a Rust-based HTTP server that supports the WSGI interface and can be
 used to run synchronous Django applications.
