@@ -232,3 +232,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_any_value(self):
         return not self.connection.mysql_is_mariadb
+
+    @cached_property
+    def supports_uuid4_function(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (11, 7)
+        return False
+
+    @cached_property
+    def supports_uuid7_function(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (11, 7)
+        return False

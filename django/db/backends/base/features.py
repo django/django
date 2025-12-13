@@ -426,6 +426,10 @@ class BaseDatabaseFeatures:
     # that should be skipped for this database.
     django_test_skips = {}
 
+    supports_uuid4_function = False
+    supports_uuid7_function = False
+    supports_uuid7_function_shift = False
+
     def __init__(self, connection):
         self.connection = connection
 
