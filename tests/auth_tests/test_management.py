@@ -1663,7 +1663,23 @@ class PermissionRenameOperationsTests(TransactionTestCase):
         )
 
     def test_rename_backward_does_nothing_if_no_permissions(self):
+        """
+        Test that backward migration handles the case where permissions
+        don't exist (e.g., they were manually deleted).
+        """
+        call_command(
+            "migrate",
+            "auth_tests",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
         Permission.objects.filter(content_type__app_label="auth_tests").delete()
+
+        self.assertFalse(
+            Permission.objects.filter(content_type__app_label="auth_tests").exists()
+        )
 
         call_command(
             "migrate",
@@ -1699,7 +1715,8 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             interactive=False,
             verbosity=0,
         )
-        self.assertTrue(
+
+        self.assertFalse(
             Permission.objects.filter(
                 codename="change_oldmodel",
                 name="Can change old model",
@@ -1712,6 +1729,63 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             ).count(),
             1,
         )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    def test_rename_permission_merges_assignments(self):
+        """
+        Test that when a rename causes a
+        duplicate permission, all assignments are merged.
+        """
+        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
+
+        old_perm = Permission.objects.create(
+            codename="change_oldmodel",
+            name="Can change old model",
+            content_type=ct,
+        )
+
+        new_perm = Permission.objects.create(
+            codename="change_newmodel",
+            name="Can change new model",
+            content_type=ct,
+        )
+
+        user1 = User.objects.create(username="joe")
+        user2 = User.objects.create(username="moe")
+        group1 = Group.objects.create(name="group1")
+        group2 = Group.objects.create(name="group2")
+
+        old_perm.user_set.add(user1)
+        old_perm.group_set.add(group1)
+
+        new_perm.user_set.add(user2)
+        new_perm.group_set.add(group2)
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+        self.assertFalse(Permission.objects.filter(pk=new_perm.pk).exists())
+
+        merged_perm = Permission.objects.get(codename="change_newmodel")
+        self.assertEqual(merged_perm.name, "Can change new model")
+
+        self.assertTrue(user1 in merged_perm.user_set.all())
+        self.assertTrue(user2 in merged_perm.user_set.all())
+        self.assertTrue(group1 in merged_perm.group_set.all())
+        self.assertTrue(group2 in merged_perm.group_set.all())
 
         call_command(
             "migrate",
