@@ -1,0 +1,36 @@
+How to use Django with Granian (WSGI)
+------------------------------------
+
+Granian is a Rust-based HTTP server that supports the WSGI interface and can be
+used to run synchronous Django applications.
+
+Installation
+~~~~~~~~~~~~
+Install Granian into your project's virtual environment:
+
+.. code-block:: bash
+
+    pip install granian
+
+Running Django (WSGI)
+~~~~~~~~~~~~~~~~~~~~~
+From the directory that contains your project's ``manage.py`` run:
+
+.. code-block:: bash
+
+    granian --interface wsgi myproject.wsgi:application
+
+This tells Granian to load the WSGI application callable defined by
+``myproject/wsgi.py``. Ensure the command is run from the project root so the
+project package is importable.
+
+Notes for production
+~~~~~~~~~~~~~~~~~~~~
+* Consider putting Granian behind a reverse proxy (for TLS, virtual hosts,
+  and static file handling), such as Nginx.
+* Run Granian under a process manager (systemd, supervisor) in production.
+* Use ``granian --help`` to discover granular options for binding address,
+  logging and worker configuration.
+
+See the Granian project for full usage and options:
+https://github.com/emmett-framework/granian

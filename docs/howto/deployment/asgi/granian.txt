@@ -1,0 +1,32 @@
+How to use Django with Granian (ASGI)
+-------------------------------------
+
+Granian also supports ASGI and can be used to serve Django ASGI applications.
+
+Installation
+~~~~~~~~~~~~
+Install Granian into your virtual environment:
+
+.. code-block:: bash
+
+    pip install granian
+
+Running Django (ASGI)
+~~~~~~~~~~~~~~~~~~~~~
+From the directory that contains your project's ``manage.py`` run:
+
+.. code-block:: bash
+
+    granian --interface asgi myproject.asgi:application
+
+This will load the ASGI application callable defined by ``myproject/asgi.py``.
+
+Notes for production
+~~~~~~~~~~~~~~~~~~~~
+* Put Granian behind a reverse proxy (for TLS, virtual hosts and static file
+  handling), for example Nginx.
+* Manage Granian with a process manager (systemd, supervisor).
+* Consult ``granian --help`` or the upstream project docs for advanced options.
+
+See the Granian project for details:
+https://github.com/emmett-framework/granian
