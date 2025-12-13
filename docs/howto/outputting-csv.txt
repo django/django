@@ -67,9 +67,12 @@ avoid a load balancer dropping a connection that might have otherwise timed out
 while the server was generating the response.
 
 In this example, we make full use of Python generators to efficiently handle
-the assembly and transmission of a large CSV file::
+the assembly and transmission of a large CSV file. Rows are batched together
+to reduce HTTP overhead and improve compression efficiency when used with
+:class:`~django.middleware.gzip.GZipMiddleware`::
 
     import csv
+    from itertools import batched
 
     from django.http import StreamingHttpResponse
 
@@ -89,11 +92,16 @@ the assembly and transmission of a large CSV file::
         # Generate a sequence of rows. The range is based on the maximum number of
         # rows that can be handled by a single sheet in most spreadsheet
         # applications.
-        rows = (["Row {}".format(idx), str(idx)] for idx in range(65536))
+        rows = ([f"Row {idx}", str(idx)] for idx in range(65536))
         pseudo_buffer = Echo()
         writer = csv.writer(pseudo_buffer)
+
+        def stream_batched_rows():
+            for batch in batched(rows, 100):
+                yield "".join(writer.writerow(row) for row in batch)
+
         return StreamingHttpResponse(
-            (writer.writerow(row) for row in rows),
+            stream_batched_rows(),
             content_type="text/csv",
             headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )

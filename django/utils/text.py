@@ -387,6 +387,7 @@ def compress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         for item in sequence:
             zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data
@@ -403,6 +404,7 @@ async def acompress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         async for item in sequence:
             zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data
