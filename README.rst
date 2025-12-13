@@ -2,47 +2,57 @@
 Django
 ======
 
-Django is a high-level Python web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
 
-All documentation is in the "``docs``" directory and online at
-https://docs.djangoproject.com/en/stable/. If you're just getting started,
-here's how we recommend you read the docs:
+Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. It allows developers to build robust and scalable web applications efficiently.  
 
-* First, read ``docs/intro/install.txt`` for instructions on installing Django.
+All documentation is available in the [`docs`](docs) directory and online at [Django Documentation](https://docs.djangoproject.com/en/stable/).
 
-* Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
-  ``docs/intro/tutorial02.txt``, etc.).
 
-* If you want to set up an actual deployment server, read
-  ``docs/howto/deployment/index.txt`` for instructions.
+## Getting Started
 
-* You'll probably want to read through the topical guides (in ``docs/topics``)
-  next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
-  problems, and check out the reference (``docs/ref``) for gory details.
+To begin using Django, we recommend the following steps:
 
-* See ``docs/README`` for instructions on building an HTML version of the docs.
+1. **Installation**  
+   Read [docs/intro/install.txt](docs/intro/install.txt) for detailed installation instructions.
 
-Docs are updated rigorously. If you find any problems in the docs, or think
-they should be clarified in any way, please take 30 seconds to fill out a
-ticket here: https://code.djangoproject.com/newticket
+2. **Tutorials**  
+   Work through the tutorials in sequence:  
+   - [Tutorial 1](docs/intro/tutorial01.txt)  
+   - [Tutorial 2](docs/intro/tutorial02.txt)  
+   ...and so on.
 
-To get more help:
+3. **Deployment**  
+   For setting up a production server, see [Deployment Guide](docs/howto/deployment/index.txt).
 
-* Join the `Django Discord community <https://chat.djangoproject.com>`_.
+4. **Further Reading**  
+   - **Topical Guides:** [`docs/topics`](docs/topics)  
+   - **HOWTOs:** [`docs/howto`](docs/howto)  
+   - **Reference:** [`docs/ref`](docs/ref)  
 
-* Join the community on the `Django Forum <https://forum.djangoproject.com/>`_.
+5. **Building HTML Documentation**  
+   Instructions are available in [`docs/README`](docs/README).
 
-To contribute to Django:
 
-* Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
-  information about getting involved.
+## Community and Support
 
-To run Django's test suite:
+If you need help or want to contribute:
 
-* Follow the instructions in the "Unit tests" section of
-  ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
-  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+- Join the [Django Discord community](https://chat.djangoproject.com).  
+- Participate in the [Django Forum](https://forum.djangoproject.com/).  
+- Learn how to [contribute to Django](https://docs.djangoproject.com/en/dev/internals/contributing/).
+
+
+## Running Django's Test Suite
+
+To run Django's tests, follow the instructions in [Unit Tests](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests).
+
+
+## Supporting Django
+
+Django's development relies on the support of the community. If you use Django, consider supporting the Django Software Foundation: [Fundraising](https://www.djangoproject.com/fundraising/).
+
+*Django – making web development fast, clean, and scalable.*
+
 
 Supporting the Development of Django
 ====================================
