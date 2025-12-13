@@ -1327,13 +1327,14 @@ def querystring(context, *args, **kwargs):
                 "querystring requires mappings for positional arguments (got "
                 "%r instead)." % d
             )
-        for key, value in d.items():
+        items = d.lists() if isinstance(d, QueryDict) else d.items()
+        for key, value in items:
             if not isinstance(key, str):
                 raise TemplateSyntaxError(
                     "querystring requires strings for mapping keys (got %r "
                     "instead)." % key
                 )
-            if value is None:
+            if value is None or value == [None]:
                 params.pop(key, None)
             elif isinstance(value, Iterable) and not isinstance(value, str):
                 params.setlist(key, value)
