@@ -221,8 +221,8 @@ most common ways to refine a :class:`~django.db.models.query.QuerySet` are:
     Returns a new :class:`~django.db.models.query.QuerySet` containing objects
     that do *not* match the given lookup parameters.
 
-The lookup parameters (``**kwargs`` in the above function definitions) should
-be in the format described in `Field lookups`_ below.
+
+
 
 For example, to get a :class:`~django.db.models.query.QuerySet` of blog entries
 from the year 2006, use :meth:`~django.db.models.query.QuerySet.filter` like
@@ -327,10 +327,9 @@ If you know there is only one object that matches your query, you can use the
 
     >>> one_entry = Entry.objects.get(pk=1)
 
-You can use any query expression with
-:meth:`~django.db.models.query.QuerySet.get`, just like with
-:meth:`~django.db.models.query.QuerySet.filter` - again, see `Field lookups`_
-below.
+You can use any valid lookup expression with :meth:`~django.db.models.query.QuerySet.get`,
+just as you would with :meth:`~django.db.models.query.QuerySet.filter`.
+For details on available lookup types, see the `Field lookups`_ section below.
 
 Note that there is a difference between using
 :meth:`~django.db.models.query.QuerySet.get`, and using
@@ -414,18 +413,18 @@ second will raise ``DoesNotExist`` if no objects match the given criteria. See
 :meth:`~django.db.models.query.QuerySet.get` for more details.
 
 .. _field-lookups-intro:
-
 Field lookups
 -------------
 
-Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
-specified as keyword arguments to the :class:`~django.db.models.query.QuerySet`
+Field lookups define the conditions used in an SQL ``WHERE`` clause. They are
+provided as keyword arguments to the :class:`~django.db.models.query.QuerySet`
 methods :meth:`~django.db.models.query.QuerySet.filter`,
-:meth:`~django.db.models.query.QuerySet.exclude` and
+:meth:`~django.db.models.query.QuerySet.exclude`, and
 :meth:`~django.db.models.query.QuerySet.get`.
 
-Basic lookups keyword arguments take the form ``field__lookuptype=value``.
-(That's a double-underscore). For example:
+Basic lookup keyword arguments follow the pattern ``field__lookuptype=value``,
+where a double underscore separates the field name from the lookup type. For
+example:
 
 .. code-block:: pycon
 
@@ -821,7 +820,8 @@ can be combined with ``pk`` to perform a query on the primary key of a model:
     # Get all blog entries with id > 14
     >>> Blog.objects.filter(pk__gt=14)
 
-``pk`` lookups also work across joins. For example, these three statements are
+``pk`` lookups also work across joins because a primary key is simply an alias
+for the underlying ``id`` field. For example, the following three statements are
 equivalent:
 
 .. code-block:: pycon
@@ -833,12 +833,12 @@ equivalent:
 Escaping percent signs and underscores in ``LIKE`` statements
 -------------------------------------------------------------
 
-The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
-``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
-and ``iendswith``) will automatically escape the two special characters used in
-``LIKE`` statements -- the percent sign and the underscore. (In a ``LIKE``
-statement, the percent sign signifies a multiple-character wildcard and the
-underscore signifies a single-character wildcard.)
+Field lookups that translate to ``LIKE`` SQL statements (``iexact``,
+``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``,
+and ``iendswith``) automatically escape the two special characters used in
+``LIKE`` patterns: the percent sign and the underscore. In a ``LIKE`` clause,
+the percent sign represents a multi-character wildcard, while the underscore
+represents a single-character wildcard.
 
 This means things should work intuitively, so the abstraction doesn't leak.
 For example, to retrieve all the entries that contain a percent sign, use the
@@ -1109,16 +1109,17 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
 .. note::
 
-    Storing JSON scalar ``null`` does not violate :attr:`null=False
-    <django.db.models.Field.null>`.
+    Storing the JSON scalar ``null`` does not violate :attr:`null=False
+    <django.db.models.Field.null>`, because ``null`` is a valid JSON value
+    distinct from Python's ``None``.
 
 .. admonition:: Storing JSON ``null`` inside JSON data
 
     While :class:`JSONNull() <django.db.models.JSONNull>` can be used in
     :lookup:`jsonfield.key` exact lookups, it cannot be stored inside
-    :class:`dict` or :class:`list` instances meant to be saved in a
-    ``JSONField``, unless a custom encoder is used. If you don't want to use
-    a custom encoder, use ``None`` instead.
+    :class:`dict` or :class:`list` instances intended for saving in a
+    ``JSONField`` unless a custom encoder is provided. If a custom encoder is
+    not being used, store ``None`` instead.
 
 .. fieldlookup:: jsonfield.key
 
@@ -1294,6 +1295,10 @@ Containment and key lookups
 
 .. fieldlookup:: jsonfield.contains
 
+    Tests whether the given value is contained within the JSONField data.
+    This lookup performs a containment check using the JSON containment
+    operators provided by the database backend.
+
 ``contains``
 ~~~~~~~~~~~~
 
@@ -1417,8 +1422,8 @@ etc. -- are "AND"ed together. If you need to execute more complex queries (for
 example, queries with ``OR`` statements), you can use :ref:`q-objects`.
 
 A :ref:`Q object <q-objects>` (``django.db.models.Q``) is an object used to
-encapsulate a collection of keyword arguments. These keyword arguments are
-specified as in "Field lookups" above.
+encapsulate a collection of keyword arguments. These keyword arguments follow
+the same naming patterns described in the "Field lookups" section above.
 
 For example, this ``Q`` object encapsulates a single ``LIKE`` query::
 
@@ -1441,10 +1446,9 @@ This is equivalent to the following SQL ``WHERE`` clause:
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&``, ``|``, and ``^`` operators and use parenthetical grouping.
-Also, ``Q`` objects can be negated using the ``~`` operator, allowing for
-combined lookups that combine both a normal query and a negated (``NOT``)
-query::
+with the ``&``, ``|``, and ``^`` operators and by using parenthetical grouping.
+``Q`` objects can also be negated using the ``~`` operator, allowing you to
+construct queries that include both normal and negated (``NOT``) conditions::
 
     Q(question__startswith="Who") | ~Q(pub_date__year=2005)
 
@@ -1490,8 +1494,8 @@ precede the definition of any keyword arguments. For example::
 
 .. seealso::
 
-    The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
-    unit tests show some possible uses of ``Q``.
+    The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django’s
+    unit tests demonstrate additional ways to use ``Q`` objects.
 
 Comparing objects
 =================
