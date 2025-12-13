@@ -190,6 +190,7 @@ GiB
 gis
 GiST
 Googol
+Granian
 Greenhill
 gunicorn
 GZip
@@ -491,6 +492,7 @@ swappable
 symlink
 symlinks
 syntaxes
+systemd
 systemwide
 tablespace
 tablespaces
