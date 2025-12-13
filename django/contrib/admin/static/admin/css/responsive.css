@@ -287,9 +287,6 @@ input[type="submit"], button {
         flex: 0 1 auto;
     }
 
-    .stacked select {
-        margin-bottom: 0;
-    }
 
     .stacked .selector-available, .stacked .selector-chosen {
         width: auto;
