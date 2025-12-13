@@ -1334,7 +1334,7 @@ def querystring(context, *args, **kwargs):
                     "querystring requires strings for mapping keys (got %r "
                     "instead)." % key
                 )
-            if value is None:
+            if value is None or value == [None]:
                 params.pop(key, None)
             elif isinstance(value, Iterable) and not isinstance(value, str):
                 params.setlist(key, value)

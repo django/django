@@ -112,6 +112,20 @@ class QueryStringTagTests(SimpleTestCase):
             "querystring_remove_nonexistent", context, expected="?x=y&amp;a=1"
         )
 
+    @setup({"querydict_none": "{% querystring request.GET my_query_dict %}"})
+    def test_querydict_none_remove(self):
+        request = self.request_factory.get("/", {"x": "1"})
+        my_query_dict = QueryDict(mutable=True)
+        my_query_dict["x"] = None
+        context = RequestContext(
+            request,
+            {
+                "request": request,
+                "my_query_dict": my_query_dict,
+            },
+        )
+        self.assertRenderEqual("querydict_none", context, expected="?")
+
     @setup({"querystring_remove_dict": "{% querystring my_dict a=1 %}"})
     def test_querystring_remove_from_dict(self):
         request = self.request_factory.get("/", {"test": "value"})
