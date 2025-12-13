@@ -5543,6 +5543,78 @@ class AutodetectorTests(BaseAutodetectorTests):
             preserve_default=True,
         )
 
+    def test_m2m_target_change_generates_remove_and_add(self):
+        # Initial state: Author has M2M to Book
+        before = [
+            ModelState(
+                "testapp",
+                "Book",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Magazine",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("readings", models.ManyToManyField("testapp.Book")),
+                ],
+            ),
+        ]
+
+        # After state: Author has M2M to Magazine (same field name 'readings')
+        after = [
+            ModelState(
+                "testapp",
+                "Book",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Magazine",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("readings", models.ManyToManyField("testapp.Magazine")),
+                ],
+            ),
+        ]
+
+        changes = self.get_changes(before, after)
+
+        # We expect 1 migration for testapp
+        self.assertIn("testapp", changes)
+        self.assertEqual(len(changes["testapp"]), 1)
+
+        migration = changes["testapp"][0]
+        operation_types = [op.__class__.__name__ for op in migration.operations]
+
+        # Should be RemoveField and AddField, NOT AlterField
+        # Note: Order might vary but usually Remove then Add
+        self.assertIn("RemoveField", operation_types)
+        self.assertIn("AddField", operation_types)
+        self.assertNotIn("AlterField", operation_types)
+
+        # Verify details
+        remove_op = next(
+            op for op in migration.operations if op.__class__.__name__ == "RemoveField"
+        )
+        self.assertEqual(remove_op.name, "readings")
+
+        add_op = next(
+            op for op in migration.operations if op.__class__.__name__ == "AddField"
+        )
+        self.assertEqual(add_op.name, "readings")
+        self.assertEqual(add_op.field.remote_field.model, "testapp.Magazine")
+
 
 class MigrationSuggestNameTests(SimpleTestCase):
     def test_no_operations(self):

@@ -1339,7 +1339,10 @@ class MigrationAutodetector:
             if old_field_dec != new_field_dec and old_field_name == field_name:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
-                if both_m2m or neither_m2m:
+                target_changed = (
+                    both_m2m and new_field_dec[2]["to"] != old_field_dec[2]["to"]
+                )
+                if (both_m2m or neither_m2m) and not target_changed:
                     # Either both fields are m2m or neither is
                     preserve_default = True
                     if (
