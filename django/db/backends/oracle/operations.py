@@ -352,7 +352,7 @@ END;
                 statement = statement.replace(
                     key, force_str(params[key], errors="replace")
                 )
-        return statement
+        return statement or super().last_executed_query(cursor, sql, params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
