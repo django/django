@@ -1,0 +1,28 @@
+{% load i18n admin_form %}
+
+{% if errors %}
+  {% translate 'The following fields have errors:' as field_error_title %}
+  <div class="errornote" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+    <h2 id="error-summary-title">
+      {% translate 'There is a problem' %}
+    </h2>
+    {% if form.errors %}
+    <div class="group">
+      <h3>
+        <span>{{ opts.verbose_name|capfirst }}</span>
+        {{ form.non_field_errors }}
+      </h3>
+      {% if form|has_field_errors %}
+      <p>{{ field_error_title }}</p>
+      <ul class="errorlist">
+        {% for field in form %}
+          {% if field.errors %}
+          <li><a href="#{{ field.id_for_label }}">{{ field.label }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+{% endif %}
