@@ -44,6 +44,7 @@ class CacheHandler(BaseConnectionHandler):
         params = self.settings[alias].copy()
         backend = params.pop("BACKEND")
         location = params.pop("LOCATION", "")
+        params["ALIAS"] = alias
         try:
             backend_cls = import_string(backend)
         except ImportError as e:
