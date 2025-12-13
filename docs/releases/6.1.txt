@@ -436,3 +436,10 @@ to remove usage of these features.
 * Support for subclasses of ``RemoteUserMiddleware`` that override
   ``process_request()`` without overriding ``aprocess_request()`` is
   removed.
+
+Bugfixes
+========
+
+* Fixed :class:`~django.middleware.gzip.GZipMiddleware` buffering streaming
+  responses, causing delayed delivery of chunks. The middleware now flushes
+  each chunk immediately after compression.
