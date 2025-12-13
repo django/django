@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -20,7 +20,7 @@ class EscapeseqTests(SimpleTestCase):
     def test_basic(self):
         output = self.engine.render_to_string(
             "escapeseq_basic",
-            {"a": ["x&y", "<p>"], "b": [mark_safe("x&y"), mark_safe("<p>")]},
+            {"a": ["x&y", "<p>"], "b": [SafeString("x&y"), SafeString("<p>")]},
         )
         self.assertEqual(output, "x&amp;y, &lt;p&gt; -- x&y, <p>")
 
@@ -36,7 +36,7 @@ class EscapeseqTests(SimpleTestCase):
     def test_autoescape_off(self):
         output = self.engine.render_to_string(
             "escapeseq_autoescape_off",
-            {"a": ["x&y", "<p>"], "b": [mark_safe("x&y"), mark_safe("<p>")]},
+            {"a": ["x&y", "<p>"], "b": [SafeString("x&y"), SafeString("<p>")]},
         )
         self.assertEqual(output, "x&amp;y, &lt;p&gt; -- x&y, <p>")
 

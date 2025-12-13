@@ -33,7 +33,7 @@ from django.utils.formats import (
     time_format,
 )
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeString, mark_safe
+from django.utils.safestring import SafeString
 from django.utils.translation import (
     activate,
     check_for_language,
@@ -410,7 +410,7 @@ class TranslationTests(SimpleTestCase):
         """Empty value must stay empty after being translated (#23196)."""
         with translation.override("de"):
             self.assertEqual("", gettext(""))
-            s = mark_safe("")
+            s = SafeString("")
             self.assertEqual(s, gettext(s))
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -421,16 +421,16 @@ class TranslationTests(SimpleTestCase):
         """
         trans_real._active = Local()
         trans_real._translations = {}
-        s1 = mark_safe("Password")
-        s2 = mark_safe("May")
+        s1 = SafeString("Password")
+        s2 = SafeString("May")
         with translation.override("de", deactivate=True):
             self.assertIs(type(gettext(s1)), SafeString)
             self.assertIs(type(pgettext("month name", s2)), SafeString)
         self.assertEqual("aPassword", SafeString("a") + s1)
         self.assertEqual("Passworda", s1 + SafeString("a"))
-        self.assertEqual("Passworda", s1 + mark_safe("a"))
-        self.assertEqual("aPassword", mark_safe("a") + s1)
-        self.assertEqual("as", mark_safe("a") + mark_safe("s"))
+        self.assertEqual("Passworda", s1 + SafeString("a"))
+        self.assertEqual("aPassword", SafeString("a") + s1)
+        self.assertEqual("as", SafeString("a") + SafeString("s"))
 
     def test_maclines(self):
         """

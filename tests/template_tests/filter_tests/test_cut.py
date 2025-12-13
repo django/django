@@ -1,6 +1,6 @@
 from django.template.defaultfilters import cut
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -15,14 +15,14 @@ class CutTests(SimpleTestCase):
     )
     def test_cut01(self):
         output = self.engine.render_to_string(
-            "cut01", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut01", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "&y &amp;y")
 
     @setup({"cut02": '{{ a|cut:"x" }} {{ b|cut:"x" }}'})
     def test_cut02(self):
         output = self.engine.render_to_string(
-            "cut02", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut02", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "&amp;y &amp;y")
 
@@ -35,14 +35,14 @@ class CutTests(SimpleTestCase):
     )
     def test_cut03(self):
         output = self.engine.render_to_string(
-            "cut03", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut03", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "xy xamp;y")
 
     @setup({"cut04": '{{ a|cut:"&" }} {{ b|cut:"&" }}'})
     def test_cut04(self):
         output = self.engine.render_to_string(
-            "cut04", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut04", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "xy xamp;y")
 
@@ -57,14 +57,14 @@ class CutTests(SimpleTestCase):
     )
     def test_cut05(self):
         output = self.engine.render_to_string(
-            "cut05", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut05", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "x&y x&ampy")
 
     @setup({"cut06": '{{ a|cut:";" }} {{ b|cut:";" }}'})
     def test_cut06(self):
         output = self.engine.render_to_string(
-            "cut06", {"a": "x&y", "b": mark_safe("x&amp;y")}
+            "cut06", {"a": "x&y", "b": SafeString("x&amp;y")}
         )
         self.assertEqual(output, "x&amp;y x&amp;ampy")
 

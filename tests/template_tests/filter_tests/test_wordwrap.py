@@ -1,7 +1,7 @@
 from django.template.defaultfilters import wordwrap
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -17,14 +17,14 @@ class WordwrapTests(SimpleTestCase):
     )
     def test_wordwrap01(self):
         output = self.engine.render_to_string(
-            "wordwrap01", {"a": "a & b", "b": mark_safe("a & b")}
+            "wordwrap01", {"a": "a & b", "b": SafeString("a & b")}
         )
         self.assertEqual(output, "a &\nb a &\nb")
 
     @setup({"wordwrap02": '{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}'})
     def test_wordwrap02(self):
         output = self.engine.render_to_string(
-            "wordwrap02", {"a": "a & b", "b": mark_safe("a & b")}
+            "wordwrap02", {"a": "a & b", "b": SafeString("a & b")}
         )
         self.assertEqual(output, "a &amp;\nb a &\nb")
 

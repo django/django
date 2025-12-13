@@ -1,6 +1,6 @@
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import SafeClass, UnsafeClass, setup
 
@@ -50,14 +50,14 @@ class AutoescapeTagTests(SimpleTestCase):
     @setup({"autoescape-tag06": "{{ first }}"})
     def test_autoescape_tag06(self):
         output = self.engine.render_to_string(
-            "autoescape-tag06", {"first": mark_safe("<b>first</b>")}
+            "autoescape-tag06", {"first": SafeString("<b>first</b>")}
         )
         self.assertEqual(output, "<b>first</b>")
 
     @setup({"autoescape-tag07": "{% autoescape on %}{{ first }}{% endautoescape %}"})
     def test_autoescape_tag07(self):
         output = self.engine.render_to_string(
-            "autoescape-tag07", {"first": mark_safe("<b>Apple</b>")}
+            "autoescape-tag07", {"first": SafeString("<b>Apple</b>")}
         )
         self.assertEqual(output, "<b>Apple</b>")
 

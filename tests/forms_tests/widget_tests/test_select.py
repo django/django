@@ -2,7 +2,7 @@ import datetime
 
 from django.forms import ChoiceField, Form, MultiWidget, Select, TextInput
 from django.test import override_settings
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from .test_choicewidget import ChoiceWidgetTest
 
@@ -199,7 +199,7 @@ class SelectTest(ChoiceWidgetTest):
         )
 
     def test_choices_escaping(self):
-        choices = (("bad", "you & me"), ("good", mark_safe("you &gt; me")))
+        choices = (("bad", "you & me"), ("good", SafeString("you &gt; me")))
         self.check_html(
             self.widget(choices=choices),
             "escape",

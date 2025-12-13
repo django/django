@@ -1,7 +1,7 @@
 from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -20,7 +20,7 @@ class UrlizetruncTests(SimpleTestCase):
             "urlizetrunc01",
             {
                 "a": '"Unsafe" http://example.com/x=&y=',
-                "b": mark_safe("&quot;Safe&quot; http://example.com?x=&amp;y="),
+                "b": SafeString("&quot;Safe&quot; http://example.com?x=&amp;y="),
             },
         )
         self.assertEqual(
@@ -37,7 +37,7 @@ class UrlizetruncTests(SimpleTestCase):
             "urlizetrunc02",
             {
                 "a": '"Unsafe" http://example.com/x=&y=',
-                "b": mark_safe("&quot;Safe&quot; http://example.com?x=&amp;y="),
+                "b": SafeString("&quot;Safe&quot; http://example.com?x=&amp;y="),
             },
         )
         self.assertEqual(

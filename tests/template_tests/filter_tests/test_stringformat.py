@@ -1,6 +1,6 @@
 from django.template.defaultfilters import stringformat
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -21,7 +21,7 @@ class StringformatTests(SimpleTestCase):
     )
     def test_stringformat01(self):
         output = self.engine.render_to_string(
-            "stringformat01", {"a": "a<b", "b": mark_safe("a<b")}
+            "stringformat01", {"a": "a<b", "b": SafeString("a<b")}
         )
         self.assertEqual(output, ".  a<b. .  a<b.")
 
@@ -30,7 +30,7 @@ class StringformatTests(SimpleTestCase):
     )
     def test_stringformat02(self):
         output = self.engine.render_to_string(
-            "stringformat02", {"a": "a<b", "b": mark_safe("a<b")}
+            "stringformat02", {"a": "a<b", "b": SafeString("a<b")}
         )
         self.assertEqual(output, ".  a&lt;b. .  a<b.")
 

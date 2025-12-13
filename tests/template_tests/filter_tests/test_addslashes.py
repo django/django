@@ -1,6 +1,6 @@
 from django.template.defaultfilters import addslashes
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -16,14 +16,14 @@ class AddslashesTests(SimpleTestCase):
     )
     def test_addslashes01(self):
         output = self.engine.render_to_string(
-            "addslashes01", {"a": "<a>'", "b": mark_safe("<a>'")}
+            "addslashes01", {"a": "<a>'", "b": SafeString("<a>'")}
         )
         self.assertEqual(output, r"<a>\' <a>\'")
 
     @setup({"addslashes02": "{{ a|addslashes }} {{ b|addslashes }}"})
     def test_addslashes02(self):
         output = self.engine.render_to_string(
-            "addslashes02", {"a": "<a>'", "b": mark_safe("<a>'")}
+            "addslashes02", {"a": "<a>'", "b": SafeString("<a>'")}
         )
         self.assertEqual(output, r"&lt;a&gt;\&#x27; <a>\'")
 

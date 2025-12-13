@@ -1,6 +1,6 @@
 from django.template.defaultfilters import join
 from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString
 
 from ..utils import setup
 
@@ -37,7 +37,7 @@ class JoinTests(SimpleTestCase):
     @setup({"join06": "{{ a|join:var }}"})
     def test_join06(self):
         output = self.engine.render_to_string(
-            "join06", {"a": ["alpha", "beta & me"], "var": mark_safe(" & ")}
+            "join06", {"a": ["alpha", "beta & me"], "var": SafeString(" & ")}
         )
         self.assertEqual(output, "alpha & beta &amp; me")
 
@@ -51,7 +51,7 @@ class JoinTests(SimpleTestCase):
     @setup({"join08": "{{ a|join:var|lower }}"})
     def test_join08(self):
         output = self.engine.render_to_string(
-            "join08", {"a": ["Alpha", "Beta & me"], "var": mark_safe(" & ")}
+            "join08", {"a": ["Alpha", "Beta & me"], "var": SafeString(" & ")}
         )
         self.assertEqual(output, "alpha & beta &amp; me")
 
