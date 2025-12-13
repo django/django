@@ -111,7 +111,7 @@
                 option = new Option(newRepr, newId);
                 select.options.add(option);
                 // Update SelectBox cache for related fields.
-                if (window.SelectBox !== undefined && !SelectBox.cache[currentSelect.id]) {
+                if (window.SelectBox !== undefined && !SelectBox.cache[currentSelect.id] && SelectBox.cache[select.id]) {
                     SelectBox.add_to_cache(select.id, option);
                     SelectBox.redisplay(select.id);
                 }
