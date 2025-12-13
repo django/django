@@ -682,8 +682,11 @@ class LoaderTests(TestCase):
         with tempfile.NamedTemporaryFile(
             mode="w", encoding="utf-8", suffix=".py", dir=tests_dir, delete=False
         ) as test_settings:
+            self.addCleanup(os.remove, test_settings.name)
             for attr, value in settings._wrapped.__dict__.items():
-                if attr.isupper():
+                # Only write builtin values so that any settings that reference
+                # a value that needs an import are omitted.
+                if attr.isupper() and type(value).__module__ == "builtins":
                     test_settings.write(f"{attr} = {value!r}\n")
             # Provide overrides here, instead of via decorators.
             test_settings.write(f"DATABASES = {settings.DATABASES}\n")
@@ -693,8 +696,6 @@ class LoaderTests(TestCase):
                 "INSTALLED_APPS=[a for a in INSTALLED_APPS if a.startswith('django')]\n"
             )
             test_settings.write(f"INSTALLED_APPS += {INSTALLED_APPS}\n")
-        test_settings_name = test_settings.name
-        self.addCleanup(os.remove, test_settings_name)
 
         test_environ = os.environ.copy()
         test_environ["PYTHONPATH"] = str(tests_dir)
@@ -709,7 +710,7 @@ class LoaderTests(TestCase):
             "app1",
             "--skip-checks",
             "--settings",
-            Path(test_settings_name).stem,
+            Path(test_settings.name).stem,
         ]
         try:
             subprocess.run(
