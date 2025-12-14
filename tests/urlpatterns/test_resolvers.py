@@ -1,12 +1,20 @@
-from django.test import SimpleTestCase, override_settings
-from django.urls import path, include, resolve
+from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.urls import include, path, resolve
 from django.utils.translation import gettext_lazy as _
 
 urlpatterns = [
-    path(_("test/"), include([
-        path("child/", lambda request: None, name="child"),
-    ])),
+    path(
+        _("test/"),
+        include(
+            [
+                path("child/", lambda request: None, name="child"),
+            ]
+        ),
+    ),
 ]
+
+
 @override_settings(ROOT_URLCONF=__name__)
 class LazyRouteIncludeTests(SimpleTestCase):
     def test_lazy_route_with_include_resolves(self):
