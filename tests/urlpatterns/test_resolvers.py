@@ -15,8 +15,8 @@ urlpatterns = [
 ]
 
 
-@override_settings(ROOT_URLCONF=__name__)
 class LazyRouteIncludeTests(SimpleTestCase):
+    @override_settings(ROOT_URLCONF=__name__)
     def test_lazy_route_with_include_resolves(self):
         match = resolve("/test/child/")
         self.assertEqual(match.url_name, "child")
