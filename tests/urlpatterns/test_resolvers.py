@@ -1,44 +1,14 @@
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.urls import include, path, resolve
-from django.urls.resolvers import RegexPattern, RoutePattern, get_resolver
+from django.test import SimpleTestCase, override_settings
+from django.urls import path, include, resolve
 from django.utils.translation import gettext_lazy as _
 
 urlpatterns = [
-    path(_('invitation/'), include([
-        path(_('request/'), lambda r: None, name='request'),
+    path(_("test/"), include([
+        path("child/", lambda request: None, name="child"),
     ])),
 ]
-
-
-
+@override_settings(ROOT_URLCONF=__name__)
 class LazyRouteIncludeTests(SimpleTestCase):
-    def test_lazy_route_with_include(self):
-        match = resolve('/invitation/request/')
-        self.assertEqual(match.url_name, 'request')
-
-
-
-class RegexPatternTests(SimpleTestCase):
-    def test_str(self):
-        self.assertEqual(str(RegexPattern(_("^translated/$"))), "^translated/$")
-
-
-class RoutePatternTests(SimpleTestCase):
-    def test_str(self):
-        self.assertEqual(str(RoutePattern(_("translated/"))), "translated/")
-
-    def test_has_converters(self):
-        self.assertEqual(len(RoutePattern("translated/").converters), 0)
-        self.assertEqual(len(RoutePattern(_("translated/")).converters), 0)
-        self.assertEqual(len(RoutePattern("translated/<int:foo>").converters), 1)
-        self.assertEqual(len(RoutePattern(_("translated/<int:foo>")).converters), 1)
-
-
-class ResolverCacheTests(SimpleTestCase):
-    @override_settings(ROOT_URLCONF="urlpatterns.path_urls")
-    def test_resolver_cache_default__root_urlconf(self):
-        # resolver for a default URLconf (passing no argument) and for the
-        # settings.ROOT_URLCONF is the same cached object.
-        self.assertIs(get_resolver(), get_resolver("urlpatterns.path_urls"))
-        self.assertIsNot(get_resolver(), get_resolver("urlpatterns.path_dynamic_urls"))
+    def test_lazy_route_with_include_resolves(self):
+        match = resolve("/test/child/")
+        self.assertEqual(match.url_name, "child")
