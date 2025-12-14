@@ -91,16 +91,16 @@ model will be serialized. For example, consider the following models::
 
 
     class Restaurant(Place):
-        serves_pizza = models.BooleanField(default=False)
+        serves_hot_dogs = models.BooleanField(default=False)
 
 Querying and serializing ``Restaurant`` model along with the parent’s fields::
 
-    data = Restaurant.objects.values("id", "name", "address", "serves_pizza")
+    data = Restaurant.objects.values("id", "name", "address", "serves_hot_dogs")
     output = json.dumps(list(data), indent=2)
 
 produces::
 
-    [{"id": 1, "name": "Django Diner", "address": "123 Main St", "serves_pizza": true}]
+    [{"id": 1, "name": "Django Diner", "address": "123 Main St", "serves_hot_dogs": true}]
 
 This pattern is often more useful than the default serializer output when you
 need to expose related fields from both parent and child models.
