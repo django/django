@@ -4,12 +4,12 @@ from django.urls import include, path, resolve
 from django.urls.resolvers import RegexPattern, RoutePattern, get_resolver
 from django.utils.translation import gettext_lazy as _
 
-
 urlpatterns = [
     path(_('invitation/'), include([
         path(_('request/'), lambda r: None, name='request'),
     ])),
 ]
+
 
 
 class LazyRouteIncludeTests(SimpleTestCase):
