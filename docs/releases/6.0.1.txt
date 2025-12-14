@@ -31,3 +31,7 @@ Bugfixes
 * Fixed a crash in Django 6.0 caused by infinite recursion when calling
   ``repr()`` on an unevaluated ``django.utils.csp.LazyNonce`` instance
   (:ticket:`36810`).
+
+* Fixed a regression in Django 6.0 where :func:`~django.urls.path` routes
+  defined using :func:`~django.utils.translation.gettext_lazy` failed to
+  resolve correctly (:ticket:`36796`).
