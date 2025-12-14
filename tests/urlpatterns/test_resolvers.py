@@ -2,6 +2,20 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.urls.resolvers import RegexPattern, RoutePattern, get_resolver
 from django.utils.translation import gettext_lazy as _
+from django.urls import include, path, resolve
+
+urlpatterns = [
+    path(_('invitation/'), include([
+        path(_('request/'), lambda r: None, name='request'),
+    ])),
+]
+
+
+class LazyRouteIncludeTests(SimpleTestCase):
+    def test_lazy_route_with_include(self):
+        match = resolve('/invitation/request/')
+        self.assertEqual(match.url_name, 'request')
+        
 
 
 class RegexPatternTests(SimpleTestCase):

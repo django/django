@@ -322,6 +322,8 @@ class RoutePattern(CheckURLMixin):
         self.name = name
 
     def match(self, path):
+        route = str(self._route)
+
         # Only use regex overhead if there are converters.
         if self.converters:
             if match := self.regex.search(path):
@@ -338,11 +340,11 @@ class RoutePattern(CheckURLMixin):
         # If this is an endpoint, the path should be exactly the same as the
         # route.
         elif self._is_endpoint:
-            if self._route == path:
+            if route == path:
                 return "", (), {}
         # If this isn't an endpoint, the path should start with the route.
         elif path.startswith(self._route):
-            return path.removeprefix(self._route), (), {}
+            return path.removeprefix(route), (), {}
         return None
 
     def check(self):
