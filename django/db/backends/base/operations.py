@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.models.expressions import Col
 from django.utils import timezone
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
 
 
@@ -208,13 +209,6 @@ class BaseDatabaseOperations:
         else:
             return ["DISTINCT"], []
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the newly created data.
-        """
-        return cursor.fetchone()
-
     def force_group_by(self):
         """
         Return a GROUP BY clause to use with a HAVING clause when no grouping
@@ -259,6 +253,16 @@ class BaseDatabaseOperations:
             )
             if sql
         )
+
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement.
+        """
+        if operation in ["CASCADE", "SET NULL", "SET DEFAULT"]:
+            return f" ON DELETE {operation}"
+        if operation == "":
+            return ""
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
@@ -358,13 +362,31 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_columns(self, fields):
+    def returning_columns(self, fields):
         """
-        For backends that support returning columns as part of an insert query,
-        return the SQL and params to append to the INSERT query. The returned
-        fragment should contain a format string to hold the appropriate column.
+        For backends that support returning columns as part of an insert or
+        update query, return the SQL and params to append to the query.
+        The returned fragment should contain a format string to hold the
+        appropriate column.
         """
-        pass
+        if not fields:
+            return "", ()
+        columns = [
+            "%s.%s"
+            % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            for field in fields
+        ]
+        return "RETURNING %s" % ", ".join(columns), ()
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        """
+        Given a cursor object for a DML query with a RETURNING statement,
+        return the selected returning rows of tuples.
+        """
+        return cursor.fetchall()
 
     def compiler(self, compiler_name):
         """
@@ -552,6 +574,16 @@ class BaseDatabaseOperations:
         if value is None:
             return None
         return str(value)
+
+    def adapt_durationfield_value(self, value):
+        """
+        Transform a timedelta value into an object compatible with what is
+        expected by the backend driver for duration columns (by default,
+        an integer of microseconds).
+        """
+        if value is None:
+            return None
+        return duration_microseconds(value)
 
     def adapt_timefield_value(self, value):
         """

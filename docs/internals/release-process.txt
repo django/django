@@ -31,7 +31,8 @@ own branch, called ``stable/A.B.x``, and bugfix/security releases will be
 issued from those branches.
 
 For more information about how the Django project issues new releases for
-security purposes, please see :doc:`our security policies <security>`.
+security purposes, please see :doc:`our security policies
+</internals/security>`.
 
 .. glossary::
 

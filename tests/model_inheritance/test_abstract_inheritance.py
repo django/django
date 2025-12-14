@@ -443,30 +443,30 @@ class AbstractInheritanceTests(SimpleTestCase):
         self.assertEqual(
             fields(model1),
             [
-                ("id", models.AutoField),
+                ("id", models.BigAutoField),
                 ("name", models.CharField),
                 ("age", models.IntegerField),
             ],
         )
 
         self.assertEqual(
-            fields(model2), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model2), [("id", models.BigAutoField), ("name", models.CharField)]
         )
         self.assertEqual(getattr(model2, "age"), 2)
 
         self.assertEqual(
-            fields(model3), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model3), [("id", models.BigAutoField), ("name", models.CharField)]
         )
 
         self.assertEqual(
-            fields(model4), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model4), [("id", models.BigAutoField), ("name", models.CharField)]
         )
         self.assertEqual(getattr(model4, "age"), 2)
 
         self.assertEqual(
             fields(model5),
             [
-                ("id", models.AutoField),
+                ("id", models.BigAutoField),
                 ("foo", models.IntegerField),
                 ("concretemodel_ptr", models.OneToOneField),
                 ("age", models.SmallIntegerField),

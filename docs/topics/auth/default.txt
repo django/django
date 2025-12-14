@@ -37,8 +37,8 @@ The primary attributes of the default user are:
 * :attr:`~django.contrib.auth.models.User.first_name`
 * :attr:`~django.contrib.auth.models.User.last_name`
 
-See the :class:`full API documentation <django.contrib.auth.models.User>` for
-full reference, the documentation that follows is more task oriented.
+See the :class:`~django.contrib.auth.models.User` API documentation for a
+complete reference. The documentation that follows is more task-oriented.
 
 .. _topics-auth-creating-users:
 
@@ -368,7 +368,7 @@ Authentication in web requests
 ==============================
 
 Django uses :doc:`sessions </topics/http/sessions>` and middleware to hook the
-authentication system into :class:`request objects <django.http.HttpRequest>`.
+authentication system into :class:`~django.http.HttpRequest` objects.
 
 These provide a :attr:`request.user <django.http.HttpRequest.user>`  attribute
 and a :meth:`request.auser <django.http.HttpRequest.auser>` async method
@@ -1619,9 +1619,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 .. class:: AdminPasswordChangeForm
 
     A form used in the admin interface to change a user's password, including
-    the ability to set an :meth:`unusable password
-    <django.contrib.auth.models.User.set_unusable_password>`, which blocks the
-    user from logging in with password-based authentication.
+    the ability to set an unusable password (via
+    :meth:`~django.contrib.auth.models.User.set_unusable_password`), which
+    blocks the user from logging in with password-based authentication.
 
     Takes the ``user`` as the first positional argument.
 

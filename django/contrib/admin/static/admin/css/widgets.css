@@ -49,7 +49,7 @@
     padding: 8px;
 }
 
-.aligned .selector-chosen-title label {
+.selector-chosen-title label {
     color: var(--header-link-color);
     width: 100%;
 }
@@ -60,7 +60,7 @@
     padding: 8px;
 }
 
-.aligned .selector-available-title label {
+.selector-available-title label {
     width: 100%;
 }
 
@@ -568,7 +568,8 @@ ul.timelist, .timelist li {
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
-    background: url(../img/inline-delete.svg) 0 0 no-repeat;
+    background: url(../img/inline-delete.svg) center center no-repeat;
+    background-size: contain;
     width: 1.5rem;
     height: 1.5rem;
     border: 0px none;

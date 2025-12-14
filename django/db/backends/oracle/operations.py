@@ -22,7 +22,7 @@ from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
-from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
+from .utils import BoundVar, BulkInsertMapper, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -273,12 +273,12 @@ END;
         return value
 
     def convert_datefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.date()
         return value
 
     def convert_timefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.time()
         return value
 
@@ -298,12 +298,27 @@ END;
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        columns = []
-        for param in returning_params:
-            value = param.get_value()
-            columns.append(value[0])
-        return tuple(columns)
+    def returning_columns(self, fields):
+        if not fields:
+            return "", ()
+        field_names = []
+        params = []
+        for field in fields:
+            field_names.append(
+                "%s.%s"
+                % (
+                    self.quote_name(field.model._meta.db_table),
+                    self.quote_name(field.column),
+                )
+            )
+            params.append(BoundVar(field))
+        return "RETURNING %s INTO %s" % (
+            ", ".join(field_names),
+            ", ".join(["%s"] * len(params)),
+        ), tuple(params)
+
+    def fetch_returned_rows(self, cursor, returning_params):
+        return list(zip(*(param.get_value() for param in returning_params)))
 
     def no_limit_value(self):
         return None
@@ -390,25 +405,6 @@ END;
         else:
             match_option = "'i'"
         return "REGEXP_LIKE(%%s, %%s, %s)" % match_option
-
-    def return_insert_columns(self, fields):
-        if not fields:
-            return "", ()
-        field_names = []
-        params = []
-        for field in fields:
-            field_names.append(
-                "%s.%s"
-                % (
-                    self.quote_name(field.model._meta.db_table),
-                    self.quote_name(field.column),
-                )
-            )
-            params.append(InsertVar(field))
-        return "RETURNING %s INTO %s" % (
-            ", ".join(field_names),
-            ", ".join(["%s"] * len(params)),
-        ), tuple(params)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
@@ -612,6 +608,9 @@ END;
 
         return Oracle_datetime.from_datetime(value)
 
+    def adapt_durationfield_value(self, value):
+        return value
+
     def adapt_timefield_value(self, value):
         if value is None:
             return None
@@ -730,3 +729,8 @@ END;
         if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False
+
+    def format_json_path_numeric_index(self, num):
+        if num < 0:
+            return "[last-%s]" % abs(num + 1)  # Indexing is zero-based.
+        return super().format_json_path_numeric_index(num)

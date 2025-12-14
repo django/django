@@ -1548,7 +1548,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         # Breadcrumb.
         self.assertContains(
-            response, f"{self.admin.username}</a>\n&rsaquo; Change password"
+            response,
+            f'{self.admin.username}</a></li>\n<li aria-current="page">'
+            "Change password</li>",
         )
         # Usable password field.
         self.assertContains(
@@ -1648,7 +1650,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         self.assertContains(response, f"<h1>Set password: {test_user.username}</h1>")
         # Breadcrumb.
         self.assertContains(
-            response, f"{test_user.username}</a>\n&rsaquo; Set password"
+            response,
+            f'{test_user.username}</a></li>\n<li aria-current="page">'
+            "Set password</li>",
         )
         # Submit buttons
         self.assertContains(response, '<input type="submit" name="set-password"')

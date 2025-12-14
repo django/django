@@ -942,8 +942,8 @@ Configuring the rendering of a form's widgets
 
 .. attribute:: Form.default_renderer
 
-Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
-``None`` which means to use the default renderer specified by the
+Specifies the :doc:`renderer </ref/forms/renderers>` to use for the form.
+Defaults to ``None`` which means to use the default renderer specified by the
 :setting:`FORM_RENDERER` setting.
 
 You can set this as a class attribute when declaring your form or use the
@@ -1043,10 +1043,6 @@ If the widget is rendered in a ``<fieldset>`` then ``aria-describedby`` is
 added to this element, otherwise it is added to the widget's HTML element (e.g.
 ``<input>``).
 
-.. versionchanged:: 5.2
-
-    ``aria-describedby`` was added to associate errors with its input.
-
 .. _ref-forms-error-list-format:
 
 Customizing the error list format
@@ -1059,10 +1055,6 @@ Customizing the error list format
     list of errors. In addition this class has the following attributes and
     methods.
 
-    .. versionchanged:: 5.2
-
-        The ``field_id`` argument was added.
-
     .. attribute:: error_class
 
         The CSS classes to be used when rendering the error list. Any provided
@@ -1070,13 +1062,11 @@ Customizing the error list format
 
     .. attribute:: renderer
 
-        Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
-        Defaults to ``None`` which means to use the default renderer
-        specified by the :setting:`FORM_RENDERER` setting.
+        Specifies the :doc:`renderer </ref/forms/renderers>` to use for
+        ``ErrorList``. Defaults to ``None`` which means to use the default
+        renderer specified by the :setting:`FORM_RENDERER` setting.
 
     .. attribute:: field_id
-
-        .. versionadded:: 5.2
 
         An ``id`` for the field for which the errors relate. This allows an
         HTML ``id`` attribute to be added in the error template and is useful
@@ -1195,8 +1185,6 @@ Attributes of ``BoundField``
 ----------------------------
 
 .. attribute:: BoundField.aria_describedby
-
-    .. versionadded:: 5.2
 
     Returns an ``aria-describedby`` reference to associate a field with its
     help text and errors. Returns ``None`` if ``aria-describedby`` is set in
@@ -1504,8 +1492,6 @@ Customizing ``BoundField``
 ==========================
 
 .. attribute:: Form.bound_field_class
-
-.. versionadded:: 5.2
 
 Define a custom :class:`~django.forms.BoundField` class to use when rendering
 the form. This takes precedence over the project-level

@@ -169,11 +169,32 @@ Widget classes
 
         ``3857``
 
-    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``ol.js`` file hosted
-    on the ``cdn.jsdelivr.net`` content-delivery network. You can subclass
-    these widgets in order to specify your own version of the ``ol.js`` file in
-    the ``js`` property of the inner ``Media`` class (see
+    ``OpenLayersWidget`` and :class:`OSMWidget` include the ``ol.js`` and
+    ``ol.css`` files hosted on the ``cdn.jsdelivr.net`` content-delivery
+    network. These files can be overridden by subclassing the widget and
+    setting the ``js`` and ``css`` properties of the inner ``Media`` class (see
     :ref:`assets-as-a-static-definition`).
+
+    .. admonition:: External assets with CSP
+
+        When :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is
+        enabled, the default OpenLayers CDN assets (``ol.js`` and ``ol.css``)
+        will be blocked unless explicitly allowed. This can be addressed in one
+        of two ways: **serve assets locally** by subclassing the widget and
+        provide local copies of the JavaScript and CSS files, or
+        **allow the CDN in the CSP policy**.
+
+        For example, to allow the default NASA Worldview base layer (replace
+        ``x.y.z`` with the actual version)::
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                "default-src": [CSP.SELF],
+                "script-src": [CSP.SELF, "https://cdn.jsdelivr.net/npm/ol@x.y.z/dist/ol.js"],
+                "style-src": [CSP.SELF, "https://cdn.jsdelivr.net/npm/ol@x.y.z/ol.css"],
+                "img-src": [CSP.SELF, "https://*.earthdata.nasa.gov"],
+            }
 
 ``OSMWidget``
 
@@ -198,9 +219,22 @@ Widget classes
 
         The default map zoom is ``12``.
 
-    The :class:`OpenLayersWidget` note about JavaScript file hosting above also
-    applies here. See also this `FAQ answer`_ about ``https`` access to map
-    tiles.
+    The :class:`OpenLayersWidget` note about using external assets also applies
+    here. See also this `FAQ answer`_ about ``https`` access to map tiles.
+
+    .. admonition:: OpenStreetMap tiles with CSP
+
+        This widget uses OpenStreetMap tiles instead of NASA Worldview. If
+        :ref:`security-csp` enabled, both the OpenLayers CDN resources (as
+        required by :class:`OpenLayersWidget`) and the OpenStreetMap tile
+        servers must be allowed::
+
+            from django.utils.csp import CSP
+
+            SECURE_CSP = {
+                # other directives
+                "img-src": [CSP.SELF, "https://tile.openstreetmap.org"],
+            }
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
 

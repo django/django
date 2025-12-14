@@ -232,12 +232,12 @@ class BuiltinLookup(Lookup):
         lhs_sql = (
             connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
         )
-        return lhs_sql, list(params)
+        return lhs_sql, tuple(params)
 
     def as_sql(self, compiler, connection):
         lhs_sql, params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
+        params = (*params, *rhs_params)
         rhs_sql = self.get_rhs_op(connection, rhs_sql)
         return "%s %s" % (lhs_sql, rhs_sql), params
 
@@ -287,33 +287,28 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     def get_prep_lookup(self):
         if hasattr(self.rhs, "resolve_expression"):
             return self.rhs
-        contains_expr = False
+        if any(hasattr(value, "resolve_expression") for value in self.rhs):
+            # Wrap direct values in Value expressions so they are handled by
+            # the database at compilation time, along with other expressions.
+            return ExpressionList(
+                *[
+                    (
+                        value
+                        if hasattr(value, "resolve_expression")
+                        else Value(value, self.lhs.output_field)
+                    )
+                    for value in self.rhs
+                ]
+            )
         prepared_values = []
         for rhs_value in self.rhs:
-            if hasattr(rhs_value, "resolve_expression"):
-                # An expression will be handled by the database but can coexist
-                # alongside real values.
-                contains_expr = True
-            elif (
+            if (
                 self.prepare_rhs
                 and hasattr(self.lhs, "output_field")
                 and hasattr(self.lhs.output_field, "get_prep_value")
             ):
                 rhs_value = self.lhs.output_field.get_prep_value(rhs_value)
             prepared_values.append(rhs_value)
-        if contains_expr:
-            return ExpressionList(
-                *[
-                    # Expression defaults `str` to field references while
-                    # lookups default them to literal values.
-                    (
-                        Value(prep_value, self.lhs.output_field)
-                        if isinstance(prep_value, str)
-                        else prep_value
-                    )
-                    for prep_value in prepared_values
-                ]
-            )
         return prepared_values
 
     def process_rhs(self, compiler, connection):
@@ -725,7 +720,7 @@ class YearLookup(Lookup):
             rhs_sql, _ = self.process_rhs(compiler, connection)
             rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
             start, finish = self.year_lookup_bounds(connection, self.rhs)
-            params.extend(self.get_bound_params(start, finish))
+            params = (*params, *self.get_bound_params(start, finish))
             return "%s %s" % (lhs_sql, rhs_sql), params
         return super().as_sql(compiler, connection)
 

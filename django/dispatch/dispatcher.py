@@ -22,6 +22,28 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
+async def _gather(*coros):
+    if len(coros) == 0:
+        return []
+
+    if len(coros) == 1:
+        return [await coros[0]]
+
+    async def run(i, coro):
+        results[i] = await coro
+
+    try:
+        async with asyncio.TaskGroup() as tg:
+            results = [None] * len(coros)
+            for i, coro in enumerate(coros):
+                tg.create_task(run(i, coro))
+        return results
+    except BaseExceptionGroup as exception_group:
+        if len(exception_group.exceptions) == 1:
+            raise exception_group.exceptions[0]
+        raise
+
+
 class Signal:
     """
     Base class for all signals
@@ -186,7 +208,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -211,7 +233,7 @@ class Signal:
         if async_receivers:
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _gather(
                     *(
                         receiver(signal=self, sender=sender, **named)
                         for receiver in async_receivers
@@ -235,7 +257,7 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather().
+        concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -268,9 +290,9 @@ class Signal:
             async def sync_send():
                 return []
 
-        responses, async_responses = await asyncio.gather(
+        responses, async_responses = await _gather(
             sync_send(),
-            asyncio.gather(
+            _gather(
                 *(
                     receiver(signal=self, sender=sender, **named)
                     for receiver in async_receivers
@@ -294,7 +316,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -340,7 +362,7 @@ class Signal:
                 return response
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _gather(
                     *(
                         asend_and_wrap_exception(receiver)
                         for receiver in async_receivers
@@ -359,7 +381,7 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather.
+        concurrently with asyncio.TaskGroup.
 
         Arguments:
 
@@ -414,9 +436,9 @@ class Signal:
                 return err
             return response
 
-        responses, async_responses = await asyncio.gather(
+        responses, async_responses = await _gather(
             sync_send(),
-            asyncio.gather(
+            _gather(
                 *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
             ),
         )

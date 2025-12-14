@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+
+    <object pk="1" model="fixtures.person">
+        <field type="CharField" name="name">
+            <natural>Django <em>pony</em></natural>
+        </field>
+    </object>
+
+</django-objects>

@@ -159,9 +159,7 @@ class ExplainTests(TestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("FORMAT=TRADITIONAL", captured_queries[0]["sql"])
 
-    @unittest.skipUnless(
-        connection.vendor == "mysql", "MariaDB and MySQL >= 8.0.18 specific."
-    )
+    @unittest.skipUnless(connection.vendor == "mysql", "MySQL specific")
     def test_mysql_analyze(self):
         qs = Tag.objects.filter(name="test")
         with CaptureQueriesContext(connection) as captured_queries:

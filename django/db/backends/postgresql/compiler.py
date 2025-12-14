@@ -1,10 +1,10 @@
-from django.db.models.sql.compiler import (
+from django.db.models.sql.compiler import (  # isort:skip
     SQLAggregateCompiler,
     SQLCompiler,
     SQLDeleteCompiler,
+    SQLInsertCompiler as BaseSQLInsertCompiler,
+    SQLUpdateCompiler,
 )
-from django.db.models.sql.compiler import SQLInsertCompiler as BaseSQLInsertCompiler
-from django.db.models.sql.compiler import SQLUpdateCompiler
 
 __all__ = [
     "SQLAggregateCompiler",
@@ -36,6 +36,11 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
             # Lack of fields denote the usage of the DEFAULT keyword
             # for the insertion of empty rows.
             or any(field is None for field in fields)
+            # Field.get_placeholder takes value as an argument, so the
+            # resulting placeholder might be dependent on the value.
+            # in UNNEST requires a single placeholder to "fit all values" in
+            # the array.
+            or any(hasattr(field, "get_placeholder") for field in fields)
             # Fields that don't use standard internal types might not be
             # unnest'able (e.g. array and geometry types are known to be
             # problematic).

@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.forms.widgets import Select
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -284,16 +285,18 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         if can_add_related is None:
             can_add_related = admin_site.is_registered(rel.model)
         self.can_add_related = can_add_related
-        # XXX: The UX does not support multiple selected values.
-        multiple = getattr(widget, "allow_multiple_selected", False)
         if not isinstance(widget, AutocompleteMixin):
             self.attrs["data-context"] = "available-source"
-        self.can_change_related = not multiple and can_change_related
+        # Only single-select Select widgets are supported.
+        supported = not getattr(
+            widget, "allow_multiple_selected", False
+        ) and isinstance(widget, Select)
+        self.can_change_related = supported and can_change_related
         # XXX: The deletion UX can be confusing when dealing with cascading
         # deletion.
         cascade = getattr(rel, "on_delete", None) is CASCADE
-        self.can_delete_related = not multiple and not cascade and can_delete_related
-        self.can_view_related = not multiple and can_view_related
+        self.can_delete_related = supported and not cascade and can_delete_related
+        self.can_view_related = supported and can_view_related
         # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
         self.use_fieldset = True

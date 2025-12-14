@@ -1,8 +1,13 @@
 import datetime
 from copy import deepcopy
 
-from django.core.exceptions import FieldError, MultipleObjectsReturned
+from django.core.exceptions import (
+    FieldError,
+    FieldFetchBlocked,
+    MultipleObjectsReturned,
+)
 from django.db import IntegrityError, models, transaction
+from django.db.models import FETCH_PEERS, RAISE
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -916,3 +921,72 @@ class ManyToOneTests(TestCase):
                 instances=countries,
                 querysets=[City.objects.all(), City.objects.all()],
             )
+
+    def test_fetch_mode_fetch_peers_forward(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            a1.reporter
+        with self.assertNumQueries(0):
+            a2.reporter
+
+    def test_fetch_mode_raise_forward(self):
+        a = Article.objects.fetch_mode(RAISE).get(pk=self.a.pk)
+        msg = "Fetching of Article.reporter blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            a.reporter
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        a1 = Article.objects.fetch_mode(FETCH_PEERS).get()
+        self.assertEqual(a1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            a1.reporter._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(a1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            a1.reporter._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        r1 = Reporter.objects.fetch_mode(FETCH_PEERS).get(pk=self.r.pk)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        article = r1.article_set.get()
+        self.assertEqual(
+            article._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        r1, r2 = Reporter.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        a1 = r1.article_set.get()
+        self.assertEqual(
+            a1._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        a2 = r2.article_set.get()
+        self.assertEqual(
+            a2._state.fetch_mode,
+            FETCH_PEERS,
+        )

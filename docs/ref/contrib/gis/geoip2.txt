@@ -5,6 +5,11 @@ Geolocation with GeoIP2
 .. module:: django.contrib.gis.geoip2
     :synopsis: Python interface for MaxMind's GeoIP2 databases.
 
+.. _geoip2-overview:
+
+Overview
+========
+
 The :class:`GeoIP2` object is a wrapper for the :pypi:`MaxMind geoip2 Python
 library <geoip2>`. [#]_
 

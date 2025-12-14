@@ -19,7 +19,7 @@ At the highest level, you can serialize data like this::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all())
+    data = serializers.serialize("json", SomeModel.objects.all())
 
 The arguments to the ``serialize`` function are the format to serialize the
 data to (see `Serialization formats`_) and a
@@ -31,16 +31,16 @@ almost always be a QuerySet).
 
 You can also use a serializer object directly::
 
-    XMLSerializer = serializers.get_serializer("xml")
-    xml_serializer = XMLSerializer()
-    xml_serializer.serialize(queryset)
-    data = xml_serializer.getvalue()
+    JSONSerializer = serializers.get_serializer("json")
+    json_serializer = JSONSerializer()
+    json_serializer.serialize(queryset)
+    data = json_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
 (which includes an :class:`~django.http.HttpResponse`)::
 
-    with open("file.xml", "w") as out:
-        xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+    with open("file.json", "w") as out:
+        json_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
@@ -58,7 +58,7 @@ specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
 
-    data = serializers.serialize("xml", SomeModel.objects.all(), fields=["name", "size"])
+    data = serializers.serialize("json", SomeModel.objects.all(), fields=["name", "size"])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
 be serialized. The primary key is always serialized as the ``pk`` element in
@@ -75,22 +75,15 @@ Inherited models
 ----------------
 
 If you have a model that is defined using an :ref:`abstract base class
-<abstract-base-classes>`, you don’t have to do anything special to serialize
+<abstract-base-classes>`, you don't have to do anything special to serialize
 that model. Call the serializer on the object (or objects) that you want to
 serialize, and the output will be a complete representation of the serialized
 object.
 
-If you have a model that uses :ref:`multi-table inheritance
-<multi-table-inheritance>`, the built-in serializer will only include
-the fields defined on the subclass being serialized.
-Parent model fields are not automatically pulled in.
-
-A more likely use case is that you want to serialize a subclass (e.g.,
-Restaurant) while also including some fields from the parent (e.g., the
-name of the Place). In such cases you can use
-:meth:`~django.db.models.query.QuerySet.values` to build the desired output.
-
-For example::
+However, if you have a model that uses :ref:`multi-table inheritance
+<multi-table-inheritance>`, you also need to serialize all of the base classes
+for the model. This is because only the fields that are locally defined on the
+model will be serialized. For example, consider the following models::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -117,7 +110,7 @@ Deserializing data
 
 Deserializing data is very similar to serializing it::
 
-    for obj in serializers.deserialize("xml", data):
+    for obj in serializers.deserialize("json", data):
         do_something_with(obj)
 
 As you can see, the ``deserialize`` function takes the same format argument as
@@ -140,7 +133,7 @@ data in your serialized representation doesn't match what's currently in the
 database. Usually, working with these ``DeserializedObject`` instances looks
 something like::
 
-    for deserialized_object in serializers.deserialize("xml", data):
+    for deserialized_object in serializers.deserialize("json", data):
         if object_should_be_saved(deserialized_object):
             deserialized_object.save()
 
@@ -153,7 +146,7 @@ If fields in the serialized data do not exist on a model, a
 ``DeserializationError`` will be raised unless the ``ignorenonexistent``
 argument is passed in as ``True``::
 
-    serializers.deserialize("xml", data, ignorenonexistent=True)
+    serializers.deserialize("json", data, ignorenonexistent=True)
 
 .. _serialization-formats:
 

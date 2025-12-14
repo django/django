@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -506,7 +506,7 @@ msgstr "Bu sahə ağ qala bilməz."
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s bu %(field_label)s sahə ilə artıq mövcuddur."
+msgstr "Bu %(field_label)s ilə %(model_name)s artıq mövcuddur."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or
 #. 'month'. Eg: "Title must be unique for pub_date year"
@@ -547,7 +547,7 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"“%(value)s” dəyəri səhv tarix formatındadır. Formatı YYYY-MM-DD olmalıdır."
+"“%(value)s” dəyəri səhv tarix formatındadır. YYYY-MM-DD formatı olmalıdır."
 
 #, python-format
 msgid ""
@@ -815,7 +815,7 @@ msgstr[1] "Zəhmət olmasa ən çox %(num)d forma təsdiqləyin."
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] "Zəhmət olmasa ən az %(num)d forma təsdiqləyin."
-msgstr[1] "Zəhmət olmasa ən az %(num)d forma təsdiqləyin."
+msgstr[1] "Zəhmət olmasa azı %(num)d forma təsdiqləyin."
 
 msgid "Order"
 msgstr "Sırala"
@@ -1190,7 +1190,7 @@ msgstr[0] "%(num)d dəqiqə"
 msgstr[1] "%(num)d dəqiqə"
 
 msgid "Forbidden"
-msgstr "Qadağan"
+msgstr "Qadağan olunmuş"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF təsdiqləmə alınmadı. Sorğu ləğv edildi."
@@ -1245,7 +1245,7 @@ msgstr ""
 "sorğular üçün aktiv edin."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Daha ətraflı məlumat DEBUG=True ilə mövcuddur."
+msgstr "Əlavə məlumatı DEBUG=True ilə əldə etmək olar."
 
 msgid "No year specified"
 msgstr "İl göstərilməyib"

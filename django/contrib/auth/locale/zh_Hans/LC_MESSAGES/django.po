@@ -15,6 +15,7 @@
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Lemon Li <leeway1985@gmail.com>, 2012-2013
 # Wentao Han <wentao.han@gmail.com>, 2020
+# DWXXX, 2025
 # hizyn <zhangyanan5552@gmail.com>, 2016
 # ced773123cfad7b4e8b79ca80f736af9, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -23,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
-"Last-Translator: L., 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-12-03 08:09+0000\n"
+"Last-Translator: DWXXX, 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -73,11 +74,11 @@ msgstr "密码"
 msgid "last login"
 msgstr "上次登录"
 
-msgid "No password set."
-msgstr "密码未设置。"
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "不可用的密码格式或未知的哈希算法。"
+
+msgid "No password set."
+msgstr "密码未设置。"
 
 msgid "Reset password"
 msgstr "重置密码"
@@ -88,14 +89,6 @@ msgstr "设置密码"
 msgid "The two password fields didn’t match."
 msgstr "输入的两个密码不一致。"
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"用户是否能够使用密码进行认证。如果禁用，他们仍可能能够使用其他后端进行认证，"
-"例如单一登入或LDAP。"
-
 msgid "Password"
 msgstr "密码"
 
@@ -104,6 +97,14 @@ msgstr "密码确认"
 
 msgid "Enter the same password as before, for verification."
 msgstr "为了校验，请输入与上面相同的密码。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"用户是否能够使用密码进行认证。如果禁用，他们仍可能能够使用其他后端进行认证，"
+"例如单一登入或LDAP。"
 
 msgid "Password-based authentication"
 msgstr "基于密码的验证"
@@ -265,13 +266,10 @@ msgid "users"
 msgstr "用户"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "密码长度太短。密码必须包含至少 %(min_length)d 个字符。"
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "此密码太短，至少要包含 %d 个字符。"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

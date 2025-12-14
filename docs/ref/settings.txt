@@ -463,9 +463,9 @@ A list of trusted origins for unsafe requests (e.g. ``POST``).
 For requests that include the ``Origin`` header, Django's CSRF protection
 requires that header match the origin present in the ``Host`` header.
 
-For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
-request that doesn't include the ``Origin`` header, the request must have a
-``Referer`` header that matches the origin present in the ``Host`` header.
+For a secure (determined by :meth:`~django.http.HttpRequest.is_secure`) unsafe
+request that doesn't include the ``Origin`` header, the request must include a
+``Referer`` header that matches the origin in the ``Host`` header.
 
 These checks prevent, for example, a ``POST`` request from
 ``subdomain.example.com`` from succeeding against ``api.example.com``. If you
@@ -1279,10 +1279,15 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 ``DEFAULT_AUTO_FIELD``
 ----------------------
 
-Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
+
+.. versionchanged:: 6.0
+
+    In older versions, the default value is
+    :class:`django.db.models.AutoField`.
 
 .. admonition:: Migrating auto-created through tables
 
@@ -1773,9 +1778,10 @@ Default: ``[]`` (Empty list)
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
 :doc:`/howto/error-reporting`). Regular expressions are matched against
-:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
-query string, if any). Use this if your site does not provide a commonly
-requested file such as ``favicon.ico`` or ``robots.txt``.
+request's full paths, as returned by
+:meth:`~django.http.HttpRequest.get_full_path` (including any query strings).
+Use this if your site does not provide a commonly requested file such as
+``favicon.ico`` or ``robots.txt``.
 
 This is only used if
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
@@ -2651,7 +2657,7 @@ protocol.
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail`
+    regular email messages sent with :func:`~django.core.mail.send_mail`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT
@@ -2760,6 +2766,68 @@ backend definition in :setting:`STORAGES`.
 
     Defining this setting overrides the default value and is *not* merged with
     it.
+
+.. setting:: TASKS
+
+``TASKS``
+---------
+
+.. versionadded:: 6.0
+
+Default::
+
+    {
+        "default": {
+            "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
+        }
+    }
+
+A dictionary containing the settings for all Task backends to be used with
+Django. It is a nested dictionary whose contents maps backend aliases to a
+dictionary containing the options for each backend.
+
+The :setting:`TASKS` setting must configure a ``default`` backend; any number
+of additional backends may also be specified. Depending on which backend is
+used, other options may be required. The following options are available as
+standard.
+
+.. setting:: TASKS-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: ``''`` (Empty string)
+
+The Tasks backend to use. The built-in backends are:
+
+* ``'django.tasks.backends.dummy.DummyBackend'``
+* ``'django.tasks.backends.immediate.ImmediateBackend'``
+
+You can use a backend that doesn't ship with Django by setting
+:setting:`BACKEND <TASKS-BACKEND>` to a fully-qualified path of a backend
+class (i.e. ``mypackage.backends.whatever.WhateverBackend``).
+
+.. setting:: TASKS-QUEUES
+
+``QUEUES``
+~~~~~~~~~~
+
+Default: ``["default"]``
+
+Specify the queue names supported by the backend. This can be used to ensure
+Tasks aren't enqueued to queues which do not exist.
+
+To disable queue name validation, set to an empty list (``[]``).
+
+.. setting:: TASKS-OPTIONS
+
+``OPTIONS``
+~~~~~~~~~~~
+
+Default: ``{}``
+
+Extra parameters to pass to the Task backend. Available parameters vary
+depending on the Task backend.
 
 .. setting:: TEMPLATES
 

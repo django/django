@@ -821,7 +821,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                     OpClass(TsTzRange("start", "end", RangeBoundary()), "range_ops"),
                     RangeOperators.OVERLAPS,
                 ),
-                (OpClass("room", "gist_int4_ops"), RangeOperators.EQUAL),
+                (OpClass("room", "gist_int8_ops"), RangeOperators.EQUAL),
             ],
             condition=Q(cancelled=False),
         )

@@ -3,6 +3,7 @@ Tests for django test runner
 """
 
 import collections.abc
+import functools
 import multiprocessing
 import os
 import sys
@@ -738,8 +739,10 @@ class TestRunnerInitializerTests(SimpleTestCase):
                     "test_runner_apps.simple.tests",
                 ]
             )
-        # Initializer must be a function.
-        self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
+        # Initializer must be a partial function binding _init_worker.
+        initializer = mocked_pool.call_args.kwargs["initializer"]
+        self.assertIsInstance(initializer, functools.partial)
+        self.assertIs(initializer.args[0], _init_worker)
         initargs = mocked_pool.call_args.kwargs["initargs"]
         self.assertEqual(len(initargs), 7)
         self.assertEqual(initargs[5], True)  # debug_mode

@@ -215,27 +215,28 @@ messages during filesystem inspection and event subscription processes.
 ``django.contrib.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Log messages related to :doc:`contrib/auth`, particularly ``ERROR`` messages
-are generated when a :class:`~django.contrib.auth.forms.PasswordResetForm` is
-successfully submitted but the password reset email cannot be delivered due to
-a mail sending exception.
+Log messages related to :doc:`/ref/contrib/auth`, particularly ``ERROR``
+messages are generated when a
+:class:`~django.contrib.auth.forms.PasswordResetForm` is successfully submitted
+but the password reset email cannot be delivered due to a mail sending
+exception.
 
 .. _django-contrib-gis-logger:
 
 ``django.contrib.gis``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Log messages related to :doc:`contrib/gis/index` at various points: during the
-loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when reporting
-errors. Each ``ERROR`` log record includes the caught exception and relevant
-contextual data.
+Log messages related to :doc:`/ref/contrib/gis/index` at various points: during
+the loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when
+reporting errors. Each ``ERROR`` log record includes the caught exception and
+relevant contextual data.
 
 .. _django-dispatch-logger:
 
 ``django.dispatch``
 ~~~~~~~~~~~~~~~~~~~
 
-This logger is used in :doc:`signals`, specifically within the
+This logger is used in :doc:`/ref/signals`, specifically within the
 :mod:`~django.dispatch.Signal` class, to report issues when dispatching a
 signal to a connected receiver. The ``ERROR`` log record includes the caught
 exception as ``exc_info`` and adds the following extra context:

@@ -214,6 +214,46 @@ class ServerFormatter(logging.Formatter):
         return self._fmt.find("{server_time}") >= 0
 
 
+def log_message(
+    logger,
+    message,
+    *args,
+    level=None,
+    status_code=None,
+    request=None,
+    exception=None,
+    **extra,
+):
+    """Log `message` using `logger` based on `status_code` and logger `level`.
+
+    Pass `request`, `status_code` (if defined) and any provided `extra` as such
+    to the logging method,
+
+    Arguments from `args` will be escaped to avoid potential log injections.
+
+    """
+    extra = {"request": request, **extra}
+    if status_code is not None:
+        extra["status_code"] = status_code
+        if level is None:
+            if status_code >= 500:
+                level = "error"
+            elif status_code >= 400:
+                level = "warning"
+
+    escaped_args = tuple(
+        a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
+        for a in args
+    )
+
+    getattr(logger, level or "info")(
+        message,
+        *escaped_args,
+        extra=extra,
+        exc_info=exception,
+    )
+
+
 def log_response(
     message,
     *args,
@@ -237,26 +277,13 @@ def log_response(
     if getattr(response, "_has_been_logged", False):
         return
 
-    if level is None:
-        if response.status_code >= 500:
-            level = "error"
-        elif response.status_code >= 400:
-            level = "warning"
-        else:
-            level = "info"
-
-    escaped_args = tuple(
-        a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
-        for a in args
-    )
-
-    getattr(logger, level)(
+    log_message(
+        logger,
         message,
-        *escaped_args,
-        extra={
-            "status_code": response.status_code,
-            "request": request,
-        },
-        exc_info=exception,
+        *args,
+        level=level,
+        status_code=response.status_code,
+        request=request,
+        exception=exception,
     )
     response._has_been_logged = True

@@ -721,11 +721,10 @@ def parse_boundary_stream(stream, max_header_size):
 
     # Eliminate blank lines
     for line in header.split(b"\r\n"):
-        # This terminology ("main value" and "dictionary of
-        # parameters") is from the Python docs.
         try:
-            main_value_pair, params = parse_header_parameters(line.decode())
-            name, value = main_value_pair.split(":", 1)
+            header_name, value_and_params = line.decode().split(":", 1)
+            name = header_name.lower().rstrip(" ")
+            value, params = parse_header_parameters(value_and_params.lstrip(" "))
             params = {k: v.encode() for k, v in params.items()}
         except ValueError:  # Invalid header.
             continue

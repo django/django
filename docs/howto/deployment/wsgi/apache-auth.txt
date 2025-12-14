@@ -128,7 +128,7 @@ In this case, the Apache configuration should look like this:
 
 To support the ``WSGIAuthGroupScript`` directive, the same WSGI script
 ``mysite.wsgi`` must also import the ``groups_for_user`` function which
-returns a list groups the given user belongs to.
+returns a list of groups the given user belongs to.
 
 .. code-block:: python
 

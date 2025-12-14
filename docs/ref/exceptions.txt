@@ -165,6 +165,16 @@ Django core exception classes are defined in ``django.core.exceptions``.
     - A field name is invalid
     - A query contains invalid order_by arguments
 
+``FieldFetchBlocked``
+---------------------
+
+.. versionadded:: 6.1
+
+.. exception:: FieldFetchBlocked
+
+    Raised when a field would be fetched on-demand and the
+    :attr:`~django.db.models.RAISE` fetch mode is active.
+
 ``ValidationError``
 -------------------
 

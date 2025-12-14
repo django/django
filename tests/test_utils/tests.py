@@ -646,6 +646,53 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             self.assertTemplateNotUsed(response, "template.html")
 
 
+@override_settings(ROOT_URLCONF="test_utils.urls")
+class AssertTemplateUsedPartialTests(SimpleTestCase):
+    def test_template_used_pass(self):
+        with self.assertTemplateUsed("template_used/partials.html#hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass(self):
+        with self.assertTemplateNotUsed("hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_used_fail(self):
+        msg = "Template 'hello' was not a template used to render the response."
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("hello"),
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_not_used_fail(self):
+        msg = (
+            "Template 'template_used/partials.html#hello' was used "
+            "unexpectedly in rendering the response"
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateNotUsed("template_used/partials.html#hello"),
+        ):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass_non_partial(self):
+        with self.assertTemplateNotUsed(
+            "template_used/base.html#template_used/base.html"
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_used_fail_non_partial(self):
+        msg = (
+            "Template 'template_used/base.html#template_used/base.html' was not a "
+            "template used to render the response."
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("template_used/base.html#template_used/base.html"),
+        ):
+            render_to_string("template_used/base.html")
+
+
 class HTMLEqualTests(SimpleTestCase):
     def test_html_parser(self):
         element = parse_html("<div><p>Hello</p></div>")

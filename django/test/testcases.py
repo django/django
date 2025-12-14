@@ -43,6 +43,7 @@ from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
+from django.template.base import PartialTemplate
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -138,10 +139,22 @@ class _AssertTemplateUsedContext:
         self.rendered_templates.append(template)
         self.context.append(copy(context))
 
+    @property
+    def rendered_template_names(self):
+        return [
+            (
+                f"{t.origin.template_name}#{t.name}"
+                if isinstance(t, PartialTemplate)
+                else t.name
+            )
+            for t in self.rendered_templates
+            if t.name is not None
+        ]
+
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            [t.name for t in self.rendered_templates if t.name is not None],
+            self.rendered_template_names,
             self.msg_prefix,
             self.count,
         )
@@ -159,11 +172,8 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        rendered_template_names = [
-            t.name for t in self.rendered_templates if t.name is not None
-        ]
         self.test_case.assertFalse(
-            self.template_name in rendered_template_names,
+            self.template_name in self.rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )

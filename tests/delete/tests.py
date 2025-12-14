@@ -15,6 +15,7 @@ from .models import (
     Avatar,
     B,
     Base,
+    CascadeDbModel,
     Child,
     DeleteBottom,
     DeleteTop,
@@ -34,7 +35,12 @@ from .models import (
     RChild,
     RChildChild,
     Referrer,
+    RelatedDbOptionGrandParent,
+    RelatedDbOptionParent,
+    RProxy,
     S,
+    SetDefaultDbModel,
+    SetNullDbModel,
     T,
     User,
     create_a,
@@ -75,17 +81,50 @@ class OnDeleteTests(TestCase):
         a = A.objects.get(pk=a.pk)
         self.assertIsNone(a.setnull)
 
+    @skipUnlessDBFeature("supports_on_delete_db_null")
+    def test_db_setnull(self):
+        a = SetNullDbModel.objects.create(
+            db_setnull=RelatedDbOptionParent.objects.create()
+        )
+        a.db_setnull.delete()
+        a = SetNullDbModel.objects.get(pk=a.pk)
+        self.assertIsNone(a.db_setnull)
+
     def test_setdefault(self):
         a = create_a("setdefault")
         a.setdefault.delete()
         a = A.objects.get(pk=a.pk)
         self.assertEqual(self.DEFAULT, a.setdefault.pk)
 
+    @skipUnlessDBFeature("supports_on_delete_db_default")
+    def test_db_setdefault(self):
+        # Object cannot be created on the module initialization, use hardcoded
+        # PKs instead.
+        r = RelatedDbOptionParent.objects.create(pk=2)
+        default_r = RelatedDbOptionParent.objects.create(pk=1)
+        set_default_db_obj = SetDefaultDbModel.objects.create(db_setdefault=r)
+        set_default_db_obj.db_setdefault.delete()
+        set_default_db_obj = SetDefaultDbModel.objects.get(pk=set_default_db_obj.pk)
+        self.assertEqual(set_default_db_obj.db_setdefault, default_r)
+
     def test_setdefault_none(self):
         a = create_a("setdefault_none")
         a.setdefault_none.delete()
         a = A.objects.get(pk=a.pk)
         self.assertIsNone(a.setdefault_none)
+
+    @skipUnlessDBFeature("supports_on_delete_db_default")
+    def test_db_setdefault_none(self):
+        # Object cannot be created on the module initialization, use hardcoded
+        # PKs instead.
+        r = RelatedDbOptionParent.objects.create(pk=2)
+        default_r = RelatedDbOptionParent.objects.create(pk=1)
+        set_default_db_obj = SetDefaultDbModel.objects.create(
+            db_setdefault_none=r, db_setdefault=default_r
+        )
+        set_default_db_obj.db_setdefault_none.delete()
+        set_default_db_obj = SetDefaultDbModel.objects.get(pk=set_default_db_obj.pk)
+        self.assertIsNone(set_default_db_obj.db_setdefault_none)
 
     def test_cascade(self):
         a = create_a("cascade")
@@ -357,6 +396,23 @@ class DeletionTests(TestCase):
         # + 1 (delete `s`)
         self.assertNumQueries(5, s.delete)
         self.assertFalse(S.objects.exists())
+
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
+    def test_db_cascade(self):
+        related_db_op = RelatedDbOptionParent.objects.create(
+            p=RelatedDbOptionGrandParent.objects.create()
+        )
+        CascadeDbModel.objects.bulk_create(
+            [
+                CascadeDbModel(db_cascade=related_db_op)
+                for _ in range(2 * GET_ITERATOR_CHUNK_SIZE)
+            ]
+        )
+        with self.assertNumQueries(1):
+            results = related_db_op.delete()
+            self.assertEqual(results, (1, {"delete.RelatedDbOptionParent": 1}))
+        self.assertFalse(CascadeDbModel.objects.exists())
+        self.assertFalse(RelatedDbOptionParent.objects.exists())
 
     def test_instance_update(self):
         deleted = []
@@ -674,6 +730,14 @@ class DeletionTests(TestCase):
                     ctx.captured_queries[0]["sql"],
                 )
                 signal.disconnect(receiver, sender=Referrer)
+
+    def test_keep_parents_does_not_delete_proxy_related(self):
+        r_child = RChild.objects.create()
+        r_proxy = RProxy.objects.get(pk=r_child.pk)
+        Origin.objects.create(r_proxy=r_proxy)
+        self.assertEqual(Origin.objects.count(), 1)
+        r_child.delete(keep_parents=True)
+        self.assertEqual(Origin.objects.count(), 1)
 
 
 class FastDeleteTests(TestCase):

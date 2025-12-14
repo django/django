@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-07 07:17+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-09-17 19:03+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +22,7 @@ msgstr ""
 "2);\n"
 
 msgid "Advanced options"
-msgstr "Papildus opcijas"
+msgstr "Papildu iespējas"
 
 msgid "Flat Pages"
 msgstr "Vienkāršās lapas"
@@ -32,30 +33,28 @@ msgstr "URL"
 msgid ""
 "Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Piemēram: “/about/contact/”. Pārliecinieties, ka esat ievietojuši sākuma un "
-"beigu slīpsvītras."
+"Piemērs: “/par/sazinaties/”. Jāpārliecinās, ka sākumā un beigās ir "
+"slīpsvītra."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Šai vērtība ir jāsatur tikai burtus, ciparus, punktus, pasvītrojumi, "
-"domuzīmes, slīpsvītras vai tildes simboli."
+"Šajā vērtībā drīkst būt tikai burti, cipari, punkti, apakšsvītras, "
+"domuzīmes, slīpsvītras vai tildes."
 
 msgid "Example: “/about/contact”. Make sure to have a leading slash."
-msgstr ""
-"Piemēram: “/about/contact”. Pārliecinieties, ka esat ievietojuši sākuma "
-"slīpsvītru."
+msgstr "Piemērs: “/par/sazināties”. Jāpārliecinās, ka sākumā ir slīpsvītra."
 
 msgid "URL is missing a leading slash."
-msgstr "URL trūkst sākuma slīpsvītra."
+msgstr "URL trūkst sākuma slīpsvītras."
 
 msgid "URL is missing a trailing slash."
-msgstr "URL trūkst beigu slīpsvītra."
+msgstr "URL trūkst beigu slīpsvītras."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "Vienkāršā lapa ar url %(url)s jau eksistē vietnei %(site)s"
+msgstr "Vienkāršā lapa ar URL %(url)s jau pastāv vietnei %(site)s"
 
 msgid "title"
 msgstr "virsraksts"
@@ -64,24 +63,24 @@ msgid "content"
 msgstr "saturs"
 
 msgid "enable comments"
-msgstr "ieslēgt komentārus"
+msgstr "ieslēgt piebildes"
 
 msgid "template name"
-msgstr "šablona nosaukums"
+msgstr "veidnes nosaukums"
 
 msgid ""
 "Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
 "will use “flatpages/default.html”."
 msgstr ""
-"Piemēram: “flatpages/contact_page.html”. Ja tas nav norādīts, sistēma lietos "
-"“flatpages/default.html”."
+"Piemērs: “flatpages/contact_page.html”. Ja tas nav norādīts, sistēma "
+"izmantos “flatpages/default.html”."
 
 msgid "registration required"
-msgstr "reģistrācija obligāta"
+msgstr "nepieciešama reģistrēšanās"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Ja šis ir atzīmēts, tikai pieslēgušies lietotāji, varēs piekļūt šai lapu."
+"Ja šis ir atzīmēts, tikai pieteikušies lietotāji varēs apskatīt šo lapu."
 
 msgid "sites"
 msgstr "vietnes"

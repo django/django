@@ -76,8 +76,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         if is_mariadb:
             if self.connection.mysql_version < (12, 0, 1):
                 disallowed_aggregates.insert(0, models.Collect)
-        elif self.connection.mysql_version < (8, 0, 24):
-            disallowed_aggregates.insert(0, models.Collect)
         return tuple(disallowed_aggregates)
 
     function_names = {
@@ -100,6 +98,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
+            "NumDimensions",
             "Perimeter",
             "PointOnSurface",
             "Reverse",

@@ -1546,6 +1546,7 @@ class PermissionRenameOperationsTests(TransactionTestCase):
         "django.contrib.auth",
         "auth_tests",
     ]
+    databases = {"default", "other"}
 
     def setUp(self):
         app_config = apps.get_app_config("auth_tests")
@@ -1604,6 +1605,26 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
             )
+
+    def test_permission_rename_other_db(self):
+        ct = ContentType.objects.using("default").create(
+            app_label="auth_tests", model="oldmodel"
+        )
+        permission = Permission.objects.using("default").create(
+            codename="add_oldmodel",
+            name="Can add old model",
+            content_type=ct,
+        )
+        # RenamePermission respects the database.
+        call_command("migrate", "auth_tests", verbosity=0, database="other")
+        permission.refresh_from_db()
+        self.assertEqual(permission.codename, "add_oldmodel")
+        self.assertFalse(
+            Permission.objects.using("other").filter(codename="add_oldmodel").exists()
+        )
+        self.assertTrue(
+            Permission.objects.using("other").filter(codename="add_newmodel").exists()
+        )
 
     @mock.patch(
         "django.db.router.allow_migrate_model",

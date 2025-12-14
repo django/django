@@ -423,6 +423,16 @@ class DebugViewTests(SimpleTestCase):
             response, "<h1>The install worked successfully! Congratulations!</h1>"
         )
 
+    @override_settings(ROOT_URLCONF="view_tests.default_urls")
+    def test_default_urlconf_technical_404(self):
+        response = self.client.get("/favicon.ico")
+        self.assertContains(
+            response,
+            "<code>\nadmin/\n[namespace='admin']\n</code>",
+            status_code=404,
+            html=True,
+        )
+
     @override_settings(ROOT_URLCONF="view_tests.regression_21530_urls")
     def test_regression_21530(self):
         """

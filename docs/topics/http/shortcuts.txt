@@ -125,10 +125,6 @@ This example is equivalent to::
    ``True``   ``True``         308
    =========  ================ ================
 
-   .. versionchanged:: 5.2
-
-       The argument ``preserve_request`` was added.
-
 Examples
 --------
 
@@ -210,7 +206,7 @@ Arguments
     the object.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -290,7 +286,7 @@ Arguments
     list.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and

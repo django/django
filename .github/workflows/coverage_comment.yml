@@ -1,0 +1,78 @@
+name: Coverage Comment
+
+on:
+  workflow_run:
+    workflows: ["Coverage Tests"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.repository == 'django/django'
+    name: Post Coverage Comment
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Read PR number
+        id: pr
+        run: |
+          pr_number=$(cat pr_number.txt)
+          echo "number=$pr_number" >> $GITHUB_OUTPUT
+
+      - name: Post/update PR comment
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'diff-cover-report.md';
+            let body = 'No coverage data available.';
+            if (fs.existsSync(reportPath)) {
+              body = fs.readFileSync(reportPath, 'utf8');
+            }
+            const commentBody = '### 📊 Coverage Report for Changed Files\n\n```\n' + body + '\n```\n\n**Note:** Missing lines are warnings only. Some lines may not be covered by SQLite tests as they are database-specific.\n\nFor more information about code coverage on pull requests, see the [contributing documentation](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests).';
+
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            if (isNaN(prNumber)) {
+              core.setFailed('PR number is not available or invalid.');
+              return;
+            }
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            for (const c of comments) {
+              if ((c.body || '').includes('📊 Coverage Report for Changed Files')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody,
+            });

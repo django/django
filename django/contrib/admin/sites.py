@@ -416,16 +416,18 @@ class AdminSite:
         """
         Display the login form for the given HttpRequest.
         """
-        if request.method == "GET" and self.has_permission(request):
-            # Already logged-in, redirect to admin index
-            index_path = reverse("admin:index", current_app=self.name)
-            return HttpResponseRedirect(index_path)
-
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
         from django.contrib.auth.views import LoginView
+
+        redirect_url = LoginView().get_redirect_url(request) or reverse(
+            "admin:index", current_app=self.name
+        )
+        if request.method == "GET" and self.has_permission(request):
+            # Already logged-in, redirect accordingly.
+            return HttpResponseRedirect(redirect_url)
 
         context = {
             **self.each_context(request),
@@ -433,12 +435,8 @@ class AdminSite:
             "subtitle": None,
             "app_path": request.get_full_path(),
             "username": request.user.get_username(),
+            REDIRECT_FIELD_NAME: redirect_url,
         }
-        if (
-            REDIRECT_FIELD_NAME not in request.GET
-            and REDIRECT_FIELD_NAME not in request.POST
-        ):
-            context[REDIRECT_FIELD_NAME] = reverse("admin:index", current_app=self.name)
         context.update(extra_context or {})
 
         defaults = {

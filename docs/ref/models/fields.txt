@@ -561,12 +561,8 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
-The primary key field is set to ``None`` when
-:meth:`deleting <django.db.models.Model.delete>` an object.
-
-.. versionchanged:: 5.2
-
-    The ``CompositePrimaryKey`` field was added.
+The primary key field is set to ``None`` when calling a model instance’s
+:meth:`~django.db.models.Model.delete` method.
 
 ``unique``
 ----------
@@ -716,8 +712,6 @@ isn't defined.
 ``CompositePrimaryKey``
 -----------------------
 
-.. versionadded:: 5.2
-
 .. class:: CompositePrimaryKey(*field_names, **options)
 
 A virtual field used for defining a composite primary key.
@@ -757,10 +751,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
-
-    .. versionchanged:: 5.2
-
-       Support for unlimited ``VARCHAR`` columns was added on SQLite.
 
 .. attribute:: CharField.db_collation
 
@@ -841,6 +831,39 @@ exclusive. Any combination of these options will result in an error.
     instance, removing its time component. This is true for both storage and
     comparison.
 
+.. warning::
+
+    On PostgreSQL and MySQL, arithmetic operations on a ``DateField`` with a
+    :class:`~datetime.timedelta` return a ``datetime`` instead of a ``date``.
+    This occurs because Python's ``timedelta`` is converted to SQL
+    ``INTERVAL``, and the SQL operation ``date +/- interval`` returns a
+    ``timestamp`` on these databases.
+
+    To ensure a ``date`` result, use one of the following approaches. Either
+    explicitly cast the result to a date::
+
+        import datetime
+        from django.db.models import DateField, F
+        from django.db.models.functions import Cast
+
+        qs = MyModel.objects.annotate(
+            previous_day=Cast(
+                F("date_field") - datetime.timedelta(days=1),
+                output_field=DateField(),
+            )
+        )
+
+    Or on PostgreSQL only, use integer arithmetic to represent days::
+
+        from django.db.models import DateField, ExpressionWrapper, F
+
+        qs = MyModel.objects.annotate(
+            previous_day=ExpressionWrapper(
+                F("date_field") - 1,  # Subtract 1 day as integer
+                output_field=DateField(),
+            )
+        )
+
 ``DateTimeField``
 -----------------
 
@@ -872,16 +895,22 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has the following **required** arguments:
+Has the following arguments:
 
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than or equal to ``decimal_places``.
+    must be greater than or equal to ``decimal_places``. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.decimal_places` is provided.
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number.
+    The number of decimal places to store with the number. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.max_digits` is provided.
 
 For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
@@ -904,6 +933,11 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
     should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
     of decimal fields.
+
+.. versionchanged:: 6.1
+
+    Support for ``DecimalField`` with no precision was added on Oracle,
+    PostgreSQL, and SQLite.
 
 ``DurationField``
 -----------------
@@ -1312,14 +1346,13 @@ materialized view.
     real column. If ``False``, the column acts as a virtual column and does
     not occupy database storage space.
 
-    PostgreSQL only supports persisted columns. Oracle only supports virtual
-    columns.
+    PostgreSQL < 18 only supports persisted columns. Oracle < 23ai/26ai (23.7)
+    only supports virtual columns.
 
-.. admonition:: Refresh the data
+    .. versionchanged:: 6.1
 
-    Since the database computes the value, the object must be reloaded to
-    access the new value after :meth:`~Model.save`, for example, by using
-    :meth:`~Model.refresh_from_db`.
+        Support for stored ``GeneratedField``\s was added on Oracle 23ai/26ai
+        (23.7+).
 
 .. admonition:: Database limitations
 
@@ -1337,6 +1370,12 @@ materialized view.
 .. _Oracle: https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6__BABIIGBD
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
+
+.. versionchanged:: 6.0
+
+    ``GeneratedField``\s are now automatically refreshed from the database on
+    backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
+    deferred otherwise.
 
 ``GenericIPAddressField``
 -------------------------
@@ -1709,11 +1748,11 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
-    emulate the behavior of the SQL constraint specified by the
-    :attr:`on_delete` argument. For example, if you have a nullable
-    :class:`ForeignKey` and you want it to be set null when the referenced
-    object is deleted::
+    When an object referenced by a :class:`ForeignKey` is deleted, the
+    referring objects need updating. The :attr:`on_delete` argument specifies
+    how this is done, and whether Django or your database makes the updates.
+    For example, if you have a nullable :class:`ForeignKey` and you want Django
+    to set it to ``None`` when the referenced object is deleted::
 
         user = models.ForeignKey(
             User,
@@ -1722,21 +1761,42 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create an SQL constraint in the database. Support for
-    database-level cascade options :ticket:`may be implemented later <21961>`.
+    The possible values for :attr:`~ForeignKey.on_delete` are listed below.
+    Import them from :mod:`django.db.models`. The ``DB_*`` variants use the
+    database to prevent deletions or update referring objects, whilst the other
+    values make Django perform the relevant actions.
+
+    The database variants are more efficient because they avoid fetching
+    related objects, but ``pre_delete`` and ``post_delete`` signals won't be
+    sent when ``DB_CASCADE`` is used.
+
+    The database variants cannot be mixed with Python variants (other than
+    :attr:`DO_NOTHING`) in the same model and in models related to each other.
+
+.. versionchanged:: 6.1
+
+    Support for ``DB_*`` variants of the ``on_delete`` attribute was added.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
 
 * .. attribute:: CASCADE
 
-    Cascade deletes. Django emulates the behavior of the SQL constraint ON
-    DELETE CASCADE and also deletes the object containing the ForeignKey.
+    Cascade deletes. Django emulates the behavior of the SQL constraint ``ON
+    DELETE CASCADE`` and also deletes the object containing the
+    :class:`ForeignKey`.
 
     :meth:`.Model.delete` isn't called on related models, but the
     :data:`~django.db.models.signals.pre_delete` and
     :data:`~django.db.models.signals.post_delete` signals are sent for all
     deleted objects.
+
+* .. attribute:: DB_CASCADE
+
+    .. versionadded:: 6.1
+
+    Cascade deletes. Database-level version of :attr:`CASCADE`: the database
+    deletes referred-to rows and the one containing the ``ForeignKey``.
 
 * .. attribute:: PROTECT
 
@@ -1791,10 +1851,29 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Set the :class:`ForeignKey` null; this is only possible if
     :attr:`~Field.null` is ``True``.
 
+* .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 6.1
+
+    Set the :class:`ForeignKey` value to ``NULL``. This is only possible if
+    :attr:`~Field.null` is ``True``. Database-level version of
+    :attr:`SET_NULL`.
+
 * .. attribute:: SET_DEFAULT
 
     Set the :class:`ForeignKey` to its default value; a default for the
     :class:`ForeignKey` must be set.
+
+* .. attribute:: DB_SET_DEFAULT
+
+    .. versionadded:: 6.1
+
+    Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value,
+    which must be set. If a row in the referenced table is deleted, the foreign
+    key values in the referencing table will be updated to their
+    :attr:`Field.db_default` values.
+
+    ``DB_SET_DEFAULT`` is not supported on MySQL and MariaDB.
 
 * .. function:: SET()
 
@@ -1950,9 +2029,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Setting it to ``False`` does not mean you can reference a swappable model
     even if it is swapped out - ``False`` means that the migrations made
-    with this ForeignKey will always reference the exact model you specify
-    (so it will fail hard if the user tries to run with a User model you don't
-    support, for example).
+    with this :class:`ForeignKey` will always reference the exact model you
+    specify (so it will fail hard if the user tries to run with a ``User``
+    model you don't support, for example).
 
     If in doubt, leave it to its default of ``True``.
 
@@ -2406,9 +2485,9 @@ Field API reference
     Python types to database (:meth:`get_prep_value`) and vice-versa
     (:meth:`from_db_value`).
 
-    A field is thus a fundamental piece in different Django APIs, notably,
-    :class:`models <django.db.models.Model>` and :class:`querysets
-    <django.db.models.query.QuerySet>`.
+    A field is thus a fundamental piece in different Django APIs, notably the
+    :class:`~django.db.models.Model` and the
+    :class:`~django.db.models.query.QuerySet` APIs.
 
     In models, a field is instantiated as a class attribute and represents a
     particular table column, see :doc:`/topics/db/models`. It has attributes
@@ -2493,8 +2572,8 @@ Field API reference
     .. method:: get_db_prep_value(value, connection, prepared=False)
 
         Converts ``value`` to a backend-specific value. By default it returns
-        ``value`` if ``prepared=True`` and :meth:`~Field.get_prep_value` if is
-        ``False``.
+        ``value`` if ``prepared=True``, and :meth:`get_prep_value(value)
+        <Field.get_prep_value>` otherwise.
 
         See :ref:`converting-query-values-to-database-values` for usage.
 
@@ -2568,7 +2647,7 @@ Field API reference
 
         See :ref:`converting-model-field-to-serialization` for usage.
 
-    When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
+    When using :doc:`model forms </topics/forms/modelforms>`, the ``Field``
     needs to know which form field it should be represented by:
 
     .. method:: formfield(form_class=None, choices_form_class=None, **kwargs)

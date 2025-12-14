@@ -73,8 +73,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "ForcePolygonCW": "ST_ForceLHR",
         "FromWKB": "ST_GeomFromWKB",
         "FromWKT": "ST_GeomFromText",
+        "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
+        "NumDimensions": "ST_NDims",
         "NumPoints": "ST_NPoints",
         "Reverse": "ST_Reverse",
         "Scale": "ScaleCoords",
@@ -84,7 +86,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"GeometryDistance", "IsEmpty", "MemSize", "Rotate"}
+        unsupported = {"GeometryDistance", "MemSize", "Rotate"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
         if self.spatial_version < (5, 1):

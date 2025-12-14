@@ -4,6 +4,7 @@ import re
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.deletion import DatabaseOnDelete
 
 
 class Command(BaseCommand):
@@ -163,7 +164,9 @@ class Command(BaseCommand):
                         extra_params["unique"] = True
 
                     if is_relation:
-                        ref_db_column, ref_db_table = relations[column_name]
+                        ref_db_column, ref_db_table, db_on_delete = relations[
+                            column_name
+                        ]
                         if extra_params.pop("unique", False) or extra_params.get(
                             "primary_key"
                         ):
@@ -191,6 +194,8 @@ class Command(BaseCommand):
                                 model_name.lower(),
                                 att_name,
                             )
+                        if db_on_delete and isinstance(db_on_delete, DatabaseOnDelete):
+                            extra_params["on_delete"] = f"models.{db_on_delete}"
                         used_relations.add(rel_to)
                     else:
                         # Calling `get_field_type` to get the field type string
@@ -227,8 +232,12 @@ class Command(BaseCommand):
                         "" if "." in field_type else "models.",
                         field_type,
                     )
+                    on_delete_qualname = extra_params.pop("on_delete", None)
                     if field_type.startswith(("ForeignKey(", "OneToOneField(")):
-                        field_desc += ", models.DO_NOTHING"
+                        if on_delete_qualname:
+                            field_desc += f", {on_delete_qualname}"
+                        else:
+                            field_desc += ", models.DO_NOTHING"
 
                     # Add comment.
                     if connection.features.supports_comments and row.comment:
@@ -350,21 +359,15 @@ class Command(BaseCommand):
         if field_type in {"CharField", "TextField"} and row.collation:
             field_params["db_collation"] = row.collation
 
-        if field_type == "DecimalField":
-            if row.precision is None or row.scale is None:
-                field_notes.append(
-                    "max_digits and decimal_places have been guessed, as this "
-                    "database handles decimal fields as float"
-                )
-                field_params["max_digits"] = (
-                    row.precision if row.precision is not None else 10
-                )
-                field_params["decimal_places"] = (
-                    row.scale if row.scale is not None else 5
-                )
-            else:
-                field_params["max_digits"] = row.precision
-                field_params["decimal_places"] = row.scale
+        if field_type == "DecimalField" and (
+            # This can generate DecimalFields with only one of max_digits and
+            # decimal_fields specified. This configuration would be incorrect,
+            # but nothing more correct could be generated.
+            row.precision is not None
+            or row.scale is not None
+        ):
+            field_params["max_digits"] = row.precision
+            field_params["decimal_places"] = row.scale
 
         return field_type, field_params, field_notes
 

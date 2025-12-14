@@ -23,13 +23,16 @@ jobs:
   docs:
     runs-on: ubuntu-24.04
     name: spelling
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
         with:
-          python-version: '3.13'
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'docs/requirements.txt'
       - run: python -m pip install -r docs/requirements.txt
@@ -41,13 +44,16 @@ jobs:
   blacken-docs:
     runs-on: ubuntu-latest
     name: blacken-docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
         with:
-          python-version: '3.13'
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
       - run: python -m pip install blacken-docs
       - name: Build docs
         run: |
@@ -62,13 +68,16 @@ jobs:
   lint-docs:
     runs-on: ubuntu-latest
     name: lint-docs
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
         with:
-          python-version: '3.13'
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
       - run: python -m pip install sphinx-lint
       - name: Build docs
         run: |

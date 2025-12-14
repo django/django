@@ -441,8 +441,13 @@ time-zone-related utilities in :mod:`django.utils.timezone`, respectively. If
 you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
-Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again:
+Save these changes and start a new Python interactive shell. (If a
+three-chevron prompt (>>>) indicates you are still in the shell, you need to
+exit first using ``exit()``). Run ``python manage.py shell`` again to reload
+the models.
+
+.. RemovedInDjango70Warning: When Python 3.12 is no longer supported,
+  ``exit()`` can be replaced with ``exit``.
 
 .. code-block:: pycon
 

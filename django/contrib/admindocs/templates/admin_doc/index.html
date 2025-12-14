@@ -2,10 +2,10 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; {% translate 'Documentation' %}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li aria-current="page">{% translate 'Documentation' %}</li>
+</ol>
 {% endblock %}
 {% block title %}{% translate 'Documentation' %}{% endblock %}
 

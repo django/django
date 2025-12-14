@@ -1,13 +1,11 @@
 import inspect
 import re
-import warnings
 
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
-from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_variables
 
@@ -156,21 +154,7 @@ def login(request, user, backend=None):
     have to reauthenticate on every request. Note that data set during
     the anonymous session is retained when the user logs in.
     """
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # session_auth_hash = user.get_session_auth_hash()
-    session_auth_hash = ""
-    # RemovedInDjango61Warning.
-    if user is None:
-        user = request.user
-        warnings.warn(
-            "Fallback to request.user when user is None will be removed.",
-            RemovedInDjango61Warning,
-            stacklevel=2,
-        )
-
-    # RemovedInDjango61Warning.
-    if hasattr(user, "get_session_auth_hash"):
-        session_auth_hash = user.get_session_auth_hash()
+    session_auth_hash = user.get_session_auth_hash()
 
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
@@ -199,20 +183,7 @@ def login(request, user, backend=None):
 
 async def alogin(request, user, backend=None):
     """See login()."""
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
-    # session_auth_hash = user.get_session_auth_hash()
-    session_auth_hash = ""
-    # RemovedInDjango61Warning.
-    if user is None:
-        warnings.warn(
-            "Fallback to request.auser() when user is None will be removed.",
-            RemovedInDjango61Warning,
-            stacklevel=2,
-        )
-        user = await request.auser()
-    # RemovedInDjango61Warning.
-    if hasattr(user, "get_session_auth_hash"):
-        session_auth_hash = user.get_session_auth_hash()
+    session_auth_hash = user.get_session_auth_hash()
 
     if await request.session.ahas_key(SESSION_KEY):
         if await _aget_user_session_key(request) != user.pk or (

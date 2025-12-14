@@ -287,11 +287,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
             parsed_origin = urlsplit(request_origin)
         except ValueError:
             return False
-        request_scheme = parsed_origin.scheme
-        request_netloc = parsed_origin.netloc
+        parsed_origin_scheme = parsed_origin.scheme
+        parsed_origin_netloc = parsed_origin.netloc
         return any(
-            is_same_domain(request_netloc, host)
-            for host in self.allowed_origin_subdomains.get(request_scheme, ())
+            is_same_domain(parsed_origin_netloc, host)
+            for host in self.allowed_origin_subdomains.get(parsed_origin_scheme, ())
         )
 
     def _check_referer(self, request):
