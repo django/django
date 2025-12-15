@@ -95,6 +95,11 @@ Minor features
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
+* Non-AutoField primary keys are now automatically made read-only in admin
+  change views to prevent accidental creation of duplicate objects or URL
+  mismatches. Set :attr:`~django.contrib.admin.ModelAdmin.editable_primary_key`
+  to ``True`` to opt out of this behavior (refs :ticket:`2259`).
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

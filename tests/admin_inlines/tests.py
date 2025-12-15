@@ -2570,3 +2570,48 @@ class SeleniumTests(AdminSeleniumTestCase):
         m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
         self.assertTrue(m2m_widget.is_displayed())
         self.take_screenshot("tabular")
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
+class PrimaryKeyReadonlyInlineTest(TestDataMixin, TestCase):
+    """
+    Tests for #2259: Non-AutoField primary keys should be readonly in inlines
+    on change views.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.superuser)
+        self.parent = ParentModelWithCustomPk.objects.create(
+            my_own_pk="parent-1", name="Parent"
+        )
+        self.child1 = ChildModel1.objects.create(
+            my_own_pk="child-1", name="Child 1", parent=self.parent
+        )
+
+    def test_inline_pk_readonly_in_change_view(self):
+        """Non-AutoField PK in inline should be readonly in change view."""
+        response = self.client.get(
+            reverse(
+                "admin:admin_inlines_parentmodelwithcustompk_change",
+                args=(self.parent.pk,),
+            )
+        )
+        # PK field should be readonly in the inline
+        # Check that the PK input is not present (it should be readonly)
+        self.assertNotContains(
+            response, 'name="childmodel1_set-0-my_own_pk"', status_code=200
+        )
+        # The PK value should be displayed (as readonly)
+        self.assertContains(response, "child-1")
+
+    def test_inline_pk_editable_in_add_view(self):
+        """Non-AutoField PK in inline should be editable in add view."""
+        response = self.client.get(
+            reverse("admin:admin_inlines_parentmodelwithcustompk_add")
+        )
+        # In add view, PK should be editable (input field present for new
+        # inline)
+        self.assertContains(
+            response, 'name="childmodel1_set-0-my_own_pk"', status_code=200
+        )

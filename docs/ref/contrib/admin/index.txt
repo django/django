@@ -1202,6 +1202,19 @@ subclass::
                     ((line,) for line in instance.get_full_address()),
                 ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
+.. attribute:: ModelAdmin.editable_primary_key
+
+    By default, non-AutoField primary keys are automatically made read-only in
+    change views to prevent accidental creation of duplicate objects or URL
+    mismatches. Set ``editable_primary_key`` to ``True`` to allow editing
+    primary keys in change views (not recommended).
+
+    This setting only affects change views; primary keys remain editable in add
+    views regardless of this setting. AutoField primary keys are not affected
+    by this setting as they are already handled by the form system.
+
+    By default, ``editable_primary_key`` is set to ``False``.
+
 .. attribute:: ModelAdmin.save_as
 
     Set ``save_as`` to enable a "save as new" feature on admin change forms.

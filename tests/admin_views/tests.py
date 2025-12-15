@@ -9,6 +9,7 @@ from urllib.parse import parse_qsl, urljoin, urlsplit
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
+from django.contrib.admin import site as admin_site
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
@@ -147,8 +148,10 @@ from .models import (
     WorkHour,
 )
 
-ERROR_MESSAGE = "Please enter the correct username and password \
-for a staff account. Note that both fields may be case-sensitive."
+ERROR_MESSAGE = (
+    "Please enter the correct username and password for a staff account. "
+    "Note that both fields may be case-sensitive."
+)
 
 MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 
@@ -7362,6 +7365,120 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         with self.settings(LANGUAGE_CODE="fr"):
             response = self.client.get(url)
         self.assertContains(response, "<label>Toppings\u00a0:</label>", html=True)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class PrimaryKeyReadonlyTest(AdminFieldExtractionMixin, TestCase):
+    """
+    Tests for #2259: Non-AutoField primary keys should be readonly by default
+    in admin change views.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.string_pk_obj = ModelWithStringPrimaryKey.objects.create(
+            string_pk="test-pk"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_non_autofield_pk_readonly_in_change_view(self):
+        """Non-AutoField PK should be readonly in change view."""
+        response = self.client.get(
+            reverse(
+                "admin:admin_views_modelwithstringprimarykey_change",
+                args=(self.string_pk_obj.pk,),
+            )
+        )
+        # PK field should be readonly (displayed as div, not input)
+        readonly_fields = self.get_admin_readonly_fields(response)
+        pk_field = [f for f in readonly_fields if f.field["name"] == "string_pk"][0]
+        self.assertTrue(pk_field.is_readonly)
+        # Should not have an input field for the PK
+        self.assertNotContains(response, 'name="string_pk"')
+
+    def test_non_autofield_pk_editable_in_add_view(self):
+        """Non-AutoField PK should be editable in add view."""
+        response = self.client.get(
+            reverse("admin:admin_views_modelwithstringprimarykey_add")
+        )
+        # PK field should be editable (input field present)
+        self.assertContains(response, 'name="string_pk"')
+        # Should not be in readonly fields
+        readonly_fields = self.get_admin_readonly_fields(response)
+        pk_field_names = [f.field["name"] for f in readonly_fields]
+        self.assertNotIn("string_pk", pk_field_names)
+
+    def test_autofield_pk_not_affected(self):
+        """AutoField PKs should not be affected (they're already handled)."""
+        from django.utils import timezone
+
+        article = Article.objects.create(
+            title="Test", content="Content", date=timezone.now()
+        )
+        response = self.client.get(
+            reverse("admin:admin_views_article_change", args=(article.pk,))
+        )
+        # AutoField PKs don't appear in forms anyway, so just verify no errors
+        self.assertEqual(response.status_code, 200)
+
+    def test_editable_primary_key_opt_out(self):
+        """Setting editable_primary_key=True should allow PK editing."""
+
+        class CustomAdmin(ModelAdmin):
+            editable_primary_key = True
+
+        # Temporarily register with custom admin
+        original_admin = admin_site._registry.get(ModelWithStringPrimaryKey)
+        admin_site.unregister(ModelWithStringPrimaryKey)
+        admin_site.register(ModelWithStringPrimaryKey, CustomAdmin)
+
+        try:
+            response = self.client.get(
+                reverse(
+                    "admin:admin_views_modelwithstringprimarykey_change",
+                    args=(self.string_pk_obj.pk,),
+                )
+            )
+            # With opt-out, PK should be editable
+            self.assertContains(response, 'name="string_pk"')
+            readonly_fields = self.get_admin_readonly_fields(response)
+            pk_field_names = [f.field["name"] for f in readonly_fields]
+            self.assertNotIn("string_pk", pk_field_names)
+        finally:
+            # Restore original registration
+            admin_site.unregister(ModelWithStringPrimaryKey)
+            if original_admin:
+                admin_site.register(ModelWithStringPrimaryKey, original_admin.__class__)
+            else:
+                admin_site.register(ModelWithStringPrimaryKey)
+
+    def test_pk_readonly_prevents_duplicate_on_change(self):
+        """Readonly PK should prevent creating duplicates via form
+        submission."""
+        # Try to submit a form that would change the PK (should be ignored)
+        data = {"string_pk": "new-pk-value"}
+        response = self.client.post(
+            reverse(
+                "admin:admin_views_modelwithstringprimarykey_change",
+                args=(self.string_pk_obj.pk,),
+            ),
+            data,
+        )
+        # Should succeed (redirect)
+        self.assertIn(response.status_code, [200, 302])
+        # Original object should still exist with original PK
+        self.assertTrue(
+            ModelWithStringPrimaryKey.objects.filter(string_pk="test-pk").exists()
+        )
+        # New object should NOT be created
+        self.assertFalse(
+            ModelWithStringPrimaryKey.objects.filter(string_pk="new-pk-value").exists()
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

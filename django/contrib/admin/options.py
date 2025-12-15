@@ -144,6 +144,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
+    editable_primary_key = False
 
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)
@@ -418,7 +419,26 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying custom readonly fields.
         """
-        return self.readonly_fields
+        readonly = list(self.readonly_fields) if self.readonly_fields else []
+
+        # Automatically make non-AutoField primary keys readonly in change
+        # views to prevent duplicate row creation and URL mismatches
+        # (refs #2259).
+        # For inline forms, obj is the parent object; for regular forms, obj
+        # is the object being edited. In both cases, if obj exists, we're in
+        # a change view.
+        if obj is not None and not self.editable_primary_key:
+            # Only apply to change views (obj exists), not add views
+            pk_field = self.model._meta.pk
+            # Skip AutoFields since they're already handled by formfield()
+            # returning None
+            if not isinstance(pk_field, models.AutoField):
+                pk_name = pk_field.name
+                # Only add if not already in readonly_fields
+                if pk_name not in readonly:
+                    readonly.append(pk_name)
+
+        return tuple(readonly) if readonly else self.readonly_fields
 
     def get_prepopulated_fields(self, request, obj=None):
         """
@@ -2406,7 +2426,13 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
         exclude = [] if excluded is None else list(excluded)
-        exclude.extend(self.get_readonly_fields(request, obj))
+        readonly_fields = self.get_readonly_fields(request, obj)
+        # Don't exclude readonly fields - they should be displayed as readonly,
+        # not hidden. This is especially important for non-AutoField PKs in
+        # change views (refs #2259).
+        for field in readonly_fields:
+            if field in exclude:
+                exclude.remove(field)
         if excluded is None and hasattr(self.form, "_meta") and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.
