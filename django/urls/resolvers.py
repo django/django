@@ -323,6 +323,7 @@ class RoutePattern(CheckURLMixin):
 
     def match(self, path):
         route = str(self._route)
+        print(type(self._route), repr(self._route))
 
         # Only use regex overhead if there are converters.
         if self.converters:
@@ -343,7 +344,7 @@ class RoutePattern(CheckURLMixin):
             if route == path:
                 return "", (), {}
         # If this isn't an endpoint, the path should start with the route.
-        elif path.startswith(self._route):
+        elif path.startswith(route):
             return path.removeprefix(route), (), {}
         return None
 
@@ -352,7 +353,7 @@ class RoutePattern(CheckURLMixin):
             *self._check_pattern_startswith_slash(),
             *self._check_pattern_unmatched_angle_brackets(),
         ]
-        route = self._route
+        route = str(self._route)
         if "(?P<" in route or route.startswith("^") or route.endswith("$"):
             warnings.append(
                 Warning(
