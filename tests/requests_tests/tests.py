@@ -1112,6 +1112,79 @@ class RequestsTests(SimpleTestCase):
         request.session["key"] = "value"
         self.assertEqual(request_copy.session, {})
 
+    def test_chunked_request_without_content_length(self):
+        """
+        Requests with Transfer-Encoding: chunked and no CONTENT_LENGTH
+        must not drop the request body (regression for #35838).
+        """
+        body = b"chunked body content"
+
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(body),
+                "HTTP_TRANSFER_ENCODING": "chunked",
+            }
+        )
+        self.assertEqual(request.body, body)
+
+    def test_chunked_request_empty_body(self):
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(b""),
+                "HTTP_TRANSFER_ENCODING": "chunked",
+            }
+        )
+        self.assertEqual(request.body, b"")
+
+    def test_chunked_with_content_length_uses_content_length(self):
+        """
+        If both Transfer-Encoding: chunked and CONTENT_LENGTH are provided,
+        CONTENT_LENGTH must still be respected.
+        """
+        body = b"abcdef"
+
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(body),
+                "HTTP_TRANSFER_ENCODING": "chunked",
+                "CONTENT_LENGTH": "3",
+            }
+        )
+        self.assertEqual(request.body, b"abc")
+
+    def test_no_content_length_and_no_chunked_has_empty_body(self):
+        """
+        Requests without CONTENT_LENGTH and without Transfer-Encoding
+        must continue to return an empty body.
+        """
+
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(b"unexpected"),
+            }
+        )
+        self.assertEqual(request.body, b"")
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
