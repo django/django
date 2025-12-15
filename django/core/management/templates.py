@@ -103,7 +103,8 @@ class TemplateCommand(BaseCommand):
         else:
             top_dir = os.path.abspath(os.path.expanduser(target))
             if app_or_project == "app":
-                self.validate_name(os.path.basename(top_dir), "directory")
+                #self.validate_name(os.path.basename(top_dir), "directory")
+                pass
             if not os.path.exists(top_dir):
                 raise CommandError(
                     "Destination directory '%s' does not "
