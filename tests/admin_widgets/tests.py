@@ -1284,7 +1284,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def assertButtonsDisabled(
         self,
-        mode,
         field_name,
         choose_btn_disabled=False,
         remove_btn_disabled=False,
@@ -1300,7 +1299,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertEqual(self.is_disabled(choose_all_button), choose_all_btn_disabled)
         self.assertEqual(self.is_disabled(remove_all_button), remove_all_btn_disabled)
 
-    def execute_basic_operations(self, mode, field_name):
+    def execute_basic_operations(self, field_name):
         from selenium.webdriver.common.by import By
 
         original_url = self.selenium.current_url
@@ -1326,7 +1325,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.assertSelectOptions(to_box, [str(self.lisa.id), str(self.peter.id)])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1351,7 +1349,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1376,7 +1373,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.assertSelectOptions(to_box, [])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1400,7 +1396,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.bob.id))
         self.select_option(from_box, str(self.john.id))
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=False,
             remove_btn_disabled=True,
@@ -1409,7 +1404,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.selenium.find_element(By.ID, choose_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1449,7 +1443,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(to_box, str(self.lisa.id))
         self.select_option(to_box, str(self.bob.id))
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=False,
@@ -1458,7 +1451,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.selenium.find_element(By.ID, remove_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1549,8 +1541,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
             self.wait_page_ready()
             self.trigger_resize()
-            self.execute_basic_operations("vertical", "students")
-            self.execute_basic_operations("horizontal", "alumni")
+            self.execute_basic_operations("students")
+            self.execute_basic_operations("alumni")
 
             # Save, everything should be stored properly stored in the
             # database.
