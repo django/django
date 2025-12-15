@@ -323,7 +323,6 @@ class RoutePattern(CheckURLMixin):
 
     def match(self, path):
         route = str(self._route)
-        print(type(self._route), repr(self._route))
 
         # Only use regex overhead if there are converters.
         if self.converters:
