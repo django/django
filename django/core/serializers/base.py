@@ -209,6 +209,34 @@ class Serializer:
         if callable(getattr(self.stream, "getvalue", None)):
             return self.stream.getvalue()
 
+    def _resolve_natural_key(self, obj):
+        """Return a natural key tuple for the given object when available."""
+        try:
+            return obj.natural_key()
+        except AttributeError:
+            return None
+
+    def _resolve_fk_natural_key(self, obj, field):
+        """
+        Return the natural key for a ForeignKey's related object, or None if
+        not supported.
+        """
+        if not self._model_supports_natural_key(field.remote_field.model):
+            return None
+
+        related = getattr(obj, field.name, None)
+        try:
+            return related.natural_key()
+        except AttributeError:
+            return None
+
+    def _model_supports_natural_key(self, model):
+        """Return True if the model defines a natural_key() method."""
+        try:
+            return callable(model.natural_key)
+        except AttributeError:
+            return False
+
 
 class Deserializer:
     """

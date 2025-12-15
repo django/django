@@ -20,9 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       python_versions_output: ${{ steps.set-matrix.outputs.python_versions }}
+    timeout-minutes: 60
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - id: set-matrix
         run: |
           python_versions=$(sed -n "s/^.*Programming Language :: Python :: \([[:digit:]]\+\.[[:digit:]]\+\).*$/'\1', /p" pyproject.toml | tr -d '\n' | sed 's/, $//g')
@@ -34,9 +37,12 @@ jobs:
     strategy:
       matrix:
         python-version: ${{ fromJson(needs.define-matrix.outputs.python_versions_output) }}
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:

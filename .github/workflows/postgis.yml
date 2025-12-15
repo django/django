@@ -36,9 +36,12 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:

@@ -1541,6 +1541,20 @@ class AliasTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
 
+    def test_alias_filtered_relation_sql_injection_dollar_sign(self):
+        qs = Book.objects.alias(
+            **{"crafted_alia$": FilteredRelation("authors")}
+        ).values("name", "crafted_alia$")
+        if connection.features.prohibits_dollar_signs_in_column_aliases:
+            msg = (
+                "Dollar signs are not permitted in column aliases on "
+                f"{connection.display_name}."
+            )
+            with self.assertRaisesMessage(ValueError, msg):
+                list(qs)
+        else:
+            self.assertEqual(qs.first()["name"], self.b1.name)
+
     def test_values_wrong_alias(self):
         expected_message = (
             "Cannot resolve keyword 'alias_typo' into field. Choices are: %s"

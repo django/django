@@ -1,0 +1,12 @@
+==========================
+Django 6.0.1 release notes
+==========================
+
+*Expected January 6, 2026*
+
+Django 6.0.1 fixes several bugs in 6.0.
+
+Bugfixes
+========
+
+* ...

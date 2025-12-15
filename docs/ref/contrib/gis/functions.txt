@@ -669,6 +669,19 @@ Accepts a geographic field or expression and returns its geometry type.
 Accepts a single geographic field or expression and returns the memory size
 (number of bytes) that the geometry field takes.
 
+``NumDimensions``
+-----------------
+
+.. versionadded:: 6.1
+
+.. class:: NumDimensions(expression, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Accepts a single geometry field or expression and returns the number of
+dimensions used by the geometry.
+
 ``NumGeometries``
 -----------------
 

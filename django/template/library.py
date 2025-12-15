@@ -4,6 +4,7 @@ from importlib import import_module
 from inspect import getfullargspec, unwrap
 
 from django.utils.html import conditional_escape
+from django.utils.inspect import lazy_annotations
 
 from .base import Node, Template, token_kwargs
 from .exceptions import TemplateSyntaxError
@@ -110,16 +111,26 @@ class Library:
         """
 
         def dec(func):
-            (
-                params,
-                varargs,
-                varkw,
-                defaults,
-                kwonly,
-                kwonly_defaults,
-                _,
-            ) = getfullargspec(unwrap(func))
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
+
+            if takes_context:
+                if params and params[0] == "context":
+                    del params[0]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
 
             @wraps(func)
             def compile_func(parser, token):
@@ -137,7 +148,6 @@ class Library:
                     defaults,
                     kwonly,
                     kwonly_defaults,
-                    takes_context,
                     function_name,
                 )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
@@ -165,41 +175,47 @@ class Library:
 
         def dec(func):
             nonlocal end_name
-
-            (
-                params,
-                varargs,
-                varkw,
-                defaults,
-                kwonly,
-                kwonly_defaults,
-                _,
-            ) = getfullargspec(unwrap(func))
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
 
             if end_name is None:
                 end_name = f"end{function_name}"
 
-            @wraps(func)
-            def compile_func(parser, token):
-                tag_params = params.copy()
-
-                if takes_context:
-                    if len(tag_params) >= 2 and tag_params[1] == "content":
-                        del tag_params[1]
-                    else:
-                        raise TemplateSyntaxError(
-                            f"{function_name!r} is decorated with takes_context=True so"
-                            " it must have a first argument of 'context' and a second "
-                            "argument of 'content'"
-                        )
-                elif tag_params and tag_params[0] == "content":
-                    del tag_params[0]
+            if takes_context:
+                if len(params) >= 2 and params[1] == "content":
+                    del params[1]
                 else:
                     raise TemplateSyntaxError(
-                        f"'{function_name}' must have a first argument of 'content'"
+                        f"{function_name!r} is decorated with takes_context=True so"
+                        " it must have a first argument of 'context' and a second "
+                        "argument of 'content'"
                     )
 
+                if params and params[0] == "context":
+                    del params[0]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
+            elif params and params[0] == "content":
+                del params[0]
+            else:
+                raise TemplateSyntaxError(
+                    f"{function_name!r} must have a first argument of 'content'"
+                )
+
+            @wraps(func)
+            def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 target_var = None
                 if len(bits) >= 2 and bits[-2] == "as":
@@ -212,13 +228,12 @@ class Library:
                 args, kwargs = parse_bits(
                     parser,
                     bits,
-                    tag_params,
+                    params,
                     varargs,
                     varkw,
                     defaults,
                     kwonly,
                     kwonly_defaults,
-                    takes_context,
                     function_name,
                 )
 
@@ -249,16 +264,26 @@ class Library:
         """
 
         def dec(func):
-            (
-                params,
-                varargs,
-                varkw,
-                defaults,
-                kwonly,
-                kwonly_defaults,
-                _,
-            ) = getfullargspec(unwrap(func))
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
+
+            if takes_context:
+                if params and params[0] == "context":
+                    params = params[1:]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
 
             @wraps(func)
             def compile_func(parser, token):
@@ -272,7 +297,6 @@ class Library:
                     defaults,
                     kwonly,
                     kwonly_defaults,
-                    takes_context,
                     function_name,
                 )
                 return InclusionNode(
@@ -391,7 +415,6 @@ def parse_bits(
     defaults,
     kwonly,
     kwonly_defaults,
-    takes_context,
     name,
 ):
     """
@@ -399,14 +422,6 @@ def parse_bits(
     particular by detecting syntax errors and by extracting positional and
     keyword arguments.
     """
-    if takes_context:
-        if params and params[0] == "context":
-            params = params[1:]
-        else:
-            raise TemplateSyntaxError(
-                "'%s' is decorated with takes_context=True so it must "
-                "have a first argument of 'context'" % name
-            )
     args = []
     kwargs = {}
     unhandled_params = list(params)

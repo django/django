@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
 "Last-Translator: BouRock, 2015-2025\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
@@ -28,7 +28,7 @@ msgstr ""
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Seçili %(verbose_name_plural)s nesnelerini sil"
+msgstr "Seçilen %(verbose_name_plural)s nesnelerini sil"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -334,11 +334,8 @@ msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta yoluyla bildirildi ve kısa süre "
 "içinde düzeltilecektir. Sabrınız için teşekkür ederiz."
 
-msgid "Run the selected action"
-msgstr "Seçilen eylemi çalıştır"
-
-msgid "Go"
-msgstr "Git"
+msgid "Run"
+msgstr "Çalıştır"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Tüm sayfalardaki nesneleri seçmek için buraya tıklayın"
@@ -448,6 +445,9 @@ msgstr "Sayıları göster"
 msgid "Clear all filters"
 msgstr "Tüm süzgeçleri temizle"
 
+msgid "Save"
+msgstr "Kaydet"
+
 msgid "Remove from sorting"
 msgstr "Sıralamadan kaldır"
 
@@ -469,28 +469,28 @@ msgstr "Temayı değiştir (şu anki tema: koyu)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' nesnesinin silinmesi, ilgili nesnelerin "
-"silinmesi ile sonuçlanacak, ancak hesabınız aşağıdaki nesnelerin türünü "
-"silmek için izine sahip değil."
+"%(object_name)s “%(escaped_object)s” nesnesinin silinmesi, ilgili nesnelerin "
+"silinmesi ile sonuçlanacak, ancak hesabınız aşağıdaki nesne türlerini silmek "
+"için izne sahip değil:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' nesnesinin silinmesi, aşağıda korunan "
+"%(object_name)s “%(escaped_object)s” nesnesinin silinmesi, aşağıda korunan "
 "ilgili nesnelerin silinmesini gerektirecek:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"%(object_name)s \"%(escaped_object)s\" nesnesini silmek istediğinize emin "
+"%(object_name)s “%(escaped_object)s” nesnesini silmek istediğinize emin "
 "misiniz? Aşağıdaki ilgili öğelerin tümü silinecektir:"
 
 msgid "Objects"
@@ -509,8 +509,8 @@ msgid ""
 "types of objects:"
 msgstr ""
 "Seçilen %(objects_name)s nesnelerinin silinmesi, ilgili nesnelerin silinmesi "
-"ile sonuçlanacak, ancak hesabınız aşağıdaki nesnelerin türünü silmek için "
-"izine sahip değil."
+"ile sonuçlanacak, ancak hesabınız aşağıdaki nesne türlerini silmek için izne "
+"sahip değil:"
 
 #, python-format
 msgid ""
@@ -600,6 +600,10 @@ msgstr "Kullanıcı"
 msgid "Action"
 msgstr "Eylem"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "%(name)s girişlerini sayfalandırma"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "giriş"
@@ -612,14 +616,19 @@ msgstr ""
 "Bu nesne değişme geçmişine sahip değil. Muhtemelen bu yönetici sitesi "
 "aracılığıyla eklenmedi."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "%(name)s sayfalandırma"
+
 msgid "Show all"
 msgstr "Tümünü göster"
 
-msgid "Save"
-msgstr "Kaydet"
-
 msgid "Popup closing…"
 msgstr "Açılır pencere kapanıyor…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "%(name)s ara"
 
 msgid "Search"
 msgstr "Ara"

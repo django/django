@@ -8,6 +8,7 @@ import asyncio
 import threading
 import warnings
 from contextlib import contextmanager
+from functools import lru_cache
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -29,6 +30,7 @@ except ImportError:
     raise ImproperlyConfigured("Error loading psycopg2 or psycopg module")
 
 
+@lru_cache
 def psycopg_version():
     version = Database.__version__.split(" ", 1)[0]
     return get_version_tuple(version)
@@ -87,6 +89,12 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
+def _get_decimal_column(data):
+    if data["max_digits"] is None and data["decimal_places"] is None:
+        return "numeric"
+    return "numeric(%(max_digits)s, %(decimal_places)s)" % data
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
@@ -103,7 +111,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "timestamp with time zone",
-        "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",
+        "DecimalField": _get_decimal_column,
         "DurationField": "interval",
         "FileField": "varchar(%(max_length)s)",
         "FilePathField": "varchar(%(max_length)s)",

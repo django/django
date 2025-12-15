@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
 "Last-Translator: BouRock, 2015-2025\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
@@ -150,6 +150,9 @@ msgstr "Hırvatça"
 
 msgid "Upper Sorbian"
 msgstr "Yukarı Sorb dili"
+
+msgid "Haitian Creole"
+msgstr "Haiti Kreyolu"
 
 msgid "Hungarian"
 msgstr "Macarca"
@@ -723,8 +726,8 @@ msgid "Many-to-many relationship"
 msgstr "Çoka-çok ilişki"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -888,6 +891,22 @@ msgstr "Evet"
 
 msgid "No"
 msgstr "Hayır"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Hazır"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Çalışıyor"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Başarısız oldu"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Başarılı"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"

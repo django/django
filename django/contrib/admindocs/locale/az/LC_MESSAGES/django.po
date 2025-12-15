@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2025-09-17 20:19+0000\n"
+"PO-Revision-Date: 2025-12-03 20:19+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -26,22 +26,22 @@ msgid "Home"
 msgstr "Ev"
 
 msgid "Documentation"
-msgstr "Dokumentasiya"
+msgstr "Sənədləşmə"
 
 msgid "Bookmarklets"
-msgstr "Bukmarkletlər"
+msgstr "Əlfəcin skriptləri"
 
 msgid "Documentation bookmarklets"
-msgstr "Sənədləşmə əlfəcinləri"
+msgstr "Sənədləşmə üçün əlfəcin skriptləri"
 
 msgid ""
 "To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Sənədləşmələri quraşdırmaq üçün linki əlfəcin alətləri panelinizə sürükləyin "
-"və ya linki sağ klikləyin və onu əlfəcinlərinizə əlavə edin. İndi siz saytın "
-"istənilən səhifəsindən bukmarklet seçə bilərsiniz."
+"Əlfəcin skriptlərini quraşdırmaq üçün keçidi əlfəcin alətləri panelinizə "
+"sürükləyin və ya keçidi sağ klikləyin və onu əlfəcinlərinizə əlavə edin. "
+"İndi siz saytın istənilən səhifəsindən əlfəcin skriptini seçə bilərsiniz."
 
 msgid "Documentation for this page"
 msgstr "Bu səhifənin sənədləri"
@@ -102,7 +102,7 @@ msgid ""
 "The admin documentation system requires Python’s <a "
 "href=\"%(link)s\">docutils</a> library."
 msgstr ""
-"Admin dokumentasiyası üçün Python-un <a href=\"%(link)s\">docutils</a> "
+"İnzibatçı sənədləşməsi üçün Python-un <a href=\"%(link)s\">docutils</a> "
 "kitabxanası tələb olunur."
 
 #, python-format
@@ -138,10 +138,10 @@ msgid "Arguments"
 msgstr "Arqumentlər"
 
 msgid "Back to Model documentation"
-msgstr "Model dokumentasiyaına qayıt"
+msgstr "Model sənədləşməsinə qayıt"
 
 msgid "Model documentation"
-msgstr "Model dokumentasiyası"
+msgstr "Model sənədləşməsi"
 
 msgid "Model groups"
 msgstr "Model qrupları"
@@ -166,13 +166,13 @@ msgid "(does not exist)"
 msgstr "(mövcud deyil)"
 
 msgid "Back to Documentation"
-msgstr "Dokumentasiyaya qayıt"
+msgstr "Sənədləşməyə qayıt"
 
 msgid "Template filters"
 msgstr "Şablon süzgəcləri"
 
 msgid "Template filter documentation"
-msgstr "Şablon süzgəc dokumentasiyası"
+msgstr "Şablon süzgəc sənədləşməsi"
 
 msgid "Built-in filters"
 msgstr "Qurulmuş süzgəclər"
@@ -189,7 +189,7 @@ msgid "Template tags"
 msgstr "Şablon teqləri"
 
 msgid "Template tag documentation"
-msgstr "Şablon teq dokumentasiyası"
+msgstr "Şablon teq sənədləşməsi"
 
 msgid "Built-in tags"
 msgstr "Qurulu teqlər"
@@ -213,10 +213,10 @@ msgid "Templates:"
 msgstr "Şablonlar:"
 
 msgid "Back to View documentation"
-msgstr "Görüntü dokumentasiyasına qayıdın"
+msgstr "Görüntü sənədləşməsinə qayıt"
 
 msgid "View documentation"
-msgstr "Görüntü dokumentasiyası"
+msgstr "Görüntü sənədləşməsi"
 
 msgid "Jump to namespace"
 msgstr "Ad sahəsinə keç"
