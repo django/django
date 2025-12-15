@@ -173,6 +173,8 @@ Identifier  Information
 .. _jsonl: https://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
+.. _serialization-formats-xml:
+
 XML
 ---
 
@@ -423,11 +425,6 @@ Then add the module containing the serializer definitions to your
         "json": "django.core.serializers.json",
     }
 
-.. versionchanged:: 5.2
-
-    A ``Deserializer`` class definition was added to each of the provided
-    serialization formats.
-
 .. _topics-serialization-natural-keys:
 
 Natural keys
@@ -641,6 +638,15 @@ command line flags to generate natural keys.
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 
+Subclasses can opt out of natural key serialization by returning an empty tuple
+(``()``) from ``natural_key()``. This tells the serializer to fall back to
+the standard primary key.
+
+.. versionchanged:: 6.1
+
+   Support for opting out of natural key serialization by returning an empty
+   tuple was added.
+
 .. _natural-keys-and-forward-references:
 
 Natural keys and forward references
@@ -672,7 +678,7 @@ Typical usage looks like this::
 
     objs_with_deferred_fields = []
 
-    for obj in serializers.deserialize("xml", data, handle_forward_references=True):
+    for obj in serializers.deserialize("json", data, handle_forward_references=True):
         obj.save()
         if obj.deferred_fields is not None:
             objs_with_deferred_fields.append(obj)
