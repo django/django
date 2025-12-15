@@ -1346,6 +1346,38 @@ class OperationTests(OperationTestBase):
         ponyrider = PonyRider.objects.create()
         ponyrider.riders.add(jockey)
 
+    def test_rename_m2m_field(self):
+        app_label = "test_rename_m2m_field"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("riders", models.ManyToManyField("Rider")),
+                    ],
+                ),
+            ],
+        )
+        new_state = self.apply_operations(
+            app_label,
+            project_state,
+            operations=[migrations.RenameField("Pony", "riders", "new_riders")],
+        )
+        Pony = new_state.apps.get_model(app_label, "Pony")
+        Rider = new_state.apps.get_model(app_label, "Rider")
+        pony = Pony.objects.create()
+        rider = Rider.objects.create()
+        pony.new_riders.add(rider)
+
     def test_rename_m2m_field_with_2_references(self):
         app_label = "test_rename_many_refs"
         project_state = self.apply_operations(
