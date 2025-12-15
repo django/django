@@ -9,6 +9,8 @@ from django.utils.copy import replace
 from django.utils.functional import cached_property
 
 from .fields import AddField, AlterField, FieldOperation, RemoveField, RenameField
+# 新增：导入权限和内容类型模型（修复#36793需要）
+from django.contrib.auth.models import Permission, ContentType
 
 
 def _check_for_duplicates(arg_name, objs):
@@ -491,6 +493,22 @@ class RenameModel(ModelOperation):
                     new_field,
                     strict=False,
                 )
+            try:
+                # 1. 获取旧模型的Content-Type（用缓存的小写名称，避免重复lower()）
+                old_ct = ContentType.objects.get(
+                    app_label=app_label,
+                    model=self.old_name_lower  # 用你的缓存属性，适配6.0.x
+                )
+                # 2. 获取新模型的Content-Type
+                new_ct = ContentType.objects.get(
+                    app_label=app_label,
+                    model=self.new_name_lower  # 用你的缓存属性
+                )
+                # 3. 同步权限：把旧模型的权限指向新模型
+                Permission.objects.filter(content_type=old_ct).update(content_type=new_ct)
+            except ContentType.DoesNotExist:
+                # 无Content-Type时跳过，不影响原有逻辑
+                pass
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.new_name_lower, self.old_name_lower = (
