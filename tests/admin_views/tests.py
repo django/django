@@ -1601,8 +1601,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             },
             {
                 "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "NumericPasswordValidator"
+                    "django.contrib.auth.password_validation.NumericPasswordValidator"
                 )
             },
         ]
@@ -1673,11 +1672,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 "UserAttributeSimilarityValidator"
             )
         },
-        {
-            "NAME": (
-                "django.contrib.auth.password_validation." "NumericPasswordValidator"
-            )
-        },
+        {"NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator")},
     ],
     TEMPLATES=[
         {
@@ -6248,6 +6243,33 @@ class SeleniumTests(AdminSeleniumTestCase):
             ),
         )
         self.take_screenshot("selectbox-non-collapsible")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_selectbox_selected_option(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        question = Question.objects.create(question="django")
+        url = self.live_server_url + reverse(
+            "admin7:admin_views_question_change", args=(question.big_id,)
+        )
+        self.selenium.get(url)
+        option = self.selenium.find_element(
+            By.CSS_SELECTOR, "select#id_related_questions_from option"
+        )
+        self.assertTrue(option.is_displayed())
+
+        # Selected and focused
+        option.click()
+        self.take_screenshot("selectbox-selected-focused")
+
+        # Selected but unfocused
+        body = self.selenium.find_element(By.TAG_NAME, "body")
+        body.send_keys(Keys.TAB)
+        self.take_screenshot("selectbox-selected-unfocused")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_selected_rows(self):
