@@ -188,7 +188,7 @@ To use Redis as your cache backend with Django:
 * Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
   instance, using the appropriate scheme. See the ``redis-py`` docs for
   `details on the available schemes
-  <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`__.
+  <https://redis.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`__.
 
 For example, if Redis is running on localhost (127.0.0.1) port 6379::
 
@@ -863,8 +863,8 @@ For cases like this, Django exposes a low-level cache API. You can use this API
 to store objects in the cache with any level of granularity you like. You can
 cache any Python object that can be pickled safely: strings, dictionaries,
 lists of model objects, and so forth. (Most common Python objects can be
-pickled; refer to the Python documentation for more information about
-pickling.)
+pickled; refer to the :mod:`Python documentation <pickle>` for more information
+about pickling.)
 
 Accessing the cache
 -------------------

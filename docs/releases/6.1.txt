@@ -118,6 +118,11 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   database function are now supported on SpatiaLite.
 
+* The new :lookup:`num_dimensions` lookup and :class:`NumDimensions()
+  <django.contrib.gis.db.models.functions.NumDimensions>` database function
+  allow filtering geometries by the number of dimensions on PostGIS and
+  SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -126,7 +131,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`inspectdb` now introspects
+  :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
+  installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,7 +233,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Management commands now set :class:`~argparse.ArgumentParser`\'s
+  ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
+  suggestions for mistyped subcommand names and argument choices.
 
 Migrations
 ~~~~~~~~~~
@@ -244,6 +253,22 @@ Models
   top-level :class:`~django.db.models.JSONField` value, or querying for
   top-level or nested JSON ``null`` values. See
   :ref:`storing-and-querying-for-none` for usage examples and some caveats.
+
+* :attr:`DecimalField.max_digits <django.db.models.DecimalField.max_digits>`
+  and :attr:`DecimalField.decimal_places
+  <django.db.models.DecimalField.decimal_places>` are no longer required to be
+  set on Oracle, PostgreSQL, and SQLite.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
+  21c+.
+
+* The new :class:`~django.db.models.functions.UUID4` and
+  :class:`~django.db.models.functions.UUID7` database functions were added.
+
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
 
 Pagination
 ~~~~~~~~~~
@@ -263,7 +288,10 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Subclasses of models defining the ``natural_key()`` method can now opt out of
+  natural key serialization by overriding the method to return an empty tuple:
+  ``()``. This ensures primary keys are serialized when using
+  :option:`dumpdata --natural-primary`.
 
 Signals
 ~~~~~~~
@@ -325,6 +353,10 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+* Support for GEOS 3.8 is removed.
+
+* Support for GDAL 3.1 and 3.2 is removed.
+
 :mod:`django.contrib.postgres`
 ------------------------------
 
@@ -333,6 +365,12 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+System checks
+-------------
+
+* The :djadmin:`check` management command now supplies all ``databases`` if not
+  specified. Callers should be prepared for databases to be accessed.
 
 Dropped support for PostgreSQL 14
 ---------------------------------

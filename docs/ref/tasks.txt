@@ -7,6 +7,10 @@ Tasks
 .. module:: django.tasks
    :synopsis: Django's built-in background Task system.
 
+The Task framework provides the contract and plumbing for background work, not
+the engine that runs it. The Tasks API defines how work is described, queued,
+and tracked, but leaves actual execution to external infrastructure.
+
 Task definition
 ===============
 
@@ -274,6 +278,10 @@ Task errors
 Backends
 ========
 
+Backends handle how Tasks are stored and executed. All backends share a common
+interface defined by ``BaseTaskBackend``, which specifies the core methods for
+enqueueing Tasks and retrieving results.
+
 Base backend
 ------------
 
@@ -364,6 +372,10 @@ Feature                      :class:`.DummyBackend`  :class:`.ImmediateBackend`
 
 Available backends
 ------------------
+
+Django includes only development and testing backends. These support local
+execution and inspection, for production ready backends refer to
+:ref:`configuring-a-task-backend`.
 
 Immediate backend
 ~~~~~~~~~~~~~~~~~

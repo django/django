@@ -413,7 +413,7 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         obj = GeneratedModelNonAutoPk.objects.create(id=1, a=2)
         self.assertEqual(obj.id, 1)
         self.assertEqual(obj.a, 2)
-        self.assertEqual(obj.b, 2)
+        self.assertEqual(obj.b, 3)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")

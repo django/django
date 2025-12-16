@@ -1,0 +1,11 @@
+rules:
+  dangerous-triggers:
+    ignore:
+      - coverage_comment.yml
+      - labels.yml
+      - new_contributor_pr.yml
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        psf/*: ref-pin

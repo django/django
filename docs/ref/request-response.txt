@@ -1058,7 +1058,7 @@ Methods
 .. method:: HttpResponse.close()
 
     This method is called at the end of the request directly by the WSGI
-    server.
+    or ASGI server.
 
 .. method:: HttpResponse.write(content)
 

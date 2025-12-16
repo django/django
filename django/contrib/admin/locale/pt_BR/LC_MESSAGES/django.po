@@ -6,9 +6,9 @@
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2019
 # Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2019
-# Filipe Cifali <cifali.filipe@gmail.com>, 2016
+# 4d0174b27b7822abd7a4a8c03ed19a69_59a53b9 <beacf43be9da9d9676ba062dfd34740a_20017>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
-# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
+# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024-2025
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Fabio Cerqueira <fabio@cerqueira.me>, 2019
@@ -38,9 +38,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024-2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -358,11 +358,8 @@ msgstr ""
 "Ocorreu um erro. Este foi reportado para os administradores do site via "
 "email e deve ser corrigido logo. Obirgado por sua paciência."
 
-msgid "Run the selected action"
-msgstr "Executar ação selecionada"
-
-msgid "Go"
-msgstr "Ir"
+msgid "Run"
+msgstr "Executar"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Clique aqui para selecionar os objetos de todas as páginas"
@@ -471,6 +468,9 @@ msgstr "Mostrar contagem"
 msgid "Clear all filters"
 msgstr "Limpar todos os filtros"
 
+msgid "Save"
+msgstr "Salvar"
+
 msgid "Remove from sorting"
 msgstr "Remover da ordenação"
 
@@ -492,28 +492,28 @@ msgstr "Alternar tema (tema atual: escuro)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"A remoção de '%(object_name)s' %(escaped_object)s pode resultar na remoção "
+"A remoção de %(object_name)s “%(escaped_object)s” pode resultar na remoção "
 "de objetos relacionados, mas sua conta não tem a permissão para remoção dos "
 "seguintes tipos de objetos:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Remover o %(object_name)s  ' %(escaped_object)s ' exigiria remover os "
+"Remover o %(object_name)s  “%(escaped_object)s” exigiria remover os "
 "seguintes objetos protegidos relacionados:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Você tem certeza que quer remover %(object_name)s \"%(escaped_object)s\"? "
+"Você tem certeza que quer remover %(object_name)s “%(escaped_object)s”? "
 "Todos os seguintes itens relacionados serão removidos:"
 
 msgid "Objects"
@@ -623,6 +623,10 @@ msgstr "Usuário"
 msgid "Action"
 msgstr "Ação"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paginação de %(name)s itens"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "entrada"
@@ -636,14 +640,19 @@ msgstr ""
 "Este objeto não tem histórico de alterações. Provavelmente não adicionado "
 "por este site de administração."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginação %(name)s"
+
 msgid "Show all"
 msgstr "Mostrar tudo"
 
-msgid "Save"
-msgstr "Salvar"
-
 msgid "Popup closing…"
 msgstr "Popup fechando…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Busca %(name)s"
 
 msgid "Search"
 msgstr "Pesquisar"

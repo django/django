@@ -27,6 +27,7 @@ from math import (
     tan,
 )
 from re import search as re_search
+from uuid import uuid4
 
 from django.db.backends.utils import (
     split_tzname_delta,
@@ -35,6 +36,10 @@ from django.db.backends.utils import (
 )
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
+from django.utils.version import PY314
+
+if PY314:
+    from uuid import uuid7
 
 
 def register(connection):
@@ -81,6 +86,9 @@ def register(connection):
     connection.create_aggregate("VAR_POP", 1, VarPop)
     connection.create_aggregate("VAR_SAMP", 1, VarSamp)
     connection.create_aggregate("ANY_VALUE", 1, AnyValue)
+    connection.create_function("UUIDV4", 0, _sqlite_uuid4)
+    if PY314:
+        connection.create_function("UUIDV7", 0, _sqlite_uuid7)
     # Some math functions are enabled by default in SQLite 3.35+.
     sql = "select sqlite_compileoption_used('ENABLE_MATH_FUNCTIONS')"
     if not connection.execute(sql).fetchone()[0]:
@@ -494,6 +502,14 @@ def _sqlite_tan(x):
     if x is None:
         return None
     return tan(x)
+
+
+def _sqlite_uuid4():
+    return uuid4().hex
+
+
+def _sqlite_uuid7():
+    return uuid7().hex
 
 
 class ListAggregate(list):

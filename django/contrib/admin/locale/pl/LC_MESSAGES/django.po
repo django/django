@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, "
 "2020,2022-2025\n"
 "Language-Team: Polish (http://app.transifex.com/django/django/language/pl/)\n"
@@ -346,11 +346,8 @@ msgstr ""
 "Niestety wystąpił błąd. Zostało to zgłoszone administratorom strony poprzez "
 "email i niebawem powinno zostać naprawione. Dziękujemy za cierpliwość."
 
-msgid "Run the selected action"
-msgstr "Wykonaj wybraną akcję"
-
-msgid "Go"
-msgstr "Wykonaj"
+msgid "Run"
+msgstr "Uruchom"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Kliknij by wybrać obiekty na wszystkich stronach"
@@ -460,6 +457,9 @@ msgstr "Pokaż ilości"
 msgid "Clear all filters"
 msgstr "Wyczyść wszystkie filtry"
 
+msgid "Save"
+msgstr "Zapisz"
+
 msgid "Remove from sorting"
 msgstr "Usuń z sortowania"
 
@@ -481,29 +481,29 @@ msgstr "Przełącz motyw (bieżący motyw: ciemny)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Usunięcie %(object_name)s „%(escaped_object)s” wiązałoby się z usunięciem "
-"obiektów z nim/nią powiązanych, ale niestety nie posiadasz uprawnień do "
-"usunięcia obiektów następujących typów:"
+"Usunięcie %(object_name)s “%(escaped_object)s” skutkowałoby skasowaniem "
+"obiektów powiązanych, ale niestety nie posiadasz uprawnień do usunięcia "
+"obiektów następujących typów: "
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Usunięcie %(object_name)s „%(escaped_object)s” wymagałoby skasowania "
-"następujących chronionych obiektów, które są z nim/nią powiązane:"
+"Usunięcie %(object_name)s “%(escaped_object)s” wymagałoby skasowania "
+"następujących chronionych obiektów powiązanych:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Czy chcesz skasować %(object_name)s „%(escaped_object)s”? Następujące "
-"obiekty powiązane zostaną usunięte:"
+"Czy jesteś pewien że chcesz usunąć %(object_name)s “%(escaped_object)s”? "
+"Wszystkie wymienione poniżej obiekty powiązane zostaną usunięte:"
 
 msgid "Objects"
 msgstr "Obiekty"
@@ -612,6 +612,10 @@ msgstr "Użytkownik"
 msgid "Action"
 msgstr "Akcja"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Pozycje paginacji %(name)s"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "wpis"
@@ -626,14 +630,19 @@ msgstr ""
 "Ten obiekt nie ma historii zmian. Najprawdopodobniej nie został on dodany "
 "poprzez panel administracyjny."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginacja %(name)s"
+
 msgid "Show all"
 msgstr "Pokaż wszystko"
 
-msgid "Save"
-msgstr "Zapisz"
-
 msgid "Popup closing…"
 msgstr "Zamykanie okna..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr " Wyszukaj %(name)s "
 
 msgid "Search"
 msgstr "Szukaj"

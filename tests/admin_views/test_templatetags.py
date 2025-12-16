@@ -1,13 +1,17 @@
 import datetime
+import unittest
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.templatetags.admin_list import date_hierarchy
 from django.contrib.admin.templatetags.admin_modify import submit_row
+from django.contrib.admin.templatetags.base import InclusionAdminNode
 from django.contrib.auth import get_permission_codename
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.template.base import Token, TokenType
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.version import PY314
 
 from .admin import ArticleAdmin, site
 from .models import Article, Question
@@ -130,6 +134,23 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         self.assertContains(response, "override-date_hierarchy")
         self.assertContains(response, "override-pagination")
         self.assertContains(response, "override-search_form")
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_inclusion_admin_node_deferred_annotation(self):
+        def action(arg: SomeType = None):  # NOQA: F821
+            pass
+
+        # This used to raise TypeError via the underlying call to
+        # inspect.getfullargspec(), which is not ready for deferred
+        # evaluation of annotations.
+        InclusionAdminNode(
+            "test",
+            parser=object(),
+            token=Token(token_type=TokenType.TEXT, contents="a"),
+            func=action,
+            template_name="test.html",
+            takes_context=False,
+        )
 
 
 class DateHierarchyTests(TestCase):

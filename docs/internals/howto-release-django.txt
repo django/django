@@ -471,12 +471,25 @@ Building the artifacts
 .. admonition:: Optionally use helper scripts
 
     You can streamline some of the steps below using helper scripts from the
-    Wiki:
+    ``scripts`` folder:
 
-    * `Release script
-      <https://code.djangoproject.com/wiki/ReleaseScript>`_
-    * `Test new version script
-      <https://code.djangoproject.com/wiki/ReleaseTestNewVersion>`_
+    * Release script example run:
+
+    .. code-block:: shell
+
+        $ PGP_KEY_ID=<key-id> PGP_KEY_URL=<key-url> DEST_FOLDER=~/releases scripts/do_django_release.py
+
+    * Test new version script:
+
+    .. code-block:: shell
+
+        $ VERSION=5.2.1 scripts/test_new_version.sh
+
+    * Confirm release signature script:
+
+    .. code-block:: shell
+
+        $ VERSION=5.2.1 scripts/confirm_release.sh
 
 #. Tag the release using ``git tag``. For example:
 
@@ -489,8 +502,7 @@ Building the artifacts
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``python -m build`` to generate the release packages. This will create
-   the release artifacts (tarball and wheel) in a ``dist/`` directory. For
-   Django 5.0 or older, you need to run ``make -f extras/Makefile`` instead.
+   the release artifacts (tarball and wheel) in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages:
 
@@ -692,6 +704,15 @@ You're almost done! All that's left to do now is:
 
    #. Update djangoproject.com's download page (`example PR
       <https://github.com/django/djangoproject.com/pull/1444>`__).
+
+   #. Process the older versions that will reach End-Of-Mainstream and/or
+      End-Of-Life support when this final release is published:
+
+      #. Ensure that the EOL versions are mentioned in the blog post. `Example
+         <https://www.djangoproject.com/weblog/2025/apr/02/django-52-released/>`_.
+
+      #. Create a tag for the EOL stable branch and delete the stable branch.
+         Inspect and use the ``scripts/archive_eol_stable_branches.py`` helper.
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.

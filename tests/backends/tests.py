@@ -19,6 +19,7 @@ from django.db import (
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper
+from django.db.models import BigAutoField, Value
 from django.db.models.sql.constants import CURSOR
 from django.test import (
     TestCase,
@@ -966,7 +967,7 @@ class ThreadTests(TransactionTestCase):
             connection.dec_thread_sharing()
 
 
-class MySQLPKZeroTests(TestCase):
+class MySQLAutoPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
     does not allow zero for autoincrement primary key if the
@@ -975,8 +976,15 @@ class MySQLPKZeroTests(TestCase):
 
     @skipIfDBFeature("allows_auto_pk_0")
     def test_zero_as_autoval(self):
-        with self.assertRaises(ValueError):
+        msg = "The database backend does not accept 0 as a value for AutoField."
+        with self.assertRaisesMessage(ValueError, msg):
             Square.objects.create(id=0, root=0, square=1)
+        with self.assertRaisesMessage(ValueError, msg):
+            Square.objects.create(id=Value(0, BigAutoField()), root=0, square=1)
+
+    @skipIfDBFeature("allows_auto_pk_0")
+    def test_no_error_when_filtering_with_expression(self):
+        self.assertSequenceEqual(Square.objects.filter(id=Value(0, BigAutoField())), ())
 
 
 class DBConstraintTestCase(TestCase):

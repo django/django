@@ -113,8 +113,9 @@ ancestor classes are  documented under the section title of **Ancestors
         If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
-        The default implementation returns ``HttpResponseNotAllowed`` with a
-        list of allowed methods in plain text.
+        The default implementation returns ``HttpResponseNotAllowed`` with the
+        list of allowed methods in the ``Allow`` header, as required by
+        :rfc:`RFC 7231 <7231#section-6.5.5>`. The response body is empty.
 
     .. method:: options(request, *args, **kwargs)
 

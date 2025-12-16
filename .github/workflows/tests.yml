@@ -19,15 +19,19 @@ permissions:
 
 jobs:
   windows:
+    if: github.event_name == 'push'
     runs-on: windows-latest
     strategy:
       matrix:
         python-version:
           - '3.14'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -43,9 +47,12 @@ jobs:
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:

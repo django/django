@@ -831,6 +831,39 @@ exclusive. Any combination of these options will result in an error.
     instance, removing its time component. This is true for both storage and
     comparison.
 
+.. warning::
+
+    On PostgreSQL and MySQL, arithmetic operations on a ``DateField`` with a
+    :class:`~datetime.timedelta` return a ``datetime`` instead of a ``date``.
+    This occurs because Python's ``timedelta`` is converted to SQL
+    ``INTERVAL``, and the SQL operation ``date +/- interval`` returns a
+    ``timestamp`` on these databases.
+
+    To ensure a ``date`` result, use one of the following approaches. Either
+    explicitly cast the result to a date::
+
+        import datetime
+        from django.db.models import DateField, F
+        from django.db.models.functions import Cast
+
+        qs = MyModel.objects.annotate(
+            previous_day=Cast(
+                F("date_field") - datetime.timedelta(days=1),
+                output_field=DateField(),
+            )
+        )
+
+    Or on PostgreSQL only, use integer arithmetic to represent days::
+
+        from django.db.models import DateField, ExpressionWrapper, F
+
+        qs = MyModel.objects.annotate(
+            previous_day=ExpressionWrapper(
+                F("date_field") - 1,  # Subtract 1 day as integer
+                output_field=DateField(),
+            )
+        )
+
 ``DateTimeField``
 -----------------
 
@@ -862,16 +895,22 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has the following **required** arguments:
+Has the following arguments:
 
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than or equal to ``decimal_places``.
+    must be greater than or equal to ``decimal_places``. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.decimal_places` is provided.
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number.
+    The number of decimal places to store with the number. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.max_digits` is provided.
 
 For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
@@ -894,6 +933,11 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
     should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
     of decimal fields.
+
+.. versionchanged:: 6.1
+
+    Support for ``DecimalField`` with no precision was added on Oracle,
+    PostgreSQL, and SQLite.
 
 ``DurationField``
 -----------------
@@ -1302,8 +1346,13 @@ materialized view.
     real column. If ``False``, the column acts as a virtual column and does
     not occupy database storage space.
 
-    PostgreSQL < 18 only supports persisted columns. Oracle only supports
-    virtual columns.
+    PostgreSQL < 18 only supports persisted columns. Oracle < 23ai/26ai (23.7)
+    only supports virtual columns.
+
+    .. versionchanged:: 6.1
+
+        Support for stored ``GeneratedField``\s was added on Oracle 23ai/26ai
+        (23.7+).
 
 .. admonition:: Database limitations
 

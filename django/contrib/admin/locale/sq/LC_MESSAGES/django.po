@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
@@ -326,11 +326,8 @@ msgstr ""
 "Pati një gabim. U është njoftuar përgjegjësve të sajtit përmes email-i dhe "
 "do të duhej ndrequr pa humbur kohë. Faleminderit për durimin."
 
-msgid "Run the selected action"
-msgstr "Kryej veprimin e përzgjedhur"
-
-msgid "Go"
-msgstr "Shko tek"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klikoni këtu që të përzgjidhni objektet nëpër krejt faqet"
@@ -350,13 +347,13 @@ msgid "Models in the %(name)s application"
 msgstr "Modele te aplikacioni %(name)s"
 
 msgid "Model name"
-msgstr ""
+msgstr "Emër modeli"
 
 msgid "Add link"
-msgstr ""
+msgstr "Shtoni lidhje"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Ndryshoni, ose shihni lidhje liste"
 
 msgid "Add"
 msgstr "Shtoni"
@@ -369,9 +366,11 @@ msgstr "S’keni leje të shihni apo të përpunoni gjë."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
+"Pasi të keni krijuar një përdoruesi, do të jeni në gjendje të përpunoni më "
+"tepër mundësi përdoruesi."
 
 msgid "Error:"
-msgstr ""
+msgstr "Gabim:"
 
 msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
@@ -439,6 +438,9 @@ msgstr "Shfaqi numrat"
 msgid "Clear all filters"
 msgstr "Spastroji krejt filtrat"
 
+msgid "Save"
+msgstr "Ruaje"
+
 msgid "Remove from sorting"
 msgstr "Hiqe prej renditjeje"
 
@@ -460,25 +462,25 @@ msgstr "Ndërroni temën (temë e tanishme: e errët)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Fshirja e %(object_name)s '%(escaped_object)s' do të shpinte në fshirjen e "
-"objekteve të lidhur me të, por llogaria juaj s’ka leje për fshirje të "
-"objekteve të llojeve të mëposhtëm:"
+"Fshirja e %(object_name)s “%(escaped_object)s” do të sjellë fshirjen e "
+"objekteve të lidhura me të, por llogaria juaj s’ka lehe të fshijë objekte të "
+"llojeve vijuese:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Fshirja e %(object_name)s '%(escaped_object)s' do të kërkonte fshirjen e "
-"objekteve të mbrojtur vijues, të lidhur me të:"
+"Fshirja e %(object_name)s “%(escaped_object)s” do të dojë doemos fshirjen e "
+"objekteve vijues të mbrojtur që lidhen me të:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 "Jeni i sigurt se doni të fshihet %(object_name)s “%(escaped_object)s”? Krejt "
@@ -568,7 +570,7 @@ msgstr ""
 "në këtë faqe. Do të donit të hyni në një llogari tjetër?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "Harruat kredencialet tuaja për hyrje?"
 
 msgid "Toggle navigation"
 msgstr "Shfaqni/fshihni lëvizjen"
@@ -591,6 +593,10 @@ msgstr "Përdorues"
 msgid "Action"
 msgstr "Veprim"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "zë"
@@ -603,14 +609,19 @@ msgstr ""
 "Ky objekt s’ka historik ndryshimesh. Gjasat janë të mos ketë qenë shtuar "
 "përmes këtij sajti admin."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Shfaqi krejt"
 
-msgid "Save"
-msgstr "Ruaje"
-
 msgid "Popup closing…"
 msgstr "Mbyllje flluske…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Kërko për %(name)s"
 
 msgid "Search"
 msgstr "Kërko"
@@ -736,7 +747,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Ju lutemi, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Në rast se e harruat, jeni:"
 
 msgid "Thanks for using our site!"
 msgstr "Faleminderit që përdorni sajtin tonë!"

@@ -9,7 +9,8 @@ The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
 Functions are also :doc:`expressions </ref/models/expressions>`, so they can be
 used and combined with other expressions like :ref:`aggregate functions
-<aggregation-functions>`.
+<aggregation-functions>`. See the :class:`~django.db.models.Func` documentation
+for security considerations.
 
 We'll be using the following model in examples of each function::
 
@@ -1783,10 +1784,10 @@ Usage example:
 ``StrIndex``
 ------------
 
-.. class:: StrIndex(string, substring, **extra)
+.. class:: StrIndex(expression, substring, **extra)
 
 Returns a positive integer corresponding to the 1-indexed position of the first
-occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
+occurrence of ``substring`` inside ``expression``, or 0 if ``substring`` is not
 found.
 
 Usage example:
@@ -1876,6 +1877,47 @@ Usage example:
     MARGARET SMITH
 
 .. _window-functions:
+
+UUID functions
+==============
+
+``UUID4``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID4()
+
+Generates a :rfc:`version 4 UUID <9562#section-5.4>`, which is random and is
+generated using a cryptographically secure method.
+
+.. admonition:: Availability
+
+    Available on PostgreSQL, SQLite, MariaDB version 11.7 or later, and Oracle
+    23ai/26ai (23.9) or later.
+
+``UUID7``
+---------
+
+.. versionadded:: 6.1
+
+.. class:: UUID7(shift=None)
+
+Generates a :rfc:`version 7 UUID <9562#section-5.7>`, which starts with a
+time-based component.
+
+.. admonition:: Availability
+
+    Available on PostgreSQL version 18 or later, MariaDB version 11.7 or later,
+    and SQLite on Python version 3.14 or later.
+
+.. admonition:: ``shift``
+
+    On PostgreSQL, ``UUID7`` also supports an optional ``shift`` value, which
+    can be used to offset the timestamp of the generated UUID. This should be a
+    :class:`datetime.timedelta` or an expression with an ``output_field`` of
+    :class:`~django.db.models.DurationField`. A positive value will shift the
+    timestamp into the future and a negative value into the past.
 
 Window functions
 ================
