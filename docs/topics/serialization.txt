@@ -356,7 +356,8 @@ Custom serialization formats
 In addition to the default formats, you can create a custom serialization
 format.
 
-Custom serializers must set ``internal_use_only = False`` to be usable with management commands such as dumpdata
+Custom serializers must set ``internal_use_only = False`` to be usable with
+management commands such as :djadmin:`dumpdata`
 
 For example, let’s consider a csv serializer and deserializer. First, define a
 ``Serializer`` and a ``Deserializer`` class. These can override existing
