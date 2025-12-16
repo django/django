@@ -33,24 +33,28 @@ jobs:
           python-version: '3.14'
 
       - name: Restore cached virtualenv
+        id: cache-venv
         uses: actions/cache/restore@v4
         with:
           key: venv-coverage-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}
           path: .venv
 
+      - name: Create virtualenv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+
       - name: Install dependencies
         run: |
-          if (-not (Test-Path .venv)) {
-            python -m venv .venv
-          }
           . .venv\Scripts\Activate.ps1
           python -m pip install --upgrade pip wheel
           python -m pip install -r tests/requirements/py3.txt -e .
           python -m pip install 'coverage[toml]' diff-cover
-          "$PWD\.venv\Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
-          "VIRTUAL_ENV=$PWD\.venv" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "$PWD\.venv\Scripts" >> $env:GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD\.venv" >> $env:GITHUB_ENV
 
       - name: Save cached virtualenv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           key: venv-coverage-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}

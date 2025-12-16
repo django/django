@@ -51,21 +51,23 @@ jobs:
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
       - name: Restore cached virtualenv
+        id: cache-venv
         uses: actions/cache/restore@v4
         with:
           key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}
           path: .venv
+      - name: Create virtualenv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: python -m venv .venv
       - name: Install dependencies
         run: |
-          if [ ! -d .venv ]; then
-            python -m venv .venv
-          fi
           source .venv/bin/activate
           python -m pip install --upgrade pip wheel
           python -m pip install -r tests/requirements/py3.txt -e .
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
       - name: Save cached virtualenv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}
