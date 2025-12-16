@@ -33,9 +33,38 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'docs/requirements.txt'
-      - run: python -m pip install -r docs/requirements.txt
+          
+      - name: Restore cached virtualenv
+        uses: actions/cache/restore@v4
+        with:
+          path: .venv
+          key: >
+            venv-docs-
+            linux-
+            ${{ steps.setup_python.outputs.python-version }}-
+            ${{ hashFiles('docs/requirements.txt') }}
+
+      - name: Install docs dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r docs/requirements.txt
+
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+      - name: Save cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          path: .venv
+          key: >
+            venv-docs-
+            linux-
+            ${{ steps.setup_python.outputs.python-version }}-
+            ${{ hashFiles('docs/requirements.txt') }}
+
       - name: Build docs
         run: |
           cd docs

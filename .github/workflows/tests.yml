@@ -36,11 +36,36 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
+      
+      - name: Restore cached virtualenv
+        uses: actions/cache/restore@v4
+        with:
+          path: .venv
+          key: >
+            venv-windows-
+            ${{ steps.setup_python.outputs.python-version }}-
+            ${{ hashFiles('tests/requirements/py3.txt') }}
+
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -e .
+        run: |
+          python -m venv .venv
+          .venv\Scripts\activate
+
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -e .
+
+          echo ".venv\Scripts" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+
+      - name: Save cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          path: .venv
+          key: >
+            venv-windows-
+            ${{ steps.setup_python.outputs.python-version }}-
+            ${{ hashFiles('tests/requirements/py3.txt') }}
+    
       - name: Run tests
         run: python -Wall tests/runtests.py -v2
 
