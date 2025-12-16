@@ -26,15 +26,31 @@ jobs:
           persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
+        id: setup_python
         with:
           python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Restore cached virtualenv
+        uses: actions/cache/restore@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}
+          path: .venv
+      - name: Install dependencies
+        run: |
+          if [ ! -d .venv ]; then
+            python -m venv .venv
+          fi
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -e .
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+      - name: Save cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt') }}
+          path: .venv
       - name: Run Selenium tests
         working-directory: ./tests/
         run: |
@@ -66,15 +82,31 @@ jobs:
           persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
+        id: setup_python
         with:
           python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Restore cached virtualenv
+        uses: actions/cache/restore@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt', 'tests/requirements/postgres.txt') }}
+          path: .venv
+      - name: Install dependencies
+        run: |
+          if [ ! -d .venv ]; then
+            python -m venv .venv
+          fi
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+      - name: Save cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt', 'tests/requirements/postgres.txt') }}
+          path: .venv
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
       - name: Run Selenium tests

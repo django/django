@@ -44,10 +44,9 @@ jobs:
           persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
+        id: setup_python
         with:
           python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Update apt repo
         run: sudo apt update
       - name: Install libmemcached-dev for pylibmc
@@ -61,9 +60,26 @@ jobs:
           POSTGRES_PASSWORD: postgres
         run: |
           PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -c "SELECT PostGIS_full_version();"
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Restore cached virtualenv
+        uses: actions/cache/restore@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt', 'tests/requirements/postgres.txt') }}
+          path: .venv
+      - name: Install dependencies
+        run: |
+          if [ ! -d .venv ]; then
+            python -m venv .venv
+          fi
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+      - name: Save cached virtualenv
+        uses: actions/cache/save@v4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('tests/requirements/py3.txt', 'tests/requirements/postgres.txt') }}
+          path: .venv
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
       - name: Run PostGIS tests
