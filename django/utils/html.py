@@ -397,7 +397,7 @@ class Urlizer:
                     attrs=nofollow_attr,
                     url=trimmed,
                 )
-                return mark_safe(f"{lead}{middle}{trail}")
+                return SafeString(f"{lead}{middle}{trail}")
             else:
                 if safe_input:
                     return mark_safe(word)
