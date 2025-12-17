@@ -1322,7 +1322,8 @@ Default primary key field type to use for models that don't have a field with
     Ensure you properly review any such migrations before applying them.
 
     To work around this, you may need to specify the default auto field for
-    each of your apps by setting their :attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+    each of your apps by setting their
+    :attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
     attribute.
 
 .. setting:: DEFAULT_CHARSET
