@@ -255,7 +255,7 @@ class EmailValidator:
         if domain_part not in self.domain_allowlist and not self.validate_domain_part(
             domain_part
         ):
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+            raise ValidationError(self.message, code=self.code, params={"value": value, "domain_part": domain_part})
 
     def validate_domain_part(self, domain_part):
         if self.domain_regex.match(domain_part):
