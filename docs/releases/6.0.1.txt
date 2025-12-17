@@ -24,3 +24,6 @@ Bugfixes
 * Fixed a regression in Django 6.0 that caused
   :meth:`~django.db.models.query.QuerySet.bulk_create` to crash
   when introspecting the connection on SQLite (:ticket:`36818`).
+
+* Fixed a visual regression in Django 6.0 for admin form fields grouped under a
+  ``<fieldset>`` in Safari (:ticket:`36807`).
