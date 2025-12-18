@@ -322,6 +322,8 @@ class RoutePattern(CheckURLMixin):
         self.name = name
 
     def match(self, path):
+        # Coerce lazy routes to str.
+        # path.startswith() does not support lazy objects.
         route = str(self._route)
 
         # Only use regex overhead if there are converters.
@@ -352,7 +354,7 @@ class RoutePattern(CheckURLMixin):
             *self._check_pattern_startswith_slash(),
             *self._check_pattern_unmatched_angle_brackets(),
         ]
-        route = str(self._route)
+        route = self._route
         if "(?P<" in route or route.startswith("^") or route.endswith("$"):
             warnings.append(
                 Warning(

@@ -1,8 +1,17 @@
 from django.urls import include, path, re_path
+from django.utils.translation import gettext_lazy as _
 
 from . import views
 
 urlpatterns = [
+    path(
+        _("test/"),
+        include(
+            [
+                path("child/", lambda request: None, name="child"),
+            ]
+        ),
+    ),
     path("articles/2003/", views.empty_view, name="articles-2003"),
     path("articles/<int:year>/", views.empty_view, name="articles-year"),
     path(
