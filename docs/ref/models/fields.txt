@@ -1377,6 +1377,9 @@ materialized view.
     backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
     deferred otherwise.
 
+:attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
+column is nullable depends on the database and expression used.
+
 ``GenericIPAddressField``
 -------------------------
 
