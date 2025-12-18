@@ -265,7 +265,7 @@ class UniqueConstraint(BaseConstraint):
         self,
         *expressions,
         fields=(),
-        name=None,
+        name,
         condition=None,
         deferrable=None,
         include=None,
