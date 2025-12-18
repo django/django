@@ -221,6 +221,7 @@ Model fields
   ``GeneratedField``\s.
 * **fields.E223**: ``GeneratedField.output_field`` has errors: ...
 * **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
+* **fields.W225**: ``null`` has no effect on ``GeneratedField``.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
