@@ -1660,6 +1660,13 @@ aria-describedby="id_birthday_error">
         with self.assertRaisesMessage(ValueError, "has no field named"):
             f.add_error("missing_field", "Some error.")
 
+        with self.assertRaisesMessage(
+            TypeError,
+            "The argument `field` must be `None` when the `error` argument is a "
+            "dictionary.",
+        ):
+            f.add_error("password1", ValidationError({"password1": "Some error."}))
+
     def test_update_error_dict(self):
         class CodeForm(Form):
             code = CharField(max_length=10)
