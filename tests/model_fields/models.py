@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection, models
 from django.db.models import F, Value
 from django.db.models.fields.files import ImageFieldFile
-from django.db.models.functions import Lower
+from django.db.models.functions import Cast, Lower
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
@@ -534,7 +534,7 @@ class UUIDGrandchild(UUIDChild):
 class GeneratedModelFieldWithConverters(models.Model):
     field = models.UUIDField()
     field_copy = models.GeneratedField(
-        expression=F("field"),
+        expression=Cast("field", models.UUIDField()),
         output_field=models.UUIDField(),
         db_persist=True,
     )
@@ -561,7 +561,7 @@ class GeneratedModelNonAutoPk(models.Model):
     id = models.IntegerField(primary_key=True)
     a = models.IntegerField()
     b = models.GeneratedField(
-        expression=F("a"),
+        expression=F("a") + 1,
         output_field=models.IntegerField(),
         db_persist=True,
     )

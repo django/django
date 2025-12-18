@@ -303,6 +303,15 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``raw``
+
+    .. versionadded:: 6.1
+
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
+
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this::
 
@@ -357,6 +366,8 @@ Argument        Value
 ``pk_set``      ``{t.id}`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
+
+``raw``         ``False`` (since it is not loaded from a fixture)
 ==============  ============================================================
 
 And if we would then do something like this:
@@ -387,6 +398,8 @@ Argument        Value
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
+
+``raw``         ``False`` (since it is not loaded from a fixture)
 ==============  ============================================================
 
 ``class_prepared``

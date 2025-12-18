@@ -447,8 +447,8 @@ Models
   expression and won't be validated during the model ``full_clean()``.
 * **models.W046**: ``<database>`` does not support comments on tables
   (``db_table_comment``).
-* **models.W047**: ``<database>`` does not support unique constraints with
-  nulls distinct.
+* **models.W047**: ``<database>`` does not support
+  ``UniqueConstraint.nulls_distinct``.
 * **models.E048**: ``constraints/indexes/unique_together`` refers to a
   ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
   not supported for that option.

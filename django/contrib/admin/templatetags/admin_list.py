@@ -25,7 +25,7 @@ from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats, timezone
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
@@ -76,6 +76,7 @@ def pagination(cl):
 @register.tag(name="pagination")
 def pagination_tag(parser, token):
     return InclusionAdminNode(
+        "pagination",
         parser,
         token,
         func=pagination,
@@ -102,11 +103,11 @@ def result_headers(cl):
             if field_name == "action_checkbox":
                 aria_label = _("Select all objects on this page for an action")
                 yield {
-                    "text": mark_safe(
+                    "text": SafeString(
                         f'<input type="checkbox" id="action-toggle" '
                         f'aria-label="{aria_label}">'
                     ),
-                    "class_attrib": mark_safe(' class="action-checkbox-column"'),
+                    "class_attrib": SafeString(' class="action-checkbox-column"'),
                     "sortable": False,
                 }
                 continue
@@ -255,7 +256,7 @@ def items_for_result(cl, result, form):
                     f, (models.DateField, models.TimeField, models.ForeignKey)
                 ):
                     row_classes.append("nowrap")
-        row_class = mark_safe(' class="%s"' % " ".join(row_classes))
+        row_class = SafeString(' class="%s"' % " ".join(row_classes))
         # If list_display_links not defined, add the link tag to the first
         # field
         if link_to_changelist:
@@ -361,6 +362,7 @@ def result_list(cl):
 @register.tag(name="result_list")
 def result_list_tag(parser, token):
     return InclusionAdminNode(
+        "result_list",
         parser,
         token,
         func=result_list,
@@ -376,6 +378,7 @@ def date_hierarchy(cl):
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
         field = get_fields_from_path(cl.model, field_name)[-1]
+        field_verbose_name = field.verbose_name
         if isinstance(field, models.DateTimeField):
             dates_or_datetimes = "datetimes"
         else:
@@ -418,6 +421,7 @@ def date_hierarchy(cl):
                 "choices": [
                     {"title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT"))}
                 ],
+                "field_name": field_verbose_name,
             }
         elif year_lookup and month_lookup:
             days = getattr(cl.queryset, dates_or_datetimes)(field_name, "day")
@@ -440,6 +444,7 @@ def date_hierarchy(cl):
                     }
                     for day in days
                 ],
+                "field_name": field_verbose_name,
             }
         elif year_lookup:
             months = getattr(cl.queryset, dates_or_datetimes)(field_name, "month")
@@ -457,6 +462,7 @@ def date_hierarchy(cl):
                     }
                     for month in months
                 ],
+                "field_name": field_verbose_name,
             }
         else:
             years = getattr(cl.queryset, dates_or_datetimes)(field_name, "year")
@@ -470,12 +476,14 @@ def date_hierarchy(cl):
                     }
                     for year in years
                 ],
+                "field_name": field_verbose_name,
             }
 
 
 @register.tag(name="date_hierarchy")
 def date_hierarchy_tag(parser, token):
     return InclusionAdminNode(
+        "date_hierarchy",
         parser,
         token,
         func=date_hierarchy,
@@ -500,6 +508,7 @@ def search_form(cl):
 @register.tag(name="search_form")
 def search_form_tag(parser, token):
     return InclusionAdminNode(
+        "search_form",
         parser,
         token,
         func=search_form,
@@ -532,7 +541,7 @@ def admin_actions(context):
 @register.tag(name="admin_actions")
 def admin_actions_tag(parser, token):
     return InclusionAdminNode(
-        parser, token, func=admin_actions, template_name="actions.html"
+        "admin_actions", parser, token, func=admin_actions, template_name="actions.html"
     )
 
 
@@ -540,6 +549,7 @@ def admin_actions_tag(parser, token):
 def change_list_object_tools_tag(parser, token):
     """Display the row of change list object tools."""
     return InclusionAdminNode(
+        "change_list_object_tools",
         parser,
         token,
         func=lambda context: context,

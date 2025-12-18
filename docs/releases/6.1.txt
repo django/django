@@ -237,6 +237,10 @@ Management Commands
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
   suggestions for mistyped subcommand names and argument choices.
 
+* The :djadmin:`loaddata` command now calls
+  :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
+  loading fixtures.
+
 Migrations
 ~~~~~~~~~~
 
@@ -263,6 +267,13 @@ Models
   :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
   21c+.
 
+* The new :class:`~django.db.models.functions.UUID4` and
+  :class:`~django.db.models.functions.UUID7` database functions were added.
+
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
+
 Pagination
 ~~~~~~~~~~
 
@@ -281,7 +292,10 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Subclasses of models defining the ``natural_key()`` method can now opt out of
+  natural key serialization by overriding the method to return an empty tuple:
+  ``()``. This ensures primary keys are serialized when using
+  :option:`dumpdata --natural-primary`.
 
 Signals
 ~~~~~~~
@@ -311,7 +325,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
+  durations expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~

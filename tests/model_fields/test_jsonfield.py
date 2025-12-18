@@ -1010,6 +1010,19 @@ class TestQuerying(TestCase):
             NullableJSONModel.objects.filter(value__foo__iexact='"BaR"').exists(), False
         )
 
+    def test_in(self):
+        tests = [
+            ([[]], [self.objs[1]]),
+            ([{}], [self.objs[2]]),
+            ([{"a": "b", "c": 14}], [self.objs[3]]),
+            ([[1, [2]]], [self.objs[5]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
     def test_key_in(self):
         tests = [
             ("value__c__in", [14], self.objs[3:5]),
@@ -1023,6 +1036,7 @@ class TestQuerying(TestCase):
                 [self.objs[7]],
             ),
             ("value__foo__in", [F("value__bax__foo")], [self.objs[7]]),
+            ("value__foo__in", [F("value__bax__foo"), {}], [self.objs[7]]),
             (
                 "value__foo__in",
                 [KeyTransform("foo", KeyTransform("bax", "value")), "baz"],
@@ -1031,6 +1045,17 @@ class TestQuerying(TestCase):
             ("value__foo__in", [F("value__bax__foo"), "baz"], [self.objs[7]]),
             ("value__foo__in", ["bar", "baz"], [self.objs[7]]),
             ("value__bar__in", [["foo", "bar"]], [self.objs[7]]),
+            ("value__bar__in", [Value(["foo", "bar"], JSONField())], [self.objs[7]]),
+            (
+                "value__bar__in",
+                [["foo", "bar"], Value({}, JSONField())],
+                [self.objs[7]],
+            ),
+            (
+                "value__bar__in",
+                [Value(["foo", "bar"], JSONField()), {"a": "b"}],
+                [self.objs[7]],
+            ),
             ("value__bar__in", [["foo", "bar"], ["a"]], [self.objs[7]]),
             ("value__bax__in", [{"foo": "bar"}, {"a": "b"}], [self.objs[7]]),
             ("value__h__in", [True, "foo"], [self.objs[4]]),
@@ -1295,6 +1320,22 @@ class JSONNullTests(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__isnull=True), [sql_null]
+        )
+
+    def test_filter_in(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        obj2 = NullableJSONModel.objects.create(value=[1])
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__in=[JSONNull(), [1], "foo"]),
+            [obj, obj2],
+        )
+
+    def test_key_in(self):
+        obj1 = NullableJSONModel.objects.create(value={"key": None})
+        obj2 = NullableJSONModel.objects.create(value={"key": [1]})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key__in=[JSONNull(), [1], 0]),
+            [obj1, obj2],
         )
 
     def test_bulk_update(self):

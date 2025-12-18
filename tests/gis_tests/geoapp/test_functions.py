@@ -14,13 +14,12 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
-from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import F, IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin
+from ..utils import FuncTestMixin, can_save_multipoint
 from .models import (
     City,
     Country,
@@ -965,12 +964,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ("MULTILINESTRING", MultiLineString),
             ("MULTIPOLYGON", MultiPolygon),
         ]
-        # GEOSWKTWriter_write() behavior was changed in GEOS 3.12+ to include
-        # parentheses for sub-members. MariaDB doesn't accept WKT
-        # representations with additional parentheses for MultiPoint. This is
-        # an accepted bug (MDEV-36166) in MariaDB that should be fixed in the
-        # future.
-        if not connection.ops.mariadb or geos_version_tuple() < (3, 12):
+        if can_save_multipoint:
             test_features.append(
                 Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1)))
             )

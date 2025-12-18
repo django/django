@@ -394,6 +394,49 @@ settings file  defines ``coverage_html`` as the output directory for the report
 and also excludes several directories not relevant to the results
 (test code or external code included in Django).
 
+.. _code-coverage-on-pull-requests:
+
+Code coverage on pull requests
+------------------------------
+
+Django's continuous integration (CI) system automatically runs code coverage
+analysis on pull requests and posts a comment with a diff coverage report. This
+helps reviewers see which lines in the changed code are covered by tests.
+
+**What the coverage report shows:**
+
+The coverage report posted on pull requests uses `diff-cover`_ to analyze only
+the lines that were changed or added in the PR. It shows:
+
+* Lines that are covered by tests (✓)
+* Lines that are not covered by tests (✗)
+* Lines that cannot be covered (e.g., comments, blank lines)
+
+.. _diff-cover: https://github.com/Bachmann1234/diff_cover
+
+**Important limitations:**
+
+When reviewing coverage reports on pull requests, keep these limitations in
+mind:
+
+* **Database-specific code:** The CI coverage job runs tests using SQLite on
+  Windows. Code paths specific to other databases (PostgreSQL, MySQL, Oracle)
+  will appear as "not covered" even if database-specific tests exist. This is
+  expected and acceptable.
+
+* **Platform-specific code:** Similarly, code that only runs on certain
+  operating systems (Linux, macOS) will appear as not covered when run on
+  Windows.
+
+* **Coverage doesn't equal quality:** A line being "covered" only means it was
+  executed during tests. It doesn't guarantee the line is well-tested or that
+  all edge cases are handled. During review, assess test quality beyond just
+  coverage numbers.
+
+
+Missing coverage should be considered a warning rather than a blocker and
+should be evaluated in context.
+
 .. _contrib-apps:
 
 Contrib apps
