@@ -215,12 +215,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # wildcard for the LIKE operator.
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     _pattern_ops = {
-        "contains": "'%%' || {} || '%%'",
-        "icontains": "'%%' || UPPER({}) || '%%'",
-        "startswith": "{} || '%%'",
-        "istartswith": "UPPER({}) || '%%'",
-        "endswith": "'%%' || {}",
-        "iendswith": "'%%' || UPPER({})",
+        # Wrap expressions with NVL to handle NULL values from functions like
+        # SUBSTR. Oracle treats NULL || 'string' as 'string', which causes
+        # LIKE NULL || '%' to become LIKE '%', incorrectly matching all rows.
+        # NVL converts NULL to CHR(0) (null byte), a safe replacement value.
+        "contains": "'%%' || NVL({}, CHR(0)) || '%%'",
+        "icontains": "'%%' || NVL(UPPER({}), CHR(0)) || '%%'",
+        "startswith": "NVL({}, CHR(0)) || '%%'",
+        "istartswith": "NVL(UPPER({}), CHR(0)) || '%%'",
+        "endswith": "'%%' || NVL({}, CHR(0))",
+        "iendswith": "'%%' || NVL(UPPER({}), CHR(0))",
     }
 
     _standard_pattern_ops = {

@@ -46,3 +46,33 @@ class SubstrTests(TestCase):
         self.assertQuerySetEqual(
             authors.order_by("name"), ["HN SM", "HONDA"], lambda a: a.name_part
         )
+
+    def test_substr_null_with_pattern_lookups(self):
+        """
+        Test that Substr works correctly with pattern lookups.
+
+        Regression test for #29222. On Oracle, SUBSTR(NULL, x, y) returns NULL,
+        which when concatenated in LIKE patterns without NVL, creates patterns
+        like LIKE '%' that incorrectly match all rows due to Oracle's NULL
+        concatenation behavior (NULL || 'text' = 'text' on Oracle).
+        """
+        # Author where name matches the Substr pattern from alias
+        match = Author.objects.create(name="JaneDoe", alias="janedoe")
+        # Author with alias but name doesn't match the pattern
+        Author.objects.create(name="Bob Wilson", alias="bobby")
+
+        # Substr("janedoe", 1, 4) = "jane", should only match "JaneDoe"
+        qs = Author.objects.filter(name__startswith=Substr("alias", 1, 4))
+        self.assertCountEqual(qs, [match])
+
+        # Case-insensitive startswith
+        qs = Author.objects.filter(name__istartswith=Substr("alias", 1, 4))
+        self.assertCountEqual(qs, [match])
+
+        # Substr("janedoe", 5, 3) = "doe", "JaneDoe" iendswith "doe"
+        qs = Author.objects.filter(name__iendswith=Substr("alias", 5, 3))
+        self.assertCountEqual(qs, [match])
+
+        # Substr("janedoe", 2, 4) = "aned", "JaneDoe" icontains "aned"
+        qs = Author.objects.filter(name__icontains=Substr("alias", 2, 4))
+        self.assertCountEqual(qs, [match])
