@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a regression in Django 6.0 that prevented changing the name of a
   :class:`~django.db.models.ManyToManyField` from taking effect when applying
   migrations (:ticket:`36800`).
+
+* Fixed a bug where management command colorized help (introduced in
+  Python 3.14) ignored the :option:`--no-color` option and the
+  :envvar:`DJANGO_COLORS` setting (:ticket:`36376`).
