@@ -341,12 +341,10 @@ class RoutePattern(CheckURLMixin):
                 return path[match.end() :], (), kwargs
         # If this is an endpoint, the path should be exactly the same as the
         # route.
-        elif self._is_endpoint:
-            if str(route) == path:
-                return "", (), {}
-
-        elif path.startswith(str(route)):
-            return path.removeprefix(str(route)), (), {}
+        elif not self._is_endpoint:
+            route_str = str(route)
+            if path.startswith(route_str):
+                return path[len(route_str) :], (), {}
         return None
 
     def check(self):
