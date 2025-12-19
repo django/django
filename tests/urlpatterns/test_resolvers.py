@@ -20,7 +20,7 @@ class ResolverCacheTests(SimpleTestCase):
 
 
 class LazyRouteIncludeTests(SimpleTestCase):
-    @override_settings(ROOT_URLCONF="urlpatterns.lazy_include_urls")
+    @override_settings(ROOT_URLCONF="urlpatterns.path_urls")
     def test_lazy_route_with_include_resolves(self):
         match = resolve("/test/child/")
         self.assertEqual(match.url_name, "child")
