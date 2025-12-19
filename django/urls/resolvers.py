@@ -315,7 +315,7 @@ class RoutePattern(CheckURLMixin):
     regex = LocaleRegexRouteDescriptor()
 
     def __init__(self, route, name=None, is_endpoint=False):
-        self._route = str(route)
+        self._route = route
         self._regex, self.converters = _route_to_regex(str(route), is_endpoint)
         self._regex_dict = {}
         self._is_endpoint = is_endpoint
@@ -342,11 +342,11 @@ class RoutePattern(CheckURLMixin):
         # If this is an endpoint, the path should be exactly the same as the
         # route.
         elif self._is_endpoint:
-            if route == path:
+            if str(route) == path:
                 return "", (), {}
-        # If this isn't an endpoint, the path should start with the route.
-        elif path.startswith(route):
-            return path.removeprefix(route), (), {}
+
+        elif path.startswith(str(route)):
+            return path.removeprefix(str(route)), (), {}
         return None
 
     def check(self):
