@@ -2833,6 +2833,8 @@ depending on the Task backend.
 
 ``TEMPLATE_TAGS_MULTILINE``
 ---------------------------
+.. versionadded:: 6.1
+.. deprecated:: 6.1
 
 Default: ``False``
 
