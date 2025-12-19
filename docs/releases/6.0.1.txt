@@ -27,3 +27,7 @@ Bugfixes
 
 * Fixed a visual regression in Django 6.0 for admin form fields grouped under a
   ``<fieldset>`` in Safari (:ticket:`36807`).
+
+* Fixed a crash in Django 6.0 caused by infinite recursion when calling
+  ``repr()`` on an unevaluated ``django.utils.csp.LazyNonce`` instance
+  (:ticket:`36810`).
