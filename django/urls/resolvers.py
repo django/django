@@ -315,7 +315,7 @@ class RoutePattern(CheckURLMixin):
     regex = LocaleRegexRouteDescriptor()
 
     def __init__(self, route, name=None, is_endpoint=False):
-        self._route = route
+        self._route = str(route)
         self._regex, self.converters = _route_to_regex(str(route), is_endpoint)
         self._regex_dict = {}
         self._is_endpoint = is_endpoint
@@ -324,7 +324,7 @@ class RoutePattern(CheckURLMixin):
     def match(self, path):
         # Coerce lazy routes to str.
         # path.startswith() does not support lazy objects.
-        route = str(self._route)
+        route = self._route
 
         # Only use regex overhead if there are converters.
         if self.converters:

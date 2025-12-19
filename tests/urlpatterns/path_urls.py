@@ -4,14 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from . import views
 
 urlpatterns = [
-    path(
-        _("test/"),
-        include(
-            [
-                path("child/", lambda request: None, name="child"),
-            ]
-        ),
-    ),
     path("articles/2003/", views.empty_view, name="articles-2003"),
     path("articles/<int:year>/", views.empty_view, name="articles-year"),
     path(
@@ -45,4 +37,5 @@ urlpatterns = [
     ),
     path("", include("urlpatterns.more_urls"), {"sub-extra": False}),
     path("<lang>/<path:url>/", views.empty_view, name="lang-and-path"),
+    path(_("lazy/"), include([path("child/", views.empty_view, name="child")])),
 ]
