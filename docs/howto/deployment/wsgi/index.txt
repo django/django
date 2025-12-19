@@ -16,6 +16,7 @@ Django includes getting-started documentation for the following WSGI servers:
 .. toctree::
    :maxdepth: 1
 
+   granian
    gunicorn
    uwsgi
    modwsgi
