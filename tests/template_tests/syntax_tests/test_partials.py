@@ -6,8 +6,8 @@ from django.template import (
 )
 from django.template.base import Token, TokenType
 from django.test import (
-    override_settings,
     SimpleTestCase,
+    override_settings,
 )
 from django.views.debug import ExceptionReporter
 
@@ -571,7 +571,7 @@ class PartialTagTests(SimpleTestCase):
         if self.engine.debug:
             exc_debug = cm.exception.template_debug
 
-            self.assertEqual(exc_debug["during"], '{% if user %}')
+            self.assertEqual(exc_debug["during"], "{% if user %}")
             self.assertEqual(exc_debug["name"], "partial_with_syntax_error")
             self.assertIn("endif", exc_debug["message"].lower())
 
