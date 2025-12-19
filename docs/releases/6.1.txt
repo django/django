@@ -274,6 +274,9 @@ Models
   (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
   Oracle 23ai/26ai (23.7+).
 
+* The :data:`~django.db.models.signals.m2m_changed` signal now receives a
+  ``raw`` argument.
+
 Pagination
 ~~~~~~~~~~
 
