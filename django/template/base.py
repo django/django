@@ -58,7 +58,7 @@ from enum import Enum
 
 from django.conf import settings
 from django.template.context import BaseContext
-from django.utils.deprecation import django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import lazy_annotations
@@ -67,7 +67,6 @@ from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
-from django.utils.deprecation import RemovedInDjango70Warning
 
 from .exceptions import TemplateSyntaxError
 
@@ -411,7 +410,6 @@ class Token:
 class Lexer:
     # RemovedInDjango70Warning: When the deprecation ends, remove this
     _has_warned_for_multiline = False
-
 
     def __init__(self, template_string):
         self.template_string = template_string
