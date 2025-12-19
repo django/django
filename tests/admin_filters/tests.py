@@ -20,7 +20,15 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
-from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
+from .models import (
+    Book,
+    BookBinaryInfo,
+    Bookmark,
+    Department,
+    Employee,
+    ImprovedBook,
+    TaggedItem,
+)
 
 
 def select_by(dictlist, key, value):
@@ -2047,6 +2055,44 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [jane])
+
+    def test_binaryfield_listfilter(self):
+        from urllib.parse import parse_qsl, quote, urlparse
+
+        class BookBinaryInfoAdmin(ModelAdmin):
+            list_filter = ["datas"]
+
+        datas = b"test"
+        BookBinaryInfo.objects.create(datas=datas)
+        modeladmin = BookBinaryInfoAdmin(BookBinaryInfo, site)
+        request = self.request_factory.get("/")
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+        try:
+            choice = select_by(choices, "display", str(datas))
+        except IndexError as e:
+            raise IndexError(f"{e}, choices={choices}")
+        self.assertEqual(
+            choice["query_string"],
+            "?datas=%s" % (quote(str(datas)),),
+        )
+        binary_choice_href = choice["query_string"]
+        filter_request_query = urlparse(binary_choice_href).query
+        filter_request_params = dict(parse_qsl(filter_request_query))
+        filter_modeladmin = BookBinaryInfoAdmin(BookBinaryInfo, site)
+        filter_request = self.request_factory.get("/", filter_request_params)
+        filter_request.user = self.alfred
+        filter_changelist = filter_modeladmin.get_changelist_instance(filter_request)
+        queryset = filter_changelist.get_queryset(filter_request)
+        result = list(queryset)
+        result_datas = (
+            result[0].datas.tobytes()
+            if isinstance(result[0].datas, memoryview)
+            else result[0].datas
+        )
+        self.assertEqual(result_datas, datas)
 
 
 class FacetsMixinTests(SimpleTestCase):
