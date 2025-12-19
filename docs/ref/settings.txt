@@ -2836,11 +2836,11 @@ depending on the Task backend.
 .. versionadded:: 6.1
 .. deprecated:: 6.1
 
-Default: ``False``
+Default: ``True``
 
 Turns on multi-line parsing of templates. If this setting is ``False`` it will
-produce a warning. This is planned to be the default behavior in Django 7.0.
-
+produce a warning the first time a template is rendered. This option will be
+removed in Django 7.0.
 
 .. setting:: TEMPLATES
 

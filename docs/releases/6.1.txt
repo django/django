@@ -90,9 +90,11 @@ not trigger the ``pre_delete`` or ``post_delete`` signals.
 Multi-line template tags and variables
 --------------------------------------
 
-A new setting :setting:`TEMPLATE_TAGS_MULTILINE` is available to switch to a
-multi-line mode for the template engine. If this is turned on you can use
-newlines inside template tags and variable blocks to improve readability:
+Template tags are now multi-line by default. You can get the old behavior
+by setting :setting:`TEMPLATE_TAGS_MULTILINE` to ``False``. This option
+will be removed in Django 7.0.
+
+With this new behavior you can now do this:
 
 .. code-block:: html+django
 
@@ -108,9 +110,9 @@ newlines inside template tags and variable blocks to improve readability:
         | filter2
     }}
 
-This setting is turned on by default with new projects when using
-:djadmin:`django-admin startproject <startproject>`, and a warning is issued if
-you are using the old behavior.
+    {#
+        comment
+    #}
 
 
 Minor features
@@ -442,6 +444,11 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The non-multiline template syntax is deprecated. Set
+  ``TEMPLATE_TAGS_MULTILINE=False`` in ``settings.py`` to opt out of the new
+  behavior. This setting will be removed in 7.0.
+
 
 Features removed in 6.1
 =======================

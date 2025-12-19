@@ -66,8 +66,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_TAGS_MULTILINE = True
-
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 
 
