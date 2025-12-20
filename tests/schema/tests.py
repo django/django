@@ -67,6 +67,7 @@ from django.db.models.functions import (
     Upper,
 )
 from django.db.models.indexes import IndexExpression
+from django.db.models.lookups import In as InLookup
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
@@ -2571,6 +2572,57 @@ class SchemaTests(TransactionTestCase):
             if details["columns"] == [new_field_name] and details["check"]
         ]
         self.assertEqual(len(check_constraints), 1)
+
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
+    @isolate_apps("schema")
+    def test_field_custom_constraint_detected_in_alter_field(self):
+        class CharChoiceField(CharField):
+            """
+            A custom CharField that automatically creates a db constraint to guarante
+            that the stored value respects the field's `choices`.
+            """
+
+            @property
+            def non_db_attrs(self):
+                # Remove `choices` from non_db_attrs so that migrations that only change
+                # choices still trigger a db operation and drop/create the constraint.
+                attrs = super().non_db_attrs
+                return tuple({*attrs} - {"choices"})
+
+            def db_check(self, connection, **overrides):
+                if not self.choices:
+                    return None
+                data = self.db_type_parameters(connection) | overrides
+                constraint = CheckConstraint(
+                    condition=InLookup(F(data["column"]), dict(self.choices)),
+                    name="",  # doesn't matter, Django will reassign one anyway
+                )
+                with connection.schema_editor() as schema_editor:
+                    return constraint._get_check_sql(self.model, schema_editor)
+
+        class ModelWithCustomField(Model):
+            f = CharChoiceField(choices=[])
+
+            class Meta:
+                app_label = "schema"
+
+        self.isolated_local_models = [ModelWithCustomField]
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithCustomField)
+
+        constraints = self.get_constraints_for_column(ModelWithCustomField, "f")
+        self.assertEqual(len(constraints), 0)
+
+        old_field = ModelWithCustomField._meta.get_field("f")
+        new_field = CharChoiceField(choices=[("a", "a")])
+        new_field.contribute_to_class(ModelWithCustomField, "f")
+        with connection.schema_editor() as editor:
+            editor.alter_field(ModelWithCustomField, old_field, new_field, strict=True)
+
+        constraints = self.get_constraints_for_column(ModelWithCustomField, "f")
+        self.assertEqual(len(constraints), 1)
 
     def _test_m2m_create(self, M2MFieldClass):
         """
