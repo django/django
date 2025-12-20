@@ -217,35 +217,15 @@
             
             // Focus on the "Now" option for better screen reader experience
             // Screen readers can then navigate the dialog naturally
-            const nowLink = clock_box.querySelector('ul.timelist li:first-child a');
-            if (nowLink) {
-                nowLink.focus();
-            } else {
-                // Fallback to first focusable element
-                const firstFocusableElement = clock_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
-                if (firstFocusableElement) {
-                    firstFocusableElement.focus();
-                } else {
-                    clock_box.focus();
-                }
-            }
+            clock_box.querySelector('button, [role="button"]').focus();
             
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
         },
         dismissClock: function(num) {
             const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
             clock_box.style.display = 'none';
-            
-            // Remove focus loop
-            DateTimeShortcuts.removeFocusLoop(clock_box);
-            
-            // Restore focus to the trigger button
-            if (DateTimeShortcuts.lastFocusedElement) {
-                DateTimeShortcuts.lastFocusedElement.focus();
-                DateTimeShortcuts.lastFocusedElement = null;
-            }
-            
-            document.removeEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
+            const trigger = document.querySelector(`[aria-controls="${clock_box.id}"]`);
+            trigger.focus();
         },
         handleClockQuicklink: function(num, val) {
             let d;
