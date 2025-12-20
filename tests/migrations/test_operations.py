@@ -1759,6 +1759,27 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
 
+    def test_alter_index_together_remove_preserves_unique_constraint(self):
+        project_state = self.set_up_test_model("test_alintounique", unique_together=True, index_together=True)
+        operation = migrations.AlterIndexTogether("Pony", None)
+        new_state = project_state.clone()
+        operation.state_forwards("test_alintounique", new_state)
+        unique_together = new_state.models["test_alintounique", "pony"].options.get("unique_together", set())
+        self.assertEqual({tuple(fields) for fields in unique_together}, {("pink", "weight")})
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO test_alintounique_pony (pink, weight) VALUES (1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute("INSERT INTO test_alintounique_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("DELETE FROM test_alintounique_pony")
+            with connection.schema_editor() as editor:
+                operation.database_forwards("test_alintounique", editor, project_state, new_state)
+            cursor.execute("INSERT INTO test_alintounique_pony (pink, weight) VALUES (1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute("INSERT INTO test_alintounique_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("DELETE FROM test_alintounique_pony")
+
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")
