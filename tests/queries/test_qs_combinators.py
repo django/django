@@ -1,9 +1,20 @@
 from django.db import connection
-from django.db.models import Exists, F, IntegerField, OuterRef, Value
+from django.db.models import Exists, F, IntegerField, OuterRef, Q, Value
 from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils import timezone
 
-from .models import Number, ReservedName
+from .models import (
+    Author,
+    DateTimePK,
+    ExtraInfo,
+    Item,
+    NamedCategory,
+    Note,
+    Number,
+    ReservedName,
+    Tag,
+)
 
 
 @skipUnlessDBFeature('supports_select_union')
@@ -285,3 +296,60 @@ class QuerySetSetOperationTests(TestCase):
                         msg % (operation, combinator),
                     ):
                         getattr(getattr(qs, combinator)(qs), operation)()
+
+
+class ExistsOuterRefCorrelationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.category_with_item = NamedCategory.objects.create(name='with-item')
+        cls.category_without_item = NamedCategory.objects.create(name='without-item')
+
+        cls.tag_with_item = Tag.objects.create(
+            name='tag-with',
+            category=cls.category_with_item,
+        )
+        cls.tag_without_item = Tag.objects.create(
+            name='tag-without',
+            category=cls.category_without_item,
+        )
+
+        note = Note.objects.create(note='note', misc='misc', tag=cls.tag_with_item)
+        date_pk = DateTimePK.objects.create()
+        extra = ExtraInfo.objects.create(info='extra', note=note, value=1, date=date_pk)
+        author = Author.objects.create(name='author', num=1, extra=extra)
+
+        item = Item.objects.create(
+            name='item-with-tag',
+            created=timezone.now(),
+            modified=timezone.now(),
+            creator=author,
+            note=note,
+        )
+        item.tags.add(cls.tag_with_item)
+
+    def _category_names(self, queryset):
+        return list(queryset.order_by('name').values_list('name', flat=True))
+
+    def test_exists_filter_outerref(self):
+        qs = NamedCategory.objects.annotate(
+            has_items=Exists(
+                Item.objects.filter(tags__category_id=OuterRef('pk')),
+            )
+        ).filter(has_items=True)
+        self.assertEqual(self._category_names(qs), ['with-item'])
+
+    def test_exists_exclude_outerref(self):
+        qs = NamedCategory.objects.annotate(
+            has_other_items=Exists(
+                Item.objects.exclude(tags__category_id=OuterRef('pk')),
+            )
+        ).filter(has_other_items=True)
+        self.assertEqual(self._category_names(qs), ['without-item'])
+
+    def test_exists_negated_q_outerref(self):
+        qs = NamedCategory.objects.annotate(
+            has_other_items=Exists(
+                Item.objects.filter(~Q(tags__category_id=OuterRef('pk'))),
+            )
+        ).filter(has_other_items=True)
+        self.assertEqual(self._category_names(qs), ['without-item'])

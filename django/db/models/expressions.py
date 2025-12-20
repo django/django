@@ -1028,7 +1028,17 @@ class Subquery(Expression):
     contains_aggregate = False
 
     def __init__(self, queryset, output_field=None, **extra):
-        self.query = queryset.query
+        if hasattr(queryset, 'query'):
+            query = queryset.query
+        else:
+            from django.db.models.sql.query import Query
+
+            if isinstance(queryset, Query):
+                query = queryset
+            else:
+                raise TypeError('Subquery requires a QuerySet or Query instance.')
+        self.query = query
+        self._original_query = query.clone()
         self.extra = extra
         super().__init__(output_field)
 
@@ -1049,7 +1059,19 @@ class Subquery(Expression):
     def copy(self):
         clone = super().copy()
         clone.query = clone.query.clone()
+        clone._original_query = self._original_query.clone()
         return clone
+
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
+                           summarize=False, for_save=False):
+        if query is self.query:
+            clone = self.copy()
+            clone.is_summary = summarize
+            return clone
+        return super().resolve_expression(
+            query, allow_joins=allow_joins, reuse=reuse,
+            summarize=summarize, for_save=for_save,
+        )
 
     @property
     def external_aliases(self):
@@ -1058,7 +1080,11 @@ class Subquery(Expression):
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
+        outer_query = getattr(compiler.query, '_subquery_outer_query', compiler.query)
+        base_query = self._original_query.clone()
+        resolved_query = base_query.resolve_expression(outer_query)
+        resolved_query._subquery_outer_query = outer_query
+        subquery_sql, sql_params = resolved_query.as_sql(compiler, connection)
         template_params['subquery'] = subquery_sql[1:-1]
 
         template = template or template_params.get('template', self.template)

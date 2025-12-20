@@ -23,7 +23,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, F, OuterRef, Ref, SimpleCol,
+    BaseExpression, Col, F, OuterRef, Ref, SimpleCol, Subquery,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -1737,8 +1737,9 @@ class Query(BaseExpression):
             query.where.add(lookup, AND)
             query.external_aliases.add(alias)
 
+        query.subquery = True
         condition, needed_inner = self.build_filter(
-            ('%s__in' % trimmed_prefix, query),
+            ('%s__in' % trimmed_prefix, Subquery(query)),
             current_negated=True, branch_negated=True, can_reuse=can_reuse)
         if contains_louter:
             or_null_condition, _ = self.build_filter(
