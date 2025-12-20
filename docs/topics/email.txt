@@ -262,9 +262,10 @@ addresses should not be constructed manually using string formatting::
 Manually formatting addresses can lead to improperly quoted values or invalid
 headers if the name or email address contains special characters, and may
 result in header values that are rejected by Django's email functions. Instead,
-Python's standard library provides ``email.utils.formataddr()``, which correctly
-formats email addresses with display names, handling quoting and escaping as
-required. The returned value can be passed directly to Django's email functions::
+Python's standard library provides ``email.utils.formataddr()``, which
+correctly formats email addresses with display names, handling quoting and
+escaping as required. The returned value can be passed directly to Django's
+email functions::
 
     from email.utils import formataddr
 
@@ -277,6 +278,7 @@ replies, and redirects to ``/contact/thanks/`` on success::
     from django.core.mail import send_mail
     from email.utils import formataddr
     from django.http import HttpResponseRedirect
+
 
     def send_email(request):
         name = request.POST.get("name", "")
