@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout Benchmark Repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: django/django-asv
           path: "."
