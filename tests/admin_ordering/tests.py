@@ -5,8 +5,8 @@ from django.db.models import F
 from django.test import RequestFactory, TestCase
 
 from .models import (
-    Band, DynOrderingBandAdmin, Song, SongInlineDefaultOrdering,
-    SongInlineNewOrdering,
+    Band, DynOrderingBandAdmin, MTIChild, MTIParent, Song,
+    SongInlineDefaultOrdering, SongInlineNewOrdering,
 )
 
 
@@ -187,3 +187,47 @@ class TestRelatedFieldsAdminOrdering(TestCase):
         site.register(Band, StaticOrderingBandAdmin)
 
         self.check_ordering_of_field_choices([self.b2])
+
+
+class AdminMultiTableOrderingTests(TestCase):
+    request_factory = RequestFactory()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        class MTIParentAdmin(admin.ModelAdmin):
+            list_display = ('id', 'child_alias')
+
+            def child_alias(self, obj):
+                return obj.mtichild.alias
+
+        MTIParentAdmin.child_alias.short_description = 'Child alias'
+        MTIParentAdmin.child_alias.admin_order_field = 'mtichild'
+        admin.site.register(MTIParent, MTIParentAdmin)
+        cls._admin_registered = True
+
+    @classmethod
+    def tearDownClass(cls):
+        if getattr(cls, '_admin_registered', False) and MTIParent in admin.site._registry:
+            admin.site.unregister(MTIParent)
+        super().tearDownClass()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser('mtiadmin', 'mti@example.com', 'password')
+        cls.child_alpha = MTIChild.objects.create(name='Parent Alpha', alias='Alpha')
+        cls.child_bravo = MTIChild.objects.create(name='Parent Bravo', alias='bravo')
+
+    def test_admin_orders_by_child_expression(self):
+        request = self.request_factory.get('/', {'o': '2'})
+        request.user = type(self).superuser
+        model_admin = admin.site._registry[MTIParent]
+        changelist = model_admin.get_changelist_instance(request)
+        aliases = [obj.mtichild.alias for obj in changelist.get_queryset(request)]
+        self.assertEqual(aliases, ['Alpha', 'bravo'])
+
+        request_desc = self.request_factory.get('/', {'o': '-2'})
+        request_desc.user = type(self).superuser
+        changelist_desc = model_admin.get_changelist_instance(request_desc)
+        aliases_desc = [obj.mtichild.alias for obj in changelist_desc.get_queryset(request_desc)]
+        self.assertEqual(aliases_desc, ['bravo', 'Alpha'])

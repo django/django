@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db import models
+from django.db.models.functions import Lower
 
 
 class Band(models.Model):
@@ -37,3 +38,17 @@ class DynOrderingBandAdmin(admin.ModelAdmin):
             return ['rank']
         else:
             return ['name']
+
+
+class MTIParent(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class MTIChild(MTIParent):
+    alias = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = (Lower('alias'),)
+
+    def __str__(self):
+        return self.alias

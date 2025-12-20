@@ -9,7 +9,10 @@ from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from .models import Article, Author, OrderedByFArticle, Reference
+from .models import (
+    Article, Author, MTIChild, MTIParent, MixedOrderingChild,
+    MixedOrderingParent, OrderedByFArticle, Reference,
+)
 
 
 class OrderingTests(TestCase):
@@ -471,3 +474,57 @@ class OrderingTests(TestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
             list(Article.objects.values('author').annotate(Count('headline')))
+
+
+class MultiTableInheritanceOrderingTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.child_alpha = MTIChild.objects.create(name='Parent Alpha', alias='Alpha')
+        cls.child_bravo = MTIChild.objects.create(name='Parent Bravo', alias='bravo')
+
+    def test_related_meta_ordering_expression(self):
+        parents = list(MTIParent.objects.order_by('mtichild'))
+        self.assertEqual(
+            [parent.mtichild.alias for parent in parents],
+            ['Alpha', 'bravo'],
+        )
+
+    def test_related_meta_ordering_expression_desc(self):
+        parents = list(MTIParent.objects.order_by('-mtichild'))
+        self.assertEqual(
+            [parent.mtichild.alias for parent in parents],
+            ['bravo', 'Alpha'],
+        )
+
+
+class MixedMetaOrderingTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.child_late = MixedOrderingChild.objects.create(
+            title='Parent Gamma', code='b', alias='Gamma', alt_alias='carrot',
+        )
+        cls.child_alpha = MixedOrderingChild.objects.create(
+            title='Parent Alpha', code='a', alias='Alpha', alt_alias='zulu',
+        )
+        cls.child_alpha_lower_first = MixedOrderingChild.objects.create(
+            title='Parent alpha 1', code='a', alias='alpha', alt_alias='mango',
+        )
+        cls.child_alpha_lower_second = MixedOrderingChild.objects.create(
+            title='Parent alpha 2', code='a', alias='alpha', alt_alias='mango',
+        )
+
+    def test_related_mixed_meta_ordering(self):
+        parents = list(MixedOrderingParent.objects.order_by('mixedorderingchild'))
+        self.assertEqual(
+            [parent.mixedorderingchild.alias for parent in parents],
+            ['Alpha', 'alpha', 'alpha', 'Gamma'],
+        )
+
+    def test_related_mixed_meta_ordering_desc(self):
+        parents = list(MixedOrderingParent.objects.order_by('-mixedorderingchild'))
+        self.assertEqual(
+            [parent.mixedorderingchild.alias for parent in parents],
+            ['Gamma', 'alpha', 'alpha', 'Alpha'],
+        )

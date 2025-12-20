@@ -5,7 +5,7 @@ from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Value
+from django.db.models.expressions import F, OrderBy, Random, RawSQL, Ref, Value
 from django.db.models.functions import Cast
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
@@ -722,11 +722,43 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
-                results.extend(self.find_ordering_name(item, opts, alias,
-                                                       order, already_seen))
+                if hasattr(item, 'resolve_expression'):
+                    order_by = item if isinstance(item, OrderBy) else OrderBy(item)
+                    order_by = order_by.copy()
+                    related_expression = self._relate_expr_to_alias(
+                        order_by.expression, opts, alias, transform_function,
+                    )
+                    order_by.set_source_expressions([related_expression])
+                    if order == 'DESC':
+                        order_by.reverse_ordering()
+                    results.append((order_by, False))
+                else:
+                    results.extend(self.find_ordering_name(item, opts, alias,
+                                                           order, already_seen))
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
         return [(OrderBy(transform_function(t, alias), descending=descending), False) for t in targets]
+
+    def _relate_expr_to_alias(self, expr, related_opts, alias, transform_function):
+        if isinstance(expr, F):
+            pieces = expr.name.split(LOOKUP_SEP)
+            _, targets, join_alias, joins, path, _, join_transform = self._setup_joins(pieces, related_opts, alias)
+            targets, join_alias, _ = self.query.trim_joins(targets, joins, path)
+            if len(targets) != 1:
+                raise FieldError('Cannot order by multi-field expression: %s' % expr.name)
+            target = targets[0]
+            if len(pieces) == 1:
+                return transform_function(target, join_alias)
+            return join_transform(target, join_alias)
+        clone = expr.copy()
+        source_expressions = []
+        for source in expr.get_source_expressions():
+            if source is None:
+                source_expressions.append(None)
+            else:
+                source_expressions.append(self._relate_expr_to_alias(source, related_opts, alias, transform_function))
+        clone.set_source_expressions(source_expressions)
+        return clone
 
     def _setup_joins(self, pieces, opts, alias):
         """

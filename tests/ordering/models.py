@@ -14,7 +14,9 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
+from django.db.models import ExpressionWrapper
 from django.db.models.expressions import OrderBy
+from django.db.models.functions import Lower
 
 
 class Author(models.Model):
@@ -59,3 +61,44 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ('article',)
+
+
+class MTIParent(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class MTIChild(MTIParent):
+    alias = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = (Lower('alias'),)
+
+    def __str__(self):
+        return self.alias
+
+
+class MixedOrderingParent(models.Model):
+    title = models.CharField(max_length=50)
+
+
+class MixedOrderingChild(MixedOrderingParent):
+    code = models.CharField(max_length=10)
+    alias = models.CharField(max_length=50)
+    alt_alias = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = (
+            'code',
+            Lower('alias'),
+            OrderBy(
+                ExpressionWrapper(
+                    Lower('alt_alias'),
+                    output_field=models.CharField(),
+                ),
+                descending=True,
+            ),
+            Lower('pk'),
+        )
+
+    def __str__(self):
+        return self.alias
