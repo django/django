@@ -1841,6 +1841,42 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(LocalBook, old_field, new_field, strict=True)
         self.assertForeignKeyExists(LocalBook, "author_id", "schema_author")
 
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_fk_constraint_index_drop(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        author = Author.objects.create(name="Alice")
+        Book.objects.create(
+            author=author,
+            title="Much Ado About Foreign Keys",
+            pub_date=datetime.datetime.now(),
+        )
+
+        old_field = Book._meta.get_field("author")
+        new_field = ForeignKey(Author, CASCADE, db_index=False)
+        new_field.set_attributes_from_name("author")
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
+            editor.alter_field(Book, old_field, new_field, strict=True)
+
+        if connection.features.requires_fk_constraints_to_be_recreated:
+            self.assertTrue(
+                any(
+                    "DROP FOREIGN KEY" in query["sql"] for query in ctx.captured_queries
+                )
+            )
+            self.assertTrue(
+                any("ADD CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
+            )
+        else:
+            self.assertFalse(
+                any("DROP CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
+            )
+
     @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
     def test_alter_o2o_to_fk(self):
         """
