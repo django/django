@@ -129,24 +129,28 @@ class CharFieldTests(TestCase):
     def test_negative_max_length(self):
         msg = "'max_length' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.CharField(max_length=-1)
 
     def test_bad_max_length_value(self):
         msg = "'max_length' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.CharField(max_length="bad")
 
     def test_str_max_length_value(self):
         msg = "'max_length' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.CharField(max_length="20")
 
     def test_str_max_length_type(self):
         msg = "'max_length' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.CharField(max_length=True)
 
@@ -631,12 +635,14 @@ class DecimalFieldTests(TestCase):
     def test_negative_max_digits_and_decimal_places(self):
         msg = "'max_digits' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.DecimalField(max_digits=-1, decimal_places=-1)
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
         msg = "'max_digits' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 field = models.DecimalField(max_digits="bad", decimal_places="bad")
 
@@ -1369,13 +1375,12 @@ class GeneratedFieldTests(TestCase):
     def test_output_field_check_error(self):
         msg = "'max_digits' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
+
             class Model(models.Model):
                 value = models.DecimalField(max_digits=5, decimal_places=2)
                 field = models.GeneratedField(
                     expression=models.F("value") * 2,
-                    output_field=models.DecimalField(
-                        max_digits=-1, decimal_places=-1
-                    ),
+                    output_field=models.DecimalField(max_digits=-1, decimal_places=-1),
                     db_persist=True,
                 )
 
