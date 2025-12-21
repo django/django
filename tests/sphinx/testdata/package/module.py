@@ -9,7 +9,7 @@ from . import other_module  # noqa
 from .other_module import MyOtherClass  # noqa
 
 
-class MyClass(object):
+class MyClass:
     def __init__(self):
         pass
 

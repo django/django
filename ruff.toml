@@ -11,7 +11,7 @@ preview = true
 select = [
     "UP001",  # useless-metaclass-type
     "UP003",  # type-of-primitive
-#   "UP004",  # useless-object-inheritance
+    "UP004",  # useless-object-inheritance
     "UP005",  # deprecated-unittest-alias
 #   "UP006",  # non-pep585-annotation
     "UP007",  # non-pep604-annotation-union
