@@ -61,7 +61,7 @@ class SubstrTests(TestCase):
         # Author with alias but name doesn't match the pattern
         Author.objects.create(name="Bob Wilson", alias="bobby")
 
-        # Substr("janedoe", 1, 4) = "jane", should only match "JaneDoe"
+        # Substr(alias, 1, 4) where alias="janedoe" = "jane"
         qs = Author.objects.filter(name__startswith=Substr("alias", 1, 4))
         self.assertCountEqual(qs, [match])
 
@@ -69,10 +69,23 @@ class SubstrTests(TestCase):
         qs = Author.objects.filter(name__istartswith=Substr("alias", 1, 4))
         self.assertCountEqual(qs, [match])
 
-        # Substr("janedoe", 5, 3) = "doe", "JaneDoe" iendswith "doe"
+        # Substr(alias, 5, 3) where alias="janedoe" = "doe"
+        qs = Author.objects.filter(name__endswith=Substr("alias", 5, 3))
+        self.assertCountEqual(qs, [match])
+
+        # Substr(alias, 5, 3) where alias="janedoe" = "doe"
         qs = Author.objects.filter(name__iendswith=Substr("alias", 5, 3))
         self.assertCountEqual(qs, [match])
 
-        # Substr("janedoe", 2, 4) = "aned", "JaneDoe" icontains "aned"
+        # Substr(alias, 2, 4) where alias="janedoe" = "aned"
+        qs = Author.objects.filter(name__contains=Substr("alias", 2, 4))
+        self.assertCountEqual(qs, [match])
+
+        # Substr(alias, 2, 4) where alias="janedoe" = "aned"
         qs = Author.objects.filter(name__icontains=Substr("alias", 2, 4))
+        self.assertCountEqual(qs, [match])
+
+        # Verify NULL handling: author with NULL alias shouldn't match
+        Author.objects.create(name="NoAlias", alias=None)
+        qs = Author.objects.filter(name__startswith=Substr("alias", 1, 4))
         self.assertCountEqual(qs, [match])
