@@ -5,7 +5,7 @@ from django.db import models
 T = typing.TypeVar("T")
 
 
-class GenericModel(typing.Generic[T], models.Model):
+class GenericModel[T](models.Model):
     """A model inheriting from typing.Generic."""
 
 
@@ -20,11 +20,11 @@ T2 = typing.TypeVar("T2")
 T3 = typing.TypeVar("T3")
 
 
-class Parent1(typing.Generic[T1, T2]):
+class Parent1[T1, T2]:
     pass
 
 
-class Parent2(typing.Generic[T1, T2]):
+class Parent2[T1, T2]:
     pass
 
 

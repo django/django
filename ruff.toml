@@ -50,7 +50,7 @@ select = [
     "UP043",  # unnecessary-default-type-args
     "UP044",  # non-pep646-unpack
     "UP045",  # non-pep604-annotation-optional
-#   "UP046",  # non-pep695-generic-class
+    "UP046",  # non-pep695-generic-class
     "UP047",  # non-pep695-generic-function
     "UP049",  # private-type-parameter
     "UP050",  # useless-class-metaclass-type
