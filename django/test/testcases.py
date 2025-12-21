@@ -605,7 +605,7 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         if (count is None and real_count > 0) or (
-            (count is not None and real_count == count)
+            count is not None and real_count == count
         ):
             return
 
