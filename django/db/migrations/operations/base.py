@@ -4,7 +4,7 @@ from django.db import router
 from django.utils.inspect import get_func_args
 
 
-class OperationCategory(str, enum.Enum):
+class OperationCategory(enum.StrEnum):
     ADDITION = "+"
     REMOVAL = "-"
     ALTERATION = "~"

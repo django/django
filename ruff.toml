@@ -46,7 +46,7 @@ select = [
     "UP039",  # unnecessary-class-parentheses
     "UP040",  # non-pep695-type-alias
     "UP041",  # timeout-error-alias
-#   "UP042",  # replace-str-enum (preview)
+    "UP042",  # replace-str-enum (preview)
     "UP043",  # unnecessary-default-type-args
     "UP044",  # non-pep646-unpack
 #   "UP045",  # non-pep604-annotation-optional
