@@ -19,7 +19,7 @@ select = [
     "UP009",  # utf8-encoding-declaration
     "UP010",  # unnecessary-future-import
     "UP011",  # lru-cache-without-parameters
-#   "UP012",  # unnecessary-encode-utf8
+    "UP012",  # unnecessary-encode-utf8
     "UP013",  # convert-typed-dict-functional-to-class
     "UP014",  # convert-named-tuple-functional-to-class
     "UP015",  # redundant-open-modes
