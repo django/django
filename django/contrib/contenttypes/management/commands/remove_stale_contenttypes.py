@@ -59,9 +59,7 @@ class Command(BaseCommand):
                     ct_info = []
                     for ct in to_remove:
                         ct_info.append(
-                            "    - Content type for {}.{}".format(
-                                ct.app_label, ct.model
-                            )
+                            f"    - Content type for {ct.app_label}.{ct.model}"
                         )
                         collector = Collector(
                             using=using, origin=ct, force_collection=True
@@ -71,10 +69,7 @@ class Command(BaseCommand):
                         for obj_type, objs in collector.data.items():
                             if objs != {ct}:
                                 ct_info.append(
-                                    "    - {} {} object(s)".format(
-                                        len(objs),
-                                        obj_type._meta.label,
-                                    )
+                                    f"    - {len(objs)} {obj_type._meta.label} object(s)"
                                 )
                     content_type_display = "\n".join(ct_info)
                     self.stdout.write(
@@ -99,9 +94,7 @@ class Command(BaseCommand):
                     for ct in to_remove:
                         if verbosity >= 2:
                             self.stdout.write(
-                                "Deleting stale content type '{} | {}'".format(
-                                    ct.app_label, ct.model
-                                )
+                                f"Deleting stale content type '{ct.app_label} | {ct.model}'"
                             )
                         ct.delete()
                 else:

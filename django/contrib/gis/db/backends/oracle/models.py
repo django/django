@@ -26,7 +26,7 @@ class OracleGeometryColumns(models.Model):
         managed = False
 
     def __str__(self):
-        return "{} - {} (SRID: {})".format(self.table_name, self.column_name, self.srid)
+        return f"{self.table_name} - {self.column_name} (SRID: {self.srid})"
 
     @classmethod
     def table_name_col(cls):

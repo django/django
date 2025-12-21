@@ -34,9 +34,7 @@ class ListFilter:
         self.used_parameters = {}
         if self.title is None:
             raise ImproperlyConfigured(
-                "The list filter '{}' does not specify a 'title'.".format(
-                    self.__class__.__name__
-                )
+                f"The list filter '{self.__class__.__name__}' does not specify a 'title'."
             )
 
     def has_output(self):
@@ -98,9 +96,7 @@ class SimpleListFilter(FacetsMixin, ListFilter):
         super().__init__(request, params, model, model_admin)
         if self.parameter_name is None:
             raise ImproperlyConfigured(
-                "The list filter '{}' does not specify a 'parameter_name'.".format(
-                    self.__class__.__name__
-                )
+                f"The list filter '{self.__class__.__name__}' does not specify a 'parameter_name'."
             )
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
@@ -224,8 +220,8 @@ class FieldListFilter(FacetsMixin, ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        self.lookup_kwarg = "{}__{}__exact".format(field_path, field.target_field.name)
-        self.lookup_kwarg_isnull = "{}__isnull".format(field_path)
+        self.lookup_kwarg = f"{field_path}__{field.target_field.name}__exact"
+        self.lookup_kwarg_isnull = f"{field_path}__isnull"
         self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
@@ -329,8 +325,8 @@ FieldListFilter.register(lambda f: f.remote_field, RelatedFieldListFilter)
 
 class BooleanFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = "{}__exact".format(field_path)
-        self.lookup_kwarg2 = "{}__isnull".format(field_path)
+        self.lookup_kwarg = f"{field_path}__exact"
+        self.lookup_kwarg2 = f"{field_path}__isnull"
         self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
         self.lookup_val2 = get_last_value_from_parameters(params, self.lookup_kwarg2)
         super().__init__(field, request, params, model, model_admin, field_path)
@@ -400,8 +396,8 @@ FieldListFilter.register(
 
 class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = "{}__exact".format(field_path)
-        self.lookup_kwarg_isnull = "{}__isnull".format(field_path)
+        self.lookup_kwarg = f"{field_path}__exact"
+        self.lookup_kwarg_isnull = f"{field_path}__isnull"
         self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
@@ -465,7 +461,7 @@ FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
 
 class DateFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.field_generic = "{}__".format(field_path)
+        self.field_generic = f"{field_path}__"
         self.date_params = {
             k: v[-1] for k, v in params.items() if k.startswith(self.field_generic)
         }
@@ -487,8 +483,8 @@ class DateFieldListFilter(FieldListFilter):
             next_month = today.replace(month=today.month + 1, day=1)
         next_year = today.replace(year=today.year + 1, month=1, day=1)
 
-        self.lookup_kwarg_since = "{}__gte".format(field_path)
-        self.lookup_kwarg_until = "{}__lt".format(field_path)
+        self.lookup_kwarg_since = f"{field_path}__gte"
+        self.lookup_kwarg_until = f"{field_path}__lt"
         self.links = (
             (_("Any date"), {}),
             (
@@ -521,7 +517,7 @@ class DateFieldListFilter(FieldListFilter):
             ),
         )
         if field.null:
-            self.lookup_kwarg_isnull = "{}__isnull".format(field_path)
+            self.lookup_kwarg_isnull = f"{field_path}__isnull"
             self.links += (
                 (_("No date"), {self.field_generic + "isnull": True}),
                 (_("Has date"), {self.field_generic + "isnull": False}),
@@ -566,7 +562,7 @@ FieldListFilter.register(lambda f: isinstance(f, models.DateField), DateFieldLis
 class AllValuesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = field_path
-        self.lookup_kwarg_isnull = "{}__isnull".format(field_path)
+        self.lookup_kwarg_isnull = f"{field_path}__isnull"
         self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
@@ -645,7 +641,7 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
         pk_qs = (
             model_admin.get_queryset(request)
             .distinct()
-            .values_list("{}__pk".format(self.field_path), flat=True)
+            .values_list(f"{self.field_path}__pk", flat=True)
         )
         ordering = self.field_admin_ordering(field, request, model_admin)
         return field.get_choices(
@@ -657,13 +653,10 @@ class EmptyFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         if not field.empty_strings_allowed and not field.null:
             raise ImproperlyConfigured(
-                "The list filter '{}' cannot be used with field '{}' which "
-                "doesn't allow empty strings and nulls.".format(
-                    self.__class__.__name__,
-                    field.name,
-                )
+                f"The list filter '{self.__class__.__name__}' cannot be used with field '{field.name}' which "
+                "doesn't allow empty strings and nulls."
             )
-        self.lookup_kwarg = "{}__isempty".format(field_path)
+        self.lookup_kwarg = f"{field_path}__isempty"
         self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
         super().__init__(field, request, params, model, model_admin, field_path)
 

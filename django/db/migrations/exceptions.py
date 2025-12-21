@@ -49,7 +49,7 @@ class NodeNotFoundError(LookupError):
         return self.message
 
     def __repr__(self):
-        return "NodeNotFoundError({!r})".format(self.node)
+        return f"NodeNotFoundError({self.node!r})"
 
 
 class MigrationSchemaMissing(DatabaseError):

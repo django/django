@@ -48,8 +48,8 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     for namespace in non_unique_namespaces:
         errors.append(
             Warning(
-                "URL namespace '{}' isn't unique. You may not be able to reverse "
-                "all URLs in this namespace".format(namespace),
+                f"URL namespace '{namespace}' isn't unique. You may not be able to reverse "
+                "all URLs in this namespace",
                 id="urls.W005",
             )
         )
@@ -84,8 +84,8 @@ def get_warning_for_invalid_pattern(pattern):
     """
     if isinstance(pattern, str):
         hint = (
-            "Try removing the string '{}'. The list of urlpatterns should not "
-            "have a prefix string as the first element.".format(pattern)
+            f"Try removing the string '{pattern}'. The list of urlpatterns should not "
+            "have a prefix string as the first element."
         )
     elif isinstance(pattern, tuple):
         hint = "Try using path() instead of a tuple."
@@ -94,8 +94,8 @@ def get_warning_for_invalid_pattern(pattern):
 
     return [
         Error(
-            "Your URL pattern {!r} is invalid. Ensure that urlpatterns is a list "
-            "of path() and/or re_path() instances.".format(pattern),
+            f"Your URL pattern {pattern!r} is invalid. Ensure that urlpatterns is a list "
+            "of path() and/or re_path() instances.",
             hint=hint,
             id="urls.E004",
         )
@@ -114,7 +114,7 @@ def check_url_settings(app_configs, **kwargs):
 
 def E006(name):
     return Error(
-        "The {} setting must end with a slash.".format(name),
+        f"The {name} setting must end with a slash.",
         id="urls.E006",
     )
 
@@ -135,11 +135,11 @@ def check_custom_error_handlers(app_configs, **kwargs):
         try:
             handler = resolver.resolve_error_handler(status_code)
         except (ImportError, ViewDoesNotExist) as e:
-            path = getattr(resolver.urlconf_module, "handler{}".format(status_code))
+            path = getattr(resolver.urlconf_module, f"handler{status_code}")
             msg = (
-                "The custom handler{status_code} view '{path}' could not be "
+                f"The custom handler{status_code} view '{path}' could not be "
                 "imported."
-            ).format(status_code=status_code, path=path)
+            )
             errors.append(Error(msg, hint=str(e), id="urls.E008"))
             continue
         signature = inspect.signature(handler)

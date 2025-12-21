@@ -27,25 +27,25 @@ class OperationWriter:
                 _arg_value, (list, tuple, dict)
             ):
                 if isinstance(_arg_value, dict):
-                    self.feed("{}={{".format(_arg_name))
+                    self.feed(f"{_arg_name}={{")
                     self.indent()
                     for key, value in _arg_value.items():
                         key_string, key_imports = MigrationWriter.serialize(key)
                         arg_string, arg_imports = MigrationWriter.serialize(value)
                         args = arg_string.splitlines()
                         if len(args) > 1:
-                            self.feed("{}: {}".format(key_string, args[0]))
+                            self.feed(f"{key_string}: {args[0]}")
                             for arg in args[1:-1]:
                                 self.feed(arg)
-                            self.feed("{},".format(args[-1]))
+                            self.feed(f"{args[-1]},")
                         else:
-                            self.feed("{}: {},".format(key_string, arg_string))
+                            self.feed(f"{key_string}: {arg_string},")
                         imports.update(key_imports)
                         imports.update(arg_imports)
                     self.unindent()
                     self.feed("},")
                 else:
-                    self.feed("{}=[".format(_arg_name))
+                    self.feed(f"{_arg_name}=[")
                     self.indent()
                     for item in _arg_value:
                         arg_string, arg_imports = MigrationWriter.serialize(item)
@@ -53,9 +53,9 @@ class OperationWriter:
                         if len(args) > 1:
                             for arg in args[:-1]:
                                 self.feed(arg)
-                            self.feed("{},".format(args[-1]))
+                            self.feed(f"{args[-1]},")
                         else:
-                            self.feed("{},".format(arg_string))
+                            self.feed(f"{arg_string},")
                         imports.update(arg_imports)
                     self.unindent()
                     self.feed("],")
@@ -63,12 +63,12 @@ class OperationWriter:
                 arg_string, arg_imports = MigrationWriter.serialize(_arg_value)
                 args = arg_string.splitlines()
                 if len(args) > 1:
-                    self.feed("{}={}".format(_arg_name, args[0]))
+                    self.feed(f"{_arg_name}={args[0]}")
                     for arg in args[1:-1]:
                         self.feed(arg)
-                    self.feed("{},".format(args[-1]))
+                    self.feed(f"{args[-1]},")
                 else:
-                    self.feed("{}={},".format(_arg_name, arg_string))
+                    self.feed(f"{_arg_name}={arg_string},")
                 imports.update(arg_imports)
 
         imports = set()
@@ -79,10 +79,10 @@ class OperationWriter:
         # We can just use the fact we already have that imported,
         # otherwise, we need to add an import for the operation class.
         if getattr(migrations, name, None) == self.operation.__class__:
-            self.feed("migrations.{}(".format(name))
+            self.feed(f"migrations.{name}(")
         else:
-            imports.add("import {}".format(self.operation.__class__.__module__))
-            self.feed("{}.{}(".format(self.operation.__class__.__module__, name))
+            imports.add(f"import {self.operation.__class__.__module__}")
+            self.feed(f"{self.operation.__class__.__module__}.{name}(")
 
         self.indent()
 
@@ -150,13 +150,11 @@ class MigrationWriter:
         for dependency in self.migration.dependencies:
             if dependency[0] == "__setting__":
                 dependencies.append(
-                    "        migrations.swappable_dependency(settings.{}),".format(
-                        dependency[1]
-                    )
+                    f"        migrations.swappable_dependency(settings.{dependency[1]}),"
                 )
                 imports.add("from django.conf import settings")
             else:
-                dependencies.append("        {},".format(self.serialize(dependency)[0]))
+                dependencies.append(f"        {self.serialize(dependency)[0]},")
         items["dependencies"] = (
             "\n".join(sorted(dependencies)) + "\n" if dependencies else ""
         )
@@ -193,12 +191,12 @@ class MigrationWriter:
                 "versions:\n# {}"
             ).format("\n# ".join(sorted(migration_imports)))
         if self.migration.replaces:
-            items["replaces_str"] = "\n    replaces = {}\n".format(
-                self.serialize(self.migration.replaces)[0]
+            items["replaces_str"] = (
+                f"\n    replaces = {self.serialize(self.migration.replaces)[0]}\n"
             )
         if self.migration.run_before:
-            items["run_before_str"] = "\n    run_before = {}\n".format(
-                self.serialize(self.migration.run_before)[0]
+            items["run_before_str"] = (
+                f"\n    run_before = {self.serialize(self.migration.run_before)[0]}\n"
             )
         # Hinting that goes into comment
         if self.include_header:
@@ -224,9 +222,9 @@ class MigrationWriter:
 
         if migrations_package_name is None:
             raise ValueError(
-                "Django can't create migrations for app '{}' because "
+                f"Django can't create migrations for app '{self.migration.app_label}' because "
                 "migrations have been disabled via the MIGRATION_MODULES "
-                "setting.".format(self.migration.app_label)
+                "setting."
             )
 
         # See if we can import the migrations module directly
@@ -269,8 +267,8 @@ class MigrationWriter:
         else:
             raise ValueError(
                 "Could not locate an appropriate location to create "
-                "migrations package {}. Make sure the toplevel "
-                "package exists and can be imported.".format(migrations_package_name)
+                f"migrations package {migrations_package_name}. Make sure the toplevel "
+                "package exists and can be imported."
             )
 
         final_dir = os.path.join(base_dir, *missing_dirs)
@@ -284,7 +282,7 @@ class MigrationWriter:
 
     @property
     def filename(self):
-        return "{}.py".format(self.migration.name)
+        return f"{self.migration.name}.py"
 
     @property
     def path(self):

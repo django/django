@@ -21,13 +21,13 @@ class Div3Lookup(models.Lookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = (*lhs_params, *rhs_params)
-        return "({}) %% 3 = {}".format(lhs, rhs), params
+        return f"({lhs}) %% 3 = {rhs}", params
 
     def as_oracle(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = (*lhs_params, *rhs_params)
-        return "mod({}, 3) = {}".format(lhs, rhs), params
+        return f"mod({lhs}, 3) = {rhs}", params
 
 
 class Div3Transform(models.Transform):
@@ -35,11 +35,11 @@ class Div3Transform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = compiler.compile(self.lhs)
-        return "({}) %% 3".format(lhs), lhs_params
+        return f"({lhs}) %% 3", lhs_params
 
     def as_oracle(self, compiler, connection, **extra_context):
         lhs, lhs_params = compiler.compile(self.lhs)
-        return "mod({}, 3)".format(lhs), lhs_params
+        return f"mod({lhs}, 3)", lhs_params
 
 
 class Div3BilateralTransform(Div3Transform):
@@ -52,7 +52,7 @@ class Mult3BilateralTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = compiler.compile(self.lhs)
-        return "3 * ({})".format(lhs), lhs_params
+        return f"3 * ({lhs})", lhs_params
 
 
 class LastDigitTransform(models.Transform):
@@ -60,7 +60,7 @@ class LastDigitTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = compiler.compile(self.lhs)
-        return "SUBSTR(CAST({} AS CHAR(2)), 2, 1)".format(lhs), lhs_params
+        return f"SUBSTR(CAST({lhs} AS CHAR(2)), 2, 1)", lhs_params
 
 
 class UpperBilateralTransform(models.Transform):
@@ -69,7 +69,7 @@ class UpperBilateralTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = compiler.compile(self.lhs)
-        return "UPPER({})".format(lhs), lhs_params
+        return f"UPPER({lhs})", lhs_params
 
 
 class YearTransform(models.Transform):
@@ -100,8 +100,8 @@ class YearExact(models.lookups.Lookup):
         # We use PostgreSQL specific SQL here. Note that we must do the
         # conversions in SQL instead of in Python to support F() references.
         return (
-            "{lhs} >= ({rhs} || '-01-01')::date "
-            "AND {lhs} <= ({rhs} || '-12-31')::date".format(lhs=lhs_sql, rhs=rhs_sql),
+            f"{lhs_sql} >= ({rhs_sql} || '-01-01')::date "
+            f"AND {lhs_sql} <= ({rhs_sql} || '-12-31')::date",
             params,
         )
 
@@ -123,7 +123,7 @@ class YearLte(models.lookups.LessThanOrEqual):
         # and day, then convert that to date. (We try to have SQL like:
         #     WHERE somecol <= '2013-12-31')
         # but also make it work if the rhs_sql is field reference.
-        return "{} <= ({} || '-12-31')::date".format(lhs_sql, rhs_sql), params
+        return f"{lhs_sql} <= ({rhs_sql} || '-12-31')::date", params
 
 
 class Exactly(models.lookups.Exact):
@@ -139,7 +139,7 @@ class Exactly(models.lookups.Exact):
 
 class SQLFuncMixin:
     def as_sql(self, compiler, connection):
-        return "{}()".format(self.name), []
+        return f"{self.name}()", []
 
     @property
     def output_field(self):
@@ -204,10 +204,8 @@ class InMonth(models.lookups.Lookup):
         # places.
         params = lhs_params + rhs_params + lhs_params + rhs_params
         return (
-            "{} >= date_trunc('month', {}) and "
-            "{} < date_trunc('month', {}) + interval '1 months'".format(
-                lhs, rhs, lhs, rhs
-            ),
+            f"{lhs} >= date_trunc('month', {rhs}) and "
+            f"{lhs} < date_trunc('month', {rhs}) + interval '1 months'",
             params,
         )
 
@@ -221,7 +219,7 @@ class DateTimeTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "from_unixtime({})".format(lhs), params
+        return f"from_unixtime({lhs})", params
 
 
 class CustomStartsWith(StartsWith):
@@ -261,7 +259,7 @@ class LookupTests(TestCase):
                 # Although combining via (*lhs_params, *rhs_params) would be
                 # more resilient, the "simple" way works too.
                 params = lhs_params + rhs_params
-                return "{} <> {}".format(lhs, rhs), params
+                return f"{lhs} <> {rhs}", params
 
         author = Author.objects.create(name="Isabella")
 
@@ -563,12 +561,10 @@ class YearLteTests(TestCase):
                 rhs_sql, rhs_params = self.process_rhs(compiler, connection)
                 params = lhs_params + rhs_params + lhs_params + rhs_params
                 return (
-                    "{lhs} >= "
-                    "str_to_date(concat({rhs}, '-01-01'), '%%Y-%%m-%%d') "
-                    "AND {lhs} <= "
-                    "str_to_date(concat({rhs}, '-12-31'), '%%Y-%%m-%%d')".format(
-                        lhs=lhs_sql, rhs=rhs_sql
-                    ),
+                    f"{lhs_sql} >= "
+                    f"str_to_date(concat({rhs_sql}, '-01-01'), '%%Y-%%m-%%d') "
+                    f"AND {lhs_sql} <= "
+                    f"str_to_date(concat({rhs_sql}, '-12-31'), '%%Y-%%m-%%d')",
                     params,
                 )
 
@@ -592,12 +588,10 @@ class YearLteTests(TestCase):
                     rhs_sql, rhs_params = self.process_rhs(compiler, connection)
                     params = lhs_params + rhs_params + lhs_params + rhs_params
                     return (
-                        "{lhs} >= "
-                        "str_to_date(CONCAT({rhs}, '-01-01'), '%%Y-%%m-%%d') "
-                        "AND {lhs} <= "
-                        "str_to_date(CONCAT({rhs}, '-12-31'), '%%Y-%%m-%%d')".format(
-                            lhs=lhs_sql, rhs=rhs_sql
-                        ),
+                        f"{lhs_sql} >= "
+                        f"str_to_date(CONCAT({rhs_sql}, '-01-01'), '%%Y-%%m-%%d') "
+                        f"AND {lhs_sql} <= "
+                        f"str_to_date(CONCAT({rhs_sql}, '-12-31'), '%%Y-%%m-%%d')",
                         params,
                     )
 

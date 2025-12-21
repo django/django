@@ -38,7 +38,7 @@ def default_key_func(key, key_prefix, version):
     the `key_prefix`. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
-    return "{}:{}:{}".format(key_prefix, version, key)
+    return f"{key_prefix}:{version}:{key}"
 
 
 def get_key_func(key_func):
@@ -279,7 +279,7 @@ class BaseCache:
         """
         value = self.get(key, self._missing_key, version=version)
         if value is self._missing_key:
-            raise ValueError("Key '{}' not found".format(key))
+            raise ValueError(f"Key '{key}' not found")
         new_value = value + delta
         self.set(key, new_value, version=version)
         return new_value
@@ -292,7 +292,7 @@ class BaseCache:
             )
         value = await self.aget(key, self._missing_key, version=version)
         if value is self._missing_key:
-            raise ValueError("Key '{}' not found".format(key))
+            raise ValueError(f"Key '{key}' not found")
         new_value = value + delta
         await self.aset(key, new_value, version=version)
         return new_value
@@ -377,7 +377,7 @@ class BaseCache:
 
         value = self.get(key, self._missing_key, version=version)
         if value is self._missing_key:
-            raise ValueError("Key '{}' not found".format(key))
+            raise ValueError(f"Key '{key}' not found")
 
         self.set(key, value, version=version + delta)
         self.delete(key, version=version)
@@ -394,7 +394,7 @@ class BaseCache:
 
         value = await self.aget(key, self._missing_key, version=version)
         if value is self._missing_key:
-            raise ValueError("Key '{}' not found".format(key))
+            raise ValueError(f"Key '{key}' not found")
 
         await self.aset(key, value, version=version + delta)
         await self.adelete(key, version=version)
@@ -424,8 +424,8 @@ memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")
 def memcache_key_warnings(key):
     if len(key) > MEMCACHE_MAX_KEY_LENGTH:
         yield (
-            "Cache key will cause errors if used with memcached: {!r} "
-            "(longer than {})".format(key, MEMCACHE_MAX_KEY_LENGTH)
+            f"Cache key will cause errors if used with memcached: {key!r} "
+            f"(longer than {MEMCACHE_MAX_KEY_LENGTH})"
         )
     if memcached_error_chars_re.search(key):
         yield (

@@ -252,10 +252,7 @@ class AdminReadonlyField:
         )
 
     def get_admin_url(self, remote_field, remote_obj):
-        url_name = "admin:{}_{}_change".format(
-            remote_field.model._meta.app_label,
-            remote_field.model._meta.model_name,
-        )
+        url_name = f"admin:{remote_field.model._meta.app_label}_{remote_field.model._meta.model_name}_change"
         try:
             url = reverse(
                 url_name,
@@ -424,7 +421,7 @@ class InlineAdminFormSet:
         verbose_name = self.opts.verbose_name
         return json.dumps(
             {
-                "name": "#{}".format(self.formset.prefix),
+                "name": f"#{self.formset.prefix}",
                 "options": {
                     "prefix": self.formset.prefix,
                     "addText": gettext("Add another %(verbose_name)s")

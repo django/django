@@ -75,7 +75,7 @@ class MultiValueDict(dict):
         super().__init__(key_to_list_mapping)
 
     def __repr__(self):
-        return "<{}: {}>".format(self.__class__.__name__, super().__repr__())
+        return f"<{self.__class__.__name__}: {super().__repr__()}>"
 
     def __getitem__(self, key):
         """
@@ -337,12 +337,12 @@ class CaseInsensitiveMapping(Mapping):
         for i, elem in enumerate(data):
             if len(elem) != 2:
                 raise ValueError(
-                    "dictionary update sequence element #{} has length {}; "
-                    "2 is required.".format(i, len(elem))
+                    f"dictionary update sequence element #{i} has length {len(elem)}; "
+                    "2 is required."
                 )
             if not isinstance(elem[0], str):
                 raise ValueError(
-                    "Element key {!r} invalid, only strings are allowed".format(elem[0])
+                    f"Element key {elem[0]!r} invalid, only strings are allowed"
                 )
             yield elem
 

@@ -164,10 +164,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if self.admin_site.is_registered(rel_to):
             # The related object is registered with the same AdminSite
             related_url = reverse(
-                "admin:{}_{}_changelist".format(
-                    rel_to._meta.app_label,
-                    rel_to._meta.model_name,
-                ),
+                f"admin:{rel_to._meta.app_label}_{rel_to._meta.model_name}_changelist",
                 current_app=self.admin_site.name,
             )
 
@@ -213,11 +210,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
         try:
             url = reverse(
-                "{}:{}_{}_change".format(
-                    self.admin_site.name,
-                    obj._meta.app_label,
-                    obj._meta.model_name,
-                ),
+                f"{self.admin_site.name}:{obj._meta.app_label}_{obj._meta.model_name}_change",
                 args=(obj.pk,),
             )
         except NoReverseMatch:
@@ -570,7 +563,7 @@ class AutocompleteMixin:
         choices = (
             (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
             for obj in self.choices.queryset.using(self.db).filter(
-                **{"{}__in".format(to_field_name): selected_choices}
+                **{f"{to_field_name}__in": selected_choices}
             )
         )
         for option_value, option_label in choices:
@@ -591,21 +584,21 @@ class AutocompleteMixin:
     def media(self):
         extra = "" if settings.DEBUG else ".min"
         i18n_file = (
-            ("admin/js/vendor/select2/i18n/{}.js".format(self.i18n_name),)
+            (f"admin/js/vendor/select2/i18n/{self.i18n_name}.js",)
             if self.i18n_name
             else ()
         )
         return forms.Media(
             js=(
-                "admin/js/vendor/jquery/jquery{}.js".format(extra),
-                "admin/js/vendor/select2/select2.full{}.js".format(extra),
+                f"admin/js/vendor/jquery/jquery{extra}.js",
+                f"admin/js/vendor/select2/select2.full{extra}.js",
                 *i18n_file,
                 "admin/js/jquery.init.js",
                 "admin/js/autocomplete.js",
             ),
             css={
                 "screen": (
-                    "admin/css/vendor/select2/select2{}.css".format(extra),
+                    f"admin/css/vendor/select2/select2{extra}.css",
                     "admin/css/autocomplete.css",
                 ),
             },

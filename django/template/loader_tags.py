@@ -46,7 +46,7 @@ class BlockNode(Node):
         self.parent = parent
 
     def __repr__(self):
-        return "<Block Node: {}. Contents: {!r}>".format(self.name, self.nodelist)
+        return f"<Block Node: {self.name}. Contents: {self.nodelist!r}>"
 
     def render(self, context):
         block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
@@ -71,10 +71,8 @@ class BlockNode(Node):
     def super(self):
         if not hasattr(self, "context"):
             raise TemplateSyntaxError(
-                "'{}' object has no attribute 'context'. Did you use "
-                "{{{{ block.super }}}} in a base template?".format(
-                    self.__class__.__name__
-                )
+                f"'{self.__class__.__name__}' object has no attribute 'context'. Did you use "
+                "{{ block.super }} in a base template?"
             )
         render_context = self.context.render_context
         if (
@@ -96,9 +94,7 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return "<{}: extends {}>".format(
-            self.__class__.__name__, self.parent_name.token
-        )
+        return f"<{self.__class__.__name__}: extends {self.parent_name.token}>"
 
     def find_template(self, template_name, context):
         """
@@ -121,11 +117,9 @@ class ExtendsNode(Node):
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
         if not parent:
-            error_msg = "Invalid template name in 'extends' tag: {!r}.".format(parent)
+            error_msg = f"Invalid template name in 'extends' tag: {parent!r}."
             if self.parent_name.filters or isinstance(self.parent_name.var, Variable):
-                error_msg += " Got this from the '{}' variable.".format(
-                    self.parent_name.token
-                )
+                error_msg += f" Got this from the '{self.parent_name.token}' variable."
             raise TemplateSyntaxError(error_msg)
         if isinstance(parent, Template):
             # parent is a django.template.Template
@@ -224,16 +218,14 @@ def do_block(parser, token):
     # variable as arguments.
     bits = token.contents.split()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'{}' tag takes only one argument".format(bits[0]))
+        raise TemplateSyntaxError(f"'{bits[0]}' tag takes only one argument")
     block_name = bits[1]
     # Keep track of the names of BlockNodes found in this template, so we can
     # check for duplication.
     try:
         if block_name in parser.__loaded_blocks:
             raise TemplateSyntaxError(
-                "'{}' tag with name '{}' appears more than once".format(
-                    bits[0], block_name
-                )
+                f"'{bits[0]}' tag with name '{block_name}' appears more than once"
             )
         parser.__loaded_blocks.append(block_name)
     except AttributeError:  # parser.__loaded_blocks isn't a list yet
@@ -242,7 +234,7 @@ def do_block(parser, token):
 
     # This check is kept for backwards-compatibility. See #3100.
     endblock = parser.next_token()
-    acceptable_endblocks = ("endblock", "endblock {}".format(block_name))
+    acceptable_endblocks = ("endblock", f"endblock {block_name}")
     if endblock.contents not in acceptable_endblocks:
         parser.invalid_block_tag(endblock, "endblock", acceptable_endblocks)
 
@@ -279,15 +271,13 @@ def construct_relative_path(
     )
     if new_name.startswith("../"):
         raise TemplateSyntaxError(
-            "The relative path '{}' points outside the file hierarchy that "
-            "template '{}' is in.".format(relative_name, current_template_name)
+            f"The relative path '{relative_name}' points outside the file hierarchy that "
+            f"template '{current_template_name}' is in."
         )
     if not allow_recursion and current_template_name.lstrip("/") == new_name:
         raise TemplateSyntaxError(
-            "The relative path '{}' was translated to template name '{}', the "
-            "same template in which the tag appears.".format(
-                relative_name, current_template_name
-            )
+            f"The relative path '{relative_name}' was translated to template name '{current_template_name}', the "
+            "same template in which the tag appears."
         )
     has_quotes = (
         relative_name.startswith(('"', "'")) and relative_name[0] == relative_name[-1]
@@ -308,13 +298,13 @@ def do_extends(parser, token):
     """
     bits = token.split_contents()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'{}' takes one argument".format(bits[0]))
+        raise TemplateSyntaxError(f"'{bits[0]}' takes one argument")
     bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError(
-            "'{}' cannot appear more than once in the same template".format(bits[0])
+            f"'{bits[0]}' cannot appear more than once in the same template"
         )
     return ExtendsNode(nodelist, parent_name)
 
@@ -339,8 +329,8 @@ def do_include(parser, token):
     bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError(
-            "{!r} tag takes at least one argument: the name of the template to "
-            "be included.".format(bits[0])
+            f"{bits[0]!r} tag takes at least one argument: the name of the template to "
+            "be included."
         )
     options = {}
     remaining_bits = bits[2:]
@@ -348,21 +338,19 @@ def do_include(parser, token):
         option = remaining_bits.pop(0)
         if option in options:
             raise TemplateSyntaxError(
-                "The {!r} option was specified more than once.".format(option)
+                f"The {option!r} option was specified more than once."
             )
         if option == "with":
             value = token_kwargs(remaining_bits, parser, support_legacy=False)
             if not value:
                 raise TemplateSyntaxError(
-                    '"with" in {!r} tag needs at least one keyword argument.'.format(
-                        bits[0]
-                    )
+                    f'"with" in {bits[0]!r} tag needs at least one keyword argument.'
                 )
         elif option == "only":
             value = True
         else:
             raise TemplateSyntaxError(
-                "Unknown argument for {!r} tag: {!r}.".format(bits[0], option)
+                f"Unknown argument for {bits[0]!r} tag: {option!r}."
             )
         options[option] = value
     isolated_context = options.get("only", False)

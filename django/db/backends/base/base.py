@@ -174,8 +174,8 @@ class BaseDatabaseWrapper:
     def queries(self):
         if len(self.queries_log) == self.queries_log.maxlen:
             warnings.warn(
-                "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen),
+                f"Limit for query logging exceeded, only the last {self.queries_log.maxlen} queries "
+                "will be returned.",
                 stacklevel=2,
             )
         return list(self.queries_log)
@@ -263,9 +263,7 @@ class BaseDatabaseWrapper:
     def check_settings(self):
         if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
             raise ImproperlyConfigured(
-                "Connection '{}' cannot set TIME_ZONE because USE_TZ is False.".format(
-                    self.alias
-                )
+                f"Connection '{self.alias}' cannot set TIME_ZONE because USE_TZ is False."
             )
 
     @async_unsafe
@@ -646,10 +644,8 @@ class BaseDatabaseWrapper:
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
-                "with alias '{}' was created in thread id {} and this is "
-                "thread id {}.".format(
-                    self.alias, self._thread_ident, _thread.get_ident()
-                )
+                f"with alias '{self.alias}' was created in thread id {self._thread_ident} and this is "
+                f"thread id {_thread.get_ident()}."
             )
 
     # ##### Miscellaneous #####

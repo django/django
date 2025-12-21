@@ -409,9 +409,7 @@ class MigrationAutodetector:
                     chop_mode = True
                 else:
                     raise ValueError(
-                        "Cannot resolve operation dependencies: {!r}".format(
-                            self.generated_operations
-                        )
+                        f"Cannot resolve operation dependencies: {self.generated_operations!r}"
                     )
             num_ops = new_num_ops
 
@@ -545,7 +543,7 @@ class MigrationAutodetector:
             )
         # Unknown dependency. Raise an error.
         else:
-            raise ValueError("Can't handle dependency {!r}".format(dependency))
+            raise ValueError(f"Can't handle dependency {dependency!r}")
 
     def add_operation(self, app_label, operation, dependencies=None, beginning=False):
         # Dependencies are
@@ -567,7 +565,7 @@ class MigrationAutodetector:
                 base if isinstance(base, str) else base.__name__
                 for base in model_state.bases
             }
-            string_version = "{}.{}".format(item[0], item[1])
+            string_version = f"{item[0]}.{item[1]}"
             if (
                 model_state.options.get("swappable")
                 or "AbstractUser" in base_names
@@ -632,15 +630,9 @@ class MigrationAutodetector:
                                 dependencies=dependencies,
                             )
                             self.renamed_models[app_label, model_name] = rem_model_name
-                            renamed_models_rel_key = "{}.{}".format(
-                                rem_model_state.app_label,
-                                rem_model_state.name_lower,
-                            )
+                            renamed_models_rel_key = f"{rem_model_state.app_label}.{rem_model_state.name_lower}"
                             self.renamed_models_rel[renamed_models_rel_key] = (
-                                "{}.{}".format(
-                                    model_state.app_label,
-                                    model_state.name_lower,
-                                )
+                                f"{model_state.app_label}.{model_state.name_lower}"
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))

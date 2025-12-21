@@ -28,7 +28,7 @@ class GeoSitemapTest(TestCase):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ("kml", "kmz"):
             doc = minidom.parseString(
-                self.client.get("/sitemaps/{}.xml".format(kml_type)).content
+                self.client.get(f"/sitemaps/{kml_type}.xml").content
             )
 
             # Ensuring the right sitemaps namespace is present.

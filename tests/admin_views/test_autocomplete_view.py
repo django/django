@@ -280,7 +280,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
                 self.user.user_permissions.clear()
                 p = Permission.objects.get(
                     content_type=ContentType.objects.get_for_model(Question),
-                    codename="{}_question".format(permission),
+                    codename=f"{permission}_question",
                 )
                 self.user.user_permissions.add(p)
                 request.user = User.objects.get(pk=self.user.pk)

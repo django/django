@@ -32,11 +32,7 @@ class SDODWithin(SpatialOperator):
 
 
 class SDODisjoint(SpatialOperator):
-    sql_template = (
-        "SDO_GEOM.RELATE(%(lhs)s, 'DISJOINT', %(rhs)s, {}) = 'DISJOINT'".format(
-            DEFAULT_TOLERANCE
-        )
-    )
+    sql_template = f"SDO_GEOM.RELATE(%(lhs)s, 'DISJOINT', %(rhs)s, {DEFAULT_TOLERANCE}) = 'DISJOINT'"
 
 
 class SDORelate(SpatialOperator):
@@ -47,9 +43,9 @@ class SDORelate(SpatialOperator):
             "TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|"
             "CONTAINS|COVERS|ANYINTERACT|ON"
         )
-        mask_regex = re.compile(r"^({})(\+({}))*$".format(masks, masks), re.I)
+        mask_regex = re.compile(rf"^({masks})(\+({masks}))*$", re.I)
         if not isinstance(arg, str) or not mask_regex.match(arg):
-            raise ValueError('Invalid SDO_RELATE mask: "{}"'.format(arg))
+            raise ValueError(f'Invalid SDO_RELATE mask: "{arg}"')
 
     def as_sql(self, connection, lookup, template_params, sql_params):
         template_params["mask"] = sql_params[-1]
@@ -162,7 +158,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
                 ur = ll
             else:
                 raise Exception(
-                    "Unexpected geometry type returned for extent: {}".format(gtype)
+                    f"Unexpected geometry type returned for extent: {gtype}"
                 )
             xmin, ymin = ll
             xmax, ymax = ur
@@ -201,7 +197,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         # dwithin lookups on Oracle require a special string parameter
         # that starts with "distance=".
         if lookup_type == "dwithin":
-            dist_param = "distance={}".format(dist_param)
+            dist_param = f"distance={dist_param}"
 
         return [dist_param]
 

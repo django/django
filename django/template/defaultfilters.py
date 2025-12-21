@@ -725,13 +725,8 @@ def unordered_list(value, autoescape=True):
         for item, children in walk_items(item_list):
             sublist = ""
             if children:
-                sublist = "\n{}<ul>\n{}\n{}</ul>\n{}".format(
-                    indent,
-                    list_formatter(children, tabs + 1),
-                    indent,
-                    indent,
-                )
-            output.append("{}<li>{}{}</li>".format(indent, escaper(item), sublist))
+                sublist = f"\n{indent}<ul>\n{list_formatter(children, tabs + 1)}\n{indent}</ul>\n{indent}"
+            output.append(f"{indent}<li>{escaper(item)}{sublist}</li>")
         return "\n".join(output)
 
     return mark_safe(list_formatter(value))
@@ -935,7 +930,7 @@ def filesizeformat(bytes_):
         value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
 
     if negative:
-        value = "-{}".format(value)
+        value = f"-{value}"
     return avoid_wrapping(value)
 
 
@@ -993,4 +988,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: {}: {}".format(e.__class__.__name__, e)
+        return f"Error in formatting: {e.__class__.__name__}: {e}"

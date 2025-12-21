@@ -91,8 +91,8 @@ class Index:
         if self.name[0] == "_" or self.name[0].isdigit():
             errors.append(
                 checks.Error(
-                    "The index name '{}' cannot start with an underscore "
-                    "or a number.".format(self.name),
+                    f"The index name '{self.name}' cannot start with an underscore "
+                    "or a number.",
                     obj=model,
                     id="models.E033",
                 ),
@@ -130,9 +130,7 @@ class Index:
         ) and any(self.condition is not None for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "{} does not support indexes with conditions.".format(
-                        connection.display_name
-                    ),
+                    f"{connection.display_name} does not support indexes with conditions.",
                     hint=(
                         "Conditions will be ignored. Silence this warning "
                         "if you don't care about it."
@@ -147,9 +145,7 @@ class Index:
         ) and any(index.include for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "{} does not support indexes with non-key columns.".format(
-                        connection.display_name
-                    ),
+                    f"{connection.display_name} does not support indexes with non-key columns.",
                     hint=(
                         "Non-key columns will be ignored. Silence this "
                         "warning if you don't care about it."
@@ -164,9 +160,7 @@ class Index:
         ) and any(index.contains_expressions for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "{} does not support indexes on expressions.".format(
-                        connection.display_name
-                    ),
+                    f"{connection.display_name} does not support indexes on expressions.",
                     hint=(
                         "An index won't be created. Silence this warning "
                         "if you don't care about it."
@@ -230,7 +224,7 @@ class Index:
         return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
-        path = "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
+        path = f"{self.__class__.__module__}.{self.__class__.__name__}"
         path = path.replace("django.db.models.indexes", "django.db.models")
         kwargs = {"name": self.name}
         if self.fields:
@@ -275,7 +269,7 @@ class Index:
         self.name = "{}_{}_{}".format(
             table_name[:11],
             column_names[0][:7],
-            "{}_{}".format(names_digest(*hash_data, length=6), self.suffix),
+            f"{names_digest(*hash_data, length=6)}_{self.suffix}",
         )
         if len(self.name) > self.max_name_length:
             raise ValueError(
@@ -283,26 +277,22 @@ class Index:
                 "longer than 3 characters?"
             )
         if self.name[0] == "_" or self.name[0].isdigit():
-            self.name = "D{}".format(self.name[1:])
+            self.name = f"D{self.name[1:]}"
 
     def __repr__(self):
         return "<{}:{}{}{}{}{}{}{}>".format(
             self.__class__.__qualname__,
-            "" if not self.fields else " fields={}".format(repr(self.fields)),
-            (
-                ""
-                if not self.expressions
-                else " expressions={}".format(repr(self.expressions))
-            ),
-            "" if not self.name else " name={}".format(repr(self.name)),
+            "" if not self.fields else f" fields={repr(self.fields)}",
+            ("" if not self.expressions else f" expressions={repr(self.expressions)}"),
+            "" if not self.name else f" name={repr(self.name)}",
             (
                 ""
                 if self.db_tablespace is None
-                else " db_tablespace={}".format(repr(self.db_tablespace))
+                else f" db_tablespace={repr(self.db_tablespace)}"
             ),
-            "" if self.condition is None else " condition={}".format(self.condition),
-            "" if not self.include else " include={}".format(repr(self.include)),
-            "" if not self.opclasses else " opclasses={}".format(repr(self.opclasses)),
+            "" if self.condition is None else f" condition={self.condition}",
+            "" if not self.include else f" include={repr(self.include)}",
+            "" if not self.opclasses else f" opclasses={repr(self.opclasses)}",
         )
 
     def __eq__(self, other):

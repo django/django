@@ -210,7 +210,7 @@ class GeoModelTest(TestCase):
         point_select = connection.ops.select % "point"
         cities2 = list(
             City.objects.raw(
-                "select id, name, {} as point from geoapp_city".format(point_select)
+                f"select id, name, {point_select} as point from geoapp_city"
             )
         )
         self.assertEqual(len(cities1), len(cities2))
@@ -234,7 +234,7 @@ class GeoModelTest(TestCase):
         call_command("dumpdata", "geoapp.City", stdout=out)
         result = out.getvalue()
         houston = City.objects.get(name="Houston")
-        self.assertIn('"point": "{}"'.format(houston.point.ewkt), result)
+        self.assertIn(f'"point": "{houston.point.ewkt}"', result)
 
         # Reload now dumped data
         with NamedTemporaryFile(mode="w", suffix=".json") as tmp:
@@ -537,7 +537,7 @@ class GeoLookupTest(TestCase):
         for lookup, geom in queries:
             with self.subTest(lookup=lookup):
                 self.assertNotIn(
-                    null, State.objects.filter(**{"poly__{}".format(lookup): geom})
+                    null, State.objects.filter(**{f"poly__{lookup}": geom})
                 )
 
     def test_wkt_string_in_lookup(self):

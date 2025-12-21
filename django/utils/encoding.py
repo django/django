@@ -10,10 +10,8 @@ from django.utils.functional import Promise
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __str__(self):
-        return "{}. You passed in {!r} ({})".format(
-            super().__str__(),
-            self.object,
-            type(self.object),
+        return (
+            f"{super().__str__()}. You passed in {self.object!r} ({type(self.object)})"
         )
 
 

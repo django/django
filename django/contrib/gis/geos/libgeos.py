@@ -38,7 +38,7 @@ def load_geos():
         # *NIX libraries
         lib_names = ["geos_c", "GEOS"]
     else:
-        raise ImportError('Unsupported OS "{}"'.format(os.name))
+        raise ImportError(f'Unsupported OS "{os.name}"')
 
     # Using the ctypes `find_library` utility to find the path to the GEOS
     # shared library. This is better than manually specifying each library name

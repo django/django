@@ -37,16 +37,16 @@ class BaseAutodetectorTests(TestCase):
     def repr_changes(self, changes, include_dependencies=False):
         output = ""
         for app_label, migrations_ in sorted(changes.items()):
-            output += "  {}:\n".format(app_label)
+            output += f"  {app_label}:\n"
             for migration in migrations_:
-                output += "    {}\n".format(migration.name)
+                output += f"    {migration.name}\n"
                 for operation in migration.operations:
-                    output += "      {}\n".format(operation)
+                    output += f"      {operation}\n"
                 if include_dependencies:
                     output += "      Dependencies:\n"
                     if migration.dependencies:
                         for dep in migration.dependencies:
-                            output += "        {}\n".format(dep)
+                            output += f"        {dep}\n"
                     else:
                         output += "        None\n"
         return output
@@ -54,50 +54,32 @@ class BaseAutodetectorTests(TestCase):
     def assertNumberMigrations(self, changes, app_label, number):
         if len(changes.get(app_label, [])) != number:
             self.fail(
-                "Incorrect number of migrations ({}) for {} (expected {})\n{}".format(
-                    len(changes.get(app_label, [])),
-                    app_label,
-                    number,
-                    self.repr_changes(changes),
-                )
+                f"Incorrect number of migrations ({len(changes.get(app_label, []))}) for {app_label} (expected {number})\n{self.repr_changes(changes)}"
             )
 
     def assertMigrationDependencies(self, changes, app_label, position, dependencies):
         if not changes.get(app_label):
             self.fail(
-                "No migrations found for {}\n{}".format(
-                    app_label, self.repr_changes(changes)
-                )
+                f"No migrations found for {app_label}\n{self.repr_changes(changes)}"
             )
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No migration at index {} for {}\n{}".format(
-                    position, app_label, self.repr_changes(changes)
-                )
+                f"No migration at index {position} for {app_label}\n{self.repr_changes(changes)}"
             )
         migration = changes[app_label][position]
         if set(migration.dependencies) != set(dependencies):
             self.fail(
-                "Migration dependencies mismatch for {}.{} (expected {}):\n{}".format(
-                    app_label,
-                    migration.name,
-                    dependencies,
-                    self.repr_changes(changes, include_dependencies=True),
-                )
+                f"Migration dependencies mismatch for {app_label}.{migration.name} (expected {dependencies}):\n{self.repr_changes(changes, include_dependencies=True)}"
             )
 
     def assertOperationTypes(self, changes, app_label, position, types):
         if not changes.get(app_label):
             self.fail(
-                "No migrations found for {}\n{}".format(
-                    app_label, self.repr_changes(changes)
-                )
+                f"No migrations found for {app_label}\n{self.repr_changes(changes)}"
             )
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No migration at index {} for {}\n{}".format(
-                    position, app_label, self.repr_changes(changes)
-                )
+                f"No migration at index {position} for {app_label}\n{self.repr_changes(changes)}"
             )
         migration = changes[app_label][position]
         real_types = [
@@ -105,12 +87,7 @@ class BaseAutodetectorTests(TestCase):
         ]
         if types != real_types:
             self.fail(
-                "Operation type mismatch for {}.{} (expected {}):\n{}".format(
-                    app_label,
-                    migration.name,
-                    types,
-                    self.repr_changes(changes),
-                )
+                f"Operation type mismatch for {app_label}.{migration.name} (expected {types}):\n{self.repr_changes(changes)}"
             )
 
     def assertOperationAttributes(
@@ -118,39 +95,22 @@ class BaseAutodetectorTests(TestCase):
     ):
         if not changes.get(app_label):
             self.fail(
-                "No migrations found for {}\n{}".format(
-                    app_label, self.repr_changes(changes)
-                )
+                f"No migrations found for {app_label}\n{self.repr_changes(changes)}"
             )
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No migration at index {} for {}\n{}".format(
-                    position, app_label, self.repr_changes(changes)
-                )
+                f"No migration at index {position} for {app_label}\n{self.repr_changes(changes)}"
             )
         migration = changes[app_label][position]
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No operation at index {} for {}.{}\n{}".format(
-                    operation_position,
-                    app_label,
-                    migration.name,
-                    self.repr_changes(changes),
-                )
+                f"No operation at index {operation_position} for {app_label}.{migration.name}\n{self.repr_changes(changes)}"
             )
         operation = migration.operations[operation_position]
         for attr, value in attrs.items():
             if getattr(operation, attr, None) != value:
                 self.fail(
-                    "Attribute mismatch for {}.{} op #{}, {} (expected {!r}, got {!r}):\n{}".format(
-                        app_label,
-                        migration.name,
-                        operation_position,
-                        attr,
-                        value,
-                        getattr(operation, attr, None),
-                        self.repr_changes(changes),
-                    )
+                    f"Attribute mismatch for {app_label}.{migration.name} op #{operation_position}, {attr} (expected {value!r}, got {getattr(operation, attr, None)!r}):\n{self.repr_changes(changes)}"
                 )
 
     def assertOperationFieldAttributes(
@@ -158,49 +118,28 @@ class BaseAutodetectorTests(TestCase):
     ):
         if not changes.get(app_label):
             self.fail(
-                "No migrations found for {}\n{}".format(
-                    app_label, self.repr_changes(changes)
-                )
+                f"No migrations found for {app_label}\n{self.repr_changes(changes)}"
             )
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No migration at index {} for {}\n{}".format(
-                    position, app_label, self.repr_changes(changes)
-                )
+                f"No migration at index {position} for {app_label}\n{self.repr_changes(changes)}"
             )
         migration = changes[app_label][position]
         if len(changes[app_label]) < position + 1:
             self.fail(
-                "No operation at index {} for {}.{}\n{}".format(
-                    operation_position,
-                    app_label,
-                    migration.name,
-                    self.repr_changes(changes),
-                )
+                f"No operation at index {operation_position} for {app_label}.{migration.name}\n{self.repr_changes(changes)}"
             )
         operation = migration.operations[operation_position]
         if not hasattr(operation, "field"):
             self.fail(
-                "No field attribute for {}.{} op #{}.".format(
-                    app_label,
-                    migration.name,
-                    operation_position,
-                )
+                f"No field attribute for {app_label}.{migration.name} op #{operation_position}."
             )
         field = operation.field
         for attr, value in attrs.items():
             if getattr(field, attr, None) != value:
                 self.fail(
-                    "Field attribute mismatch for {}.{} op #{}, field.{} (expected {!r}, "
-                    "got {!r}):\n{}".format(
-                        app_label,
-                        migration.name,
-                        operation_position,
-                        attr,
-                        value,
-                        getattr(field, attr, None),
-                        self.repr_changes(changes),
-                    )
+                    f"Field attribute mismatch for {app_label}.{migration.name} op #{operation_position}, field.{attr} (expected {value!r}, "
+                    f"got {getattr(field, attr, None)!r}):\n{self.repr_changes(changes)}"
                 )
 
     def make_project_state(self, model_states):
@@ -1268,11 +1207,11 @@ class AutodetectorTests(BaseAutodetectorTests):
         changes = autodetector.arrange_for_graph(changes, graph, migration_name)
 
         # Make sure there's a new name, deps match, etc.
-        self.assertEqual(changes["testapp"][0].name, "0003_{}".format(migration_name))
+        self.assertEqual(changes["testapp"][0].name, f"0003_{migration_name}")
         self.assertEqual(
             changes["testapp"][0].dependencies, [("testapp", "0002_foobar")]
         )
-        self.assertEqual(changes["otherapp"][0].name, "0002_{}".format(migration_name))
+        self.assertEqual(changes["otherapp"][0].name, f"0002_{migration_name}")
         self.assertEqual(
             changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")]
         )
@@ -1567,7 +1506,7 @@ class AutodetectorTests(BaseAutodetectorTests):
 
     def test_supports_functools_partial(self):
         def _content_file_name(instance, filename, key, **kwargs):
-            return "{}/{}".format(instance, filename)
+            return f"{instance}/{filename}"
 
         def content_file_name(key, **kwargs):
             return functools.partial(_content_file_name, key, **kwargs)
@@ -2993,7 +2932,7 @@ class AutodetectorTests(BaseAutodetectorTests):
                 ops = ", ".join(
                     o.__class__.__name__ for o in changes["a"][0].operations
                 )
-                self.fail("Created operation(s) {} from {}".format(ops, msg))
+                self.fail(f"Created operation(s) {ops} from {msg}")
 
         tests = (
             (

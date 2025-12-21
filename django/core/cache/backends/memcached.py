@@ -115,7 +115,7 @@ class BaseMemcachedCache(BaseCache):
         except self.LibraryValueNotFoundException:
             val = None
         if val is None:
-            raise ValueError("Key '{}' not found".format(key))
+            raise ValueError(f"Key '{key}' not found")
         return val
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):

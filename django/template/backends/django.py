@@ -39,7 +39,7 @@ class DjangoTemplates(BaseEngine):
             return [
                 Error(
                     "'string_if_invalid' in TEMPLATES OPTIONS must be a string but "
-                    "got: {!r} ({}).".format(value, type(value)),
+                    f"got: {value!r} ({type(value)}).",
                     obj=self,
                     id="templates.E002",
                 )
@@ -175,7 +175,7 @@ def get_package_libraries(pkg):
         except ImportError as e:
             raise InvalidTemplateLibrary(
                 "Invalid template library specified. ImportError raised when "
-                "trying to load '{}': {}".format(entry[1], e)
+                f"trying to load '{entry[1]}': {e}"
             ) from e
 
         if hasattr(module, "register"):

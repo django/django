@@ -29,8 +29,7 @@ def prepopulated_fields_js(context):
                 "id": "#{}".format(field["field"].auto_id),
                 "name": field["field"].name,
                 "dependency_ids": [
-                    "#{}".format(dependency.auto_id)
-                    for dependency in field["dependencies"]
+                    f"#{dependency.auto_id}" for dependency in field["dependencies"]
                 ],
                 "dependency_list": [
                     dependency.name for dependency in field["dependencies"]

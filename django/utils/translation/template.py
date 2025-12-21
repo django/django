@@ -75,7 +75,7 @@ def templatize(src, origin=None):
                         translators_comment_start is not None
                         and lineno >= translators_comment_start
                     ):
-                        out.write(" # {}".format(line))
+                        out.write(f" # {line}")
                     else:
                         out.write(" #\n")
                 incomment = False
@@ -90,20 +90,11 @@ def templatize(src, origin=None):
                     if inplural:
                         if message_context:
                             out.write(
-                                " npgettext({p}{!r}, {p}{!r}, {p}{!r},count) ".format(
-                                    message_context,
-                                    join_tokens(singular, trimmed),
-                                    join_tokens(plural, trimmed),
-                                    p=raw_prefix,
-                                )
+                                f" npgettext({raw_prefix}{message_context!r}, {raw_prefix}{join_tokens(singular, trimmed)!r}, {raw_prefix}{join_tokens(plural, trimmed)!r},count) "
                             )
                         else:
                             out.write(
-                                " ngettext({p}{!r}, {p}{!r}, count) ".format(
-                                    join_tokens(singular, trimmed),
-                                    join_tokens(plural, trimmed),
-                                    p=raw_prefix,
-                                )
+                                f" ngettext({raw_prefix}{join_tokens(singular, trimmed)!r}, {raw_prefix}{join_tokens(plural, trimmed)!r}, count) "
                             )
                         for part in singular:
                             out.write(blankout(part, "S"))
@@ -112,18 +103,11 @@ def templatize(src, origin=None):
                     else:
                         if message_context:
                             out.write(
-                                " pgettext({p}{!r}, {p}{!r}) ".format(
-                                    message_context,
-                                    join_tokens(singular, trimmed),
-                                    p=raw_prefix,
-                                )
+                                f" pgettext({raw_prefix}{message_context!r}, {raw_prefix}{join_tokens(singular, trimmed)!r}) "
                             )
                         else:
                             out.write(
-                                " gettext({p}{!r}) ".format(
-                                    join_tokens(singular, trimmed),
-                                    p=raw_prefix,
-                                )
+                                f" gettext({raw_prefix}{join_tokens(singular, trimmed)!r}) "
                             )
                         for part in singular:
                             out.write(blankout(part, "S"))
@@ -137,16 +121,16 @@ def templatize(src, origin=None):
                 else:
                     filemsg = ""
                     if origin:
-                        filemsg = "file {}, ".format(origin)
+                        filemsg = f"file {origin}, "
                     raise SyntaxError(
                         "Translation blocks must not include other block tags: "
                         "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
                     )
             elif t.token_type == TokenType.VAR:
                 if inplural:
-                    plural.append("%({})s".format(t.contents))
+                    plural.append(f"%({t.contents})s")
                 else:
-                    singular.append("%({})s".format(t.contents))
+                    singular.append(f"%({t.contents})s")
             elif t.token_type == TokenType.TEXT:
                 contents = t.contents.replace("%", "%%")
                 if inplural:
@@ -163,7 +147,7 @@ def templatize(src, origin=None):
                         for c in lineno_comment_map[comment_lineno_cache]:
                             filemsg = ""
                             if origin:
-                                filemsg = "file {}, ".format(origin)
+                                filemsg = f"file {origin}, "
                             warn_msg = (
                                 "The translator-targeted comment '%s' "
                                 "(%sline %d) was ignored, because it wasn't "
@@ -199,16 +183,14 @@ def templatize(src, origin=None):
                         elif message_context[0] == "'":
                             message_context = message_context.strip("'")
                         out.write(
-                            " pgettext({p}{!r}, {p}{!r}) ".format(
-                                message_context, g, p=raw_prefix
-                            )
+                            f" pgettext({raw_prefix}{message_context!r}, {raw_prefix}{g!r}) "
                         )
                         message_context = None
                     else:
-                        out.write(" gettext({p}{!r}) ".format(g, p=raw_prefix))
+                        out.write(f" gettext({raw_prefix}{g!r}) ")
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
-                        out.write(" _({}) ".format(fmatch))
+                        out.write(f" _({fmatch}) ")
                     if bmatch[1]:
                         # A context is provided
                         context_match = context_re.match(bmatch[1])
@@ -224,7 +206,7 @@ def templatize(src, origin=None):
                     plural = []
                 elif cmatches:
                     for cmatch in cmatches:
-                        out.write(" _({}) ".format(cmatch))
+                        out.write(f" _({cmatch}) ")
                 elif t.contents == "comment":
                     incomment = True
                 else:
@@ -233,7 +215,7 @@ def templatize(src, origin=None):
                 parts = t.contents.split("|")
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(" _({}) ".format(cmatch[1]))
+                    out.write(f" _({cmatch[1]}) ")
                 for p in parts[1:]:
                     if p.find(":_(") >= 0:
                         out.write(" {} ".format(p.split(":", 1)[1]))

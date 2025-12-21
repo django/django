@@ -190,16 +190,16 @@ class UserModelChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Critical(
-                    "{}.is_anonymous must be an attribute or property rather than "
+                    f"{BadUser}.is_anonymous must be an attribute or property rather than "
                     "a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!".format(BadUser),
+                    "users will be treated as authenticated!",
                     obj=BadUser,
                     id="auth.C009",
                 ),
                 checks.Critical(
-                    "{}.is_authenticated must be an attribute or property rather "
+                    f"{BadUser}.is_authenticated must be an attribute or property rather "
                     "than a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!".format(BadUser),
+                    "users will be treated as authenticated!",
                     obj=BadUser,
                     id="auth.C010",
                 ),
@@ -229,20 +229,16 @@ class UserModelChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Critical(
-                    "{}.is_anonymous must be an attribute or property rather than "
+                    f"{VulnerableStaticUser}.is_anonymous must be an attribute or property rather than "
                     "a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!".format(
-                        VulnerableStaticUser
-                    ),
+                    "users will be treated as authenticated!",
                     obj=VulnerableStaticUser,
                     id="auth.C009",
                 ),
                 checks.Critical(
-                    "{}.is_authenticated must be an attribute or property rather "
+                    f"{VulnerableStaticUser}.is_authenticated must be an attribute or property rather "
                     "than a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!".format(
-                        VulnerableStaticUser
-                    ),
+                    "users will be treated as authenticated!",
                     obj=VulnerableStaticUser,
                     id="auth.C010",
                 ),
@@ -336,9 +332,9 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The name of model 'auth_tests.{}' must be at most 93 "
+                    f"The name of model 'auth_tests.{model_name}' must be at most 93 "
                     "characters for its builtin permission codenames to be at "
-                    "most 100 characters.".format(model_name),
+                    "most 100 characters.",
                     obj=model,
                     id="auth.E011",
                 ),
@@ -361,8 +357,8 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The permission named '{}' of model 'auth_tests.Checked' is longer "
-                    "than 255 characters.".format(custom_permission_name),
+                    f"The permission named '{custom_permission_name}' of model 'auth_tests.Checked' is longer "
+                    "than 255 characters.",
                     obj=Checked,
                     id="auth.E008",
                 ),
@@ -383,8 +379,8 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The permission codenamed '{}' of model 'auth_tests.Checked' "
-                    "is longer than 100 characters.".format(custom_permission_codename),
+                    f"The permission codenamed '{custom_permission_codename}' of model 'auth_tests.Checked' "
+                    "is longer than 100 characters.",
                     obj=Checked,
                     id="auth.E012",
                 ),

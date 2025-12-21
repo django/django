@@ -251,15 +251,15 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, "model"):
             return super().__str__()
         model = self.model
-        return "{}.{}".format(model._meta.label, self.name)
+        return f"{model._meta.label}.{self.name}"
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
-        path = "{}.{}".format(self.__class__.__module__, self.__class__.__qualname__)
+        path = f"{self.__class__.__module__}.{self.__class__.__qualname__}"
         name = getattr(self, "name", None)
         if name is not None:
-            return "<{}: {}>".format(path, name)
-        return "<{}>".format(path)
+            return f"<{path}: {name}>"
+        return f"<{path}>"
 
     def check(self, **kwargs):
         return [
@@ -292,7 +292,7 @@ class Field(RegisterLookupMixin):
         elif LOOKUP_SEP in self.name:
             return [
                 checks.Error(
-                    'Field names must not contain "{}".'.format(LOOKUP_SEP),
+                    f'Field names must not contain "{LOOKUP_SEP}".',
                     obj=self,
                     id="fields.E002",
                 )
@@ -497,11 +497,8 @@ class Field(RegisterLookupMixin):
                     checks.Error(
                         "All 'validators' must be callable.",
                         hint=(
-                            "validators[{i}] ({repr}) isn't a function or "
-                            "instance of a validator class.".format(
-                                i=i,
-                                repr=repr(validator),
-                            )
+                            f"validators[{i}] ({repr(validator)}) isn't a function or "
+                            "instance of a validator class."
                         ),
                         obj=self,
                         id="fields.E008",
@@ -515,8 +512,8 @@ class Field(RegisterLookupMixin):
                 checks.Error(
                     self.system_check_removed_details.get(
                         "msg",
-                        "{} has been removed except for support in historical "
-                        "migrations.".format(self.__class__.__name__),
+                        f"{self.__class__.__name__} has been removed except for support in historical "
+                        "migrations.",
                     ),
                     hint=self.system_check_removed_details.get("hint"),
                     obj=self,
@@ -527,7 +524,7 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Warning(
                     self.system_check_deprecated_details.get(
-                        "msg", "{} has been deprecated.".format(self.__class__.__name__)
+                        "msg", f"{self.__class__.__name__} has been deprecated."
                     ),
                     hint=self.system_check_deprecated_details.get("hint"),
                     obj=self,
@@ -645,7 +642,7 @@ class Field(RegisterLookupMixin):
                 if value is not default:
                     keywords[name] = value
         # Work out path - we shorten it for known Django core fields
-        path = "{}.{}".format(self.__class__.__module__, self.__class__.__qualname__)
+        path = f"{self.__class__.__module__}.{self.__class__.__qualname__}"
         if path.startswith("django.db.models.fields.related"):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         elif path.startswith("django.db.models.fields.files"):
@@ -958,10 +955,10 @@ class Field(RegisterLookupMixin):
             # this class, but don't check methods derived from inheritance, to
             # allow overriding inherited choices. For more complex inheritance
             # structures users should override contribute_to_class().
-            if "get_{}_display".format(self.name) not in cls.__dict__:
+            if f"get_{self.name}_display" not in cls.__dict__:
                 setattr(
                     cls,
-                    "get_{}_display".format(self.name),
+                    f"get_{self.name}_display",
                     partialmethod(cls._get_FIELD_display, field=self),
                 )
 
@@ -1267,8 +1264,8 @@ class CharField(Field):
             ):
                 errors.append(
                     checks.Error(
-                        "{} does not support a database collation on "
-                        "CharFields.".format(connection.display_name),
+                        f"{connection.display_name} does not support a database collation on "
+                        "CharFields.",
                         obj=self,
                         id="fields.E190",
                     ),
@@ -1518,14 +1515,14 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.null:
             setattr(
                 cls,
-                "get_next_by_{}".format(self.name),
+                f"get_next_by_{self.name}",
                 partialmethod(
                     cls._get_next_or_previous_by_FIELD, field=self, is_next=True
                 ),
             )
             setattr(
                 cls,
-                "get_previous_by_{}".format(self.name),
+                f"get_previous_by_{self.name}",
                 partialmethod(
                     cls._get_next_or_previous_by_FIELD, field=self, is_next=False
                 ),
@@ -1664,12 +1661,12 @@ class DateTimeField(DateField):
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
             try:
-                name = "{}.{}".format(self.model.__name__, self.name)
+                name = f"{self.model.__name__}.{self.name}"
             except AttributeError:
                 name = "(unbound)"
             warnings.warn(
-                "DateTimeField {} received a naive datetime ({})"
-                " while time zone support is active.".format(name, value),
+                f"DateTimeField {name} received a naive datetime ({value})"
+                " while time zone support is active.",
                 RuntimeWarning,
             )
             default_timezone = timezone.get_default_timezone()
@@ -2058,7 +2055,7 @@ class FloatField(Field):
             return float(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '{}' expected a number but got {!r}.".format(self.name, value),
+                f"Field '{self.name}' expected a number but got {value!r}.",
             ) from e
 
     def get_internal_type(self):
@@ -2102,9 +2099,7 @@ class IntegerField(Field):
         if self.max_length is not None:
             return [
                 checks.Warning(
-                    "'max_length' is ignored when used with {}.".format(
-                        self.__class__.__name__
-                    ),
+                    f"'max_length' is ignored when used with {self.__class__.__name__}.",
                     hint="Remove 'max_length' from field",
                     obj=self,
                     id="fields.W122",
@@ -2155,7 +2150,7 @@ class IntegerField(Field):
             return int(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '{}' expected a number but got {!r}.".format(self.name, value),
+                f"Field '{self.name}' expected a number but got {value!r}.",
             ) from e
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -2497,8 +2492,8 @@ class TextField(Field):
             ):
                 errors.append(
                     checks.Error(
-                        "{} does not support a database collation on "
-                        "TextFields.".format(connection.display_name),
+                        f"{connection.display_name} does not support a database collation on "
+                        "TextFields.",
                         obj=self,
                         id="fields.E190",
                     ),
@@ -2855,9 +2850,7 @@ class AutoFieldMixin:
     def contribute_to_class(self, cls, name, **kwargs):
         if cls._meta.auto_field:
             raise ValueError(
-                "Model {} can't have more than one auto-generated field.".format(
-                    cls._meta.label
-                )
+                f"Model {cls._meta.label} can't have more than one auto-generated field."
             )
         super().contribute_to_class(cls, name, **kwargs)
         cls._meta.auto_field = self

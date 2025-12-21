@@ -13,7 +13,7 @@ class Alarm(models.Model):
     time = models.TimeField()
 
     def __str__(self):
-        return "{} ({})".format(self.time, self.desc)
+        return f"{self.time} ({self.desc})"
 
 
 class Author(models.Model):

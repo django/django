@@ -37,8 +37,8 @@ class EngineHandler:
             except Exception:
                 invalid_backend = tpl.get("BACKEND", "<not defined>")
                 raise ImproperlyConfigured(
-                    "Invalid BACKEND for a template engine: {}. Check "
-                    "your TEMPLATES setting.".format(invalid_backend)
+                    f"Invalid BACKEND for a template engine: {invalid_backend}. Check "
+                    "your TEMPLATES setting."
                 )
 
             tpl = {
@@ -72,8 +72,7 @@ class EngineHandler:
                 params = self.templates[alias]
             except KeyError:
                 raise InvalidTemplateEngineError(
-                    "Could not find config for '{}' "
-                    "in settings.TEMPLATES".format(alias)
+                    f"Could not find config for '{alias}' " "in settings.TEMPLATES"
                 )
 
             # If importing or initializing the backend raises an exception,

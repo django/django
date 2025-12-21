@@ -111,7 +111,7 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage(),
             )
         except Exception:
-            subject = "{}: {}".format(record.levelname, record.getMessage())
+            subject = f"{record.levelname}: {record.getMessage()}"
             request = None
         subject = self.format_subject(subject)
 
@@ -127,10 +127,7 @@ class AdminEmailHandler(logging.Handler):
             exc_info = (None, record.getMessage(), None)
 
         reporter = self.reporter_class(request, is_email=True, *exc_info)
-        message = "{}\n\n{}".format(
-            self.format(no_exc_record),
-            reporter.get_traceback_text(),
-        )
+        message = f"{self.format(no_exc_record)}\n\n{reporter.get_traceback_text()}"
         html_message = reporter.get_traceback_html() if self.include_html else None
         self.send_mail(subject, message, fail_silently=True, html_message=html_message)
 

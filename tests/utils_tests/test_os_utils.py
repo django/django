@@ -9,13 +9,13 @@ from django.utils._os import safe_join, to_path
 class SafeJoinTests(unittest.TestCase):
     def test_base_path_ends_with_sep(self):
         drive, path = os.path.splitdrive(safe_join("/abc/", "abc"))
-        self.assertEqual(path, "{0}abc{0}abc".format(os.path.sep))
+        self.assertEqual(path, f"{os.path.sep}abc{os.path.sep}abc")
 
     def test_root_path(self):
         drive, path = os.path.splitdrive(safe_join("/", "path"))
         self.assertEqual(
             path,
-            "{}path".format(os.path.sep),
+            f"{os.path.sep}path",
         )
 
         drive, path = os.path.splitdrive(safe_join("/", ""))

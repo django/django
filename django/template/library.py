@@ -46,9 +46,7 @@ class Library:
             return compile_function
         else:
             raise ValueError(
-                "Unsupported arguments to Library.tag: ({!r}, {!r})".format(
-                    name, compile_function
-                ),
+                f"Unsupported arguments to Library.tag: ({name!r}, {compile_function!r})",
             )
 
     def tag_function(self, func):
@@ -95,9 +93,7 @@ class Library:
             return filter_func
         else:
             raise ValueError(
-                "Unsupported arguments to Library.filter: ({!r}, {!r})".format(
-                    name, filter_func
-                ),
+                f"Unsupported arguments to Library.filter: ({name!r}, {filter_func!r})",
             )
 
     def filter_function(self, func, **flags):
@@ -439,14 +435,12 @@ def parse_bits(
             if param not in params and param not in kwonly and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(
-                    "'{}' received unexpected keyword argument '{}'".format(name, param)
+                    f"'{name}' received unexpected keyword argument '{param}'"
                 )
             elif param in kwargs:
                 # The keyword argument has already been supplied once
                 raise TemplateSyntaxError(
-                    "'{}' received multiple values for keyword argument '{}'".format(
-                        name, param
-                    )
+                    f"'{name}' received multiple values for keyword argument '{param}'"
                 )
             else:
                 # All good, record the keyword argument
@@ -461,8 +455,8 @@ def parse_bits(
         else:
             if kwargs:
                 raise TemplateSyntaxError(
-                    "'{}' received some positional argument(s) after some "
-                    "keyword argument(s)".format(name)
+                    f"'{name}' received some positional argument(s) after some "
+                    "keyword argument(s)"
                 )
             else:
                 # Record the positional argument
@@ -473,7 +467,7 @@ def parse_bits(
                 except IndexError:
                     if varargs is None:
                         raise TemplateSyntaxError(
-                            "'{}' received too many positional arguments".format(name)
+                            f"'{name}' received too many positional arguments"
                         )
     if defaults is not None:
         # Consider the last n params handled, where n is the
@@ -484,9 +478,7 @@ def parse_bits(
         raise TemplateSyntaxError(
             "'{}' did not receive value(s) for the argument(s): {}".format(
                 name,
-                ", ".join(
-                    "'{}'".format(p) for p in unhandled_params + unhandled_kwargs
-                ),
+                ", ".join(f"'{p}'" for p in unhandled_params + unhandled_kwargs),
             )
         )
     return args, kwargs
@@ -501,11 +493,11 @@ def import_library(name):
     except ImportError as e:
         raise InvalidTemplateLibrary(
             "Invalid template library specified. ImportError raised when "
-            "trying to load '{}': {}".format(name, e)
+            f"trying to load '{name}': {e}"
         )
     try:
         return module.register
     except AttributeError:
         raise InvalidTemplateLibrary(
-            "Module {} does not have a variable named 'register'".format(name),
+            f"Module {name} does not have a variable named 'register'",
         )

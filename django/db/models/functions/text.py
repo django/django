@@ -10,7 +10,7 @@ class MySQLSHA2Mixin:
         return super().as_sql(
             compiler,
             connection,
-            template="SHA2(%(expressions)s, {})".format(self.function[3:]),
+            template=f"SHA2(%(expressions)s, {self.function[3:]})",
             **extra_context,
         )
 

@@ -9,7 +9,7 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
 
     def get_absolute_url(self):
-        return "/authors/{}/".format(self.id)
+        return f"/authors/{self.id}/"
 
 
 class BaseArticle(models.Model):
@@ -38,7 +38,7 @@ class UrlArticle(BaseArticle):
     date_created = models.DateTimeField()
 
     def get_absolute_url(self):
-        return "/urlarticles/{}/".format(self.slug)
+        return f"/urlarticles/{self.slug}/"
 
     get_absolute_url.purge = True
 

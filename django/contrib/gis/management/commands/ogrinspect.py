@@ -145,14 +145,12 @@ class Command(BaseCommand):
                 [
                     "",
                     "",
-                    "# Auto-generated `LayerMapping` dictionary for {} model".format(
-                        model_name
-                    ),
-                    "{}_mapping = {{".format(model_name.lower()),
+                    f"# Auto-generated `LayerMapping` dictionary for {model_name} model",
+                    f"{model_name.lower()}_mapping = {{",
                 ]
             )
             output.extend(
-                "    '{}': '{}',".format(rev_mapping[ogr_fld], ogr_fld)
+                f"    '{rev_mapping[ogr_fld]}': '{ogr_fld}',"
                 for ogr_fld in ds[options["layer_key"]].fields
             )
             output.extend(

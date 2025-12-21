@@ -19,9 +19,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict["TEST"]["NAME"] or ":memory:"
         if test_database_name == ":memory:":
-            return "file:memorydb_{}?mode=memory&cache=shared".format(
-                self.connection.alias
-            )
+            return f"file:memorydb_{self.connection.alias}?mode=memory&cache=shared"
         return test_database_name
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
@@ -33,23 +31,19 @@ class DatabaseCreation(BaseDatabaseCreation):
             # Erase the old test database
             if verbosity >= 1:
                 self.log(
-                    "Destroying old test database for alias {}...".format(
-                        self._get_database_display_str(verbosity, test_database_name)
-                    )
+                    f"Destroying old test database for alias {self._get_database_display_str(verbosity, test_database_name)}..."
                 )
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
                     confirm = input(
                         "Type 'yes' if you would like to try deleting the test "
-                        "database '{}', or 'no' to cancel: ".format(test_database_name)
+                        f"database '{test_database_name}', or 'no' to cancel: "
                     )
                 if autoclobber or confirm == "yes":
                     try:
                         os.remove(test_database_name)
                     except Exception as e:
-                        self.log(
-                            "Got an error deleting the old test database: {}".format(e)
-                        )
+                        self.log(f"Got an error deleting the old test database: {e}")
                         sys.exit(2)
                 else:
                     self.log("Tests cancelled.")
@@ -95,14 +89,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                 try:
                     os.remove(target_database_name)
                 except Exception as e:
-                    self.log(
-                        "Got an error deleting the old test database: {}".format(e)
-                    )
+                    self.log(f"Got an error deleting the old test database: {e}")
                     sys.exit(2)
             try:
                 shutil.copy(source_database_name, target_database_name)
             except Exception as e:
-                self.log("Got an error cloning the test database: {}".format(e))
+                self.log(f"Got an error cloning the test database: {e}")
                 sys.exit(2)
         # Forking automatically makes a copy of an in-memory database.
         # Forkserver and spawn require migrating to disk which will be

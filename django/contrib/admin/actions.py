@@ -86,10 +86,8 @@ def delete_selected(modeladmin, request, queryset):
         request,
         modeladmin.delete_selected_confirmation_template
         or [
-            "admin/{}/{}/delete_selected_confirmation.html".format(
-                app_label, opts.model_name
-            ),
-            "admin/{}/delete_selected_confirmation.html".format(app_label),
+            f"admin/{app_label}/{opts.model_name}/delete_selected_confirmation.html",
+            f"admin/{app_label}/delete_selected_confirmation.html",
             "admin/delete_selected_confirmation.html",
         ],
         context,

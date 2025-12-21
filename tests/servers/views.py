@@ -26,9 +26,7 @@ def create_model_instance(request):
 
 
 def environ_view(request):
-    return HttpResponse(
-        "\n".join("{}: {!r}".format(k, v) for k, v in request.environ.items())
-    )
+    return HttpResponse("\n".join(f"{k}: {v!r}" for k, v in request.environ.items()))
 
 
 def subview(request):
@@ -37,14 +35,14 @@ def subview(request):
 
 def subview_calling_view(request):
     with urlopen(request.GET["url"] + "/subview/") as response:
-        return HttpResponse("subview calling view: {}".format(response.read().decode()))
+        return HttpResponse(f"subview calling view: {response.read().decode()}")
 
 
 def check_model_instance_from_subview(request):
     with urlopen(request.GET["url"] + "/create_model_instance/"):
         pass
     with urlopen(request.GET["url"] + "/model_view/") as response:
-        return HttpResponse("subview calling view: {}".format(response.read().decode()))
+        return HttpResponse(f"subview calling view: {response.read().decode()}")
 
 
 @csrf_exempt

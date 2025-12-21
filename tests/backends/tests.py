@@ -319,13 +319,9 @@ class BackendTestCase(TransactionTestCase):
         f1 = connection.ops.quote_name(opts.get_field("root").column)
         f2 = connection.ops.quote_name(opts.get_field("square").column)
         if paramstyle == "format":
-            query = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(tbl, f1, f2)
+            query = f"INSERT INTO {tbl} ({f1}, {f2}) VALUES (%s, %s)"
         elif paramstyle == "pyformat":
-            query = "INSERT INTO {} ({}, {}) VALUES (%(root)s, %(square)s)".format(
-                tbl,
-                f1,
-                f2,
-            )
+            query = f"INSERT INTO {tbl} ({f1}, {f2}) VALUES (%(root)s, %(square)s)"
         else:
             raise ValueError("unsupported paramstyle in test")
         with connection.cursor() as cursor:
@@ -402,12 +398,7 @@ class BackendTestCase(TransactionTestCase):
         f3, f4 = opts2.get_field("first_name"), opts2.get_field("last_name")
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT {}, {} FROM {} ORDER BY {}".format(
-                    qn(f3.column),
-                    qn(f4.column),
-                    connection.introspection.identifier_converter(opts2.db_table),
-                    qn(f3.column),
-                )
+                f"SELECT {qn(f3.column)}, {qn(f4.column)} FROM {connection.introspection.identifier_converter(opts2.db_table)} ORDER BY {qn(f3.column)}"
             )
             self.assertEqual(cursor.fetchone(), ("Clark", "Kent"))
             self.assertEqual(
@@ -427,7 +418,7 @@ class BackendTestCase(TransactionTestCase):
             # As password is probably wrong, a database exception is expected
             pass
         except Exception as e:
-            self.fail("Unexpected error raised with Unicode password: {}".format(e))
+            self.fail(f"Unexpected error raised with Unicode password: {e}")
         finally:
             connection.settings_dict["PASSWORD"] = old_password
 
@@ -451,7 +442,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_duplicate_table_error(self):
         """Creating an existing table returns a DatabaseError"""
-        query = "CREATE TABLE {} (id INTEGER);".format(Article._meta.db_table)
+        query = f"CREATE TABLE {Article._meta.db_table} (id INTEGER);"
         with connection.cursor() as cursor:
             with self.assertRaises(DatabaseError):
                 cursor.execute(query)
@@ -532,7 +523,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
         self.assertEqual(list(connection.queries[0]), ["sql", "time"])
-        self.assertEqual(connection.queries[0]["sql"], "2 times: {}".format(sql))
+        self.assertEqual(connection.queries[0]["sql"], f"2 times: {sql}")
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature("test_db_allows_multiple_connections")

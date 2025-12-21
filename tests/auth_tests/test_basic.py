@@ -67,7 +67,7 @@ class BasicTestCase(TestCase):
         ]
         for i, kwargs in enumerate(cases):
             with self.subTest(**kwargs):
-                u = User.objects.create_user("testuser{}".format(i), **kwargs)
+                u = User.objects.create_user(f"testuser{i}", **kwargs)
                 self.assertEqual(u.email, "")
 
     def test_superuser(self):
@@ -95,7 +95,7 @@ class BasicTestCase(TestCase):
         ]
         for i, kwargs in enumerate(cases):
             with self.subTest(**kwargs):
-                superuser = User.objects.create_superuser("super{}".format(i), **kwargs)
+                superuser = User.objects.create_superuser(f"super{i}", **kwargs)
                 self.assertEqual(superuser.email, "")
                 self.assertFalse(superuser.has_usable_password())
 

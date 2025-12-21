@@ -53,18 +53,18 @@ class Command(BaseCommand):
         except LookupError as err:
             raise CommandError(str(err))
         if app_label not in loader.migrated_apps:
-            raise CommandError("App '{}' does not have migrations".format(app_label))
+            raise CommandError(f"App '{app_label}' does not have migrations")
         try:
             migration = loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
             raise CommandError(
-                "More than one migration matches '{}' in app '{}'. Please be more "
-                "specific.".format(migration_name, app_label)
+                f"More than one migration matches '{migration_name}' in app '{app_label}'. Please be more "
+                "specific."
             )
         except KeyError:
             raise CommandError(
-                "Cannot find a migration matching '{}' from app '{}'. Is it in "
-                "INSTALLED_APPS?".format(migration_name, app_label)
+                f"Cannot find a migration matching '{migration_name}' from app '{app_label}'. Is it in "
+                "INSTALLED_APPS?"
             )
         target = (app_label, migration.name)
 

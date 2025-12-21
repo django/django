@@ -228,7 +228,7 @@ class ProxyModelTests(TestCase):
 
         def make_handler(model, event):
             def _handler(*args, **kwargs):
-                output.append("{} {} save".format(model, event))
+                output.append(f"{model} {event} save")
 
             return _handler
 

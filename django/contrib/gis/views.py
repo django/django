@@ -15,8 +15,8 @@ def feed(request, url, feed_dict=None):
 
     instance = f()
     instance.feed_url = getattr(f, "feed_url", None) or request.path
-    instance.title_template = f.title_template or ("feeds/{}_title.html".format(slug))
+    instance.title_template = f.title_template or (f"feeds/{slug}_title.html")
     instance.description_template = f.description_template or (
-        "feeds/{}_description.html".format(slug)
+        f"feeds/{slug}_description.html"
     )
     return instance(request)

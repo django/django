@@ -532,9 +532,7 @@ def register_tests(test_class, method_name, test_func, exclude=()):
             continue
         decorated_func = skipIf(
             isinstance(serializers.get_serializer(format_), serializers.BadSerializer),
-            "The Python library for the {} serializer is not installed.".format(
-                format_
-            ),
+            f"The Python library for the {format_} serializer is not installed.",
         )(test_func)
         setattr(
             test_class, method_name % format_, partialmethod(decorated_func, format_)

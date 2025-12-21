@@ -187,7 +187,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"{}"'.format(name)
+        return f'"{name}"'
 
     def no_limit_value(self):
         return -1
@@ -363,10 +363,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
-            raise DatabaseError(
-                "Invalid connector for timedelta: {}.".format(connector)
-            )
-        fn_params = ["'{}'".format(connector), *sub_expressions]
+            raise DatabaseError(f"Invalid connector for timedelta: {connector}.")
+        fn_params = [f"'{connector}'", *sub_expressions]
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
         return "django_format_dtdelta({})".format(", ".join(fn_params))
@@ -387,8 +385,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         params = (*lhs_params, *rhs_params)
         if internal_type == "TimeField":
-            return "django_time_diff({}, {})".format(lhs_sql, rhs_sql), params
-        return "django_timestamp_diff({}, {})".format(lhs_sql, rhs_sql), params
+            return f"django_time_diff({lhs_sql}, {rhs_sql})", params
+        return f"django_timestamp_diff({lhs_sql}, {rhs_sql})", params
 
     def insert_statement(self, on_conflict=None):
         if on_conflict == OnConflict.IGNORE:
@@ -420,8 +418,4 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
 
     def format_json_path_numeric_index(self, num):
-        return (
-            "[#{}]".format(num)
-            if num < 0
-            else super().format_json_path_numeric_index(num)
-        )
+        return f"[#{num}]" if num < 0 else super().format_json_path_numeric_index(num)

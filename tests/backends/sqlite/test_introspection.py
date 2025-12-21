@@ -24,9 +24,7 @@ class IntrospectionTests(TestCase):
         )
         with connection.cursor() as cursor:
             for column, expected_string in testable_column_strings:
-                sql = "CREATE TABLE test_primary ({} int PRIMARY KEY NOT NULL)".format(
-                    column
-                )
+                sql = f"CREATE TABLE test_primary ({column} int PRIMARY KEY NOT NULL)"
                 with self.subTest(column=column):
                     try:
                         cursor.execute(sql)

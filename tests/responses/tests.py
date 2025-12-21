@@ -111,20 +111,18 @@ class HttpResponseTests(SimpleTestCase):
         response = HttpResponse(charset=ISO88591)
         self.assertEqual(response.charset, ISO88591)
         self.assertEqual(
-            response.headers["Content-Type"], "text/html; charset={}".format(ISO88591)
+            response.headers["Content-Type"], f"text/html; charset={ISO88591}"
         )
 
         response = HttpResponse(
-            content_type="text/plain; charset={}".format(UTF8), charset=ISO88591
+            content_type=f"text/plain; charset={UTF8}", charset=ISO88591
         )
         self.assertEqual(response.charset, ISO88591)
 
-        response = HttpResponse(content_type="text/plain; charset={}".format(ISO88591))
+        response = HttpResponse(content_type=f"text/plain; charset={ISO88591}")
         self.assertEqual(response.charset, ISO88591)
 
-        response = HttpResponse(
-            content_type='text/plain; charset="{}"'.format(ISO88591)
-        )
+        response = HttpResponse(content_type=f'text/plain; charset="{ISO88591}"')
         self.assertEqual(response.charset, ISO88591)
 
         response = HttpResponse(content_type="text/plain; charset=")
@@ -143,7 +141,7 @@ class HttpResponseTests(SimpleTestCase):
         self.assertContains(response, utf8_content)
 
         response = HttpResponse(
-            iso_content, content_type="text/plain; charset={}".format(ISO88591)
+            iso_content, content_type=f"text/plain; charset={ISO88591}"
         )
         self.assertContains(response, iso_content)
 

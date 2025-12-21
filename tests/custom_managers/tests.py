@@ -70,9 +70,7 @@ class CustomManagerTests(TestCase):
                 manager._optin_private_method()
                 # Methods with queryset_only=True aren't copied even if they
                 # are public.
-                msg = "{!r} object has no attribute 'optout_public_method'".format(
-                    manager.__class__.__name__
-                )
+                msg = f"{manager.__class__.__name__!r} object has no attribute 'optout_public_method'"
                 with self.assertRaisesMessage(AttributeError, msg):
                     manager.optout_public_method()
 

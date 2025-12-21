@@ -112,9 +112,7 @@ def make_password(password, salt=None, hasher="default"):
         )
     if not isinstance(password, (bytes, str)):
         raise TypeError(
-            "Password must be a string or bytes, got {}.".format(
-                type(password).__qualname__
-            )
+            f"Password must be a string or bytes, got {type(password).__qualname__}."
         )
     hasher = get_hasher(hasher)
     salt = salt or hasher.salt()
@@ -129,7 +127,7 @@ def get_hashers():
         hasher = hasher_cls()
         if not getattr(hasher, "algorithm"):
             raise ImproperlyConfigured(
-                "hasher doesn't specify an algorithm name: {}".format(hasher_path)
+                f"hasher doesn't specify an algorithm name: {hasher_path}"
             )
         hashers.append(hasher)
     return hashers
@@ -166,9 +164,9 @@ def get_hasher(algorithm="default"):
             return hashers[algorithm]
         except KeyError:
             raise ValueError(
-                "Unknown password hashing algorithm '{}'. "
+                f"Unknown password hashing algorithm '{algorithm}'. "
                 "Did you specify it in the PASSWORD_HASHERS "
-                "setting?".format(algorithm)
+                "setting?"
             )
 
 
@@ -233,15 +231,11 @@ class BasePasswordHasher:
                 module = importlib.import_module(mod_path)
             except ImportError as e:
                 raise ValueError(
-                    "Couldn't load {!r} algorithm library: {}".format(
-                        self.__class__.__name__, e
-                    )
+                    f"Couldn't load {self.__class__.__name__!r} algorithm library: {e}"
                 )
             return module
         raise ValueError(
-            "Hasher {!r} doesn't specify a library attribute".format(
-                self.__class__.__name__
-            )
+            f"Hasher {self.__class__.__name__!r} doesn't specify a library attribute"
         )
 
     def salt(self):
@@ -672,7 +666,7 @@ class MD5PasswordHasher(BasePasswordHasher):
         password = force_str(password)
         salt = force_str(salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
-        return "{}${}${}".format(self.algorithm, salt, hash)
+        return f"{self.algorithm}${salt}${hash}"
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split("$", 2)

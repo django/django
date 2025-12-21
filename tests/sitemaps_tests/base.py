@@ -20,7 +20,7 @@ class SitemapTestsBase(TestCase):
         cls.i18n_model = I18nTestModel.objects.create(name="Test Object")
 
     def setUp(self):
-        self.base_url = "{}://{}".format(self.protocol, self.domain)
+        self.base_url = f"{self.protocol}://{self.domain}"
         cache.clear()
 
     @classmethod

@@ -31,11 +31,7 @@ class DeserializationError(Exception):
         Factory method for creating a deserialization error which has a more
         explanatory message.
         """
-        return cls(
-            "{}: ({}:pk={}) field_value was '{}'".format(
-                original_exc, model, fk, field_value
-            )
-        )
+        return cls(f"{original_exc}: ({model}:pk={fk}) field_value was '{field_value}'")
 
 
 class M2MDeserializationError(Exception):
@@ -282,11 +278,7 @@ class DeserializedObject:
         self.deferred_fields = deferred_fields
 
     def __repr__(self):
-        return "<{}: {}(pk={})>".format(
-            self.__class__.__name__,
-            self.object._meta.label,
-            self.object.pk,
-        )
+        return f"<{self.__class__.__name__}: {self.object._meta.label}(pk={self.object.pk})>"
 
     def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any

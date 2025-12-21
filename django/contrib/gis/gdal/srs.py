@@ -84,7 +84,7 @@ class SpatialReference(GDALBase):
             srs = srs_input
             srs_type = "ogr"
         else:
-            raise TypeError('Invalid SRS type "{}"'.format(srs_type))
+            raise TypeError(f'Invalid SRS type "{srs_type}"')
 
         if srs_type == "ogr":
             # Input is already an SRS pointer.
@@ -96,9 +96,7 @@ class SpatialReference(GDALBase):
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException(
-                "Could not create spatial reference from: {}".format(srs_input)
-            )
+            raise SRSException(f"Could not create spatial reference from: {srs_input}")
         else:
             self.ptr = srs
 
@@ -365,4 +363,4 @@ class CoordTransform(GDALBase):
         self._srs2_name = target.name
 
     def __str__(self):
-        return 'Transform from "{}" to "{}"'.format(self._srs1_name, self._srs2_name)
+        return f'Transform from "{self._srs1_name}" to "{self._srs2_name}"'

@@ -1083,7 +1083,7 @@ class AggregateTestCase(TestCase):
         thedate = timezone.now()
         for i in range(10):
             Book.objects.create(
-                isbn="abcde{}".format(i),
+                isbn=f"abcde{i}",
                 name="none",
                 pages=10,
                 rating=4.0,

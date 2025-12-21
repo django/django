@@ -32,4 +32,4 @@ class Redirect(models.Model):
         ordering = ["old_path"]
 
     def __str__(self):
-        return "{} ---> {}".format(self.old_path, self.new_path)
+        return f"{self.old_path} ---> {self.new_path}"

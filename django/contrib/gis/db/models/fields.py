@@ -184,9 +184,7 @@ class BaseSpatialField(Field):
                 return gdal.GDALRaster(value)
             except GDALException:
                 raise ValueError(
-                    "Couldn't create spatial object from lookup value '{}'.".format(
-                        value
-                    )
+                    f"Couldn't create spatial object from lookup value '{value}'."
                 )
 
     def get_prep_value(self, value):
@@ -213,15 +211,11 @@ class BaseSpatialField(Field):
                     obj = GEOSGeometry(obj)
                 except (GEOSException, GDALException):
                     raise ValueError(
-                        "Couldn't create spatial object from lookup value '{}'.".format(
-                            obj
-                        )
+                        f"Couldn't create spatial object from lookup value '{obj}'."
                     )
             else:
                 raise ValueError(
-                    "Cannot use object with type {} for a spatial lookup parameter.".format(
-                        type(obj).__name__
-                    )
+                    f"Cannot use object with type {type(obj).__name__} for a spatial lookup parameter."
                 )
 
         # Assigning the SRID value.

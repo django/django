@@ -19,15 +19,13 @@ def get_callable(lookup_view):
 
     if not isinstance(lookup_view, str):
         raise ViewDoesNotExist(
-            "'{}' is not a callable or a dot-notation path".format(lookup_view)
+            f"'{lookup_view}' is not a callable or a dot-notation path"
         )
 
     mod_name, func_name = get_mod_func(lookup_view)
     if not func_name:  # No '.' in lookup_view
         raise ImportError(
-            "Could not import '{}'. The path must be fully qualified.".format(
-                lookup_view
-            )
+            f"Could not import '{lookup_view}'. The path must be fully qualified."
         )
 
     try:
@@ -36,9 +34,7 @@ def get_callable(lookup_view):
         parentmod, submod = get_mod_func(mod_name)
         if submod and not module_has_submodule(import_module(parentmod), submod):
             raise ViewDoesNotExist(
-                "Could not import '{}'. Parent module {} does not exist.".format(
-                    lookup_view, mod_name
-                )
+                f"Could not import '{lookup_view}'. Parent module {mod_name} does not exist."
             )
         else:
             raise
@@ -47,16 +43,12 @@ def get_callable(lookup_view):
             view_func = getattr(mod, func_name)
         except AttributeError:
             raise ViewDoesNotExist(
-                "Could not import '{}'. View does not exist in module {}.".format(
-                    lookup_view, mod_name
-                )
+                f"Could not import '{lookup_view}'. View does not exist in module {mod_name}."
             )
         else:
             if not callable(view_func):
                 raise ViewDoesNotExist(
-                    "Could not import '{}.{}'. View is not callable.".format(
-                        mod_name, func_name
-                    )
+                    f"Could not import '{mod_name}.{func_name}'. View is not callable."
                 )
             return view_func
 

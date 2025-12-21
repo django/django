@@ -228,7 +228,7 @@ def get_child_arguments():
     py_script = Path(sys.argv[0])
     exe_entrypoint = py_script.with_suffix(".exe")
 
-    args = [sys.executable] + ["-W{}".format(o) for o in sys.warnoptions]
+    args = [sys.executable] + [f"-W{o}" for o in sys.warnoptions]
     if sys.implementation.name in ("cpython", "pypy"):
         args.extend(
             f"-X{key}" if value is True else f"-X{key}={value}"
@@ -251,11 +251,11 @@ def get_child_arguments():
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
             return [exe_entrypoint, *sys.argv[1:]]
-        script_entrypoint = py_script.with_name("{}-script.py".format(py_script.name))
+        script_entrypoint = py_script.with_name(f"{py_script.name}-script.py")
         if script_entrypoint.exists():
             # Should be executed as usual.
             return [*args, script_entrypoint, *sys.argv[1:]]
-        raise RuntimeError("Script {} does not exist.".format(py_script))
+        raise RuntimeError(f"Script {py_script} does not exist.")
     else:
         args += sys.argv
     return args
@@ -513,16 +513,14 @@ class WatchmanReloader(BaseReloader):
                     directory,
                 )
                 return
-            prefix = "files-parent-{}".format(directory.name)
-            filenames = [
-                "{}/{}".format(directory.name, filename) for filename in filenames
-            ]
+            prefix = f"files-parent-{directory.name}"
+            filenames = [f"{directory.name}/{filename}" for filename in filenames]
             directory = directory.parent
             expression = ["name", filenames, "wholename"]
         else:
             prefix = "files"
             expression = ["name", filenames]
-        self._subscribe(directory, "{}:{}".format(prefix, directory), expression)
+        self._subscribe(directory, f"{prefix}:{directory}", expression)
 
     def _watch_glob(self, directory, patterns):
         """
@@ -541,14 +539,14 @@ class WatchmanReloader(BaseReloader):
                     directory,
                 )
                 return
-            prefix = "glob-parent-{}".format(directory.name)
-            patterns = ["{}/{}".format(directory.name, pattern) for pattern in patterns]
+            prefix = f"glob-parent-{directory.name}"
+            patterns = [f"{directory.name}/{pattern}" for pattern in patterns]
             directory = directory.parent
 
         expression = ["anyof"]
         for pattern in patterns:
             expression.append(["match", pattern, "wholename"])
-        self._subscribe(directory, "{}:{}".format(prefix, directory), expression)
+        self._subscribe(directory, f"{prefix}:{directory}", expression)
 
     def watched_roots(self, watched_files):
         extra_directories = self.directory_globs.keys()

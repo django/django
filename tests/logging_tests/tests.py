@@ -433,7 +433,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ["admin@example.com"])
         self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
-        self.assertIn("Report at {}".format(url_path), msg.body)
+        self.assertIn(f"Report at {url_path}", msg.body)
 
     @override_settings(
         MANAGERS=["manager@example.com"],
@@ -660,7 +660,7 @@ format=%(message)s
             "settings.py",
             sdict={
                 "LOGGING_CONFIG": '"logging.config.fileConfig"',
-                "LOGGING": 'r"{}"'.format(temp_file.name),
+                "LOGGING": f'r"{temp_file.name}"',
             },
         )
 
@@ -708,14 +708,12 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg, extra={"server_time": server_time})
-            self.assertEqual(
-                "[{}] {}\n".format(server_time, log_msg), logger_output.getvalue()
-            )
+            self.assertEqual(f"[{server_time}] {log_msg}\n", logger_output.getvalue())
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
             self.assertRegex(
-                logger_output.getvalue(), r"^\[[/:,\w\s\d]+\] {}\n".format(log_msg)
+                logger_output.getvalue(), rf"^\[[/:,\w\s\d]+\] {log_msg}\n"
             )
 
 

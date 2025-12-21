@@ -20,8 +20,8 @@ class TestFloatField(TestCase):
         instance.size = instance
         msg = (
             "Tried to update field model_fields.FloatModel.size with a model "
-            "instance, {!r}. Use a value compatible with FloatField."
-        ).format(instance)
+            f"instance, {instance!r}. Use a value compatible with FloatField."
+        )
         with transaction.atomic():
             with self.assertRaisesMessage(TypeError, msg):
                 instance.save()
@@ -44,6 +44,6 @@ class TestFloatField(TestCase):
         ]
         for exception, value in tests:
             with self.subTest(value):
-                msg = "Field 'size' expected a number but got {!r}.".format(value)
+                msg = f"Field 'size' expected a number but got {value!r}."
                 with self.assertRaisesMessage(exception, msg):
                     FloatModel.objects.create(size=value)

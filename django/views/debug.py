@@ -233,7 +233,7 @@ class SafeExceptionReporterFilter:
             # MultiValueDicts will have a return value.
             is_multivalue_dict = isinstance(value, MultiValueDict)
         except Exception as e:
-            return "{!r} while evaluating {!r}".format(e, value)
+            return f"{e!r} while evaluating {value!r}"
 
         if is_multivalue_dict:
             # Cleanse MultiValueDicts (request.POST is the one we usually care
@@ -340,11 +340,7 @@ class ExceptionReporter:
         Return an absolute URI from variables available in this request. Skip
         allowed hosts protection, so may return insecure URI.
         """
-        return "{scheme}://{host}{path}".format(
-            scheme=self.request.scheme,
-            host=self.request._get_raw_host(),
-            path=self.request.get_full_path(),
-        )
+        return f"{self.request.scheme}://{self.request._get_raw_host()}{self.request.get_full_path()}"
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
@@ -510,8 +506,8 @@ class ExceptionReporter:
             exc_value = self._get_explicit_or_implicit_cause(exc_value)
             if exc_value in exceptions:
                 warnings.warn(
-                    "Cycle in the exception chain detected: exception '{}' "
-                    "encountered again.".format(exc_value),
+                    f"Cycle in the exception chain detected: exception '{exc_value}' "
+                    "encountered again.",
                     ExceptionCycleWarning,
                 )
                 # Avoid infinite loop if there's a cyclic reference (#29393).

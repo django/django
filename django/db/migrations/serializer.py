@@ -114,7 +114,7 @@ class DeconstructibleSerializer(BaseSerializer):
             if kw.isidentifier():
                 arg_string, arg_imports = serializer_factory(arg).serialize()
                 imports.update(arg_imports)
-                strings.append("{}={}".format(kw, arg_string))
+                strings.append(f"{kw}={arg_string}")
             else:
                 non_ident_kwargs[kw] = arg
         if non_ident_kwargs:
@@ -130,9 +130,9 @@ class DeconstructibleSerializer(BaseSerializer):
         module, name = path.rsplit(".", 1)
         if module == "django.db.models":
             imports = {"from django.db import models"}
-            name = "models.{}".format(name)
+            name = f"models.{name}"
         else:
-            imports = {"import {}".format(module)}
+            imports = {f"import {module}"}
             name = path
         return name, imports
 
@@ -151,7 +151,7 @@ class DictionarySerializer(BaseSerializer):
             imports.update(v_imports)
             strings.append((k_string, v_string))
         return (
-            "{{{}}}".format(", ".join("{}: {}".format(k, v) for k, v in strings)),
+            "{{{}}}".format(", ".join(f"{k}: {v}" for k, v in strings)),
             imports,
         )
 
@@ -171,14 +171,14 @@ class EnumSerializer(BaseSerializer):
                     for item in members
                 ]
             ),
-            {"import {}".format(module)},
+            {f"import {module}"},
         )
 
 
 class FloatSerializer(BaseSimpleSerializer):
     def serialize(self):
         if math.isnan(self.value) or math.isinf(self.value):
-            return 'float("{}")'.format(self.value), set()
+            return f'float("{self.value}")', set()
         return super().serialize()
 
 
@@ -194,28 +194,24 @@ class FunctionTypeSerializer(BaseSerializer):
         ):
             klass = self.value.__self__
             module = klass.__module__
-            return "{}.{}.{}".format(module, klass.__qualname__, self.value.__name__), {
-                "import {}".format(module)
+            return f"{module}.{klass.__qualname__}.{self.value.__name__}", {
+                f"import {module}"
             }
         # Further error checking
         if self.value.__name__ == "<lambda>":
             raise ValueError("Cannot serialize function: lambda")
         if self.value.__module__ is None:
-            raise ValueError(
-                "Cannot serialize function {!r}: No module".format(self.value)
-            )
+            raise ValueError(f"Cannot serialize function {self.value!r}: No module")
 
         module_name = self.value.__module__
 
         if "<" not in self.value.__qualname__:  # Qualname can include <locals>
-            return "{}.{}".format(module_name, self.value.__qualname__), {
-                "import {}".format(self.value.__module__)
+            return f"{module_name}.{self.value.__qualname__}", {
+                f"import {self.value.__module__}"
             }
 
         raise ValueError(
-            "Could not find function {} in {}.\n".format(
-                self.value.__name__, module_name
-            )
+            f"Could not find function {self.value.__name__} in {module_name}.\n"
         )
 
 
@@ -265,7 +261,7 @@ class ModelManagerSerializer(DeconstructibleSerializer):
         as_manager, manager_path, qs_path, args, kwargs = self.value.deconstruct()
         if as_manager:
             name, imports = self._serialize_path(qs_path)
-            return "{}.as_manager()".format(name), imports
+            return f"{name}.as_manager()", imports
         else:
             return self.serialize_deconstructed(manager_path, args, kwargs)
 
@@ -290,7 +286,7 @@ class PathSerializer(BaseSerializer):
         # Convert concrete paths to pure paths to avoid issues with migrations
         # generated on one platform being used on a different platform.
         prefix = "Pure" if isinstance(self.value, pathlib.Path) else ""
-        return "pathlib.{}{!r}".format(prefix, self.value), {"import pathlib"}
+        return f"pathlib.{prefix}{self.value!r}", {"import pathlib"}
 
 
 class RegexSerializer(BaseSerializer):
@@ -323,7 +319,7 @@ class SetSerializer(BaseUnorderedSequenceSerializer):
 
 class SettingsReferenceSerializer(BaseSerializer):
     def serialize(self):
-        return "settings.{}".format(self.value.setting_name), {
+        return f"settings.{self.value.setting_name}", {
             "from django.conf import settings"
         }
 
@@ -349,14 +345,12 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "{}.{}".format(module, self.value.__qualname__), {
-                    "import {}".format(module)
-                }
+                return f"{module}.{self.value.__qualname__}", {f"import {module}"}
 
 
 class UUIDSerializer(BaseSerializer):
     def serialize(self):
-        return "uuid.{}".format(repr(self.value)), {"import uuid"}
+        return f"uuid.{repr(self.value)}", {"import uuid"}
 
 
 class ZoneInfoSerializer(BaseSerializer):
@@ -396,7 +390,7 @@ class Serializer:
     def register(cls, type_, serializer):
         if not issubclass(serializer, BaseSerializer):
             raise ValueError(
-                "'{}' must inherit from 'BaseSerializer'.".format(serializer.__name__)
+                f"'{serializer.__name__}' must inherit from 'BaseSerializer'."
             )
         cls._registry[type_] = serializer
 
@@ -428,7 +422,7 @@ def serializer_factory(value):
         if isinstance(value, type_):
             return serializer_cls(value)
     raise ValueError(
-        "Cannot serialize: {!r}\nThere are some values Django cannot serialize into "
-        "migration files.\nFor more, see https://docs.djangoproject.com/en/{}/"
-        "topics/migrations/#migration-serializing".format(value, get_docs_version())
+        f"Cannot serialize: {value!r}\nThere are some values Django cannot serialize into "
+        f"migration files.\nFor more, see https://docs.djangoproject.com/en/{get_docs_version()}/"
+        "topics/migrations/#migration-serializing"
     )

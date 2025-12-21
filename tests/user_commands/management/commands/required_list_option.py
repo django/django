@@ -7,4 +7,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for option, value in options.items():
-            self.stdout.write("{}={}".format(option, value))
+            self.stdout.write(f"{option}={value}")

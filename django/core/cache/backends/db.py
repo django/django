@@ -117,7 +117,7 @@ class DatabaseCache(BaseDatabaseCache):
         table = quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM {}".format(table))
+            cursor.execute(f"SELECT COUNT(*) FROM {table}")
             num = cursor.fetchone()[0]
             now = tz_now()
             now = now.replace(microsecond=0)
@@ -285,4 +285,4 @@ class DatabaseCache(BaseDatabaseCache):
         connection = connections[db]
         table = connection.ops.quote_name(self._table)
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM {}".format(table))
+            cursor.execute(f"DELETE FROM {table}")

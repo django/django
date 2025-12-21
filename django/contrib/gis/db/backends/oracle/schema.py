@@ -135,7 +135,7 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
         # Oracle doesn't allow object names > 30 characters. Use this scheme
         # instead of self._create_index_name() for backwards compatibility.
         return truncate_name(
-            "{}_{}_id".format(strip_quotes(model._meta.db_table), field.column), 30
+            f"{strip_quotes(model._meta.db_table)}_{field.column}_id", 30
         )
 
     def _create_spatial_index_sql(self, model, field):

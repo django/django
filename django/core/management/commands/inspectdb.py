@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 "# Feel free to rename the models, but don't rename db_table values or "
                 "field names."
             )
-            yield "from {} import models".format(self.db_module)
+            yield f"from {self.db_module} import models"
             known_models = []
             # Determine types of tables and/or views to be introspected.
             types = {"t"}
@@ -123,14 +123,14 @@ class Command(BaseCommand):
                         cursor, table_name
                     )
                 except Exception as e:
-                    yield "# Unable to inspect table '{}'".format(table_name)
-                    yield "# The error was: {}".format(e)
+                    yield f"# Unable to inspect table '{table_name}'"
+                    yield f"# The error was: {e}"
                     continue
 
                 model_name = self.normalize_table_name(table_name)
                 yield ""
                 yield ""
-                yield "class {}(models.Model):".format(model_name)
+                yield f"class {model_name}(models.Model):"
                 known_models.append(model_name)
 
                 if len(primary_key_columns) > 1:
@@ -186,13 +186,12 @@ class Command(BaseCommand):
                             else self.normalize_table_name(ref_db_table)
                         )
                         if rel_to in known_models:
-                            field_type = "{}({}".format(rel_type, rel_to)
+                            field_type = f"{rel_type}({rel_to}"
                         else:
-                            field_type = "{}('{}'".format(rel_type, rel_to)
+                            field_type = f"{rel_type}('{rel_to}'"
                         if rel_to in used_relations:
-                            extra_params["related_name"] = "{}_{}_set".format(
-                                model_name.lower(),
-                                att_name,
+                            extra_params["related_name"] = (
+                                f"{model_name.lower()}_{att_name}_set"
                             )
                         if db_on_delete and isinstance(db_on_delete, DatabaseOnDelete):
                             extra_params["on_delete"] = f"models.{db_on_delete}"
@@ -247,12 +246,12 @@ class Command(BaseCommand):
                         if not field_desc.endswith("("):
                             field_desc += ", "
                         field_desc += ", ".join(
-                            "{}={!r}".format(k, v) for k, v in extra_params.items()
+                            f"{k}={v!r}" for k, v in extra_params.items()
                         )
                     field_desc += ")"
                     if comment_notes:
                         field_desc += "  # " + " ".join(comment_notes)
-                    yield "    {}".format(field_desc)
+                    yield f"    {field_desc}"
                 comment = None
                 if info := table_info.get(table_name):
                     is_view = info.type == "v"
@@ -303,11 +302,11 @@ class Command(BaseCommand):
                 )
 
         if new_name.startswith("_"):
-            new_name = "field{}".format(new_name)
+            new_name = f"field{new_name}"
             field_notes.append("Field renamed because it started with '_'.")
 
         if new_name.endswith("_"):
-            new_name = "{}field".format(new_name)
+            new_name = f"{new_name}field"
             field_notes.append("Field renamed because it ended with '_'.")
 
         if keyword.iskeyword(new_name):
@@ -315,7 +314,7 @@ class Command(BaseCommand):
             field_notes.append("Field renamed because it was a Python reserved word.")
 
         if new_name[0].isdigit():
-            new_name = "number_{}".format(new_name)
+            new_name = f"number_{new_name}"
             field_notes.append(
                 "Field renamed because it wasn't a valid Python identifier."
             )
@@ -410,12 +409,12 @@ class Command(BaseCommand):
             meta.append("    # A unique constraint could not be introspected.")
         meta += [
             "    class Meta:",
-            "        managed = False{}".format(managed_comment),
-            "        db_table = {!r}".format(table_name),
+            f"        managed = False{managed_comment}",
+            f"        db_table = {table_name!r}",
         ]
         if unique_together:
             tup = "(" + ", ".join(unique_together) + ",)"
-            meta += ["        unique_together = {}".format(tup)]
+            meta += [f"        unique_together = {tup}"]
         if comment:
             meta += [f"        db_table_comment = {comment!r}"]
         return meta

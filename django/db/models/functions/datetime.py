@@ -104,9 +104,7 @@ class Extract(TimezoneMixin, Transform):
             "second",
         ):
             raise ValueError(
-                "Cannot extract time component '{}' from DateField '{}'.".format(
-                    copy.lookup_name, field.name
-                )
+                f"Cannot extract time component '{copy.lookup_name}' from DateField '{field.name}'."
             )
         if isinstance(field, DurationField) and copy.lookup_name in (
             "year",
@@ -118,9 +116,7 @@ class Extract(TimezoneMixin, Transform):
             "quarter",
         ):
             raise ValueError(
-                "Cannot extract component '{}' from DurationField '{}'.".format(
-                    copy.lookup_name, field.name
-                )
+                f"Cannot extract component '{copy.lookup_name}' from DurationField '{field.name}'."
             )
         return copy
 
@@ -294,9 +290,7 @@ class TruncBase(TimezoneMixin, Transform):
         # DateTimeField is a subclass of DateField so this works for both.
         if not isinstance(field, (DateField, TimeField)):
             raise TypeError(
-                "{!r} isn't a DateField, TimeField, or DateTimeField.".format(
-                    field.name
-                )
+                f"{field.name!r} isn't a DateField, TimeField, or DateTimeField."
             )
         # If self.output_field was None, then accessing the field will trigger
         # the resolver to assign it to self.lhs.output_field.

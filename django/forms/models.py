@@ -207,8 +207,8 @@ def fields_for_model(
                 and (exclude is None or f.name not in exclude)
             ):
                 raise FieldError(
-                    "'{}' cannot be specified for {} model form as it is a "
-                    "non-editable field".format(f.name, model.__name__)
+                    f"'{f.name}' cannot be specified for {model.__name__} model form as it is a "
+                    "non-editable field"
                 )
             continue
         if fields is not None and f.name not in fields:
@@ -287,12 +287,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             value = getattr(opts, opt)
             if isinstance(value, str) and value != ALL_FIELDS:
                 msg = (
-                    "{model}.Meta.{opt} cannot be a string. "
-                    "Did you mean to type: ('{value}',)?".format(
-                        model=new_class.__name__,
-                        opt=opt,
-                        value=value,
-                    )
+                    f"{new_class.__name__}.Meta.{opt} cannot be a string. "
+                    f"Did you mean to type: ('{value}',)?"
                 )
                 raise TypeError(msg)
 
@@ -301,8 +297,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             if opts.fields is None and opts.exclude is None:
                 raise ImproperlyConfigured(
                     "Creating a ModelForm without either the 'fields' attribute "
-                    "or the 'exclude' attribute is prohibited; form {} "
-                    "needs updating.".format(name)
+                    f"or the 'exclude' attribute is prohibited; form {name} "
+                    "needs updating."
                 )
 
             if opts.fields == ALL_FIELDS:
@@ -734,7 +730,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = "{}-{}".format(self.add_prefix(i), self.model._meta.pk.name)
+                pk_key = f"{self.add_prefix(i)}-{self.model._meta.pk.name}"
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
@@ -1254,14 +1250,10 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 )
             ):
                 raise ValueError(
-                    "fk_name '{}' is not a ForeignKey to '{}'.".format(
-                        fk_name, parent_model._meta.label
-                    )
+                    f"fk_name '{fk_name}' is not a ForeignKey to '{parent_model._meta.label}'."
                 )
         elif not fks_to_parent:
-            raise ValueError(
-                "'{}' has no field named '{}'.".format(model._meta.label, fk_name)
-            )
+            raise ValueError(f"'{model._meta.label}' has no field named '{fk_name}'.")
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         all_parents = (*parent_model._meta.all_parents, parent_model)
@@ -1284,18 +1276,12 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if can_fail:
                 return
             raise ValueError(
-                "'{}' has no ForeignKey to '{}'.".format(
-                    model._meta.label,
-                    parent_model._meta.label,
-                )
+                f"'{model._meta.label}' has no ForeignKey to '{parent_model._meta.label}'."
             )
         else:
             raise ValueError(
-                "'{}' has more than one ForeignKey to '{}'. You must specify "
-                "a 'fk_name' attribute.".format(
-                    model._meta.label,
-                    parent_model._meta.label,
-                )
+                f"'{model._meta.label}' has more than one ForeignKey to '{parent_model._meta.label}'. You must specify "
+                "a 'fk_name' attribute."
             )
     return fk
 
@@ -1672,7 +1658,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     code="invalid_pk_value",
                     params={"pk": pk},
                 )
-        qs = self.queryset.filter(**{"{}__in".format(key): value})
+        qs = self.queryset.filter(**{f"{key}__in": value})
         pks = {str(getattr(o, key)) for o in qs}
         for val in value:
             if str(val) not in pks:

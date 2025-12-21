@@ -202,7 +202,7 @@ class FileUploadTests(TestCase):
                 [
                     "--" + client.BOUNDARY,
                     'Content-Disposition: form-data; name="file_unicode"; '
-                    "filename*=UTF-8''{}".format(quote(UNICODE_FILENAME)),
+                    f"filename*=UTF-8''{quote(UNICODE_FILENAME)}",
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -231,7 +231,7 @@ class FileUploadTests(TestCase):
                 [
                     "--" + client.BOUNDARY,
                     "Content-Disposition: form-data; name*=UTF-8''file_unicode; "
-                    "filename*=UTF-8''{}".format(quote(UNICODE_FILENAME)),
+                    f"filename*=UTF-8''{quote(UNICODE_FILENAME)}",
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -257,7 +257,7 @@ class FileUploadTests(TestCase):
                 [
                     "--" + client.BOUNDARY,
                     'Content-Disposition: form-data; name="file_unicode"; '
-                    "filename*=\"UTF-8''{}\"".format(quote(UNICODE_FILENAME)),
+                    f"filename*=\"UTF-8''{quote(UNICODE_FILENAME)}\"",
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -282,7 +282,7 @@ class FileUploadTests(TestCase):
                 [
                     "--" + client.BOUNDARY,
                     "Content-Disposition: form-data; name*=\"UTF-8''file_unicode\"; "
-                    "filename*=\"UTF-8''{}\"".format(quote(UNICODE_FILENAME)),
+                    f"filename*=\"UTF-8''{quote(UNICODE_FILENAME)}\"",
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -319,9 +319,7 @@ class FileUploadTests(TestCase):
                 "\r\n".join(
                     [
                         "--" + client.BOUNDARY,
-                        'Content-Disposition: form-data; name="file{}"; filename="{}"'.format(
-                            i, name
-                        ),
+                        f'Content-Disposition: form-data; name="file{i}"; filename="{name}"',
                         "Content-Type: application/octet-stream",
                         "",
                         "You got pwnd.\r\n",
@@ -343,7 +341,7 @@ class FileUploadTests(TestCase):
         # Empty filenames should be ignored
         received = response.json()
         for i, name in enumerate(filenames):
-            self.assertIsNone(received.get("file{}".format(i)))
+            self.assertIsNone(received.get(f"file{i}"))
 
     def test_non_printable_chars_in_file_names(self):
         file_name = "non-\x00printable\x00\n_chars.txt\x00"
@@ -388,9 +386,7 @@ class FileUploadTests(TestCase):
                 "\r\n".join(
                     [
                         "--" + client.BOUNDARY,
-                        'Content-Disposition: form-data; name="file{}"; filename="{}"'.format(
-                            i, name
-                        ),
+                        f'Content-Disposition: form-data; name="file{i}"; filename="{name}"',
                         "Content-Type: application/octet-stream",
                         "",
                         "You got pwnd.\r\n",
@@ -411,7 +407,7 @@ class FileUploadTests(TestCase):
         # view.
         received = response.json()
         for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
-            got = received["file{}".format(i)]
+            got = received[f"file{i}"]
             self.assertEqual(got, "hax0rd.txt")
 
     def test_filename_overflow(self):
@@ -424,16 +420,16 @@ class FileUploadTests(TestCase):
             # field name, filename, expected
             (
                 "long_filename",
-                "{}.txt".format(long_str),
-                "{}.txt".format(long_str[:251]),
+                f"{long_str}.txt",
+                f"{long_str[:251]}.txt",
             ),
-            ("long_extension", "foo.{}".format(long_str), ".{}".format(long_str[:254])),
+            ("long_extension", f"foo.{long_str}", f".{long_str[:254]}"),
             ("no_extension", long_str, long_str[:255]),
-            ("no_filename", ".{}".format(long_str), ".{}".format(long_str[:254])),
+            ("no_filename", f".{long_str}", f".{long_str[:254]}"),
             (
                 "long_everything",
-                "{}.{}".format(long_str, long_str),
-                ".{}".format(long_str[:254]),
+                f"{long_str}.{long_str}",
+                f".{long_str[:254]}",
             ),
         ]
         payload = client.FakePayload()
@@ -462,9 +458,9 @@ class FileUploadTests(TestCase):
         result = response.json()
         for name, _, expected in cases:
             got = result[name]
-            self.assertEqual(expected, got, "Mismatch for {}".format(name))
+            self.assertEqual(expected, got, f"Mismatch for {name}")
             self.assertLess(
-                len(got), 256, "Got a long file name ({} characters).".format(len(got))
+                len(got), 256, f"Got a long file name ({len(got)} characters)."
             )
 
     def test_file_content(self):
@@ -830,7 +826,7 @@ class FileUploadTests(TestCase):
                         [
                             "--" + client.BOUNDARY,
                             'Content-Disposition: form-data; name="my_file"; '
-                            'filename="{}";'.format(file_name),
+                            f'filename="{file_name}";',
                             "Content-Type: text/plain",
                             "",
                             "file contents.\r\n",
@@ -900,7 +896,7 @@ class DirectoryCreationTests(SimpleTestCase):
         with SimpleUploadedFile(UPLOAD_TO, b"x") as file:
             default_storage.save(UPLOAD_FOLDER, file)
         self.addCleanup(default_storage.delete, UPLOAD_TO)
-        msg = "{} exists and is not a directory.".format(UPLOAD_TO)
+        msg = f"{UPLOAD_TO} exists and is not a directory."
         with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile("foo.txt", b"x") as file:
                 self.obj.testfile.save("foo.txt", file, save=False)

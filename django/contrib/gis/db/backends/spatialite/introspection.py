@@ -38,9 +38,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             row = cursor.fetchone()
             if not row:
                 raise Exception(
-                    'Could not find a geometry column for "{}"."{}"'.format(
-                        table_name, description.name
-                    )
+                    f'Could not find a geometry column for "{table_name}"."{description.name}"'
                 )
 
             # OGRGeomType does not require GDAL and makes it easy to convert
@@ -73,7 +71,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             (table_name,),
         )
         for row in cursor.fetchall():
-            constraints["{}__spatial__index".format(row[0])] = {
+            constraints[f"{row[0]}__spatial__index"] = {
                 "columns": [row[0]],
                 "primary_key": False,
                 "unique": False,

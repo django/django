@@ -51,4 +51,4 @@ class StaffTag(models.Model):
     tag = models.ForeignKey(Tag, models.CASCADE)
 
     def __str__(self):
-        return "{} -> {}".format(self.tag, self.staff)
+        return f"{self.tag} -> {self.staff}"

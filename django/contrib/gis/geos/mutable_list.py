@@ -82,7 +82,7 @@ class ListMixin:
     def __delitem__(self, index):
         "Delete the item(s) at the specified index/slice."
         if not isinstance(index, (int, slice)):
-            raise TypeError("{} is not a legal index".format(index))
+            raise TypeError(f"{index} is not a legal index")
 
         # calculate new length and dimensions
         origLen = len(self)
@@ -181,7 +181,7 @@ class ListMixin:
         for i in range(0, len(self)):
             if self[i] == val:
                 return i
-        raise ValueError("{} not found in object".format(val))
+        raise ValueError(f"{val} not found in object")
 
     # ## Mutating ##
     def append(self, val):
@@ -195,7 +195,7 @@ class ListMixin:
     def insert(self, index, val):
         "Standard list insert method"
         if not isinstance(index, int):
-            raise TypeError("{} is not a legal index".format(index))
+            raise TypeError(f"{index} is not a legal index")
         self[index:index] = [val]
 
     def pop(self, index=-1):
@@ -234,7 +234,7 @@ class ListMixin:
             return index
         if -length <= index < 0:
             return index + length
-        raise IndexError("invalid index: {}".format(index))
+        raise IndexError(f"invalid index: {index}")
 
     def _check_allowed(self, items):
         if hasattr(self, "_allowed"):

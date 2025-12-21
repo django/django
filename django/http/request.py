@@ -77,12 +77,8 @@ class HttpRequest:
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
-            return "<{}>".format(self.__class__.__name__)
-        return "<{}: {} {!r}>".format(
-            self.__class__.__name__,
-            self.method,
-            self.get_full_path(),
-        )
+            return f"<{self.__class__.__name__}>"
+        return f"<{self.__class__.__name__}: {self.method} {self.get_full_path()!r}>"
 
     @cached_property
     def headers(self):
@@ -179,7 +175,7 @@ class HttpRequest:
             host = self.META["SERVER_NAME"]
             server_port = self.get_port()
             if server_port != ("443" if self.is_secure() else "80"):
-                host = "{}:{}".format(host, server_port)
+                host = f"{host}:{server_port}"
         return host
 
     def get_host(self):
@@ -195,9 +191,9 @@ class HttpRequest:
         if domain and validate_host(domain, allowed_hosts):
             return host
         else:
-            msg = "Invalid HTTP_HOST header: {!r}.".format(host)
+            msg = f"Invalid HTTP_HOST header: {host!r}."
             if domain:
-                msg += " You may need to add {!r} to ALLOWED_HOSTS.".format(domain)
+                msg += f" You may need to add {domain!r} to ALLOWED_HOSTS."
             else:
                 msg += (
                     " The domain name provided is not valid according to RFC 1034/1035."
@@ -267,7 +263,7 @@ class HttpRequest:
         if location is None:
             # Make it an absolute url (but schemeless and domainless) for the
             # edge case that the path starts with '//'.
-            location = "//{}".format(self.get_full_path())
+            location = f"//{self.get_full_path()}"
         else:
             # Coerce lazy locations.
             location = str(location)
@@ -296,7 +292,7 @@ class HttpRequest:
 
     @cached_property
     def _current_scheme_host(self):
-        return "{}://{}".format(self.scheme, self.get_host())
+        return f"{self.scheme}://{self.get_host()}"
 
     def _get_scheme(self):
         """
@@ -696,7 +692,7 @@ class QueryDict(MultiValueDict):
             safe = safe.encode(self.encoding)
 
             def encode(k, v):
-                return "{}={}".format(quote(k, safe), quote(v, safe))
+                return f"{quote(k, safe)}={quote(v, safe)}"
 
         else:
 
@@ -719,15 +715,15 @@ class MediaType:
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join("; {}={}".format(k, v) for k, v in self.params.items())
+        params_str = "".join(f"; {k}={v}" for k, v in self.params.items())
         return "{}{}{}".format(
             self.main_type,
-            ("/{}".format(self.sub_type)) if self.sub_type else "",
+            (f"/{self.sub_type}") if self.sub_type else "",
             params_str,
         )
 
     def __repr__(self):
-        return "<{}: {}>".format(self.__class__.__qualname__, self)
+        return f"<{self.__class__.__qualname__}: {self}>"
 
     @cached_property
     def range_params(self):

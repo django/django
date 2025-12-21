@@ -13,7 +13,7 @@ class TranslatableFileTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(trans_file),
-            "<TranslatableFile: {}>".format(os.path.join(dirpath, file_name)),
+            f"<TranslatableFile: {os.path.join(dirpath, file_name)}>",
         )
 
     def test_eq(self):

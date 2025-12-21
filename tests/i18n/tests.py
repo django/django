@@ -1515,9 +1515,7 @@ class FormattingTests(SimpleTestCase):
                     self.assertEqual(
                         regex.findall(formatter),
                         [],
-                        "{} locale's {} uses an unsupported format code.".format(
-                            language_code, format_name
-                        ),
+                        f"{language_code} locale's {format_name} uses an unsupported format code.",
                     )
 
 
@@ -1843,8 +1841,8 @@ class ResolutionOrderI18NTests(SimpleTestCase):
         self.assertIn(
             msgstr,
             result,
-            "The string '{}' isn't in the translation of '{}'; the actual result is "
-            "'{}'.".format(msgstr, msgid, result),
+            f"The string '{msgstr}' isn't in the translation of '{msgid}'; the actual result is "
+            f"'{result}'.",
         )
 
 

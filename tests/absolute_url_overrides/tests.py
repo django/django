@@ -11,13 +11,13 @@ class AbsoluteUrlOverrideTests(SimpleTestCase):
         """
 
         def get_absolute_url(o):
-            return "/test-a/{}/".format(o.pk)
+            return f"/test-a/{o.pk}/"
 
         TestA = self._create_model_class("TestA", get_absolute_url)
 
         self.assertTrue(hasattr(TestA, "get_absolute_url"))
         obj = TestA(pk=1, name="Foo")
-        self.assertEqual("/test-a/{}/".format(obj.pk), obj.get_absolute_url())
+        self.assertEqual(f"/test-a/{obj.pk}/", obj.get_absolute_url())
 
     def test_override_get_absolute_url(self):
         """
@@ -25,20 +25,16 @@ class AbsoluteUrlOverrideTests(SimpleTestCase):
         """
 
         def get_absolute_url(o):
-            return "/test-b/{}/".format(o.pk)
+            return f"/test-b/{o.pk}/"
 
         with self.settings(
             ABSOLUTE_URL_OVERRIDES={
-                "absolute_url_overrides.testb": lambda o: "/overridden-test-b/{}/".format(
-                    o.pk
-                ),
+                "absolute_url_overrides.testb": lambda o: f"/overridden-test-b/{o.pk}/",
             },
         ):
             TestB = self._create_model_class("TestB", get_absolute_url)
             obj = TestB(pk=1, name="Foo")
-            self.assertEqual(
-                "/overridden-test-b/{}/".format(obj.pk), obj.get_absolute_url()
-            )
+            self.assertEqual(f"/overridden-test-b/{obj.pk}/", obj.get_absolute_url())
 
     def test_insert_get_absolute_url(self):
         """
@@ -47,12 +43,12 @@ class AbsoluteUrlOverrideTests(SimpleTestCase):
         """
         with self.settings(
             ABSOLUTE_URL_OVERRIDES={
-                "absolute_url_overrides.testc": lambda o: "/test-c/{}/".format(o.pk),
+                "absolute_url_overrides.testc": lambda o: f"/test-c/{o.pk}/",
             },
         ):
             TestC = self._create_model_class("TestC")
             obj = TestC(pk=1, name="Foo")
-            self.assertEqual("/test-c/{}/".format(obj.pk), obj.get_absolute_url())
+            self.assertEqual(f"/test-c/{obj.pk}/", obj.get_absolute_url())
 
     def _create_model_class(self, class_name, get_absolute_url_method=None):
         attrs = {

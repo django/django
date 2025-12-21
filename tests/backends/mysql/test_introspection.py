@@ -35,8 +35,8 @@ class StorageEngineTests(TestCase):
 
     def test_get_storage_engine(self):
         table_name = "test_storage_engine"
-        create_sql = "CREATE TABLE {} (id INTEGER) ENGINE = %s".format(table_name)
-        drop_sql = "DROP TABLE {}".format(table_name)
+        create_sql = f"CREATE TABLE {table_name} (id INTEGER) ENGINE = %s"
+        drop_sql = f"DROP TABLE {table_name}"
         default_connection = connections["default"]
         other_connection = connections["other"]
         try:

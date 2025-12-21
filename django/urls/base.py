@@ -90,7 +90,7 @@ def reverse(
                         )
                     )
                 else:
-                    raise NoReverseMatch("{} is not a registered namespace".format(key))
+                    raise NoReverseMatch(f"{key} is not a registered namespace")
         if ns_pattern:
             resolver = get_ns_resolver(
                 ns_pattern, resolver, tuple(ns_converters.items())
@@ -193,9 +193,7 @@ def translate_url(url, lang_code):
         pass
     else:
         to_be_reversed = (
-            "{}:{}".format(match.namespace, match.url_name)
-            if match.namespace
-            else match.url_name
+            f"{match.namespace}:{match.url_name}" if match.namespace else match.url_name
         )
         with override(lang_code):
             try:

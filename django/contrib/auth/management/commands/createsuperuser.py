@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--{}".format(self.UserModel.USERNAME_FIELD),
+            f"--{self.UserModel.USERNAME_FIELD}",
             help="Specifies the login for the superuser.",
         )
         parser.add_argument(
@@ -47,11 +47,9 @@ class Command(BaseCommand):
             dest="interactive",
             help=(
                 "Tells Django to NOT prompt the user for input of any kind. "
-                "You must use --{} with --noinput, along with an option for "
+                f"You must use --{self.UserModel.USERNAME_FIELD} with --noinput, along with an option for "
                 "any other required field. Superusers created with --noinput will "
-                "not be able to log in until they're given a valid password.".format(
-                    self.UserModel.USERNAME_FIELD
-                )
+                "not be able to log in until they're given a valid password."
             ),
         )
         parser.add_argument(
@@ -68,24 +66,22 @@ class Command(BaseCommand):
                     and not field.remote_field.through._meta.auto_created
                 ):
                     raise CommandError(
-                        "Required field '{}' specifies a many-to-many "
-                        "relation through model, which is not supported.".format(
-                            field_name
-                        )
+                        f"Required field '{field_name}' specifies a many-to-many "
+                        "relation through model, which is not supported."
                     )
                 else:
                     parser.add_argument(
-                        "--{}".format(field_name),
+                        f"--{field_name}",
                         action="append",
                         help=(
-                            "Specifies the {} for the superuser. Can be used "
-                            "multiple times.".format(field_name),
+                            f"Specifies the {field_name} for the superuser. Can be used "
+                            "multiple times.",
                         ),
                     )
             else:
                 parser.add_argument(
-                    "--{}".format(field_name),
-                    help="Specifies the {} for the superuser.".format(field_name),
+                    f"--{field_name}",
+                    help=f"Specifies the {field_name} for the superuser.",
                 )
 
     def execute(self, *args, **options):
@@ -121,7 +117,7 @@ class Command(BaseCommand):
                         username = None
                 elif username == "":
                     raise CommandError(
-                        "{} cannot be blank.".format(capfirst(verbose_field_name))
+                        f"{capfirst(verbose_field_name)} cannot be blank."
                     )
                 # Prompt for username.
                 while username is None:
@@ -210,9 +206,7 @@ class Command(BaseCommand):
                     )
                 if username is None:
                     raise CommandError(
-                        "You must use --{} with --noinput.".format(
-                            self.UserModel.USERNAME_FIELD
-                        )
+                        f"You must use --{self.UserModel.USERNAME_FIELD} with --noinput."
                     )
                 else:
                     error_msg = self._validate_username(
@@ -232,7 +226,7 @@ class Command(BaseCommand):
                         ):
                             continue
                         raise CommandError(
-                            "You must use --{} with --noinput.".format(field_name)
+                            f"You must use --{field_name} with --noinput."
                         )
                     user_data[field_name] = field.clean(value, None)
                     if field.many_to_many and isinstance(user_data[field_name], str):
@@ -276,7 +270,7 @@ class Command(BaseCommand):
     def _get_input_message(self, field, default=None):
         return "{}{}{}: ".format(
             capfirst(field.verbose_name),
-            " (leave blank to use '{}')".format(default) if default else "",
+            f" (leave blank to use '{default}')" if default else "",
             (
                 " ({}.{})".format(
                     field.remote_field.model._meta.object_name,
@@ -311,9 +305,9 @@ class Command(BaseCommand):
             except self.UserModel.DoesNotExist:
                 pass
             else:
-                return "Error: That {} is already taken.".format(verbose_field_name)
+                return f"Error: That {verbose_field_name} is already taken."
         if not username:
-            return "{} cannot be blank.".format(capfirst(verbose_field_name))
+            return f"{capfirst(verbose_field_name)} cannot be blank."
         try:
             self.username_field.clean(username, None)
         except exceptions.ValidationError as e:

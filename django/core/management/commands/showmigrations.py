@@ -104,17 +104,15 @@ class Command(BaseCommand):
                         # Give it a nice title if it's a squashed one
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:
-                            title += " ({} squashed migrations)".format(
-                                len(graph.nodes[plan_node].replaces)
-                            )
+                            title += f" ({len(graph.nodes[plan_node].replaces)} squashed migrations)"
                         applied_migration = loader.applied_migrations.get(plan_node)
                         # Mark it as applied/unapplied
                         if applied_migration:
                             if plan_node in recorded_migrations:
-                                output = " [X] {}".format(title)
+                                output = f" [X] {title}"
                             else:
                                 title += " Run 'manage.py migrate' to finish recording."
-                                output = " [-] {}".format(title)
+                                output = f" [-] {title}"
                             if self.verbosity >= 2 and hasattr(
                                 applied_migration, "applied"
                             ):
@@ -125,7 +123,7 @@ class Command(BaseCommand):
                                 )
                             self.stdout.write(output)
                         else:
-                            self.stdout.write(" [ ] {}".format(title))
+                            self.stdout.write(f" [ ] {title}")
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
@@ -169,8 +167,8 @@ class Command(BaseCommand):
             if self.verbosity >= 2:
                 deps = print_deps(node)
             if node.key in loader.applied_migrations:
-                self.stdout.write("[X]  {}.{}{}".format(node.key[0], node.key[1], deps))
+                self.stdout.write(f"[X]  {node.key[0]}.{node.key[1]}{deps}")
             else:
-                self.stdout.write("[ ]  {}.{}{}".format(node.key[0], node.key[1], deps))
+                self.stdout.write(f"[ ]  {node.key[0]}.{node.key[1]}{deps}")
         if not plan:
             self.stdout.write("(no migrations)", self.style.ERROR)

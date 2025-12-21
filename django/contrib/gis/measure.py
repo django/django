@@ -74,17 +74,13 @@ class MeasureBase:
         if name in self.UNITS:
             return self.standard / self.UNITS[name]
         else:
-            raise AttributeError("Unknown unit type: {}".format(name))
+            raise AttributeError(f"Unknown unit type: {name}")
 
     def __repr__(self):
-        return "{}({}={})".format(
-            pretty_name(self),
-            self._default_unit,
-            getattr(self, self._default_unit),
-        )
+        return f"{pretty_name(self)}({self._default_unit}={getattr(self, self._default_unit)})"
 
     def __str__(self):
-        return "{} {}".format(getattr(self, self._default_unit), self._default_unit)
+        return f"{getattr(self, self._default_unit)} {self._default_unit}"
 
     # **** Comparison methods ****
 
@@ -225,7 +221,7 @@ class MeasureBase:
                     val += self.UNITS[u] * value
                     default_unit = u
                 else:
-                    raise AttributeError("Unknown unit type: {}".format(unit))
+                    raise AttributeError(f"Unknown unit type: {unit}")
         return val, default_unit
 
     @classmethod
@@ -347,10 +343,10 @@ class Distance(MeasureBase):
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = {"{}{}".format(AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()} | {
+    UNITS = {f"{AREA_PREFIX}{k}": v**2 for k, v in Distance.UNITS.items()} | {
         "ha": 10000,
     }
-    ALIAS = {k: "{}{}".format(AREA_PREFIX, v) for k, v in Distance.ALIAS.items()} | {
+    ALIAS = {k: f"{AREA_PREFIX}{v}" for k, v in Distance.ALIAS.items()} | {
         "hectare": "ha",
     }
 

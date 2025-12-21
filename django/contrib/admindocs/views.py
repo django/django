@@ -211,9 +211,9 @@ def user_has_model_view_permission(user, opts):
     """Based off ModelAdmin.has_view_permission."""
     codename_view = get_permission_codename("view", opts)
     codename_change = get_permission_codename("change", opts)
-    return user.has_perm(
-        "{}.{}".format(opts.app_label, codename_view)
-    ) or user.has_perm("{}.{}".format(opts.app_label, codename_change))
+    return user.has_perm(f"{opts.app_label}.{codename_view}") or user.has_perm(
+        f"{opts.app_label}.{codename_change}"
+    )
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -294,7 +294,7 @@ class ModelDetailView(BaseAdminDocsView):
             }
             fields.append(
                 {
-                    "name": "{}.all".format(field.name),
+                    "name": f"{field.name}.all",
                     "data_type": "List",
                     "verbose": utils.parse_rst(
                         _("all %s") % verbose, "model", _("model:") + opts.model_name
@@ -303,7 +303,7 @@ class ModelDetailView(BaseAdminDocsView):
             )
             fields.append(
                 {
-                    "name": "{}.count".format(field.name),
+                    "name": f"{field.name}.count",
                     "data_type": "Integer",
                     "verbose": utils.parse_rst(
                         _("number of %s") % verbose,
@@ -382,7 +382,7 @@ class ModelDetailView(BaseAdminDocsView):
             accessor = rel.accessor_name
             fields.append(
                 {
-                    "name": "{}.all".format(accessor),
+                    "name": f"{accessor}.all",
                     "data_type": "List",
                     "verbose": utils.parse_rst(
                         _("all %s") % verbose, "model", _("model:") + opts.model_name
@@ -391,7 +391,7 @@ class ModelDetailView(BaseAdminDocsView):
             )
             fields.append(
                 {
-                    "name": "{}.count".format(accessor),
+                    "name": f"{accessor}.count",
                     "data_type": "Integer",
                     "verbose": utils.parse_rst(
                         _("number of %s") % verbose,

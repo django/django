@@ -121,7 +121,7 @@ class ChangeList:
         to_field = request.GET.get(TO_FIELD_VAR)
         if to_field and not model_admin.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field {} cannot be referenced.".format(to_field)
+                f"The field {to_field} cannot be referenced."
             )
         self.to_field = to_field
         self.params = dict(request.GET.items())
@@ -151,11 +151,7 @@ class ChangeList:
         self.pk_attname = self.lookup_opts.pk.attname
 
     def __repr__(self):
-        return "<{}: model={} model_admin={}>".format(
-            self.__class__.__qualname__,
-            self.model.__qualname__,
-            self.model_admin.__class__.__qualname__,
-        )
+        return f"<{self.__class__.__qualname__}: model={self.model.__qualname__} model_admin={self.model_admin.__class__.__qualname__}>"
 
     def get_filters_params(self, params=None):
         """
@@ -224,10 +220,10 @@ class ChangeList:
         if self.date_hierarchy:
             # Create bounded lookup parameters so that the query is more
             # efficient.
-            year = lookup_params.pop("{}__year".format(self.date_hierarchy), None)
+            year = lookup_params.pop(f"{self.date_hierarchy}__year", None)
             if year is not None:
-                month = lookup_params.pop("{}__month".format(self.date_hierarchy), None)
-                day = lookup_params.pop("{}__day".format(self.date_hierarchy), None)
+                month = lookup_params.pop(f"{self.date_hierarchy}__month", None)
+                day = lookup_params.pop(f"{self.date_hierarchy}__day", None)
                 try:
                     from_date = datetime(
                         int(year[-1]),
@@ -249,8 +245,8 @@ class ChangeList:
                     to_date = make_aware(to_date)
                 lookup_params.update(
                     {
-                        "{}__gte".format(self.date_hierarchy): [from_date],
-                        "{}__lt".format(self.date_hierarchy): [to_date],
+                        f"{self.date_hierarchy}__gte": [from_date],
+                        f"{self.date_hierarchy}__lt": [to_date],
                     }
                 )
 
@@ -290,7 +286,7 @@ class ChangeList:
                     del p[k]
             else:
                 p[k] = v
-        return "?{}".format(urlencode(sorted(p.items()), doseq=True))
+        return f"?{urlencode(sorted(p.items()), doseq=True)}"
 
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(
@@ -613,7 +609,7 @@ class ChangeList:
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
         return reverse(
-            "admin:{}_{}_change".format(self.opts.app_label, self.opts.model_name),
+            f"admin:{self.opts.app_label}_{self.opts.model_name}_change",
             args=(quote(pk),),
             current_app=self.model_admin.admin_site.name,
         )

@@ -75,9 +75,7 @@ class SpatialProxy(DeferredAttribute):
             pass
         else:
             raise TypeError(
-                "Cannot set {} SpatialProxy ({}) with value of type: {}".format(
-                    instance.__class__.__name__, gtype, type(value)
-                )
+                f"Cannot set {instance.__class__.__name__} SpatialProxy ({gtype}) with value of type: {type(value)}"
             )
 
         # Setting the objects dictionary with the value, and returning.

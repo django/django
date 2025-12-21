@@ -159,9 +159,9 @@ class CheckURLMixin:
         """
         Format the URL pattern for display in warning messages.
         """
-        description = "'{}'".format(self)
+        description = f"'{self}'"
         if self.name:
-            description += " [name='{}']".format(self.name)
+            description += f" [name='{self.name}']"
         return description
 
     def _check_pattern_startswith_slash(self):
@@ -176,11 +176,9 @@ class CheckURLMixin:
             "/"
         ):
             warning = Warning(
-                "Your URL pattern {} has a route beginning with a '/'. Remove this "
+                f"Your URL pattern {self.describe()} has a route beginning with a '/'. Remove this "
                 "slash as it is unnecessary. If this pattern is targeted in an "
-                "include(), ensure the include() pattern has a trailing '/'.".format(
-                    self.describe()
-                ),
+                "include(), ensure the include() pattern has a trailing '/'.",
                 id="urls.W002",
             )
             return [warning]
@@ -225,9 +223,9 @@ class RegexPattern(CheckURLMixin):
         if self._regex.endswith("$") and not self._regex.endswith(r"\$"):
             return [
                 Warning(
-                    "Your URL pattern {} uses include with a route ending with a '$'. "
+                    f"Your URL pattern {self.describe()} uses include with a route ending with a '$'. "
                     "Remove the dollar from the route to avoid problems including "
-                    "URLs.".format(self.describe()),
+                    "URLs.",
                     id="urls.W001",
                 )
             ]
@@ -353,9 +351,9 @@ class RoutePattern(CheckURLMixin):
         if "(?P<" in route or route.startswith("^") or route.endswith("$"):
             warnings.append(
                 Warning(
-                    "Your URL pattern {} has a route that contains '(?P<', begins "
+                    f"Your URL pattern {self.describe()} has a route that contains '(?P<', begins "
                     "with a '^', or ends with a '$'. This was likely an oversight "
-                    "when migrating to django.urls.path().".format(self.describe()),
+                    "when migrating to django.urls.path().",
                     id="2_0.W001",
                 )
             )
@@ -400,7 +398,7 @@ class LocalePrefixPattern:
         if language_code == settings.LANGUAGE_CODE and not self.prefix_default_language:
             return ""
         else:
-            return "{}/".format(language_code)
+            return f"{language_code}/"
 
     def match(self, path):
         language_prefix = self.language_prefix
@@ -412,7 +410,7 @@ class LocalePrefixPattern:
         return []
 
     def describe(self):
-        return "'{}'".format(self)
+        return f"'{self}'"
 
     def __str__(self):
         return self.language_prefix
@@ -426,7 +424,7 @@ class URLPattern:
         self.name = name
 
     def __repr__(self):
-        return "<{} {}>".format(self.__class__.__name__, self.pattern.describe())
+        return f"<{self.__class__.__name__} {self.pattern.describe()}>"
 
     def check(self):
         warnings = self._check_pattern_name()
@@ -440,8 +438,8 @@ class URLPattern:
         """
         if self.pattern.name is not None and ":" in self.pattern.name:
             warning = Warning(
-                "Your URL pattern {} has a name including a ':'. Remove the colon, to "
-                "avoid ambiguous namespace references.".format(self.pattern.describe()),
+                f"Your URL pattern {self.pattern.describe()} has a name including a ':'. Remove the colon, to "
+                "avoid ambiguous namespace references.",
                 id="urls.W003",
             )
             return [warning]
@@ -455,12 +453,8 @@ class URLPattern:
         if inspect.isclass(view) and issubclass(view, View):
             return [
                 Error(
-                    "Your URL pattern {} has an invalid view, pass {}.as_view() "
-                    "instead of {}.".format(
-                        self.pattern.describe(),
-                        view.__name__,
-                        view.__name__,
-                    ),
+                    f"Your URL pattern {self.pattern.describe()} has an invalid view, pass {view.__name__}.as_view() "
+                    f"instead of {view.__name__}.",
                     id="urls.E009",
                 )
             ]
@@ -523,16 +517,10 @@ class URLResolver:
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
             # Don't bother to output the whole list, it can be huge
-            urlconf_repr = "<{} list>".format(self.urlconf_name[0].__class__.__name__)
+            urlconf_repr = f"<{self.urlconf_name[0].__class__.__name__} list>"
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return "<{} {} ({}:{}) {}>".format(
-            self.__class__.__name__,
-            urlconf_repr,
-            self.app_name,
-            self.namespace,
-            self.pattern.describe(),
-        )
+        return f"<{self.__class__.__name__} {urlconf_repr} ({self.app_name}:{self.namespace}) {self.pattern.describe()}>"
 
     def check(self):
         messages = []
@@ -738,13 +726,13 @@ class URLResolver:
         return patterns
 
     def resolve_error_handler(self, view_type):
-        callback = getattr(self.urlconf_module, "handler{}".format(view_type), None)
+        callback = getattr(self.urlconf_module, f"handler{view_type}", None)
         if not callback:
             # No handler specified in file; use lazy import, since
             # django.conf.urls imports this file.
             from django.conf import urls
 
-            callback = getattr(urls, "handler{}".format(view_type))
+            callback = getattr(urls, f"handler{view_type}")
         return get_callable(callback)
 
     def reverse(self, lookup_view, *args, **kwargs):
@@ -799,7 +787,7 @@ class URLResolver:
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = _prefix.replace("%", "%%") + result
                 if re.search(
-                    "^{}{}".format(re.escape(_prefix), pattern),
+                    f"^{re.escape(_prefix)}{pattern}",
                     candidate_pat % text_candidate_subs,
                 ):
                     # safe characters from `pchar` definition of RFC 3986
@@ -814,16 +802,16 @@ class URLResolver:
         m = getattr(lookup_view, "__module__", None)
         n = getattr(lookup_view, "__name__", None)
         if m is not None and n is not None:
-            lookup_view_s = "{}.{}".format(m, n)
+            lookup_view_s = f"{m}.{n}"
         else:
             lookup_view_s = lookup_view
 
         patterns = [pattern for (_, pattern, _, _) in possibilities]
         if patterns:
             if args:
-                arg_msg = "arguments '{}'".format(args)
+                arg_msg = f"arguments '{args}'"
             elif kwargs:
-                arg_msg = "keyword arguments '{}'".format(kwargs)
+                arg_msg = f"keyword arguments '{kwargs}'"
             else:
                 arg_msg = "no arguments"
             msg = "Reverse for '%s' with %s not found. %d pattern(s) tried: %s" % (
@@ -834,7 +822,7 @@ class URLResolver:
             )
         else:
             msg = (
-                "Reverse for '{view}' not found. '{view}' is not "
-                "a valid view function or pattern name.".format(view=lookup_view_s)
+                f"Reverse for '{lookup_view_s}' not found. '{lookup_view_s}' is not "
+                "a valid view function or pattern name."
             )
         raise NoReverseMatch(msg)

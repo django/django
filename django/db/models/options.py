@@ -171,11 +171,11 @@ class Options:
 
     @property
     def label(self):
-        return "{}.{}".format(self.app_label, self.object_name)
+        return f"{self.app_label}.{self.object_name}"
 
     @property
     def label_lower(self):
-        return "{}.{}".format(self.app_label, self.model_name)
+        return f"{self.app_label}.{self.model_name}"
 
     @property
     def app_config(self):
@@ -242,7 +242,7 @@ class Options:
 
         # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
-            self.db_table = "{}_{}".format(self.app_label, self.model_name)
+            self.db_table = f"{self.app_label}_{self.model_name}"
             self.db_table = truncate_name(
                 self.db_table, connection.ops.max_name_length()
             )
@@ -304,7 +304,7 @@ class Options:
                 )
             except StopIteration:
                 raise FieldDoesNotExist(
-                    "{} has no field named '{}'".format(self.object_name, query)
+                    f"{self.object_name} has no field named '{query}'"
                 )
 
             self.ordering = ("_order",)
@@ -389,7 +389,7 @@ class Options:
         self.db_table = target._meta.db_table
 
     def __repr__(self):
-        return "<Options for {}>".format(self.object_name)
+        return f"<Options for {self.object_name}>"
 
     def __str__(self):
         return self.label_lower
@@ -441,10 +441,7 @@ class Options:
                     # get_user_model or as part of validation.
                     return swapped_for
 
-                if (
-                    "{}.{}".format(swapped_label, swapped_object.lower())
-                    != self.label_lower
-                ):
+                if f"{swapped_label}.{swapped_object.lower()}" != self.label_lower:
                     return swapped_for
         return None
 
@@ -492,10 +489,7 @@ class Options:
                 return self.managers_map[base_manager_name]
             except KeyError:
                 raise ValueError(
-                    "{} has no manager named {!r}".format(
-                        self.object_name,
-                        base_manager_name,
-                    )
+                    f"{self.object_name} has no manager named {base_manager_name!r}"
                 )
 
         manager = Manager()
@@ -519,10 +513,7 @@ class Options:
                 return self.managers_map[default_manager_name]
             except KeyError:
                 raise ValueError(
-                    "{} has no manager named {!r}".format(
-                        self.object_name,
-                        default_manager_name,
-                    )
+                    f"{self.object_name} has no manager named {default_manager_name!r}"
                 )
 
         if self.managers:
@@ -680,9 +671,9 @@ class Options:
             # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.models_ready:
                 raise FieldDoesNotExist(
-                    "{} has no field named '{}'. The app cache isn't ready yet, "
+                    f"{self.object_name} has no field named '{field_name}'. The app cache isn't ready yet, "
                     "so if this is an auto-created related field, it won't "
-                    "be available yet.".format(self.object_name, field_name)
+                    "be available yet."
                 )
 
         try:
@@ -691,7 +682,7 @@ class Options:
             return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist(
-                "{} has no field named '{}'".format(self.object_name, field_name)
+                f"{self.object_name} has no field named '{field_name}'"
             )
 
     def get_base_chain(self, model):
@@ -898,9 +889,7 @@ class Options:
           parent chain to the model's concrete model.
         """
         if include_parents not in (True, False, PROXY_PARENTS):
-            raise TypeError(
-                "Invalid argument for include_parents: {}".format(include_parents)
-            )
+            raise TypeError(f"Invalid argument for include_parents: {include_parents}")
         # This helper function is used to allow recursion in ``get_fields()``
         # implementation and to provide a fast way for Django's internals to
         # access specific subsets of fields.

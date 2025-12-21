@@ -1876,11 +1876,7 @@ class WindowFunctionTests(TestCase):
 
     @skipUnlessDBFeature("only_supports_unbounded_with_preceding_and_following")
     def test_unsupported_range_frame_start(self):
-        msg = (
-            "{} only supports UNBOUNDED together with PRECEDING and FOLLOWING.".format(
-                connection.display_name
-            )
-        )
+        msg = f"{connection.display_name} only supports UNBOUNDED together with PRECEDING and FOLLOWING."
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(
                 Employee.objects.annotate(
@@ -1894,11 +1890,7 @@ class WindowFunctionTests(TestCase):
 
     @skipUnlessDBFeature("only_supports_unbounded_with_preceding_and_following")
     def test_unsupported_range_frame_end(self):
-        msg = (
-            "{} only supports UNBOUNDED together with PRECEDING and FOLLOWING.".format(
-                connection.display_name
-            )
-        )
+        msg = f"{connection.display_name} only supports UNBOUNDED together with PRECEDING and FOLLOWING."
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(
                 Employee.objects.annotate(

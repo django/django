@@ -16,9 +16,9 @@ def add_domain(domain, url, secure=False):
     protocol = "https" if secure else "http"
     if url.startswith("//"):
         # Support network-path reference (see #16753) - RSS requires a protocol
-        url = "{}:{}".format(protocol, url)
+        url = f"{protocol}:{url}"
     elif not url.startswith(("http://", "https://", "mailto:")):
-        url = iri_to_uri("{}://{}{}".format(protocol, domain, url))
+        url = iri_to_uri(f"{protocol}://{domain}{url}")
     return url
 
 
@@ -60,8 +60,8 @@ class Feed:
             return item.get_absolute_url()
         except AttributeError:
             raise ImproperlyConfigured(
-                "Give your {} class a get_absolute_url() method, or define an "
-                "item_link() method in your Feed class.".format(item.__class__.__name__)
+                f"Give your {item.__class__.__name__} class a get_absolute_url() method, or define an "
+                "item_link() method in your Feed class."
             )
 
     def item_enclosures(self, item):

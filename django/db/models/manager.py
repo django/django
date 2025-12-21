@@ -34,7 +34,7 @@ class BaseManager:
 
     def __str__(self):
         """Return "app_label.model_label.manager_name"."""
-        return "{}.{}".format(self.model._meta.label, self.name)
+        return f"{self.model._meta.label}.{self.name}"
 
     def __class_getitem__(cls, *args, **kwargs):
         return cls
@@ -52,7 +52,7 @@ class BaseManager:
             return (
                 True,  # as_manager
                 None,  # manager_class
-                "{}.{}".format(qs_class.__module__, qs_class.__name__),  # qs_class
+                f"{qs_class.__module__}.{qs_class.__name__}",  # qs_class
                 None,  # args
                 None,  # kwargs
             )
@@ -63,15 +63,13 @@ class BaseManager:
             module = import_module(module_name)
             if not hasattr(module, name):
                 raise ValueError(
-                    "Could not find manager {} in {}.\n"
+                    f"Could not find manager {name} in {module_name}.\n"
                     "Please note that you need to inherit from managers you "
-                    "dynamically generated with 'from_queryset()'.".format(
-                        name, module_name
-                    )
+                    "dynamically generated with 'from_queryset()'."
                 )
             return (
                 False,  # as_manager
-                "{}.{}".format(module_name, name),  # manager_class
+                f"{module_name}.{name}",  # manager_class
                 None,  # qs_class
                 self._constructor_args[0],  # args
                 self._constructor_args[1],  # kwargs
@@ -108,7 +106,7 @@ class BaseManager:
     @classmethod
     def from_queryset(cls, queryset_class, class_name=None):
         if class_name is None:
-            class_name = "{}From{}".format(cls.__name__, queryset_class.__name__)
+            class_name = f"{cls.__name__}From{queryset_class.__name__}"
         return type(
             class_name,
             (cls,),
@@ -185,20 +183,17 @@ class ManagerDescriptor:
     def __get__(self, instance, cls=None):
         if instance is not None:
             raise AttributeError(
-                "Manager isn't accessible via {} instances".format(cls.__name__)
+                f"Manager isn't accessible via {cls.__name__} instances"
             )
 
         if cls._meta.abstract:
             raise AttributeError(
-                "Manager isn't available; {} is abstract".format(cls._meta.object_name)
+                f"Manager isn't available; {cls._meta.object_name} is abstract"
             )
 
         if cls._meta.swapped:
             raise AttributeError(
-                "Manager isn't available; '{}' has been swapped for '{}'".format(
-                    cls._meta.label,
-                    cls._meta.swapped,
-                )
+                f"Manager isn't available; '{cls._meta.label}' has been swapped for '{cls._meta.swapped}'"
             )
 
         return cls._meta.managers_map[self.manager.name]

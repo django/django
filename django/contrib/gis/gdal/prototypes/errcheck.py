@@ -81,7 +81,7 @@ def check_geom(result, func, cargs):
         result = c_void_p(result)
     if not result:
         raise GDALException(
-            'Invalid geometry pointer returned from "{}".'.format(func.__name__)
+            f'Invalid geometry pointer returned from "{func.__name__}".'
         )
     return result
 
@@ -99,9 +99,7 @@ def check_srs(result, func, cargs):
         result = c_void_p(result)
     if not result:
         raise SRSException(
-            'Invalid spatial reference pointer returned from "{}".'.format(
-                func.__name__
-            )
+            f'Invalid spatial reference pointer returned from "{func.__name__}".'
         )
     return result
 
@@ -130,7 +128,7 @@ def check_pointer(result, func, cargs):
     if result:
         return result
     else:
-        raise GDALException('Invalid pointer returned from "{}"'.format(func.__name__))
+        raise GDALException(f'Invalid pointer returned from "{func.__name__}"')
 
 
 def check_str_arg(result, func, cargs):

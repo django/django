@@ -116,4 +116,4 @@ class SlugPage(models.Model):
         ordering = ["slug"]
 
     def __str__(self):
-        return "SlugPage {}".format(self.slug)
+        return f"SlugPage {self.slug}"

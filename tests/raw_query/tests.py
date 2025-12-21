@@ -201,7 +201,7 @@ class RawQueryTests(TestCase):
         )
 
         for select in selects:
-            query = "SELECT {} FROM raw_query_author".format(select)
+            query = f"SELECT {select} FROM raw_query_author"
             authors = Author.objects.all()
             self.assertSuccessfulRawQuery(Author, query, authors)
 

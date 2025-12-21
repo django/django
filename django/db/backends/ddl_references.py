@@ -40,7 +40,7 @@ class Reference:
         pass
 
     def __repr__(self):
-        return "<{} {!r}>".format(self.__class__.__name__, str(self))
+        return f"<{self.__class__.__name__} {str(self)!r}>"
 
     def __str__(self):
         raise NotImplementedError(
@@ -100,7 +100,7 @@ class Columns(TableColumns):
             try:
                 suffix = self.col_suffixes[idx]
                 if suffix:
-                    col = "{} {}".format(col, suffix)
+                    col = f"{col} {suffix}"
             except IndexError:
                 pass
             return col
@@ -131,11 +131,11 @@ class IndexColumns(Columns):
         def col_str(column, idx):
             # Index.__init__() guarantees that self.opclasses is the same
             # length as self.columns.
-            col = "{} {}".format(self.quote_name(column), self.opclasses[idx])
+            col = f"{self.quote_name(column)} {self.opclasses[idx]}"
             try:
                 suffix = self.col_suffixes[idx]
                 if suffix:
-                    col = "{} {}".format(col, suffix)
+                    col = f"{col} {suffix}"
             except IndexError:
                 pass
             return col

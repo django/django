@@ -178,9 +178,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         }
         self.cache_bust_counter += 1
         cursor.execute(
-            "SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
-                self.connection.ops.quote_name(table_name), self.cache_bust_counter
-            )
+            f"SELECT * FROM {self.connection.ops.quote_name(table_name)} WHERE ROWNUM < 2 AND {self.cache_bust_counter} > 0"
         )
         description = []
         for desc in cursor.description:

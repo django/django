@@ -1121,11 +1121,8 @@ class SessionMiddlewareTests(TestCase):
         #  "Set-Cookie: sessionid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; "
         #  "Max-Age=0; Path=/"
         self.assertEqual(
-            'Set-Cookie: {}=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; '
-            "Max-Age=0; Path=/; SameSite={}".format(
-                settings.SESSION_COOKIE_NAME,
-                settings.SESSION_COOKIE_SAMESITE,
-            ),
+            f'Set-Cookie: {settings.SESSION_COOKIE_NAME}=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; '
+            f"Max-Age=0; Path=/; SameSite={settings.SESSION_COOKIE_SAMESITE}",
             str(response.cookies[settings.SESSION_COOKIE_NAME]),
         )
         # SessionMiddleware sets 'Vary: Cookie' to prevent the 'Set-Cookie'
@@ -1155,11 +1152,8 @@ class SessionMiddlewareTests(TestCase):
         #              expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0;
         #              Path=/example/
         self.assertEqual(
-            'Set-Cookie: {}=""; Domain=.example.local; expires=Thu, '
-            "01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/example/; SameSite={}".format(
-                settings.SESSION_COOKIE_NAME,
-                settings.SESSION_COOKIE_SAMESITE,
-            ),
+            f'Set-Cookie: {settings.SESSION_COOKIE_NAME}=""; Domain=.example.local; expires=Thu, '
+            f"01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/example/; SameSite={settings.SESSION_COOKIE_SAMESITE}",
             str(response.cookies[settings.SESSION_COOKIE_NAME]),
         )
 
@@ -1198,7 +1192,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertEqual(tuple(request.session.items()), (("foo", "bar"),))
         # A cookie should be set, along with Vary: Cookie.
         self.assertIn(
-            "Set-Cookie: sessionid={}".format(request.session.session_key),
+            f"Set-Cookie: sessionid={request.session.session_key}",
             str(response.cookies),
         )
         self.assertEqual(response.headers["Vary"], "Cookie")
@@ -1215,7 +1209,7 @@ class SessionMiddlewareTests(TestCase):
         # still be set, along with Vary: Cookie.
         self.assertGreater(len(request.session.session_key), 8)
         self.assertIn(
-            "Set-Cookie: sessionid={}".format(request.session.session_key),
+            f"Set-Cookie: sessionid={request.session.session_key}",
             str(response.cookies),
         )
         self.assertEqual(response.headers["Vary"], "Cookie")

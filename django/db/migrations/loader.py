@@ -69,7 +69,7 @@ class MigrationLoader:
             return settings.MIGRATION_MODULES[app_label], True
         else:
             app_package_name = apps.get_app_config(app_label).name
-            return "{}.{}".format(app_package_name, MIGRATIONS_MODULE_NAME), False
+            return f"{app_package_name}.{MIGRATIONS_MODULE_NAME}", False
 
     def load_disk(self):
         """Load the migrations from all INSTALLED_APPS from disk."""
@@ -116,22 +116,20 @@ class MigrationLoader:
             ]
             # Load migrations
             for migration_name in migration_names:
-                migration_path = "{}.{}".format(module_name, migration_name)
+                migration_path = f"{module_name}.{migration_name}"
                 try:
                     migration_module = import_module(migration_path)
                 except ImportError as e:
                     if "bad magic number" in str(e):
                         raise ImportError(
-                            "Couldn't import {!r} as it appears to be a stale "
-                            ".pyc file.".format(migration_path)
+                            f"Couldn't import {migration_path!r} as it appears to be a stale "
+                            ".pyc file."
                         ) from e
                     else:
                         raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
-                        "Migration {} in app {} has no Migration class".format(
-                            migration_name, app_config.label
-                        )
+                        f"Migration {migration_name} in app {app_config.label} has no Migration class"
                     )
                 self.disk_migrations[app_config.label, migration_name] = (
                     migration_module.Migration(
@@ -158,9 +156,7 @@ class MigrationLoader:
                 results.append((migration_app_label, migration_name))
         if len(results) > 1:
             raise AmbiguityError(
-                "There is more than one migration for '{}' with the prefix '{}'".format(
-                    app_label, name_prefix
-                )
+                f"There is more than one migration for '{app_label}' with the prefix '{name_prefix}'"
             )
         elif not results:
             raise KeyError(
@@ -195,10 +191,8 @@ class MigrationLoader:
                 if self.ignore_no_migrations:
                     return None
                 else:
-                    raise ValueError(
-                        "Dependency on app with no migrations: {}".format(key[0])
-                    )
-        raise ValueError("Dependency on unknown app: {}".format(key[0]))
+                    raise ValueError(f"Dependency on app with no migrations: {key[0]}")
+        raise ValueError(f"Dependency on unknown app: {key[0]}")
 
     def add_internal_dependencies(self, key, migration):
         """
@@ -332,12 +326,10 @@ class MigrationLoader:
                 if not is_replaced:
                     tries = ", ".join("{}.{}".format(*c) for c in candidates)
                     raise NodeNotFoundError(
-                        "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
-                        "Django tried to replace migration {1}.{2} with any of [{3}] "
+                        f"Migration {exc.origin} depends on nonexistent node ('{exc.node[0]}', '{exc.node[1]}'). "
+                        f"Django tried to replace migration {exc.node[0]}.{exc.node[1]} with any of [{tries}] "
                         "but wasn't able to because some of the replaced migrations "
-                        "are already applied.".format(
-                            exc.origin, exc.node[0], exc.node[1], tries
-                        ),
+                        "are already applied.",
                         exc.node,
                     ) from exc
             raise
@@ -361,14 +353,8 @@ class MigrationLoader:
                     if self.all_replaced_applied(parent.key, applied):
                         continue
                     raise InconsistentMigrationHistory(
-                        "Migration {}.{} is applied before its dependency "
-                        "{}.{} on database '{}'.".format(
-                            migration[0],
-                            migration[1],
-                            parent[0],
-                            parent[1],
-                            connection.alias,
-                        )
+                        f"Migration {migration[0]}.{migration[1]} is applied before its dependency "
+                        f"{parent[0]}.{parent[1]} on database '{connection.alias}'."
                     )
 
     def all_replaced_applied(self, migration_key, applied):

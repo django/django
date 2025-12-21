@@ -554,7 +554,7 @@ class SelectDateWidgetTest(WidgetTest):
             ):
                 with self.subTest(values=values):
                     data = {
-                        "field_{}".format(field): value
+                        f"field_{field}": value
                         for field, value in zip(("year", "month", "day"), values)
                     }
                     self.assertEqual(
@@ -623,7 +623,7 @@ class SelectDateWidgetTest(WidgetTest):
                 data = {}
                 for field_name, value in zip(("year", "month", "day"), values):
                     if value is not None:
-                        data["field_{}".format(field_name)] = value
+                        data[f"field_{field_name}"] = value
                 self.assertEqual(
                     self.widget.value_from_datadict(data, {}, "field"), expected
                 )

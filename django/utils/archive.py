@@ -79,7 +79,7 @@ class Archive:
             cls = extension_map.get(ext)
         if not cls:
             raise UnrecognizedArchiveFormat(
-                "Path not a recognized archive format: {}".format(filename)
+                f"Path not a recognized archive format: {filename}"
             )
         return cls
 
@@ -147,14 +147,10 @@ class BaseArchive:
         filename = os.path.abspath(os.path.join(target_path, name))
         try:
             if os.path.commonpath([target_path, filename]) != target_path:
-                raise SuspiciousOperation(
-                    "Archive contains invalid path: '{}'".format(name)
-                )
+                raise SuspiciousOperation(f"Archive contains invalid path: '{name}'")
         except ValueError:
             # Different drives on Windows raises ValueError.
-            raise SuspiciousOperation(
-                "Archive contains invalid path: '{}'".format(name)
-            )
+            raise SuspiciousOperation(f"Archive contains invalid path: '{name}'")
         return filename
 
     def extract(self):
@@ -193,9 +189,7 @@ class TarArchive(BaseArchive):
                     # Some corrupt tar files seem to produce this
                     # (specifically bad symlinks)
                     print(
-                        "In the tar file {} the member {} is invalid: {}".format(
-                            name, member.name, exc
-                        )
+                        f"In the tar file {name} the member {member.name} is invalid: {exc}"
                     )
                 else:
                     dirname = os.path.dirname(filename)

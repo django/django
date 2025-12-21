@@ -151,7 +151,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             }
         }]"""
         key = ["doesnotexist", "metadata"]
-        expected = "(serializers.category:pk=1) field_value was '{!r}'".format(key)
+        expected = f"(serializers.category:pk=1) field_value was '{key!r}'"
         with self.assertRaisesMessage(DeserializationError, expected):
             list(serializers.deserialize("json", test_string))
 
@@ -220,7 +220,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             }
         }]"""
         key = ["doesnotexist", "meta1"]
-        expected = "(serializers.article:pk=1) field_value was '{!r}'".format(key)
+        expected = f"(serializers.article:pk=1) field_value was '{key!r}'"
         with self.assertRaisesMessage(DeserializationError, expected):
             for obj in serializers.deserialize("json", test_string):
                 obj.save()

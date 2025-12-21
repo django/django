@@ -66,7 +66,7 @@ class CsrfFunctionTestMixin:
             f"got {records_len}).",
         )
         record = logger_cm.records[0]
-        self.assertEqual(record.getMessage(), "Forbidden ({}): ".format(reason))
+        self.assertEqual(record.getMessage(), f"Forbidden ({reason}): ")
         self.assertEqual(record.levelno, levelno)
         self.assertEqual(record.status_code, 403)
         self.assertEqual(response.status_code, 403)

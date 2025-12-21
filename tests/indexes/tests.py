@@ -604,9 +604,7 @@ class CoveringIndexTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             extra_sql = ""
             if settings.DEFAULT_INDEX_TABLESPACE:
-                extra_sql = "TABLESPACE {} ".format(
-                    editor.quote_name(settings.DEFAULT_INDEX_TABLESPACE)
-                )
+                extra_sql = f"TABLESPACE {editor.quote_name(settings.DEFAULT_INDEX_TABLESPACE)} "
             self.assertIn(
                 "({}) INCLUDE ({}) {}WHERE {} ".format(
                     editor.quote_name("headline"),

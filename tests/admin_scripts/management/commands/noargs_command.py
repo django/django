@@ -6,4 +6,4 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     def handle(self, **options):
-        print("EXECUTE: noargs_command options={}".format(sorted(options.items())))
+        print(f"EXECUTE: noargs_command options={sorted(options.items())}")

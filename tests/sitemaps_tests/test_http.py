@@ -21,27 +21,21 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
         response = self.client.get("/simple/index.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>{}/simple/sitemap-simple.xml</loc><lastmod>{}</lastmod></sitemap>
+<sitemap><loc>{self.base_url}/simple/sitemap-simple.xml</loc><lastmod>{date.today()}</lastmod></sitemap>
 </sitemapindex>
-""".format(
-            self.base_url,
-            date.today(),
-        )
+"""
         self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_not_callable(self):
         """A sitemap may not be callable."""
         response = self.client.get("/simple-not-callable/index.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>{}/simple/sitemap-simple.xml</loc><lastmod>{}</lastmod></sitemap>
+<sitemap><loc>{self.base_url}/simple/sitemap-simple.xml</loc><lastmod>{date.today()}</lastmod></sitemap>
 </sitemapindex>
-""".format(
-            self.base_url,
-            date.today(),
-        )
+"""
         self.assertXMLEqual(response.text, expected_content)
 
     def test_paged_sitemap(self):
@@ -67,15 +61,12 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_simple_sitemap_custom_lastmod_index(self):
         "A simple sitemap index can be rendered with a custom template"
         response = self.client.get("/simple/custom-lastmod-index.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customized template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>{}/simple/sitemap-simple.xml</loc><lastmod>{}</lastmod></sitemap>
+<sitemap><loc>{self.base_url}/simple/sitemap-simple.xml</loc><lastmod>{date.today()}</lastmod></sitemap>
 </sitemapindex>
-""".format(
-            self.base_url,
-            date.today(),
-        )
+"""
         self.assertXMLEqual(response.text, expected_content)
 
     def test_simple_sitemap_section(self):
@@ -85,12 +76,9 @@ class HTTPSitemapTests(SitemapTestsBase):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "<url><loc>{}/location/</loc><lastmod>{}</lastmod>"
+            f"<url><loc>{self.base_url}/location/</loc><lastmod>{date.today()}</lastmod>"
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
-        ).format(
-            self.base_url,
-            date.today(),
         )
         self.assertXMLEqual(response.text, expected_content)
 
@@ -119,12 +107,9 @@ class HTTPSitemapTests(SitemapTestsBase):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "<url><loc>{}/location/</loc><lastmod>{}</lastmod>"
+            f"<url><loc>{self.base_url}/location/</loc><lastmod>{date.today()}</lastmod>"
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
-        ).format(
-            self.base_url,
-            date.today(),
         )
         self.assertXMLEqual(response.text, expected_content)
 
@@ -139,15 +124,12 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
         response = self.client.get("/simple/custom-sitemap.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customized template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>{}/location/</loc><lastmod>{}</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>{self.base_url}/location/</loc><lastmod>{date.today()}</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""".format(
-            self.base_url,
-            date.today(),
-        )
+"""
         self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_last_modified(self):
@@ -253,7 +235,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             # Priorities aren't rendered in localized format.
             response = self.client.get("/simple/sitemap.xml")
             self.assertContains(response, "<priority>0.5</priority>")
-            self.assertContains(response, "<lastmod>{}</lastmod>".format(date.today()))
+            self.assertContains(response, f"<lastmod>{date.today()}</lastmod>")
 
     @modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"})
     def test_requestsite_sitemap(self):
@@ -264,10 +246,10 @@ class HTTPSitemapTests(SitemapTestsBase):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "<url><loc>http://testserver/location/</loc><lastmod>{}</lastmod>"
+            f"<url><loc>http://testserver/location/</loc><lastmod>{date.today()}</lastmod>"
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
-        ).format(date.today())
+        )
         self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_get_urls_no_site_1(self):
@@ -308,14 +290,11 @@ class HTTPSitemapTests(SitemapTestsBase):
         A cached sitemap index can be rendered (#2713).
         """
         response = self.client.get("/cached/index.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>{}/cached/sitemap-simple.xml</loc><lastmod>{}</lastmod></sitemap>
+<sitemap><loc>{self.base_url}/cached/sitemap-simple.xml</loc><lastmod>{date.today()}</lastmod></sitemap>
 </sitemapindex>
-""".format(
-            self.base_url,
-            date.today(),
-        )
+"""
         self.assertXMLEqual(response.text, expected_content)
 
     def test_x_robots_sitemap(self):
@@ -341,11 +320,11 @@ class HTTPSitemapTests(SitemapTestsBase):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "<url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq>"
-            "<priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc>"
+            f"<url><loc>{self.base_url}/en/i18n/testmodel/{self.i18n_model.pk}/</loc><changefreq>never</changefreq>"
+            f"<priority>0.5</priority></url><url><loc>{self.base_url}/pt/i18n/testmodel/{self.i18n_model.pk}/</loc>"
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
-        ).format(self.base_url, self.i18n_model.pk)
+        )
         self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))

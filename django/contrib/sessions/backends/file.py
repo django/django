@@ -36,9 +36,9 @@ class SessionStore(SessionBase):
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
                 raise ImproperlyConfigured(
-                    "The session storage path {!r} doesn't exist. Please set your"
+                    f"The session storage path {storage_path!r} doesn't exist. Please set your"
                     " SESSION_FILE_PATH setting to an existing directory in which"
-                    " Django can store session data.".format(storage_path)
+                    " Django can store session data."
                 )
 
             cls._storage_path = storage_path
@@ -89,7 +89,7 @@ class SessionStore(SessionBase):
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
                         logger = logging.getLogger(
-                            "django.security.{}".format(e.__class__.__name__)
+                            f"django.security.{e.__class__.__name__}"
                         )
                         logger.warning(str(e))
                     self.create()

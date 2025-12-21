@@ -118,9 +118,7 @@ class UserPassesTestMixin(AccessMixin):
 
     def test_func(self):
         raise NotImplementedError(
-            "{} is missing the implementation of the test_func() method.".format(
-                self.__class__.__name__
-            )
+            f"{self.__class__.__name__} is missing the implementation of the test_func() method."
         )
 
     def get_test_func(self):

@@ -94,7 +94,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = "{}\n{}".format(msg, e)
+        standardMsg = f"{msg}\n{e}"
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -232,16 +232,12 @@ class SimpleTestCase(unittest.TestCase):
         for alias in cls.databases:
             if alias not in connections:
                 message = (
-                    "{}.{}.databases refers to {!r} which is not defined in "
-                    "settings.DATABASES.".format(
-                        cls.__module__,
-                        cls.__qualname__,
-                        alias,
-                    )
+                    f"{cls.__module__}.{cls.__qualname__}.databases refers to {alias!r} which is not defined in "
+                    "settings.DATABASES."
                 )
                 close_matches = get_close_matches(alias, list(connections))
                 if close_matches:
-                    message += " Did you mean {!r}?".format(close_matches[0])
+                    message += f" Did you mean {close_matches[0]!r}?"
                 raise ImproperlyConfigured(message)
         return frozenset(cls.databases)
 
@@ -254,7 +250,7 @@ class SimpleTestCase(unittest.TestCase):
             connection = connections[alias]
             for name, operation in cls._disallowed_connection_methods:
                 message = cls._disallowed_database_msg % {
-                    "test": "{}.{}".format(cls.__module__, cls.__qualname__),
+                    "test": f"{cls.__module__}.{cls.__qualname__}",
                     "alias": alias,
                     "operation": operation,
                 }
@@ -487,12 +483,10 @@ class SimpleTestCase(unittest.TestCase):
                 domain, port = split_domain_port(netloc)
                 if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
                     raise ValueError(
-                        "The test client is unable to fetch remote URLs (got {}). "
-                        "If the host is served by Django, add '{}' to ALLOWED_HOSTS. "
+                        f"The test client is unable to fetch remote URLs (got {url}). "
+                        f"If the host is served by Django, add '{domain}' to ALLOWED_HOSTS. "
                         "Otherwise, use "
-                        "assertRedirects(..., fetch_redirect_response=False).".format(
-                            url, domain
-                        )
+                        "assertRedirects(..., fetch_redirect_response=False)."
                     )
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
@@ -519,8 +513,7 @@ class SimpleTestCase(unittest.TestCase):
         self.assertURLEqual(
             url,
             expected_url,
-            msg_prefix
-            + "Response redirected to '{}', expected '{}'".format(url, expected_url),
+            msg_prefix + f"Response redirected to '{url}', expected '{expected_url}'",
         )
 
     def assertURLEqual(self, url1, url2, msg_prefix=""):
@@ -544,13 +537,13 @@ class SimpleTestCase(unittest.TestCase):
         self.assertEqual(
             normalize(url1),
             normalize(url2),
-            msg_prefix + "Expected '{}' to equal '{}'.".format(url1, url2),
+            msg_prefix + f"Expected '{url1}' to equal '{url2}'.",
         )
 
     def _text_repr(self, content, force_string):
         if isinstance(content, bytes) and not force_string:
             return safe_repr(content)
-        return "'{}'".format(str(content))
+        return f"'{str(content)}'"
 
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
@@ -664,16 +657,12 @@ class SimpleTestCase(unittest.TestCase):
     ):
         if not form.is_bound:
             self.fail(
-                "{}The {} is not bound, it will never have any errors.".format(
-                    msg_prefix, self._form_repr(form, formset, form_index)
-                )
+                f"{msg_prefix}The {self._form_repr(form, formset, form_index)} is not bound, it will never have any errors."
             )
 
         if field is not None and field not in form.fields:
             self.fail(
-                "{}The {} does not contain the field {!r}.".format(
-                    msg_prefix, self._form_repr(form, formset, form_index), field
-                )
+                f"{msg_prefix}The {self._form_repr(form, formset, form_index)} does not contain the field {field!r}."
             )
         field_errors = (
             form.non_field_errors() if field is None else form.errors.get(field, [])
@@ -684,14 +673,9 @@ class SimpleTestCase(unittest.TestCase):
 
         # Use assertEqual to show detailed diff if errors don't match.
         if field is None:
-            failure_message = "The non-field errors of {} don't match.".format(
-                self._form_repr(form, formset, form_index),
-            )
+            failure_message = f"The non-field errors of {self._form_repr(form, formset, form_index)} don't match."
         else:
-            failure_message = "The errors of field {!r} on {} don't match.".format(
-                field,
-                self._form_repr(form, formset, form_index),
-            )
+            failure_message = f"The errors of field {field!r} on {self._form_repr(form, formset, form_index)} don't match."
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
     def assertFormError(self, form, field, errors, msg_prefix=""):
@@ -835,9 +819,7 @@ class SimpleTestCase(unittest.TestCase):
         self.assertFalse(
             template_name in template_names,
             msg_prefix
-            + "Template '{}' was used unexpectedly in rendering the response".format(
-                template_name
-            ),
+            + f"Template '{template_name}' was used unexpectedly in rendering the response",
         )
 
     @contextmanager
@@ -967,9 +949,7 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         if dom1 != dom2:
-            standardMsg = "{} != {}".format(
-                safe_repr(dom1, True), safe_repr(dom2, True)
-            )
+            standardMsg = f"{safe_repr(dom1, True)} != {safe_repr(dom2, True)}"
             diff = "\n" + "\n".join(
                 difflib.ndiff(
                     str(dom1).splitlines(),
@@ -989,9 +969,7 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         if dom1 == dom2:
-            standardMsg = "{} == {}".format(
-                safe_repr(dom1, True), safe_repr(dom2, True)
-            )
+            standardMsg = f"{safe_repr(dom1, True)} == {safe_repr(dom2, True)}"
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertInHTML(self, needle, haystack, count=None, msg_prefix=""):
@@ -1040,14 +1018,12 @@ class SimpleTestCase(unittest.TestCase):
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            self.fail("First argument is not valid JSON: {!r}".format(raw))
+            self.fail(f"First argument is not valid JSON: {raw!r}")
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
-                self.fail(
-                    "Second argument is not valid JSON: {!r}".format(expected_data)
-                )
+                self.fail(f"Second argument is not valid JSON: {expected_data!r}")
         self.assertEqual(data, expected_data, msg=msg)
 
     def assertJSONNotEqual(self, raw, expected_data, msg=None):
@@ -1059,14 +1035,12 @@ class SimpleTestCase(unittest.TestCase):
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            self.fail("First argument is not valid JSON: {!r}".format(raw))
+            self.fail(f"First argument is not valid JSON: {raw!r}")
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except json.JSONDecodeError:
-                self.fail(
-                    "Second argument is not valid JSON: {!r}".format(expected_data)
-                )
+                self.fail(f"Second argument is not valid JSON: {expected_data!r}")
         self.assertNotEqual(data, expected_data, msg=msg)
 
     def assertXMLEqual(self, xml1, xml2, msg=None):
@@ -1078,14 +1052,11 @@ class SimpleTestCase(unittest.TestCase):
         try:
             result = compare_xml(xml1, xml2)
         except Exception as e:
-            standardMsg = "First or second argument is not valid XML\n{}".format(e)
+            standardMsg = f"First or second argument is not valid XML\n{e}"
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if not result:
-                standardMsg = "{} != {}".format(
-                    safe_repr(xml1, True),
-                    safe_repr(xml2, True),
-                )
+                standardMsg = f"{safe_repr(xml1, True)} != {safe_repr(xml2, True)}"
                 diff = "\n" + "\n".join(
                     difflib.ndiff(xml1.splitlines(), xml2.splitlines())
                 )
@@ -1101,14 +1072,11 @@ class SimpleTestCase(unittest.TestCase):
         try:
             result = compare_xml(xml1, xml2)
         except Exception as e:
-            standardMsg = "First or second argument is not valid XML\n{}".format(e)
+            standardMsg = f"First or second argument is not valid XML\n{e}"
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if result:
-                standardMsg = "{} == {}".format(
-                    safe_repr(xml1, True),
-                    safe_repr(xml2, True),
-                )
+                standardMsg = f"{safe_repr(xml1, True)} == {safe_repr(xml2, True)}"
                 self.fail(self._formatMessage(msg, standardMsg))
 
 
@@ -1381,7 +1349,7 @@ class TestData:
         return data
 
     def __repr__(self):
-        return "<TestData: name={!r}, data={!r}>".format(self.name, self.data)
+        return f"<TestData: name={self.name!r}, data={self.data!r}>"
 
 
 class TestCase(TransactionTestCase):
@@ -1586,13 +1554,8 @@ def _deferredSkip(condition, reason, name):
                     and connection.alias not in getattr(args[0], "databases", {})
                 ):
                     raise ValueError(
-                        "{} cannot be used on {} as {} doesn't allow queries "
-                        "against the {!r} database.".format(
-                            name,
-                            args[0],
-                            args[0].__class__.__qualname__,
-                            connection.alias,
-                        )
+                        f"{name} cannot be used on {args[0]} as {args[0].__class__.__qualname__} doesn't allow queries "
+                        f"against the {connection.alias!r} database."
                     )
                 if condition():
                     raise unittest.SkipTest(reason)
@@ -1607,12 +1570,8 @@ def _deferredSkip(condition, reason, name):
                 # Defer raising to allow importing test class's module.
                 def condition():
                     raise ValueError(
-                        "{} cannot be used on {} as it doesn't allow queries "
-                        "against the '{}' database.".format(
-                            name,
-                            test_item,
-                            connection.alias,
-                        )
+                        f"{name} cannot be used on {test_item} as it doesn't allow queries "
+                        f"against the '{connection.alias}' database."
                     )
 
             # Retrieve the possibly existing value from the class's dict to
@@ -1818,7 +1777,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classproperty
     def live_server_url(cls):
-        return "http://{}:{}".format(cls.host, cls.server_thread.port)
+        return f"http://{cls.host}:{cls.server_thread.port}"
 
     @classproperty
     def allowed_host(cls):
@@ -1893,8 +1852,8 @@ class SerializeMixin:
         super().__init_subclass__(**kwargs)
         if cls.lockfile is None:
             raise ValueError(
-                "{}.lockfile isn't set. Set it to a unique value "
-                "in the base class.".format(cls.__name__)
+                f"{cls.__name__}.lockfile isn't set. Set it to a unique value "
+                "in the base class."
             )
 
     @classmethod

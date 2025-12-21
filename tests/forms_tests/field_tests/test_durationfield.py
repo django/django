@@ -41,10 +41,7 @@ class DurationFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertIsNone(f.clean(""))
 
     def test_overflow(self):
-        msg = "The number of days must be between {min_days} and {max_days}.".format(
-            min_days=datetime.timedelta.min.days,
-            max_days=datetime.timedelta.max.days,
-        )
+        msg = f"The number of days must be between {datetime.timedelta.min.days} and {datetime.timedelta.max.days}."
         f = DurationField()
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1000000000 00:00:00")
@@ -52,10 +49,7 @@ class DurationFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean("-1000000000 00:00:00")
 
     def test_overflow_translation(self):
-        msg = "Le nombre de jours doit être entre {min_days} et {max_days}.".format(
-            min_days=datetime.timedelta.min.days,
-            max_days=datetime.timedelta.max.days,
-        )
+        msg = f"Le nombre de jours doit être entre {datetime.timedelta.min.days} et {datetime.timedelta.max.days}."
         with translation.override("fr"):
             with self.assertRaisesMessage(ValidationError, msg):
                 DurationField().clean("1000000000 00:00:00")

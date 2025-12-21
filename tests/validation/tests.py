@@ -32,9 +32,7 @@ class BaseModelValidationTests(ValidationAssertions, TestCase):
             mtv.full_clean,
             "parent",
             [
-                "model to validate instance with id {!r} is not a valid choice.".format(
-                    mtv.parent_id
-                )
+                f"model to validate instance with id {mtv.parent_id!r} is not a valid choice."
             ],
         )
         mtv = ModelToValidate(number=10, name="Some Name", ufm_id="Some Name")
@@ -42,8 +40,8 @@ class BaseModelValidationTests(ValidationAssertions, TestCase):
             mtv.full_clean,
             "ufm",
             [
-                "unique fields model instance with unique_charfield {!r} is not "
-                "a valid choice.".format(mtv.name)
+                f"unique fields model instance with unique_charfield {mtv.name!r} is not "
+                "a valid choice."
             ],
         )
 

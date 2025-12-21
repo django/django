@@ -17,7 +17,7 @@ def trim(value, num):
 @mark_safe
 def make_data_div(value):
     """A filter that uses a decorator (@mark_safe)."""
-    return '<div data-name="{}"></div>'.format(value)
+    return f'<div data-name="{value}"></div>'
 
 
 @register.simple_block_tag
@@ -55,7 +55,7 @@ no_params.anything = "Expected no_params __dict__"
 @register.simple_tag
 def one_param(arg):
     """Expected one_param __doc__"""
-    return "one_param - Expected result: {}".format(arg)
+    return f"one_param - Expected result: {arg}"
 
 
 one_param.anything = "Expected one_param __dict__"
@@ -70,7 +70,7 @@ def one_param_block(content, arg):
 @register.simple_tag(takes_context=False)
 def explicit_no_context(arg):
     """Expected explicit_no_context __doc__"""
-    return "explicit_no_context - Expected result: {}".format(arg)
+    return f"explicit_no_context - Expected result: {arg}"
 
 
 explicit_no_context.anything = "Expected explicit_no_context __dict__"
@@ -130,7 +130,7 @@ def params_and_context_block(context, content, arg):
 @register.simple_tag
 def simple_two_params(one, two):
     """Expected simple_two_params __doc__"""
-    return "simple_two_params - Expected result: {}, {}".format(one, two)
+    return f"simple_two_params - Expected result: {one}, {two}"
 
 
 simple_two_params.anything = "Expected simple_two_params __dict__"
@@ -139,45 +139,33 @@ simple_two_params.anything = "Expected simple_two_params __dict__"
 @register.simple_block_tag
 def simple_two_params_block(content, one, two):
     """Expected simple_two_params_block __doc__"""
-    return (
-        "simple_two_params_block - Expected result (content value: {}): {}, {}".format(
-            content,
-            one,
-            two,
-        )
-    )
+    return f"simple_two_params_block - Expected result (content value: {content}): {one}, {two}"
 
 
 @register.simple_tag
 def simple_keyword_only_param(*, kwarg):
-    return "simple_keyword_only_param - Expected result: {}".format(kwarg)
+    return f"simple_keyword_only_param - Expected result: {kwarg}"
 
 
 @register.simple_block_tag
 def simple_keyword_only_param_block(content, *, kwarg):
-    return "simple_keyword_only_param_block - Expected result (content value: {}): {}".format(
-        content,
-        kwarg,
-    )
+    return f"simple_keyword_only_param_block - Expected result (content value: {content}): {kwarg}"
 
 
 @register.simple_tag
 def simple_keyword_only_default(*, kwarg=42):
-    return "simple_keyword_only_default - Expected result: {}".format(kwarg)
+    return f"simple_keyword_only_default - Expected result: {kwarg}"
 
 
 @register.simple_block_tag
 def simple_keyword_only_default_block(content, *, kwarg=42):
-    return "simple_keyword_only_default_block - Expected result (content value: {}): {}".format(
-        content,
-        kwarg,
-    )
+    return f"simple_keyword_only_default_block - Expected result (content value: {content}): {kwarg}"
 
 
 @register.simple_tag
 def simple_one_default(one, two="hi"):
     """Expected simple_one_default __doc__"""
-    return "simple_one_default - Expected result: {}, {}".format(one, two)
+    return f"simple_one_default - Expected result: {one}, {two}"
 
 
 simple_one_default.anything = "Expected simple_one_default __dict__"
@@ -186,13 +174,7 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 @register.simple_block_tag
 def simple_one_default_block(content, one, two="hi"):
     """Expected simple_one_default_block __doc__"""
-    return (
-        "simple_one_default_block - Expected result (content value: {}): {}, {}".format(
-            content,
-            one,
-            two,
-        )
-    )
+    return f"simple_one_default_block - Expected result (content value: {content}): {one}, {two}"
 
 
 @register.simple_tag
@@ -242,7 +224,7 @@ def simple_unlimited_args_kwargs(one, two="hi", *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
     return "simple_unlimited_args_kwargs - Expected result: {} / {}".format(
         ", ".join(str(arg) for arg in [one, two, *args]),
-        ", ".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
+        ", ".join(f"{k}={v}" for (k, v) in kwargs.items()),
     )
 
 
@@ -257,7 +239,7 @@ def simple_unlimited_args_kwargs_block(content, one, two="hi", *args, **kwargs):
         "{} / {}".format(
             content,
             ", ".join(str(arg) for arg in [one, two, *args]),
-            ", ".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
+            ", ".join(f"{k}={v}" for (k, v) in kwargs.items()),
         )
     )
 

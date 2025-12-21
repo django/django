@@ -57,17 +57,17 @@ class MultiDBOperationTests(OperationTestBase):
         new_state = project_state.clone()
         operation.state_forwards(app_label, new_state)
         # Test the database alteration
-        self.assertTableNotExists("{}_pony".format(app_label))
+        self.assertTableNotExists(f"{app_label}_pony")
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, new_state)
         if should_run:
-            self.assertTableExists("{}_pony".format(app_label))
+            self.assertTableExists(f"{app_label}_pony")
         else:
-            self.assertTableNotExists("{}_pony".format(app_label))
+            self.assertTableNotExists(f"{app_label}_pony")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
-        self.assertTableNotExists("{}_pony".format(app_label))
+        self.assertTableNotExists(f"{app_label}_pony")
 
     @override_settings(DATABASE_ROUTERS=[AgnosticRouter()])
     def test_create_model(self):
@@ -109,12 +109,10 @@ class MultiDBOperationTests(OperationTestBase):
         with override_settings(DATABASE_ROUTERS=[MigrateEverythingRouter()]):
             project_state = self.set_up_test_model(app_label)
 
-        sql = """
-        INSERT INTO {0}_pony (pink, weight) VALUES (1, 3.55);
-        INSERT INTO {0}_pony (pink, weight) VALUES (3, 5.0);
-        """.format(
-            app_label
-        )
+        sql = f"""
+        INSERT INTO {app_label}_pony (pink, weight) VALUES (1, 3.55);
+        INSERT INTO {app_label}_pony (pink, weight) VALUES (3, 5.0);
+        """
 
         operation = migrations.RunSQL(sql, hints=hints or {})
         # Test the state alteration does nothing

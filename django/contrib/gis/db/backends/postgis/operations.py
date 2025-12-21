@@ -309,7 +309,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             if value.field.srid == f.srid:
                 placeholder = "%s"
             else:
-                placeholder = "{}(%s, {})".format(transform_func, f.srid)
+                placeholder = f"{transform_func}(%s, {f.srid})"
             return placeholder
 
         # Get the srid for this object
@@ -323,7 +323,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             placeholder = "%s"
         else:
-            placeholder = "{}(%s, {})".format(transform_func, f.srid)
+            placeholder = f"{transform_func}(%s, {f.srid})"
 
         return placeholder
 
@@ -334,7 +334,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         # Close out the connection. See #9437.
         with self.connection.temporary_connection() as cursor:
-            cursor.execute("SELECT {}()".format(func))
+            cursor.execute(f"SELECT {func}()")
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):

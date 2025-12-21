@@ -63,13 +63,13 @@ class Driver(GDALBase):
             driver = dr_input
         else:
             raise GDALException(
-                "Unrecognized input type for GDAL/OGR Driver: {}".format(type(dr_input))
+                f"Unrecognized input type for GDAL/OGR Driver: {type(dr_input)}"
             )
 
         # Making sure we get a valid pointer to the OGR Driver
         if not driver:
             raise GDALException(
-                "Could not initialize GDAL/OGR Driver on input: {}".format(dr_input)
+                f"Could not initialize GDAL/OGR Driver on input: {dr_input}"
             )
         self.ptr = driver
 

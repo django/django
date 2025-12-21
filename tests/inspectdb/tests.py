@@ -77,9 +77,7 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
 
         def assertFieldType(name, definition):
-            out_def = re.search(
-                r"^\s*{} = (models.*)$".format(name), output, re.MULTILINE
-            )[1]
+            out_def = re.search(rf"^\s*{name} = (models.*)$", output, re.MULTILINE)[1]
             self.assertEqual(definition, out_def)
 
         return assertFieldType
@@ -169,13 +167,13 @@ class InspectDBTestCase(TestCase):
         if not connection.features.interprets_empty_strings_as_nulls:
             self.assertIn(
                 "char_field = models.CharField(max_length=10, "
-                "db_collation='{}')".format(test_collation),
+                f"db_collation='{test_collation}')",
                 output,
             )
         else:
             self.assertIn(
                 "char_field = models.CharField(max_length=10, "
-                "db_collation='{}', blank=True, null=True)".format(test_collation),
+                f"db_collation='{test_collation}', blank=True, null=True)",
                 output,
             )
 
@@ -187,15 +185,13 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         if not connection.features.interprets_empty_strings_as_nulls:
             self.assertIn(
-                "text_field = models.TextField(db_collation='{}')".format(
-                    test_collation
-                ),
+                f"text_field = models.TextField(db_collation='{test_collation}')",
                 output,
             )
         else:
             self.assertIn(
-                "text_field = models.TextField(db_collation='{}, blank=True, "
-                "null=True)".format(test_collation),
+                f"text_field = models.TextField(db_collation='{test_collation}, blank=True, "
+                "null=True)",
                 output,
             )
 
@@ -222,7 +218,7 @@ class InspectDBTestCase(TestCase):
         if auto_field_type != "AutoField":
             assertFieldType(
                 "id",
-                "models.{}(primary_key=True)  # AutoField?".format(auto_field_type),
+                f"models.{auto_field_type}(primary_key=True)  # AutoField?",
             )
 
         assertFieldType(
@@ -231,10 +227,10 @@ class InspectDBTestCase(TestCase):
         )
 
         bool_field_type = introspected_field_types["BooleanField"]
-        assertFieldType("bool_field", "models.{}()".format(bool_field_type))
+        assertFieldType("bool_field", f"models.{bool_field_type}()")
         assertFieldType(
             "null_bool_field",
-            "models.{}(blank=True, null=True)".format(bool_field_type),
+            f"models.{bool_field_type}(blank=True, null=True)",
         )
 
         if connection.vendor != "sqlite":
@@ -342,22 +338,22 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
         self.assertNotIn(
-            "    123 = models.{}".format(char_field_type), output, msg=error_message
+            f"    123 = models.{char_field_type}", output, msg=error_message
         )
-        self.assertIn("number_123 = models.{}".format(char_field_type), output)
+        self.assertIn(f"number_123 = models.{char_field_type}", output)
 
         error_message = (
             "inspectdb generated a model field name which starts with a digit"
         )
         self.assertNotIn(
-            "    4extra = models.{}".format(char_field_type), output, msg=error_message
+            f"    4extra = models.{char_field_type}", output, msg=error_message
         )
-        self.assertIn("number_4extra = models.{}".format(char_field_type), output)
+        self.assertIn(f"number_4extra = models.{char_field_type}", output)
 
         self.assertNotIn(
-            "    45extra = models.{}".format(char_field_type), output, msg=error_message
+            f"    45extra = models.{char_field_type}", output, msg=error_message
         )
-        self.assertIn("number_45extra = models.{}".format(char_field_type), output)
+        self.assertIn(f"number_45extra = models.{char_field_type}", output)
 
     def test_special_column_name_introspection(self):
         """
@@ -371,27 +367,23 @@ class InspectDBTestCase(TestCase):
         integer_field_type = connection.features.introspected_field_types[
             "IntegerField"
         ]
-        self.assertIn("field = models.{}()".format(integer_field_type), output)
+        self.assertIn(f"field = models.{integer_field_type}()", output)
         self.assertIn(
-            "field_field = models.{}(db_column='{}_')".format(
-                integer_field_type, base_name
-            ),
+            f"field_field = models.{integer_field_type}(db_column='{base_name}_')",
             output,
         )
         self.assertIn(
-            "field_field_0 = models.{}(db_column='{}__')".format(
-                integer_field_type, base_name
-            ),
+            f"field_field_0 = models.{integer_field_type}(db_column='{base_name}__')",
             output,
         )
         self.assertIn(
-            "field_field_1 = models.{}(db_column='__field')".format(integer_field_type),
+            f"field_field_1 = models.{integer_field_type}(db_column='__field')",
             output,
         )
         self.assertIn(
-            "prc_x = models.{}(db_column='prc(%) x')".format(integer_field_type), output
+            f"prc_x = models.{integer_field_type}(db_column='prc(%) x')", output
         )
-        self.assertIn("tamaño = models.{}()".format(integer_field_type), output)
+        self.assertIn(f"tamaño = models.{integer_field_type}()", output)
 
     def test_table_name_introspection(self):
         """
@@ -464,10 +456,8 @@ class InspectDBTestCase(TestCase):
     def test_unsupported_unique_together(self):
         """Unsupported index types (COALESCE here) are skipped."""
         cursor_execute(
-            "CREATE UNIQUE INDEX Findex ON {} "
-            "(id, people_unique_id, COALESCE(message_id, -1))".format(
-                PeopleMoreData._meta.db_table
-            )
+            f"CREATE UNIQUE INDEX Findex ON {PeopleMoreData._meta.db_table} "
+            "(id, people_unique_id, COALESCE(message_id, -1))"
         )
         self.addCleanup(cursor_execute, "DROP INDEX Findex")
         out = StringIO()

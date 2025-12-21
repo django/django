@@ -187,7 +187,7 @@ class RawQuery:
         return iter(result)
 
     def __repr__(self):
-        return "<{}: {}>".format(self.__class__.__name__, self)
+        return f"<{self.__class__.__name__}: {self}>"
 
     @property
     def params_type(self):
@@ -214,7 +214,7 @@ class RawQuery:
         elif params_type is None:
             params = None
         else:
-            raise RuntimeError("Unexpected params type: {}".format(params_type))
+            raise RuntimeError(f"Unexpected params type: {params_type}")
 
         self.cursor = connection.cursor()
         self.cursor.execute(self.sql, params)
@@ -467,7 +467,7 @@ class Query(BaseExpression):
                 self, allow_joins=True, reuse=None, summarize=True
             )
             if not aggregate.contains_aggregate:
-                raise TypeError("{} is not an aggregate expression".format(alias))
+                raise TypeError(f"{alias} is not an aggregate expression")
             # Temporarily add aggregate to annotations to allow remaining
             # members of `aggregates` to resolve against each others.
             self.append_annotation_mask([alias])
@@ -1311,7 +1311,7 @@ class Query(BaseExpression):
                 query.clear_ordering(force=False)
         sql, params = self.get_compiler(connection=connection).as_sql()
         if self.subquery:
-            sql = "({})".format(sql)
+            sql = f"({sql})"
         return sql, params
 
     def resolve_lookup_value(self, value, can_reuse, allow_joins, summarize=False):
@@ -1353,9 +1353,7 @@ class Query(BaseExpression):
         field_parts = lookup_splitted[0 : len(lookup_splitted) - len(lookup_parts)]
         if len(lookup_parts) > 1 and not field_parts:
             raise FieldError(
-                'Invalid lookup "{}" for model {}".'.format(
-                    lookup, self.get_meta().model.__name__
-                )
+                f'Invalid lookup "{lookup}" for model {self.get_meta().model.__name__}".'
             )
         return lookup_parts, field_parts, False
 
@@ -1367,9 +1365,7 @@ class Query(BaseExpression):
         if hasattr(value, "_meta"):
             if not check_rel_lookup_compatibility(value._meta.model, opts, field):
                 raise ValueError(
-                    'Cannot query "{}": Must be "{}" instance.'.format(
-                        value, opts.object_name
-                    )
+                    f'Cannot query "{value}": Must be "{opts.object_name}" instance.'
                 )
 
     def check_related_objects(self, field, value, opts):
@@ -1386,9 +1382,7 @@ class Query(BaseExpression):
                 and not check_rel_lookup_compatibility(value.model, opts, field)
             ):
                 raise ValueError(
-                    'Cannot use QuerySet for "{}": Use a QuerySet for "{}".'.format(
-                        value.model._meta.object_name, opts.object_name
-                    )
+                    f'Cannot use QuerySet for "{value.model._meta.object_name}": Use a QuerySet for "{opts.object_name}".'
                 )
             elif hasattr(value, "_meta"):
                 self.check_query_object_type(value, opts, field)
@@ -1480,10 +1474,8 @@ class Query(BaseExpression):
             else:
                 unsupported_lookup = name
             raise FieldError(
-                "Unsupported lookup '{}' for {} or join on the field not "
-                "permitted{}".format(
-                    unsupported_lookup, output_field.__name__, suggestion
-                )
+                f"Unsupported lookup '{unsupported_lookup}' for {output_field.__name__} or join on the field not "
+                f"permitted{suggestion}"
             )
 
     def build_filter(
@@ -1548,7 +1540,7 @@ class Query(BaseExpression):
             return WhereNode([condition], connector=AND), []
         arg, value = filter_expr
         if not arg:
-            raise FieldError("Cannot parse keyword query {!r}".format(arg))
+            raise FieldError(f"Cannot parse keyword query {arg!r}")
         lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
 
         if check_filterable:
@@ -1730,7 +1722,7 @@ class Query(BaseExpression):
         if relation_lookup_parts:
             raise ValueError(
                 "FilteredRelation's relation_name cannot contain lookups "
-                "(got {!r}).".format(filtered_relation.relation_name)
+                f"(got {filtered_relation.relation_name!r})."
             )
         for lookup in get_children_from_q(filtered_relation.condition):
             lookup_parts, lookup_field_parts, _ = self.solve_lookup_type(lookup)
@@ -1741,15 +1733,13 @@ class Query(BaseExpression):
                     if relation_field_parts[idx] != lookup_field_part:
                         raise ValueError(
                             "FilteredRelation's condition doesn't support "
-                            "relations outside the {!r} (got {!r}).".format(
-                                filtered_relation.relation_name, lookup
-                            )
+                            f"relations outside the {filtered_relation.relation_name!r} (got {lookup!r})."
                         )
             if len(lookup_field_parts) > len(relation_field_parts) + 1:
                 raise ValueError(
                     "FilteredRelation's condition doesn't support nested "
-                    "relations deeper than the relation_name (got {!r} for "
-                    "{!r}).".format(lookup, filtered_relation.relation_name)
+                    f"relations deeper than the relation_name (got {lookup!r} for "
+                    f"{filtered_relation.relation_name!r})."
                 )
         filtered_relation = filtered_relation.clone()
         filtered_relation.condition = rename_prefix_from_q(
@@ -1808,10 +1798,10 @@ class Query(BaseExpression):
                 # relations and therefore cannot be used for reverse querying.
                 if field.is_relation and not field.related_model:
                     raise FieldError(
-                        "Field {!r} does not generate an automatic reverse "
+                        f"Field {name!r} does not generate an automatic reverse "
                         "relation and therefore cannot be used for reverse "
                         "querying. If it is a GenericForeignKey, consider "
-                        "adding a GenericRelation.".format(name)
+                        "adding a GenericRelation."
                     )
                 try:
                     model = field.model._meta.concrete_model
@@ -1869,8 +1859,8 @@ class Query(BaseExpression):
                 targets = (field,)
                 if fail_on_missing and pos + 1 != len(names):
                     raise FieldError(
-                        "Cannot resolve keyword {!r} into field. Join on '{}'"
-                        " not permitted.".format(names[pos + 1], name)
+                        f"Cannot resolve keyword {names[pos + 1]!r} into field. Join on '{name}'"
+                        " not permitted."
                     )
                 break
         return path, final_field, targets, names[pos + 1 :]
@@ -2063,8 +2053,8 @@ class Query(BaseExpression):
                 # annotation.
                 if name not in self.annotation_select:
                     raise FieldError(
-                        "Cannot aggregate over the '{}' alias. Use annotate() "
-                        "to promote it.".format(name)
+                        f"Cannot aggregate over the '{name}' alias. Use annotate() "
+                        "to promote it."
                     )
                 return Ref(name, self.annotation_select[name])
             else:
@@ -2153,7 +2143,7 @@ class Query(BaseExpression):
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
-                ("{}__isnull".format(trimmed_prefix), True),
+                (f"{trimmed_prefix}__isnull", True),
                 current_negated=True,
                 branch_negated=True,
                 can_reuse=can_reuse,
@@ -2291,7 +2281,7 @@ class Query(BaseExpression):
             if cols:
                 self.set_select(cols)
         except MultiJoin:
-            raise FieldError("Invalid field name: '{}'".format(name))
+            raise FieldError(f"Invalid field name: '{name}'")
         except FieldError:
             if LOOKUP_SEP in name:
                 # For lookups spanning over relationships, show the error
@@ -2338,10 +2328,10 @@ class Query(BaseExpression):
             if getattr(item, "contains_aggregate", False):
                 raise FieldError(
                     "Using an aggregate in order_by() without also including "
-                    "it in annotate() is not allowed: {}".format(item)
+                    f"it in annotate() is not allowed: {item}"
                 )
         if errors:
-            raise FieldError("Invalid order_by arguments: {}".format(errors))
+            raise FieldError(f"Invalid order_by arguments: {errors}")
         if ordering:
             self.order_by += ordering
         else:

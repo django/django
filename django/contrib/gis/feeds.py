@@ -14,7 +14,7 @@ class GeoFeedMixin:
         a single white space. Given a tuple of coordinates, return a string
         GeoRSS representation.
         """
-        return " ".join("{:f} {:f}".format(coord[1], coord[0]) for coord in coords)
+        return " ".join(f"{coord[1]:f} {coord[0]:f}" for coord in coords)
 
     def add_georss_point(self, handler, coords, w3c_geo=False):
         """
@@ -24,8 +24,8 @@ class GeoFeedMixin:
         """
         if w3c_geo:
             lon, lat = coords[:2]
-            handler.addQuickElement("geo:lat", "{:f}".format(lat))
-            handler.addQuickElement("geo:lon", "{:f}".format(lon))
+            handler.addQuickElement("geo:lat", f"{lat:f}")
+            handler.addQuickElement("geo:lon", f"{lon:f}")
         else:
             handler.addQuickElement("georss:point", self.georss_coords((coords,)))
 
@@ -83,7 +83,7 @@ class GeoFeedMixin:
                         )
                     else:
                         raise ValueError(
-                            'Geometry type "{}" not supported.'.format(geom.geom_type)
+                            f'Geometry type "{geom.geom_type}" not supported.'
                         )
 
 

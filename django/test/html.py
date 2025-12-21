@@ -164,12 +164,12 @@ class Element:
         return self.children[key]
 
     def __str__(self):
-        output = "<{}".format(self.name)
+        output = f"<{self.name}"
         for key, value in self.attributes:
             if value is not None:
-                output += ' {}="{}"'.format(key, value)
+                output += f' {key}="{value}"'
             else:
-                output += " {}".format(key)
+                output += f" {key}"
         if self.children:
             output += ">\n"
             output += "".join(
@@ -178,7 +178,7 @@ class Element:
                     for c in self.children
                 ]
             )
-            output += "\n</{}>".format(self.name)
+            output += f"\n</{self.name}>"
         else:
             output += ">"
         return output
@@ -242,15 +242,11 @@ class Parser(HTMLParser):
 
     def handle_endtag(self, tag):
         if not self.open_tags:
-            self.error(
-                "Unexpected end tag `{}` ({})".format(tag, self.format_position())
-            )
+            self.error(f"Unexpected end tag `{tag}` ({self.format_position()})")
         element = self.open_tags.pop()
         while element.name != tag:
             if not self.open_tags:
-                self.error(
-                    "Unexpected end tag `{}` ({})".format(tag, self.format_position())
-                )
+                self.error(f"Unexpected end tag `{tag}` ({self.format_position()})")
             element = self.open_tags.pop()
 
     def handle_data(self, data):

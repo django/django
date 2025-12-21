@@ -83,7 +83,7 @@ class GenericInlineFormsetTests(TestCase):
         tagged_item_id = TaggedItem.objects.get(tag="shiny", object_id=platypus.id).id
         self.assertHTMLEqual(
             "".join(form.as_p() for form in formset.forms),
-            """
+            f"""
             <p><label
                 for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
             Tag:</label>
@@ -99,7 +99,7 @@ class GenericInlineFormsetTests(TestCase):
                 id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">
             <input type="hidden"
                 name="generic_relations-taggeditem-content_type-object_id-0-id"
-                value="{}"
+                value="{tagged_item_id}"
                 id="id_generic_relations-taggeditem-content_type-object_id-0-id"></p>
             <p><label
                 for="id_generic_relations-taggeditem-content_type-object_id-1-tag">
@@ -117,9 +117,7 @@ class GenericInlineFormsetTests(TestCase):
             <input type="hidden"
                 name="generic_relations-taggeditem-content_type-object_id-1-id"
                 id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>
-            """.format(
-                tagged_item_id
-            ),
+            """,
         )
         lion = Animal.objects.create(common_name="Lion", latin_name="Panthera leo")
         formset = GenericFormSet(instance=lion, prefix="x")
@@ -153,10 +151,8 @@ class GenericInlineFormsetTests(TestCase):
             formset.forms[0].as_p(),
             '<input type="hidden" '
             'name="generic_relations-taggeditem-content_type-object_id-0-id" '
-            'value="{}" '
-            'id="id_generic_relations-taggeditem-content_type-object_id-0-id">'.format(
-                harmless.pk
-            ),
+            f'value="{harmless.pk}" '
+            'id="id_generic_relations-taggeditem-content_type-object_id-0-id">',
         )
         self.assertEqual(formset.forms[0].instance, harmless)
         self.assertEqual(formset.forms[1].instance, mammal)

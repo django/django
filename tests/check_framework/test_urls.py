@@ -136,8 +136,8 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertEqual(len(result), 2)
         non_unique_namespaces = ["app-ns1", "app-1"]
         warning_messages = [
-            "URL namespace '{}' isn't unique. You may not be able to reverse "
-            "all URLs in this namespace".format(namespace)
+            f"URL namespace '{namespace}' isn't unique. You may not be able to reverse "
+            "all URLs in this namespace"
             for namespace in non_unique_namespaces
         ]
         for warning in result:
@@ -248,7 +248,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
         for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
-            with self.subTest("handler{}".format(code)):
+            with self.subTest(f"handler{code}"):
                 self.assertEqual(
                     error,
                     Error(
@@ -269,7 +269,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
         for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
-            with self.subTest("handler{}".format(code)):
+            with self.subTest(f"handler{code}"):
                 self.assertEqual(
                     error,
                     Error(
@@ -303,13 +303,11 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
             "Could not import '{}'. The path must be fully qualified.",
         ]
         for code, path, hint, error in zip([400, 403, 404, 500], paths, hints, result):
-            with self.subTest("handler{}".format(code)):
+            with self.subTest(f"handler{code}"):
                 self.assertEqual(
                     error,
                     Error(
-                        "The custom handler{} view '{}' could not be imported.".format(
-                            code, path
-                        ),
+                        f"The custom handler{code} view '{path}' could not be imported.",
                         hint=hint.format(path),
                         id="urls.E008",
                     ),

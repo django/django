@@ -983,7 +983,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic(), connection.cursor() as cursor:
                 quoted_name = connection.ops.quote_name(constraint_name)
-                cursor.execute("SET CONSTRAINTS {} IMMEDIATE".format(quoted_name))
+                cursor.execute(f"SET CONSTRAINTS {quoted_name} IMMEDIATE")
         # Remove adjacent range before the end of transaction.
         adjacent_range.delete()
         RangesModel.objects.create(ints=(10, 19))

@@ -52,12 +52,12 @@ class LocaleMiddleware(MiddlewareMixin):
         ):
             # Maybe the language code is missing in the URL? Try adding the
             # language prefix and redirecting to that URL.
-            language_path = "/{}{}".format(language, request.path_info)
+            language_path = f"/{language}{request.path_info}"
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = not path_valid and (
                 settings.APPEND_SLASH
                 and not language_path.endswith("/")
-                and is_valid_path("{}/".format(language_path), urlconf)
+                and is_valid_path(f"{language_path}/", urlconf)
             )
 
             if path_valid or path_needs_slash:
@@ -66,7 +66,7 @@ class LocaleMiddleware(MiddlewareMixin):
                 # rest of the URL
                 language_url = request.get_full_path(
                     force_append_slash=path_needs_slash
-                ).replace(script_prefix, "{}{}/".format(script_prefix, language), 1)
+                ).replace(script_prefix, f"{script_prefix}{language}/", 1)
                 # Redirect to the language-specific URL as detected by
                 # get_language_from_request(). HTTP caches may cache this
                 # redirect, so add the Vary header.

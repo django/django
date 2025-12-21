@@ -79,7 +79,7 @@ class TypedChoiceFieldTest(SimpleTestCase):
         """
 
         def coerce_func(val):
-            return decimal.Decimal("1.{}".format(val))
+            return decimal.Decimal(f"1.{val}")
 
         f = TypedChoiceField(
             choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True

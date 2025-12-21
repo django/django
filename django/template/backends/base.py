@@ -29,8 +29,8 @@ class BaseEngine:
     @property
     def app_dirname(self):
         raise ImproperlyConfigured(
-            "{} doesn't support loading templates from installed "
-            "applications.".format(self.__class__.__name__)
+            f"{self.__class__.__name__} doesn't support loading templates from installed "
+            "applications."
         )
 
     def from_string(self, template_code):

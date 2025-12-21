@@ -28,12 +28,12 @@ class IntrospectionTests(TransactionTestCase):
         self.assertIn(
             Reporter._meta.db_table,
             tl,
-            "'{}' isn't in table_list().".format(Reporter._meta.db_table),
+            f"'{Reporter._meta.db_table}' isn't in table_list().",
         )
         self.assertIn(
             Article._meta.db_table,
             tl,
-            "'{}' isn't in table_list().".format(Article._meta.db_table),
+            f"'{Article._meta.db_table}' isn't in table_list().",
         )
 
     def test_django_table_names(self):

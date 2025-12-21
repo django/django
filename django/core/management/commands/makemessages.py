@@ -51,10 +51,7 @@ class TranslatableFile:
         self.locale_dir = locale_dir
 
     def __repr__(self):
-        return "<{}: {}>".format(
-            self.__class__.__name__,
-            os.sep.join([self.dirpath, self.file]),
-        )
+        return f"<{self.__class__.__name__}: {os.sep.join([self.dirpath, self.file])}>"
 
     def __eq__(self, other):
         return self.path == other.path
@@ -362,9 +359,7 @@ class Command(BaseCommand):
 
         if (not locale and not exclude and not process_all) or self.domain is None:
             raise CommandError(
-                "Type '{} help {}' for usage information.".format(
-                    os.path.basename(sys.argv[0]), sys.argv[1]
-                )
+                f"Type '{os.path.basename(sys.argv[0])} help {sys.argv[1]}' for usage information."
             )
 
         if self.verbosity > 1:
@@ -399,9 +394,7 @@ class Command(BaseCommand):
 
         # Build locale list
         looks_like_locale = re.compile(r"[a-z]{2}")
-        locale_dirs = filter(
-            os.path.isdir, glob.glob("{}/*".format(self.default_locale_path))
-        )
+        locale_dirs = filter(os.path.isdir, glob.glob(f"{self.default_locale_path}/*"))
         all_locales = [
             lang_code
             for lang_code in map(os.path.basename, locale_dirs)
@@ -453,17 +446,14 @@ class Command(BaseCommand):
                     # Recheck if the proposed locale is valid
                     if is_valid_locale(proposed_locale):
                         self.stdout.write(
-                            "invalid locale {}, did you mean {}?".format(
-                                locale,
-                                proposed_locale,
-                            ),
+                            f"invalid locale {locale}, did you mean {proposed_locale}?",
                         )
                     else:
-                        self.stdout.write("invalid locale {}".format(locale))
+                        self.stdout.write(f"invalid locale {locale}")
 
                     continue
                 if self.verbosity > 0:
-                    self.stdout.write("processing locale {}".format(locale))
+                    self.stdout.write(f"processing locale {locale}")
                 for potfile in potfiles:
                     self.write_po_file(potfile, locale)
         finally:
@@ -504,7 +494,7 @@ class Command(BaseCommand):
         self.process_files(file_list)
         potfiles = []
         for path in self.locale_paths:
-            potfile = os.path.join(path, "{}.pot".format(self.domain))
+            potfile = os.path.join(path, f"{self.domain}.pot")
             if not os.path.exists(potfile):
                 continue
             args = ["msguniq", *self.msguniq_options, potfile]
@@ -512,7 +502,7 @@ class Command(BaseCommand):
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
-                        "errors happened while running msguniq\n{}".format(errors)
+                        f"errors happened while running msguniq\n{errors}"
                     )
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
@@ -524,7 +514,7 @@ class Command(BaseCommand):
 
     def remove_potfiles(self):
         for path in self.locale_paths:
-            pot_path = os.path.join(path, "{}.pot".format(self.domain))
+            pot_path = os.path.join(path, f"{self.domain}.pot")
             if os.path.exists(pot_path):
                 os.unlink(pot_path)
 
@@ -554,7 +544,7 @@ class Command(BaseCommand):
                 ):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
-                        self.stdout.write("ignoring directory {}".format(dirname))
+                        self.stdout.write(f"ignoring directory {dirname}")
                 elif dirname == "locale":
                     dirnames.remove(dirname)
                     locale_dir = os.path.join(os.path.abspath(dirpath), dirname)
@@ -568,9 +558,7 @@ class Command(BaseCommand):
                     file_path, self.ignore_patterns
                 ):
                     if self.verbosity > 1:
-                        self.stdout.write(
-                            "ignoring file {} in {}".format(filename, dirpath)
-                        )
+                        self.stdout.write(f"ignoring file {filename} in {dirpath}")
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
@@ -606,9 +594,7 @@ class Command(BaseCommand):
         for translatable in files:
             if self.verbosity > 1:
                 self.stdout.write(
-                    "processing file {} in {}".format(
-                        translatable.file, translatable.dirpath
-                    )
+                    f"processing file {translatable.file} in {translatable.dirpath}"
                 )
             if self.domain not in ("djangojs", "django"):
                 continue
@@ -617,11 +603,7 @@ class Command(BaseCommand):
                 build_file.preprocess()
             except UnicodeDecodeError as e:
                 self.stdout.write(
-                    "UnicodeDecodeError: skipped file {} in {} (reason: {})".format(
-                        translatable.file,
-                        translatable.dirpath,
-                        e,
-                    )
+                    f"UnicodeDecodeError: skipped file {translatable.file} in {translatable.dirpath} (reason: {e})"
                 )
                 continue
             except BaseException:
@@ -690,12 +672,12 @@ class Command(BaseCommand):
                 file_path = os.path.normpath(build_files[0].path)
                 raise CommandError(
                     "Unable to find a locale path to store translations for "
-                    "file {}. Make sure the 'locale' directory exists in an "
-                    "app or LOCALE_PATHS setting is set.".format(file_path)
+                    f"file {file_path}. Make sure the 'locale' directory exists in an "
+                    "app or LOCALE_PATHS setting is set."
                 )
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
-            potfile = os.path.join(locale_dir, "{}.pot".format(self.domain))
+            potfile = os.path.join(locale_dir, f"{self.domain}.pot")
             write_pot_file(potfile, msgs)
 
         for build_file in build_files:
@@ -710,7 +692,7 @@ class Command(BaseCommand):
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, "LC_MESSAGES")
         os.makedirs(basedir, exist_ok=True)
-        pofile = os.path.join(basedir, "{}.po".format(self.domain))
+        pofile = os.path.join(basedir, f"{self.domain}.po")
 
         if os.path.exists(pofile):
             args = ["msgmerge", *self.msgmerge_options, pofile, potfile]
@@ -718,7 +700,7 @@ class Command(BaseCommand):
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
-                        "errors happened while running msgmerge\n{}".format(errors)
+                        f"errors happened while running msgmerge\n{errors}"
                     )
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
@@ -730,7 +712,7 @@ class Command(BaseCommand):
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = normalize_eols(msgs)
         msgs = msgs.replace(
-            "#. #-#-#-#-#  {}.pot (PACKAGE VERSION)  #-#-#-#-#\n".format(self.domain),
+            f"#. #-#-#-#-#  {self.domain}.pot (PACKAGE VERSION)  #-#-#-#-#\n",
             "",
         )
         with open(pofile, "w", encoding="utf-8") as fp:
@@ -742,7 +724,7 @@ class Command(BaseCommand):
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
-                        "errors happened while running msgattrib\n{}".format(errors)
+                        f"errors happened while running msgattrib\n{errors}"
                     )
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
@@ -765,7 +747,7 @@ class Command(BaseCommand):
                 "locale",
                 locale,
                 "LC_MESSAGES",
-                "{}.po".format(domain),
+                f"{domain}.po",
             )
             if os.path.exists(django_po):
                 with open(django_po, encoding="utf-8") as fp:
@@ -773,9 +755,7 @@ class Command(BaseCommand):
                 if m:
                     plural_form_line = m["value"]
                     if self.verbosity > 1:
-                        self.stdout.write(
-                            "copying plural forms: {}".format(plural_form_line)
-                        )
+                        self.stdout.write(f"copying plural forms: {plural_form_line}")
                     lines = []
                     found = False
                     for line in msgs.splitlines():

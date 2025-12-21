@@ -747,11 +747,7 @@ class ManyToOneTests(TestCase):
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
-        msg = (
-            'Cannot assign "{!r}": "Child.parent" must be a "Parent" instance.'.format(
-                c
-            )
-        )
+        msg = f'Cannot assign "{c!r}": "Child.parent" must be a "Parent" instance.'
         with self.assertRaisesMessage(ValueError, msg):
             Child.objects.create(name="Grandchild", parent=c)
 
@@ -893,7 +889,7 @@ class ManyToOneTests(TestCase):
     def test_add_remove_set_by_pk_raises(self):
         usa = Country.objects.create(name="United States")
         chicago = City.objects.create(name="Chicago")
-        msg = "'City' instance expected, got {}".format(chicago.pk)
+        msg = f"'City' instance expected, got {chicago.pk}"
         with self.assertRaisesMessage(TypeError, msg):
             usa.cities.add(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):

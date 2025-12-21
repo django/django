@@ -447,7 +447,7 @@ class IsOverriddenTest(SimpleTestCase):
     def test_evaluated_lazysettings_repr(self):
         lazy_settings = LazySettings()
         module = os.environ.get(ENVIRONMENT_VARIABLE)
-        expected = '<LazySettings "{}">'.format(module)
+        expected = f'<LazySettings "{module}">'
         # Force evaluation of the lazy object.
         lazy_settings.APPEND_SLASH
         self.assertEqual(repr(lazy_settings), expected)
@@ -461,7 +461,7 @@ class IsOverriddenTest(SimpleTestCase):
     def test_settings_repr(self):
         module = os.environ.get(ENVIRONMENT_VARIABLE)
         lazy_settings = Settings(module)
-        expected = '<Settings "{}">'.format(module)
+        expected = f'<Settings "{module}">'
         self.assertEqual(repr(lazy_settings), expected)
 
 

@@ -291,7 +291,7 @@ class BaseDatabaseOperations:
         else:
             u_params = {to_string(k): to_string(v) for k, v in params.items()}
 
-        return "QUERY = {!r} - PARAMS = {!r}".format(sql, u_params)
+        return f"QUERY = {sql!r} - PARAMS = {u_params!r}"
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -372,10 +372,7 @@ class BaseDatabaseOperations:
         if not fields:
             return "", ()
         columns = [
-            "{}.{}".format(
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
+            f"{self.quote_name(field.model._meta.db_table)}.{self.quote_name(field.column)}"
             for field in fields
         ]
         return "RETURNING {}".format(", ".join(columns)), ()
@@ -425,19 +422,19 @@ class BaseDatabaseOperations:
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
-        return "SAVEPOINT {}".format(self.quote_name(sid))
+        return f"SAVEPOINT {self.quote_name(sid)}"
 
     def savepoint_commit_sql(self, sid):
         """
         Return the SQL for committing the given savepoint.
         """
-        return "RELEASE SAVEPOINT {}".format(self.quote_name(sid))
+        return f"RELEASE SAVEPOINT {self.quote_name(sid)}"
 
     def savepoint_rollback_sql(self, sid):
         """
         Return the SQL for rolling back the given savepoint.
         """
-        return "ROLLBACK TO SAVEPOINT {}".format(self.quote_name(sid))
+        return f"ROLLBACK TO SAVEPOINT {self.quote_name(sid)}"
 
     def set_time_zone_sql(self):
         """
@@ -696,7 +693,7 @@ class BaseDatabaseOperations:
         can vary between backends (e.g., Oracle with %% and &) and between
         subexpression types (e.g., date expressions).
         """
-        conn = " {} ".format(connector)
+        conn = f" {connector} "
         return conn.join(sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
@@ -728,9 +725,9 @@ class BaseDatabaseOperations:
         if self.connection.features.supports_temporal_subtraction:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "({} - {})".format(lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
+            return f"({lhs_sql} - {rhs_sql})", (*lhs_params, *rhs_params)
         raise NotSupportedError(
-            "This backend does not support {} subtraction.".format(internal_type)
+            f"This backend does not support {internal_type} subtraction."
         )
 
     def window_frame_value(self, value):
@@ -766,15 +763,13 @@ class BaseDatabaseOperations:
         ):
             raise ValueError(
                 "start argument must be a negative integer, zero, or None, "
-                "but got '{}'.".format(start)
+                f"but got '{start}'."
             )
         if (end is not None and not isinstance(end, int)) or (
             isinstance(end, int) and end < 0
         ):
             raise ValueError(
-                "end argument must be a positive integer, zero, or None, but got '{}'.".format(
-                    end
-                )
+                f"end argument must be a positive integer, zero, or None, but got '{end}'."
             )
         start_ = self.window_frame_value(start) or self.UNBOUNDED_PRECEDING
         end_ = self.window_frame_value(end) or self.UNBOUNDED_FOLLOWING
@@ -783,8 +778,8 @@ class BaseDatabaseOperations:
             (start and start < 0) or (end and end > 0)
         ):
             raise NotSupportedError(
-                "{} only supports UNBOUNDED together with PRECEDING and "
-                "FOLLOWING.".format(self.connection.display_name)
+                f"{self.connection.display_name} only supports UNBOUNDED together with PRECEDING and "
+                "FOLLOWING."
             )
         return start_, end_
 
@@ -797,7 +792,7 @@ class BaseDatabaseOperations:
             supported_formats = self.connection.features.supported_explain_formats
             normalized_format = format.upper()
             if normalized_format not in supported_formats:
-                msg = "{} is not a recognized format.".format(normalized_format)
+                msg = f"{normalized_format} is not a recognized format."
                 if supported_formats:
                     msg += " Allowed formats: {}".format(
                         ", ".join(sorted(supported_formats))
@@ -833,7 +828,7 @@ class BaseDatabaseOperations:
         """
         Hook for backends to customize array indexing in JSON paths.
         """
-        return "[{}]".format(num)
+        return f"[{num}]"
 
     def compile_json_path(self, key_transforms, include_root=True):
         """

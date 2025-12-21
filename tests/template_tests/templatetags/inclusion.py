@@ -27,7 +27,7 @@ inclusion_no_params_from_template.anything = (
 @register.inclusion_tag("inclusion.html")
 def inclusion_one_param(arg):
     """Expected inclusion_one_param __doc__"""
-    return {"result": "inclusion_one_param - Expected result: {}".format(arg)}
+    return {"result": f"inclusion_one_param - Expected result: {arg}"}
 
 
 inclusion_one_param.anything = "Expected inclusion_one_param __dict__"
@@ -36,9 +36,7 @@ inclusion_one_param.anything = "Expected inclusion_one_param __dict__"
 @register.inclusion_tag(engine.get_template("inclusion.html"))
 def inclusion_one_param_from_template(arg):
     """Expected inclusion_one_param_from_template __doc__"""
-    return {
-        "result": "inclusion_one_param_from_template - Expected result: {}".format(arg)
-    }
+    return {"result": f"inclusion_one_param_from_template - Expected result: {arg}"}
 
 
 inclusion_one_param_from_template.anything = (
@@ -49,7 +47,7 @@ inclusion_one_param_from_template.anything = (
 @register.inclusion_tag("inclusion.html", takes_context=False)
 def inclusion_explicit_no_context(arg):
     """Expected inclusion_explicit_no_context __doc__"""
-    return {"result": "inclusion_explicit_no_context - Expected result: {}".format(arg)}
+    return {"result": f"inclusion_explicit_no_context - Expected result: {arg}"}
 
 
 inclusion_explicit_no_context.anything = (
@@ -61,9 +59,7 @@ inclusion_explicit_no_context.anything = (
 def inclusion_explicit_no_context_from_template(arg):
     """Expected inclusion_explicit_no_context_from_template __doc__"""
     return {
-        "result": "inclusion_explicit_no_context_from_template - Expected result: {}".format(
-            arg
-        )
+        "result": f"inclusion_explicit_no_context_from_template - Expected result: {arg}"
     }
 
 
@@ -135,7 +131,7 @@ inclusion_params_and_context_from_template.anything = (
 @register.inclusion_tag("inclusion.html")
 def inclusion_two_params(one, two):
     """Expected inclusion_two_params __doc__"""
-    return {"result": "inclusion_two_params - Expected result: {}, {}".format(one, two)}
+    return {"result": f"inclusion_two_params - Expected result: {one}, {two}"}
 
 
 inclusion_two_params.anything = "Expected inclusion_two_params __dict__"
@@ -145,9 +141,7 @@ inclusion_two_params.anything = "Expected inclusion_two_params __dict__"
 def inclusion_two_params_from_template(one, two):
     """Expected inclusion_two_params_from_template __doc__"""
     return {
-        "result": "inclusion_two_params_from_template - Expected result: {}, {}".format(
-            one, two
-        )
+        "result": f"inclusion_two_params_from_template - Expected result: {one}, {two}"
     }
 
 
@@ -159,9 +153,7 @@ inclusion_two_params_from_template.anything = (
 @register.inclusion_tag("inclusion.html")
 def inclusion_one_default(one, two="hi"):
     """Expected inclusion_one_default __doc__"""
-    return {
-        "result": "inclusion_one_default - Expected result: {}, {}".format(one, two)
-    }
+    return {"result": f"inclusion_one_default - Expected result: {one}, {two}"}
 
 
 inclusion_one_default.anything = "Expected inclusion_one_default __dict__"
@@ -170,9 +162,7 @@ inclusion_one_default.anything = "Expected inclusion_one_default __dict__"
 @register.inclusion_tag("inclusion.html")
 def inclusion_keyword_only_default(*, kwarg=42):
     return {
-        "result": (
-            "inclusion_keyword_only_default - Expected result: {}".format(kwarg)
-        ),
+        "result": (f"inclusion_keyword_only_default - Expected result: {kwarg}"),
     }
 
 
@@ -180,9 +170,7 @@ def inclusion_keyword_only_default(*, kwarg=42):
 def inclusion_one_default_from_template(one, two="hi"):
     """Expected inclusion_one_default_from_template __doc__"""
     return {
-        "result": "inclusion_one_default_from_template - Expected result: {}, {}".format(
-            one, two
-        )
+        "result": f"inclusion_one_default_from_template - Expected result: {one}, {two}"
     }
 
 
@@ -268,7 +256,7 @@ def inclusion_unlimited_args_kwargs(one, two="hi", *args, **kwargs):
     return {
         "result": "inclusion_unlimited_args_kwargs - Expected result: {} / {}".format(
             ", ".join(str(arg) for arg in [one, two, *args]),
-            ", ".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
+            ", ".join(f"{k}={v}" for (k, v) in kwargs.items()),
         )
     }
 

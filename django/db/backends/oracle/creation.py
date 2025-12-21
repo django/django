@@ -38,9 +38,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     if "ORA-01543" not in str(e):
                         # All errors except "tablespace already exists" cancel
                         # tests
-                        self.log(
-                            "Got an error creating the test database: {}".format(e)
-                        )
+                        self.log(f"Got an error creating the test database: {e}")
                         sys.exit(2)
                     if not autoclobber:
                         confirm = input(
@@ -52,9 +50,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     if autoclobber or confirm == "yes":
                         if verbosity >= 1:
                             self.log(
-                                "Destroying old test database for alias '{}'...".format(
-                                    self.connection.alias
-                                )
+                                f"Destroying old test database for alias '{self.connection.alias}'..."
                             )
                         try:
                             self._execute_test_db_destruction(
@@ -69,16 +65,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                                 # Ran into a database error that isn't about
                                 # leftover objects in the tablespace.
                                 self.log(
-                                    "Got an error destroying the old test database: {}".format(
-                                        e
-                                    )
+                                    f"Got an error destroying the old test database: {e}"
                                 )
                                 sys.exit(2)
                         except Exception as e:
                             self.log(
-                                "Got an error destroying the old test database: {}".format(
-                                    e
-                                )
+                                f"Got an error destroying the old test database: {e}"
                             )
                             sys.exit(2)
                         try:
@@ -86,11 +78,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                                 cursor, parameters, verbosity, keepdb
                             )
                         except Exception as e:
-                            self.log(
-                                "Got an error recreating the test database: {}".format(
-                                    e
-                                )
-                            )
+                            self.log(f"Got an error recreating the test database: {e}")
                             sys.exit(2)
                     else:
                         self.log("Tests cancelled.")
@@ -104,7 +92,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 except Exception as e:
                     if "ORA-01920" not in str(e):
                         # All errors except "user already exists" cancel tests
-                        self.log("Got an error creating the test user: {}".format(e))
+                        self.log(f"Got an error creating the test user: {e}")
                         sys.exit(2)
                     if not autoclobber:
                         confirm = input(
@@ -124,9 +112,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                                 cursor, parameters, verbosity, keepdb
                             )
                         except Exception as e:
-                            self.log(
-                                "Got an error recreating the test user: {}".format(e)
-                            )
+                            self.log(f"Got an error recreating the test user: {e}")
                             sys.exit(2)
                     else:
                         self.log("Tests cancelled.")
@@ -192,18 +178,16 @@ class DatabaseCreation(BaseDatabaseCreation):
                         self.log("Destroying old test user...")
                     self._destroy_test_user(cursor, parameters, verbosity)
                 except Exception as e:
-                    self.log("Got an error destroying the test user: {}".format(e))
+                    self.log(f"Got an error destroying the test user: {e}")
                     sys.exit(2)
                 try:
                     if verbosity >= 1:
                         self.log(
-                            "Destroying old test database for alias '{}'...".format(
-                                self.connection.alias
-                            )
+                            f"Destroying old test database for alias '{self.connection.alias}'..."
                         )
                     self._execute_test_db_destruction(cursor, parameters, verbosity)
                 except Exception as e:
-                    self.log("Got an error destroying the test database: {}".format(e))
+                    self.log(f"Got an error destroying the test database: {e}")
                     sys.exit(2)
             else:
                 self.log("Tests cancelled -- test database cannot be recreated.")
@@ -314,9 +298,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             )
             if not success and verbosity >= 2:
                 self.log(
-                    "Failed to grant CREATE {} permission to test user. This may be ok.".format(
-                        object_type
-                    )
+                    f"Failed to grant CREATE {object_type} permission to test user. This may be ok."
                 )
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
@@ -352,7 +334,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 cursor.execute(stmt)
             except Exception as err:
                 if (not allow_quiet_fail) or verbosity >= 2:
-                    self.log("Failed ({})".format(err))
+                    self.log(f"Failed ({err})")
                 raise
 
     def _execute_allow_fail_statements(
@@ -440,11 +422,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         )
 
     def _test_database_tblspace_datafile(self):
-        tblspace = "{}.dbf".format(self._test_database_tblspace())
+        tblspace = f"{self._test_database_tblspace()}.dbf"
         return self._test_settings_get("DATAFILE", default=tblspace)
 
     def _test_database_tblspace_tmp_datafile(self):
-        tblspace = "{}.dbf".format(self._test_database_tblspace_tmp())
+        tblspace = f"{self._test_database_tblspace_tmp()}.dbf"
         return self._test_settings_get("DATAFILE_TMP", default=tblspace)
 
     def _test_database_tblspace_maxsize(self):

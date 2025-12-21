@@ -340,7 +340,7 @@ class PickleabilityTestCase(TestCase):
         qs = Group.previous_django_version_objects.all()
         msg = (
             "Pickled queryset instance's Django version 1.0 does not match "
-            "the current version {}.".format(django.__version__)
+            f"the current version {django.__version__}."
         )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
@@ -379,7 +379,7 @@ class InLookupTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         for i in range(1, 3):
-            group = Group.objects.create(name="Group {}".format(i))
+            group = Group.objects.create(name=f"Group {i}")
         cls.e1 = Event.objects.create(title="Event 1", group=group)
 
     def test_in_lookup_queryset_evaluation(self):

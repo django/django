@@ -54,7 +54,7 @@ class MigrateTests(TransactionTestCase):
         else:
             qs = GeoColumn.objects.filter(
                 **{
-                    "{}__in".format(GeoColumn.table_name_col()): [
+                    f"{GeoColumn.table_name_col()}__in": [
                         "gis_neighborhood",
                         "gis_household",
                     ]

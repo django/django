@@ -26,7 +26,7 @@ class LocalizeNode(Node):
         self.use_l10n = use_l10n
 
     def __repr__(self):
-        return "<{}>".format(self.__class__.__name__)
+        return f"<{self.__class__.__name__}>"
 
     def render(self, context):
         old_setting = context.use_l10n
@@ -52,9 +52,7 @@ def localize_tag(parser, token):
     if len(bits) == 1:
         use_l10n = True
     elif len(bits) > 2 or bits[1] not in ("on", "off"):
-        raise TemplateSyntaxError(
-            "{!r} argument should be 'on' or 'off'".format(bits[0])
-        )
+        raise TemplateSyntaxError(f"{bits[0]!r} argument should be 'on' or 'off'")
     else:
         use_l10n = bits[1] == "on"
     nodelist = parser.parse(("endlocalize",))

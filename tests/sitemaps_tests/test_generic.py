@@ -37,16 +37,14 @@ class GenericViewsSitemapTests(SitemapTestsBase):
         response = self.client.get("/generic/sitemap.xml")
         expected = ""
         for pk in TestModel.objects.values_list("id", flat=True):
-            expected += "<url><loc>{}/testmodel/{}/</loc></url>".format(
-                self.base_url, pk
-            )
+            expected += f"<url><loc>{self.base_url}/testmodel/{pk}/</loc></url>"
         expected_content = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "{}\n"
+            f"{expected}\n"
             "</urlset>"
-        ).format(expected)
+        )
         self.assertXMLEqual(response.text, expected_content)
 
     def test_generic_sitemap_lastmod(self):
@@ -57,11 +55,8 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-            "<url><loc>{}/testmodel/{}/</loc><lastmod>2013-03-13</lastmod></url>\n"
+            f"<url><loc>{self.base_url}/testmodel/{test_model.pk}/</loc><lastmod>2013-03-13</lastmod></url>\n"
             "</urlset>"
-        ).format(
-            self.base_url,
-            test_model.pk,
         )
         self.assertXMLEqual(response.text, expected_content)
         self.assertEqual(

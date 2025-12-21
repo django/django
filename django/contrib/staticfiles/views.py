@@ -35,6 +35,6 @@ def serve(request, path, insecure=False, **kwargs):
     if not absolute_path:
         if path.endswith("/") or path == "":
             raise Http404("Directory indexes are not allowed here.")
-        raise Http404("'{}' could not be found".format(path))
+        raise Http404(f"'{path}' could not be found")
     document_root, path = os.path.split(absolute_path)
     return static.serve(request, path, document_root=document_root, **kwargs)

@@ -341,10 +341,7 @@ class LogEntryTests(TestCase):
         """
         response = self.client.get(reverse("admin:index"))
         link = reverse("admin:admin_utils_article_change", args=(quote(self.a1.pk),))
-        should_contain = """<a href="{}">{}</a>""".format(
-            escape(link),
-            escape(str(self.a1)),
-        )
+        should_contain = f"""<a href="{escape(link)}">{escape(str(self.a1))}</a>"""
         self.assertContains(response, should_contain)
         should_contain = "Article"
         self.assertContains(response, should_contain)

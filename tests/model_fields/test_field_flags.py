@@ -134,7 +134,7 @@ class FieldFlagsTests(test.SimpleTestCase):
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(
                     hasattr(field, flag),
-                    "Field {} does not have flag {}".format(field, flag),
+                    f"Field {field} does not have flag {flag}",
                 )
             if field.is_relation:
                 true_cardinality_flags = sum(

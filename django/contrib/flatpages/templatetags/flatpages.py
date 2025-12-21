@@ -72,8 +72,8 @@ def get_flatpages(parser, token):
     """
     bits = token.split_contents()
     syntax_message = (
-        "{tag_name} expects a syntax of {tag_name} "
-        "['url_starts_with'] [for user] as context_name".format(tag_name=bits[0])
+        f"{bits[0]} expects a syntax of {bits[0]} "
+        "['url_starts_with'] [for user] as context_name"
     )
     # Must have at 3-6 bits in the tag
     if 3 <= len(bits) <= 6:

@@ -176,7 +176,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         # Use UPPER(x) for case-insensitive lookups; it's faster.
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
-            lookup = "UPPER({})".format(lookup)
+            lookup = f"UPPER({lookup})"
 
         return lookup
 
@@ -189,7 +189,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"{}"'.format(name)
+        return f'"{name}"'
 
     def compose_sql(self, sql, params):
         return mogrify(sql, params, self.connection)
@@ -233,9 +233,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def tablespace_sql(self, tablespace, inline=False):
         if inline:
-            return "USING INDEX TABLESPACE {}".format(self.quote_name(tablespace))
+            return f"USING INDEX TABLESPACE {self.quote_name(tablespace)}"
         else:
-            return "TABLESPACE {}".format(self.quote_name(tablespace))
+            return f"TABLESPACE {self.quote_name(tablespace)}"
 
     def sequence_reset_sql(self, style, model_list):
         from django.db import models
@@ -347,7 +347,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             params = (*lhs_params, *rhs_params)
-            return "(interval '1 day' * ({} - {}))".format(lhs_sql, rhs_sql), params
+            return f"(interval '1 day' * ({lhs_sql} - {rhs_sql}))", params
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def explain_query_prefix(self, format=None, **options):

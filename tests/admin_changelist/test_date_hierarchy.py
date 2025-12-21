@@ -21,7 +21,7 @@ class DateHierarchyTests(TestCase):
         )
 
     def assertDateParams(self, query, expected_from_date, expected_to_date):
-        query = {"date__{}".format(field): val for field, val in query.items()}
+        query = {f"date__{field}": val for field, val in query.items()}
         request = self.factory.get("/", query)
         request.user = self.superuser
         changelist = EventAdmin(Event, custom_site).get_changelist_instance(request)

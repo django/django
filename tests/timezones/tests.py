@@ -735,7 +735,7 @@ class SerializationTests(SimpleTestCase):
         self.assertEqual(objects[0]["fields"]["dt"], dt)
 
     def assert_json_contains_datetime(self, json, dt):
-        self.assertIn('"fields": {{"dt": "{}"}}'.format(dt), json)
+        self.assertIn(f'"fields": {{"dt": "{dt}"}}', json)
 
     def assert_xml_contains_datetime(self, xml, dt):
         field = parseString(xml).getElementsByTagName("field")[0]
@@ -743,9 +743,7 @@ class SerializationTests(SimpleTestCase):
 
     def assert_yaml_contains_datetime(self, yaml, dt):
         # Depending on the yaml dumper, '!timestamp' might be absent
-        self.assertRegex(
-            yaml, r"\n  fields: {{dt: !(!timestamp)? '{}'}}".format(re.escape(dt))
-        )
+        self.assertRegex(yaml, rf"\n  fields: {{dt: !(!timestamp)? '{re.escape(dt)}'}}")
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -1004,7 +1002,7 @@ class TemplateTests(SimpleTestCase):
                 self.assertEqual(
                     actual,
                     expected,
-                    "{} / {}: {!r} != {!r}".format(k1, k2, actual, expected),
+                    f"{k1} / {k2}: {actual!r} != {expected!r}",
                 )
 
         # Changes for USE_TZ = False
@@ -1021,7 +1019,7 @@ class TemplateTests(SimpleTestCase):
                     self.assertEqual(
                         actual,
                         expected,
-                        "{} / {}: {!r} != {!r}".format(k1, k2, actual, expected),
+                        f"{k1} / {k2}: {actual!r} != {expected!r}",
                     )
 
     def test_localtime_filters_with_iana(self):

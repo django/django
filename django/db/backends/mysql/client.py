@@ -29,9 +29,9 @@ class DatabaseClient(BaseDatabaseClient):
         # Seems to be no good way to set sql_mode with CLI.
 
         if defaults_file:
-            args += ["--defaults-file={}".format(defaults_file)]
+            args += [f"--defaults-file={defaults_file}"]
         if user:
-            args += ["--user={}".format(user)]
+            args += [f"--user={user}"]
         if password:
             # The MYSQL_PWD environment variable usage is discouraged per
             # MySQL's documentation due to the possibility of exposure through
@@ -43,19 +43,19 @@ class DatabaseClient(BaseDatabaseClient):
             env = {"MYSQL_PWD": password}
         if host:
             if "/" in host:
-                args += ["--socket={}".format(host)]
+                args += [f"--socket={host}"]
             else:
-                args += ["--host={}".format(host)]
+                args += [f"--host={host}"]
         if port:
-            args += ["--port={}".format(port)]
+            args += [f"--port={port}"]
         if server_ca:
-            args += ["--ssl-ca={}".format(server_ca)]
+            args += [f"--ssl-ca={server_ca}"]
         if client_cert:
-            args += ["--ssl-cert={}".format(client_cert)]
+            args += [f"--ssl-cert={client_cert}"]
         if client_key:
-            args += ["--ssl-key={}".format(client_key)]
+            args += [f"--ssl-key={client_key}"]
         if charset:
-            args += ["--default-character-set={}".format(charset)]
+            args += [f"--default-character-set={charset}"]
         if database:
             args += [database]
         args.extend(parameters)

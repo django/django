@@ -47,9 +47,9 @@ class Command(BaseCommand):
                 **{UserModel.USERNAME_FIELD: username}
             )
         except UserModel.DoesNotExist:
-            raise CommandError("user '{}' does not exist".format(username))
+            raise CommandError(f"user '{username}' does not exist")
 
-        self.stdout.write("Changing password for user '{}'".format(u))
+        self.stdout.write(f"Changing password for user '{u}'")
 
         MAX_TRIES = 3
         count = 0
@@ -73,12 +73,10 @@ class Command(BaseCommand):
 
         if count == MAX_TRIES:
             raise CommandError(
-                "Aborting password change for user '{}' after {} attempts".format(
-                    u, count
-                )
+                f"Aborting password change for user '{u}' after {count} attempts"
             )
 
         u.set_password(p1)
         u.save()
 
-        return "Password changed successfully for user '{}'".format(u)
+        return f"Password changed successfully for user '{u}'"

@@ -75,8 +75,7 @@ class IndexNameTests(ColumnsTests):
     def setUp(self):
         def create_index_name(table_name, column_names, suffix):
             return ", ".join(
-                "{}_{}_{}".format(table_name, column_name, suffix)
-                for column_name in column_names
+                f"{table_name}_{column_name}_{suffix}" for column_name in column_names
             )
 
         self.reference = IndexName(
@@ -99,8 +98,7 @@ class ForeignKeyNameTests(IndexNameTests):
     def setUp(self):
         def create_foreign_key_name(table_name, column_names, suffix):
             return ", ".join(
-                "{}_{}_{}".format(table_name, column_name, suffix)
-                for column_name in column_names
+                f"{table_name}_{column_name}_{suffix}" for column_name in column_names
             )
 
         self.reference = ForeignKeyName(

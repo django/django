@@ -725,7 +725,7 @@ class ResolverTests(SimpleTestCase):
                         if not e["name"]:
                             self.assertIsNone(
                                 t.name,
-                                "Expected no URL name but found {}.".format(t.name),
+                                f"Expected no URL name but found {t.name}.",
                             )
                         else:
                             self.assertEqual(
@@ -1445,7 +1445,7 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
+            f"{middleware.__name__}.ChangeURLconfMiddleware",
         ]
     )
     def test_urlconf_overridden(self):
@@ -1459,7 +1459,7 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.NullChangeURLconfMiddleware".format(middleware.__name__),
+            f"{middleware.__name__}.NullChangeURLconfMiddleware",
         ]
     )
     def test_urlconf_overridden_with_null(self):
@@ -1479,8 +1479,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
-            "{}.ReverseInnerInResponseMiddleware".format(middleware.__name__),
+            f"{middleware.__name__}.ChangeURLconfMiddleware",
+            f"{middleware.__name__}.ReverseInnerInResponseMiddleware",
         ]
     )
     def test_reverse_inner_in_response_middleware(self):
@@ -1494,8 +1494,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
-            "{}.ReverseOuterInResponseMiddleware".format(middleware.__name__),
+            f"{middleware.__name__}.ChangeURLconfMiddleware",
+            f"{middleware.__name__}.ReverseOuterInResponseMiddleware",
         ]
     )
     def test_reverse_outer_in_response_middleware(self):
@@ -1512,8 +1512,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
-            "{}.ReverseInnerInStreaming".format(middleware.__name__),
+            f"{middleware.__name__}.ChangeURLconfMiddleware",
+            f"{middleware.__name__}.ReverseInnerInStreaming",
         ]
     )
     def test_reverse_inner_in_streaming(self):
@@ -1527,8 +1527,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
-            "{}.ReverseOuterInStreaming".format(middleware.__name__),
+            f"{middleware.__name__}.ChangeURLconfMiddleware",
+            f"{middleware.__name__}.ReverseOuterInStreaming",
         ]
     )
     def test_reverse_outer_in_streaming(self):
@@ -1545,7 +1545,7 @@ class RequestURLconfTests(SimpleTestCase):
         """The URLconf is reset after each request."""
         self.assertIsNone(get_urlconf())
         with override_settings(
-            MIDDLEWARE=["{}.ChangeURLconfMiddleware".format(middleware.__name__)]
+            MIDDLEWARE=[f"{middleware.__name__}.ChangeURLconfMiddleware"]
         ):
             self.client.get(reverse("inner"))
         self.assertIsNone(get_urlconf())

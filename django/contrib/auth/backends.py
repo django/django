@@ -110,17 +110,17 @@ class ModelBackend(BaseBackend):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
-        perm_cache_name = "_{}_perm_cache".format(from_name)
+        perm_cache_name = f"_{from_name}_perm_cache"
         if not hasattr(user_obj, perm_cache_name):
             if user_obj.is_superuser:
                 perms = Permission.objects.all()
             else:
-                perms = getattr(self, "_get_{}_permissions".format(from_name))(user_obj)
+                perms = getattr(self, f"_get_{from_name}_permissions")(user_obj)
             perms = perms.values_list("content_type__app_label", "codename").order_by()
             setattr(
                 user_obj,
                 perm_cache_name,
-                {"{}.{}".format(ct, name) for ct, name in perms},
+                {f"{ct}.{name}" for ct, name in perms},
             )
         return getattr(user_obj, perm_cache_name)
 
@@ -129,17 +129,17 @@ class ModelBackend(BaseBackend):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
-        perm_cache_name = "_{}_perm_cache".format(from_name)
+        perm_cache_name = f"_{from_name}_perm_cache"
         if not hasattr(user_obj, perm_cache_name):
             if user_obj.is_superuser:
                 perms = Permission.objects.all()
             else:
-                perms = getattr(self, "_get_{}_permissions".format(from_name))(user_obj)
+                perms = getattr(self, f"_get_{from_name}_permissions")(user_obj)
             perms = perms.values_list("content_type__app_label", "codename").order_by()
             setattr(
                 user_obj,
                 perm_cache_name,
-                {"{}.{}".format(ct, name) async for ct, name in perms},
+                {f"{ct}.{name}" async for ct, name in perms},
             )
         return getattr(user_obj, perm_cache_name)
 

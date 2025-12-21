@@ -701,12 +701,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel_uuid, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", band.uuid, attrs={}),
-            '<div><input type="text" name="test" value="{banduuid}" '
+            f'<div><input type="text" name="test" value="{band.uuid}" '
             'class="vForeignKeyRawIdAdminField vUUIDField">'
             '<a href="/admin_widgets/band/?_to_field=uuid" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
-            '<a href="/admin_widgets/band/{bandpk}/change/">Linkin Park</a>'
-            "</strong></div>".format(banduuid=band.uuid, bandpk=band.pk),
+            f'<a href="/admin_widgets/band/{band.pk}/change/">Linkin Park</a>'
+            "</strong></div>",
         )
 
         rel_id = ReleaseEvent._meta.get_field("album").remote_field
@@ -732,8 +732,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong><a href="/admin_widgets/inventory/{pk}/change/">'
-            "Apple</a></strong></div>".format(pk=apple.pk),
+            f'&nbsp;<strong><a href="/admin_widgets/inventory/{apple.pk}/change/">'
+            "Apple</a></strong></div>",
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -746,10 +746,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("honeycomb_widget", big_honeycomb.pk, attrs={}),
-            '<input type="text" name="honeycomb_widget" value="{hcombpk}">'
-            "&nbsp;<strong>{hcomb}</strong>".format(
-                hcombpk=big_honeycomb.pk, hcomb=big_honeycomb
-            ),
+            f'<input type="text" name="honeycomb_widget" value="{big_honeycomb.pk}">'
+            f"&nbsp;<strong>{big_honeycomb}</strong>",
         )
 
     def test_fk_to_self_model_not_in_admin(self):
@@ -762,10 +760,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("individual_widget", subject1.pk, attrs={}),
-            '<input type="text" name="individual_widget" value="{subj1pk}">'
-            "&nbsp;<strong>{subj1}</strong>".format(
-                subj1pk=subject1.pk, subj1=subject1
-            ),
+            f'<input type="text" name="individual_widget" value="{subject1.pk}">'
+            f"&nbsp;<strong>{subject1}</strong>",
         )
 
     def test_proper_manager_for_label_lookup(self):
@@ -783,8 +779,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '   class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong><a href="/admin_widgets/inventory/{pk}/change/">'
-            "Hidden</a></strong></div>".format(pk=hidden.pk),
+            f'&nbsp;<strong><a href="/admin_widgets/inventory/{hidden.pk}/change/">'
+            "Hidden</a></strong></div>",
         )
 
     def test_render_unsafe_limit_choices_to(self):
@@ -823,21 +819,21 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk, m2.pk], attrs={}),
             (
-                '<div><input type="text" name="test" value="{m1pk},{m2pk}" '
+                f'<div><input type="text" name="test" value="{m1.pk},{m2.pk}" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
                 '   id="lookup_id_test" title="Lookup"></a></div>'
-            ).format(m1pk=m1.pk, m2pk=m2.pk),
+            ),
         )
 
         self.assertHTMLEqual(
             w.render("test", [m1.pk]),
             (
-                '<div><input type="text" name="test" value="{m1pk}" '
+                f'<div><input type="text" name="test" value="{m1.pk}" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
                 '   id="lookup_id_test" title="Lookup"></a></div>'
-            ).format(m1pk=m1.pk),
+            ),
         )
 
     def test_m2m_related_model_not_in_admin(self):
@@ -853,16 +849,12 @@ class ManyToManyRawIdWidgetTest(TestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("company_widget1", [c1.pk, c2.pk], attrs={}),
-            '<input type="text" name="company_widget1" value="{c1pk},{c2pk}">'.format(
-                c1pk=c1.pk, c2pk=c2.pk
-            ),
+            f'<input type="text" name="company_widget1" value="{c1.pk},{c2.pk}">',
         )
 
         self.assertHTMLEqual(
             w.render("company_widget2", [c1.pk]),
-            '<input type="text" name="company_widget2" value="{c1pk}">'.format(
-                c1pk=c1.pk
-            ),
+            f'<input type="text" name="company_widget2" value="{c1.pk}">',
         )
 
 
@@ -1192,7 +1184,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
                 # Get the expected caption.
                 may_translation = month_name
-                expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
+                expected_caption = f"{may_translation.upper():s} {1984:d}"
 
                 # Every locale.
                 with override_settings(LANGUAGE_CODE=language_code):
@@ -1291,10 +1283,10 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         choose_all_btn_disabled=False,
         remove_all_btn_disabled=False,
     ):
-        choose_button = "#id_{}_add".format(field_name)
-        choose_all_button = "#id_{}_add_all".format(field_name)
-        remove_button = "#id_{}_remove".format(field_name)
-        remove_all_button = "#id_{}_remove_all".format(field_name)
+        choose_button = f"#id_{field_name}_add"
+        choose_all_button = f"#id_{field_name}_add_all"
+        remove_button = f"#id_{field_name}_remove"
+        remove_all_button = f"#id_{field_name}_remove_all"
         self.assertEqual(self.is_disabled(choose_button), choose_btn_disabled)
         self.assertEqual(self.is_disabled(remove_button), remove_btn_disabled)
         if mode == "horizontal":
@@ -1310,12 +1302,12 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         original_url = self.selenium.current_url
 
-        from_box = "#id_{}_from".format(field_name)
-        to_box = "#id_{}_to".format(field_name)
-        choose_button = "id_{}_add".format(field_name)
-        choose_all_button = "id_{}_add_all".format(field_name)
-        remove_button = "id_{}_remove".format(field_name)
-        remove_all_button = "id_{}_remove_all".format(field_name)
+        from_box = f"#id_{field_name}_from"
+        to_box = f"#id_{field_name}_to"
+        choose_button = f"id_{field_name}_add"
+        choose_all_button = f"id_{field_name}_add_all"
+        remove_button = f"id_{field_name}_remove"
+        remove_all_button = f"id_{field_name}_remove_all"
 
         # Initial positions ---------------------------------------------------
         self.assertSelectOptions(
@@ -1409,7 +1401,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Choose some options ------------------------------------------------
         from_lisa_select_option = self.selenium.find_element(
-            By.CSS_SELECTOR, '{} > option[value="{}"]'.format(from_box, self.lisa.id)
+            By.CSS_SELECTOR, f'{from_box} > option[value="{self.lisa.id}"]'
         )
 
         # Check the title attribute is there for tool tips: ticket #20821
@@ -1461,7 +1453,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Check the tooltip is still there after moving: ticket #20821
         to_lisa_select_option = self.selenium.find_element(
-            By.CSS_SELECTOR, '{} > option[value="{}"]'.format(to_box, self.lisa.id)
+            By.CSS_SELECTOR, f'{to_box} > option[value="{self.lisa.id}"]'
         )
         self.assertEqual(
             to_lisa_select_option.get_attribute("title"),
@@ -1608,13 +1600,11 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             )
 
             for field_name in ["students", "alumni"]:
-                from_box = "#id_{}_from".format(field_name)
-                to_box = "#id_{}_to".format(field_name)
-                choose_link = "id_{}_add".format(field_name)
-                remove_link = "id_{}_remove".format(field_name)
-                input = self.selenium.find_element(
-                    By.ID, "id_{}_input".format(field_name)
-                )
+                from_box = f"#id_{field_name}_from"
+                to_box = f"#id_{field_name}_to"
+                choose_link = f"id_{field_name}_add"
+                remove_link = f"id_{field_name}_remove"
+                input = self.selenium.find_element(By.ID, f"id_{field_name}_input")
                 # Initial values.
                 self.assertSelectOptions(
                     from_box,
@@ -1984,7 +1974,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     name_input_id = "id_name"
     photo_input_id = "id_photo"
-    tests_files_folder = "{}/files".format(Path(__file__).parent.parent)
+    tests_files_folder = f"{Path(__file__).parent.parent}/files"
     clear_checkbox_id = "photo-clear_id"
 
     def _submit_and_wait(self):

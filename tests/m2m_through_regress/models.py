@@ -58,7 +58,7 @@ class CarDriver(models.Model):
     driver = models.ForeignKey("Driver", models.CASCADE, to_field="name")
 
     def __str__(self):
-        return "pk={} car={} driver={}".format(str(self.pk), self.car, self.driver)
+        return f"pk={str(self.pk)} car={self.car} driver={self.driver}"
 
 
 # Through models using multi-table inheritance

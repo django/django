@@ -9,9 +9,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         if field.db_index and field_type.lower() in self.connection._limited_data_types:
             errors.append(
                 checks.Warning(
-                    "Oracle does not support a database index on {} columns.".format(
-                        field_type
-                    ),
+                    f"Oracle does not support a database index on {field_type} columns.",
                     hint=(
                         "An index won't be created. Silence this warning if "
                         "you don't care about it."

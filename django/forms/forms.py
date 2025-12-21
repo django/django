@@ -211,11 +211,11 @@ class BaseForm(RenderableFormMixin):
 
         Subclasses may wish to override.
         """
-        return "{}-{}".format(self.prefix, field_name) if self.prefix else field_name
+        return f"{self.prefix}-{field_name}" if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
         """Add an 'initial' prefix for checking dynamic initial values."""
-        return "initial-{}".format(self.add_prefix(field_name))
+        return f"initial-{self.add_prefix(field_name)}"
 
     def _widget_data_value(self, widget, html_name):
         # value_from_datadict() gets the data from the data dictionaries.
@@ -298,9 +298,7 @@ class BaseForm(RenderableFormMixin):
             if field not in self.errors:
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
-                        "'{}' has no field named '{}'.".format(
-                            self.__class__.__name__, field
-                        )
+                        f"'{self.__class__.__name__}' has no field named '{field}'."
                     )
                 if field == NON_FIELD_ERRORS:
                     self._errors[field] = self.error_class(
@@ -343,8 +341,8 @@ class BaseForm(RenderableFormMixin):
             field = bf.field
             try:
                 self.cleaned_data[name] = field._clean_bound_field(bf)
-                if hasattr(self, "clean_{}".format(name)):
-                    value = getattr(self, "clean_{}".format(name))()
+                if hasattr(self, f"clean_{name}"):
+                    value = getattr(self, f"clean_{name}")()
                     self.cleaned_data[name] = value
             except ValidationError as e:
                 self.add_error(name, e)

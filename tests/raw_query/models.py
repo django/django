@@ -14,7 +14,7 @@ class Author(models.Model):
         for k in kwargs:
             assert k in [
                 f.attname for f in self._meta.fields
-            ], "Author.__init__ got an unexpected parameter: {}".format(k)
+            ], f"Author.__init__ got an unexpected parameter: {k}"
 
 
 class Book(models.Model):

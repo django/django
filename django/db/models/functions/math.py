@@ -89,7 +89,7 @@ class Degrees(NumericOutputFieldMixin, Transform):
         return super().as_sql(
             compiler,
             connection,
-            template="((%(expressions)s) * 180 / {})".format(math.pi),
+            template=f"((%(expressions)s) * 180 / {math.pi})",
             **extra_context,
         )
 
@@ -151,7 +151,7 @@ class Radians(NumericOutputFieldMixin, Transform):
         return super().as_sql(
             compiler,
             connection,
-            template="((%(expressions)s) * {} / 180)".format(math.pi),
+            template=f"((%(expressions)s) * {math.pi} / 180)",
             **extra_context,
         )
 

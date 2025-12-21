@@ -129,7 +129,7 @@ def result_headers(cl):
             continue
 
         # OK, it is sortable if we got this far
-        th_classes = ["sortable", "column-{}".format(field_name)]
+        th_classes = ["sortable", f"column-{field_name}"]
         order_type = ""
         new_order_type = "asc"
         sort_priority = 0
@@ -138,7 +138,7 @@ def result_headers(cl):
         if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
-            th_classes.append("sorted {}ending".format(order_type))
+            th_classes.append(f"sorted {order_type}ending")
             new_order_type = {"asc": "desc", "desc": "asc"}[order_type]
 
         # build new ordering param
@@ -218,7 +218,7 @@ def items_for_result(cl, result, form):
     pk = cl.lookup_opts.pk.attname
     for field_index, field_name in enumerate(cl.list_display):
         empty_value_display = cl.model_admin.get_empty_value_display()
-        row_classes = ["field-{}".format(_coerce_field_name(field_name, field_index))]
+        row_classes = [f"field-{_coerce_field_name(field_name, field_index)}"]
         link_to_changelist = link_in_col(first, field_name, cl)
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
@@ -385,10 +385,10 @@ def date_hierarchy(cl):
             dates_or_datetimes = "datetimes"
         else:
             dates_or_datetimes = "dates"
-        year_field = "{}__year".format(field_name)
-        month_field = "{}__month".format(field_name)
-        day_field = "{}__day".format(field_name)
-        field_generic = "{}__".format(field_name)
+        year_field = f"{field_name}__year"
+        month_field = f"{field_name}__month"
+        day_field = f"{field_name}__day"
+        field_generic = f"{field_name}__"
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)

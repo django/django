@@ -72,9 +72,7 @@ class OperationTestCase(TransactionTestCase):
         self.assertEqual(
             GeometryColumns.objects.filter(
                 **{
-                    "{}__iexact".format(
-                        GeometryColumns.table_name_col()
-                    ): "gis_neighborhood",
+                    f"{GeometryColumns.table_name_col()}__iexact": "gis_neighborhood",
                 }
             ).count(),
             expected_count,
@@ -86,7 +84,7 @@ class OperationTestCase(TransactionTestCase):
         if raster:
             self.assertTrue(
                 any(
-                    "st_convexhull({})".format(column) in c["definition"]
+                    f"st_convexhull({column})" in c["definition"]
                     for c in constraints.values()
                     if c["definition"] is not None
                 )
@@ -100,7 +98,7 @@ class OperationTestCase(TransactionTestCase):
         if raster:
             self.assertFalse(
                 any(
-                    "st_convexhull({})".format(column) in c["definition"]
+                    f"st_convexhull({column})" in c["definition"]
                     for c in constraints.values()
                     if c["definition"] is not None
                 )

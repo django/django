@@ -280,4 +280,4 @@ class Command(BaseCommand):
                 return getattr(self, shell)(options)
             except ImportError:
                 pass
-        raise CommandError("Couldn't import {} interface.".format(shell))
+        raise CommandError(f"Couldn't import {shell} interface.")

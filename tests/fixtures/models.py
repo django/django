@@ -60,11 +60,7 @@ class Tag(models.Model):
     tagged = GenericForeignKey(ct_field="tagged_type", fk_field="tagged_id")
 
     def __str__(self):
-        return '<{}: {}> tagged "{}"'.format(
-            self.tagged.__class__.__name__,
-            self.tagged,
-            self.name,
-        )
+        return f'<{self.tagged.__class__.__name__}: {self.tagged}> tagged "{self.name}"'
 
 
 class PersonManager(models.Manager):
@@ -127,7 +123,7 @@ class Book(models.Model):
 
     def __str__(self):
         authors = " and ".join(a.name for a in self.authors.all())
-        return "{} by {}".format(self.name, authors) if authors else self.name
+        return f"{self.name} by {authors}" if authors else self.name
 
 
 class PrimaryKeyUUIDModel(models.Model):

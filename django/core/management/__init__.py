@@ -45,7 +45,7 @@ def load_command_class(app_name, name):
     class instance. Allow all errors raised by the import process
     (ImportError, AttributeError) to propagate.
     """
-    module = import_module("{}.management.commands.{}".format(app_name, name))
+    module = import_module(f"{app_name}.management.commands.{name}")
     return module.Command()
 
 
@@ -109,7 +109,7 @@ def call_command(command_name, *args, **options):
         try:
             app_name = get_commands()[command_name]
         except KeyError:
-            raise CommandError("Unknown command: {!r}".format(command_name))
+            raise CommandError(f"Unknown command: {command_name!r}")
 
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -213,9 +213,7 @@ class ManagementUtility:
         else:
             usage = [
                 "",
-                "Type '{} help <subcommand>' for help on a specific subcommand.".format(
-                    self.prog_name
-                ),
+                f"Type '{self.prog_name} help <subcommand>' for help on a specific subcommand.",
                 "",
                 "Available subcommands:",
             ]
@@ -229,17 +227,15 @@ class ManagementUtility:
             style = color_style()
             for app in sorted(commands_dict):
                 usage.append("")
-                usage.append(style.NOTICE("[{}]".format(app)))
+                usage.append(style.NOTICE(f"[{app}]"))
                 for name in sorted(commands_dict[app]):
-                    usage.append("    {}".format(name))
+                    usage.append(f"    {name}")
             # Output an extra note if settings are not properly configured
             if self.settings_exception is not None:
                 usage.append(
                     style.NOTICE(
                         "Note that only Django core commands are listed "
-                        "as settings are not properly configured (error: {}).".format(
-                            self.settings_exception
-                        )
+                        f"as settings are not properly configured (error: {self.settings_exception})."
                     )
                 )
 
@@ -265,10 +261,10 @@ class ManagementUtility:
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
-            sys.stderr.write("Unknown command: {!r}".format(subcommand))
+            sys.stderr.write(f"Unknown command: {subcommand!r}")
             if possible_matches:
-                sys.stderr.write(". Did you mean {}?".format(possible_matches[0]))
-            sys.stderr.write("\nType '{} help' for usage.\n".format(self.prog_name))
+                sys.stderr.write(f". Did you mean {possible_matches[0]}?")
+            sys.stderr.write(f"\nType '{self.prog_name} help' for usage.\n")
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.

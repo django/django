@@ -180,7 +180,7 @@ class NKChild(Parent):
         return (self.data,)
 
     def __str__(self):
-        return "NKChild {}:{}".format(self.name, self.data)
+        return f"NKChild {self.name}:{self.data}"
 
 
 class RefToNKChild(models.Model):

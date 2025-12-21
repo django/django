@@ -430,7 +430,7 @@ class PasswordResetForm(forms.Form):
         email_field_name = UserModel.get_email_field_name()
         active_users = UserModel._default_manager.filter(
             **{
-                "{}__iexact".format(email_field_name): email,
+                f"{email_field_name}__iexact": email,
                 "is_active": True,
             }
         )

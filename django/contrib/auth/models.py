@@ -77,7 +77,7 @@ class Permission(models.Model):
         ordering = ["content_type__app_label", "content_type__model", "codename"]
 
     def __str__(self):
-        return "{} | {}".format(self.content_type, self.name)
+        return f"{self.content_type} | {self.name}"
 
     def natural_key(self):
         return (self.codename, *self.content_type.natural_key())
@@ -225,9 +225,7 @@ class UserManager(BaseUserManager):
                 )
         elif not isinstance(backend, str):
             raise TypeError(
-                "backend must be a dotted import path string (got {!r}).".format(
-                    backend
-                )
+                f"backend must be a dotted import path string (got {backend!r})."
             )
         else:
             backend = auth.load_backend(backend)
@@ -244,7 +242,7 @@ class UserManager(BaseUserManager):
 # A few helper functions for common logic between User and AnonymousUser.
 def _user_get_permissions(user, obj, from_name):
     permissions = set()
-    name = "get_{}_permissions".format(from_name)
+    name = f"get_{from_name}_permissions"
     for backend in auth.get_backends():
         if hasattr(backend, name):
             permissions.update(getattr(backend, name)(user, obj))
@@ -253,7 +251,7 @@ def _user_get_permissions(user, obj, from_name):
 
 async def _auser_get_permissions(user, obj, from_name):
     permissions = set()
-    name = "aget_{}_permissions".format(from_name)
+    name = f"aget_{from_name}_permissions"
     for backend in auth.get_backends():
         if hasattr(backend, name):
             permissions.update(await getattr(backend, name)(user, obj))
@@ -504,7 +502,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """
         Return the first_name plus the last_name, with a space in between.
         """
-        full_name = "{} {}".format(self.first_name, self.last_name)
+        full_name = f"{self.first_name} {self.last_name}"
         return full_name.strip()
 
     def get_short_name(self):

@@ -119,7 +119,7 @@ def json_view(request):
     if request.META.get("CONTENT_TYPE") != "application/json":
         return HttpResponse()
 
-    t = Template("Viewing {} page. With data {{ data }}.".format(request.method))
+    t = Template(f"Viewing {request.method} page. With data {{ data }}.")
     data = json.loads(request.body.decode("utf-8"))
     c = Context({"data": data})
     return HttpResponse(t.render(c))

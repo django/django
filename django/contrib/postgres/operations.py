@@ -27,9 +27,7 @@ class CreateExtension(Operation):
             return
         if not self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
-                "CREATE EXTENSION IF NOT EXISTS {}".format(
-                    schema_editor.quote_name(self.name)
-                )
+                f"CREATE EXTENSION IF NOT EXISTS {schema_editor.quote_name(self.name)}"
             )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
@@ -50,9 +48,7 @@ class CreateExtension(Operation):
             return
         if self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
-                "DROP EXTENSION IF EXISTS {}".format(
-                    schema_editor.quote_name(self.name)
-                )
+                f"DROP EXTENSION IF EXISTS {schema_editor.quote_name(self.name)}"
             )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
@@ -67,11 +63,11 @@ class CreateExtension(Operation):
             return bool(cursor.fetchone())
 
     def describe(self):
-        return "Creates extension {}".format(self.name)
+        return f"Creates extension {self.name}"
 
     @property
     def migration_name_fragment(self):
-        return "create_extension_{}".format(self.name)
+        return f"create_extension_{self.name}"
 
 
 class BloomExtension(CreateExtension):
@@ -118,8 +114,8 @@ class NotInTransactionMixin:
     def _ensure_not_in_transaction(self, schema_editor):
         if schema_editor.connection.in_atomic_block:
             raise NotSupportedError(
-                "The {} operation cannot be executed inside a transaction "
-                "(set atomic = False on the migration).".format(self.__class__.__name__)
+                f"The {self.__class__.__name__} operation cannot be executed inside a transaction "
+                "(set atomic = False on the migration)."
             )
 
 
@@ -156,7 +152,7 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     category = OperationCategory.REMOVAL
 
     def describe(self):
-        return "Concurrently remove index {} from {}".format(self.name, self.model_name)
+        return f"Concurrently remove index {self.name} from {self.model_name}"
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
@@ -212,7 +208,7 @@ class CollationOperation(Operation):
 
     def remove_collation(self, schema_editor):
         schema_editor.execute(
-            "DROP COLLATION {}".format(schema_editor.quote_name(self.name)),
+            f"DROP COLLATION {schema_editor.quote_name(self.name)}",
         )
 
 
@@ -238,7 +234,7 @@ class CreateCollation(CollationOperation):
 
     @property
     def migration_name_fragment(self):
-        return "create_collation_{}".format(self.name.lower())
+        return f"create_collation_{self.name.lower()}"
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveCollation) and self.name == operation.name:
@@ -268,7 +264,7 @@ class RemoveCollation(CollationOperation):
 
     @property
     def migration_name_fragment(self):
-        return "remove_collation_{}".format(self.name.lower())
+        return f"remove_collation_{self.name.lower()}"
 
 
 class AddConstraintNotValid(AddConstraint):
@@ -287,10 +283,7 @@ class AddConstraintNotValid(AddConstraint):
         super().__init__(model_name, constraint)
 
     def describe(self):
-        return "Create not valid constraint {} on model {}".format(
-            self.constraint.name,
-            self.model_name,
-        )
+        return f"Create not valid constraint {self.constraint.name} on model {self.model_name}"
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)
@@ -317,16 +310,13 @@ class ValidateConstraint(Operation):
         self.name = name
 
     def describe(self):
-        return "Validate constraint {} on model {}".format(self.name, self.model_name)
+        return f"Validate constraint {self.name} on model {self.model_name}"
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.execute(
-                "ALTER TABLE {} VALIDATE CONSTRAINT {}".format(
-                    schema_editor.quote_name(model._meta.db_table),
-                    schema_editor.quote_name(self.name),
-                )
+                f"ALTER TABLE {schema_editor.quote_name(model._meta.db_table)} VALIDATE CONSTRAINT {schema_editor.quote_name(self.name)}"
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -338,7 +328,7 @@ class ValidateConstraint(Operation):
 
     @property
     def migration_name_fragment(self):
-        return "{}_validate_{}".format(self.model_name.lower(), self.name.lower())
+        return f"{self.model_name.lower()}_validate_{self.name.lower()}"
 
     def deconstruct(self):
         return (

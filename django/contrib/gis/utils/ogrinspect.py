@@ -193,7 +193,7 @@ def _ogrinspect(
         yield ""
         yield ""
 
-    yield "class {}(models.Model):".format(model_name)
+    yield f"class {model_name}(models.Model):"
 
     for field_name, width, precision, field_type in zip(
         ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types
@@ -220,25 +220,21 @@ def _ogrinspect(
                     kwargs_str,
                 )
             else:
-                yield "    {} = models.FloatField({})".format(mfield, kwargs_str[2:])
+                yield f"    {mfield} = models.FloatField({kwargs_str[2:]})"
         elif field_type is OFTInteger:
-            yield "    {} = models.IntegerField({})".format(mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.IntegerField({kwargs_str[2:]})"
         elif field_type is OFTInteger64:
-            yield "    {} = models.BigIntegerField({})".format(mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.BigIntegerField({kwargs_str[2:]})"
         elif field_type is OFTString:
-            yield "    {} = models.CharField(max_length={}{})".format(
-                mfield,
-                width,
-                kwargs_str,
-            )
+            yield f"    {mfield} = models.CharField(max_length={width}{kwargs_str})"
         elif field_type is OFTDate:
-            yield "    {} = models.DateField({})".format(mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.DateField({kwargs_str[2:]})"
         elif field_type is OFTDateTime:
-            yield "    {} = models.DateTimeField({})".format(mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.DateTimeField({kwargs_str[2:]})"
         elif field_type is OFTTime:
-            yield "    {} = models.TimeField({})".format(mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.TimeField({kwargs_str[2:]})"
         else:
-            raise TypeError("Unknown field type {} in {}".format(field_type, mfield))
+            raise TypeError(f"Unknown field type {field_type} in {mfield}")
 
     # TODO: Autodetection of multigeometry types (see #7218).
     gtype = layer.geom_type
@@ -258,12 +254,12 @@ def _ogrinspect(
                 # WGS84 is already the default.
                 srid_str = ""
             else:
-                srid_str = "srid={}".format(srid)
+                srid_str = f"srid={srid}"
     else:
-        srid_str = "srid={}".format(srid)
+        srid_str = f"srid={srid}"
 
-    yield "    {} = models.{}({})".format(geom_name, geom_field, srid_str)
+    yield f"    {geom_name} = models.{geom_field}({srid_str})"
 
     if name_field:
         yield ""
-        yield "    def __str__(self): return self.{}".format(name_field)
+        yield f"    def __str__(self): return self.{name_field}"

@@ -161,9 +161,7 @@ class Command(BaseCommand):
                 except OperationalError as error:
                     warnings.warn(
                         "Got an error checking a consistent migration history "
-                        "performed for database connection '{}': {}".format(
-                            alias, error
-                        ),
+                        f"performed for database connection '{alias}': {error}",
                         RuntimeWarning,
                     )
         # Before anything else, see if there's conflicting apps and drop out
@@ -186,8 +184,8 @@ class Command(BaseCommand):
             )
             raise CommandError(
                 "Conflicting migrations detected; multiple leaf nodes in the "
-                "migration graph: ({}).\nTo fix them run "
-                "'python manage.py makemigrations --merge'".format(name_str)
+                f"migration graph: ({name_str}).\nTo fix them run "
+                "'python manage.py makemigrations --merge'"
             )
 
         # If they want to merge and there's nothing to merge, then politely
@@ -250,9 +248,7 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 if app_labels:
                     if len(app_labels) == 1:
-                        self.log(
-                            "No changes detected in app '{}'".format(app_labels.pop())
-                        )
+                        self.log(f"No changes detected in app '{app_labels.pop()}'")
                     else:
                         self.log(
                             "No changes detected in apps '{}'".format(
@@ -347,9 +343,7 @@ class Command(BaseCommand):
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
-                self.log(
-                    self.style.MIGRATE_HEADING("Migrations for '{}':".format(app_label))
-                )
+                self.log(self.style.MIGRATE_HEADING(f"Migrations for '{app_label}':"))
             for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration, self.include_header)
@@ -357,11 +351,9 @@ class Command(BaseCommand):
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
                     migration_string = self.get_relative_path(writer.path)
-                    self.log(
-                        "  {}\n".format(self.style.MIGRATE_LABEL(migration_string))
-                    )
+                    self.log(f"  {self.style.MIGRATE_LABEL(migration_string)}\n")
                     for operation in migration.operations:
-                        self.log("    {}".format(operation.formatted_description()))
+                        self.log(f"    {operation.formatted_description()}")
                     if self.scriptable:
                         self.stdout.write(migration_string)
                 if not self.dry_run:
@@ -400,7 +392,7 @@ class Command(BaseCommand):
                     # the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
-                            "Full migrations file '{}':".format(writer.filename)
+                            f"Full migrations file '{writer.filename}':"
                         )
                     )
                     self.log(writer.as_string())
@@ -450,9 +442,7 @@ class Command(BaseCommand):
                 )
             )
             if not common_ancestor_count:
-                raise ValueError(
-                    "Could not find common ancestor of {}".format(migration_names)
-                )
+                raise ValueError(f"Could not find common ancestor of {migration_names}")
             # Now work out the operations along each divergent branch
             for migration in merge_migrations:
                 migration.branch = migration.ancestry[common_ancestor_count:]
@@ -465,13 +455,11 @@ class Command(BaseCommand):
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
             if self.verbosity > 0:
-                self.log(self.style.MIGRATE_HEADING("Merging {}".format(app_label)))
+                self.log(self.style.MIGRATE_HEADING(f"Merging {app_label}"))
                 for migration in merge_migrations:
-                    self.log(
-                        self.style.MIGRATE_LABEL("  Branch {}".format(migration.name))
-                    )
+                    self.log(self.style.MIGRATE_LABEL(f"  Branch {migration.name}"))
                     for operation in migration.merged_operations:
-                        self.log("    {}".format(operation.formatted_description()))
+                        self.log(f"    {operation.formatted_description()}")
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
@@ -515,7 +503,7 @@ class Command(BaseCommand):
                         fh.write(writer.as_string())
                     run_formatters([writer.path], stderr=self.stderr)
                     if self.verbosity > 0:
-                        self.log("\nCreated new merge migration {}".format(writer.path))
+                        self.log(f"\nCreated new merge migration {writer.path}")
                         if self.scriptable:
                             self.stdout.write(writer.path)
                 elif self.verbosity == 3:
@@ -524,7 +512,7 @@ class Command(BaseCommand):
                     # saving the file to the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
-                            "Full merge migrations file '{}':".format(writer.filename)
+                            f"Full merge migrations file '{writer.filename}':"
                         )
                     )
                     self.log(writer.as_string())

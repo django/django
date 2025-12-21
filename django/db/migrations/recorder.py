@@ -40,7 +40,7 @@ class MigrationRecorder:
                     db_table = "django_migrations"
 
                 def __str__(self):
-                    return "Migration {} for {}".format(self.name, self.app)
+                    return f"Migration {self.name} for {self.app}"
 
             cls._migration_class = Migration
         return cls._migration_class
@@ -78,7 +78,7 @@ class MigrationRecorder:
                 editor.create_model(self.Migration)
         except DatabaseError as exc:
             raise MigrationSchemaMissing(
-                "Unable to create the django_migrations table ({})".format(exc)
+                f"Unable to create the django_migrations table ({exc})"
             )
 
     def applied_migrations(self):

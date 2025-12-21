@@ -110,7 +110,7 @@ class Collate(Func):
 
     def __init__(self, expression, collation):
         if not (collation and self.collation_re.match(collation)):
-            raise ValueError("Invalid collation name: {!r}.".format(collation))
+            raise ValueError(f"Invalid collation name: {collation!r}.")
         self.collation = collation
         super().__init__(expression)
 

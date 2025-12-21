@@ -103,7 +103,7 @@ class ExplainTests(TestCase):
                 self.assertEqual(len(captured_queries), 1)
                 for name, value in options.items():
                     if isinstance(value, str):
-                        option = "{} {}".format(name.upper(), value.upper())
+                        option = f"{name.upper()} {value.upper()}"
                     else:
                         option = "{} {}".format(
                             name.upper(), "true" if value else "false"

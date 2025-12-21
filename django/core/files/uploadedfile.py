@@ -43,9 +43,7 @@ class UploadedFile(File):
         self.content_type_extra = content_type_extra
 
     def __repr__(self):
-        return "<{}: {} ({})>".format(
-            self.__class__.__name__, self.name, self.content_type
-        )
+        return f"<{self.__class__.__name__}: {self.name} ({self.content_type})>"
 
     def _get_name(self):
         return self._name

@@ -14,13 +14,13 @@ class POFileAssertionMixin:
     def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
         if use_quotes:
-            expected_value = '"{}"'.format(expected_value)
+            expected_value = f'"{expected_value}"'
             q = "'"
-        needle = "{} {}".format(keyword, expected_value)
+        needle = f"{keyword} {expected_value}"
         expected_value = re.escape(expected_value)
         return self.assertTrue(
-            re.search("^{} {}".format(keyword, expected_value), haystack, re.MULTILINE),
-            "Could not find {q}{n}{q} in generated PO file".format(n=needle, q=q),
+            re.search(f"^{keyword} {expected_value}", haystack, re.MULTILINE),
+            f"Could not find {q}{needle}{q} in generated PO file",
         )
 
     def assertMsgId(self, msgid, haystack, use_quotes=True):

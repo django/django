@@ -41,9 +41,7 @@ class FieldFile(File, AltersData):
     def _require_file(self):
         if not self:
             raise ValueError(
-                "The '{}' attribute has no file associated with it.".format(
-                    self.field.name
-                )
+                f"The '{self.field.name}' attribute has no file associated with it."
             )
 
     def _get_file(self):
@@ -257,11 +255,7 @@ class FileField(Field):
             self.storage = self.storage()
             if not isinstance(self.storage, Storage):
                 raise TypeError(
-                    "{}.storage must be a subclass/instance of {}.{}".format(
-                        self.__class__.__qualname__,
-                        Storage.__module__,
-                        Storage.__qualname__,
-                    )
+                    f"{self.__class__.__qualname__}.storage must be a subclass/instance of {Storage.__module__}.{Storage.__qualname__}"
                 )
         self.upload_to = upload_to
 
@@ -279,9 +273,7 @@ class FileField(Field):
         if self._primary_key_set_explicitly:
             return [
                 checks.Error(
-                    "'primary_key' is not a valid argument for a {}.".format(
-                        self.__class__.__name__
-                    ),
+                    f"'primary_key' is not a valid argument for a {self.__class__.__name__}.",
                     obj=self,
                     id="fields.E201",
                 )
@@ -293,8 +285,8 @@ class FileField(Field):
         if isinstance(self.upload_to, str) and self.upload_to.startswith("/"):
             return [
                 checks.Error(
-                    "{}'s 'upload_to' argument must be a relative path, not an "
-                    "absolute path.".format(self.__class__.__name__),
+                    f"{self.__class__.__name__}'s 'upload_to' argument must be a relative path, not an "
+                    "absolute path.",
                     obj=self,
                     id="fields.E202",
                     hint="Remove the leading slash.",

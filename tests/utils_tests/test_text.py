@@ -352,8 +352,8 @@ class TestUtilsText(SimpleTestCase):
         long_word = "l%sng" % ("o" * 20)
         self.assertEqual(text.wrap(long_word, 20), long_word)
         self.assertEqual(
-            text.wrap("a {} word".format(long_word), 10),
-            "a\n{}\nword".format(long_word),
+            text.wrap(f"a {long_word} word", 10),
+            f"a\n{long_word}\nword",
         )
         self.assertEqual(text.wrap(lazystr(digits), 100), "1234 67 9")
 

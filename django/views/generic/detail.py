@@ -44,8 +44,8 @@ class SingleObjectMixin(ContextMixin):
         # If none of those are defined, it's an error.
         if pk is None and slug is None:
             raise AttributeError(
-                "Generic detail view {} must be called with either an object "
-                "pk or a slug in the URLconf.".format(self.__class__.__name__)
+                f"Generic detail view {self.__class__.__name__} must be called with either an object "
+                "pk or a slug in the URLconf."
             )
 
         try:
@@ -70,9 +70,9 @@ class SingleObjectMixin(ContextMixin):
                 return self.model._default_manager.all()
             else:
                 raise ImproperlyConfigured(
-                    "{cls} is missing a QuerySet. Define "
-                    "{cls}.model, {cls}.queryset, or override "
-                    "{cls}.get_queryset().".format(cls=self.__class__.__name__)
+                    f"{self.__class__.__name__} is missing a QuerySet. Define "
+                    f"{self.__class__.__name__}.model, {self.__class__.__name__}.queryset, or override "
+                    f"{self.__class__.__name__}.get_queryset()."
                 )
         return self.queryset.all()
 
@@ -150,21 +150,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
                 names.append(
-                    "{}/{}{}.html".format(
-                        object_meta.app_label,
-                        object_meta.model_name,
-                        self.template_name_suffix,
-                    )
+                    f"{object_meta.app_label}/{object_meta.model_name}{self.template_name_suffix}.html"
                 )
             elif getattr(self, "model", None) is not None and issubclass(
                 self.model, models.Model
             ):
                 names.append(
-                    "{}/{}{}.html".format(
-                        self.model._meta.app_label,
-                        self.model._meta.model_name,
-                        self.template_name_suffix,
-                    )
+                    f"{self.model._meta.app_label}/{self.model._meta.model_name}{self.template_name_suffix}.html"
                 )
 
             # If we still haven't managed to find any template names, we should

@@ -60,7 +60,7 @@ def index(
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = reverse(sitemap_url_name, kwargs={"section": section})
-        absolute_url = "{}://{}{}".format(protocol, req_site.domain, sitemap_url)
+        absolute_url = f"{protocol}://{req_site.domain}{sitemap_url}"
         site_lastmod = site.get_latest_lastmod()
         if all_indexes_lastmod:
             if site_lastmod is not None:
@@ -70,9 +70,7 @@ def index(
         sites.append(SitemapIndexItem(absolute_url, site_lastmod))
         # Add links to all pages of the sitemap.
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append(
-                SitemapIndexItem("{}?p={}".format(absolute_url, page), site_lastmod)
-            )
+            sites.append(SitemapIndexItem(f"{absolute_url}?p={page}", site_lastmod))
     # If lastmod is defined for all sites, set header so as
     # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
     if all_indexes_lastmod and latest_lastmod:
@@ -101,7 +99,7 @@ def sitemap(
 
     if section is not None:
         if section not in sitemaps:
-            raise Http404("No sitemap available for section: {!r}".format(section))
+            raise Http404(f"No sitemap available for section: {section!r}")
         maps = [sitemaps[section]]
     else:
         maps = sitemaps.values()
@@ -122,9 +120,9 @@ def sitemap(
                 else:
                     all_sites_lastmod = False
         except EmptyPage:
-            raise Http404("Page {} empty".format(page))
+            raise Http404(f"Page {page} empty")
         except PageNotAnInteger:
-            raise Http404("No page '{}'".format(page))
+            raise Http404(f"No page '{page}'")
     # If lastmod is defined for all sites, set header so as
     # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
     if all_sites_lastmod:

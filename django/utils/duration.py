@@ -19,11 +19,11 @@ def duration_string(duration):
     """Version of str(timedelta) which is not English specific."""
     days, hours, minutes, seconds, microseconds = _get_duration_components(duration)
 
-    string = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    string = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
     if days:
-        string = "{} ".format(days) + string
+        string = f"{days} " + string
     if microseconds:
-        string += ".{:06d}".format(microseconds)
+        string += f".{microseconds:06d}"
 
     return string
 
@@ -36,10 +36,8 @@ def duration_iso_string(duration):
         sign = ""
 
     days, hours, minutes, seconds, microseconds = _get_duration_components(duration)
-    ms = ".{:06d}".format(microseconds) if microseconds else ""
-    return "{}P{}DT{:02d}H{:02d}M{:02d}{}S".format(
-        sign, days, hours, minutes, seconds, ms
-    )
+    ms = f".{microseconds:06d}" if microseconds else ""
+    return f"{sign}P{days}DT{hours:02d}H{minutes:02d}M{seconds:02d}{ms}S"
 
 
 def duration_microseconds(delta):

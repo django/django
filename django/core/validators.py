@@ -355,9 +355,7 @@ def ip_address_validators(protocol, unpack_ipv4):
         return ip_address_validator_map[protocol.lower()]
     except KeyError:
         raise ValueError(
-            "The protocol '{}' is unknown. Supported: {}".format(
-                protocol, list(ip_address_validator_map)
-            )
+            f"The protocol '{protocol}' is unknown. Supported: {list(ip_address_validator_map)}"
         )
 
 

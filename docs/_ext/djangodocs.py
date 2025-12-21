@@ -81,11 +81,9 @@ class VersionDirective(Directive):
 
     def run(self):
         if len(self.arguments) > 1:
-            msg = """Only one argument accepted for directive '{directive_name}::'.
+            msg = f"""Only one argument accepted for directive '{self.name}::'.
             Comments should be provided as content,
-            not as an extra argument.""".format(
-                directive_name=self.name
-            )
+            not as an extra argument."""
             raise self.error(msg)
 
         env = self.state.document.settings.env
@@ -171,7 +169,7 @@ class DjangoHTMLTranslator(HTMLTranslator):
             title = "{}{}".format(
                 version_text % node["version"], ":" if len(node) else "."
             )
-            self.body.append('<span class="title">{}</span> '.format(title))
+            self.body.append(f'<span class="title">{title}</span> ')
 
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
@@ -188,7 +186,7 @@ class DjangoHTMLTranslator(HTMLTranslator):
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(" ")[0]
     env.ref_context["std:program"] = command
-    title = "django-admin {}".format(sig)
+    title = f"django-admin {sig}"
     signode += addnodes.desc_name(title, title)
     return command
 
@@ -258,16 +256,14 @@ def visit_console_html(self, node):
         self.document._console_directive_used_flag = True
         uid = node["uid"]
         self.body.append(
-            """\
-<div class="console-block" id="console-block-{id}">
-<input class="c-tab-unix" id="c-tab-{id}-unix" type="radio" name="console-{id}" \
+            f"""\
+<div class="console-block" id="console-block-{uid}">
+<input class="c-tab-unix" id="c-tab-{uid}-unix" type="radio" name="console-{uid}" \
 checked>
-<label for="c-tab-{id}-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
-<input class="c-tab-win" id="c-tab-{id}-win" type="radio" name="console-{id}">
-<label for="c-tab-{id}-win" title="Windows">&#xf17a</label>
-<section class="c-content-unix" id="c-content-{id}-unix">\n""".format(
-                id=uid
-            )
+<label for="c-tab-{uid}-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-{uid}-win" type="radio" name="console-{uid}">
+<label for="c-tab-{uid}-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-{uid}-unix">\n"""
         )
         try:
             self.visit_literal_block(node)
@@ -275,9 +271,7 @@ checked>
             pass
         self.body.append("</section>\n")
 
-        self.body.append(
-            '<section class="c-content-win" id="c-content-{id}-win">\n'.format(id=uid)
-        )
+        self.body.append(f'<section class="c-content-win" id="c-content-{uid}-win">\n')
         win_text = node["win_console_text"]
         highlight_args = {"force": True}
         linenos = node.get("linenos", False)
@@ -405,8 +399,8 @@ def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
     msg = (
-        "Default role used (`single backticks`): {}. Did you mean to use two "
-        "backticks for ``code``, or miss an underscore for a `link`_ ?".format(rawtext)
+        f"Default role used (`single backticks`): {rawtext}. Did you mean to use two "
+        "backticks for ``code``, or miss an underscore for a `link`_ ?"
     )
     logger.warning(msg, location=(inliner.document.current_source, lineno))
     return [nodes.Text(text)], []

@@ -4417,7 +4417,7 @@ class ValuesJoinPromotionTests(TestCase):
         )
         self.assertEqual(qs.count(), 1)
         tblname = connection.ops.quote_name(ObjectB._meta.db_table)
-        self.assertIn(" LEFT OUTER JOIN {}".format(tblname), str(qs.query))
+        self.assertIn(f" LEFT OUTER JOIN {tblname}", str(qs.query))
 
 
 class ForeignKeyToBaseExcludeTests(TestCase):

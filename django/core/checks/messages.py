@@ -34,19 +34,12 @@ class CheckMessage:
             obj = self.obj._meta.label
         else:
             obj = str(self.obj)
-        id = "({}) ".format(self.id) if self.id else ""
-        hint = "\n\tHINT: {}".format(self.hint) if self.hint else ""
-        return "{}: {}{}{}".format(obj, id, self.msg, hint)
+        id = f"({self.id}) " if self.id else ""
+        hint = f"\n\tHINT: {self.hint}" if self.hint else ""
+        return f"{obj}: {id}{self.msg}{hint}"
 
     def __repr__(self):
-        return "<{}: level={!r}, msg={!r}, hint={!r}, obj={!r}, id={!r}>".format(
-            self.__class__.__name__,
-            self.level,
-            self.msg,
-            self.hint,
-            self.obj,
-            self.id,
-        )
+        return f"<{self.__class__.__name__}: level={self.level!r}, msg={self.msg!r}, hint={self.hint!r}, obj={self.obj!r}, id={self.id!r}>"
 
     def is_serious(self, level=ERROR):
         return self.level >= level

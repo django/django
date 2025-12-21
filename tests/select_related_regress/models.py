@@ -15,7 +15,7 @@ class Port(models.Model):
     port_number = models.CharField(max_length=10)
 
     def __str__(self):
-        return "{}/{}".format(self.device.name, self.port_number)
+        return f"{self.device.name}/{self.port_number}"
 
 
 class Connection(models.Model):

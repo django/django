@@ -113,7 +113,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
             self.stream.writeln(self.separator1)
-            self.stream.writeln("{}: {}".format(flavour, self.getDescription(test)))
+            self.stream.writeln(f"{flavour}: {self.getDescription(test)}")
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
@@ -143,7 +143,7 @@ class PDBDebugResult(unittest.TextTestResult):
         self._restoreStdout()
         self.buffer = False
         exc_type, exc_value, traceback = error
-        print("\nOpening PDB: {!r}".format(exc_value))
+        print(f"\nOpening PDB: {exc_value!r}")
         if PY313:
             pdb.post_mortem(exc_value)
         else:
@@ -208,22 +208,20 @@ class RemoteTestResult(unittest.TestResult):
 
     def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
         print(
-            """
+            f"""
 Subtest failed:
 
-    test: {}
- subtest: {}
+    test: {test}
+ subtest: {subtest}
 
 Unfortunately, the subtest that failed cannot be pickled, so the parallel
 test runner cannot handle it cleanly. Here is the pickling error:
 
-> {}
+> {pickle_exc}
 
 You should re-run this test with --parallel=1 to reproduce the failure
 with a cleaner failure message.
-""".format(
-                test, subtest, pickle_exc
-            )
+"""
         )
 
     def check_picklable(self, test, err):
@@ -246,11 +244,11 @@ with a cleaner failure message.
             )
             if tblib is None:
                 print(
-                    """
+                    f"""
 
-{} failed:
+{test} failed:
 
-{}
+{original_exc_txt}
 
 Unfortunately, tracebacks cannot be pickled, making it impossible for the
 parallel test runner to handle this exception cleanly.
@@ -258,30 +256,26 @@ parallel test runner to handle this exception cleanly.
 In order to see the traceback, you should install tblib:
 
     python -m pip install tblib
-""".format(
-                        test, original_exc_txt
-                    )
+"""
                 )
             else:
                 print(
-                    """
+                    f"""
 
-{} failed:
+{test} failed:
 
-{}
+{original_exc_txt}
 
 Unfortunately, the exception it raised cannot be pickled, making it impossible
 for the parallel test runner to handle it cleanly.
 
 Here's the error encountered while trying to pickle the exception:
 
-{}
+{pickle_exc_txt}
 
 You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
-""".format(
-                        test, original_exc_txt, pickle_exc_txt
-                    )
+"""
                 )
             raise
 
@@ -682,7 +676,7 @@ class Shuffler:
         return f"{self.seed!r} ({self.seed_source})"
 
     def _hash_item(self, item, key):
-        text = "{}{}".format(self.seed, key(item))
+        text = f"{self.seed}{key(item)}"
         return self._hash_text(text)
 
     def shuffle(self, items, key):
@@ -698,10 +692,8 @@ class Shuffler:
         for item in items:
             hashed = self._hash_item(item, key)
             if hashed in hashes:
-                msg = "item {!r} has same hash {!r} as item {!r}".format(
-                    item,
-                    hashed,
-                    hashes[hashed],
+                msg = (
+                    f"item {item!r} has same hash {hashed!r} as item {hashes[hashed]!r}"
                 )
                 raise RuntimeError(msg)
             hashes[hashed] = item
@@ -770,7 +762,7 @@ class DiscoverRunner:
             # unittest does not export the _convert_select_pattern function
             # that converts command-line arguments to patterns.
             self.test_name_patterns = {
-                pattern if "*" in pattern else "*{}*".format(pattern)
+                pattern if "*" in pattern else f"*{pattern}*"
                 for pattern in test_name_patterns
             }
         self.shuffle = shuffle

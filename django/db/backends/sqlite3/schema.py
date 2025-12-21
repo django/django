@@ -65,12 +65,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character.
-            return "X'{}'".format(value.hex())
+            return f"X'{value.hex()}'"
         else:
             raise ValueError(
-                "Cannot quote parameter value {!r} of type {}".format(
-                    value, type(value)
-                )
+                f"Cannot quote parameter value {value!r} of type {type(value)}"
             )
 
     def prepare_default(self, value):
@@ -167,10 +165,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     default = self.prepare_default(self.effective_default(new_field))
                 else:
                     default, _ = self.db_default_sql(new_field)
-                case_sql = "coalesce({col}, {default})".format(
-                    col=self.quote_name(old_field.column),
-                    default=default,
-                )
+                case_sql = f"coalesce({self.quote_name(old_field.column)}, {default})"
                 mapping[new_field.column] = case_sql
             else:
                 mapping[new_field.column] = self.quote_name(old_field.column)
@@ -229,7 +224,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body_copy = copy.deepcopy(body)
         meta_contents = {
             "app_label": model._meta.app_label,
-            "db_table": "new__{}".format(strip_quotes(model._meta.db_table)),
+            "db_table": f"new__{strip_quotes(model._meta.db_table)}",
             "unique_together": unique_together,
             "indexes": indexes,
             "constraints": constraints,
@@ -238,9 +233,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         meta = type("Meta", (), meta_contents)
         body_copy["Meta"] = meta
         body_copy["__module__"] = model.__module__
-        new_model = type(
-            "New{}".format(model._meta.object_name), model.__bases__, body_copy
-        )
+        new_model = type(f"New{model._meta.object_name}", model.__bases__, body_copy)
 
         # Remove the automatically recreated default primary key, if it has
         # been deleted.

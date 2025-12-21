@@ -3,8 +3,8 @@ termcolors.py
 """
 
 color_names = ("black", "red", "green", "yellow", "blue", "magenta", "cyan", "white")
-foreground = {color_names[x]: "3{}".format(x) for x in range(8)}
-background = {color_names[x]: "4{}".format(x) for x in range(8)}
+foreground = {color_names[x]: f"3{x}" for x in range(8)}
+background = {color_names[x]: f"4{x}" for x in range(8)}
 
 RESET = "0"
 opt_dict = {
@@ -47,7 +47,7 @@ def colorize(text="", opts=(), **kwargs):
     """
     code_list = []
     if text == "" and len(opts) == 1 and opts[0] == "reset":
-        return "\x1b[{}m".format(RESET)
+        return f"\x1b[{RESET}m"
     for k, v in kwargs.items():
         if k == "fg":
             code_list.append(foreground[v])

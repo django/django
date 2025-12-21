@@ -258,9 +258,7 @@ class SchemaTests(TransactionTestCase):
     ):
         with connection.cursor() as cursor:
             schema_editor.add_field(model, field)
-            cursor.execute(
-                "SELECT {} FROM {};".format(field_name, model._meta.db_table)
-            )
+            cursor.execute(f"SELECT {field_name} FROM {model._meta.db_table};")
             database_default = cursor.fetchall()[0][0]
             if cast_function and type(database_default) is not type(expected_default):
                 database_default = cast_function(database_default)
@@ -3763,7 +3761,7 @@ class SchemaTests(TransactionTestCase):
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "slug"), True)
-        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
+        self.assertIn(f"COLLATE {editor.quote_name(collation)}", str(sql))
         # Remove constraint.
         with connection.schema_editor() as editor:
             editor.remove_constraint(BookWithSlug, constraint)
@@ -4143,11 +4141,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_multiple_wrapper_references(self):
         index = Index(OrderBy(F("name").desc(), descending=True), name="name")
-        msg = (
-            "Multiple references to {} can't be used in an indexed expression.".format(
-                self._index_expressions_wrappers()
-            )
-        )
+        msg = f"Multiple references to {self._index_expressions_wrappers()} can't be used in an indexed expression."
         with connection.schema_editor() as editor:
             with self.assertRaisesMessage(ValueError, msg):
                 editor.add_index(Author, index)
@@ -4155,9 +4149,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_invalid_topmost_expressions(self):
         index = Index(Upper(F("name").desc()), name="name")
-        msg = "{} must be topmost expressions in an indexed expression.".format(
-            self._index_expressions_wrappers()
-        )
+        msg = f"{self._index_expressions_wrappers()} must be topmost expressions in an indexed expression."
         with connection.schema_editor() as editor:
             with self.assertRaisesMessage(ValueError, msg):
                 editor.add_index(Author, index)
@@ -4347,7 +4339,7 @@ class SchemaTests(TransactionTestCase):
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "slug"), True)
-        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
+        self.assertIn(f"COLLATE {editor.quote_name(collation)}", str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Book, index)
@@ -4375,7 +4367,7 @@ class SchemaTests(TransactionTestCase):
             self.assertIndexOrder(table, index.name, ["DESC"])
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
+        self.assertIn(f"COLLATE {editor.quote_name(collation)}", str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Author, index)
@@ -4646,7 +4638,7 @@ class SchemaTests(TransactionTestCase):
             except OperationalError as e:
                 self.fail(
                     "Errors when applying initial migration for a model "
-                    "with a table named after an SQL reserved word: {}".format(e)
+                    f"with a table named after an SQL reserved word: {e}"
                 )
         # The table is there
         list(Thing.objects.all())
@@ -5555,7 +5547,7 @@ class SchemaTests(TransactionTestCase):
             max_name_length = connection.ops.max_name_length() or 200
             namespace = "n" * max_name_length
             table_name = "t" * max_name_length
-            namespaced_table_name = '"{}"."{}"'.format(namespace, table_name)
+            namespaced_table_name = f'"{namespace}"."{table_name}"'
             self.assertEqual(
                 editor._create_index_name(table_name, []),
                 editor._create_index_name(namespaced_table_name, []),
@@ -5573,7 +5565,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = "schema"
                 apps = new_apps
-                db_table = '"{}"."DJANGO_STUDENT_TABLE"'.format(oracle_user)
+                db_table = f'"{oracle_user}"."DJANGO_STUDENT_TABLE"'
 
         class Document(Model):
             name = CharField(max_length=30)
@@ -5582,7 +5574,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = "schema"
                 apps = new_apps
-                db_table = '"{}"."DJANGO_DOCUMENT_TABLE"'.format(oracle_user)
+                db_table = f'"{oracle_user}"."DJANGO_DOCUMENT_TABLE"'
 
         self.isolated_local_models = [Student, Document]
 

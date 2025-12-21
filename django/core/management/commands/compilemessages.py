@@ -112,7 +112,7 @@ class Command(BaseCommand):
         # Build locale list
         all_locales = []
         for basedir in basedirs:
-            locale_dirs = filter(os.path.isdir, glob.glob("{}/*".format(basedir)))
+            locale_dirs = filter(os.path.isdir, glob.glob(f"{basedir}/*"))
             all_locales.extend(map(os.path.basename, locale_dirs))
 
         # Account for excluded locales
@@ -152,22 +152,18 @@ class Command(BaseCommand):
                     if mo_path.stat().st_mtime >= po_path.stat().st_mtime:
                         if self.verbosity > 0:
                             self.stdout.write(
-                                "File “{}” is already compiled and up to date.".format(
-                                    po_path
-                                )
+                                f"File “{po_path}” is already compiled and up to date."
                             )
                         continue
                 except FileNotFoundError:
                     pass
                 if self.verbosity > 0:
-                    self.stdout.write("processing file {} in {}".format(f, dirpath))
+                    self.stdout.write(f"processing file {f} in {dirpath}")
 
                 if has_bom(po_path):
                     self.stderr.write(
-                        "The {} file has a BOM (Byte Order Mark). Django only "
-                        "supports .po files encoded in UTF-8 and without any BOM.".format(
-                            po_path
-                        )
+                        f"The {po_path} file has a BOM (Byte Order Mark). Django only "
+                        "supports .po files encoded in UTF-8 and without any BOM."
                     )
                     self.has_errors = True
                     continue
@@ -175,10 +171,8 @@ class Command(BaseCommand):
                 # Check writability on first location
                 if i == 0 and not is_dir_writable(mo_path.parent):
                     self.stderr.write(
-                        "The po files under {} are in a seemingly not writable "
-                        "location. mo files will not be updated/created.".format(
-                            dirpath
-                        )
+                        f"The po files under {dirpath} are in a seemingly not writable "
+                        "location. mo files will not be updated/created."
                     )
                     self.has_errors = True
                     return
@@ -192,12 +186,8 @@ class Command(BaseCommand):
                     if self.verbosity > 0:
                         if errors:
                             self.stderr.write(
-                                "Execution of {} failed: {}".format(
-                                    self.program, errors
-                                )
+                                f"Execution of {self.program} failed: {errors}"
                             )
                         else:
-                            self.stderr.write(
-                                "Execution of {} failed".format(self.program)
-                            )
+                            self.stderr.write(f"Execution of {self.program} failed")
                     self.has_errors = True

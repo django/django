@@ -146,9 +146,7 @@ def localtime_tag(parser, token):
     if len(bits) == 1:
         use_tz = True
     elif len(bits) > 2 or bits[1] not in ("on", "off"):
-        raise TemplateSyntaxError(
-            "{!r} argument should be 'on' or 'off'".format(bits[0])
-        )
+        raise TemplateSyntaxError(f"{bits[0]!r} argument should be 'on' or 'off'")
     else:
         use_tz = bits[1] == "on"
     nodelist = parser.parse(("endlocaltime",))
@@ -173,7 +171,7 @@ def timezone_tag(parser, token):
     """
     bits = token.split_contents()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'{}' takes one argument (timezone)".format(bits[0]))
+        raise TemplateSyntaxError(f"'{bits[0]}' takes one argument (timezone)")
     tz = parser.compile_filter(bits[1])
     nodelist = parser.parse(("endtimezone",))
     parser.delete_first_token()
@@ -197,6 +195,6 @@ def get_current_timezone_tag(parser, token):
     args = token.contents.split()
     if len(args) != 3 or args[1] != "as":
         raise TemplateSyntaxError(
-            "'get_current_timezone' requires 'as variable' (got {!r})".format(args)
+            f"'get_current_timezone' requires 'as variable' (got {args!r})"
         )
     return GetCurrentTimezoneNode(args[2])

@@ -1237,7 +1237,7 @@ class MigrateTests(MigrationTestBase):
         table_name = truncate_name(
             "unmigrated_app_syncdb_classroom", connection.ops.max_name_length()
         )
-        self.assertIn("Creating table {}".format(table_name), stdout)
+        self.assertIn(f"Creating table {table_name}", stdout)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_syncdb_app_with_migrations(self):
@@ -1951,9 +1951,7 @@ class MakeMigrationsTests(MigrationTestBase):
             else:
                 target_str = "('migrations', '0002_conflicting_second')"
             self.assertIn(target_str, content)
-        self.assertIn(
-            "Created new merge migration {}".format(merge_file), out.getvalue()
-        )
+        self.assertIn(f"Created new merge migration {merge_file}", out.getvalue())
 
     @mock.patch("django.db.migrations.utils.datetime")
     def test_makemigrations_auto_merge_name(self, mock_datetime):
@@ -2546,7 +2544,7 @@ class MakeMigrationsTests(MigrationTestBase):
                     *args,
                 )
                 migration_file = os.path.join(
-                    migration_dir, "{}_{}.py".format(migration_count, migration_name)
+                    migration_dir, f"{migration_count}_{migration_name}.py"
                 )
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
@@ -2983,12 +2981,12 @@ class SquashMigrationsTests(MigrationTestBase):
             " - 0002_second\n"
             "Optimizing...\n"
             "  Optimized from 8 operations to 2 operations.\n"
-            "Created new squashed migration {}\n"
+            f"Created new squashed migration {squashed_migration_file}\n"
             "  You should commit this migration but leave the old ones in place;\n"
             "  the new migration will be used for new installs. Once you are sure\n"
             "  all instances of the codebase have applied the migrations you "
             "squashed,\n"
-            "  you can delete them.\n".format(squashed_migration_file),
+            "  you can delete them.\n",
         )
 
     def test_squashmigrations_replacement_cycle(self):
@@ -3342,7 +3340,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 verbosity=0,
             )
             squashed_migration_file = os.path.join(
-                migration_dir, "0001_{}.py".format(squashed_name)
+                migration_dir, f"0001_{squashed_name}.py"
             )
             self.assertTrue(os.path.exists(squashed_migration_file))
 
@@ -3361,7 +3359,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 verbosity=0,
             )
             squashed_migration_file = os.path.join(
-                migration_dir, "0001_{}.py".format(squashed_name)
+                migration_dir, f"0001_{squashed_name}.py"
             )
             self.assertTrue(os.path.exists(squashed_migration_file))
 

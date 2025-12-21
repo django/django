@@ -1323,7 +1323,7 @@ class UniqueConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             with atomic(), connection.cursor() as cursor:
                 constraint_name = connection.ops.quote_name("name_init_deferred_uniq")
-                cursor.execute("SET CONSTRAINTS {} IMMEDIATE".format(constraint_name))
+                cursor.execute(f"SET CONSTRAINTS {constraint_name} IMMEDIATE")
                 swap()
 
     @skipUnlessDBFeature("supports_deferrable_unique_constraints")
@@ -1336,7 +1336,7 @@ class UniqueConstraintTests(TestCase):
         # Behavior can be changed with SET CONSTRAINTS.
         with connection.cursor() as cursor:
             constraint_name = connection.ops.quote_name("sheld_init_immediate_uniq")
-            cursor.execute("SET CONSTRAINTS {} DEFERRED".format(constraint_name))
+            cursor.execute(f"SET CONSTRAINTS {constraint_name} DEFERRED")
             obj_1.save()
             obj_2.save()
 

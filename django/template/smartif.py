@@ -22,13 +22,13 @@ class TokenBase:
     def nud(self, parser):
         # Null denotation - called in prefix context
         raise parser.error_class(
-            "Not expecting '{}' in this position in if tag.".format(self.id)
+            f"Not expecting '{self.id}' in this position in if tag."
         )
 
     def led(self, left, parser):
         # Left denotation - called in infix context
         raise parser.error_class(
-            "Not expecting '{}' as infix operator in if tag.".format(self.id)
+            f"Not expecting '{self.id}' as infix operator in if tag."
         )
 
     def display(self):
@@ -140,7 +140,7 @@ class Literal(TokenBase):
         return self.value
 
     def __repr__(self):
-        return "({} {!r})".format(self.id, self.value)
+        return f"({self.id} {self.value!r})"
 
 
 class EndToken(TokenBase):
@@ -197,9 +197,7 @@ class IfParser:
         # Check that we have exhausted all the tokens
         if self.current_token is not EndToken:
             raise self.error_class(
-                "Unused '{}' at end of if expression.".format(
-                    self.current_token.display()
-                )
+                f"Unused '{self.current_token.display()}' at end of if expression."
             )
         return retval
 

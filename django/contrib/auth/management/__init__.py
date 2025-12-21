@@ -31,7 +31,7 @@ def _get_builtin_permissions(opts):
         perms.append(
             (
                 get_permission_codename(action, opts),
-                "Can {} {}".format(action, opts.verbose_name_raw),
+                f"Can {action} {opts.verbose_name_raw}",
             )
         )
     return perms
@@ -107,7 +107,7 @@ def create_permissions(
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
-            print("Adding permission '{}'".format(perm))
+            print(f"Adding permission '{perm}'")
 
 
 class RenamePermission(migrations.RunPython):

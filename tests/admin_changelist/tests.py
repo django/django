@@ -80,11 +80,11 @@ def build_tbody_html(obj, href, field_name, extra_fields):
     return (
         "<tbody><tr>"
         '<td class="action-checkbox">'
-        '<input type="checkbox" name="_selected_action" value="{}" '
-        'class="action-select" aria-label="Select this object for an action - {}"></td>'
-        '<th class="field-name"><a href="{}">{}</a></th>'
-        "{}</tr></tbody>"
-    ).format(obj.pk, str(obj), href, field_name, extra_fields)
+        f'<input type="checkbox" name="_selected_action" value="{obj.pk}" '
+        f'class="action-select" aria-label="Select this object for an action - {str(obj)}"></td>'
+        f'<th class="field-name"><a href="{href}">{field_name}</a></th>'
+        f"{extra_fields}</tr></tbody>"
+    )
 
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
@@ -253,7 +253,7 @@ class ChangeListTests(TestCase):
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
-            "Failed to find expected row element: {}".format(table_output),
+            f"Failed to find expected row element: {table_output}",
         )
 
     def test_result_list_empty_changelist_value_blank_string(self):
@@ -298,7 +298,7 @@ class ChangeListTests(TestCase):
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
-            "Failed to find expected row element: {}".format(table_output),
+            f"Failed to find expected row element: {table_output}",
         )
 
     def test_result_list_set_empty_value_display_in_model_admin(self):
@@ -327,7 +327,7 @@ class ChangeListTests(TestCase):
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
-            "Failed to find expected row element: {}".format(table_output),
+            f"Failed to find expected row element: {table_output}",
         )
 
     def test_result_list_html(self):
@@ -352,12 +352,12 @@ class ChangeListTests(TestCase):
             new_child,
             link,
             "name",
-            '<td class="field-parent nowrap">{}</td>'.format(new_parent),
+            f'<td class="field-parent nowrap">{new_parent}</td>',
         )
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
-            "Failed to find expected row element: {}".format(table_output),
+            f"Failed to find expected row element: {table_output}",
         )
         self.assertInHTML(
             '<input type="checkbox" id="action-toggle" '
@@ -389,7 +389,7 @@ class ChangeListTests(TestCase):
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
-            "Failed to find expected row element: {}".format(table_output),
+            f"Failed to find expected row element: {table_output}",
         )
 
     def test_result_list_editable_html(self):
@@ -435,7 +435,7 @@ class ChangeListTests(TestCase):
             'maxlength="30" type="text" id="id_form-0-name">'
         )
         self.assertInHTML(
-            '<td class="field-name">{}</td>'.format(editable_name_field),
+            f'<td class="field-name">{editable_name_field}</td>',
             table_output,
             msg_prefix='Failed to find "name" list_editable field',
         )
@@ -446,7 +446,7 @@ class ChangeListTests(TestCase):
         """
         new_parent = Parent.objects.create(name="parent")
         for i in range(1, 201):
-            Child.objects.create(name="name {}".format(i), parent=new_parent)
+            Child.objects.create(name=f"name {i}", parent=new_parent)
         request = self.factory.get("/child/", data={"p": -1})  # Anything outside range
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
@@ -508,7 +508,7 @@ class ChangeListTests(TestCase):
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name="parent")
         for i in range(1, 201):
-            Child.objects.create(name="name {}".format(i), parent=new_parent)
+            Child.objects.create(name=f"name {i}", parent=new_parent)
 
         request = self.factory.get("/child/")
         request.user = self.superuser
@@ -928,8 +928,8 @@ class ChangeListTests(TestCase):
         """
         parent = Parent.objects.create(name="anything")
         for i in range(1, 31):
-            Child.objects.create(name="name {}".format(i), parent=parent)
-            Child.objects.create(name="filtered {}".format(i), parent=parent)
+            Child.objects.create(name=f"name {i}", parent=parent)
+            Child.objects.create(name=f"filtered {i}", parent=parent)
 
         request = self.factory.get("/child/")
         request.user = self.superuser
@@ -1000,7 +1000,7 @@ class ChangeListTests(TestCase):
         """
         parent = Parent.objects.create(name="parent")
         for i in range(10):
-            Child.objects.create(name="child {}".format(i), parent=parent)
+            Child.objects.create(name=f"child {i}", parent=parent)
 
         user_noparents = self._create_superuser("noparents")
         user_parents = self._create_superuser("parents")
@@ -1039,8 +1039,8 @@ class ChangeListTests(TestCase):
     def test_show_all(self):
         parent = Parent.objects.create(name="anything")
         for i in range(1, 31):
-            Child.objects.create(name="name {}".format(i), parent=parent)
-            Child.objects.create(name="filtered {}".format(i), parent=parent)
+            Child.objects.create(name=f"name {i}", parent=parent)
+            Child.objects.create(name=f"filtered {i}", parent=parent)
 
         # Add "show all" parameter to request
         request = self.factory.get("/child/", data={ALL_VAR: ""})
@@ -1069,7 +1069,7 @@ class ChangeListTests(TestCase):
         """
         parent = Parent.objects.create(name="parent")
         for i in range(1, 10):
-            Child.objects.create(id=i, name="child {}".format(i), parent=parent, age=i)
+            Child.objects.create(id=i, name=f"child {i}", parent=parent, age=i)
 
         m = DynamicListDisplayLinksChildAdmin(Child, custom_site)
         superuser = self._create_superuser("superuser")
@@ -1077,7 +1077,7 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         for i in range(1, 10):
             link = reverse("admin:admin_changelist_child_change", args=(i,))
-            self.assertContains(response, '<a href="{}">{}</a>'.format(link, i))
+            self.assertContains(response, f'<a href="{link}">{i}</a>')
 
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
@@ -1092,7 +1092,7 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/parent/", superuser)
         response = m.changelist_view(request)
         link = reverse("admin:admin_changelist_parent_change", args=(p.pk,))
-        self.assertNotContains(response, '<a href="{}">'.format(link))
+        self.assertNotContains(response, f'<a href="{link}">')
 
     def test_link_field_display_links(self):
         self.client.force_login(self.superuser)
@@ -1104,13 +1104,13 @@ class ChangeListTests(TestCase):
         response = self.client.get(reverse("admin:admin_changelist_genre_changelist"))
         self.assertContains(
             response,
-            '<a href="/admin/admin_changelist/genre/{}/change/">'
-            "documents/blues_history.txt</a>".format(g.pk),
+            f'<a href="/admin/admin_changelist/genre/{g.pk}/change/">'
+            "documents/blues_history.txt</a>",
         )
         self.assertContains(
             response,
-            '<a href="/admin/admin_changelist/genre/{}/change/">'
-            "http://blues_history.com</a>".format(g.pk),
+            f'<a href="/admin/admin_changelist/genre/{g.pk}/change/">'
+            "http://blues_history.com</a>",
         )
 
     def test_blank_str_display_links(self):
@@ -1121,9 +1121,7 @@ class ChangeListTests(TestCase):
         )
         self.assertContains(
             response,
-            '<a href="/admin/admin_changelist/grandchild/{}/change/">-</a>'.format(
-                gc.pk
-            ),
+            f'<a href="/admin/admin_changelist/grandchild/{gc.pk}/change/">-</a>',
         )
 
     def test_clear_all_filters_link(self):
@@ -1140,11 +1138,11 @@ class ChangeListTests(TestCase):
             ),
             (
                 {"is_staff__exact": "0", SEARCH_VAR: "test"},
-                "?{}=test".format(SEARCH_VAR),
+                f"?{SEARCH_VAR}=test",
             ),
             (
                 {"is_staff__exact": "0", IS_POPUP_VAR: "id"},
-                "?{}=id".format(IS_POPUP_VAR),
+                f"?{IS_POPUP_VAR}=id",
             ),
         ):
             with self.subTest(data=data):
@@ -1165,7 +1163,7 @@ class ChangeListTests(TestCase):
             ),
             (
                 {"nr_of_members_partition": "5", IS_POPUP_VAR: "id"},
-                "?{}=id".format(IS_POPUP_VAR),
+                f"?{IS_POPUP_VAR}=id",
             ),
         ):
             with self.subTest(data=data):
@@ -1205,7 +1203,7 @@ class ChangeListTests(TestCase):
         # Reverse one-to-one relations should work.
         self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
         self.assertContains(
-            response, '<td class="field-swallowonetoone">{}</td>'.format(swallow_o2o)
+            response, f'<td class="field-swallowonetoone">{swallow_o2o}</td>'
         )
 
     def test_multiuser_edit(self):
@@ -1415,7 +1413,7 @@ class ChangeListTests(TestCase):
             counter = 0 if ascending else 51
             for page in range(1, 6):
                 request = self._mocked_authenticated_request(
-                    "/unorderedobject/?p={}".format(page), superuser
+                    f"/unorderedobject/?p={page}", superuser
                 )
                 response = model_admin.changelist_view(request)
                 for result in response.context_data["cl"].result_list:
@@ -1476,7 +1474,7 @@ class ChangeListTests(TestCase):
             counter = 0 if ascending else 51
             for page in range(1, 6):
                 request = self._mocked_authenticated_request(
-                    "/orderedobject/?p={}".format(page), superuser
+                    f"/orderedobject/?p={page}", superuser
                 )
                 response = model_admin.changelist_view(request)
                 for result in response.context_data["cl"].result_list:
@@ -1680,7 +1678,7 @@ class ChangeListTests(TestCase):
         """
         parent = Parent.objects.create(name="parent")
         for i in range(10):
-            Child.objects.create(name="child {}".format(i), parent=parent)
+            Child.objects.create(name=f"child {i}", parent=parent)
 
         user_noparents = self._create_superuser("noparents")
         user_parents = self._create_superuser("parents")
@@ -1948,18 +1946,18 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Test amount of rows in the Changelist
         rows = self.selenium.find_elements(
-            By.CSS_SELECTOR, "{} #result_list tbody tr".format(form_id)
+            By.CSS_SELECTOR, f"{form_id} #result_list tbody tr"
         )
         self.assertEqual(len(rows), 1)
         row = rows[0]
 
         selection_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, "{} .action-counter".format(form_id)
+            By.CSS_SELECTOR, f"{form_id} .action-counter"
         )
         all_selector = self.selenium.find_element(By.ID, "action-toggle")
         row_selector = self.selenium.find_element(
             By.CSS_SELECTOR,
-            "{} #result_list tbody tr:first-child .action-select".format(form_id),
+            f"{form_id} #result_list tbody tr:first-child .action-select",
         )
 
         # Test current selection

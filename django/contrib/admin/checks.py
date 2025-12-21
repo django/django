@@ -71,8 +71,8 @@ def check_dependencies(**kwargs):
         if not apps.is_installed(app_name):
             errors.append(
                 checks.Error(
-                    "'{}' must be in INSTALLED_APPS in order to use the admin "
-                    "application.".format(app_name),
+                    f"'{app_name}' must be in INSTALLED_APPS in order to use the admin "
+                    "application.",
                     id="admin.E%d" % error_code,
                 )
             )
@@ -240,11 +240,8 @@ class BaseModelAdminChecks:
             except NotRegistered:
                 return [
                     checks.Error(
-                        'An admin for model "{}" has to be registered '
-                        "to be referenced by {}.autocomplete_fields.".format(
-                            field.remote_field.model.__name__,
-                            type(obj).__name__,
-                        ),
+                        f'An admin for model "{field.remote_field.model.__name__}" has to be registered '
+                        f"to be referenced by {type(obj).__name__}.autocomplete_fields.",
                         obj=obj.__class__,
                         id="admin.E039",
                     )
@@ -253,11 +250,8 @@ class BaseModelAdminChecks:
                 if not related_admin.search_fields:
                     return [
                         checks.Error(
-                            '{} must define "search_fields", because it\'s '
-                            "referenced by {}.autocomplete_fields.".format(
-                                related_admin.__class__.__name__,
-                                type(obj).__name__,
-                            ),
+                            f'{related_admin.__class__.__name__} must define "search_fields", because it\'s '
+                            f"referenced by {type(obj).__name__}.autocomplete_fields.",
                             obj=obj.__class__,
                             id="admin.E040",
                         )
@@ -383,12 +377,12 @@ class BaseModelAdminChecks:
             return must_be("of length 2", option=label, obj=obj, id="admin.E009")
         elif not isinstance(fieldset[1], dict):
             return must_be(
-                "a dictionary", option="{}[1]".format(label), obj=obj, id="admin.E010"
+                "a dictionary", option=f"{label}[1]", obj=obj, id="admin.E010"
             )
         elif "fields" not in fieldset[1]:
             return [
                 checks.Error(
-                    "The value of '{}[1]' must contain the key 'fields'.".format(label),
+                    f"The value of '{label}[1]' must contain the key 'fields'.",
                     obj=obj.__class__,
                     id="admin.E011",
                 )
@@ -396,7 +390,7 @@ class BaseModelAdminChecks:
         elif not isinstance(fieldset[1]["fields"], (list, tuple)):
             return must_be(
                 "a list or tuple",
-                option="{}[1]['fields']".format(label),
+                option=f"{label}[1]['fields']",
                 obj=obj,
                 id="admin.E008",
             )
@@ -412,7 +406,7 @@ class BaseModelAdminChecks:
         ]:
             return [
                 checks.Error(
-                    "There are duplicate field(s) in '{}[1]'.".format(label),
+                    f"There are duplicate field(s) in '{label}[1]'.",
                     hint="Remove duplicates of {}.".format(
                         ", ".join(map(repr, duplicate_fields))
                     ),
@@ -422,9 +416,7 @@ class BaseModelAdminChecks:
             ]
         return list(
             chain.from_iterable(
-                self._check_field_spec(
-                    obj, fieldset_fields, '{}[1]["fields"]'.format(label)
-                )
+                self._check_field_spec(obj, fieldset_fields, f'{label}[1]["fields"]')
                 for fieldset_fields in fieldset[1]["fields"]
             )
         )
@@ -466,9 +458,9 @@ class BaseModelAdminChecks:
                 ):
                     return [
                         checks.Error(
-                            "The value of '{}' cannot include the ManyToManyField "
-                            "'{}', because that field manually specifies a "
-                            "relationship model.".format(label, field_name),
+                            f"The value of '{label}' cannot include the ManyToManyField "
+                            f"'{field_name}', because that field manually specifies a "
+                            "relationship model.",
                             obj=obj.__class__,
                             id="admin.E013",
                         )
@@ -582,7 +574,7 @@ class BaseModelAdminChecks:
                 chain.from_iterable(
                     self._check_radio_fields_key(obj, field_name, "radio_fields")
                     + self._check_radio_fields_value(
-                        obj, val, 'radio_fields["{}"]'.format(field_name)
+                        obj, val, f'radio_fields["{field_name}"]'
                     )
                     for field_name, val in obj.radio_fields.items()
                 )
@@ -602,9 +594,9 @@ class BaseModelAdminChecks:
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which is not an "
+                        f"The value of '{label}' refers to '{field_name}', which is not an "
                         "instance of ForeignKey, and does not have a 'choices' "
-                        "definition.".format(label, field_name),
+                        "definition.",
                         obj=obj.__class__,
                         id="admin.E023",
                     )
@@ -620,8 +612,8 @@ class BaseModelAdminChecks:
         if val not in (HORIZONTAL, VERTICAL):
             return [
                 checks.Error(
-                    "The value of '{}' must be either admin.HORIZONTAL or "
-                    "admin.VERTICAL.".format(label),
+                    f"The value of '{label}' must be either admin.HORIZONTAL or "
+                    "admin.VERTICAL.",
                     obj=obj.__class__,
                     id="admin.E024",
                 )
@@ -656,7 +648,7 @@ class BaseModelAdminChecks:
                         obj, field_name, "prepopulated_fields"
                     )
                     + self._check_prepopulated_fields_value(
-                        obj, val, 'prepopulated_fields["{}"]'.format(field_name)
+                        obj, val, f'prepopulated_fields["{field_name}"]'
                     )
                     for field_name, val in obj.prepopulated_fields.items()
                 )
@@ -679,9 +671,9 @@ class BaseModelAdminChecks:
             ):
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which must not be a "
+                        f"The value of '{label}' refers to '{field_name}', which must not be a "
                         "DateTimeField, a ForeignKey, a OneToOneField, or a "
-                        "ManyToManyField.".format(label, field_name),
+                        "ManyToManyField.",
                         obj=obj.__class__,
                         id="admin.E028",
                     )
@@ -699,7 +691,7 @@ class BaseModelAdminChecks:
             return list(
                 chain.from_iterable(
                     self._check_prepopulated_fields_value_item(
-                        obj, subfield_name, "{}[{!r}]".format(label, index)
+                        obj, subfield_name, f"{label}[{index!r}]"
                     )
                     for index, subfield_name in enumerate(val)
                 )
@@ -806,13 +798,8 @@ class BaseModelAdminChecks:
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which is not a callable, "
-                        "an attribute of '{}', or an attribute of '{}'.".format(
-                            label,
-                            field_name,
-                            obj.__class__.__name__,
-                            obj.model._meta.label,
-                        ),
+                        f"The value of '{label}' refers to '{field_name}', which is not a callable, "
+                        f"an attribute of '{obj.__class__.__name__}', or an attribute of '{obj.model._meta.label}'.",
                         obj=obj.__class__,
                         id="admin.E035",
                     )
@@ -878,7 +865,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         except AttributeError:
             return [
                 checks.Error(
-                    "'{}' must inherit from 'InlineModelAdmin'.".format(obj),
+                    f"'{obj}' must inherit from 'InlineModelAdmin'.",
                     obj=obj.__class__,
                     id="admin.E104",
                 )
@@ -889,7 +876,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not _issubclass(inline, InlineModelAdmin):
             return [
                 checks.Error(
-                    "'{}' must inherit from 'InlineModelAdmin'.".format(inline_label),
+                    f"'{inline_label}' must inherit from 'InlineModelAdmin'.",
                     obj=obj.__class__,
                     id="admin.E104",
                 )
@@ -897,7 +884,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif not inline.model:
             return [
                 checks.Error(
-                    "'{}' must have a 'model' attribute.".format(inline_label),
+                    f"'{inline_label}' must have a 'model' attribute.",
                     obj=obj.__class__,
                     id="admin.E105",
                 )
@@ -905,7 +892,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif not _issubclass(inline.model, models.Model):
             return must_be(
                 "a Model",
-                option="{}.model".format(inline_label),
+                option=f"{inline_label}.model",
                 obj=obj,
                 id="admin.E106",
             )
@@ -994,8 +981,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if field_name not in obj.list_display:
             return [
                 checks.Error(
-                    "The value of '{}' refers to '{}', which is not defined in "
-                    "'list_display'.".format(label, field_name),
+                    f"The value of '{label}' refers to '{field_name}', which is not defined in "
+                    "'list_display'.",
                     obj=obj.__class__,
                     id="admin.E111",
                 )
@@ -1036,9 +1023,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif issubclass(item, FieldListFilter):
                 return [
                     checks.Error(
-                        "The value of '{}' must not inherit from 'FieldListFilter'.".format(
-                            label
-                        ),
+                        f"The value of '{label}' must not inherit from 'FieldListFilter'.",
                         obj=obj.__class__,
                         id="admin.E114",
                     )
@@ -1051,7 +1036,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if not _issubclass(list_filter_class, FieldListFilter):
                 return must_inherit_from(
                     parent="FieldListFilter",
-                    option="{}[1]".format(label),
+                    option=f"{label}[1]",
                     obj=obj,
                     id="admin.E115",
                 )
@@ -1067,8 +1052,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except (NotRelationField, FieldDoesNotExist):
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which does not refer to a "
-                        "Field.".format(label, field),
+                        f"The value of '{label}' refers to '{field}', which does not refer to a "
+                        "Field.",
                         obj=obj.__class__,
                         id="admin.E116",
                     )
@@ -1138,8 +1123,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field_name not in obj.list_display:
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which is not "
-                        "contained in 'list_display'.".format(label, field_name),
+                        f"The value of '{label}' refers to '{field_name}', which is not "
+                        "contained in 'list_display'.",
                         obj=obj.__class__,
                         id="admin.E122",
                     )
@@ -1147,8 +1132,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif obj.list_display_links and field_name in obj.list_display_links:
                 return [
                     checks.Error(
-                        "The value of '{}' cannot be in both 'list_editable' and "
-                        "'list_display_links'.".format(field_name),
+                        f"The value of '{field_name}' cannot be in both 'list_editable' and "
+                        "'list_display_links'.",
                         obj=obj.__class__,
                         id="admin.E123",
                     )
@@ -1162,9 +1147,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
             ):
                 return [
                     checks.Error(
-                        "The value of '{}' refers to the first field in 'list_display' "
-                        "('{}'), which cannot be used unless 'list_display_links' is "
-                        "set.".format(label, obj.list_display[0]),
+                        f"The value of '{label}' refers to the first field in 'list_display' "
+                        f"('{obj.list_display[0]}'), which cannot be used unless 'list_display_links' is "
+                        "set.",
                         obj=obj.__class__,
                         id="admin.E124",
                     )
@@ -1172,8 +1157,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif not field.editable or field.primary_key:
                 return [
                     checks.Error(
-                        "The value of '{}' refers to '{}', which is not editable "
-                        "through the admin.".format(label, field_name),
+                        f"The value of '{label}' refers to '{field_name}', which is not editable "
+                        "through the admin.",
                         obj=obj.__class__,
                         id="admin.E125",
                     )
@@ -1202,8 +1187,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except (NotRelationField, FieldDoesNotExist):
                 return [
                     checks.Error(
-                        "The value of 'date_hierarchy' refers to '{}', which "
-                        "does not refer to a Field.".format(obj.date_hierarchy),
+                        f"The value of 'date_hierarchy' refers to '{obj.date_hierarchy}', which "
+                        "does not refer to a Field.",
                         obj=obj.__class__,
                         id="admin.E127",
                     )
@@ -1229,15 +1214,11 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if not hasattr(func, "allowed_permissions"):
                 continue
             for permission in func.allowed_permissions:
-                method_name = "has_{}_permission".format(permission)
+                method_name = f"has_{permission}_permission"
                 if not hasattr(obj, method_name):
                     errors.append(
                         checks.Error(
-                            "{} must define a {}() method for the {} action.".format(
-                                obj.__class__.__name__,
-                                method_name,
-                                func.__name__,
-                            ),
+                            f"{obj.__class__.__name__} must define a {method_name}() method for the {func.__name__} action.",
                             obj=obj.__class__,
                             id="admin.E129",
                         )
@@ -1248,11 +1229,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if count > 1:
                 errors.append(
                     checks.Error(
-                        "__name__ attributes of actions defined in {} must be "
-                        "unique. Name {!r} is not unique.".format(
-                            obj.__class__.__name__,
-                            name,
-                        ),
+                        f"__name__ attributes of actions defined in {obj.__class__.__name__} must be "
+                        f"unique. Name {name!r} is not unique.",
                         obj=obj.__class__,
                         id="admin.E130",
                     )
@@ -1291,11 +1269,8 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         if fk.name in obj.exclude:
             return [
                 checks.Error(
-                    "Cannot exclude the field '{}', because it is the foreign key "
-                    "to the parent model '{}'.".format(
-                        fk.name,
-                        parent_model._meta.label,
-                    ),
+                    f"Cannot exclude the field '{fk.name}', because it is the foreign key "
+                    f"to the parent model '{parent_model._meta.label}'.",
                     obj=obj.__class__,
                     id="admin.E201",
                 )
@@ -1353,7 +1328,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
 def must_be(type, option, obj, id):
     return [
         checks.Error(
-            "The value of '{}' must be {}.".format(option, type),
+            f"The value of '{option}' must be {type}.",
             obj=obj.__class__,
             id=id,
         ),
@@ -1363,7 +1338,7 @@ def must_be(type, option, obj, id):
 def must_inherit_from(parent, option, obj, id):
     return [
         checks.Error(
-            "The value of '{}' must inherit from '{}'.".format(option, parent),
+            f"The value of '{option}' must inherit from '{parent}'.",
             obj=obj.__class__,
             id=id,
         ),
@@ -1373,9 +1348,7 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, obj, id):
     return [
         checks.Error(
-            "The value of '{}' refers to '{}', which is not a field of '{}'.".format(
-                option, field, obj.model._meta.label
-            ),
+            f"The value of '{option}' refers to '{field}', which is not a field of '{obj.model._meta.label}'.",
             obj=obj.__class__,
             id=id,
         ),

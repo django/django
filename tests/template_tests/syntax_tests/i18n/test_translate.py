@@ -138,27 +138,25 @@ class I18nTransTagTests(SimpleTestCase):
 
     @setup({"template": "{% load i18n %}{% translate %}A}"})
     def test_syntax_error_no_arguments(self, tag_name):
-        msg = "'{}' takes at least one argument".format(tag_name)
+        msg = f"'{tag_name}' takes at least one argument"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")
 
     @setup({"template": '{% load i18n %}{% translate "Yes" badoption %}'})
     def test_syntax_error_bad_option(self, tag_name):
-        msg = "Unknown argument for '{}' tag: 'badoption'".format(tag_name)
+        msg = f"Unknown argument for '{tag_name}' tag: 'badoption'"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")
 
     @setup({"template": '{% load i18n %}{% translate "Yes" as %}'})
     def test_syntax_error_missing_assignment(self, tag_name):
-        msg = "No argument provided to the '{}' tag for the as option.".format(tag_name)
+        msg = f"No argument provided to the '{tag_name}' tag for the as option."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")
 
     @setup({"template": '{% load i18n %}{% translate "Yes" as var context %}'})
     def test_syntax_error_missing_context(self, tag_name):
-        msg = "No argument provided to the '{}' tag for the context option.".format(
-            tag_name
-        )
+        msg = f"No argument provided to the '{tag_name}' tag for the context option."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")
 
@@ -197,7 +195,7 @@ class TranslationTransTagTests(SimpleTestCase):
 
     def get_template(self, template_string):
         return Template(
-            template_string.replace("{{% translate ", "{{% {}".format(self.tag_name))
+            template_string.replace("{{% translate ", f"{{% {self.tag_name}")
         )
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -271,7 +269,7 @@ class MultipleLocaleActivationTransTagTests(MultipleLocaleActivationTestCase):
 
     def get_template(self, template_string):
         return Template(
-            template_string.replace("{{% translate ", "{{% {}".format(self.tag_name))
+            template_string.replace("{{% translate ", f"{{% {self.tag_name}")
         )
 
     def test_single_locale_activation(self):

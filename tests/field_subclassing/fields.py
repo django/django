@@ -17,7 +17,7 @@ class CustomDeferredAttribute(DeferredAttribute):
         instance.__dict__[self.field.attname] = value
 
     def _count_call(self, instance, get_or_set):
-        count_attr = "_{}_{}_count".format(self.field.attname, get_or_set)
+        count_attr = f"_{self.field.attname}_{get_or_set}_count"
         count = getattr(instance, count_attr, 0)
         setattr(instance, count_attr, count + 1)
 

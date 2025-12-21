@@ -13,9 +13,9 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _get_database_create_suffix(self, encoding=None, template=None):
         suffix = ""
         if encoding:
-            suffix += " ENCODING '{}'".format(encoding)
+            suffix += f" ENCODING '{encoding}'"
         if template:
-            suffix += " TEMPLATE {}".format(self._quote_name(template))
+            suffix += f" TEMPLATE {self._quote_name(template)}"
         return suffix and "WITH" + suffix
 
     def sql_table_creation_suffix(self):
@@ -47,7 +47,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         except Exception as e:
             if not isinstance(e.__cause__, errors.DuplicateDatabase):
                 # All errors except "database already exists" cancel tests.
-                self.log("Got an error creating the test database: {}".format(e))
+                self.log(f"Got an error creating the test database: {e}")
                 sys.exit(2)
             elif not keepdb:
                 # If the database should be kept, ignore "database already
@@ -82,7 +82,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     cursor.execute("DROP DATABASE {dbname}".format(**test_db_params))
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
-                    self.log("Got an error cloning the test database: {}".format(e))
+                    self.log(f"Got an error cloning the test database: {e}")
                     sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):

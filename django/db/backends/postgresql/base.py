@@ -616,5 +616,5 @@ else:
                 return self.cursor.copy_expert(sql, file, *args)
 
         def copy_to(self, file, table, *args, **kwargs):
-            with self.debug_sql(sql="COPY {} TO STDOUT".format(table)):
+            with self.debug_sql(sql=f"COPY {table} TO STDOUT"):
                 return self.cursor.copy_to(file, table, *args, **kwargs)

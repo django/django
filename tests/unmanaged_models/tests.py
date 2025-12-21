@@ -48,7 +48,7 @@ class ManyToManyUnmanagedTests(TestCase):
         table = Unmanaged2._meta.get_field("mm").m2m_db_table()
         tables = connection.introspection.table_names()
         self.assertNotIn(
-            table, tables, "Table '{}' should not exist, but it does.".format(table)
+            table, tables, f"Table '{table}' should not exist, but it does."
         )
 
     def test_many_to_many_between_unmanaged_and_managed(self):
@@ -58,4 +58,4 @@ class ManyToManyUnmanagedTests(TestCase):
         """
         table = Managed1._meta.get_field("mm").m2m_db_table()
         tables = connection.introspection.table_names()
-        self.assertIn(table, tables, "Table '{}' does not exist.".format(table))
+        self.assertIn(table, tables, f"Table '{table}' does not exist.")

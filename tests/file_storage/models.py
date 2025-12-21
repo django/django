@@ -50,7 +50,7 @@ class Storage(models.Model):
     def random_upload_to(self, filename):
         # This returns a different result each time,
         # to make sure it only gets called once.
-        return "{}/{}".format(random.randint(100, 999), filename)
+        return f"{random.randint(100, 999)}/{filename}"
 
     def pathlib_upload_to(self, filename):
         return Path("bar") / filename

@@ -113,7 +113,7 @@ def load_backend(backend_name):
         backend_name = "django.db.backends.postgresql"
 
     try:
-        return import_module("{}.base".format(backend_name))
+        return import_module(f"{backend_name}.base")
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all built-in database backends.
@@ -124,9 +124,7 @@ def load_backend(backend_name):
             for _, name, ispkg in pkgutil.iter_modules(django.db.backends.__path__)
             if ispkg and name not in {"base", "dummy"}
         ]
-        if backend_name not in [
-            "django.db.backends.{}".format(b) for b in builtin_backends
-        ]:
+        if backend_name not in [f"django.db.backends.{b}" for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
             raise ImproperlyConfigured(
                 "{!r} isn't an available database backend or couldn't be "

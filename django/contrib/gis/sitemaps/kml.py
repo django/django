@@ -65,7 +65,7 @@ class KMLSitemap(Sitemap):
 
     def location(self, obj):
         return reverse(
-            "django.contrib.gis.sitemaps.views.{}".format(self.geo_format),
+            f"django.contrib.gis.sitemaps.views.{self.geo_format}",
             kwargs={
                 "label": obj[0],
                 "model": obj[1],

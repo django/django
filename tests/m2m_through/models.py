@@ -41,7 +41,7 @@ class Membership(models.Model):
         ordering = ("date_joined", "invite_reason", "group")
 
     def __str__(self):
-        return "{} is a member of {}".format(self.person.name, self.group.name)
+        return f"{self.person.name} is a member of {self.group.name}"
 
 
 class CustomMembership(models.Model):
@@ -60,7 +60,7 @@ class CustomMembership(models.Model):
         ordering = ["date_joined"]
 
     def __str__(self):
-        return "{} is a member of {}".format(self.person.name, self.group.name)
+        return f"{self.person.name} is a member of {self.group.name}"
 
 
 class TestNoDefaultsOrNulls(models.Model):

@@ -51,8 +51,8 @@ class Command(BaseCommand):
         # a strange error -- it causes this handle() method to be called
         # multiple times.
         shutdown_message = (
-            "\nServer stopped.\nNote that the test database, {!r}, has not been "
-            "deleted. You can explore it on your own.".format(db_name)
+            f"\nServer stopped.\nNote that the test database, {db_name!r}, has not been "
+            "deleted. You can explore it on your own."
         )
         use_threading = connection.features.test_db_allows_multiple_connections
         call_command(

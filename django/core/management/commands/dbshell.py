@@ -35,9 +35,7 @@ class Command(BaseCommand):
             # which case this error message would be inaccurate. Still, this
             # message catches the common case.
             raise CommandError(
-                "You appear not to have the {!r} program installed or on your path.".format(
-                    connection.client.executable_name
-                )
+                f"You appear not to have the {connection.client.executable_name!r} program installed or on your path."
             )
         except subprocess.CalledProcessError as e:
             raise CommandError(

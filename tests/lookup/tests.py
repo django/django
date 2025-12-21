@@ -1079,7 +1079,7 @@ class LookupTests(TestCase):
                 [self.a1],
             )
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN ({})".format(self.a1.pk), sql)
+        self.assertIn(f"IN ({self.a1.pk})", sql)
 
     def test_in_ignore_solo_none(self):
         with self.assertNumQueries(0):
@@ -1095,7 +1095,7 @@ class LookupTests(TestCase):
                 [self.a1],
             )
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN ({})".format(self.a1.pk), sql)
+        self.assertIn(f"IN ({self.a1.pk})", sql)
 
     def test_in_select_mismatch(self):
         msg = (
@@ -1626,7 +1626,7 @@ class LookupTests(TestCase):
         for lookup, result in tests:
             with self.subTest(lookup=lookup):
                 authors = Author.objects.filter(
-                    **{"name__{}".format(lookup): Substr("alias", 1, 3)}
+                    **{f"name__{lookup}": Substr("alias", 1, 3)}
                 )
                 self.assertCountEqual(authors, result)
 

@@ -16,6 +16,6 @@ class Command(BaseCommand):
             engine.SessionStore.clear_expired()
         except NotImplementedError:
             raise CommandError(
-                "Session engine '{}' doesn't support clearing expired "
-                "sessions.".format(settings.SESSION_ENGINE)
+                f"Session engine '{settings.SESSION_ENGINE}' doesn't support clearing expired "
+                "sessions."
             )

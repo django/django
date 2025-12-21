@@ -62,7 +62,7 @@ class Command(BaseCommand):
 
         if tablename in connection.introspection.table_names():
             if self.verbosity > 0:
-                self.stdout.write("Cache table '{}' already exists.".format(tablename))
+                self.stdout.write(f"Cache table '{tablename}' already exists.")
             return
 
         fields = (
@@ -91,13 +91,13 @@ class Command(BaseCommand):
                 index_output.append(
                     "CREATE {}INDEX {} ON {} ({});".format(
                         unique,
-                        qn("{}_{}".format(tablename, f.name)),
+                        qn(f"{tablename}_{f.name}"),
                         qn(tablename),
                         qn(f.name),
                     )
                 )
             table_output.append(" ".join(field_output))
-        full_statement = ["CREATE TABLE {} (".format(qn(tablename))]
+        full_statement = [f"CREATE TABLE {qn(tablename)} ("]
         for i, line in enumerate(table_output):
             full_statement.append(
                 "    {}{}".format(line, "," if i < len(table_output) - 1 else "")
@@ -120,12 +120,10 @@ class Command(BaseCommand):
                     curs.execute(full_statement)
                 except DatabaseError as e:
                     raise CommandError(
-                        "Cache table '{}' could not be created.\nThe error was: {}.".format(
-                            tablename, e
-                        )
+                        f"Cache table '{tablename}' could not be created.\nThe error was: {e}."
                     )
                 for statement in index_output:
                     curs.execute(statement)
 
         if self.verbosity > 1:
-            self.stdout.write("Cache table '{}' created.".format(tablename))
+            self.stdout.write(f"Cache table '{tablename}' created.")

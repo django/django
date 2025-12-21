@@ -47,7 +47,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
             return self.__dict__["model"]
         except KeyError:
             raise AttributeError(
-                "'{}' object has no attribute 'model'".format(self.__class__.__name__)
+                f"'{self.__class__.__name__}' object has no attribute 'model'"
             )
 
     @model.setter
@@ -73,7 +73,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
             base_checks = self.base_field.check(**kwargs)
             if base_checks:
                 error_messages = "\n    ".join(
-                    "{} ({})".format(base_check.msg, base_check.id)
+                    f"{base_check.msg} ({base_check.id})"
                     for base_check in base_checks
                     if isinstance(base_check, checks.Error)
                     # Prevent duplication of E005 in an E001 check.
@@ -82,24 +82,20 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 if error_messages:
                     errors.append(
                         checks.Error(
-                            "Base field for array has errors:\n    {}".format(
-                                error_messages
-                            ),
+                            f"Base field for array has errors:\n    {error_messages}",
                             obj=self,
                             id="postgres.E001",
                         )
                     )
                 warning_messages = "\n    ".join(
-                    "{} ({})".format(base_check.msg, base_check.id)
+                    f"{base_check.msg} ({base_check.id})"
                     for base_check in base_checks
                     if isinstance(base_check, checks.Warning)
                 )
                 if warning_messages:
                     errors.append(
                         checks.Warning(
-                            "Base field for array has warnings:\n    {}".format(
-                                warning_messages
-                            ),
+                            f"Base field for array has warnings:\n    {warning_messages}",
                             obj=self,
                             id="postgres.W004",
                         )
@@ -112,15 +108,15 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
 
     @property
     def description(self):
-        return "Array of {}".format(self.base_field.description)
+        return f"Array of {self.base_field.description}"
 
     def db_type(self, connection):
         size = self.size or ""
-        return "{}[{}]".format(self.base_field.db_type(connection), size)
+        return f"{self.base_field.db_type(connection)}[{size}]"
 
     def cast_db_type(self, connection):
         size = self.size or ""
-        return "{}[{}]".format(self.base_field.cast_db_type(connection), size)
+        return f"{self.base_field.cast_db_type(connection)}[{size}]"
 
     def db_parameters(self, connection):
         db_params = super().db_parameters(connection)
@@ -128,7 +124,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         return db_params
 
     def get_placeholder(self, value, compiler, connection):
-        return "%s::{}".format(self.db_type(connection))
+        return f"%s::{self.db_type(connection)}"
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
@@ -271,7 +267,7 @@ class ArrayRHSMixin:
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
         cast_type = self.lhs.output_field.cast_db_type(connection)
-        return "{}::{}".format(rhs, cast_type), rhs_params
+        return f"{rhs}::{cast_type}", rhs_params
 
     def _rhs_not_none_values(self, rhs):
         for x in rhs:
@@ -310,9 +306,9 @@ class ArrayLenTransform(Transform):
         lhs, params = compiler.compile(self.lhs)
         # Distinguish NULL and empty arrays
         return (
-            "CASE WHEN {lhs} IS NULL THEN NULL ELSE "
-            "coalesce(array_length({lhs}, 1), 0) END"
-        ).format(lhs=lhs), params * 2
+            f"CASE WHEN {lhs} IS NULL THEN NULL ELSE "
+            f"coalesce(array_length({lhs}, 1), 0) END"
+        ), params * 2
 
 
 @ArrayField.register_lookup
@@ -341,8 +337,8 @@ class IndexTransform(Transform):
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
         if not lhs.endswith("]"):
-            lhs = "({})".format(lhs)
-        return "{}[%s]".format(lhs), (*params, self.index)
+            lhs = f"({lhs})"
+        return f"{lhs}[%s]", (*params, self.index)
 
     @property
     def output_field(self):

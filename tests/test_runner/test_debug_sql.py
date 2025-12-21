@@ -21,7 +21,7 @@ class QueryFormatterTests(unittest.TestCase):
 
     def new_format_sql(self, sql):
         # Use time() to introduce some uniqueness.
-        formatted = "Formatted! {} at {}".format(sql.upper(), time())
+        formatted = f"Formatted! {sql.upper()} at {time()}"
         self.format_sql_calls.append({sql: formatted})
         return formatted
 

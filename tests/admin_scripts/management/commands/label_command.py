@@ -6,8 +6,4 @@ class Command(LabelCommand):
     requires_system_checks = []
 
     def handle_label(self, label, **options):
-        print(
-            "EXECUTE:LabelCommand label={}, options={}".format(
-                label, sorted(options.items())
-            )
-        )
+        print(f"EXECUTE:LabelCommand label={label}, options={sorted(options.items())}")

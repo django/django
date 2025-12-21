@@ -27,7 +27,7 @@ class SecurityMiddleware(MiddlewareMixin):
         ):
             host = self.redirect_host or request.get_host()
             return HttpResponsePermanentRedirect(
-                "https://{}{}".format(host, request.get_full_path())
+                f"https://{host}{request.get_full_path()}"
             )
 
     def process_response(self, request, response):
@@ -36,7 +36,7 @@ class SecurityMiddleware(MiddlewareMixin):
             and request.is_secure()
             and "Strict-Transport-Security" not in response
         ):
-            sts_header = "max-age={}".format(self.sts_seconds)
+            sts_header = f"max-age={self.sts_seconds}"
             if self.sts_include_subdomains:
                 sts_header += "; includeSubDomains"
             if self.sts_preload:

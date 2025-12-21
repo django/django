@@ -53,9 +53,7 @@ class FuncTestMixin:
                 func.output_field
                 __dict__original = copy.deepcopy(func.__dict__)
                 result = original_as_sql(*args, **kwargs)
-                msg = "{} Func was mutated during compilation.".format(
-                    func.__class__.__name__
-                )
+                msg = f"{func.__class__.__name__} Func was mutated during compilation."
                 self.assertEqual(func.__dict__, __dict__original, msg)
                 return result
 

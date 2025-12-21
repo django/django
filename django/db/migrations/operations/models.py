@@ -16,9 +16,7 @@ def _check_for_duplicates(arg_name, objs):
     for val in objs:
         if val in used_vals:
             raise ValueError(
-                "Found duplicate value {} in CreateModel {} argument.".format(
-                    val, arg_name
-                )
+                f"Found duplicate value {val} in CreateModel {arg_name} argument."
             )
         used_vals.add(val)
 
@@ -411,11 +409,11 @@ class DeleteModel(ModelOperation):
         return True
 
     def describe(self):
-        return "Delete model {}".format(self.name)
+        return f"Delete model {self.name}"
 
     @property
     def migration_name_fragment(self):
-        return "delete_{}".format(self.name_lower)
+        return f"delete_{self.name_lower}"
 
 
 class RenameModel(ModelOperation):
@@ -515,11 +513,11 @@ class RenameModel(ModelOperation):
         )
 
     def describe(self):
-        return "Rename model {} to {}".format(self.old_name, self.new_name)
+        return f"Rename model {self.old_name} to {self.new_name}"
 
     @property
     def migration_name_fragment(self):
-        return "rename_{}_{}".format(self.old_name_lower, self.new_name_lower)
+        return f"rename_{self.old_name_lower}_{self.new_name_lower}"
 
     def reduce(self, operation, app_label):
         if (
@@ -594,7 +592,7 @@ class AlterModelTable(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_table".format(self.name_lower)
+        return f"alter_{self.name_lower}_table"
 
 
 class AlterModelTableComment(ModelOptionOperation):
@@ -667,7 +665,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             from_model_state = from_state.models[app_label, self.name_lower]
             to_model_state = to_state.models[app_label, self.name_lower]
-            alter_together = getattr(schema_editor, "alter_{}".format(self.option_name))
+            alter_together = getattr(schema_editor, f"alter_{self.option_name}")
             alter_together(
                 new_model,
                 from_model_state.options.get(self.option_name) or set(),
@@ -692,7 +690,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_{}".format(self.name_lower, self.option_name)
+        return f"alter_{self.name_lower}_{self.option_name}"
 
     def can_reduce_through(self, operation, app_label):
         return super().can_reduce_through(operation, app_label) or (
@@ -783,14 +781,13 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
         )
 
     def describe(self):
-        return "Set order_with_respect_to on {} to {}".format(
-            self.name,
-            self.order_with_respect_to,
+        return (
+            f"Set order_with_respect_to on {self.name} to {self.order_with_respect_to}"
         )
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_order_with_respect_to".format(self.name_lower)
+        return f"alter_{self.name_lower}_order_with_respect_to"
 
 
 class AlterModelOptions(ModelOptionOperation):
@@ -841,11 +838,11 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on {}".format(self.name)
+        return f"Change Meta options on {self.name}"
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_options".format(self.name_lower)
+        return f"alter_{self.name_lower}_options"
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -870,11 +867,11 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on {}".format(self.name)
+        return f"Change managers on {self.name}"
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_managers".format(self.name_lower)
+        return f"alter_{self.name_lower}_managers"
 
 
 class IndexOperation(Operation):
@@ -895,7 +892,7 @@ class AddIndex(IndexOperation):
         if not index.name:
             raise ValueError(
                 "Indexes passed to AddIndex operations require a name "
-                "argument. {!r} doesn't have one.".format(index)
+                f"argument. {index!r} doesn't have one."
             )
         self.index = index
 
@@ -938,7 +935,7 @@ class AddIndex(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "{}_{}".format(self.model_name_lower, self.index.name.lower())
+        return f"{self.model_name_lower}_{self.index.name.lower()}"
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
@@ -988,11 +985,11 @@ class RemoveIndex(IndexOperation):
         )
 
     def describe(self):
-        return "Remove index {} from {}".format(self.name, self.model_name)
+        return f"Remove index {self.name} from {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "remove_{}_{}".format(self.model_name_lower, self.name.lower())
+        return f"remove_{self.model_name_lower}_{self.name.lower()}"
 
 
 class RenameIndex(IndexOperation):
@@ -1123,7 +1120,7 @@ class RenameIndex(IndexOperation):
     @property
     def migration_name_fragment(self):
         if self.old_name:
-            return "rename_{}_{}".format(self.old_name_lower, self.new_name_lower)
+            return f"rename_{self.old_name_lower}_{self.new_name_lower}"
         return "rename_{}_{}_{}".format(
             self.model_name_lower,
             "_".join(self.old_fields),
@@ -1173,14 +1170,11 @@ class AddConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Create constraint {} on model {}".format(
-            self.constraint.name,
-            self.model_name,
-        )
+        return f"Create constraint {self.constraint.name} on model {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "{}_{}".format(self.model_name_lower, self.constraint.name.lower())
+        return f"{self.model_name_lower}_{self.constraint.name.lower()}"
 
     def reduce(self, operation, app_label):
         if (
@@ -1234,11 +1228,11 @@ class RemoveConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Remove constraint {} from model {}".format(self.name, self.model_name)
+        return f"Remove constraint {self.name} from model {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "remove_{}_{}".format(self.model_name_lower, self.name.lower())
+        return f"remove_{self.model_name_lower}_{self.name.lower()}"
 
 
 class AlterConstraint(IndexOperation):
@@ -1277,7 +1271,7 @@ class AlterConstraint(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_{}".format(self.model_name_lower, self.constraint.name.lower())
+        return f"alter_{self.model_name_lower}_{self.constraint.name.lower()}"
 
     def reduce(self, operation, app_label):
         if (

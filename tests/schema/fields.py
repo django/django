@@ -68,7 +68,7 @@ class CustomManyToManyField(RelatedField):
             self.remote_field.model == "self"
             or self.remote_field.model == cls._meta.object_name
         ):
-            self.remote_field.related_name = "{}_rel_+".format(name)
+            self.remote_field.related_name = f"{name}_rel_+"
         super().contribute_to_class(cls, name, **kwargs)
         if (
             not self.remote_field.through

@@ -13,7 +13,7 @@ class Reporter(models.Model):
     email = models.EmailField()
 
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return f"{self.first_name} {self.last_name}"
 
 
 class Article(models.Model):
@@ -115,7 +115,7 @@ class Relation(models.Model):
     right = models.ForeignKey(Record, models.CASCADE, related_name="right_set")
 
     def __str__(self):
-        return "{} - {}".format(self.left.category.name, self.right.category.name)
+        return f"{self.left.category.name} - {self.right.category.name}"
 
 
 # Test related objects visibility.

@@ -169,7 +169,7 @@ class SimplifiedURLTests(SimpleTestCase):
     def test_converter_reverse(self):
         for expected, (url_name, app_name, kwargs) in converter_test_data:
             if app_name:
-                url_name = "{}:{}".format(app_name, url_name)
+                url_name = f"{app_name}:{url_name}"
             with self.subTest(url=url_name):
                 url = reverse(url_name, kwargs=kwargs)
                 self.assertEqual(url, expected)
@@ -233,12 +233,12 @@ class SimplifiedURLTests(SimpleTestCase):
         msg = "URL route %r cannot contain whitespace in angle brackets <…>"
         for whitespace in string.whitespace:
             with self.subTest(repr(whitespace)):
-                route = "space/<int:num>/extra/<str:{}test>".format(whitespace)
+                route = f"space/<int:num>/extra/<str:{whitespace}test>"
                 with self.assertRaisesMessage(ImproperlyConfigured, msg % route):
                     path(route, empty_view)
         # Whitespaces are valid in paths.
-        p = path("space{}/<int:num>/".format(string.whitespace), empty_view)
-        match = p.resolve("space{}/1/".format(string.whitespace))
+        p = path(f"space{string.whitespace}/<int:num>/", empty_view)
+        match = p.resolve(f"space{string.whitespace}/1/")
         self.assertEqual(match.kwargs, {"num": 1})
 
     def test_path_trailing_newlines(self):
@@ -270,7 +270,7 @@ class ConverterTests(SimpleTestCase):
         )
         for url_name, url_suffixes, converter in test_data:
             for url_suffix in url_suffixes:
-                url = "/{}/{}/".format(url_name, url_suffix)
+                url = f"/{url_name}/{url_suffix}/"
                 with self.subTest(url=url):
                     match = resolve(url)
                     self.assertEqual(match.url_name, url_name)
@@ -283,7 +283,7 @@ class ConverterTests(SimpleTestCase):
                         # The converted value might be different for int (a
                         # leading zero is lost in the conversion).
                         converted_value = match.kwargs[url_name]
-                        converted_url = "/{}/{}/".format(url_name, converted_value)
+                        converted_url = f"/{url_name}/{converted_value}/"
                         self.assertEqual(
                             reverse(url_name, kwargs={url_name: converted_value}),
                             converted_url,
@@ -309,7 +309,7 @@ class ConverterTests(SimpleTestCase):
         )
         for url_name, url_suffixes in test_data:
             for url_suffix in url_suffixes:
-                url = "/{}/{}/".format(url_name, url_suffix)
+                url = f"/{url_name}/{url_suffix}/"
                 with self.subTest(url=url), self.assertRaises(Resolver404):
                     resolve(url)
 
@@ -369,7 +369,7 @@ class SameNameTests(SimpleTestCase):
         ]
         for url_name, cases in tests:
             for args, kwargs, url_suffix in cases:
-                expected_url = "/{}/{}".format(url_name, url_suffix)
+                expected_url = f"/{url_name}/{url_suffix}"
                 with self.subTest(url=expected_url):
                     self.assertEqual(
                         reverse(url_name, args=args, kwargs=kwargs),

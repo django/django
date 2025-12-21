@@ -1523,7 +1523,7 @@ class ModelFormBasicTests(TestCase):
         )
         self.assertHTMLEqual(
             f.as_ul(),
-            """
+            f"""
             <li>Headline:
             <input type="text" name="headline" value="Your headline here" maxlength="50"
                 required>
@@ -1532,15 +1532,15 @@ class ModelFormBasicTests(TestCase):
             <li>Pub date: <input type="text" name="pub_date" required></li>
             <li>Writer: <select name="writer" required>
             <option value="" selected>---------</option>
-            <option value="{}">Bob Woodward</option>
-            <option value="{}">Mike Royko</option>
+            <option value="{self.w_woodward.pk}">Bob Woodward</option>
+            <option value="{self.w_royko.pk}">Mike Royko</option>
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required></textarea></li>
             <li>Categories: <select multiple name="categories">
-            <option value="{}" selected>Entertainment</option>
-            <option value="{}" selected>It&#x27;s a test</option>
-            <option value="{}">Third test</option>
+            <option value="{self.c1.pk}" selected>Entertainment</option>
+            <option value="{self.c2.pk}" selected>It&#x27;s a test</option>
+            <option value="{self.c3.pk}">Third test</option>
             </select></li>
             <li>Status: <select name="status">
             <option value="" selected>---------</option>
@@ -1548,9 +1548,7 @@ class ModelFormBasicTests(TestCase):
             <option value="2">Pending</option>
             <option value="3">Live</option>
             </select></li>
-            """.format(
-                self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk
-            ),
+            """,
         )
 
         # When the ModelForm is passed an instance, that instance's current
@@ -1575,7 +1573,7 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False, instance=art)
         self.assertHTMLEqual(
             f.as_ul(),
-            """
+            f"""
             <li>Headline:
             <input type="text" name="headline" value="Test article" maxlength="50"
                 required>
@@ -1587,15 +1585,15 @@ class ModelFormBasicTests(TestCase):
             <input type="text" name="pub_date" value="1988-01-04" required></li>
             <li>Writer: <select name="writer" required>
             <option value="">---------</option>
-            <option value="{}">Bob Woodward</option>
-            <option value="{}" selected>Mike Royko</option>
+            <option value="{self.w_woodward.pk}">Bob Woodward</option>
+            <option value="{self.w_royko.pk}" selected>Mike Royko</option>
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
             <li>Categories: <select multiple name="categories">
-            <option value="{}">Entertainment</option>
-            <option value="{}">It&#x27;s a test</option>
-            <option value="{}">Third test</option>
+            <option value="{self.c1.pk}">Entertainment</option>
+            <option value="{self.c2.pk}">It&#x27;s a test</option>
+            <option value="{self.c3.pk}">Third test</option>
             </select></li>
             <li>Status: <select name="status">
             <option value="" selected>---------</option>
@@ -1603,9 +1601,7 @@ class ModelFormBasicTests(TestCase):
             <option value="2">Pending</option>
             <option value="3">Live</option>
             </select></li>
-            """.format(
-                self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk
-            ),
+            """,
         )
 
         f = ArticleForm(
@@ -1722,7 +1718,7 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            """
+            f"""
             <div>Headline:
                 <input type="text" name="headline" maxlength="50" required>
             </div>
@@ -1735,8 +1731,8 @@ class ModelFormBasicTests(TestCase):
             <div>Writer:
                 <select name="writer" required>
                     <option value="" selected>---------</option>
-                    <option value="{}">Bob Woodward</option>
-                    <option value="{}">Mike Royko</option>
+                    <option value="{self.w_woodward.pk}">Bob Woodward</option>
+                    <option value="{self.w_royko.pk}">Mike Royko</option>
                 </select>
             </div>
             <div>Article:
@@ -1744,9 +1740,9 @@ class ModelFormBasicTests(TestCase):
             </div>
             <div>Categories:
                 <select name="categories" multiple>
-                    <option value="{}">Entertainment</option>
-                    <option value="{}">It&#x27;s a test</option>
-                    <option value="{}">Third test</option>
+                    <option value="{self.c1.pk}">Entertainment</option>
+                    <option value="{self.c2.pk}">It&#x27;s a test</option>
+                    <option value="{self.c3.pk}">Third test</option>
                 </select>
             </div>
             <div>Status:
@@ -1756,9 +1752,7 @@ class ModelFormBasicTests(TestCase):
                     <option value="3">Live</option>
                 </select>
             </div>
-            """.format(
-                self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk
-            ),
+            """,
         )
 
         # Add some categories and test the many-to-many form output.
@@ -1774,7 +1768,7 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False, instance=new_art)
         self.assertHTMLEqual(
             f.as_ul(),
-            """
+            f"""
             <li>Headline:
             <input type="text" name="headline" value="New headline" maxlength="50"
                 required>
@@ -1786,15 +1780,15 @@ class ModelFormBasicTests(TestCase):
             <input type="text" name="pub_date" value="1988-01-04" required></li>
             <li>Writer: <select name="writer" required>
             <option value="">---------</option>
-            <option value="{}">Bob Woodward</option>
-            <option value="{}" selected>Mike Royko</option>
+            <option value="{self.w_woodward.pk}">Bob Woodward</option>
+            <option value="{self.w_royko.pk}" selected>Mike Royko</option>
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
             <li>Categories: <select multiple name="categories">
-            <option value="{}" selected>Entertainment</option>
-            <option value="{}">It&#x27;s a test</option>
-            <option value="{}">Third test</option>
+            <option value="{self.c1.pk}" selected>Entertainment</option>
+            <option value="{self.c2.pk}">It&#x27;s a test</option>
+            <option value="{self.c3.pk}">Third test</option>
             </select></li>
             <li>Status: <select name="status">
             <option value="" selected>---------</option>
@@ -1802,9 +1796,7 @@ class ModelFormBasicTests(TestCase):
             <option value="2">Pending</option>
             <option value="3">Live</option>
             </select></li>
-            """.format(
-                self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk
-            ),
+            """,
         )
 
     def test_subset_fields(self):
@@ -1963,24 +1955,22 @@ class ModelFormBasicTests(TestCase):
             '<li>Pub date: <input type="text" name="pub_date" required></li>'
             '<li>Writer: <select name="writer" required>'
             '<option value="" selected>---------</option>'
-            '<option value="{}">Bob Woodward</option>'
-            '<option value="{}">Mike Royko</option>'
+            f'<option value="{self.w_woodward.pk}">Bob Woodward</option>'
+            f'<option value="{self.w_royko.pk}">Mike Royko</option>'
             "</select></li>"
             '<li>Article: <textarea rows="10" cols="40" name="article" required>'
             "</textarea></li>"
             '<li>Categories: <select multiple name="categories">'
-            '<option value="{}">Entertainment</option>'
-            '<option value="{}">It&#x27;s a test</option>'
-            '<option value="{}">Third test</option>'
+            f'<option value="{self.c1.pk}">Entertainment</option>'
+            f'<option value="{self.c2.pk}">It&#x27;s a test</option>'
+            f'<option value="{self.c3.pk}">Third test</option>'
             "</select> </li>"
             '<li>Status: <select name="status">'
             '<option value="" selected>---------</option>'
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
-            "</select></li>".format(
-                self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk
-            ),
+            "</select></li>",
         )
 
         c4 = Category.objects.create(name="Fourth", url="4th")
@@ -1993,32 +1983,24 @@ class ModelFormBasicTests(TestCase):
             '<li>Pub date: <input type="text" name="pub_date" required></li>'
             '<li>Writer: <select name="writer" required>'
             '<option value="" selected>---------</option>'
-            '<option value="{}">Bob Woodward</option>'
-            '<option value="{}">Carl Bernstein</option>'
-            '<option value="{}">Mike Royko</option>'
+            f'<option value="{self.w_woodward.pk}">Bob Woodward</option>'
+            f'<option value="{w_bernstein.pk}">Carl Bernstein</option>'
+            f'<option value="{self.w_royko.pk}">Mike Royko</option>'
             "</select></li>"
             '<li>Article: <textarea rows="10" cols="40" name="article" required>'
             "</textarea></li>"
             '<li>Categories: <select multiple name="categories">'
-            '<option value="{}">Entertainment</option>'
-            '<option value="{}">It&#x27;s a test</option>'
-            '<option value="{}">Third test</option>'
-            '<option value="{}">Fourth</option>'
+            f'<option value="{self.c1.pk}">Entertainment</option>'
+            f'<option value="{self.c2.pk}">It&#x27;s a test</option>'
+            f'<option value="{self.c3.pk}">Third test</option>'
+            f'<option value="{c4.pk}">Fourth</option>'
             "</select></li>"
             '<li>Status: <select name="status">'
             '<option value="" selected>---------</option>'
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
-            "</select></li>".format(
-                self.w_woodward.pk,
-                w_bernstein.pk,
-                self.w_royko.pk,
-                self.c1.pk,
-                self.c2.pk,
-                self.c3.pk,
-                c4.pk,
-            ),
+            "</select></li>",
         )
 
     @isolate_apps("model_forms")
@@ -2229,7 +2211,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         """
         ModelMultipleChoiceField does O(1) queries instead of O(n) (#10156).
         """
-        persons = [Writer.objects.create(name="Person {}".format(i)) for i in range(30)]
+        persons = [Writer.objects.create(name=f"Person {i}") for i in range(30)]
 
         f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
         self.assertNumQueries(1, f.clean, [p.pk for p in persons[1:11:2]])
@@ -2248,7 +2230,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         ModelMultipleChoiceField run given validators (#14144).
         """
         for i in range(30):
-            Writer.objects.create(name="Person {}".format(i))
+            Writer.objects.create(name=f"Person {i}")
 
         self._validator_run = False
 
@@ -2412,19 +2394,16 @@ class ModelOneToOneFieldTests(TestCase):
         form = WriterProfileForm()
         self.assertHTMLEqual(
             form.as_p(),
-            """
+            f"""
             <p><label for="id_writer">Writer:</label>
             <select name="writer" id="id_writer" required>
             <option value="" selected>---------</option>
-            <option value="{}">Bob Woodward</option>
-            <option value="{}">Mike Royko</option>
+            <option value="{self.w_woodward.pk}">Bob Woodward</option>
+            <option value="{self.w_royko.pk}">Mike Royko</option>
             </select></p>
             <p><label for="id_age">Age:</label>
             <input type="number" name="age" id="id_age" min="0" required></p>
-            """.format(
-                self.w_woodward.pk,
-                self.w_royko.pk,
-            ),
+            """,
         )
 
         data = {
@@ -2438,19 +2417,16 @@ class ModelOneToOneFieldTests(TestCase):
         form = WriterProfileForm(instance=instance)
         self.assertHTMLEqual(
             form.as_p(),
-            """
+            f"""
             <p><label for="id_writer">Writer:</label>
             <select name="writer" id="id_writer" required>
             <option value="">---------</option>
-            <option value="{}" selected>Bob Woodward</option>
-            <option value="{}">Mike Royko</option>
+            <option value="{self.w_woodward.pk}" selected>Bob Woodward</option>
+            <option value="{self.w_royko.pk}">Mike Royko</option>
             </select></p>
             <p><label for="id_age">Age:</label>
             <input type="number" name="age" value="65" id="id_age" min="0" required>
-            </p>""".format(
-                self.w_woodward.pk,
-                self.w_royko.pk,
-            ),
+            </p>""",
         )
 
     def test_assignment_of_none(self):
@@ -3113,17 +3089,15 @@ class OtherModelFormTests(TestCase):
         self.maxDiff = 1024
         self.assertHTMLEqual(
             form.as_p(),
-            """
+            f"""
             <p>
             <label for="id_name">Name:</label>
             <input id="id_name" type="text" name="name" maxlength="50" required></p>
             <p><label for="id_colors">Colors:</label>
             <select multiple name="colors" id="id_colors" required>
-            <option value="{blue_pk}">Blue</option>
+            <option value="{color.pk}">Blue</option>
             </select></p>
-            """.format(
-                blue_pk=color.pk
-            ),
+            """,
         )
 
     def test_callable_field_default(self):
@@ -3137,15 +3111,15 @@ class OtherModelFormTests(TestCase):
         today_str = str(datetime.date.today())
         self.assertHTMLEqual(
             form.as_p(),
-            """
+            f"""
             <p><label for="id_title">Title:</label>
             <input id="id_title" maxlength="30" name="title" type="text" required>
             </p>
             <p><label for="id_date_published">Date published:</label>
-            <input id="id_date_published" name="date_published" type="text" value="{0}"
+            <input id="id_date_published" name="date_published" type="text" value="{today_str}"
                 required>
             <input id="initial-id_date_published" name="initial-date_published"
-                type="hidden" value="{0}">
+                type="hidden" value="{today_str}">
             </p>
             <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
             <option value="di" selected>direct</option>
@@ -3160,9 +3134,7 @@ class OtherModelFormTests(TestCase):
             <option value="3" selected>Novel</option></select>
             <input id="initial-id_category" name="initial-category" type="hidden"
                 value="3">
-            """.format(
-                today_str
-            ),
+            """,
         )
         empty_data = {
             "title": "",

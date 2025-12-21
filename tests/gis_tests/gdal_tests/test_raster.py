@@ -380,7 +380,7 @@ class GDALRasterTests(SimpleTestCase):
         info_lines = [line.strip() for line in infos.split("\n") if line.strip() != ""]
         for line in [
             "Driver: GTiff/GeoTIFF",
-            "Files: {}".format(self.rs_path),
+            f"Files: {self.rs_path}",
             "Size is 163, 174",
             "Origin = (511700.468070655711927,435103.377123198588379)",
             "Pixel Size = (100.000000000000000,-100.000000000000000)",

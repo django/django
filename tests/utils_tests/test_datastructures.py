@@ -274,7 +274,7 @@ class ImmutableListTests(SimpleTestCase):
 class DictWrapperTests(SimpleTestCase):
     def test_dictwrapper(self):
         def f(x):
-            return "*{}".format(x)
+            return f"*{x}"
 
         d = DictWrapper({"a": "a"}, f, "xx_")
         self.assertEqual(

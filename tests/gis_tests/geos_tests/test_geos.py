@@ -1041,7 +1041,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             with self.subTest(srid=srid):
                 self.assertTrue(
                     pnt.ewkt.startswith(
-                        ("SRID={};".format(srid) if srid else "") + "POINT (111200"
+                        (f"SRID={srid};" if srid else "") + "POINT (111200"
                     )
                 )
                 self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)

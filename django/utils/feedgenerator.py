@@ -56,7 +56,7 @@ def get_tag_uri(url, date):
     d = ""
     if date is not None:
         d = ",{}".format(date.strftime("%Y-%m-%d"))
-    return "tag:{}{}:{}/{}".format(bits.hostname, d, bits.path, bits.fragment)
+    return f"tag:{bits.hostname}{d}:{bits.path}/{bits.fragment}"
 
 
 def _guess_stylesheet_mimetype(url):

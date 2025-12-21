@@ -178,9 +178,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         ):
             # default lang should have at least one translation file available.
             raise OSError(
-                "No translation files found for default language {}.".format(
-                    settings.LANGUAGE_CODE
-                )
+                f"No translation files found for default language {settings.LANGUAGE_CODE}."
             )
         self._add_fallback(localedirs)
         if self._catalog is None:
@@ -188,7 +186,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._catalog = TranslationCatalog()
 
     def __repr__(self):
-        return "<DjangoTranslation lang:{}>".format(self.__language)
+        return f"<DjangoTranslation lang:{self.__language}>"
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
         """
@@ -396,7 +394,7 @@ def gettext(message):
 
 
 def pgettext(context, message):
-    msg_with_ctxt = "{}{}{}".format(context, CONTEXT_SEPARATOR, message)
+    msg_with_ctxt = f"{context}{CONTEXT_SEPARATOR}{message}"
     result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
@@ -437,8 +435,8 @@ def ngettext(singular, plural, number):
 
 def npgettext(context, singular, plural, number):
     msgs_with_ctxt = (
-        "{}{}{}".format(context, CONTEXT_SEPARATOR, singular),
-        "{}{}{}".format(context, CONTEXT_SEPARATOR, plural),
+        f"{context}{CONTEXT_SEPARATOR}{singular}",
+        f"{context}{CONTEXT_SEPARATOR}{plural}",
         number,
     )
     result = ngettext(*msgs_with_ctxt)

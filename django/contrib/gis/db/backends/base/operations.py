@@ -94,7 +94,7 @@ class BaseSpatialOperations:
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
-        return "'{}'".format(name)
+        return f"'{name}'"
 
     # GeometryField operations
     def geo_db_type(self, f):
@@ -141,17 +141,15 @@ class BaseSpatialOperations:
                 f.srid,
             )
         elif self.connection.features.has_spatialrefsys_table:
-            return "{}(%s,{})".format(self.from_text, f.srid)
+            return f"{self.from_text}(%s,{f.srid})"
         else:
             # For backwards compatibility on MySQL (#27464).
-            return "{}(%s)".format(self.from_text)
+            return f"{self.from_text}(%s)"
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):
             raise NotSupportedError(
-                "{} spatial aggregation is not supported by this database backend.".format(
-                    expression.name
-                )
+                f"{expression.name} spatial aggregation is not supported by this database backend."
             )
         super().check_expression_support(expression)
 
@@ -163,7 +161,7 @@ class BaseSpatialOperations:
     def spatial_function_name(self, func_name):
         if func_name in self.unsupported_functions:
             raise NotSupportedError(
-                "This backend doesn't support the {} function.".format(func_name)
+                f"This backend doesn't support the {func_name} function."
             )
         return self.function_names.get(func_name, self.geom_func_prefix + func_name)
 

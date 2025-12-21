@@ -34,9 +34,9 @@ def _setup_environment(environ):
             import ctypes
         except ImportError as e:
             raise ImproperlyConfigured(
-                "Error loading ctypes: {}; "
+                f"Error loading ctypes: {e}; "
                 "the Oracle backend requires ctypes to "
-                "operate correctly under Cygwin.".format(e)
+                "operate correctly under Cygwin."
             )
         kernel32 = ctypes.CDLL("kernel32")
         for name, value in environ:
@@ -367,9 +367,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.queries_logged:
             self.queries_log.append(
                 {
-                    "sql": "-- RELEASE SAVEPOINT {} (faked)".format(
-                        self.ops.quote_name(sid)
-                    ),
+                    "sql": f"-- RELEASE SAVEPOINT {self.ops.quote_name(sid)} (faked)",
                     "time": "0.000",
                 }
             )
@@ -598,7 +596,7 @@ class FormatStylePlaceholderCursor:
             params = []
         elif hasattr(params, "keys"):
             # Handle params as dict
-            args = {k: ":{}".format(k) for k in params}
+            args = {k: f":{k}" for k in params}
             query %= args
         elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their

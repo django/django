@@ -80,7 +80,7 @@ class URLPrefixTests(URLTestCaseBase):
             self.assertEqual(reverse("prefixed"), "/nl/prefixed/")
         with translation.override(None):
             self.assertEqual(
-                reverse("prefixed"), "/{}/prefixed/".format(settings.LANGUAGE_CODE)
+                reverse("prefixed"), f"/{settings.LANGUAGE_CODE}/prefixed/"
             )
 
     @override_settings(ROOT_URLCONF="i18n.patterns.urls.wrong")
@@ -474,7 +474,7 @@ class URLRedirectWithScriptAliasTests(URLTestCaseBase):
                 "/prefixed/", headers={"accept-language": "en"}, SCRIPT_NAME=prefix
             )
             self.assertRedirects(
-                response, "{}/en/prefixed/".format(prefix), target_status_code=404
+                response, f"{prefix}/en/prefixed/", target_status_code=404
             )
 
 

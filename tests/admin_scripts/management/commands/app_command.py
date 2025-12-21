@@ -7,7 +7,5 @@ class Command(AppCommand):
 
     def handle_app_config(self, app_config, **options):
         print(
-            "EXECUTE:AppCommand name={}, options={}".format(
-                app_config.name, sorted(options.items())
-            )
+            f"EXECUTE:AppCommand name={app_config.name}, options={sorted(options.items())}"
         )

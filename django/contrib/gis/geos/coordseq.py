@@ -205,8 +205,6 @@ class GEOSCoordSeq(GEOSBase):
         ret = c_byte()
         if not capi.cs_is_ccw(self.ptr, byref(ret)):
             raise GEOSException(
-                'Error encountered in GEOS C function "{}".'.format(
-                    capi.cs_is_ccw.func_name
-                )
+                f'Error encountered in GEOS C function "{capi.cs_is_ccw.func_name}".'
             )
         return ret.value == 1

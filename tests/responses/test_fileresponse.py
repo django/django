@@ -140,7 +140,7 @@ class FileResponseTests(SimpleTestCase):
                 response.close()
                 self.assertEqual(
                     response.headers["Content-Disposition"],
-                    '{}; filename="{}"'.format(header_disposition, header_filename),
+                    f'{header_disposition}; filename="{header_filename}"',
                 )
 
     def test_content_disposition_escaping(self):
@@ -199,7 +199,7 @@ class FileResponseTests(SimpleTestCase):
             )
             self.assertEqual(
                 response.headers["Content-Disposition"],
-                '{}; filename="custom_name.py"'.format(header_disposition),
+                f'{header_disposition}; filename="custom_name.py"',
             )
 
     def test_response_buffer(self):

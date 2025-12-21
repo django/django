@@ -85,7 +85,7 @@ def get_object_or_404(klass, *args, **kwargs):
         )
         raise ValueError(
             "First argument to get_object_or_404() must be a Model, Manager, "
-            "or QuerySet, not '{}'.".format(klass__name)
+            f"or QuerySet, not '{klass__name}'."
         )
     try:
         return queryset.get(*args, **kwargs)
@@ -132,7 +132,7 @@ def get_list_or_404(klass, *args, **kwargs):
         )
         raise ValueError(
             "First argument to get_list_or_404() must be a Model, Manager, or "
-            "QuerySet, not '{}'.".format(klass__name)
+            f"QuerySet, not '{klass__name}'."
         )
     obj_list = list(queryset.filter(*args, **kwargs))
     if not obj_list:

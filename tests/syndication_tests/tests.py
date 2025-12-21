@@ -173,11 +173,11 @@ class SyndicationFeedTest(FeedTestCase):
             {
                 "title": "My first entry",
                 "description": "Overridden description: My first entry",
-                "link": "http://example.com/blog/{}/".format(self.e1.pk),
-                "guid": "http://example.com/blog/{}/".format(self.e1.pk),
+                "link": f"http://example.com/blog/{self.e1.pk}/",
+                "guid": f"http://example.com/blog/{self.e1.pk}/",
                 "pubDate": pub_date,
                 "author": "test@example.com (Sally Smith)",
-                "comments": "/blog/{}/comments".format(self.e1.pk),
+                "comments": f"/blog/{self.e1.pk}/comments",
             },
         )
         self.assertCategories(items[0], ["python", "testing"])
@@ -349,7 +349,7 @@ class SyndicationFeedTest(FeedTestCase):
             {
                 "title": "My first entry",
                 "description": "Overridden description: My first entry",
-                "link": "http://example.com/blog/{}/".format(self.e1.pk),
+                "link": f"http://example.com/blog/{self.e1.pk}/",
             },
         )
         for item in items:
@@ -768,7 +768,7 @@ class SyndicationFeedTest(FeedTestCase):
             {
                 "title": "Title in your templates: My first entry\n",
                 "description": "Description in your templates: My first entry\n",
-                "link": "http://example.com/blog/{}/".format(self.e1.pk),
+                "link": f"http://example.com/blog/{self.e1.pk}/",
             },
         )
 
@@ -823,7 +823,7 @@ class SyndicationFeedTest(FeedTestCase):
                 self.assertEqual(views.add_domain(*prefix[0]), prefix[1])
 
     def test_get_object(self):
-        response = self.client.get("/syndication/rss2/articles/{}/".format(self.e1.pk))
+        response = self.client.get(f"/syndication/rss2/articles/{self.e1.pk}/")
         doc = minidom.parseString(response.content)
         feed = doc.getElementsByTagName("rss")[0]
         chan = feed.getElementsByTagName("channel")[0]
@@ -832,13 +832,9 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(
             items[0],
             {
-                "comments": "/blog/{}/article/{}/comments".format(
-                    self.e1.pk, self.a1.pk
-                ),
+                "comments": f"/blog/{self.e1.pk}/article/{self.a1.pk}/comments",
                 "description": "Article description: My first article",
-                "link": "http://example.com/blog/{}/article/{}/".format(
-                    self.e1.pk, self.a1.pk
-                ),
+                "link": f"http://example.com/blog/{self.e1.pk}/article/{self.a1.pk}/",
                 "title": "Title: My first article",
                 "pubDate": rfc2822_date(timezone.make_aware(self.a1.published, TZ)),
             },

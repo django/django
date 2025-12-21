@@ -127,7 +127,7 @@ class AdminActionsTest(TestCase):
         )
         self.assertTemplateUsed(response, "admin/delete_selected_confirmation.html")
         self.assertContains(response, 'value="9999"')  # Instead of 9,999
-        self.assertContains(response, 'value="{}"'.format(self.s2.pk))
+        self.assertContains(response, f'value="{self.s2.pk}"')
 
     def test_model_admin_default_delete_action_protected(self):
         """
@@ -192,7 +192,7 @@ class AdminActionsTest(TestCase):
         # No 500 caused by NoReverseMatch. The page doesn't display a link to
         # the nonexistent change page.
         self.assertContains(
-            response, "<li>Unchangeable object: {}</li>".format(obj), 1, html=True
+            response, f"<li>Unchangeable object: {obj}</li>", 1, html=True
         )
 
     def test_delete_queryset_hook(self):
@@ -418,7 +418,7 @@ action)</option>
         changelist_url = reverse("admin:admin_views_subscriber_changelist")
         response = self.client.get(changelist_url)
         self.assertIsNotNone(response.context["action_form"])
-        response = self.client.get(changelist_url + "?{}".format(IS_POPUP_VAR))
+        response = self.client.get(changelist_url + f"?{IS_POPUP_VAR}")
         self.assertIsNone(response.context["action_form"])
 
     def test_popup_template_response_on_add(self):
@@ -427,7 +427,7 @@ action)</option>
         easy customization.
         """
         response = self.client.post(
-            reverse("admin:admin_views_actor_add") + "?{}=1".format(IS_POPUP_VAR),
+            reverse("admin:admin_views_actor_add") + f"?{IS_POPUP_VAR}=1",
             {"name": "Troy McClure", "age": "55", IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)
@@ -445,7 +445,7 @@ action)</option>
         instance = Actor.objects.create(name="David Tennant", age=45)
         response = self.client.post(
             reverse("admin:admin_views_actor_change", args=(instance.pk,))
-            + "?{}=1".format(IS_POPUP_VAR),
+            + f"?{IS_POPUP_VAR}=1",
             {"name": "David Tennant", "age": "46", IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)
@@ -463,7 +463,7 @@ action)</option>
         instance = Actor.objects.create(name="David Tennant", age=45)
         response = self.client.post(
             reverse("admin:admin_views_actor_delete", args=(instance.pk,))
-            + "?{}=1".format(IS_POPUP_VAR),
+            + f"?{IS_POPUP_VAR}=1",
             {IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)

@@ -171,7 +171,7 @@ class Command(BaseCommand):
         try:
             connection.check_constraints(table_names=table_names)
         except Exception as e:
-            e.args = ("Problem installing fixtures: {}".format(e),)
+            e.args = (f"Problem installing fixtures: {e}",)
             raise
 
         # If we found even one object in a fixture, we need to reset the
@@ -211,11 +211,7 @@ class Command(BaseCommand):
             # psycopg raises ValueError if data contains NUL chars.
             except (DatabaseError, IntegrityError, ValueError) as e:
                 e.args = (
-                    "Could not load {object_label}(pk={pk}): {error_msg}".format(
-                        object_label=obj.object._meta.label,
-                        pk=obj.object.pk,
-                        error_msg=e,
-                    ),
+                    f"Could not load {obj.object._meta.label}(pk={obj.object.pk}): {e}",
                 )
                 raise
         if obj.deferred_fields:
@@ -236,9 +232,7 @@ class Command(BaseCommand):
             loaded_objects_in_fixture = 0
             if self.verbosity >= 2:
                 self.stdout.write(
-                    "Installing {} fixture '{}' from {}.".format(
-                        ser_fmt, fixture_name, humanize(fixture_dir)
-                    )
+                    f"Installing {ser_fmt} fixture '{fixture_name}' from {humanize(fixture_dir)}."
                 )
             try:
                 objects = serializers.deserialize(
@@ -260,9 +254,7 @@ class Command(BaseCommand):
                             )
             except Exception as e:
                 if not isinstance(e, CommandError):
-                    e.args = (
-                        "Problem installing fixture '{}': {}".format(fixture_file, e),
-                    )
+                    e.args = (f"Problem installing fixture '{fixture_file}': {e}",)
                 raise
             finally:
                 fixture.close()
@@ -274,8 +266,8 @@ class Command(BaseCommand):
             # Warn if the fixture we loaded contains 0 objects.
             if objects_in_fixture == 0:
                 warnings.warn(
-                    "No fixture data found for '{}'. (File format may be "
-                    "invalid.)".format(fixture_name),
+                    f"No fixture data found for '{fixture_name}'. (File format may be "
+                    "invalid.)",
                     RuntimeWarning,
                 )
 
@@ -319,16 +311,14 @@ class Command(BaseCommand):
 
         fixture_name, ser_fmt, cmp_fmt = self.parse_name(fixture_label)
         if self.verbosity >= 2:
-            self.stdout.write("Loading '{}' fixtures...".format(fixture_name))
+            self.stdout.write(f"Loading '{fixture_name}' fixtures...")
 
         fixture_name, fixture_dirs = self.get_fixture_name_and_dirs(fixture_name)
         targets = self.get_targets(fixture_name, ser_fmt, cmp_fmt)
         fixture_files = []
         for fixture_dir in fixture_dirs:
             if self.verbosity >= 2:
-                self.stdout.write(
-                    "Checking {} for fixtures...".format(humanize(fixture_dir))
-                )
+                self.stdout.write(f"Checking {humanize(fixture_dir)} for fixtures...")
             fixture_files_in_dir = self.find_fixture_files_in_dir(
                 fixture_dir,
                 fixture_name,
@@ -336,21 +326,19 @@ class Command(BaseCommand):
             )
             if self.verbosity >= 2 and not fixture_files_in_dir:
                 self.stdout.write(
-                    "No fixture '{}' in {}.".format(fixture_name, humanize(fixture_dir))
+                    f"No fixture '{fixture_name}' in {humanize(fixture_dir)}."
                 )
 
             # Check kept for backwards-compatibility; it isn't clear why
             # duplicates are only allowed in different directories.
             if len(fixture_files_in_dir) > 1:
                 raise CommandError(
-                    "Multiple fixtures named '{}' in {}. Aborting.".format(
-                        fixture_name, humanize(fixture_dir)
-                    )
+                    f"Multiple fixtures named '{fixture_name}' in {humanize(fixture_dir)}. Aborting."
                 )
             fixture_files.extend(fixture_files_in_dir)
 
         if not fixture_files:
-            raise CommandError("No fixture named '{}' found.".format(fixture_name))
+            raise CommandError(f"No fixture named '{fixture_name}' found.")
 
         return fixture_files
 
@@ -372,10 +360,8 @@ class Command(BaseCommand):
             app_dir = os.path.join(app_config.path, "fixtures")
             if app_dir in [str(d) for d in fixture_dirs]:
                 raise ImproperlyConfigured(
-                    "'{}' is a default fixture directory for the '{}' app "
-                    "and cannot be listed in settings.FIXTURE_DIRS.".format(
-                        app_dir, app_label
-                    )
+                    f"'{app_dir}' is a default fixture directory for the '{app_label}' app "
+                    "and cannot be listed in settings.FIXTURE_DIRS."
                 )
 
             if self.app_label and app_label != self.app_label:
@@ -433,4 +419,4 @@ class SingleZipReader(zipfile.ZipFile):
 
 
 def humanize(dirname):
-    return "'{}'".format(dirname) if dirname else "absolute path"
+    return f"'{dirname}'" if dirname else "absolute path"

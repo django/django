@@ -80,9 +80,7 @@ class ResponseHeaders(CaseInsensitiveMapping):
             if mime_encode:
                 value = Header(value, "utf-8", maxlinelen=sys.maxsize).encode()
             else:
-                e.reason += ", HTTP response headers must be in {} format".format(
-                    charset
-                )
+                e.reason += f", HTTP response headers must be in {charset} format"
                 raise
         return value
 
@@ -343,16 +341,14 @@ class HttpResponseBase:
         signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
-        raise OSError(
-            "This {} instance is not writable".format(self.__class__.__name__)
-        )
+        raise OSError(f"This {self.__class__.__name__} instance is not writable")
 
     def flush(self):
         pass
 
     def tell(self):
         raise OSError(
-            "This {} instance cannot tell its position".format(self.__class__.__name__)
+            f"This {self.__class__.__name__} instance cannot tell its position"
         )
 
     # These methods partially implement a stream-like object interface.
@@ -368,9 +364,7 @@ class HttpResponseBase:
         return False
 
     def writelines(self, lines):
-        raise OSError(
-            "This {} instance is not writable".format(self.__class__.__name__)
-        )
+        raise OSError(f"This {self.__class__.__name__} instance is not writable")
 
 
 class HttpResponse(HttpResponseBase):
@@ -473,14 +467,14 @@ class StreamingHttpResponse(HttpResponseBase):
     @property
     def content(self):
         raise AttributeError(
-            "This {} instance has no `content` attribute. Use "
-            "`streaming_content` instead.".format(self.__class__.__name__)
+            f"This {self.__class__.__name__} instance has no `content` attribute. Use "
+            "`streaming_content` instead."
         )
 
     @property
     def text(self):
         raise AttributeError(
-            "This {} instance has no `text` attribute.".format(self.__class__.__name__)
+            f"This {self.__class__.__name__} instance has no `text` attribute."
         )
 
     @property
@@ -651,7 +645,7 @@ class HttpResponseRedirectBase(HttpResponse):
             self.status_code = self.status_code_preserve_request
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
-                "Unsafe redirect to URL with protocol '{}'".format(parsed.scheme)
+                f"Unsafe redirect to URL with protocol '{parsed.scheme}'"
             )
 
     url = property(lambda self: self["Location"])

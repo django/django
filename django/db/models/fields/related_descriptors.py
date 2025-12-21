@@ -155,10 +155,7 @@ class ForwardManyToOneDescriptor:
             (self.field.remote_field.model.DoesNotExist, AttributeError),
             {
                 "__module__": self.field.model.__module__,
-                "__qualname__": "{}.{}.RelatedObjectDoesNotExist".format(
-                    self.field.model.__qualname__,
-                    self.field.name,
-                ),
+                "__qualname__": f"{self.field.model.__qualname__}.{self.field.name}.RelatedObjectDoesNotExist",
             },
         )
 
@@ -263,7 +260,7 @@ class ForwardManyToOneDescriptor:
 
         if rel_obj is None and not self.field.null:
             raise self.RelatedObjectDoesNotExist(
-                "{} has no {}.".format(self.field.model.__name__, self.field.name)
+                f"{self.field.model.__name__} has no {self.field.name}."
             )
         else:
             return rel_obj
@@ -298,12 +295,7 @@ class ForwardManyToOneDescriptor:
             value, self.field.remote_field.model._meta.concrete_model
         ):
             raise ValueError(
-                'Cannot assign "{!r}": "{}.{}" must be a "{}" instance.'.format(
-                    value,
-                    instance._meta.object_name,
-                    self.field.name,
-                    self.field.remote_field.model._meta.object_name,
-                )
+                f'Cannot assign "{value!r}": "{instance._meta.object_name}.{self.field.name}" must be a "{self.field.remote_field.model._meta.object_name}" instance.'
             )
         elif value is not None:
             if instance._state.db is None:
@@ -316,8 +308,8 @@ class ForwardManyToOneDescriptor:
                 )
             if not router.allow_relation(value, instance):
                 raise ValueError(
-                    'Cannot assign "{!r}": the current database router prevents this '
-                    "relation.".format(value)
+                    f'Cannot assign "{value!r}": the current database router prevents this '
+                    "relation."
                 )
 
         remote_field = self.field.remote_field
@@ -447,10 +439,7 @@ class ReverseOneToOneDescriptor:
             (self.related.related_model.DoesNotExist, AttributeError),
             {
                 "__module__": self.related.model.__module__,
-                "__qualname__": "{}.{}.RelatedObjectDoesNotExist".format(
-                    self.related.model.__qualname__,
-                    self.related.name,
-                ),
+                "__qualname__": f"{self.related.model.__qualname__}.{self.related.name}.RelatedObjectDoesNotExist",
             },
         )
 
@@ -475,7 +464,7 @@ class ReverseOneToOneDescriptor:
         rel_obj_attr = self.related.field.get_local_related_value
         instance_attr = self.related.field.get_foreign_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        query = {"{}__in".format(self.related.field.name): instances}
+        query = {f"{self.related.field.name}__in": instances}
         queryset = queryset.filter(**query)
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
@@ -525,9 +514,7 @@ class ReverseOneToOneDescriptor:
 
         if rel_obj is None:
             raise self.RelatedObjectDoesNotExist(
-                "{} has no {}.".format(
-                    instance.__class__.__name__, self.related.accessor_name
-                )
+                f"{instance.__class__.__name__} has no {self.related.accessor_name}."
             )
         else:
             return rel_obj
@@ -592,12 +579,7 @@ class ReverseOneToOneDescriptor:
         elif not isinstance(value, self.related.related_model):
             # An object must be an instance of the related class.
             raise ValueError(
-                'Cannot assign "{!r}": "{}.{}" must be a "{}" instance.'.format(
-                    value,
-                    instance._meta.object_name,
-                    self.related.accessor_name,
-                    self.related.related_model._meta.object_name,
-                )
+                f'Cannot assign "{value!r}": "{instance._meta.object_name}.{self.related.accessor_name}" must be a "{self.related.related_model._meta.object_name}" instance.'
             )
         else:
             if instance._state.db is None:
@@ -610,8 +592,8 @@ class ReverseOneToOneDescriptor:
                 )
             if not router.allow_relation(value, instance):
                 raise ValueError(
-                    'Cannot assign "{!r}": the current database router prevents this '
-                    "relation.".format(value)
+                    f'Cannot assign "{value!r}": the current database router prevents this '
+                    "relation."
                 )
 
             related_pk = tuple(
@@ -826,10 +808,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             def check_and_update_obj(obj):
                 if not isinstance(obj, self.model):
                     raise TypeError(
-                        "'{}' instance expected, got {!r}".format(
-                            self.model._meta.object_name,
-                            obj,
-                        )
+                        f"'{self.model._meta.object_name}' instance expected, got {obj!r}"
                     )
                 setattr(obj, self.field.name, self.instance)
 
@@ -839,8 +818,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
                     check_and_update_obj(obj)
                     if obj._state.adding or obj._state.db != db:
                         raise ValueError(
-                            "{!r} instance isn't saved. Use bulk=False or save "
-                            "the object first.".format(obj)
+                            f"{obj!r} instance isn't saved. Use bulk=False or save "
+                            "the object first."
                         )
                     pks.append(obj.pk)
                 self.model._base_manager.using(db).filter(pk__in=pks).update(
@@ -914,17 +893,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 for obj in objs:
                     if not isinstance(obj, self.model):
                         raise TypeError(
-                            "'{}' instance expected, got {!r}".format(
-                                self.model._meta.object_name,
-                                obj,
-                            )
+                            f"'{self.model._meta.object_name}' instance expected, got {obj!r}"
                         )
                     # Is obj actually part of this descriptor set?
                     if self.field.get_local_related_value(obj) == val:
                         old_ids.add(obj.pk)
                     else:
                         raise self.field.remote_field.model.DoesNotExist(
-                            "{!r} is not related to {!r}.".format(obj, self.instance)
+                            f"{obj!r} is not related to {self.instance!r}."
                         )
                 self._clear(self.filter(pk__in=old_ids), bulk)
 
@@ -1082,27 +1058,23 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             self.core_filters = {}
             self.pk_field_names = {}
             for lh_field, rh_field in self.source_field.related_fields:
-                core_filter_key = "{}__{}".format(self.query_field_name, rh_field.name)
+                core_filter_key = f"{self.query_field_name}__{rh_field.name}"
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
                 self.pk_field_names[lh_field.name] = rh_field.name
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
             if None in self.related_val:
                 raise ValueError(
-                    '"{!r}" needs to have a value for field "{}" before '
-                    "this many-to-many relationship can be used.".format(
-                        instance, self.pk_field_names[self.source_field_name]
-                    )
+                    f'"{instance!r}" needs to have a value for field "{self.pk_field_names[self.source_field_name]}" before '
+                    "this many-to-many relationship can be used."
                 )
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
             if not instance._is_pk_set():
                 raise ValueError(
-                    "{!r} instance needs to have a primary key value before "
-                    "a many-to-many relationship can be used.".format(
-                        instance.__class__.__name__
-                    )
+                    f"{instance.__class__.__name__!r} instance needs to have a primary key value before "
+                    "a many-to-many relationship can be used."
                 )
 
         def __call__(self, *, manager):
@@ -1197,9 +1169,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             qn = connection.ops.quote_name
             queryset = queryset.extra(
                 select={
-                    "_prefetch_related_val_{}".format(f.attname): "{}.{}".format(
-                        qn(join_table), qn(f.column)
-                    )
+                    f"_prefetch_related_val_{f.attname}": f"{qn(join_table)}.{qn(f.column)}"
                     for f in fk.local_related_fields
                 }
             )
@@ -1237,7 +1207,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # Nullable target rows must be excluded as well as they would have
             # been filtered out from an INNER JOIN.
             if self.target_field.null:
-                filters["{}__isnull".format(self.target_field_name)] = False
+                filters[f"{self.target_field_name}__isnull"] = False
             return manager.filter(**filters)
 
         def exists(self):
@@ -1470,24 +1440,18 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 if isinstance(obj, self.model):
                     if not router.allow_relation(obj, self.instance):
                         raise ValueError(
-                            'Cannot add "{!r}": instance is on database "{}", '
-                            'value is on database "{}"'.format(
-                                obj, self.instance._state.db, obj._state.db
-                            )
+                            f'Cannot add "{obj!r}": instance is on database "{self.instance._state.db}", '
+                            f'value is on database "{obj._state.db}"'
                         )
                     target_id = target_field.get_foreign_related_value(obj)[0]
                     if target_id is None:
                         raise ValueError(
-                            'Cannot add "{!r}": the value for field "{}" is None'.format(
-                                obj, target_field_name
-                            )
+                            f'Cannot add "{obj!r}": the value for field "{target_field_name}" is None'
                         )
                     target_ids.add(target_id)
                 elif isinstance(obj, Model):
                     raise TypeError(
-                        "'{}' instance expected, got {!r}".format(
-                            self.model._meta.object_name, obj
-                        )
+                        f"'{self.model._meta.object_name}' instance expected, got {obj!r}"
                     )
                 else:
                     target_ids.add(target_field.get_prep_value(obj))
@@ -1506,7 +1470,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 .filter(
                     **{
                         source_field_name: self.related_val[0],
-                        "{}__in".format(target_field_name): target_ids,
+                        f"{target_field_name}__in": target_ids,
                     }
                 )
             )
@@ -1572,8 +1536,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     [
                         self.through(
                             **{
-                                "{}_id".format(source_field_name): self.related_val[0],
-                                "{}_id".format(target_field_name): target_id,
+                                f"{source_field_name}_id": self.related_val[0],
+                                f"{target_field_name}_id": target_id,
                             }
                         )
                         for target_id in target_ids
@@ -1603,8 +1567,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         self.through(
                             **through_defaults,
                             **{
-                                "{}_id".format(source_field_name): self.related_val[0],
-                                "{}_id".format(target_field_name): target_id,
+                                f"{source_field_name}_id": self.related_val[0],
+                                f"{target_field_name}_id": target_id,
                             },
                         )
                         for target_id in missing_target_ids
@@ -1659,11 +1623,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(
-                        **{
-                            "{}__in".format(
-                                self.target_field.target_field.attname
-                            ): old_ids
-                        }
+                        **{f"{self.target_field.target_field.attname}__in": old_ids}
                     )
                 else:
                     old_vals = old_ids

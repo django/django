@@ -317,7 +317,7 @@ class DebugViewTests(SimpleTestCase):
             self.assertFalse(
                 re.search(b"[^c0-9]", id_repr),
                 "Numeric IDs in debug response HTML page shouldn't be localized "
-                "(value: {}).".format(id_repr.decode()),
+                f"(value: {id_repr.decode()}).",
             )
 
     def test_template_exceptions(self):
@@ -330,7 +330,7 @@ class DebugViewTests(SimpleTestCase):
                     raising_loc.find('raise Exception("boom")'),
                     -1,
                     "Failed to find 'raise Exception' in last frame of "
-                    "traceback, instead found: {}".format(raising_loc),
+                    f"traceback, instead found: {raising_loc}",
                 )
 
     @skipIf(
@@ -380,7 +380,7 @@ class DebugViewTests(SimpleTestCase):
                 )
             self.assertContains(
                 response,
-                "{} (Source does not exist)".format(template_path),
+                f"{template_path} (Source does not exist)",
                 status_code=500,
                 count=2,
             )
@@ -1348,11 +1348,11 @@ class PlainTextReportTests(SimpleTestCase):
         )
         self.assertIn(
             "Template error:\n"
-            "In template {path}, error at line 2\n"
+            f"In template {templ_path}, error at line 2\n"
             "   'cycle' tag requires at least two arguments\n"
             "   1 : Template with error:\n"
-            "   2 :  {{% cycle %}} \n"
-            "   3 : ".format(path=templ_path),
+            "   2 :  {% cycle %} \n"
+            "   3 : ",
             text,
         )
 
@@ -1971,9 +1971,7 @@ class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
 
 @override_settings(
     ROOT_URLCONF="view_tests.urls",
-    DEFAULT_EXCEPTION_REPORTER_FILTER="{}.CustomExceptionReporterFilter".format(
-        __name__
-    ),
+    DEFAULT_EXCEPTION_REPORTER_FILTER=f"{__name__}.CustomExceptionReporterFilter",
 )
 class CustomExceptionReporterFilterTests(SimpleTestCase):
     def setUp(self):

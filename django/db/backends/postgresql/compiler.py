@@ -54,6 +54,6 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
         ):
             return super().assemble_as_sql(fields, value_rows)
         db_types = [field.db_type(self.connection) for field in fields]
-        return InsertUnnest(["(%s)::{}[]".format(db_type) for db_type in db_types]), [
+        return InsertUnnest([f"(%s)::{db_type}[]" for db_type in db_types]), [
             list(map(list, zip(*value_rows)))
         ]

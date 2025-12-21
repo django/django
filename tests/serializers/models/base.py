@@ -25,7 +25,7 @@ class CategoryMetaData(models.Model):
         unique_together = (("kind", "name"),)
 
     def __str__(self):
-        return "[{}:{}]={}".format(self.kind, self.name, self.value)
+        return f"[{self.kind}:{self.name}]={self.value}"
 
     def natural_key(self):
         return (self.kind, self.name)
@@ -85,7 +85,7 @@ class AuthorProfile(models.Model):
     date_of_birth = models.DateField()
 
     def __str__(self):
-        return "Profile of {}".format(self.author)
+        return f"Profile of {self.author}"
 
 
 class Actor(models.Model):

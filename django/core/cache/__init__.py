@@ -48,7 +48,7 @@ class CacheHandler(BaseConnectionHandler):
             backend_cls = import_string(backend)
         except ImportError as e:
             raise InvalidCacheBackendError(
-                "Could not find backend '{}': {}".format(backend, e)
+                f"Could not find backend '{backend}': {e}"
             ) from e
         return backend_cls(location, params)
 

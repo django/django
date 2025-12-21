@@ -300,9 +300,7 @@ class IfChangedTests(SimpleTestCase):
             self.assertEqual(
                 output2,
                 "[0,1,2,3]",
-                "Expected [0,1,2,3] in second parallel template, got {}".format(
-                    output2
-                ),
+                f"Expected [0,1,2,3] in second parallel template, got {output2}",
             )
             yield 3
 
@@ -313,7 +311,7 @@ class IfChangedTests(SimpleTestCase):
         self.assertEqual(
             output1,
             "[0,1,2,3]",
-            "Expected [0,1,2,3] in first template, got {}".format(output1),
+            f"Expected [0,1,2,3] in first template, got {output1}",
         )
 
     def test_ifchanged_render_once(self):

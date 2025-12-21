@@ -144,8 +144,8 @@ class CursorDebugWrapper(CursorWrapper):
                 times = "?"
             self.db.queries_log.append(
                 {
-                    "sql": "{} times: {}".format(times, sql) if many else sql,
-                    "time": "{:.3f}".format(duration),
+                    "sql": f"{times} times: {sql}" if many else sql,
+                    "time": f"{duration:.3f}",
                 }
             )
             logger.debug(
@@ -174,8 +174,8 @@ def debug_transaction(connection, sql):
             duration = stop - start
             connection.queries_log.append(
                 {
-                    "sql": "{}".format(sql),
-                    "time": "{:.3f}".format(duration),
+                    "sql": f"{sql}",
+                    "time": f"{duration:.3f}",
                 }
             )
             logger.debug(
@@ -295,7 +295,7 @@ def truncate_name(identifier, length=None, hash_len=4):
 
     digest = names_digest(name, length=hash_len)
     return "{}{}{}".format(
-        '{}"."'.format(namespace) if namespace else "",
+        f'{namespace}"."' if namespace else "",
         name[: length - hash_len],
         digest,
     )
@@ -329,7 +329,7 @@ def format_number(value, max_digits, decimal_places):
     else:
         context.traps[decimal.Rounded] = 1
         value = context.create_decimal(value)
-    return "{:f}".format(value)
+    return f"{value:f}"
 
 
 def strip_quotes(table_name):

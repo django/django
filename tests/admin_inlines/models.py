@@ -34,7 +34,7 @@ class Child(models.Model):
     parent = GenericForeignKey()
 
     def __str__(self):
-        return "I am {}, a child of {}".format(self.name, self.parent)
+        return f"I am {self.name}, a child of {self.parent}"
 
 
 class Book(models.Model):

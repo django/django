@@ -692,13 +692,11 @@ class StateApps(Apps):
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
                     raise InvalidBasesError(
-                        "Cannot resolve bases for {!r}\nThis can happen if you are "
+                        f"Cannot resolve bases for {new_unrendered_models!r}\nThis can happen if you are "
                         "inheriting models from an app with migrations (e.g. "
                         "contrib.auth)\n in an app with no migrations; see "
-                        "https://docs.djangoproject.com/en/{}/topics/migrations/"
-                        "#dependencies for more".format(
-                            new_unrendered_models, get_docs_version()
-                        )
+                        f"https://docs.djangoproject.com/en/{get_docs_version()}/topics/migrations/"
+                        "#dependencies for more"
                     )
                 unrendered_models = new_unrendered_models
 
@@ -760,9 +758,7 @@ class ModelState:
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, "model"):
                 raise ValueError(
-                    'ModelState.fields cannot be bound to a model - "{}" is.'.format(
-                        name
-                    )
+                    f'ModelState.fields cannot be bound to a model - "{name}" is.'
                 )
             # Ensure that relation fields are NOT referring to a model class.
             if field.is_relation and hasattr(field.related_model, "_meta"):
@@ -782,7 +778,7 @@ class ModelState:
             if not index.name:
                 raise ValueError(
                     "Indexes passed to ModelState require a name attribute. "
-                    "{!r} doesn't have one.".format(index)
+                    f"{index!r} doesn't have one."
                 )
 
     @cached_property
@@ -812,11 +808,7 @@ class ModelState:
                 fields.append((name, field.clone()))
             except TypeError as e:
                 raise TypeError(
-                    "Couldn't reconstruct field {} on {}: {}".format(
-                        name,
-                        model._meta.label,
-                        e,
-                    )
+                    f"Couldn't reconstruct field {name} on {model._meta.label}: {e}"
                 )
         if not exclude_rels:
             for field in model._meta.local_many_to_many:
@@ -825,11 +817,7 @@ class ModelState:
                     fields.append((name, field.clone()))
                 except TypeError as e:
                     raise TypeError(
-                        "Couldn't reconstruct m2m field {} on {}: {}".format(
-                            name,
-                            model._meta.object_name,
-                            e,
-                        )
+                        f"Couldn't reconstruct m2m field {name} on {model._meta.object_name}: {e}"
                     )
         # Extract the options
         options = {}
@@ -976,7 +964,7 @@ class ModelState:
             )
         except LookupError:
             raise InvalidBasesError(
-                "Cannot resolve one or more bases from {!r}".format(self.bases)
+                f"Cannot resolve one or more bases from {self.bases!r}"
             )
         # Clone fields for the body, add other bits.
         body = {name: field.clone() for name, field in self.fields.items()}
@@ -992,18 +980,16 @@ class ModelState:
         for index in self.options["indexes"]:
             if index.name == name:
                 return index
-        raise ValueError("No index named {} on model {}".format(name, self.name))
+        raise ValueError(f"No index named {name} on model {self.name}")
 
     def get_constraint_by_name(self, name):
         for constraint in self.options["constraints"]:
             if constraint.name == name:
                 return constraint
-        raise ValueError("No constraint named {} on model {}".format(name, self.name))
+        raise ValueError(f"No constraint named {name} on model {self.name}")
 
     def __repr__(self):
-        return "<{}: '{}.{}'>".format(
-            self.__class__.__name__, self.app_label, self.name
-        )
+        return f"<{self.__class__.__name__}: '{self.app_label}.{self.name}'>"
 
     def __eq__(self, other):
         return (

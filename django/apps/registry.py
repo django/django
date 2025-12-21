@@ -92,7 +92,7 @@ class Apps:
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
-                        "duplicates: {}".format(app_config.label)
+                        f"duplicates: {app_config.label}"
                     )
 
                 self.app_configs[app_config.label] = app_config
@@ -157,10 +157,10 @@ class Apps:
         try:
             return self.app_configs[app_label]
         except KeyError:
-            message = "No installed app with label '{}'.".format(app_label)
+            message = f"No installed app with label '{app_label}'."
             for app_config in self.get_app_configs():
                 if app_config.name == app_label:
-                    message += " Did you mean '{}'?".format(app_config.label)
+                    message += f" Did you mean '{app_config.label}'?"
                     break
             raise LookupError(message)
 
@@ -224,17 +224,15 @@ class Apps:
                 and model.__module__ == app_models[model_name].__module__
             ):
                 warnings.warn(
-                    "Model '{}.{}' was already registered. Reloading models is not "
+                    f"Model '{app_label}.{model_name}' was already registered. Reloading models is not "
                     "advised as it can lead to inconsistencies, most notably with "
-                    "related models.".format(app_label, model_name),
+                    "related models.",
                     RuntimeWarning,
                     stacklevel=2,
                 )
             else:
                 raise RuntimeError(
-                    "Conflicting '{}' models in application '{}': {} and {}.".format(
-                        model_name, app_label, app_models[model_name], model
-                    )
+                    f"Conflicting '{model_name}' models in application '{app_label}': {app_models[model_name]} and {model}."
                 )
         app_models[model_name] = model
         self.do_pending_operations(model)
@@ -278,9 +276,7 @@ class Apps:
         """
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
-            raise LookupError(
-                "Model '{}.{}' not registered.".format(app_label, model_name)
-            )
+            raise LookupError(f"Model '{app_label}.{model_name}' not registered.")
         return model
 
     @functools.cache

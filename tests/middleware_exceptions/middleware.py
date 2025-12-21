@@ -45,18 +45,18 @@ class ProcessExceptionExcMiddleware(BaseMiddleware):
 
 class ProcessViewMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        return HttpResponse("Processed view {}".format(view_func.__name__))
+        return HttpResponse(f"Processed view {view_func.__name__}")
 
 
 @async_only_middleware
 class AsyncProcessViewMiddleware(BaseMiddleware):
     async def process_view(self, request, view_func, view_args, view_kwargs):
-        return HttpResponse("Processed view {}".format(view_func.__name__))
+        return HttpResponse(f"Processed view {view_func.__name__}")
 
 
 class ProcessViewNoneMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        log.append("processed view {}".format(view_func.__name__))
+        log.append(f"processed view {view_func.__name__}")
         return None
 
 

@@ -29,7 +29,7 @@ def add_message(request, level, message, extra_tags="", fail_silently=False):
         if not hasattr(request, "META"):
             raise TypeError(
                 "add_message() argument must be an HttpRequest object, not "
-                "'{}'.".format(request.__class__.__name__)
+                f"'{request.__class__.__name__}'."
             )
         if not fail_silently:
             raise MessageFailure(

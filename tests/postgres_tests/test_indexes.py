@@ -25,23 +25,23 @@ class IndexTestMixin:
         index.set_name_with_model(CharFieldModel)
         self.assertRegex(
             index.name,
-            r"postgres_te_field_[0-9a-f]{{6}}_{}".format(self.index_class.suffix),
+            rf"postgres_te_field_[0-9a-f]{{6}}_{self.index_class.suffix}",
         )
 
     def test_deconstruction_no_customization(self):
         index = self.index_class(
-            fields=["title"], name="test_title_{}".format(self.index_class.suffix)
+            fields=["title"], name=f"test_title_{self.index_class.suffix}"
         )
         path, args, kwargs = index.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.indexes.{}".format(self.index_class.__name__)
+            path, f"django.contrib.postgres.indexes.{self.index_class.__name__}"
         )
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
             {
                 "fields": ["title"],
-                "name": "test_title_{}".format(self.index_class.suffix),
+                "name": f"test_title_{self.index_class.suffix}",
             },
         )
 
@@ -720,7 +720,7 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_index(TextFieldModel, index)
             self.assertIn(
-                "COLLATE {}".format(editor.quote_name(collation)),
+                f"COLLATE {editor.quote_name(collation)}",
                 str(index.create_sql(TextFieldModel, editor)),
             )
         with editor.connection.cursor() as cursor:

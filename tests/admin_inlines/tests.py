@@ -528,10 +528,7 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(
             reverse("admin:admin_inlines_holder_change", args=(holder.id,))
         )
-        inner_shortcut = "r/{}/{}/".format(
-            ContentType.objects.get_for_model(inner).pk,
-            inner.pk,
-        )
+        inner_shortcut = f"r/{ContentType.objects.get_for_model(inner).pk}/{inner.pk}/"
         self.assertContains(response, inner_shortcut)
 
     def test_custom_pk_shortcut(self):
@@ -545,13 +542,11 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(
             reverse("admin:admin_inlines_parentmodelwithcustompk_change", args=("foo",))
         )
-        child1_shortcut = "r/{}/{}/".format(
-            ContentType.objects.get_for_model(child1).pk,
-            child1.pk,
+        child1_shortcut = (
+            f"r/{ContentType.objects.get_for_model(child1).pk}/{child1.pk}/"
         )
-        child2_shortcut = "r/{}/{}/".format(
-            ContentType.objects.get_for_model(child2).pk,
-            child2.pk,
+        child2_shortcut = (
+            f"r/{ContentType.objects.get_for_model(child2).pk}/{child2.pk}/"
         )
         self.assertContains(response, child1_shortcut)
         self.assertContains(response, child2_shortcut)
@@ -739,10 +734,8 @@ class TestInline(TestDataMixin, TestCase):
             response.context["inline_admin_formset"].opts.has_registered_model
         )
         for model, pk in items:
-            url = reverse("admin:admin_inlines_{}_change".format(model), args=(pk,))
-            self.assertContains(
-                response, '<a href="{}" {}'.format(url, INLINE_CHANGELINK_HTML)
-            )
+            url = reverse(f"admin:admin_inlines_{model}_change", args=(pk,))
+            self.assertContains(response, f'<a href="{url}" {INLINE_CHANGELINK_HTML}')
 
     def test_inlines_show_change_link_unregistered(self):
         "Inlines `show_change_link` disabled for unregistered models."
@@ -914,10 +907,8 @@ class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
         response = self.client.post(change_url, data)
         self.assertContains(
             response,
-            "Deleting chapter {} would require deleting "
-            "the following protected related objects: foot note {}".format(
-                chapter, foot_note
-            ),
+            f"Deleting chapter {chapter} would require deleting "
+            f"the following protected related objects: foot note {foot_note}",
         )
 
 
@@ -1157,7 +1148,7 @@ class TestInlinePermissions(TestCase):
             html=True,
         )
         # The field in the inline is read-only.
-        self.assertContains(response, "<p>{}</p>".format(self.book))
+        self.assertContains(response, f"<p>{self.book}</p>")
         self.assertNotContains(
             response,
             '<input type="checkbox" name="Author_books-0-DELETE" '
@@ -1276,10 +1267,8 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="inner2_set-2-0-dummy" value="{}" '
-            'class="vIntegerField" id="id_inner2_set-2-0-dummy">'.format(
-                self.inner2.dummy
-            ),
+            f'<input type="number" name="inner2_set-2-0-dummy" value="{self.inner2.dummy}" '
+            'class="vIntegerField" id="id_inner2_set-2-0-dummy">',
             html=True,
         )
 
@@ -1389,10 +1378,8 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="inner2_set-2-0-dummy" value="{}" '
-            'class="vIntegerField" id="id_inner2_set-2-0-dummy">'.format(
-                self.inner2.dummy
-            ),
+            f'<input type="number" name="inner2_set-2-0-dummy" value="{self.inner2.dummy}" '
+            'class="vIntegerField" id="id_inner2_set-2-0-dummy">',
             html=True,
         )
 
@@ -1442,7 +1429,7 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
     def test_main_model_is_rendered_as_read_only(self):
         response = self.client.get(self.change_url)
         self.assertContains(
-            response, '<div class="readonly">{}</div>'.format(self.poll.name), html=True
+            response, f'<div class="readonly">{self.poll.name}</div>', html=True
         )
         input = (
             '<input type="text" name="name" value="%s" class="vTextField" '
@@ -1457,7 +1444,7 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         response = self.client.get(self.change_url)
         self.assertContains(
             response,
-            '<td class="field-text"><p>{}</p></td>'.format(question.text),
+            f'<td class="field-text"><p>{question.text}</p></td>',
             html=True,
         )
         self.assertNotContains(response, 'id="id_question_set-0-text"')
@@ -1909,7 +1896,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         inline_id = "#inner4stacked_set-group"
-        rows_selector = "{} .dynamic-inner4stacked_set".format(inline_id)
+        rows_selector = f"{inline_id} .dynamic-inner4stacked_set"
 
         self.assertCountSeleniumElements(rows_selector, 3)
         add_button = self.selenium.find_element(
@@ -1928,7 +1915,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         inline_id = "#inner4stacked_set-group"
-        rows_selector = "{} .dynamic-inner4stacked_set".format(inline_id)
+        rows_selector = f"{inline_id} .dynamic-inner4stacked_set"
 
         self.assertCountSeleniumElements(rows_selector, 3)
 
@@ -1940,7 +1927,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.assertCountSeleniumElements(rows_selector, 5)
         for delete_link in self.selenium.find_elements(
-            By.CSS_SELECTOR, "{} .inline-deletelink".format(inline_id)
+            By.CSS_SELECTOR, f"{inline_id} .inline-deletelink"
         ):
             delete_link.click()
         with self.disable_implicit_wait():
@@ -1956,7 +1943,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         inline_id = "#inner4stacked_set-group"
-        rows_selector = "{} .dynamic-inner4stacked_set".format(inline_id)
+        rows_selector = f"{inline_id} .dynamic-inner4stacked_set"
 
         self.assertCountSeleniumElements(rows_selector, 3)
 
@@ -1992,7 +1979,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertCountSeleniumElements(rows_selector, 5)
         errorlist = self.selenium.find_element(
             By.CSS_SELECTOR,
-            "{} .dynamic-inner4stacked_set .errorlist li".format(inline_id),
+            f"{inline_id} .dynamic-inner4stacked_set .errorlist li",
         )
         self.assertEqual("Please correct the duplicate values below.", errorlist.text)
         delete_link = self.selenium.find_element(
@@ -2003,7 +1990,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element(
                 By.CSS_SELECTOR,
-                "{} .dynamic-inner4stacked_set .errorlist li".format(inline_id),
+                f"{inline_id} .dynamic-inner4stacked_set .errorlist li",
             )
 
         with self.wait_page_loaded():
@@ -2022,7 +2009,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         inline_id = "#inner4tabular_set-group"
-        rows_selector = "{} .dynamic-inner4tabular_set".format(inline_id)
+        rows_selector = f"{inline_id} .dynamic-inner4tabular_set"
 
         self.assertCountSeleniumElements(rows_selector, 3)
 
@@ -2060,9 +2047,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # tr#inner4tabular_set-3:
         errorlist = self.selenium.find_element(
             By.CSS_SELECTOR,
-            "{} #inner4tabular_set-3 + .row-form-errors .errorlist li".format(
-                inline_id
-            ),
+            f"{inline_id} #inner4tabular_set-3 + .row-form-errors .errorlist li",
         )
         self.assertEqual("Please correct the duplicate values below.", errorlist.text)
         delete_link = self.selenium.find_element(
@@ -2074,7 +2059,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element(
                 By.CSS_SELECTOR,
-                "{} .dynamic-inner4tabular_set .errorlist li".format(inline_id),
+                f"{inline_id} .dynamic-inner4tabular_set .errorlist li",
             )
 
         with self.wait_page_loaded():
@@ -2347,7 +2332,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Before save all inputs have default border
         for inline in ("stacked", "tabular"):
             for field_name in ("name", "select", "text"):
-                element_id = "id_inner5{}_set-0-{}".format(inline, field_name)
+                element_id = f"id_inner5{inline}_set-0-{field_name}"
                 self.assertBorder(
                     self.selenium.find_element(By.ID, element_id),
                     "1px solid #cccccc",

@@ -174,7 +174,7 @@ class WhereNode(tree.Node):
                     raise EmptyResultSet
                 else:
                     raise FullResultSet
-        conn = " {} ".format(self.connector)
+        conn = f" {self.connector} "
         sql_string = conn.join(result)
         if not sql_string:
             raise FullResultSet
@@ -182,9 +182,9 @@ class WhereNode(tree.Node):
             # Some backends (Oracle at least) need parentheses around the inner
             # SQL in the negated case, even if the inner SQL contains just a
             # single expression.
-            sql_string = "NOT ({})".format(sql_string)
+            sql_string = f"NOT ({sql_string})"
         elif len(result) > 1 or self.resolved:
-            sql_string = "({})".format(sql_string)
+            sql_string = f"({sql_string})"
         return sql_string, result_params
 
     def get_group_by_cols(self):
@@ -341,5 +341,5 @@ class ExtraWhere:
         self.params = params
 
     def as_sql(self, compiler=None, connection=None):
-        sqls = ["({})".format(sql) for sql in self.sqls]
+        sqls = [f"({sql})" for sql in self.sqls]
         return " AND ".join(sqls), list(self.params or ())

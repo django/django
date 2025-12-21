@@ -91,7 +91,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         interface.
         """
         cursor.execute(
-            "PRAGMA table_xinfo({})".format(self.connection.ops.quote_name(table_name))
+            f"PRAGMA table_xinfo({self.connection.ops.quote_name(table_name)})"
         )
         table_info = cursor.fetchall()
         if not table_info:
@@ -101,7 +101,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if self.connection.features.can_introspect_json_field:
             for line in table_info:
                 column = line[1]
-                json_constraint_sql = '%json_valid("{}")%'.format(column)
+                json_constraint_sql = f'%json_valid("{column}")%'
                 has_json_constraint = cursor.execute(
                     """
                     SELECT sql
@@ -158,9 +158,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         representing all foreign keys in the given table.
         """
         cursor.execute(
-            "PRAGMA foreign_key_list({})".format(
-                self.connection.ops.quote_name(table_name)
-            )
+            f"PRAGMA foreign_key_list({self.connection.ops.quote_name(table_name)})"
         )
         return {
             column_name: (
@@ -182,7 +180,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_primary_key_columns(self, cursor, table_name):
         cursor.execute(
-            "PRAGMA table_info({})".format(self.connection.ops.quote_name(table_name))
+            f"PRAGMA table_info({self.connection.ops.quote_name(table_name)})"
         )
         return [name for _, name, *_, pk in cursor.fetchall() if pk]
 
@@ -311,7 +309,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 else:
                     unnamed_constrains_index += 1
                     constraints[
-                        "__unnamed_constraint_{}__".format(unnamed_constrains_index)
+                        f"__unnamed_constraint_{unnamed_constrains_index}__"
                     ] = unique
             if check:
                 if constraint_name:
@@ -319,7 +317,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 else:
                     unnamed_constrains_index += 1
                     constraints[
-                        "__unnamed_constraint_{}__".format(unnamed_constrains_index)
+                        f"__unnamed_constraint_{unnamed_constrains_index}__"
                     ] = check
             if end_token.match(sqlparse.tokens.Punctuation, ")"):
                 break
@@ -348,7 +346,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         # Get the index info
         cursor.execute(
-            "PRAGMA index_list({})".format(self.connection.ops.quote_name(table_name))
+            f"PRAGMA index_list({self.connection.ops.quote_name(table_name)})"
         )
         for row in cursor.fetchall():
             # Discard last 2 columns.
@@ -370,7 +368,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             # Get the index info for that index
             cursor.execute(
-                "PRAGMA index_info({})".format(self.connection.ops.quote_name(index))
+                f"PRAGMA index_info({self.connection.ops.quote_name(index)})"
             )
             for index_rank, column_rank, column in cursor.fetchall():
                 if index not in constraints:

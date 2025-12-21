@@ -860,7 +860,7 @@ class FakeMigration:
         self.name = name
 
     def __repr__(self):
-        return "M<{}>".format(self.name)
+        return f"M<{self.name}>"
 
 
 class ExecutorUnitTests(SimpleTestCase):

@@ -58,10 +58,8 @@ def check_user_model(app_configs, **kwargs):
                 "The field named as the 'USERNAME_FIELD' "
                 "for a custom user model must not be included in 'REQUIRED_FIELDS'.",
                 hint=(
-                    "The 'USERNAME_FIELD' is currently set to '{}', you "
-                    "should remove '{}' from the 'REQUIRED_FIELDS'.".format(
-                        cls.USERNAME_FIELD, cls.USERNAME_FIELD
-                    )
+                    f"The 'USERNAME_FIELD' is currently set to '{cls.USERNAME_FIELD}', you "
+                    f"should remove '{cls.USERNAME_FIELD}' from the 'REQUIRED_FIELDS'."
                 ),
                 obj=cls,
                 id="auth.E002",
@@ -78,10 +76,8 @@ def check_user_model(app_configs, **kwargs):
         ]:
             errors.append(
                 checks.Error(
-                    "'{}.{}' must be unique because it is named as the "
-                    "'USERNAME_FIELD'.".format(
-                        cls._meta.object_name, cls.USERNAME_FIELD
-                    ),
+                    f"'{cls._meta.object_name}.{cls.USERNAME_FIELD}' must be unique because it is named as the "
+                    "'USERNAME_FIELD'.",
                     obj=cls,
                     id="auth.E003",
                 )
@@ -89,9 +85,7 @@ def check_user_model(app_configs, **kwargs):
         else:
             errors.append(
                 checks.Warning(
-                    "'{}.{}' is named as the 'USERNAME_FIELD', but it is not unique.".format(
-                        cls._meta.object_name, cls.USERNAME_FIELD
-                    ),
+                    f"'{cls._meta.object_name}.{cls.USERNAME_FIELD}' is named as the 'USERNAME_FIELD', but it is not unique.",
                     hint=(
                         "Ensure that your authentication backend(s) can handle "
                         "non-unique usernames."
@@ -104,9 +98,9 @@ def check_user_model(app_configs, **kwargs):
     if callable(cls().is_anonymous):
         errors.append(
             checks.Critical(
-                "{}.is_anonymous must be an attribute or property rather than "
+                f"{cls}.is_anonymous must be an attribute or property rather than "
                 "a method. Ignoring this is a security issue as anonymous "
-                "users will be treated as authenticated!".format(cls),
+                "users will be treated as authenticated!",
                 obj=cls,
                 id="auth.C009",
             )
@@ -114,9 +108,9 @@ def check_user_model(app_configs, **kwargs):
     if callable(cls().is_authenticated):
         errors.append(
             checks.Critical(
-                "{}.is_authenticated must be an attribute or property rather "
+                f"{cls}.is_authenticated must be an attribute or property rather "
                 "than a method. Ignoring this is a security issue as anonymous "
-                "users will be treated as authenticated!".format(cls),
+                "users will be treated as authenticated!",
                 obj=cls,
                 id="auth.C010",
             )
@@ -220,8 +214,8 @@ def check_models_permissions(app_configs, **kwargs):
             if codename in builtin_permissions:
                 errors.append(
                     checks.Error(
-                        "The permission codenamed '{}' clashes with a builtin "
-                        "permission for model '{}'.".format(codename, opts.label),
+                        f"The permission codenamed '{codename}' clashes with a builtin "
+                        f"permission for model '{opts.label}'.",
                         obj=model,
                         id="auth.E005",
                     )
@@ -229,8 +223,8 @@ def check_models_permissions(app_configs, **kwargs):
             elif codename in codenames:
                 errors.append(
                     checks.Error(
-                        "The permission codenamed '{}' is duplicated for "
-                        "model '{}'.".format(codename, opts.label),
+                        f"The permission codenamed '{codename}' is duplicated for "
+                        f"model '{opts.label}'.",
                         obj=model,
                         id="auth.E006",
                     )

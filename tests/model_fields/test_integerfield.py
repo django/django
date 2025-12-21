@@ -156,7 +156,7 @@ class IntegerFieldTests(TestCase):
                         "limit_value": min_custom_value,
                     }
                     with self.assertRaisesMessage(
-                        ValidationError, "[{!r}]".format(field_range_message)
+                        ValidationError, f"[{field_range_message!r}]"
                     ):
                         ranged_value_field.run_validators(min_backend_value - 1)
 
@@ -174,7 +174,7 @@ class IntegerFieldTests(TestCase):
                         "limit_value": max_custom_value,
                     }
                     with self.assertRaisesMessage(
-                        ValidationError, "[{!r}]".format(field_range_message)
+                        ValidationError, f"[{field_range_message!r}]"
                     ):
                         ranged_value_field.run_validators(max_backend_value + 1)
 
@@ -204,7 +204,7 @@ class IntegerFieldTests(TestCase):
         ]
         for exception, value in tests:
             with self.subTest(value):
-                msg = "Field 'value' expected a number but got {!r}.".format(value)
+                msg = f"Field 'value' expected a number but got {value!r}."
                 with self.assertRaisesMessage(exception, msg):
                     self.model.objects.create(value=value)
 

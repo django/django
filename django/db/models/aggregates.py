@@ -88,13 +88,9 @@ class Aggregate(Func):
         **extra,
     ):
         if distinct and not self.allow_distinct:
-            raise TypeError(
-                "{} does not allow distinct.".format(self.__class__.__name__)
-            )
+            raise TypeError(f"{self.__class__.__name__} does not allow distinct.")
         if order_by and not self.allow_order_by:
-            raise TypeError(
-                "{} does not allow order_by.".format(self.__class__.__name__)
-            )
+            raise TypeError(f"{self.__class__.__name__} does not allow order_by.")
         if default is not None and self.empty_result_set_value is not None:
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
 
@@ -144,9 +140,7 @@ class Aggregate(Func):
                         else repr(before_resolved)
                     )
                     raise FieldError(
-                        "Cannot compute {}('{}'): '{}' is an aggregate".format(
-                            c.name, name, name
-                        )
+                        f"Cannot compute {c.name}('{name}'): '{name}' is an aggregate"
                     )
         if (default := c.default) is None:
             return c
@@ -167,7 +161,7 @@ class Aggregate(Func):
             expr for expr in self.get_source_expressions() if expr is not None
         ]
         if len(expressions) == 1 and hasattr(expressions[0], "name"):
-            return "{}__{}".format(expressions[0].name, self.name.lower())
+            return f"{expressions[0].name}__{self.name.lower()}"
         raise TypeError("Complex expressions require an alias")
 
     def get_group_by_cols(self):

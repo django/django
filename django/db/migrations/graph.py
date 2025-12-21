@@ -33,9 +33,7 @@ class Node:
         return str(self.key)
 
     def __repr__(self):
-        return "<{}: ({!r}, {!r})>".format(
-            self.__class__.__name__, self.key[0], self.key[1]
-        )
+        return f"<{self.__class__.__name__}: ({self.key[0]!r}, {self.key[1]!r})>"
 
     def add_child(self, child):
         self.children.add(child)
@@ -108,14 +106,14 @@ class MigrationGraph:
         """
         if child not in self.nodes:
             error_message = (
-                "Migration {} dependencies reference nonexistent"
-                " child node {!r}".format(migration, child)
+                f"Migration {migration} dependencies reference nonexistent"
+                f" child node {child!r}"
             )
             self.add_dummy_node(child, migration, error_message)
         if parent not in self.nodes:
             error_message = (
-                "Migration {} dependencies reference nonexistent"
-                " parent node {!r}".format(migration, parent)
+                f"Migration {migration} dependencies reference nonexistent"
+                f" parent node {parent!r}"
             )
             self.add_dummy_node(parent, migration, error_message)
         self.node_map[child].add_parent(self.node_map[parent])
@@ -135,8 +133,8 @@ class MigrationGraph:
             replacement_node = self.node_map[replacement]
         except KeyError as err:
             raise NodeNotFoundError(
-                "Unable to find replacement node {!r}. It was either never added"
-                " to the migration graph, or has been removed.".format(replacement),
+                f"Unable to find replacement node {replacement!r}. It was either never added"
+                " to the migration graph, or has been removed.",
                 replacement,
             ) from err
         for replaced_key in replaced:
@@ -171,10 +169,8 @@ class MigrationGraph:
             replacement_node = self.node_map.pop(replacement)
         except KeyError as err:
             raise NodeNotFoundError(
-                "Unable to remove replacement node {!r}. It was either never added"
-                " to the migration graph, or has been removed already.".format(
-                    replacement
-                ),
+                f"Unable to remove replacement node {replacement!r}. It was either never added"
+                " to the migration graph, or has been removed already.",
                 replacement,
             ) from err
         replaced_nodes = set()
@@ -208,7 +204,7 @@ class MigrationGraph:
         follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node {!r} not a valid node".format(target), target)
+            raise NodeNotFoundError(f"Node {target!r} not a valid node", target)
         return self.iterative_dfs(self.node_map[target])
 
     def backwards_plan(self, target):
@@ -218,7 +214,7 @@ class MigrationGraph:
         would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node {!r} not a valid node".format(target), target)
+            raise NodeNotFoundError(f"Node {target!r} not a valid node", target)
         return self.iterative_dfs(self.node_map[target], forwards=False)
 
     def iterative_dfs(self, start, forwards=True):
@@ -300,7 +296,7 @@ class MigrationGraph:
 
     def __repr__(self):
         nodes, edges = self._nodes_and_edges()
-        return "<{}: nodes={}, edges={}>".format(self.__class__.__name__, nodes, edges)
+        return f"<{self.__class__.__name__}: nodes={nodes}, edges={edges}>"
 
     def _nodes_and_edges(self):
         return len(self.nodes), sum(

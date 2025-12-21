@@ -180,7 +180,7 @@ def _send_server_message(
         )
 
     mail = EmailMultiAlternatives(
-        subject="{}{}".format(settings.EMAIL_SUBJECT_PREFIX, subject),
+        subject=f"{settings.EMAIL_SUBJECT_PREFIX}{subject}",
         body=message,
         from_email=settings.SERVER_EMAIL,
         to=recipients,

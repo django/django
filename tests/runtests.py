@@ -336,7 +336,7 @@ class ActionSelenium(argparse.Action):
             except ImportError:
                 raise argparse.ArgumentError(
                     self,
-                    "Selenium browser specification '{}' is not valid.".format(browser),
+                    f"Selenium browser specification '{browser}' is not valid.",
                 )
         setattr(namespace, self.dest, browsers)
 
@@ -367,8 +367,8 @@ def django_tests(
         max_parallel = parallel
 
     if verbosity >= 1:
-        msg = "Testing against Django installed in '{}'".format(
-            os.path.dirname(django.__file__)
+        msg = (
+            f"Testing against Django installed in '{os.path.dirname(django.__file__)}'"
         )
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
@@ -422,23 +422,23 @@ def get_subprocess_args(options):
     subprocess_args = [
         sys.executable,
         __file__,
-        "--settings={}".format(options.settings),
+        f"--settings={options.settings}",
     ]
     if options.failfast:
         subprocess_args.append("--failfast")
     if options.verbosity:
-        subprocess_args.append("--verbosity={}".format(options.verbosity))
+        subprocess_args.append(f"--verbosity={options.verbosity}")
     if not options.interactive:
         subprocess_args.append("--noinput")
     if options.tags:
-        subprocess_args.append("--tag={}".format(options.tags))
+        subprocess_args.append(f"--tag={options.tags}")
     if options.exclude_tags:
-        subprocess_args.append("--exclude_tag={}".format(options.exclude_tags))
+        subprocess_args.append(f"--exclude_tag={options.exclude_tags}")
     if options.shuffle is not False:
         if options.shuffle is None:
             subprocess_args.append("--shuffle")
         else:
-            subprocess_args.append("--shuffle={}".format(options.shuffle))
+            subprocess_args.append(f"--shuffle={options.shuffle}")
     return subprocess_args
 
 
@@ -488,7 +488,7 @@ def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
             break
 
     if len(test_labels) == 1:
-        print("***** Source of error: {}".format(test_labels[0]))
+        print(f"***** Source of error: {test_labels[0]}")
 
 
 def paired_tests(paired_test, options, test_labels, start_at, start_after):
@@ -514,7 +514,7 @@ def paired_tests(paired_test, options, test_labels, start_at, start_after):
         )
         failures = subprocess.call(subprocess_args + [label, paired_test])
         if failures:
-            print("***** Found problem pair with {}".format(label))
+            print(f"***** Found problem pair with {label}")
             return
 
     print("***** No problem pair found")

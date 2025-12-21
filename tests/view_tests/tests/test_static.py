@@ -25,7 +25,7 @@ class StaticTests(SimpleTestCase):
         "The static view can serve static media"
         media_files = ["file.txt", "file.txt.gz", "%2F.txt"]
         for filename in media_files:
-            response = self.client.get("/{}/{}".format(self.prefix, quote(filename)))
+            response = self.client.get(f"/{self.prefix}/{quote(filename)}")
             response_content = b"".join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, "rb") as fp:
@@ -53,13 +53,13 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(second_chunk.strip()), 1449)
 
     def test_unknown_mime_type(self):
-        response = self.client.get("/{}/file.unknown".format(self.prefix))
+        response = self.client.get(f"/{self.prefix}/file.unknown")
         self.assertEqual("application/octet-stream", response.headers["Content-Type"])
         response.close()
 
     def test_copes_with_empty_path_component(self):
         file_name = "file.txt"
-        response = self.client.get("/{}//{}".format(self.prefix, file_name))
+        response = self.client.get(f"/{self.prefix}//{file_name}")
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
             self.assertEqual(fp.read(), response_content)
@@ -67,7 +67,7 @@ class StaticTests(SimpleTestCase):
     def test_is_modified_since(self):
         file_name = "file.txt"
         response = self.client.get(
-            "/{}/{}".format(self.prefix, file_name),
+            f"/{self.prefix}/{file_name}",
             headers={"if-modified-since": "Thu, 1 Jan 1970 00:00:00 GMT"},
         )
         response_content = b"".join(response)
@@ -77,7 +77,7 @@ class StaticTests(SimpleTestCase):
     def test_not_modified_since(self):
         file_name = "file.txt"
         response = self.client.get(
-            "/{}/{}".format(self.prefix, file_name),
+            f"/{self.prefix}/{file_name}",
             headers={
                 # This is 24h before max Unix time. Remember to fix Django and
                 # update this test well before 2038 :)
@@ -95,7 +95,7 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         invalid_date = "Mon, 28 May 999999999999 28:25:26 GMT"
         response = self.client.get(
-            "/{}/{}".format(self.prefix, file_name),
+            f"/{self.prefix}/{file_name}",
             headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
@@ -112,7 +112,7 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         invalid_date = ": 1291108438, Wed, 20 Oct 2010 14:05:00 GMT"
         response = self.client.get(
-            "/{}/{}".format(self.prefix, file_name),
+            f"/{self.prefix}/{file_name}",
             headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
@@ -121,17 +121,17 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(response_content), int(response.headers["Content-Length"]))
 
     def test_404(self):
-        response = self.client.get("/{}/nonexistent_resource".format(self.prefix))
+        response = self.client.get(f"/{self.prefix}/nonexistent_resource")
         self.assertEqual(404, response.status_code)
 
     def test_index(self):
-        response = self.client.get("/{}/".format(self.prefix))
+        response = self.client.get(f"/{self.prefix}/")
         self.assertContains(response, "Index of ./")
         # Directories have a trailing slash.
         self.assertIn("subdir/", response.context["file_list"])
 
     def test_index_subdir(self):
-        response = self.client.get("/{}/subdir/".format(self.prefix))
+        response = self.client.get(f"/{self.prefix}/subdir/")
         self.assertContains(response, "Index of subdir/")
         # File with a leading dot (e.g. .hidden) aren't displayed.
         self.assertEqual(response.context["file_list"], ["visible"])
@@ -154,7 +154,7 @@ class StaticTests(SimpleTestCase):
         ]
     )
     def test_index_custom_template(self):
-        response = self.client.get("/{}/".format(self.prefix))
+        response = self.client.get(f"/{self.prefix}/")
         self.assertEqual(response.content, b"Test index")
 
     def test_template_encoding(self):

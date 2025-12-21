@@ -130,11 +130,11 @@ class AddField(FieldOperation):
             )
 
     def describe(self):
-        return "Add field {} to {}".format(self.name, self.model_name)
+        return f"Add field {self.name} to {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "{}_{}".format(self.model_name_lower, self.name_lower)
+        return f"{self.model_name_lower}_{self.name_lower}"
 
     def reduce(self, operation, app_label):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(
@@ -184,11 +184,11 @@ class RemoveField(FieldOperation):
             schema_editor.add_field(from_model, to_model._meta.get_field(self.name))
 
     def describe(self):
-        return "Remove field {} from {}".format(self.name, self.model_name)
+        return f"Remove field {self.name} from {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "remove_{}_{}".format(self.model_name_lower, self.name_lower)
+        return f"remove_{self.model_name_lower}_{self.name_lower}"
 
     def reduce(self, operation, app_label):
         from .models import DeleteModel
@@ -248,11 +248,11 @@ class AlterField(FieldOperation):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Alter field {} on {}".format(self.name, self.model_name)
+        return f"Alter field {self.name} on {self.model_name}"
 
     @property
     def migration_name_fragment(self):
-        return "alter_{}_{}".format(self.model_name_lower, self.name_lower)
+        return f"alter_{self.model_name_lower}_{self.name_lower}"
 
     def reduce(self, operation, app_label):
         if isinstance(
@@ -323,19 +323,11 @@ class RenameField(FieldOperation):
             )
 
     def describe(self):
-        return "Rename field {} on {} to {}".format(
-            self.old_name,
-            self.model_name,
-            self.new_name,
-        )
+        return f"Rename field {self.old_name} on {self.model_name} to {self.new_name}"
 
     @property
     def migration_name_fragment(self):
-        return "rename_{}_{}_{}".format(
-            self.old_name_lower,
-            self.model_name_lower,
-            self.new_name_lower,
-        )
+        return f"rename_{self.old_name_lower}_{self.model_name_lower}_{self.new_name_lower}"
 
     def references_field(self, model_name, name, app_label):
         return self.references_model(model_name, app_label) and (

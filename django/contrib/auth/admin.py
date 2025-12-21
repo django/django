@@ -187,11 +187,7 @@ class UserAdmin(admin.ModelAdmin):
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
                     reverse(
-                        "{}:{}_{}_change".format(
-                            self.admin_site.name,
-                            user._meta.app_label,
-                            user._meta.model_name,
-                        ),
+                        f"{self.admin_site.name}:{user._meta.app_label}_{user._meta.model_name}_change",
                         args=(user.pk,),
                     )
                 )

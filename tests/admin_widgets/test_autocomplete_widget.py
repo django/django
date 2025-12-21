@@ -114,19 +114,17 @@ class AutocompleteMixinTests(TestCase):
         # With 'band', a ForeignKey.
         form = AlbumForm(initial={"band": beatles.uuid})
         output = form.as_table()
-        selected_option = '<option value="{}" selected>The Beatles</option>'.format(
-            beatles.uuid
+        selected_option = (
+            f'<option value="{beatles.uuid}" selected>The Beatles</option>'
         )
-        option = '<option value="{}">The Who</option>'.format(who.uuid)
+        option = f'<option value="{who.uuid}">The Who</option>'
         self.assertIn(selected_option, output)
         self.assertNotIn(option, output)
         # With 'featuring', a ManyToManyField.
         form = AlbumForm(initial={"featuring": [beatles.pk, who.pk]})
         output = form.as_table()
-        selected_option = '<option value="{}" selected>The Beatles</option>'.format(
-            beatles.pk
-        )
-        option = '<option value="{}" selected>The Who</option>'.format(who.pk)
+        selected_option = f'<option value="{beatles.pk}" selected>The Beatles</option>'
+        option = f'<option value="{who.pk}" selected>The Who</option>'
         self.assertIn(selected_option, output)
         self.assertIn(option, output)
 
@@ -150,8 +148,8 @@ class AutocompleteMixinTests(TestCase):
         )
         form = VideoStreamForm(initial={"release_event": release_event.pk})
         output = form.as_table()
-        selected_option = '<option value="{}" selected>Test Target</option>'.format(
-            release_event.pk
+        selected_option = (
+            f'<option value="{release_event.pk}" selected>Test Target</option>'
         )
         self.assertIn(selected_option, output)
 
@@ -186,7 +184,7 @@ class AutocompleteMixinTests(TestCase):
                 if select_lang:
                     expected_files = (
                         base_files[:2]
-                        + (("admin/js/vendor/select2/i18n/{}.js".format(select_lang)),)
+                        + ((f"admin/js/vendor/select2/i18n/{select_lang}.js"),)
                         + base_files[2:]
                     )
                 else:

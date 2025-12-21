@@ -153,7 +153,7 @@ class ErrorList(UserList, list, RenderableErrorMixin):
         if error_class is None:
             self.error_class = "errorlist"
         else:
-            self.error_class = "errorlist {}".format(error_class)
+            self.error_class = f"errorlist {error_class}"
         self.renderer = renderer or get_default_renderer()
         self.field_id = field_id
 

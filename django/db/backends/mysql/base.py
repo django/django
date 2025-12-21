@@ -35,9 +35,7 @@ from .validation import DatabaseValidation
 version = Database.version_info
 if version < (2, 2, 1):
     raise ImproperlyConfigured(
-        "mysqlclient 2.2.1 or newer is required; you have {}.".format(
-            Database.__version__
-        )
+        f"mysqlclient 2.2.1 or newer is required; you have {Database.__version__}."
     )
 
 
@@ -244,9 +242,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     "Invalid transaction isolation level '{}' specified.\n"
                     "Use one of {}, or None.".format(
                         isolation_level,
-                        ", ".join(
-                            "'{}'".format(s) for s in sorted(self.isolation_levels)
-                        ),
+                        ", ".join(f"'{s}'" for s in sorted(self.isolation_levels)),
                     )
                 )
         self.isolation_level = isolation_level
@@ -270,9 +266,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         if self.isolation_level:
             assignments.append(
-                "SET SESSION TRANSACTION ISOLATION LEVEL {}".format(
-                    self.isolation_level.upper()
-                )
+                f"SET SESSION TRANSACTION ISOLATION LEVEL {self.isolation_level.upper()}"
             )
 
         if assignments:
@@ -341,35 +335,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     _,
                 ) in relations.items():
                     cursor.execute(
+                        f"""
+                        SELECT REFERRING.`{primary_key_column_name}`, REFERRING.`{column_name}` FROM `{table_name}` as REFERRING
+                        LEFT JOIN `{referenced_table_name}` as REFERRED
+                        ON (REFERRING.`{column_name}` = REFERRED.`{referenced_column_name}`)
+                        WHERE REFERRING.`{column_name}` IS NOT NULL AND REFERRED.`{referenced_column_name}` IS NULL
                         """
-                        SELECT REFERRING.`{}`, REFERRING.`{}` FROM `{}` as REFERRING
-                        LEFT JOIN `{}` as REFERRED
-                        ON (REFERRING.`{}` = REFERRED.`{}`)
-                        WHERE REFERRING.`{}` IS NOT NULL AND REFERRED.`{}` IS NULL
-                        """.format(
-                            primary_key_column_name,
-                            column_name,
-                            table_name,
-                            referenced_table_name,
-                            column_name,
-                            referenced_column_name,
-                            column_name,
-                            referenced_column_name,
-                        )
                     )
                     for bad_row in cursor.fetchall():
                         raise IntegrityError(
-                            "The row in table '{}' with primary key '{}' has an "
-                            "invalid foreign key: {}.{} contains a value '{}' that "
-                            "does not have a corresponding value in {}.{}.".format(
-                                table_name,
-                                bad_row[0],
-                                table_name,
-                                column_name,
-                                bad_row[1],
-                                referenced_table_name,
-                                referenced_column_name,
-                            )
+                            f"The row in table '{table_name}' with primary key '{bad_row[0]}' has an "
+                            f"invalid foreign key: {table_name}.{column_name} contains a value '{bad_row[1]}' that "
+                            f"does not have a corresponding value in {referenced_table_name}.{referenced_column_name}."
                         )
 
     def is_usable(self):
@@ -430,9 +407,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         match = server_version_re.match(self.mysql_server_info)
         if not match:
             raise Exception(
-                "Unable to determine MySQL version from version string {!r}".format(
-                    self.mysql_server_info
-                )
+                f"Unable to determine MySQL version from version string {self.mysql_server_info!r}"
             )
         return tuple(int(x) for x in match.groups())
 

@@ -335,7 +335,7 @@ class IndexesTests(TestCase):
                 # consequence, @override_settings doesn't work.
                 if settings.DEFAULT_INDEX_TABLESPACE:
                     self.assertIn(
-                        '"{}"'.format(settings.DEFAULT_INDEX_TABLESPACE),
+                        f'"{settings.DEFAULT_INDEX_TABLESPACE}"',
                         str(index.create_sql(Book, editor)).lower(),
                     )
                 else:

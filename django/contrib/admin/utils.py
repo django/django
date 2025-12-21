@@ -22,7 +22,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
 
-QUOTE_MAP = {i: "_{:02X}".format(i) for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
+QUOTE_MAP = {i: f"_{i:02X}" for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
 UNQUOTE_RE = _lazy_re_compile("_(?:{})".format("|".join([x[1:] for x in UNQUOTE_MAP])))
 
@@ -145,7 +145,7 @@ def get_deleted_objects(objs, request, admin_site):
         model = obj.__class__
         opts = obj._meta
 
-        no_edit_link = "{}: {}".format(capfirst(opts.verbose_name), obj)
+        no_edit_link = f"{capfirst(opts.verbose_name)}: {obj}"
 
         if admin_site.is_registered(model):
             if not admin_site.get_model_admin(model).has_delete_permission(
@@ -154,9 +154,7 @@ def get_deleted_objects(objs, request, admin_site):
                 perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse(
-                    "{}:{}_{}_change".format(
-                        admin_site.name, opts.app_label, opts.model_name
-                    ),
+                    f"{admin_site.name}:{opts.app_label}_{opts.model_name}_change",
                     None,
                     (quote(obj.pk),),
                 )

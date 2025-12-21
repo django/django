@@ -273,9 +273,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 violations = chain.from_iterable(
                     cursor.execute(
-                        "PRAGMA foreign_key_check({})".format(
-                            self.ops.quote_name(table_name)
-                        )
+                        f"PRAGMA foreign_key_check({self.ops.quote_name(table_name)})"
                     ).fetchall()
                     for table_name in table_names
                 )
@@ -287,34 +285,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 foreign_key_index,
             ) in violations:
                 foreign_key = cursor.execute(
-                    "PRAGMA foreign_key_list({})".format(
-                        self.ops.quote_name(table_name)
-                    )
+                    f"PRAGMA foreign_key_list({self.ops.quote_name(table_name)})"
                 ).fetchall()[foreign_key_index]
                 column_name, referenced_column_name = foreign_key[3:5]
                 primary_key_column_name = self.introspection.get_primary_key_column(
                     cursor, table_name
                 )
                 primary_key_value, bad_value = cursor.execute(
-                    "SELECT {}, {} FROM {} WHERE rowid = %s".format(
-                        self.ops.quote_name(primary_key_column_name),
-                        self.ops.quote_name(column_name),
-                        self.ops.quote_name(table_name),
-                    ),
+                    f"SELECT {self.ops.quote_name(primary_key_column_name)}, {self.ops.quote_name(column_name)} FROM {self.ops.quote_name(table_name)} WHERE rowid = %s",
                     (rowid,),
                 ).fetchone()
                 raise IntegrityError(
-                    "The row in table '{}' with primary key '{}' has an "
-                    "invalid foreign key: {}.{} contains a value '{}' that "
-                    "does not have a corresponding value in {}.{}.".format(
-                        table_name,
-                        primary_key_value,
-                        table_name,
-                        column_name,
-                        bad_value,
-                        referenced_table_name,
-                        referenced_column_name,
-                    )
+                    f"The row in table '{table_name}' with primary key '{primary_key_value}' has an "
+                    f"invalid foreign key: {table_name}.{column_name} contains a value '{bad_value}' that "
+                    f"does not have a corresponding value in {referenced_table_name}.{referenced_column_name}."
                 )
 
     def is_usable(self):

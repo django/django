@@ -68,19 +68,19 @@ class Engine:
             "file_charset={}{}{} autoescape={}>"
         ).format(
             self.__class__.__qualname__,
-            "" if not self.dirs else " dirs={}".format(repr(self.dirs)),
+            "" if not self.dirs else f" dirs={repr(self.dirs)}",
             self.app_dirs,
             (
                 ""
                 if not self.context_processors
-                else " context_processors={}".format(repr(self.context_processors))
+                else f" context_processors={repr(self.context_processors)}"
             ),
             self.debug,
             repr(self.loaders),
             repr(self.string_if_invalid),
             repr(self.file_charset),
-            "" if not self.libraries else " libraries={}".format(repr(self.libraries)),
-            "" if not self.builtins else " builtins={}".format(repr(self.builtins)),
+            "" if not self.libraries else f" libraries={repr(self.libraries)}",
+            "" if not self.builtins else f" builtins={repr(self.builtins)}",
             repr(self.autoescape),
         )
 
@@ -149,7 +149,7 @@ class Engine:
             return loader_class(self, *args)
         else:
             raise ImproperlyConfigured(
-                "Invalid value in template loaders configuration: {!r}".format(loader)
+                f"Invalid value in template loaders configuration: {loader!r}"
             )
 
     def find_template(self, name, dirs=None, skip=None):

@@ -107,7 +107,7 @@ class Operation:
         """
         Output a brief summary of what the action does.
         """
-        return "{}: {}".format(self.__class__.__name__, self._constructor_args)
+        return f"{self.__class__.__name__}: {self._constructor_args}"
 
     def formatted_description(self):
         """Output a description prefixed by a category symbol."""

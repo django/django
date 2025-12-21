@@ -54,7 +54,7 @@ class TransactionTestCaseDatabasesTests(TestCase):
             self.assertEqual(
                 len(connections[alias].queries_log),
                 0,
-                "Failed for alias {}".format(alias),
+                f"Failed for alias {alias}",
             )
 
 

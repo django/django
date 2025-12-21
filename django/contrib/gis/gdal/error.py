@@ -58,4 +58,4 @@ def check_err(code, cpl=False):
         e, msg = err_dict[code]
         raise e(msg)
     else:
-        raise GDALException('Unknown error code: "{}"'.format(code))
+        raise GDALException(f'Unknown error code: "{code}"')

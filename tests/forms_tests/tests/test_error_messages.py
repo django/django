@@ -240,7 +240,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
                     return ""
                 return mark_safe(
                     '<div class="error">{}</div>'.format(
-                        "".join("<p>{}</p>".format(e) for e in self)
+                        "".join(f"<p>{e}</p>" for e in self)
                     )
                 )
 

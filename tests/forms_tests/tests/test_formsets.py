@@ -821,7 +821,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                     (
                         '<li>Title: <input type="text" name="form-0-title"></li>'
                         '<li>Pub date: <input type="text" name="form-0-pub_date">'
-                        "{}</li>".format(order_html)
+                        f"{order_html}</li>"
                     ),
                 )
 

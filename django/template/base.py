@@ -120,7 +120,7 @@ class Origin:
         return self.name
 
     def __repr__(self):
-        return "<{} name={!r}>".format(self.__class__.__qualname__, self.name)
+        return f"<{self.__class__.__qualname__} name={self.name!r}>"
 
     def __eq__(self, other):
         return (
@@ -132,10 +132,7 @@ class Origin:
     @property
     def loader_name(self):
         if self.loader:
-            return "{}.{}".format(
-                self.loader.__module__,
-                self.loader.__class__.__name__,
-            )
+            return f"{self.loader.__module__}.{self.loader.__class__.__name__}"
 
 
 class Template:
@@ -452,7 +449,7 @@ class Lexer:
                     self.verbatim = False
                 elif content[:9] in ("verbatim", "verbatim "):
                     # Then a verbatim block is starting.
-                    self.verbatim = "end{}".format(content)
+                    self.verbatim = f"end{content}"
                 return Token(TokenType.BLOCK, content, position, lineno)
             if not self.verbatim:
                 content = token_string[2:-2].strip()
@@ -524,7 +521,7 @@ class Parser:
         self.origin = origin
 
     def __repr__(self):
-        return "<{} tokens={!r}>".format(self.__class__.__qualname__, self.tokens)
+        return f"<{self.__class__.__qualname__} tokens={self.tokens!r}>"
 
     def parse(self, parse_until=None):
         """
@@ -606,9 +603,7 @@ class Parser:
                 origin = "the template"
             raise self.error(
                 token,
-                "{{% {} %}} must be the first tag in {}.".format(
-                    token.contents, origin
-                ),
+                f"{{% {token.contents} %}} must be the first tag in {origin}.",
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
@@ -640,7 +635,7 @@ class Parser:
                 % (
                     token.lineno,
                     command,
-                    get_text_list(["'{}'".format(p) for p in parse_until], "or"),
+                    get_text_list([f"'{p}'" for p in parse_until], "or"),
                 ),
             )
         raise self.error(
@@ -681,7 +676,7 @@ class Parser:
         if filter_name in self.filters:
             return self.filters[filter_name]
         else:
-            raise TemplateSyntaxError("Invalid filter: '{}'".format(filter_name))
+            raise TemplateSyntaxError(f"Invalid filter: '{filter_name}'")
 
 
 # This only matches constant *strings* (things in quotes or marked for
@@ -749,7 +744,7 @@ class FilterExpression:
             if upto != start:
                 raise TemplateSyntaxError(
                     "Could not parse some characters: "
-                    "{}|{}|{}".format(token[:upto], token[upto:start], token[start:])
+                    f"{token[:upto]}|{token[upto:start]}|{token[start:]}"
                 )
             if var_obj is None:
                 if constant := match["constant"]:
@@ -759,7 +754,7 @@ class FilterExpression:
                         var_obj = None
                 elif (var := match["var"]) is None:
                     raise TemplateSyntaxError(
-                        "Could not find variable at start of {}.".format(token)
+                        f"Could not find variable at start of {token}."
                     )
                 else:
                     var_obj = Variable(var)
@@ -776,8 +771,7 @@ class FilterExpression:
             upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError(
-                "Could not parse the remainder: '{}' "
-                "from '{}'".format(token[upto:], token)
+                f"Could not parse the remainder: '{token[upto:]}' " f"from '{token}'"
             )
 
         self.filters = filters
@@ -846,7 +840,7 @@ class FilterExpression:
         return self.token
 
     def __repr__(self):
-        return "<{} {!r}>".format(self.__class__.__qualname__, self.token)
+        return f"<{self.__class__.__qualname__} {self.token!r}>"
 
 
 class Variable:
@@ -878,9 +872,7 @@ class Variable:
         self.message_context = None
 
         if not isinstance(var, str):
-            raise TypeError(
-                "Variable must be a string or number, got {}".format(type(var))
-            )
+            raise TypeError(f"Variable must be a string or number, got {type(var)}")
         try:
             # First try to treat this variable as a number.
             #
@@ -914,16 +906,14 @@ class Variable:
                 if VARIABLE_ATTRIBUTE_SEPARATOR + "_" in var or var[0] == "_":
                     raise TemplateSyntaxError(
                         "Variables and attributes may "
-                        "not begin with underscores: '{}'".format(var)
+                        f"not begin with underscores: '{var}'"
                     )
                 # Disallow characters that are allowed in numbers but not in a
                 # variable name.
                 for c in ["+", "-"]:
                     if c in var:
                         raise TemplateSyntaxError(
-                            "Invalid character ('{}') in variable name: '{}'".format(
-                                c, var
-                            )
+                            f"Invalid character ('{c}') in variable name: '{var}'"
                         )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
 
@@ -946,7 +936,7 @@ class Variable:
         return value
 
     def __repr__(self):
-        return "<{}: {!r}>".format(self.__class__.__name__, self.var)
+        return f"<{self.__class__.__name__}: {self.var!r}>"
 
     def __str__(self):
         return self.var
@@ -1111,7 +1101,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<{}: {!r}>".format(self.__class__.__name__, self.s[:25])
+        return f"<{self.__class__.__name__}: {self.s[:25]!r}>"
 
     def render(self, context):
         return self.s
@@ -1149,7 +1139,7 @@ class VariableNode(Node):
         self.filter_expression = filter_expression
 
     def __repr__(self):
-        return "<Variable Node: {}>".format(self.filter_expression)
+        return f"<Variable Node: {self.filter_expression}>"
 
     def render(self, context):
         try:

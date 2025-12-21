@@ -19,7 +19,7 @@ class BaseStaticFilesMixin:
         self.assertIn(
             text,
             self._get_file(filepath),
-            "'{}' not in '{}'".format(text, filepath),
+            f"'{text}' not in '{filepath}'",
         )
 
     def assertFileNotFound(self, filepath):
@@ -33,10 +33,8 @@ class BaseStaticFilesMixin:
 
     def static_template_snippet(self, path, asvar=False):
         if asvar:
-            return "{{% load static from static %}}{{% static '{}' as var %}}{{{{ var }}}}".format(
-                path
-            )
-        return "{{% load static from static %}}{{% static '{}' %}}".format(path)
+            return f"{{% load static from static %}}{{% static '{path}' as var %}}{{{{ var }}}}"
+        return f"{{% load static from static %}}{{% static '{path}' %}}"
 
     def assertStaticRenders(self, path, result, asvar=False, **kwargs):
         template = self.static_template_snippet(path, asvar)

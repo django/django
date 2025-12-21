@@ -932,7 +932,7 @@ aria-describedby="id_birthday_error">
             "</label>",
         )
         self.assertHTMLEqual(
-            "\n".join("<div>{}</div>".format(bf) for bf in f["name"]),
+            "\n".join(f"<div>{bf}</div>" for bf in f["name"]),
             """
             <div><label>
             <input type="radio" name="name" value="john" required> John</label></div>
@@ -3486,9 +3486,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
             def add_prefix(self, field_name):
                 return (
-                    "{}-prefix-{}".format(self.prefix, field_name)
-                    if self.prefix
-                    else field_name
+                    f"{self.prefix}-prefix-{field_name}" if self.prefix else field_name
                 )
 
         p = Person(prefix="foo")
@@ -5350,7 +5348,7 @@ class TemplateTests(SimpleTestCase):
                 form = UserRegistration(auto_id=False)
 
             if form.is_valid():
-                return "VALID: {!r}".format(sorted(form.cleaned_data.items()))
+                return f"VALID: {sorted(form.cleaned_data.items())!r}"
 
             t = Template(
                 '<form method="post">'

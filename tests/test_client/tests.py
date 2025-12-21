@@ -169,9 +169,7 @@ class ClientTest(TestCase):
                         response = client_method(
                             "/json_view/", data, content_type="application/json"
                         )
-                        self.assertContains(
-                            response, "Viewing {} page.".format(method_name)
-                        )
+                        self.assertContains(response, f"Viewing {method_name} page.")
                         self.assertEqual(response.context["data"], expected)
 
     def test_json_encoder_argument(self):
@@ -357,7 +355,7 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_{}/".format(code),
+                    f"/redirect_view_{code}/",
                     data={"value": "test"},
                     follow=True,
                 )
@@ -372,7 +370,7 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_{}_query_string/".format(code),
+                    f"/redirect_view_{code}_query_string/",
                     data={"value": "test"},
                     follow=True,
                 )
@@ -388,7 +386,7 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_{}_query_string/".format(code),
+                    f"/redirect_view_{code}_query_string/",
                     data={"value": "test"},
                     follow=True,
                 )
@@ -401,7 +399,7 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.post(
-                    "/redirect_view_{}/".format(code),
+                    f"/redirect_view_{code}/",
                     data={"value": "test"},
                     follow=True,
                 )
@@ -411,7 +409,7 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.put(
-                    "/redirect_view_{}/?to=/put_view/".format(code),
+                    f"/redirect_view_{code}/?to=/put_view/",
                     data="a=b",
                     follow=True,
                 )
@@ -422,7 +420,7 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.get(
-                    "/redirect_view_{}/".format(code), data=data, follow=True
+                    f"/redirect_view_{code}/", data=data, follow=True
                 )
                 self.assertContains(response, "30 is the value")
 
@@ -1117,7 +1115,7 @@ class RequestFactoryTest(SimpleTestCase):
         request = self.request_factory.trace(url_path)
         response = trace_view(request)
         protocol = request.META["SERVER_PROTOCOL"]
-        echoed_request_line = "TRACE {} {}".format(url_path, protocol)
+        echoed_request_line = f"TRACE {url_path} {protocol}"
         self.assertContains(response, echoed_request_line)
 
     def test_request_factory_default_headers(self):

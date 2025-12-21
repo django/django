@@ -70,7 +70,7 @@ class Storage:
         character alphanumeric string (before the file extension, if one
         exists) to the filename.
         """
-        return "{}_{}{}".format(file_root, get_random_string(7), file_ext)
+        return f"{file_root}_{get_random_string(7)}{file_ext}"
 
     def get_available_name(self, name, max_length=None):
         """
@@ -81,7 +81,7 @@ class Storage:
         dir_name, file_name = os.path.split(name)
         if ".." in pathlib.PurePath(dir_name).parts:
             raise SuspiciousFileOperation(
-                "Detected path traversal attempt in '{}'".format(dir_name)
+                f"Detected path traversal attempt in '{dir_name}'"
             )
         validate_file_name(file_name)
         file_ext = "".join(pathlib.PurePath(file_name).suffixes)
@@ -105,9 +105,9 @@ class Storage:
                 # available filename.
                 if not file_root:
                     raise SuspiciousFileOperation(
-                        'Storage can not find an available filename for "{}". '
+                        f'Storage can not find an available filename for "{name}". '
                         "Please make sure that the corresponding file field "
-                        'allows sufficient "max_length".'.format(name)
+                        'allows sufficient "max_length".'
                     )
                 name = os.path.join(
                     dir_name, self.get_alternative_name(file_root, file_ext)
@@ -124,7 +124,7 @@ class Storage:
         dirname, filename = os.path.split(filename)
         if ".." in pathlib.PurePath(dirname).parts:
             raise SuspiciousFileOperation(
-                "Detected path traversal attempt in '{}'".format(dirname)
+                f"Detected path traversal attempt in '{dirname}'"
             )
         return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 

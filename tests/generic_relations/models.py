@@ -59,9 +59,7 @@ class Comparison(AbstractComparison):
     other_obj = GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
 
     def __str__(self):
-        return "{} is {} than {}".format(
-            self.first_obj, self.comparative, self.other_obj
-        )
+        return f"{self.first_obj} is {self.comparative} than {self.other_obj}"
 
 
 class Animal(models.Model):

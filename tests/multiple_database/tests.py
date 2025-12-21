@@ -884,8 +884,8 @@ class QueryTestCase(TestCase):
             user=alice, flavor="chocolate"
         )
         msg = (
-            'Cannot assign "{!r}": the current database router prevents this '
-            "relation.".format(alice_profile)
+            f'Cannot assign "{alice_profile!r}": the current database router prevents this '
+            "relation."
         )
         with self.assertRaisesMessage(ValueError, msg):
             bob.userprofile = alice_profile

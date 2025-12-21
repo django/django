@@ -32,15 +32,11 @@ class Command(LabelCommand):
             result = (os.path.realpath(path) for path in result)
             if verbosity >= 1:
                 file_list = "\n  ".join(result)
-                return "Found '{}' here:\n  {}{}".format(
-                    path,
-                    file_list,
-                    searched_locations,
-                )
+                return f"Found '{path}' here:\n  {file_list}{searched_locations}"
             else:
                 return "\n".join(result)
         else:
-            message = ["No matching file found for '{}'.".format(path)]
+            message = [f"No matching file found for '{path}'."]
             if verbosity >= 2:
                 message.append(searched_locations)
             if verbosity >= 1:

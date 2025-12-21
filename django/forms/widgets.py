@@ -125,7 +125,7 @@ class Media:
         self._js_lists = [js]
 
     def __repr__(self):
-        return "Media(css={!r}, js={!r})".format(self._css, self._js)
+        return f"Media(css={self._css!r}, js={self._js!r})"
 
     def __str__(self):
         return self.render()
@@ -195,7 +195,7 @@ class Media:
         """Return a Media object that only contains media of the given type."""
         if name in MEDIA_TYPES:
             return Media(**{str(name): getattr(self, "_" + name)})
-        raise KeyError('Unknown media type "{}"'.format(name))
+        raise KeyError(f'Unknown media type "{name}"')
 
     @staticmethod
     def merge(*lists):
@@ -458,7 +458,7 @@ class MultipleHiddenInput(HiddenInput):
             if id_:
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
-                widget_attrs["id"] = "{}_{}".format(id_, index)
+                widget_attrs["id"] = f"{id_}_{index}"
             widget = HiddenInput()
             widget.is_required = self.is_required
             subwidgets.append(widget.get_context(name, value_, widget_attrs)["widget"])
@@ -490,9 +490,7 @@ class FileInput(Input):
             and attrs.get("multiple", False)
         ):
             raise ValueError(
-                "{} doesn't support uploading multiple files.".format(
-                    self.__class__.__qualname__
-                )
+                f"{self.__class__.__qualname__} doesn't support uploading multiple files."
             )
         if self.allow_multiple_selected:
             if attrs is None:
@@ -760,7 +758,7 @@ class ChoiceWidget(Widget):
     def create_option(
         self, name, value, label, selected, index, subindex=None, attrs=None
     ):
-        index = str(index) if subindex is None else "{}_{}".format(index, subindex)
+        index = str(index) if subindex is None else f"{index}_{subindex}"
         option_attrs = (
             self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         )
@@ -793,7 +791,7 @@ class ChoiceWidget(Widget):
         references the zero index.
         """
         if id_ and self.add_id_index:
-            id_ = "{}_{}".format(id_, index)
+            id_ = f"{id_}_{index}"
         return id_
 
     def value_from_datadict(self, data, files, name):
@@ -968,12 +966,10 @@ class MultiWidget(Widget):
 
     def __init__(self, widgets, attrs=None):
         if isinstance(widgets, dict):
-            self.widgets_names = [
-                ("_{}".format(name)) if name else "" for name in widgets
-            ]
+            self.widgets_names = [(f"_{name}") if name else "" for name in widgets]
             widgets = widgets.values()
         else:
-            self.widgets_names = ["_{}".format(i) for i in range(len(widgets))]
+            self.widgets_names = [f"_{i}" for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
 
@@ -1007,7 +1003,7 @@ class MultiWidget(Widget):
                 widget_value = None
             if id_:
                 widget_attrs = final_attrs.copy()
-                widget_attrs["id"] = "{}_{}".format(id_, i)
+                widget_attrs["id"] = f"{id_}_{i}"
             else:
                 widget_attrs = final_attrs
             subwidgets.append(
@@ -1178,7 +1174,7 @@ class SelectDateWidget(Widget):
         ).get_context(
             name=year_name,
             value=context["widget"]["value"]["year"],
-            attrs={**context["widget"]["attrs"], "id": "id_{}".format(year_name)},
+            attrs={**context["widget"]["attrs"], "id": f"id_{year_name}"},
         )
         month_choices = list(self.months.items())
         if not self.is_required:
@@ -1189,7 +1185,7 @@ class SelectDateWidget(Widget):
         ).get_context(
             name=month_name,
             value=context["widget"]["value"]["month"],
-            attrs={**context["widget"]["attrs"], "id": "id_{}".format(month_name)},
+            attrs={**context["widget"]["attrs"], "id": f"id_{month_name}"},
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -1201,7 +1197,7 @@ class SelectDateWidget(Widget):
         ).get_context(
             name=day_name,
             value=context["widget"]["value"]["day"],
-            attrs={**context["widget"]["attrs"], "id": "id_{}".format(day_name)},
+            attrs={**context["widget"]["attrs"], "id": f"id_{day_name}"},
         )
         subwidgets = []
         for field in self._parse_date_fmt():
@@ -1252,8 +1248,8 @@ class SelectDateWidget(Widget):
 
     def id_for_label(self, id_):
         for first_select in self._parse_date_fmt():
-            return "{}_{}".format(id_, first_select)
-        return "{}_month".format(id_)
+            return f"{id_}_{first_select}"
+        return f"{id_}_month"
 
     def value_from_datadict(self, data, files, name):
         y = data.get(self.year_field % name)
@@ -1269,7 +1265,7 @@ class SelectDateWidget(Widget):
             except ValueError:
                 # Return pseudo-ISO dates with zeros for any unselected values,
                 # e.g. '2017-0-23'.
-                return "{}-{}-{}".format(y or 0, m or 0, d or 0)
+                return f"{y or 0}-{m or 0}-{d or 0}"
             except OverflowError:
                 return "0-0-0"
             return date_value.strftime(input_format)
@@ -1277,6 +1273,5 @@ class SelectDateWidget(Widget):
 
     def value_omitted_from_data(self, data, files, name):
         return not any(
-            ("{}_{}".format(name, interval) in data)
-            for interval in ("year", "month", "day")
+            (f"{name}_{interval}" in data) for interval in ("year", "month", "day")
         )

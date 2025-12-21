@@ -279,9 +279,7 @@ def get_valid_filename(name):
     s = str(name).strip().replace(" ", "_")
     s = re.sub(r"(?u)[^-\w.]", "", s)
     if s in {"", ".", ".."}:
-        raise SuspiciousFileOperation(
-            "Could not derive file name from '{}'".format(name)
-        )
+        raise SuspiciousFileOperation(f"Could not derive file name from '{name}'")
     return s
 
 
@@ -462,9 +460,9 @@ def unescape_string_literal(s):
         "'ab' c"
     """
     if not s or s[0] not in "\"'" or s[-1] != s[0]:
-        raise ValueError("Not a string literal: {!r}".format(s))
+        raise ValueError(f"Not a string literal: {s!r}")
     quote = s[0]
-    return s[1:-1].replace(r"\{}".format(quote), quote).replace(r"\\", "\\")
+    return s[1:-1].replace(rf"\{quote}", quote).replace(r"\\", "\\")
 
 
 @keep_lazy_text

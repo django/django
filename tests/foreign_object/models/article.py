@@ -10,9 +10,7 @@ class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError(
-                "{} must be accessed via instance".format(self.field.name)
-            )
+            raise AttributeError(f"{self.field.name} must be accessed via instance")
         self.field.set_cached_value(instance, value)
         if value is not None and not self.field.remote_field.multiple:
             self.field.remote_field.set_cached_value(value, instance)
@@ -25,7 +23,7 @@ class ColConstraint:
 
     def as_sql(self, compiler, connection):
         qn = compiler.quote_name_unless_alias
-        return "{}.{} = %s".format(qn(self.alias), qn(self.col)), [self.value]
+        return f"{qn(self.alias)}.{qn(self.col)} = %s", [self.value]
 
 
 class ActiveTranslationField(models.ForeignObject):

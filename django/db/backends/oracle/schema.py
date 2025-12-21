@@ -28,13 +28,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
-            return "'{}'".format(value)
+            return f"'{value}'"
         elif isinstance(value, datetime.timedelta):
-            return "'{}'".format(duration_iso_string(value))
+            return f"'{duration_iso_string(value)}'"
         elif isinstance(value, str):
             return "'{}'".format(value.replace("'", "''"))
         elif isinstance(value, (bytes, bytearray, memoryview)):
-            return "'{}'".format(value.hex())
+            return f"'{value.hex()}'"
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
@@ -127,30 +127,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
         if re.match("^N?CLOB", old_type):
-            new_value = "TO_CHAR({})".format(new_value)
+            new_value = f"TO_CHAR({new_value})"
             old_type = "VARCHAR2"
         if re.match("^N?VARCHAR2", old_type):
             new_internal_type = new_field.get_internal_type()
             if new_internal_type == "DateField":
-                new_value = "TO_DATE({}, 'YYYY-MM-DD')".format(new_value)
+                new_value = f"TO_DATE({new_value}, 'YYYY-MM-DD')"
             elif new_internal_type == "DateTimeField":
-                new_value = "TO_TIMESTAMP({}, 'YYYY-MM-DD HH24:MI:SS.FF')".format(
-                    new_value
-                )
+                new_value = f"TO_TIMESTAMP({new_value}, 'YYYY-MM-DD HH24:MI:SS.FF')"
             elif new_internal_type == "TimeField":
                 # TimeField are stored as TIMESTAMP with a 1900-01-01 date
                 # part.
-                new_value = "CONCAT('1900-01-01 ', {})".format(new_value)
-                new_value = "TO_TIMESTAMP({}, 'YYYY-MM-DD HH24:MI:SS.FF')".format(
-                    new_value
-                )
+                new_value = f"CONCAT('1900-01-01 ', {new_value})"
+                new_value = f"TO_TIMESTAMP({new_value}, 'YYYY-MM-DD HH24:MI:SS.FF')"
         # Transfer values across
         self.execute(
-            "UPDATE {} set {}={}".format(
-                self.quote_name(model._meta.db_table),
-                self.quote_name(new_temp_field.column),
-                new_value,
-            )
+            f"UPDATE {self.quote_name(model._meta.db_table)} set {self.quote_name(new_temp_field.column)}={new_value}"
         )
         # Drop the old field
         self.remove_field(model, old_field)
@@ -232,10 +224,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _drop_identity(self, table_name, column_name):
         self.execute(
-            "ALTER TABLE {table} MODIFY {column} DROP IDENTITY".format(
-                table=self.quote_name(table_name),
-                column=self.quote_name(column_name),
-            )
+            f"ALTER TABLE {self.quote_name(table_name)} MODIFY {self.quote_name(column_name)} DROP IDENTITY"
         )
 
     def _get_default_collation(self, table_name):

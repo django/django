@@ -33,7 +33,7 @@ class cached_property:
         elif name != self.name:
             raise TypeError(
                 "Cannot assign the same cached_property to two different names "
-                "({!r} and {!r}).".format(self.name, name)
+                f"({self.name!r} and {name!r})."
             )
 
     def __get__(self, instance, cls=None):
@@ -410,7 +410,7 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._setupfunc
         else:
             repr_attr = self._wrapped
-        return "<{}: {!r}>".format(type(self).__name__, repr_attr)
+        return f"<{type(self).__name__}: {repr_attr!r}>"
 
     def __copy__(self):
         if self._wrapped is empty:

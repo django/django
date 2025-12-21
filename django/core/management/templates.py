@@ -99,7 +99,7 @@ class TemplateCommand(BaseCommand):
             try:
                 os.makedirs(top_dir)
             except FileExistsError:
-                raise CommandError("'{}' already exists".format(top_dir))
+                raise CommandError(f"'{top_dir}' already exists")
             except OSError as e:
                 raise CommandError(e)
         else:
@@ -135,10 +135,10 @@ class TemplateCommand(BaseCommand):
                     app_or_project, ", ".join(extra_files)
                 )
             )
-        base_name = "{}_name".format(app_or_project)
-        base_subdir = "{}_template".format(app_or_project)
-        base_directory = "{}_directory".format(app_or_project)
-        camel_case_name = "camel_case_{}_name".format(app_or_project)
+        base_name = f"{app_or_project}_name"
+        base_subdir = f"{app_or_project}_template"
+        base_directory = f"{app_or_project}_directory"
+        camel_case_name = f"camel_case_{app_or_project}_name"
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
         context = Context(
@@ -190,12 +190,8 @@ class TemplateCommand(BaseCommand):
 
                 if os.path.exists(new_path):
                     raise CommandError(
-                        "{} already exists. Overlaying {} {} into an existing "
-                        "directory won't replace conflicting files.".format(
-                            new_path,
-                            self.a_or_an,
-                            app_or_project,
-                        )
+                        f"{new_path} already exists. Overlaying {self.a_or_an} {app_or_project} into an existing "
+                        "directory won't replace conflicting files."
                     )
 
                 # Only render the Python files, as we don't want to
@@ -211,15 +207,15 @@ class TemplateCommand(BaseCommand):
                     shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
-                    self.stdout.write("Creating {}".format(new_path))
+                    self.stdout.write(f"Creating {new_path}")
                 try:
                     self.apply_umask(old_path, new_path)
                     self.make_writeable(new_path)
                 except OSError:
                     self.stderr.write(
-                        "Notice: Couldn't set permission bits on {}. You're "
+                        f"Notice: Couldn't set permission bits on {new_path}. You're "
                         "probably using an uncommon filesystem setup. No "
-                        "problem.".format(new_path),
+                        "problem.",
                         self.style.NOTICE,
                     )
 
@@ -257,38 +253,26 @@ class TemplateCommand(BaseCommand):
                 return self.extract(absolute_path)
 
         raise CommandError(
-            "couldn't handle {} template {}.".format(self.app_or_project, template)
+            f"couldn't handle {self.app_or_project} template {template}."
         )
 
     def validate_name(self, name, name_or_dir="name"):
         if name is None:
             raise CommandError(
-                "you must provide {an} {app} name".format(
-                    an=self.a_or_an,
-                    app=self.app_or_project,
-                )
+                f"you must provide {self.a_or_an} {self.app_or_project} name"
             )
         # Check it's a valid directory name.
         if not name.isidentifier():
             raise CommandError(
-                "'{name}' is not a valid {app} {type}. Please make sure the "
-                "{type} is a valid identifier.".format(
-                    name=name,
-                    app=self.app_or_project,
-                    type=name_or_dir,
-                )
+                f"'{name}' is not a valid {self.app_or_project} {name_or_dir}. Please make sure the "
+                f"{name_or_dir} is a valid identifier."
             )
         # Check that __spec__ doesn't exist.
         if find_spec(name) is not None:
             raise CommandError(
-                "'{name}' conflicts with the name of an existing Python "
-                "module and cannot be used as {an} {app} {type}. Please try "
-                "another {type}.".format(
-                    name=name,
-                    an=self.a_or_an,
-                    app=self.app_or_project,
-                    type=name_or_dir,
-                )
+                f"'{name}' conflicts with the name of an existing Python "
+                f"module and cannot be used as {self.a_or_an} {self.app_or_project} {name_or_dir}. Please try "
+                f"another {name_or_dir}."
             )
 
     def download(self, url):
@@ -305,13 +289,13 @@ class TemplateCommand(BaseCommand):
                 display_url = url
             return filename, display_url
 
-        prefix = "django_{}_template_".format(self.app_or_project)
+        prefix = f"django_{self.app_or_project}_template_"
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_download")
         self.paths_to_remove.append(tempdir)
         filename, display_url = cleanup_url(url)
 
         if self.verbosity >= 2:
-            self.stdout.write("Downloading {}".format(display_url))
+            self.stdout.write(f"Downloading {display_url}")
 
         the_path = os.path.join(tempdir, filename)
         opener = build_opener()
@@ -321,9 +305,7 @@ class TemplateCommand(BaseCommand):
                 headers = source.info()
                 target.write(source.read())
         except OSError as e:
-            raise CommandError(
-                "couldn't download URL {} to {}: {}".format(url, filename, e)
-            )
+            raise CommandError(f"couldn't download URL {url} to {filename}: {e}")
 
         used_name = the_path.split("/")[-1]
 
@@ -368,18 +350,16 @@ class TemplateCommand(BaseCommand):
         Extract the given file to a temporary directory and return
         the path of the directory with the extracted content.
         """
-        prefix = "django_{}_template_".format(self.app_or_project)
+        prefix = f"django_{self.app_or_project}_template_"
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_extract")
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:
-            self.stdout.write("Extracting {}".format(filename))
+            self.stdout.write(f"Extracting {filename}")
         try:
             archive.extract(filename, tempdir)
             return tempdir
         except (archive.ArchiveException, OSError) as e:
-            raise CommandError(
-                "couldn't extract file {} to {}: {}".format(filename, tempdir, e)
-            )
+            raise CommandError(f"couldn't extract file {filename} to {tempdir}: {e}")
 
     def is_url(self, template):
         """Return True if the name looks like a URL."""

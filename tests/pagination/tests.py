@@ -55,9 +55,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             got,
-            "For '{}', expected {} but got {}. Paginator parameters were: {}".format(
-                name, expected, got, params
-            ),
+            f"For '{name}', expected {expected} but got {got}. Paginator parameters were: {params}",
         )
 
     async def check_attribute_async(self, name, paginator, expected, params):
@@ -66,9 +64,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             await got(),
-            "For '{}', expected {} but got {}. Paginator parameters were: {}".format(
-                name, expected, got, params
-            ),
+            f"For '{name}', expected {expected} but got {got}. Paginator parameters were: {params}",
         )
 
     def get_test_cases_for_test_paginator(self):
@@ -933,7 +929,7 @@ class ModelPaginationTests(TestCase):
         object_list = ObjectList()
         msg = (
             "Pagination may yield inconsistent results with an unordered "
-            "object_list: {!r}.".format(object_list)
+            f"object_list: {object_list!r}."
         )
         with self.assertWarnsMessage(UnorderedObjectListWarning, msg):
             Paginator(object_list, 5)
@@ -949,7 +945,7 @@ class ModelPaginationTests(TestCase):
         object_list = ObjectList()
         msg = (
             "Pagination may yield inconsistent results with an unordered "
-            "object_list: {!r}.".format(object_list)
+            f"object_list: {object_list!r}."
         )
         with self.assertWarnsMessage(UnorderedObjectListWarning, msg):
             AsyncPaginator(object_list, 5)

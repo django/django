@@ -147,7 +147,7 @@ class EmployeeNameCustomDividerFilter(FieldListFilter):
     list_separator = "|"
 
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = "{}__in".format(field_path)
+        self.lookup_kwarg = f"{field_path}__in"
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -457,10 +457,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte={}&date_registered__lt={}".format(
-                self.today,
-                self.tomorrow,
-            ),
+            f"?date_registered__gte={self.today}&date_registered__lt={self.tomorrow}",
         )
 
         request = self.request_factory.get(
@@ -494,10 +491,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte={}&date_registered__lt={}".format(
-                self.today.replace(day=1),
-                self.next_month,
-            ),
+            f"?date_registered__gte={self.today.replace(day=1)}&date_registered__lt={self.next_month}",
         )
 
         request = self.request_factory.get(
@@ -528,10 +522,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte={}&date_registered__lt={}".format(
-                self.today.replace(month=1, day=1),
-                self.next_year,
-            ),
+            f"?date_registered__gte={self.today.replace(month=1, day=1)}&date_registered__lt={self.next_year}",
         )
 
         request = self.request_factory.get(
@@ -557,10 +548,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte={}&date_registered__lt={}".format(
-                str(self.one_week_ago),
-                str(self.tomorrow),
-            ),
+            f"?date_registered__gte={str(self.one_week_ago)}&date_registered__lt={str(self.tomorrow)}",
         )
 
         # Null/not null queries
@@ -1293,7 +1281,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[3]["selected"], True)
         self.assertEqual(
             choices[3]["query_string"],
-            "?author__id__exact={}&publication-decade=the+00s".format(self.alfred.pk),
+            f"?author__id__exact={self.alfred.pk}&publication-decade=the+00s",
         )
 
         filterspec = changelist.get_filters(request)[0][0]
@@ -1302,7 +1290,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?author__id__exact={}&publication-decade=the+00s".format(self.alfred.pk),
+            f"?author__id__exact={self.alfred.pk}&publication-decade=the+00s",
         )
 
     def test_listfilter_without_title(self):
@@ -1740,7 +1728,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[1]["display"], "DEV")
         self.assertIs(choices[1]["selected"], True)
         self.assertEqual(
-            choices[1]["query_string"], "?department={}".format(self.john.department.pk)
+            choices[1]["query_string"], f"?department={self.john.department.pk}"
         )
 
     def test_lookup_with_non_string_value_underscored(self):
@@ -1766,7 +1754,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[1]["selected"], True)
         self.assertEqual(
             choices[1]["query_string"],
-            "?department__whatever={}".format(self.john.department.pk),
+            f"?department__whatever={self.john.department.pk}",
         )
 
     def test_fk_with_to_field(self):

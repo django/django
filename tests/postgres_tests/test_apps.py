@@ -66,7 +66,7 @@ class PostgresConfigTests(TestCase):
                     field = test_field(default=default)
                     with self.assertRaisesMessage(
                         ValueError,
-                        "Cannot serialize: {}".format(default.__class__.__name__),
+                        f"Cannot serialize: {default.__class__.__name__}",
                     ):
                         MigrationWriter.serialize(field)
 

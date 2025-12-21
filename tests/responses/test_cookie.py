@@ -140,7 +140,7 @@ class DeleteCookieTests(SimpleTestCase):
         response = HttpResponse()
         for prefix in ("Secure", "Host"):
             with self.subTest(prefix=prefix):
-                cookie_name = "__{}-c".format(prefix)
+                cookie_name = f"__{prefix}-c"
                 response.delete_cookie(cookie_name)
                 self.assertIs(response.cookies[cookie_name]["secure"], True)
 

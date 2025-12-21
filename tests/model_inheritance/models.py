@@ -28,7 +28,7 @@ class CommonInfo(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return "{} {}".format(self.__class__.__name__, self.name)
+        return f"{self.__class__.__name__} {self.name}"
 
 
 class Worker(CommonInfo):

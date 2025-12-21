@@ -156,7 +156,7 @@ class CreateViewTests(TestCase):
         )
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.get(name="John Doe").pk
-        self.assertRedirects(res, "/%C3%A9dit/author/{}/update/".format(pk))
+        self.assertRedirects(res, f"/%C3%A9dit/author/{pk}/update/")
 
     def test_create_with_special_properties(self):
         res = self.client.get("/edit/authors/create/special/")
@@ -315,7 +315,7 @@ class UpdateViewTests(TestCase):
         )
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.get(name="John Doe").pk
-        self.assertRedirects(res, "/%C3%A9dit/author/{}/update/".format(pk))
+        self.assertRedirects(res, f"/%C3%A9dit/author/{pk}/update/")
 
     def test_update_with_special_properties(self):
         res = self.client.get("/edit/author/%d/update/special/" % self.author.pk)
@@ -416,10 +416,10 @@ class DeleteViewTests(TestCase):
             **{"name": "Randall Munroe", "slug": "randall-munroe"}
         )
         res = self.client.post(
-            "/edit/author/{}/delete/interpolate_redirect_nonascii/".format(a.pk)
+            f"/edit/author/{a.pk}/delete/interpolate_redirect_nonascii/"
         )
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, "/%C3%A9dit/authors/create/?deleted={}".format(a.pk))
+        self.assertRedirects(res, f"/%C3%A9dit/authors/create/?deleted={a.pk}")
 
     def test_delete_with_special_properties(self):
         res = self.client.get("/edit/author/%d/delete/special/" % self.author.pk)

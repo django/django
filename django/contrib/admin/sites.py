@@ -111,26 +111,24 @@ class AdminSite:
         for model in model_or_iterable:
             if model._meta.abstract:
                 raise ImproperlyConfigured(
-                    "The model {} is abstract, so it cannot be registered with admin.".format(
-                        model.__name__
-                    )
+                    f"The model {model.__name__} is abstract, so it cannot be registered with admin."
                 )
             if model._meta.is_composite_pk:
                 raise ImproperlyConfigured(
-                    "The model {} has a composite primary key, so it cannot be "
-                    "registered with admin.".format(model.__name__)
+                    f"The model {model.__name__} has a composite primary key, so it cannot be "
+                    "registered with admin."
                 )
 
             if self.is_registered(model):
                 registered_admin = str(self.get_model_admin(model))
-                msg = "The model {} is already registered ".format(model.__name__)
+                msg = f"The model {model.__name__} is already registered "
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
                     msg += "in app {!r}.".format(
                         registered_admin.removesuffix(".ModelAdmin")
                     )
                 else:
-                    msg += "with {!r}.".format(registered_admin)
+                    msg += f"with {registered_admin!r}."
                 raise AlreadyRegistered(msg)
 
             # Ignore the registration if the model has been
@@ -144,7 +142,7 @@ class AdminSite:
                     # wrong place, which causes issues later on.
                     options["__module__"] = __name__
                     admin_class = type(
-                        "{}Admin".format(model.__name__), (admin_class,), options
+                        f"{model.__name__}Admin", (admin_class,), options
                     )
 
                 # Instantiate the admin class to save in the registry
@@ -160,9 +158,7 @@ class AdminSite:
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if not self.is_registered(model):
-                raise NotRegistered(
-                    "The model {} is not registered".format(model.__name__)
-                )
+                raise NotRegistered(f"The model {model.__name__} is not registered")
             del self._registry[model]
 
     def is_registered(self, model):
@@ -305,7 +301,7 @@ class AdminSite:
         for model, model_admin in self._registry.items():
             urlpatterns += [
                 path(
-                    "{}/{}/".format(model._meta.app_label, model._meta.model_name),
+                    f"{model._meta.app_label}/{model._meta.model_name}/",
                     include(model_admin.urls),
                 ),
             ]
@@ -460,7 +456,7 @@ class AdminSite:
         if settings.APPEND_SLASH and not url.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
             try:
-                match = resolve("{}/".format(request.path_info), urlconf)
+                match = resolve(f"{request.path_info}/", urlconf)
             except Resolver404:
                 pass
             else:
@@ -599,7 +595,7 @@ class AdminSite:
         return TemplateResponse(
             request,
             self.app_index_template
-            or ["admin/{}/app_index.html".format(app_label), "admin/app_index.html"],
+            or [f"admin/{app_label}/app_index.html", "admin/app_index.html"],
             context,
         )
 

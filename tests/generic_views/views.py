@@ -288,7 +288,7 @@ class BookSigningConfig:
     # use the same templates as for books
 
     def get_template_names(self):
-        return ["generic_views/book{}.html".format(self.template_name_suffix)]
+        return [f"generic_views/book{self.template_name_suffix}.html"]
 
 
 class BookSigningArchive(BookSigningConfig, generic.ArchiveIndexView):
