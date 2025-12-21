@@ -40,7 +40,7 @@ select = [
 #   "UP032",  # f-string
     "UP033",  # lru-cache-with-maxsize-none
     "UP034",  # extraneous-parentheses
-#   "UP035",  # deprecated-import
+    "UP035",  # deprecated-import
     "UP036",  # outdated-version-block
     "UP037",  # quoted-annotation
     "UP039",  # unnecessary-class-parentheses

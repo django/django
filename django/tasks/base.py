@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from asgiref.sync import async_to_sync, sync_to_async
 
