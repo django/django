@@ -15,7 +15,7 @@ select = [
     "UP005",  # deprecated-unittest-alias
     "UP006",  # non-pep585-annotation
     "UP007",  # non-pep604-annotation-union
-#   "UP008",  # super-call-with-parameters
+    "UP008",  # super-call-with-parameters
     "UP009",  # utf8-encoding-declaration
     "UP010",  # unnecessary-future-import
     "UP011",  # lru-cache-without-parameters
