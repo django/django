@@ -1855,6 +1855,14 @@ class LookupQueryingTests(TestCase):
                     Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
                 )
 
+    def test_in_lookup_in_filter_text_field(self):
+        self.assertSequenceEqual(
+            Season.objects.filter(
+                In(F("nulled_text_field"), [F("nulled_text_field"), "special_value"])
+            ),
+            [self.s2],
+        )
+
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(
             before_20=LessThan(F("year"), 1900),

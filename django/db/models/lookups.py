@@ -295,7 +295,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
                     (
                         value
                         if hasattr(value, "resolve_expression")
-                        else Value(value, self.lhs.output_field)
+                        else Value(value, getattr(self.lhs, "output_field", None))
                     )
                     for value in self.rhs
                 ]
