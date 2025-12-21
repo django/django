@@ -43,7 +43,7 @@ MOCK_INPUT_KEY_TO_PROMPTS = {
     "first_name": ["First name: "],
     "username": [
         "Username: ",
-        lambda: "Username (leave blank to use '%s'): " % get_default_username(),
+        lambda: "Username (leave blank to use '{}'): ".format(get_default_username()),
     ],
 }
 
@@ -83,7 +83,7 @@ def mock_inputs(inputs):
                             response = val
                         break
                 if response is None:
-                    raise ValueError("Mock input for %r not found." % prompt)
+                    raise ValueError("Mock input for {!r} not found.".format(prompt))
                 return response
 
             old_getpass = createsuperuser.getpass
@@ -343,8 +343,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs(
             {
                 "password": "nopasswd",
-                "Uživatel (leave blank to use '%s'): "
-                % get_default_username(): "foo",  # username (cz)
+                "Uživatel (leave blank to use '{}'): ".format(
+                    get_default_username()
+                ): "foo",  # username (cz)
                 "email": "nolocale@somewhere.org",
             }
         )
@@ -542,7 +543,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.group, group)
 
         non_existent_email = "mymail2@gmail.com"
-        msg = "email instance with email %r is not a valid choice." % non_existent_email
+        msg = "email instance with email {!r} is not a valid choice.".format(
+            non_existent_email
+        )
         with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "createsuperuser",
@@ -697,7 +700,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             {
                 "password": "nopasswd",
                 "Username: ": "joe",
-                "Orgs (Organization.id): ": "%s, %s" % (org_id_1, org_id_2),
+                "Orgs (Organization.id): ": "{}, {}".format(org_id_1, org_id_2),
             }
         )
         def test(self):
@@ -1073,9 +1076,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
             self.assertEqual(
                 new_io.getvalue().strip(),
-                "Error: Ensure this value has at most %s characters (it has %s).\n"
-                "Superuser created successfully."
-                % (user_field.max_length, len(invalid_username)),
+                "Error: Ensure this value has at most {} characters (it has {}).\n"
+                "Superuser created successfully.".format(
+                    user_field.max_length, len(invalid_username)
+                ),
             )
 
         test(self)

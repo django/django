@@ -51,12 +51,13 @@ class LazySettings(LazyObject):
         """
         settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
         if not settings_module:
-            desc = ("setting %s" % name) if name else "settings"
+            desc = ("setting {}".format(name)) if name else "settings"
             raise ImproperlyConfigured(
-                "Requested %s, but settings are not configured. "
-                "You must either define the environment variable %s "
-                "or call settings.configure() before accessing settings."
-                % (desc, ENVIRONMENT_VARIABLE)
+                "Requested {}, but settings are not configured. "
+                "You must either define the environment variable {} "
+                "or call settings.configure() before accessing settings.".format(
+                    desc, ENVIRONMENT_VARIABLE
+                )
             )
 
         self._wrapped = Settings(settings_module)
@@ -65,9 +66,9 @@ class LazySettings(LazyObject):
         # Hardcode the class name as otherwise it yields 'Settings'.
         if self._wrapped is empty:
             return "<LazySettings [Unevaluated]>"
-        return '<LazySettings "%(settings_module)s">' % {
-            "settings_module": self._wrapped.SETTINGS_MODULE,
-        }
+        return '<LazySettings "{settings_module}">'.format(
+            settings_module=self._wrapped.SETTINGS_MODULE,
+        )
 
     def __getattr__(self, name):
         """Return the value of a setting and cache it in self.__dict__."""
@@ -114,7 +115,7 @@ class LazySettings(LazyObject):
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
             if not name.isupper():
-                raise TypeError("Setting %r must be uppercase." % name)
+                raise TypeError("Setting {!r} must be uppercase.".format(name))
             setattr(holder, name, value)
         self._wrapped = holder
 
@@ -131,7 +132,7 @@ class LazySettings(LazyObject):
             return value
         from django.urls import get_script_prefix
 
-        return "%s%s" % (get_script_prefix(), value)
+        return "{}{}".format(get_script_prefix(), value)
 
     @property
     def configured(self):
@@ -177,7 +178,7 @@ class Settings:
                     setting_value, (list, tuple)
                 ):
                     raise ImproperlyConfigured(
-                        "The %s setting must be a list or a tuple." % setting
+                        "The {} setting must be a list or a tuple.".format(setting)
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
@@ -188,7 +189,9 @@ class Settings:
             zoneinfo_root = Path("/usr/share/zoneinfo")
             zone_info_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split("/"))
             if zoneinfo_root.exists() and not zone_info_file.exists():
-                raise ValueError("Incorrect timezone setting: %s" % self.TIME_ZONE)
+                raise ValueError(
+                    "Incorrect timezone setting: {}".format(self.TIME_ZONE)
+                )
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
             os.environ["TZ"] = self.TIME_ZONE
@@ -198,10 +201,10 @@ class Settings:
         return setting in self._explicit_settings
 
     def __repr__(self):
-        return '<%(cls)s "%(settings_module)s">' % {
-            "cls": self.__class__.__name__,
-            "settings_module": self.SETTINGS_MODULE,
-        }
+        return '<{cls} "{settings_module}">'.format(
+            cls=self.__class__.__name__,
+            settings_module=self.SETTINGS_MODULE,
+        )
 
 
 class UserSettingsHolder:
@@ -249,9 +252,9 @@ class UserSettingsHolder:
         return deleted or set_locally or set_on_default
 
     def __repr__(self):
-        return "<%(cls)s>" % {
-            "cls": self.__class__.__name__,
-        }
+        return "<{cls}>".format(
+            cls=self.__class__.__name__,
+        )
 
 
 settings = LazySettings()

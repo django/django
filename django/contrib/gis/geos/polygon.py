@@ -61,8 +61,9 @@ class Polygon(GEOSGeometry):
         for z in bbox:
             if not isinstance(z, (float, int)):
                 return GEOSGeometry(
-                    "POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))"
-                    % (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0)
+                    "POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))".format(
+                        x0, y0, x0, y1, x1, y1, x1, y0, x0, y0
+                    )
                 )
         return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
 
@@ -180,10 +181,10 @@ class Polygon(GEOSGeometry):
     def kml(self):
         "Return the KML representation of this Polygon."
         inner_kml = "".join(
-            "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
+            "<innerBoundaryIs>{}</innerBoundaryIs>".format(self[i + 1].kml)
             for i in range(self.num_interior_rings)
         )
-        return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (
+        return "<Polygon><outerBoundaryIs>{}</outerBoundaryIs>{}</Polygon>".format(
             self[0].kml,
             inner_kml,
         )

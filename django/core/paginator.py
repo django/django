@@ -313,7 +313,7 @@ class Page(collections.abc.Sequence):
         self.paginator = paginator
 
     def __repr__(self):
-        return "<Page %s of %s>" % (self.number, self.paginator.num_pages)
+        return "<Page {} of {}>".format(self.number, self.paginator.num_pages)
 
     def __len__(self):
         return len(self.object_list)
@@ -321,8 +321,9 @@ class Page(collections.abc.Sequence):
     def __getitem__(self, index):
         if not isinstance(index, (int, slice)):
             raise TypeError(
-                "Page indices must be integers or slices, not %s."
-                % type(index).__name__
+                "Page indices must be integers or slices, not {}.".format(
+                    type(index).__name__
+                )
             )
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
@@ -373,7 +374,7 @@ class AsyncPage:
         self.paginator = paginator
 
     def __repr__(self):
-        return "<Async Page %s>" % self.number
+        return "<Async Page {}>".format(self.number)
 
     async def __aiter__(self):
         if hasattr(self.object_list, "__aiter__"):
@@ -402,8 +403,9 @@ class AsyncPage:
     def __getitem__(self, index):
         if not isinstance(index, (int, slice)):
             raise TypeError(
-                "AsyncPage indices must be integers or slices, not %s."
-                % type(index).__name__
+                "AsyncPage indices must be integers or slices, not {}.".format(
+                    type(index).__name__
+                )
             )
 
         if not isinstance(self.object_list, list):

@@ -405,7 +405,9 @@ class TestQuerying(PostgreSQLTestCase):
         for lookup, filter_arg, excepted_result in tests:
             with self.subTest(lookup=lookup, filter_arg=filter_arg):
                 self.assertSequenceEqual(
-                    RangesModel.objects.filter(**{"decimals__%s" % lookup: filter_arg}),
+                    RangesModel.objects.filter(
+                        **{"decimals__{}".format(lookup): filter_arg}
+                    ),
                     excepted_result,
                 )
 

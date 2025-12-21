@@ -30,8 +30,8 @@ def select_template(template_name_list, using=None):
     if isinstance(template_name_list, str):
         raise TypeError(
             "select_template() takes an iterable of template names but got a "
-            "string: %r. Use get_template() if you want to load a single "
-            "template by name." % template_name_list
+            "string: {!r}. Use get_template() if you want to load a single "
+            "template by name.".format(template_name_list)
         )
 
     chain = []

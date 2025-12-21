@@ -692,8 +692,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             stdout=output,
         )
         result = output.getvalue()
-        self.assertIn('"pk": "%s"' % m1.id, result)
-        self.assertIn('"pk": "%s"' % m2.id, result)
+        self.assertIn('"pk": "{}"'.format(m1.id), result)
+        self.assertIn('"pk": "{}"'.format(m2.id), result)
 
     def test_dumpdata_with_file_output(self):
         management.call_command("loaddata", "fixture1.json", verbosity=0)

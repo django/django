@@ -41,8 +41,9 @@ class warn_about_renamed_method:
     def __call__(self, f):
         def wrapper(*args, **kwargs):
             warnings.warn(
-                "`%s.%s` is deprecated, use `%s` instead."
-                % (self.class_name, self.old_method_name, self.new_method_name),
+                "`{}.{}` is deprecated, use `{}` instead.".format(
+                    self.class_name, self.old_method_name, self.new_method_name
+                ),
                 self.deprecation_warning,
                 2,
             )
@@ -81,8 +82,9 @@ class RenameMethodsBase(type):
                 # Define the new method if missing and complain about it
                 if not new_method and old_method:
                     warnings.warn(
-                        "`%s.%s` method should be renamed `%s`."
-                        % (class_name, old_method_name, new_method_name),
+                        "`{}.{}` method should be renamed `{}`.".format(
+                            class_name, old_method_name, new_method_name
+                        ),
                         deprecation_warning,
                         2,
                     )
@@ -289,7 +291,7 @@ class MiddlewareMixin:
         super().__init__()
 
     def __repr__(self):
-        return "<%s get_response=%s>" % (
+        return "<{} get_response={}>".format(
             self.__class__.__qualname__,
             getattr(
                 self.get_response,

@@ -121,7 +121,7 @@ class LastExecutedQueryTest(TestCase):
     @skipUnlessDBFeature("supports_paramstyle_pyformat")
     def test_last_executed_query_dict(self):
         square_opts = Square._meta
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)" % (
+        sql = "INSERT INTO {} ({}, {}) VALUES (%(root)s, %(square)s)".format(
             connection.introspection.identifier_converter(square_opts.db_table),
             connection.ops.quote_name(square_opts.get_field("root").column),
             connection.ops.quote_name(square_opts.get_field("square").column),
@@ -137,7 +137,7 @@ class LastExecutedQueryTest(TestCase):
     @skipUnlessDBFeature("supports_paramstyle_pyformat")
     def test_last_executed_query_dict_overlap_keys(self):
         square_opts = Square._meta
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(root2)s)" % (
+        sql = "INSERT INTO {} ({}, {}) VALUES (%(root)s, %(root2)s)".format(
             connection.introspection.identifier_converter(square_opts.db_table),
             connection.ops.quote_name(square_opts.get_field("root").column),
             connection.ops.quote_name(square_opts.get_field("square").column),
@@ -175,7 +175,7 @@ class ParameterHandlingTest(TestCase):
         exception.
         """
         with connection.cursor() as cursor:
-            query = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % (
+            query = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(
                 connection.introspection.identifier_converter("backends_square"),
                 connection.ops.quote_name("root"),
                 connection.ops.quote_name("square"),
@@ -319,9 +319,9 @@ class BackendTestCase(TransactionTestCase):
         f1 = connection.ops.quote_name(opts.get_field("root").column)
         f2 = connection.ops.quote_name(opts.get_field("square").column)
         if paramstyle == "format":
-            query = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % (tbl, f1, f2)
+            query = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(tbl, f1, f2)
         elif paramstyle == "pyformat":
-            query = "INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)" % (
+            query = "INSERT INTO {} ({}, {}) VALUES (%(root)s, %(square)s)".format(
                 tbl,
                 f1,
                 f2,
@@ -402,8 +402,7 @@ class BackendTestCase(TransactionTestCase):
         f3, f4 = opts2.get_field("first_name"), opts2.get_field("last_name")
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT %s, %s FROM %s ORDER BY %s"
-                % (
+                "SELECT {}, {} FROM {} ORDER BY {}".format(
                     qn(f3.column),
                     qn(f4.column),
                     connection.introspection.identifier_converter(opts2.db_table),
@@ -428,7 +427,7 @@ class BackendTestCase(TransactionTestCase):
             # As password is probably wrong, a database exception is expected
             pass
         except Exception as e:
-            self.fail("Unexpected error raised with Unicode password: %s" % e)
+            self.fail("Unexpected error raised with Unicode password: {}".format(e))
         finally:
             connection.settings_dict["PASSWORD"] = old_password
 
@@ -452,7 +451,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_duplicate_table_error(self):
         """Creating an existing table returns a DatabaseError"""
-        query = "CREATE TABLE %s (id INTEGER);" % Article._meta.db_table
+        query = "CREATE TABLE {} (id INTEGER);".format(Article._meta.db_table)
         with connection.cursor() as cursor:
             with self.assertRaises(DatabaseError):
                 cursor.execute(query)
@@ -522,7 +521,7 @@ class BackendTestCase(TransactionTestCase):
         reset_queries()
         self.assertEqual(0, len(connection.queries))
 
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % (
+        sql = "INSERT INTO {} ({}, {}) VALUES (%s, %s)".format(
             connection.introspection.identifier_converter("backends_square"),
             connection.ops.quote_name("root"),
             connection.ops.quote_name("square"),
@@ -533,7 +532,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
         self.assertEqual(list(connection.queries[0]), ["sql", "time"])
-        self.assertEqual(connection.queries[0]["sql"], "2 times: %s" % sql)
+        self.assertEqual(connection.queries[0]["sql"], "2 times: {}".format(sql))
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature("test_db_allows_multiple_connections")

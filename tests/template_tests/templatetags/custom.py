@@ -17,7 +17,7 @@ def trim(value, num):
 @mark_safe
 def make_data_div(value):
     """A filter that uses a decorator (@mark_safe)."""
-    return '<div data-name="%s"></div>' % value
+    return '<div data-name="{}"></div>'.format(value)
 
 
 @register.simple_block_tag
@@ -55,7 +55,7 @@ no_params.anything = "Expected no_params __dict__"
 @register.simple_tag
 def one_param(arg):
     """Expected one_param __doc__"""
-    return "one_param - Expected result: %s" % arg
+    return "one_param - Expected result: {}".format(arg)
 
 
 one_param.anything = "Expected one_param __dict__"
@@ -70,7 +70,7 @@ def one_param_block(content, arg):
 @register.simple_tag(takes_context=False)
 def explicit_no_context(arg):
     """Expected explicit_no_context __doc__"""
-    return "explicit_no_context - Expected result: %s" % arg
+    return "explicit_no_context - Expected result: {}".format(arg)
 
 
 explicit_no_context.anything = "Expected explicit_no_context __dict__"
@@ -85,9 +85,8 @@ def explicit_no_context_block(content, arg):
 @register.simple_tag(takes_context=True)
 def no_params_with_context(context):
     """Expected no_params_with_context __doc__"""
-    return (
-        "no_params_with_context - Expected result (context value: %s)"
-        % context["value"]
+    return "no_params_with_context - Expected result (context value: {})".format(
+        context["value"]
     )
 
 
@@ -98,15 +97,15 @@ no_params_with_context.anything = "Expected no_params_with_context __dict__"
 def no_params_with_context_block(context, content):
     """Expected no_params_with_context_block __doc__"""
     return (
-        "no_params_with_context_block - Expected result (context value: %s) "
-        "(content value: %s)" % (context["value"], content)
+        "no_params_with_context_block - Expected result (context value: {}) "
+        "(content value: {})".format(context["value"], content)
     )
 
 
 @register.simple_tag(takes_context=True)
 def params_and_context(context, arg):
     """Expected params_and_context __doc__"""
-    return "params_and_context - Expected result (context value: %s): %s" % (
+    return "params_and_context - Expected result (context value: {}): {}".format(
         context["value"],
         arg,
     )
@@ -119,9 +118,8 @@ params_and_context.anything = "Expected params_and_context __dict__"
 def params_and_context_block(context, content, arg):
     """Expected params_and_context_block __doc__"""
     return (
-        "params_and_context_block - Expected result (context value: %s) "
-        "(content value: %s): %s"
-        % (
+        "params_and_context_block - Expected result (context value: {}) "
+        "(content value: {}): {}".format(
             context["value"],
             content,
             arg,
@@ -132,7 +130,7 @@ def params_and_context_block(context, content, arg):
 @register.simple_tag
 def simple_two_params(one, two):
     """Expected simple_two_params __doc__"""
-    return "simple_two_params - Expected result: %s, %s" % (one, two)
+    return "simple_two_params - Expected result: {}, {}".format(one, two)
 
 
 simple_two_params.anything = "Expected simple_two_params __dict__"
@@ -141,49 +139,45 @@ simple_two_params.anything = "Expected simple_two_params __dict__"
 @register.simple_block_tag
 def simple_two_params_block(content, one, two):
     """Expected simple_two_params_block __doc__"""
-    return "simple_two_params_block - Expected result (content value: %s): %s, %s" % (
-        content,
-        one,
-        two,
+    return (
+        "simple_two_params_block - Expected result (content value: {}): {}, {}".format(
+            content,
+            one,
+            two,
+        )
     )
 
 
 @register.simple_tag
 def simple_keyword_only_param(*, kwarg):
-    return "simple_keyword_only_param - Expected result: %s" % kwarg
+    return "simple_keyword_only_param - Expected result: {}".format(kwarg)
 
 
 @register.simple_block_tag
 def simple_keyword_only_param_block(content, *, kwarg):
-    return (
-        "simple_keyword_only_param_block - Expected result (content value: %s): %s"
-        % (
-            content,
-            kwarg,
-        )
+    return "simple_keyword_only_param_block - Expected result (content value: {}): {}".format(
+        content,
+        kwarg,
     )
 
 
 @register.simple_tag
 def simple_keyword_only_default(*, kwarg=42):
-    return "simple_keyword_only_default - Expected result: %s" % kwarg
+    return "simple_keyword_only_default - Expected result: {}".format(kwarg)
 
 
 @register.simple_block_tag
 def simple_keyword_only_default_block(content, *, kwarg=42):
-    return (
-        "simple_keyword_only_default_block - Expected result (content value: %s): %s"
-        % (
-            content,
-            kwarg,
-        )
+    return "simple_keyword_only_default_block - Expected result (content value: {}): {}".format(
+        content,
+        kwarg,
     )
 
 
 @register.simple_tag
 def simple_one_default(one, two="hi"):
     """Expected simple_one_default __doc__"""
-    return "simple_one_default - Expected result: %s, %s" % (one, two)
+    return "simple_one_default - Expected result: {}, {}".format(one, two)
 
 
 simple_one_default.anything = "Expected simple_one_default __dict__"
@@ -192,17 +186,19 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 @register.simple_block_tag
 def simple_one_default_block(content, one, two="hi"):
     """Expected simple_one_default_block __doc__"""
-    return "simple_one_default_block - Expected result (content value: %s): %s, %s" % (
-        content,
-        one,
-        two,
+    return (
+        "simple_one_default_block - Expected result (content value: {}): {}, {}".format(
+            content,
+            one,
+            two,
+        )
     )
 
 
 @register.simple_tag
 def simple_unlimited_args(one, two="hi", *args):
     """Expected simple_unlimited_args __doc__"""
-    return "simple_unlimited_args - Expected result: %s" % (
+    return "simple_unlimited_args - Expected result: {}".format(
         ", ".join(str(arg) for arg in [one, two, *args])
     )
 
@@ -213,17 +209,19 @@ simple_unlimited_args.anything = "Expected simple_unlimited_args __dict__"
 @register.simple_block_tag
 def simple_unlimited_args_block(content, one, two="hi", *args):
     """Expected simple_unlimited_args_block __doc__"""
-    return "simple_unlimited_args_block - Expected result (content value: %s): %s" % (
-        content,
-        ", ".join(str(arg) for arg in [one, two, *args]),
+    return (
+        "simple_unlimited_args_block - Expected result (content value: {}): {}".format(
+            content,
+            ", ".join(str(arg) for arg in [one, two, *args]),
+        )
     )
 
 
 @register.simple_tag
 def simple_only_unlimited_args(*args):
     """Expected simple_only_unlimited_args __doc__"""
-    return "simple_only_unlimited_args - Expected result: %s" % ", ".join(
-        str(arg) for arg in args
+    return "simple_only_unlimited_args - Expected result: {}".format(
+        ", ".join(str(arg) for arg in args)
     )
 
 
@@ -233,21 +231,18 @@ simple_only_unlimited_args.anything = "Expected simple_only_unlimited_args __dic
 @register.simple_block_tag
 def simple_only_unlimited_args_block(content, *args):
     """Expected simple_only_unlimited_args_block __doc__"""
-    return (
-        "simple_only_unlimited_args_block - Expected result (content value: %s): %s"
-        % (
-            content,
-            ", ".join(str(arg) for arg in args),
-        )
+    return "simple_only_unlimited_args_block - Expected result (content value: {}): {}".format(
+        content,
+        ", ".join(str(arg) for arg in args),
     )
 
 
 @register.simple_tag
 def simple_unlimited_args_kwargs(one, two="hi", *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
-    return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
+    return "simple_unlimited_args_kwargs - Expected result: {} / {}".format(
         ", ".join(str(arg) for arg in [one, two, *args]),
-        ", ".join("%s=%s" % (k, v) for (k, v) in kwargs.items()),
+        ", ".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
     )
 
 
@@ -258,12 +253,11 @@ simple_unlimited_args_kwargs.anything = "Expected simple_unlimited_args_kwargs _
 def simple_unlimited_args_kwargs_block(content, one, two="hi", *args, **kwargs):
     """Expected simple_unlimited_args_kwargs_block __doc__"""
     return (
-        "simple_unlimited_args_kwargs_block - Expected result (content value: %s): "
-        "%s / %s"
-        % (
+        "simple_unlimited_args_kwargs_block - Expected result (content value: {}): "
+        "{} / {}".format(
             content,
             ", ".join(str(arg) for arg in [one, two, *args]),
-            ", ".join("%s=%s" % (k, v) for (k, v) in kwargs.items()),
+            ", ".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
         )
     )
 

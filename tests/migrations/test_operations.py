@@ -610,7 +610,7 @@ class OperationTests(OperationTestBase):
                     quoted_name = connection.ops.quote_name(
                         deferred_unique_constraint.name
                     )
-                    cursor.execute("SET CONSTRAINTS %s IMMEDIATE" % quoted_name)
+                    cursor.execute("SET CONSTRAINTS {} IMMEDIATE".format(quoted_name))
                     obj = Pony.objects.create(pink=1)
                     obj.pink = 3
                     obj.save()
@@ -2181,8 +2181,8 @@ class OperationTests(OperationTestBase):
         operation.state_forwards(app_label, first_state)
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, first_state)
-        original_m2m_table = "%s_%s" % (pony_db_table, "stables")
-        new_m2m_table = "%s_%s" % (app_label, "pony_stables")
+        original_m2m_table = "{}_{}".format(pony_db_table, "stables")
+        new_m2m_table = "{}_{}".format(app_label, "pony_stables")
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
         # Rename the Pony db_table which should also rename the m2m table.
@@ -2485,7 +2485,7 @@ class OperationTests(OperationTestBase):
         """
         app_label = "test_afadbn"
         project_state = self.set_up_test_model(app_label, related_model=True)
-        pony_table = "%s_pony" % app_label
+        pony_table = "{}_pony".format(app_label)
         new_state = project_state.clone()
         operation = migrations.AlterField(
             "Pony", "weight", models.FloatField(db_column="weight")
@@ -2510,7 +2510,7 @@ class OperationTests(OperationTestBase):
                 )
         self.assertColumnExists(pony_table, "weight")
 
-        rider_table = "%s_rider" % app_label
+        rider_table = "{}_rider".format(app_label)
         new_state = project_state.clone()
         operation = migrations.AlterField(
             "Rider",
@@ -3027,7 +3027,9 @@ class OperationTests(OperationTestBase):
                         (
                             "rider",
                             models.ForeignKey(
-                                "%s.Rider" % app_label, models.CASCADE, to_field="code"
+                                "{}.Rider".format(app_label),
+                                models.CASCADE,
+                                to_field="code",
                             ),
                         ),
                     ],
@@ -3042,12 +3044,12 @@ class OperationTests(OperationTestBase):
         self.apply_operations(app_label, project_state, operations=[operation])
         id_type, id_null = [
             (c.type_code, c.null_ok)
-            for c in self.get_table_description("%s_rider" % app_label)
+            for c in self.get_table_description("{}_rider".format(app_label))
             if c.name == "code"
         ][0]
         fk_type, fk_null = [
             (c.type_code, c.null_ok)
-            for c in self.get_table_description("%s_pony" % app_label)
+            for c in self.get_table_description("{}_pony".format(app_label))
             if c.name == "rider_id"
         ][0]
         self.assertEqual(id_type, fk_type)
@@ -3076,7 +3078,7 @@ class OperationTests(OperationTestBase):
                         (
                             "rider",
                             models.ForeignKey(
-                                "%s.Rider" % app_label,
+                                "{}.Rider".format(app_label),
                                 models.CASCADE,
                                 to_field="code",
                                 related_name="+",
@@ -3116,7 +3118,9 @@ class OperationTests(OperationTestBase):
                         ("id", models.CharField(primary_key=True, max_length=100)),
                         (
                             "rider",
-                            models.ForeignKey("%s.Rider" % app_label, models.CASCADE),
+                            models.ForeignKey(
+                                "{}.Rider".format(app_label), models.CASCADE
+                            ),
                         ),
                     ],
                 ),
@@ -3126,7 +3130,9 @@ class OperationTests(OperationTestBase):
                         ("id", models.AutoField(primary_key=True)),
                         (
                             "pony",
-                            models.ForeignKey("%s.Pony" % app_label, models.CASCADE),
+                            models.ForeignKey(
+                                "{}.Pony".format(app_label), models.CASCADE
+                            ),
                         ),
                     ],
                 ),
@@ -3170,7 +3176,9 @@ class OperationTests(OperationTestBase):
                         (
                             "rider",
                             models.ForeignKey(
-                                "%s.Rider" % app_label, models.CASCADE, to_field="slug"
+                                "{}.Rider".format(app_label),
+                                models.CASCADE,
+                                to_field="slug",
                             ),
                         ),
                         ("slug", models.CharField(unique=True, max_length=100)),
@@ -3183,7 +3191,9 @@ class OperationTests(OperationTestBase):
                         (
                             "pony",
                             models.ForeignKey(
-                                "%s.Pony" % app_label, models.CASCADE, to_field="slug"
+                                "{}.Pony".format(app_label),
+                                models.CASCADE,
+                                to_field="slug",
                             ),
                         ),
                     ],
@@ -3265,7 +3275,9 @@ class OperationTests(OperationTestBase):
                         ("id", models.CharField(primary_key=True, max_length=100)),
                         (
                             "rider",
-                            models.ForeignKey("%s.Rider" % app_label, models.CASCADE),
+                            models.ForeignKey(
+                                "{}.Rider".format(app_label), models.CASCADE
+                            ),
                         ),
                     ],
                 ),
@@ -3275,7 +3287,9 @@ class OperationTests(OperationTestBase):
                         ("id", models.AutoField(primary_key=True)),
                         (
                             "pony",
-                            models.ForeignKey("%s.Pony" % app_label, models.CASCADE),
+                            models.ForeignKey(
+                                "{}.Pony".format(app_label), models.CASCADE
+                            ),
                         ),
                     ],
                 ),
@@ -4279,7 +4293,7 @@ class OperationTests(OperationTestBase):
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_alter_index_together_remove_with_unique_together(self):
         app_label = "test_alintoremove_wunto"
-        table_name = "%s_pony" % app_label
+        table_name = "{}_pony".format(app_label)
         project_state = self.set_up_test_model(app_label, unique_together=True)
         self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
         # Add index together.
@@ -4879,7 +4893,7 @@ class OperationTests(OperationTestBase):
                     quoted_name = connection.ops.quote_name(
                         deferred_unique_constraint.name
                     )
-                    cursor.execute("SET CONSTRAINTS %s IMMEDIATE" % quoted_name)
+                    cursor.execute("SET CONSTRAINTS {} IMMEDIATE".format(quoted_name))
                     obj = Pony.objects.create(pink=1, weight=4.0)
                     obj.pink = 3
                     obj.save()
@@ -4948,7 +4962,7 @@ class OperationTests(OperationTestBase):
                     quoted_name = connection.ops.quote_name(
                         deferred_unique_constraint.name
                     )
-                    cursor.execute("SET CONSTRAINTS %s IMMEDIATE" % quoted_name)
+                    cursor.execute("SET CONSTRAINTS {} IMMEDIATE".format(quoted_name))
                     obj = Pony.objects.create(pink=1, weight=4.0)
                     obj.pink = 3
                     obj.save()

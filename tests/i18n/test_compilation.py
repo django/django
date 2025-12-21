@@ -29,7 +29,7 @@ class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
 
 class PoFileTests(MessageCompilationTests):
     LOCALE = "es_AR"
-    MO_FILE = "locale/%s/LC_MESSAGES/django.mo" % LOCALE
+    MO_FILE = "locale/{}/LC_MESSAGES/django.mo".format(LOCALE)
     MO_FILE_EN = "locale/en/LC_MESSAGES/django.mo"
 
     def test_bom_rejection(self):
@@ -67,7 +67,9 @@ class PoFileTests(MessageCompilationTests):
         mo_file_en.touch()
         stdout = StringIO()
         call_command("compilemessages", locale=["en"], stdout=stdout, verbosity=1)
-        msg = "%s” is already compiled and up to date." % mo_file_en.with_suffix(".po")
+        msg = "{}” is already compiled and up to date.".format(
+            mo_file_en.with_suffix(".po")
+        )
         self.assertIn(msg, stdout.getvalue())
 
 
@@ -75,7 +77,7 @@ class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
 
     LOCALE = "fr"
-    MO_FILE = "locale/%s/LC_MESSAGES/django.mo" % LOCALE
+    MO_FILE = "locale/{}/LC_MESSAGES/django.mo".format(LOCALE)
 
     def test_percent_symbol_in_po_file(self):
         call_command("compilemessages", locale=[self.LOCALE], verbosity=0)
@@ -305,8 +307,8 @@ class CompilationErrorHandling(MessageCompilationTests):
 
 class ProjectAndAppTests(MessageCompilationTests):
     LOCALE = "ru"
-    PROJECT_MO_FILE = "locale/%s/LC_MESSAGES/django.mo" % LOCALE
-    APP_MO_FILE = "app_with_locale/locale/%s/LC_MESSAGES/django.mo" % LOCALE
+    PROJECT_MO_FILE = "locale/{}/LC_MESSAGES/django.mo".format(LOCALE)
+    APP_MO_FILE = "app_with_locale/locale/{}/LC_MESSAGES/django.mo".format(LOCALE)
 
 
 class FuzzyTranslationTest(ProjectAndAppTests):

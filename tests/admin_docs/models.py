@@ -54,7 +54,7 @@ class Person(models.Model):
     groups = models.ManyToManyField(Group, help_text="has membership")
 
     def _get_full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "{} {}".format(self.first_name, self.last_name)
 
     def rename_company(self, new_name):
         self.company.name = new_name

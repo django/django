@@ -114,7 +114,7 @@ def normalize(pattern):
                     # A positional group
                     name = "_%d" % num_args
                     num_args += 1
-                    result.append(Group((("%%(%s)s" % name), name)))
+                    result.append(Group((("%({})s".format(name)), name)))
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
@@ -128,12 +128,14 @@ def normalize(pattern):
                     elif ch != "P":
                         # Anything else, other than a named group, is something
                         # we cannot reverse.
-                        raise ValueError("Non-reversible reg-exp portion: '(?%s'" % ch)
+                        raise ValueError(
+                            "Non-reversible reg-exp portion: '(?{}'".format(ch)
+                        )
                     else:
                         ch, escaped = next(pattern_iter)
                         if ch not in ("<", "="):
                             raise ValueError(
-                                "Non-reversible reg-exp portion: '(?P%s'" % ch
+                                "Non-reversible reg-exp portion: '(?P{}'".format(ch)
                             )
                         # We are in a named capturing group. Extra the name and
                         # then skip to the end.
@@ -151,10 +153,10 @@ def normalize(pattern):
                         # Named backreferences have already consumed the
                         # parenthesis.
                         if terminal_char != ")":
-                            result.append(Group((("%%(%s)s" % param), param)))
+                            result.append(Group((("%({})s".format(param)), param)))
                             walk_to_end(ch, pattern_iter)
                         else:
-                            result.append(Group((("%%(%s)s" % param), None)))
+                            result.append(Group((("%({})s".format(param)), None)))
             elif ch in "*?+{":
                 # Quantifiers affect the previous item in the result list.
                 count, ch = get_quantifier(ch, pattern_iter)

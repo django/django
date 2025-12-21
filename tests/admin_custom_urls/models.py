@@ -43,7 +43,7 @@ class ActionAdmin(admin.ModelAdmin):
 
         info = self.opts.app_label, self.opts.model_name
 
-        view_name = "%s_%s_add" % info
+        view_name = "{}_{}_add".format(*info)
 
         return [
             re_path("^!add/$", wrap(self.add_view), name=view_name),

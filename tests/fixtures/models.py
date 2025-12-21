@@ -60,7 +60,7 @@ class Tag(models.Model):
     tagged = GenericForeignKey(ct_field="tagged_type", fk_field="tagged_id")
 
     def __str__(self):
-        return '<%s: %s> tagged "%s"' % (
+        return '<{}: {}> tagged "{}"'.format(
             self.tagged.__class__.__name__,
             self.tagged,
             self.name,
@@ -112,7 +112,7 @@ class Visa(models.Model):
     objects = VisaManager()
 
     def __str__(self):
-        return "%s %s" % (
+        return "{} {}".format(
             self.person.name,
             ", ".join(p.name for p in self.permissions.all()),
         )
@@ -127,7 +127,7 @@ class Book(models.Model):
 
     def __str__(self):
         authors = " and ".join(a.name for a in self.authors.all())
-        return "%s by %s" % (self.name, authors) if authors else self.name
+        return "{} by {}".format(self.name, authors) if authors else self.name
 
 
 class PrimaryKeyUUIDModel(models.Model):

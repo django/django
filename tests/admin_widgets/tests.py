@@ -594,15 +594,14 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             w.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            '<p class="file-upload">Currently: <a href="{STORAGE_URL}albums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id"> '
             '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test"></p>'
-            % {
-                "STORAGE_URL": default_storage.url(""),
-            },
+            'Change: <input type="file" name="test"></p>'.format(
+                STORAGE_URL=default_storage.url(""),
+            ),
         )
         self.assertHTMLEqual(
             w.render("test", SimpleUploadedFile("test", b"content")),
@@ -627,27 +626,25 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         widget.is_required = True
         self.assertHTMLEqual(
             widget.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            '<p class="file-upload">Currently: <a href="{STORAGE_URL}albums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a><br>'
-            'Change: <input type="file" name="test"></p>'
-            % {
-                "STORAGE_URL": default_storage.url(""),
-            },
+            'Change: <input type="file" name="test"></p>'.format(
+                STORAGE_URL=default_storage.url(""),
+            ),
         )
 
     def test_render_disabled(self):
         widget = widgets.AdminFileWidget(attrs={"disabled": True})
         self.assertHTMLEqual(
             widget.render("test", self.album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            '<p class="file-upload">Currently: <a href="{STORAGE_URL}albums/'
             r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id" disabled>'
             '<label for="test-clear_id">Clear</label></span><br>'
-            'Change: <input type="file" name="test" disabled></p>'
-            % {
-                "STORAGE_URL": default_storage.url(""),
-            },
+            'Change: <input type="file" name="test" disabled></p>'.format(
+                STORAGE_URL=default_storage.url(""),
+            ),
         )
 
     def test_render_checked(self):
@@ -674,9 +671,10 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<div class="readonly"><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
-            r"albums\hybrid_theory.jpg</a></div>"
-            % {"STORAGE_URL": default_storage.url("")},
+            '<div class="readonly"><a href="{STORAGE_URL}albums/hybrid_theory.jpg">'
+            r"albums\hybrid_theory.jpg</a></div>".format(
+                STORAGE_URL=default_storage.url("")
+            ),
             html=True,
         )
         self.assertNotContains(
@@ -703,12 +701,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel_uuid, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", band.uuid, attrs={}),
-            '<div><input type="text" name="test" value="%(banduuid)s" '
+            '<div><input type="text" name="test" value="{banduuid}" '
             'class="vForeignKeyRawIdAdminField vUUIDField">'
             '<a href="/admin_widgets/band/?_to_field=uuid" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
-            '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
-            "</strong></div>" % {"banduuid": band.uuid, "bandpk": band.pk},
+            '<a href="/admin_widgets/band/{bandpk}/change/">Linkin Park</a>'
+            "</strong></div>".format(banduuid=band.uuid, bandpk=band.pk),
         )
 
         rel_id = ReleaseEvent._meta.get_field("album").remote_field
@@ -734,8 +732,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
-            "Apple</a></strong></div>" % {"pk": apple.pk},
+            '&nbsp;<strong><a href="/admin_widgets/inventory/{pk}/change/">'
+            "Apple</a></strong></div>".format(pk=apple.pk),
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -748,9 +746,10 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("honeycomb_widget", big_honeycomb.pk, attrs={}),
-            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s">'
-            "&nbsp;<strong>%(hcomb)s</strong>"
-            % {"hcombpk": big_honeycomb.pk, "hcomb": big_honeycomb},
+            '<input type="text" name="honeycomb_widget" value="{hcombpk}">'
+            "&nbsp;<strong>{hcomb}</strong>".format(
+                hcombpk=big_honeycomb.pk, hcomb=big_honeycomb
+            ),
         )
 
     def test_fk_to_self_model_not_in_admin(self):
@@ -763,9 +762,10 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("individual_widget", subject1.pk, attrs={}),
-            '<input type="text" name="individual_widget" value="%(subj1pk)s">'
-            "&nbsp;<strong>%(subj1)s</strong>"
-            % {"subj1pk": subject1.pk, "subj1": subject1},
+            '<input type="text" name="individual_widget" value="{subj1pk}">'
+            "&nbsp;<strong>{subj1}</strong>".format(
+                subj1pk=subject1.pk, subj1=subject1
+            ),
         )
 
     def test_proper_manager_for_label_lookup(self):
@@ -783,8 +783,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '   class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
-            "Hidden</a></strong></div>" % {"pk": hidden.pk},
+            '&nbsp;<strong><a href="/admin_widgets/inventory/{pk}/change/">'
+            "Hidden</a></strong></div>".format(pk=hidden.pk),
         )
 
     def test_render_unsafe_limit_choices_to(self):
@@ -823,23 +823,21 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk, m2.pk], attrs={}),
             (
-                '<div><input type="text" name="test" value="%(m1pk)s,%(m2pk)s" '
+                '<div><input type="text" name="test" value="{m1pk},{m2pk}" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
                 '   id="lookup_id_test" title="Lookup"></a></div>'
-            )
-            % {"m1pk": m1.pk, "m2pk": m2.pk},
+            ).format(m1pk=m1.pk, m2pk=m2.pk),
         )
 
         self.assertHTMLEqual(
             w.render("test", [m1.pk]),
             (
-                '<div><input type="text" name="test" value="%(m1pk)s" '
+                '<div><input type="text" name="test" value="{m1pk}" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
                 '   id="lookup_id_test" title="Lookup"></a></div>'
-            )
-            % {"m1pk": m1.pk},
+            ).format(m1pk=m1.pk),
         )
 
     def test_m2m_related_model_not_in_admin(self):
@@ -855,14 +853,16 @@ class ManyToManyRawIdWidgetTest(TestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("company_widget1", [c1.pk, c2.pk], attrs={}),
-            '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s">'
-            % {"c1pk": c1.pk, "c2pk": c2.pk},
+            '<input type="text" name="company_widget1" value="{c1pk},{c2pk}">'.format(
+                c1pk=c1.pk, c2pk=c2.pk
+            ),
         )
 
         self.assertHTMLEqual(
             w.render("company_widget2", [c1.pk]),
-            '<input type="text" name="company_widget2" value="%(c1pk)s">'
-            % {"c1pk": c1.pk},
+            '<input type="text" name="company_widget2" value="{c1pk}">'.format(
+                c1pk=c1.pk
+            ),
         )
 
 
@@ -1291,10 +1291,10 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         choose_all_btn_disabled=False,
         remove_all_btn_disabled=False,
     ):
-        choose_button = "#id_%s_add" % field_name
-        choose_all_button = "#id_%s_add_all" % field_name
-        remove_button = "#id_%s_remove" % field_name
-        remove_all_button = "#id_%s_remove_all" % field_name
+        choose_button = "#id_{}_add".format(field_name)
+        choose_all_button = "#id_{}_add_all".format(field_name)
+        remove_button = "#id_{}_remove".format(field_name)
+        remove_all_button = "#id_{}_remove_all".format(field_name)
         self.assertEqual(self.is_disabled(choose_button), choose_btn_disabled)
         self.assertEqual(self.is_disabled(remove_button), remove_btn_disabled)
         if mode == "horizontal":
@@ -1310,12 +1310,12 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         original_url = self.selenium.current_url
 
-        from_box = "#id_%s_from" % field_name
-        to_box = "#id_%s_to" % field_name
-        choose_button = "id_%s_add" % field_name
-        choose_all_button = "id_%s_add_all" % field_name
-        remove_button = "id_%s_remove" % field_name
-        remove_all_button = "id_%s_remove_all" % field_name
+        from_box = "#id_{}_from".format(field_name)
+        to_box = "#id_{}_to".format(field_name)
+        choose_button = "id_{}_add".format(field_name)
+        choose_all_button = "id_{}_add_all".format(field_name)
+        remove_button = "id_{}_remove".format(field_name)
+        remove_all_button = "id_{}_remove_all".format(field_name)
 
         # Initial positions ---------------------------------------------------
         self.assertSelectOptions(
@@ -1608,11 +1608,13 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             )
 
             for field_name in ["students", "alumni"]:
-                from_box = "#id_%s_from" % field_name
-                to_box = "#id_%s_to" % field_name
-                choose_link = "id_%s_add" % field_name
-                remove_link = "id_%s_remove" % field_name
-                input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
+                from_box = "#id_{}_from".format(field_name)
+                to_box = "#id_{}_to".format(field_name)
+                choose_link = "id_{}_add".format(field_name)
+                remove_link = "id_{}_remove".format(field_name)
+                input = self.selenium.find_element(
+                    By.ID, "id_{}_input".format(field_name)
+                )
                 # Initial values.
                 self.assertSelectOptions(
                     from_box,
@@ -1982,7 +1984,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     name_input_id = "id_name"
     photo_input_id = "id_photo"
-    tests_files_folder = "%s/files" % Path(__file__).parent.parent
+    tests_files_folder = "{}/files".format(Path(__file__).parent.parent)
     clear_checkbox_id = "photo-clear_id"
 
     def _submit_and_wait(self):

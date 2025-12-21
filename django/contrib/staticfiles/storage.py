@@ -143,7 +143,7 @@ class HashedFilesMixin:
         if opened:
             if not self.exists(filename):
                 raise ValueError(
-                    "The file '%s' could not be found with %r." % (filename, self)
+                    "The file '{}' could not be found with {!r}.".format(filename, self)
                 )
             try:
                 content = self.open(filename)
@@ -157,8 +157,8 @@ class HashedFilesMixin:
                 content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = (".%s" % file_hash) if file_hash else ""
-        hashed_name = os.path.join(path, "%s%s%s" % (root, file_hash, ext))
+        file_hash = (".{}".format(file_hash)) if file_hash else ""
+        hashed_name = os.path.join(path, "{}{}{}".format(root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
@@ -453,7 +453,9 @@ class HashedFilesMixin:
         # If the cache name can't be determined after the max number of passes,
         # the intermediate files on disk may be corrupt; avoid an infinite
         # loop.
-        raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
+        raise ValueError(
+            "The name '{}' could not be hashed with {!r}.".format(name, self)
+        )
 
 
 class ManifestFilesMixin(HashedFilesMixin):
@@ -489,8 +491,9 @@ class ManifestFilesMixin(HashedFilesMixin):
             if version in ("1.0", "1.1"):
                 return stored.get("paths", {}), stored.get("hash", "")
         raise ValueError(
-            "Couldn't load manifest '%s' (version %s)"
-            % (self.manifest_name, self.manifest_version)
+            "Couldn't load manifest '{}' (version {})".format(
+                self.manifest_name, self.manifest_version
+            )
         )
 
     def post_process(self, *args, **kwargs):
@@ -522,7 +525,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         if cache_name is None:
             if self.manifest_strict:
                 raise ValueError(
-                    "Missing staticfiles manifest entry for '%s'" % clean_name
+                    "Missing staticfiles manifest entry for '{}'".format(clean_name)
                 )
             cache_name = self.clean_name(self.hashed_name(name))
         unparsed_name = list(parsed_name)

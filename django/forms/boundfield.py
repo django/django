@@ -61,8 +61,9 @@ class BoundField(RenderableFieldMixin):
         # from templates.
         if not isinstance(idx, (int, slice)):
             raise TypeError(
-                "BoundField indices must be integers or slices, not %s."
-                % type(idx).__name__
+                "BoundField indices must be integers or slices, not {}.".format(
+                    type(idx).__name__
+                )
             )
         return self.subwidgets[idx]
 

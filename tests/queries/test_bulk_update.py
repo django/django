@@ -44,7 +44,7 @@ class BulkUpdateNoteTests(TestCase):
 
     def test_simple(self):
         for note in self.notes:
-            note.note = "test-%s" % note.id
+            note.note = "test-{}".format(note.id)
         with self.assertNumQueries(1):
             Note.objects.bulk_update(self.notes, ["note"])
         self.assertCountEqual(
@@ -54,8 +54,8 @@ class BulkUpdateNoteTests(TestCase):
 
     def test_multiple_fields(self):
         for note in self.notes:
-            note.note = "test-%s" % note.id
-            note.misc = "misc-%s" % note.id
+            note.note = "test-{}".format(note.id)
+            note.misc = "misc-{}".format(note.id)
         with self.assertNumQueries(1):
             Note.objects.bulk_update(self.notes, ["note", "misc"])
         self.assertCountEqual(
@@ -202,10 +202,10 @@ class BulkUpdateTests(TestCase):
 
     def test_custom_pk(self):
         custom_pks = [
-            CustomPk.objects.create(name="pk-%s" % i, extra="") for i in range(10)
+            CustomPk.objects.create(name="pk-{}".format(i), extra="") for i in range(10)
         ]
         for model in custom_pks:
-            model.extra = "extra-%s" % model.pk
+            model.extra = "extra-{}".format(model.pk)
         CustomPk.objects.bulk_update(custom_pks, ["extra"])
         self.assertCountEqual(
             CustomPk.objects.values_list("extra", flat=True),
@@ -225,8 +225,8 @@ class BulkUpdateTests(TestCase):
             for i in range(10)
         ]
         for category in special_categories:
-            category.name = "test-%s" % category.id
-            category.special_name = "special-test-%s" % category.special_name
+            category.name = "test-{}".format(category.id)
+            category.special_name = "special-test-{}".format(category.special_name)
         SpecialCategory.objects.bulk_update(
             special_categories, ["name", "special_name"]
         )

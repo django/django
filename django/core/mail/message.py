@@ -76,7 +76,9 @@ def forbid_multi_line_headers(name, val, encoding):
     val = str(val)  # val may be lazy
     if "\n" in val or "\r" in val:
         raise BadHeaderError(
-            "Header values can't contain newlines (got %r for header %r)" % (val, name)
+            "Header values can't contain newlines (got {!r} for header {!r})".format(
+                val, name
+            )
         )
     try:
         val.encode("ascii")
@@ -113,12 +115,14 @@ def sanitize_address(addr, encoding):
         try:
             token, rest = parser.get_mailbox(addr)
         except (HeaderParseError, ValueError, IndexError):
-            raise ValueError('Invalid address "%s"' % addr)
+            raise ValueError('Invalid address "{}"'.format(addr))
         else:
             if rest:
                 # The entire email address must be parsed.
                 raise ValueError(
-                    'Invalid address; only %s could be parsed from "%s"' % (token, addr)
+                    'Invalid address; only {} could be parsed from "{}"'.format(
+                        token, addr
+                    )
                 )
             nm = token.display_name or ""
             localpart = token.local_part

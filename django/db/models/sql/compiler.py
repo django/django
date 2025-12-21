@@ -440,7 +440,7 @@ class SQLCompiler:
                 yield (
                     OrderBy(
                         RawSQL(
-                            "%s.%s" % (self.quote_name_unless_alias(table), col), []
+                            "{}.{}".format(self.quote_name_unless_alias(table), col), []
                         ),
                         descending=descending,
                     ),
@@ -830,7 +830,7 @@ class SQLCompiler:
                 out_cols = []
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if alias:
-                        s_sql = "%s AS %s" % (
+                        s_sql = "{} AS {}".format(
                             s_sql,
                             self.connection.ops.quote_name(alias),
                         )
@@ -898,7 +898,7 @@ class SQLCompiler:
                     result.append(for_update_part)
 
                 if where:
-                    result.append("WHERE %s" % where)
+                    result.append("WHERE {}".format(where))
                     params.extend(w_params)
 
                 grouping = []
@@ -911,13 +911,13 @@ class SQLCompiler:
                             "annotate() + distinct(fields) is not implemented."
                         )
                     order_by = order_by or self.connection.ops.force_no_ordering()
-                    result.append("GROUP BY %s" % ", ".join(grouping))
+                    result.append("GROUP BY {}".format(", ".join(grouping)))
                     if self._meta_ordering:
                         order_by = None
                 if having:
                     if not grouping:
                         result.extend(self.connection.ops.force_group_by())
-                    result.append("HAVING %s" % having)
+                    result.append("HAVING {}".format(having))
                     params.extend(h_params)
 
             if self.query.explain_info:
@@ -934,7 +934,7 @@ class SQLCompiler:
                 for _, (o_sql, o_params, _) in order_by:
                     ordering.append(o_sql)
                     params.extend(o_params)
-                order_by_sql = "ORDER BY %s" % ", ".join(ordering)
+                order_by_sql = "ORDER BY {}".format(", ".join(ordering))
                 if combinator and features.requires_compound_order_by_subquery:
                     result = ["SELECT * FROM (", *result, ")", order_by_sql]
                 else:
@@ -962,8 +962,7 @@ class SQLCompiler:
                 for index, (select, _, alias) in enumerate(self.select, start=1):
                     if alias:
                         sub_selects.append(
-                            "%s.%s"
-                            % (
+                            "{}.{}".format(
                                 self.connection.ops.quote_name("subquery"),
                                 self.connection.ops.quote_name(alias),
                             )
@@ -977,7 +976,7 @@ class SQLCompiler:
                         )
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return "SELECT %s FROM (%s) subquery" % (
+                return "SELECT {} FROM ({}) subquery".format(
                     ", ".join(sub_selects),
                     " ".join(result),
                 ), tuple(sub_params + params)
@@ -1175,7 +1174,7 @@ class SQLCompiler:
                 alias not in self.query.alias_map
                 or self.query.alias_refcount[alias] == 1
             ):
-                result.append(", %s" % self.quote_name_unless_alias(alias))
+                result.append(", {}".format(self.quote_name_unless_alias(alias)))
         return result, params
 
     def get_related_selections(
@@ -1236,9 +1235,8 @@ class SQLCompiler:
                     # or if a single non-relational field is given.
                     if next or f.name in requested:
                         raise FieldError(
-                            "Non-relational field given in select_related: '%s'. "
-                            "Choices are: %s"
-                            % (
+                            "Non-relational field given in select_related: '{}'. "
+                            "Choices are: {}".format(
                                 f.name,
                                 ", ".join(_get_field_choices()) or "(none)",
                             )
@@ -1400,11 +1398,10 @@ class SQLCompiler:
                     get_related_klass_infos(klass_info, next_klass_infos)
             fields_not_found = set(requested).difference(fields_found)
             if fields_not_found:
-                invalid_fields = ("'%s'" % s for s in fields_not_found)
+                invalid_fields = ("'{}'".format(s) for s in fields_not_found)
                 raise FieldError(
-                    "Invalid field name(s) given in select_related: %s. "
-                    "Choices are: %s"
-                    % (
+                    "Invalid field name(s) given in select_related: {}. "
+                    "Choices are: {}".format(
                         ", ".join(invalid_fields),
                         ", ".join(_get_field_choices()) or "(none)",
                     )
@@ -1507,10 +1504,9 @@ class SQLCompiler:
                     result.append(self.quote_name_unless_alias(col.alias))
         if invalid_names:
             raise FieldError(
-                "Invalid field name(s) given in select_for_update(of=(...)): %s. "
+                "Invalid field name(s) given in select_for_update(of=(...)): {}. "
                 "Only relational fields followed in the query are allowed. "
-                "Choices are: %s."
-                % (
+                "Choices are: {}.".format(
                     ", ".join(invalid_names),
                     ", ".join(_get_field_choices()),
                 )
@@ -1733,18 +1729,19 @@ class SQLInsertCompiler(SQLCompiler):
             # doesn't exist yet.
             if value.contains_column_references:
                 raise ValueError(
-                    'Failed to insert expression "%s" on %s. F() expressions '
-                    "can only be used to update, not to insert." % (value, field)
+                    'Failed to insert expression "{}" on {}. F() expressions '
+                    "can only be used to update, not to insert.".format(value, field)
                 )
             if value.contains_aggregate:
                 raise FieldError(
                     "Aggregate functions are not allowed in this query "
-                    "(%s=%r)." % (field.name, value)
+                    "({}={!r}).".format(field.name, value)
                 )
             if value.contains_over_clause:
                 raise FieldError(
-                    "Window expressions are not allowed in this query (%s=%r)."
-                    % (field.name, value)
+                    "Window expressions are not allowed in this query ({}={!r}).".format(
+                        field.name, value
+                    )
                 )
         return field.get_db_prep_save(value, connection=self.connection)
 
@@ -1804,7 +1801,7 @@ class SQLInsertCompiler(SQLCompiler):
         insert_statement = self.connection.ops.insert_statement(
             on_conflict=self.query.on_conflict,
         )
-        result = ["%s %s" % (insert_statement, qn(opts.db_table))]
+        result = ["{} {}".format(insert_statement, qn(opts.db_table))]
 
         if fields := list(self.query.fields):
             from django.db.models.expressions import DatabaseDefault
@@ -1853,7 +1850,7 @@ class SQLInsertCompiler(SQLCompiler):
                 ]
                 value_cols.append(field_values)
             value_rows = list(zip(*value_cols))
-            result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
+            result.append("({})".format(", ".join(qn(f.column) for f in fields)))
         else:
             # No fields were specified but an INSERT statement must include at
             # least one column. This can only happen when the model's primary
@@ -1863,7 +1860,7 @@ class SQLInsertCompiler(SQLCompiler):
                 [self.connection.ops.pk_default_value()] for _ in self.query.objs
             ]
             fields = [None]
-            result.append("(%s)" % qn(opts.pk.column))
+            result.append("({})".format(qn(opts.pk.column)))
 
         # Currently the backends just accept values when generating bulk
         # queries and generate their own placeholders. Doing that isn't
@@ -1891,7 +1888,7 @@ class SQLInsertCompiler(SQLCompiler):
                 )
                 params = param_rows
             else:
-                result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
+                result.append("VALUES ({})".format(", ".join(placeholder_rows[0])))
                 params = [param_rows[0]]
             if on_conflict_suffix_sql:
                 result.append(on_conflict_suffix_sql)
@@ -1914,7 +1911,7 @@ class SQLInsertCompiler(SQLCompiler):
             if on_conflict_suffix_sql:
                 result.append(on_conflict_suffix_sql)
             return [
-                (" ".join([*result, "VALUES (%s)" % ", ".join(p)]), vals)
+                (" ".join([*result, "VALUES ({})".format(", ".join(p))]), vals)
                 for p, vals in zip(placeholder_rows, param_rows)
             ]
 
@@ -1994,7 +1991,7 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        delete = "DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)
+        delete = "DELETE FROM {}".format(self.quote_name_unless_alias(query.base_table))
         try:
             where, params = self.compile(query.where)
         except FullResultSet:
@@ -2021,7 +2018,7 @@ class SQLDeleteCompiler(SQLCompiler):
             # Force the materialization of the inner query to allow reference
             # to the target table on MySQL.
             sql, params = innerq.get_compiler(connection=self.connection).as_sql()
-            innerq = RawSQL("SELECT * FROM (%s) subquery" % sql, params)
+            innerq = RawSQL("SELECT * FROM ({}) subquery".format(sql), params)
         outerq.add_filter("pk__in", innerq)
         return self._as_sql(outerq)
 
@@ -2048,26 +2045,27 @@ class SQLUpdateCompiler(SQLCompiler):
                 if val.contains_aggregate:
                     raise FieldError(
                         "Aggregate functions are not allowed in this query "
-                        "(%s=%r)." % (field.name, val)
+                        "({}={!r}).".format(field.name, val)
                     )
                 if val.contains_over_clause:
                     raise FieldError(
                         "Window expressions are not allowed in this query "
-                        "(%s=%r)." % (field.name, val)
+                        "({}={!r}).".format(field.name, val)
                     )
                 if isinstance(val, ColPairs):
                     raise FieldError(
                         "Composite primary keys expressions are not allowed "
-                        "in this query (%s=F('pk'))." % field.name
+                        "in this query ({}=F('pk')).".format(field.name)
                     )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
                     val = val.prepare_database_save(field)
                 else:
                     raise TypeError(
-                        "Tried to update field %s with a model instance, %r. "
-                        "Use a value compatible with %s."
-                        % (field, val, field.__class__.__name__)
+                        "Tried to update field {} with a model instance, {!r}. "
+                        "Use a value compatible with {}.".format(
+                            field, val, field.__class__.__name__
+                        )
                     )
             val = field.get_db_prep_save(val, connection=self.connection)
 
@@ -2079,16 +2077,16 @@ class SQLUpdateCompiler(SQLCompiler):
             name = field.column
             if hasattr(val, "as_sql"):
                 sql, params = self.compile(val)
-                values.append("%s = %s" % (qn(name), placeholder % sql))
+                values.append("{} = {}".format(qn(name), placeholder % sql))
                 update_params.extend(params)
             elif val is not None:
-                values.append("%s = %s" % (qn(name), placeholder))
+                values.append("{} = {}".format(qn(name), placeholder))
                 update_params.append(val)
             else:
-                values.append("%s = NULL" % qn(name))
+                values.append("{} = NULL".format(qn(name)))
         table = self.query.base_table
         result = [
-            "UPDATE %s SET" % qn(table),
+            "UPDATE {} SET".format(qn(table)),
             ", ".join(values),
         ]
         try:
@@ -2096,7 +2094,7 @@ class SQLUpdateCompiler(SQLCompiler):
         except FullResultSet:
             params = []
         else:
-            result.append("WHERE %s" % where)
+            result.append("WHERE {}".format(where))
         if self.returning_fields:
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
@@ -2247,7 +2245,7 @@ class SQLAggregateCompiler(SQLCompiler):
             self.using,
             elide_empty=self.elide_empty,
         ).as_sql(with_col_aliases=True)
-        sql = "SELECT %s FROM (%s) subquery" % (sql, inner_query_sql)
+        sql = "SELECT {} FROM ({}) subquery".format(sql, inner_query_sql)
         params += inner_query_params
         return sql, params
 

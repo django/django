@@ -62,7 +62,7 @@ class Command(BaseCommand):
 
         if tablename in connection.introspection.table_names():
             if self.verbosity > 0:
-                self.stdout.write("Cache table '%s' already exists." % tablename)
+                self.stdout.write("Cache table '{}' already exists.".format(tablename))
             return
 
         fields = (
@@ -89,19 +89,18 @@ class Command(BaseCommand):
             if f.db_index:
                 unique = "UNIQUE " if f.unique else ""
                 index_output.append(
-                    "CREATE %sINDEX %s ON %s (%s);"
-                    % (
+                    "CREATE {}INDEX {} ON {} ({});".format(
                         unique,
-                        qn("%s_%s" % (tablename, f.name)),
+                        qn("{}_{}".format(tablename, f.name)),
                         qn(tablename),
                         qn(f.name),
                     )
                 )
             table_output.append(" ".join(field_output))
-        full_statement = ["CREATE TABLE %s (" % qn(tablename)]
+        full_statement = ["CREATE TABLE {} (".format(qn(tablename))]
         for i, line in enumerate(table_output):
             full_statement.append(
-                "    %s%s" % (line, "," if i < len(table_output) - 1 else "")
+                "    {}{}".format(line, "," if i < len(table_output) - 1 else "")
             )
         full_statement.append(");")
 
@@ -121,11 +120,12 @@ class Command(BaseCommand):
                     curs.execute(full_statement)
                 except DatabaseError as e:
                     raise CommandError(
-                        "Cache table '%s' could not be created.\nThe error was: %s."
-                        % (tablename, e)
+                        "Cache table '{}' could not be created.\nThe error was: {}.".format(
+                            tablename, e
+                        )
                     )
                 for statement in index_output:
                     curs.execute(statement)
 
         if self.verbosity > 1:
-            self.stdout.write("Cache table '%s' created." % tablename)
+            self.stdout.write("Cache table '{}' created.".format(tablename))

@@ -115,7 +115,7 @@ class ChapterXtra1(models.Model):
     guest_author = models.ForeignKey(User, models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return "¿Xtra1: %s" % self.xtra
+        return "¿Xtra1: {}".format(self.xtra)
 
 
 class ChapterXtra2(models.Model):
@@ -123,7 +123,7 @@ class ChapterXtra2(models.Model):
     xtra = models.CharField(max_length=100, verbose_name="¿Xtra?")
 
     def __str__(self):
-        return "¿Xtra2: %s" % self.xtra
+        return "¿Xtra2: {}".format(self.xtra)
 
 
 class RowLevelChangePermissionModel(models.Model):
@@ -142,7 +142,7 @@ class ModelWithStringPrimaryKey(models.Model):
         return self.string_pk
 
     def get_absolute_url(self):
-        return "/dummy/%s/" % self.string_pk
+        return "/dummy/{}/".format(self.string_pk)
 
 
 class Color(models.Model):
@@ -183,7 +183,7 @@ class Inquisition(models.Model):
     country = models.CharField(max_length=20)
 
     def __str__(self):
-        return "by %s from %s" % (self.leader, self.country)
+        return "by {} from {}".format(self.leader, self.country)
 
 
 class Sketch(models.Model):
@@ -297,7 +297,7 @@ class Account(models.Model):
     servicename = "generic service"
 
     def __str__(self):
-        return "%s: %s" % (self.servicename, self.username)
+        return "{}: {}".format(self.servicename, self.username)
 
 
 class FooAccount(Account):
@@ -317,7 +317,7 @@ class Subscriber(models.Model):
     email = models.EmailField(blank=False, max_length=175)
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.email)
+        return "{} ({})".format(self.name, self.email)
 
 
 class ExternalSubscriber(Subscriber):
@@ -384,7 +384,7 @@ class Toy(models.Model):
 
 class EmptyModel(models.Model):
     def __str__(self):
-        return "Primary key = %s" % self.id
+        return "Primary key = {}".format(self.id)
 
 
 temp_storage = FileSystemStorage(tempfile.mkdtemp())
@@ -475,7 +475,7 @@ class Category(models.Model):
         ordering = ("order",)
 
     def __str__(self):
-        return "%s:o%s" % (self.id, self.order)
+        return "{}:o{}".format(self.id, self.order)
 
 
 def link_posted_default():
@@ -982,7 +982,7 @@ class City(models.Model):
     name = models.CharField(max_length=100, verbose_name="City verbose_name")
 
     def get_absolute_url(self):
-        return "/dummy/%s/" % self.pk
+        return "/dummy/{}/".format(self.pk)
 
 
 class Restaurant(models.Model):
@@ -996,7 +996,7 @@ class Restaurant(models.Model):
         )
 
     def get_absolute_url(self):
-        return "/dummy/%s/" % self.pk
+        return "/dummy/{}/".format(self.pk)
 
 
 class Worker(models.Model):

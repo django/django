@@ -563,7 +563,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("add", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("{}.{}".format(opts.app_label, codename))
 
     def has_change_permission(self, request, obj=None):
         """
@@ -578,7 +578,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("change", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("{}.{}".format(opts.app_label, codename))
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -593,7 +593,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("delete", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("{}.{}".format(opts.app_label, codename))
 
     def has_view_permission(self, request, obj=None):
         """
@@ -610,8 +610,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         codename_view = get_permission_codename("view", opts)
         codename_change = get_permission_codename("change", opts)
         return request.user.has_perm(
-            "%s.%s" % (opts.app_label, codename_view)
-        ) or request.user.has_perm("%s.%s" % (opts.app_label, codename_change))
+            "{}.{}".format(opts.app_label, codename_view)
+        ) or request.user.has_perm("{}.{}".format(opts.app_label, codename_change))
 
     def has_view_or_change_permission(self, request, obj=None):
         return self.has_view_permission(request, obj) or self.has_change_permission(
@@ -677,7 +677,7 @@ class ModelAdmin(BaseModelAdmin):
         super().__init__()
 
     def __str__(self):
-        return "%s.%s" % (self.opts.app_label, self.__class__.__name__)
+        return "{}.{}".format(self.opts.app_label, self.__class__.__name__)
 
     def __repr__(self):
         return (
@@ -715,29 +715,31 @@ class ModelAdmin(BaseModelAdmin):
         info = self.opts.app_label, self.opts.model_name
 
         return [
-            path("", wrap(self.changelist_view), name="%s_%s_changelist" % info),
-            path("add/", wrap(self.add_view), name="%s_%s_add" % info),
+            path("", wrap(self.changelist_view), name="{}_{}_changelist".format(*info)),
+            path("add/", wrap(self.add_view), name="{}_{}_add".format(*info)),
             path(
                 "<path:object_id>/history/",
                 wrap(self.history_view),
-                name="%s_%s_history" % info,
+                name="{}_{}_history".format(*info),
             ),
             path(
                 "<path:object_id>/delete/",
                 wrap(self.delete_view),
-                name="%s_%s_delete" % info,
+                name="{}_{}_delete".format(*info),
             ),
             path(
                 "<path:object_id>/change/",
                 wrap(self.change_view),
-                name="%s_%s_change" % info,
+                name="{}_{}_change".format(*info),
             ),
             # For backwards compatibility (was the change url before 1.9)
             path(
                 "<path:object_id>/",
                 wrap(
                     RedirectView.as_view(
-                        pattern_name="%s:%s_%s_change" % (self.admin_site.name, *info)
+                        pattern_name="{}:{}_{}_change".format(
+                            self.admin_site.name, *info
+                        )
                     )
                 ),
             ),
@@ -751,16 +753,16 @@ class ModelAdmin(BaseModelAdmin):
     def media(self):
         extra = "" if settings.DEBUG else ".min"
         js = [
-            "vendor/jquery/jquery%s.js" % extra,
+            "vendor/jquery/jquery{}.js".format(extra),
             "jquery.init.js",
             "core.js",
             "admin/RelatedObjectLookups.js",
             "actions.js",
             "urlify.js",
             "prepopulate.js",
-            "vendor/xregexp/xregexp%s.js" % extra,
+            "vendor/xregexp/xregexp{}.js".format(extra),
         ]
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+        return forms.Media(js=["admin/js/{}".format(url) for url in js])
 
     def get_model_perms(self, request):
         """
@@ -830,8 +832,9 @@ class ModelAdmin(BaseModelAdmin):
             return modelform_factory(self.model, **defaults)
         except FieldError as e:
             raise FieldError(
-                "%s. Check fields/fieldsets/exclude attributes of class %s."
-                % (e, self.__class__.__name__)
+                "{}. Check fields/fieldsets/exclude attributes of class {}.".format(
+                    e, self.__class__.__name__
+                )
             )
 
     def get_changelist(self, request, **kwargs):
@@ -1026,7 +1029,7 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
                 continue
             permission_checks = (
-                getattr(self, "has_%s_permission" % permission)
+                getattr(self, "has_{}_permission".format(permission))
                 for permission in callable.allowed_permissions
             )
             if any(has_permission(request) for has_permission in permission_checks):
@@ -1136,11 +1139,11 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name.removeprefix("^"), None
+                return "{}__istartswith".format(field_name.removeprefix("^")), None
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name.removeprefix("="), None
+                return "{}__iexact".format(field_name.removeprefix("=")), None
             elif field_name.startswith("@"):
-                return "%s__search" % field_name.removeprefix("@"), None
+                return "{}__search".format(field_name.removeprefix("@")), None
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
@@ -1172,7 +1175,7 @@ class ModelAdmin(BaseModelAdmin):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name, None
+            return "{}__icontains".format(field_name), None
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
@@ -1210,8 +1213,8 @@ class ModelAdmin(BaseModelAdmin):
         """
         match = request.resolver_match
         if self.preserve_filters and match:
-            current_url = "%s:%s" % (match.app_name, match.url_name)
-            changelist_url = "admin:%s_%s_changelist" % (
+            current_url = "{}:{}".format(match.app_name, match.url_name)
+            changelist_url = "admin:{}_{}_changelist".format(
                 self.opts.app_label,
                 self.opts.model_name,
             )
@@ -1248,10 +1251,11 @@ class ModelAdmin(BaseModelAdmin):
                 level = getattr(messages.constants, level.upper())
             except AttributeError:
                 levels = messages.constants.DEFAULT_TAGS.values()
-                levels_repr = ", ".join("`%s`" % level for level in levels)
+                levels_repr = ", ".join("`{}`".format(level) for level in levels)
                 raise ValueError(
-                    "Bad message level string: `%s`. Possible values are: %s"
-                    % (level, levels_repr)
+                    "Bad message level string: `{}`. Possible values are: {}".format(
+                        level, levels_repr
+                    )
                 )
 
         messages.add_message(
@@ -1356,8 +1360,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             form_template
             or [
-                "admin/%s/%s/change_form.html" % (app_label, self.opts.model_name),
-                "admin/%s/change_form.html" % app_label,
+                "admin/{}/{}/change_form.html".format(app_label, self.opts.model_name),
+                "admin/{}/change_form.html".format(app_label),
                 "admin/change_form.html",
             ],
             context,
@@ -1375,7 +1379,7 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
         obj_url = reverse(
-            "admin:%s_%s_change" % (opts.app_label, opts.model_name),
+            "admin:{}_{}_change".format(opts.app_label, opts.model_name),
             args=(quote(obj.pk),),
             current_app=self.admin_site.name,
         )
@@ -1408,9 +1412,10 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (opts.app_label, opts.model_name),
-                    "admin/%s/popup_response.html" % opts.app_label,
+                    "admin/{}/{}/popup_response.html".format(
+                        opts.app_label, opts.model_name
+                    ),
+                    "admin/{}/popup_response.html".format(opts.app_label),
                     "admin/popup_response.html",
                 ],
                 {
@@ -1490,9 +1495,10 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (opts.app_label, opts.model_name),
-                    "admin/%s/popup_response.html" % opts.app_label,
+                    "admin/{}/{}/popup_response.html".format(
+                        opts.app_label, opts.model_name
+                    ),
+                    "admin/{}/popup_response.html".format(opts.app_label),
                     "admin/popup_response.html",
                 ],
                 {
@@ -1538,7 +1544,7 @@ class ModelAdmin(BaseModelAdmin):
             )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse(
-                "admin:%s_%s_add" % (opts.app_label, opts.model_name),
+                "admin:{}_{}_add".format(opts.app_label, opts.model_name),
                 current_app=self.admin_site.name,
             )
             redirect_url = add_preserved_filters(
@@ -1561,7 +1567,9 @@ class ModelAdmin(BaseModelAdmin):
     def _response_post_save(self, request, obj):
         if self.has_view_or_change_permission(request):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                "admin:{}_{}_changelist".format(
+                    self.opts.app_label, self.opts.model_name
+                ),
                 current_app=self.admin_site.name,
             )
             preserved_filters = self.get_preserved_filters(request)
@@ -1670,9 +1678,10 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (self.opts.app_label, self.opts.model_name),
-                    "admin/%s/popup_response.html" % self.opts.app_label,
+                    "admin/{}/{}/popup_response.html".format(
+                        self.opts.app_label, self.opts.model_name
+                    ),
+                    "admin/{}/popup_response.html".format(self.opts.app_label),
                     "admin/popup_response.html",
                 ],
                 {
@@ -1692,7 +1701,9 @@ class ModelAdmin(BaseModelAdmin):
 
         if self.has_change_permission(request, None):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                "admin:{}_{}_changelist".format(
+                    self.opts.app_label, self.opts.model_name
+                ),
                 current_app=self.admin_site.name,
             )
             preserved_filters = self.get_preserved_filters(request)
@@ -1804,7 +1815,7 @@ class ModelAdmin(BaseModelAdmin):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field %s cannot be referenced." % to_field
+                "The field {} cannot be referenced.".format(to_field)
             )
 
         if request.method == "POST" and "_saveasnew" in request.POST:
@@ -2142,8 +2153,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.change_list_template
             or [
-                "admin/%s/%s/change_list.html" % (app_label, self.opts.model_name),
-                "admin/%s/change_list.html" % app_label,
+                "admin/{}/{}/change_list.html".format(app_label, self.opts.model_name),
+                "admin/{}/change_list.html".format(app_label),
                 "admin/change_list.html",
             ],
             context,
@@ -2171,7 +2182,7 @@ class ModelAdmin(BaseModelAdmin):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field %s cannot be referenced." % to_field
+                "The field {} cannot be referenced.".format(to_field)
             )
 
         obj = self.get_object(request, unquote(object_id), to_field)
@@ -2282,8 +2293,10 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.object_history_template
             or [
-                "admin/%s/%s/object_history.html" % (app_label, self.opts.model_name),
-                "admin/%s/object_history.html" % app_label,
+                "admin/{}/{}/object_history.html".format(
+                    app_label, self.opts.model_name
+                ),
+                "admin/{}/object_history.html".format(app_label),
                 "admin/object_history.html",
             ],
             context,
@@ -2317,7 +2330,7 @@ class ModelAdmin(BaseModelAdmin):
             prefix = FormSet.get_default_prefix()
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
-                prefix = "%s-%s" % (prefix, prefixes[prefix])
+                prefix = "{}-{}".format(prefix, prefixes[prefix])
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
@@ -2381,10 +2394,10 @@ class InlineModelAdmin(BaseModelAdmin):
     @property
     def media(self):
         extra = "" if settings.DEBUG else ".min"
-        js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
+        js = ["vendor/jquery/jquery{}.js".format(extra), "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+        return forms.Media(js=["admin/js/{}".format(url) for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""
@@ -2516,7 +2529,7 @@ class InlineModelAdmin(BaseModelAdmin):
                 break
         return any(
             request.user.has_perm(
-                "%s.%s" % (opts.app_label, get_permission_codename(perm, opts))
+                "{}.{}".format(opts.app_label, get_permission_codename(perm, opts))
             )
             for perm in perms
         )

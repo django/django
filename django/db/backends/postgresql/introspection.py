@@ -119,7 +119,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         )
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute(
-            "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
+            "SELECT * FROM {} LIMIT 1".format(
+                self.connection.ops.quote_name(table_name)
+            )
         )
 
         # PostgreSQL OIDs may vary depending on the installation, especially

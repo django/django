@@ -17,12 +17,12 @@ class AdminActionsTests(TestCase):
             name="custom", codename="custom_band", content_type=content_type
         )
         for user_type in ("view", "add", "change", "delete", "custom"):
-            username = "%suser" % user_type
+            username = "{}user".format(user_type)
             user = User.objects.create_user(
                 username=username, password="secret", is_staff=True
             )
             permission = Permission.objects.get(
-                codename="%s_band" % user_type, content_type=content_type
+                codename="{}_band".format(user_type), content_type=content_type
             )
             user.user_permissions.add(permission)
             setattr(cls, username, user)
@@ -39,7 +39,9 @@ class AdminActionsTests(TestCase):
                 pass
 
             def has_custom_permission(self, request):
-                return request.user.has_perm("%s.custom_band" % self.opts.app_label)
+                return request.user.has_perm(
+                    "{}.custom_band".format(self.opts.app_label)
+                )
 
         ma = BandAdmin(Band, admin.AdminSite())
         mock_request = MockRequest()

@@ -34,7 +34,7 @@ has_xgettext = find_command("xgettext")
 class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
     work_subdir = "commands"
 
-    PO_FILE = "locale/%s/LC_MESSAGES/django.po" % LOCALE
+    PO_FILE = "locale/{}/LC_MESSAGES/django.po".format(LOCALE)
 
     def _run_makemessages(self, **options):
         out = StringIO()
@@ -57,9 +57,11 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
-            msgid = '"%s"' % msgid
+            msgid = '"{}"'.format(msgid)
         msgid = re.escape(msgid)
-        return self.assertTrue(not re.search("^msgid %s" % msgid, s, re.MULTILINE))
+        return self.assertTrue(
+            not re.search("^msgid {}".format(msgid), s, re.MULTILINE)
+        )
 
     def _assertPoLocComment(
         self, assert_presence, po_filename, line_number, *comment_parts
@@ -68,7 +70,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
             po_contents = fp.read()
         if os.name == "nt":
             # #: .\path\to\file.html:123
-            cwd_prefix = "%s%s" % (os.curdir, os.sep)
+            cwd_prefix = "{}{}".format(os.curdir, os.sep)
         else:
             # #: path/to/file.html:123
             cwd_prefix = ""
@@ -85,11 +87,13 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         pattern = re.compile(r"^\#\:.*" + re.escape(needle), re.MULTILINE)
         if assert_presence:
             return self.assertRegex(
-                po_contents, pattern, '"%s" not found in final .po file.' % needle
+                po_contents, pattern, '"{}" not found in final .po file.'.format(needle)
             )
         else:
             return self.assertNotRegex(
-                po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
+                po_contents,
+                pattern,
+                '"{}" shouldn\'t be in final .po file.'.format(needle),
             )
 
     def _get_token_line_number(self, path, token):
@@ -98,8 +102,9 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
                 if token in content:
                     return line
         self.fail(
-            "The token '%s' could not be found in %s, please check the test config"
-            % (token, path)
+            "The token '{}' could not be found in {}, please check the test config".format(
+                token, path
+            )
         )
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
@@ -132,7 +137,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         10 seconds ago).
         """
         delta = time.time() - os.stat(path).st_mtime
-        self.assertLess(delta, 10, "%s was recently modified" % path)
+        self.assertLess(delta, 10, "{} was recently modified".format(path))
 
     def assertNotRecentlyModified(self, path):
         """
@@ -140,7 +145,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         than 10 seconds ago).
         """
         delta = time.time() - os.stat(path).st_mtime
-        self.assertGreater(delta, 10, "%s wasn't recently modified" % path)
+        self.assertGreater(delta, 10, "{} wasn't recently modified".format(path))
 
 
 class BasicExtractorTests(ExtractorTests):
@@ -349,7 +354,9 @@ class BasicExtractorTests(ExtractorTests):
     def test_extraction_error(self):
         msg = (
             "Translation blocks must not include other block tags: blocktranslate "
-            "(file %s, line 3)" % os.path.join("templates", "template_with_error.tpl")
+            "(file {}, line 3)".format(
+                os.path.join("templates", "template_with_error.tpl")
+            )
         )
         with self.assertRaisesMessage(SyntaxError, msg):
             management.call_command(
@@ -678,7 +685,7 @@ class BasicExtractorTests(ExtractorTests):
 
 
 class JavaScriptExtractorTests(ExtractorTests):
-    PO_FILE = "locale/%s/LC_MESSAGES/djangojs.po" % LOCALE
+    PO_FILE = "locale/{}/LC_MESSAGES/djangojs.po".format(LOCALE)
 
     def test_javascript_literals(self):
         _, po_contents = self._run_makemessages(domain="djangojs")

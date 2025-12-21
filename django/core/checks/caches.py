@@ -7,7 +7,7 @@ from django.core.cache.backends.filebased import FileBasedCache
 from . import Error, Tags, Warning, register
 
 E001 = Error(
-    "You must define a '%s' cache in your CACHES setting." % DEFAULT_CACHE_ALIAS,
+    "You must define a '{}' cache in your CACHES setting.".format(DEFAULT_CACHE_ALIAS),
     id="caches.E001",
 )
 

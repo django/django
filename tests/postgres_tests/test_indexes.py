@@ -24,21 +24,25 @@ class IndexTestMixin:
         index = self.index_class(fields=["field"])
         index.set_name_with_model(CharFieldModel)
         self.assertRegex(
-            index.name, r"postgres_te_field_[0-9a-f]{6}_%s" % self.index_class.suffix
+            index.name,
+            r"postgres_te_field_[0-9a-f]{{6}}_{}".format(self.index_class.suffix),
         )
 
     def test_deconstruction_no_customization(self):
         index = self.index_class(
-            fields=["title"], name="test_title_%s" % self.index_class.suffix
+            fields=["title"], name="test_title_{}".format(self.index_class.suffix)
         )
         path, args, kwargs = index.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.indexes.%s" % self.index_class.__name__
+            path, "django.contrib.postgres.indexes.{}".format(self.index_class.__name__)
         )
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
-            {"fields": ["title"], "name": "test_title_%s" % self.index_class.suffix},
+            {
+                "fields": ["title"],
+                "name": "test_title_{}".format(self.index_class.suffix),
+            },
         )
 
     def test_deconstruction_with_expressions_no_customization(self):
@@ -716,7 +720,7 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_index(TextFieldModel, index)
             self.assertIn(
-                "COLLATE %s" % editor.quote_name(collation),
+                "COLLATE {}".format(editor.quote_name(collation)),
                 str(index.create_sql(TextFieldModel, editor)),
             )
         with editor.connection.cursor() as cursor:

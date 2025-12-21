@@ -390,7 +390,7 @@ class Eaten(models.Model):
     meal = models.CharField(max_length=20)
 
     def __str__(self):
-        return "%s at %s" % (self.food, self.meal)
+        return "{} at {}".format(self.food, self.meal)
 
 
 class Node(models.Model):

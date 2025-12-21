@@ -16,7 +16,9 @@ def _check_for_duplicates(arg_name, objs):
     for val in objs:
         if val in used_vals:
             raise ValueError(
-                "Found duplicate value %s in CreateModel %s argument." % (val, arg_name)
+                "Found duplicate value {} in CreateModel {} argument.".format(
+                    val, arg_name
+                )
             )
         used_vals.add(val)
 
@@ -116,7 +118,7 @@ class CreateModel(ModelOperation):
             schema_editor.delete_model(model)
 
     def describe(self):
-        return "Create %smodel %s" % (
+        return "Create {}model {}".format(
             "proxy " if self.options.get("proxy", False) else "",
             self.name,
         )
@@ -409,11 +411,11 @@ class DeleteModel(ModelOperation):
         return True
 
     def describe(self):
-        return "Delete model %s" % self.name
+        return "Delete model {}".format(self.name)
 
     @property
     def migration_name_fragment(self):
-        return "delete_%s" % self.name_lower
+        return "delete_{}".format(self.name_lower)
 
 
 class RenameModel(ModelOperation):
@@ -513,11 +515,11 @@ class RenameModel(ModelOperation):
         )
 
     def describe(self):
-        return "Rename model %s to %s" % (self.old_name, self.new_name)
+        return "Rename model {} to {}".format(self.old_name, self.new_name)
 
     @property
     def migration_name_fragment(self):
-        return "rename_%s_%s" % (self.old_name_lower, self.new_name_lower)
+        return "rename_{}_{}".format(self.old_name_lower, self.new_name_lower)
 
     def reduce(self, operation, app_label):
         if (
@@ -585,14 +587,14 @@ class AlterModelTable(ModelOptionOperation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Rename table for %s to %s" % (
+        return "Rename table for {} to {}".format(
             self.name,
             self.table if self.table is not None else "(default)",
         )
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_table" % self.name_lower
+        return "alter_{}_table".format(self.name_lower)
 
 
 class AlterModelTableComment(ModelOptionOperation):
@@ -665,7 +667,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             from_model_state = from_state.models[app_label, self.name_lower]
             to_model_state = to_state.models[app_label, self.name_lower]
-            alter_together = getattr(schema_editor, "alter_%s" % self.option_name)
+            alter_together = getattr(schema_editor, "alter_{}".format(self.option_name))
             alter_together(
                 new_model,
                 from_model_state.options.get(self.option_name) or set(),
@@ -682,7 +684,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         )
 
     def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (
+        return "Alter {} for {} ({} constraint(s))".format(
             self.option_name,
             self.name,
             len(self.option_value or ""),
@@ -690,7 +692,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.name_lower, self.option_name)
+        return "alter_{}_{}".format(self.name_lower, self.option_name)
 
     def can_reduce_through(self, operation, app_label):
         return super().can_reduce_through(operation, app_label) or (
@@ -781,14 +783,14 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
         )
 
     def describe(self):
-        return "Set order_with_respect_to on %s to %s" % (
+        return "Set order_with_respect_to on {} to {}".format(
             self.name,
             self.order_with_respect_to,
         )
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_order_with_respect_to" % self.name_lower
+        return "alter_{}_order_with_respect_to".format(self.name_lower)
 
 
 class AlterModelOptions(ModelOptionOperation):
@@ -839,11 +841,11 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on %s" % self.name
+        return "Change Meta options on {}".format(self.name)
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_options" % self.name_lower
+        return "alter_{}_options".format(self.name_lower)
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -868,11 +870,11 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on %s" % self.name
+        return "Change managers on {}".format(self.name)
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_managers" % self.name_lower
+        return "alter_{}_managers".format(self.name_lower)
 
 
 class IndexOperation(Operation):
@@ -893,7 +895,7 @@ class AddIndex(IndexOperation):
         if not index.name:
             raise ValueError(
                 "Indexes passed to AddIndex operations require a name "
-                "argument. %r doesn't have one." % index
+                "argument. {!r} doesn't have one.".format(index)
             )
         self.index = index
 
@@ -923,12 +925,12 @@ class AddIndex(IndexOperation):
 
     def describe(self):
         if self.index.expressions:
-            return "Create index %s on %s on model %s" % (
+            return "Create index {} on {} on model {}".format(
                 self.index.name,
                 ", ".join([str(expression) for expression in self.index.expressions]),
                 self.model_name,
             )
-        return "Create index %s on field(s) %s of model %s" % (
+        return "Create index {} on field(s) {} of model {}".format(
             self.index.name,
             ", ".join(self.index.fields),
             self.model_name,
@@ -936,7 +938,7 @@ class AddIndex(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.model_name_lower, self.index.name.lower())
+        return "{}_{}".format(self.model_name_lower, self.index.name.lower())
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
@@ -986,11 +988,11 @@ class RemoveIndex(IndexOperation):
         )
 
     def describe(self):
-        return "Remove index %s from %s" % (self.name, self.model_name)
+        return "Remove index {} from {}".format(self.name, self.model_name)
 
     @property
     def migration_name_fragment(self):
-        return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+        return "remove_{}_{}".format(self.model_name_lower, self.name.lower())
 
 
 class RenameIndex(IndexOperation):
@@ -1068,8 +1070,7 @@ class RenameIndex(IndexOperation):
             )
             if len(matching_index_name) != 1:
                 raise ValueError(
-                    "Found wrong number (%s) of indexes for %s(%s)."
-                    % (
+                    "Found wrong number ({}) of indexes for {}({}).".format(
                         len(matching_index_name),
                         from_model._meta.db_table,
                         ", ".join(columns),
@@ -1122,8 +1123,8 @@ class RenameIndex(IndexOperation):
     @property
     def migration_name_fragment(self):
         if self.old_name:
-            return "rename_%s_%s" % (self.old_name_lower, self.new_name_lower)
-        return "rename_%s_%s_%s" % (
+            return "rename_{}_{}".format(self.old_name_lower, self.new_name_lower)
+        return "rename_{}_{}_{}".format(
             self.model_name_lower,
             "_".join(self.old_fields),
             self.new_name_lower,
@@ -1172,14 +1173,14 @@ class AddConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Create constraint %s on model %s" % (
+        return "Create constraint {} on model {}".format(
             self.constraint.name,
             self.model_name,
         )
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+        return "{}_{}".format(self.model_name_lower, self.constraint.name.lower())
 
     def reduce(self, operation, app_label):
         if (
@@ -1233,11 +1234,11 @@ class RemoveConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Remove constraint %s from model %s" % (self.name, self.model_name)
+        return "Remove constraint {} from model {}".format(self.name, self.model_name)
 
     @property
     def migration_name_fragment(self):
-        return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+        return "remove_{}_{}".format(self.model_name_lower, self.name.lower())
 
 
 class AlterConstraint(IndexOperation):
@@ -1276,7 +1277,7 @@ class AlterConstraint(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+        return "alter_{}_{}".format(self.model_name_lower, self.constraint.name.lower())
 
     def reduce(self, operation, app_label):
         if (

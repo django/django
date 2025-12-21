@@ -69,8 +69,8 @@ class TestFixtures(TestCase):
     def animal_pre_save_check(self, signal, sender, instance, **kwargs):
         self.pre_save_checks.append(
             (
-                "Count = %s (%s)" % (instance.count, type(instance.count)),
-                "Weight = %s (%s)" % (instance.weight, type(instance.weight)),
+                "Count = {} ({})".format(instance.count, type(instance.count)),
+                "Weight = {} ({})".format(instance.weight, type(instance.weight)),
             )
         )
 
@@ -603,9 +603,10 @@ class TestFixtures(TestCase):
         loading.
         """
         msg = (
-            "'%s' is a default fixture directory for the '%s' app "
-            "and cannot be listed in settings.FIXTURE_DIRS."
-            % (os.path.join(_cur_dir, "fixtures"), "fixtures_regress")
+            "'{}' is a default fixture directory for the '{}' app "
+            "and cannot be listed in settings.FIXTURE_DIRS.".format(
+                os.path.join(_cur_dir, "fixtures"), "fixtures_regress"
+            )
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             management.call_command("loaddata", "absolute.json", verbosity=0)
@@ -618,9 +619,10 @@ class TestFixtures(TestCase):
         loading.
         """
         msg = (
-            "'%s' is a default fixture directory for the '%s' app "
-            "and cannot be listed in settings.FIXTURE_DIRS."
-            % (os.path.join(_cur_dir, "fixtures"), "fixtures_regress")
+            "'{}' is a default fixture directory for the '{}' app "
+            "and cannot be listed in settings.FIXTURE_DIRS.".format(
+                os.path.join(_cur_dir, "fixtures"), "fixtures_regress"
+            )
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             management.call_command("loaddata", "absolute.json", verbosity=0)

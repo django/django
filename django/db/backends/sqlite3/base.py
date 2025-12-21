@@ -43,7 +43,7 @@ def adapt_datetime(val):
 def _get_varchar_column(data):
     if data["max_length"] is None:
         return "varchar"
-    return "varchar(%(max_length)s)" % data
+    return "varchar({max_length})".format(**data)
 
 
 Database.register_converter("bool", b"1".__eq__)
@@ -273,7 +273,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 violations = chain.from_iterable(
                     cursor.execute(
-                        "PRAGMA foreign_key_check(%s)" % self.ops.quote_name(table_name)
+                        "PRAGMA foreign_key_check({})".format(
+                            self.ops.quote_name(table_name)
+                        )
                     ).fetchall()
                     for table_name in table_names
                 )
@@ -285,15 +287,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 foreign_key_index,
             ) in violations:
                 foreign_key = cursor.execute(
-                    "PRAGMA foreign_key_list(%s)" % self.ops.quote_name(table_name)
+                    "PRAGMA foreign_key_list({})".format(
+                        self.ops.quote_name(table_name)
+                    )
                 ).fetchall()[foreign_key_index]
                 column_name, referenced_column_name = foreign_key[3:5]
                 primary_key_column_name = self.introspection.get_primary_key_column(
                     cursor, table_name
                 )
                 primary_key_value, bad_value = cursor.execute(
-                    "SELECT %s, %s FROM %s WHERE rowid = %%s"
-                    % (
+                    "SELECT {}, {} FROM {} WHERE rowid = %s".format(
                         self.ops.quote_name(primary_key_column_name),
                         self.ops.quote_name(column_name),
                         self.ops.quote_name(table_name),
@@ -301,10 +304,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     (rowid,),
                 ).fetchone()
                 raise IntegrityError(
-                    "The row in table '%s' with primary key '%s' has an "
-                    "invalid foreign key: %s.%s contains a value '%s' that "
-                    "does not have a corresponding value in %s.%s."
-                    % (
+                    "The row in table '{}' with primary key '{}' has an "
+                    "invalid foreign key: {}.{} contains a value '{}' that "
+                    "does not have a corresponding value in {}.{}.".format(
                         table_name,
                         primary_key_value,
                         table_name,

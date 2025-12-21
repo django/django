@@ -54,8 +54,7 @@ class BaseDatabaseCreation:
                 action = "Using existing"
 
             self.log(
-                "%s test database for alias %s..."
-                % (
+                "{} test database for alias {}...".format(
                     action,
                     self._get_database_display_str(verbosity, test_database_name),
                 )
@@ -189,9 +188,9 @@ class BaseDatabaseCreation:
         """
         Return display string for a database for use in various actions.
         """
-        return "'%s'%s" % (
+        return "'{}'{}".format(
             self.connection.alias,
-            (" ('%s')" % database_name) if verbosity >= 2 else "",
+            (" ('{}')".format(database_name)) if verbosity >= 2 else "",
         )
 
     def _get_test_db_name(self):
@@ -206,7 +205,7 @@ class BaseDatabaseCreation:
         return TEST_DATABASE_PREFIX + self.connection.settings_dict["NAME"]
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
-        cursor.execute("CREATE DATABASE %(dbname)s %(suffix)s" % parameters)
+        cursor.execute("CREATE DATABASE {dbname} {suffix}".format(**parameters))
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
@@ -227,27 +226,30 @@ class BaseDatabaseCreation:
                 if keepdb:
                     return test_database_name
 
-                self.log("Got an error creating the test database: %s" % e)
+                self.log("Got an error creating the test database: {}".format(e))
                 if not autoclobber:
                     confirm = input(
                         "Type 'yes' if you would like to try deleting the test "
-                        "database '%s', or 'no' to cancel: " % test_database_name
+                        "database '{}', or 'no' to cancel: ".format(test_database_name)
                     )
                 if autoclobber or confirm == "yes":
                     try:
                         if verbosity >= 1:
                             self.log(
-                                "Destroying old test database for alias %s..."
-                                % (
+                                "Destroying old test database for alias {}...".format(
                                     self._get_database_display_str(
                                         verbosity, test_database_name
                                     ),
                                 )
                             )
-                        cursor.execute("DROP DATABASE %(dbname)s" % test_db_params)
+                        cursor.execute(
+                            "DROP DATABASE {dbname}".format(**test_db_params)
+                        )
                         self._execute_create_test_db(cursor, test_db_params, keepdb)
                     except Exception as e:
-                        self.log("Got an error recreating the test database: %s" % e)
+                        self.log(
+                            "Got an error recreating the test database: {}".format(e)
+                        )
                         sys.exit(2)
                 else:
                     self.log("Tests cancelled.")
@@ -266,8 +268,7 @@ class BaseDatabaseCreation:
             if keepdb:
                 action = "Using existing clone"
             self.log(
-                "%s for alias %s..."
-                % (
+                "{} for alias {}...".format(
                     action,
                     self._get_database_display_str(verbosity, source_database_name),
                 )
@@ -317,8 +318,7 @@ class BaseDatabaseCreation:
             if keepdb:
                 action = "Preserving"
             self.log(
-                "%s test database for alias %s..."
-                % (
+                "{} test database for alias {}...".format(
                     action,
                     self._get_database_display_str(verbosity, test_database_name),
                 )
@@ -344,7 +344,9 @@ class BaseDatabaseCreation:
         # connected to it.
         with self._nodb_cursor() as cursor:
             cursor.execute(
-                "DROP DATABASE %s" % self.connection.ops.quote_name(test_database_name)
+                "DROP DATABASE {}".format(
+                    self.connection.ops.quote_name(test_database_name)
+                )
             )
 
     def mark_expected_failures_and_skips(self):

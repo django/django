@@ -101,7 +101,7 @@ class AdminEmailHandler(logging.Handler):
             return
         try:
             request = record.request
-            subject = "%s (%s IP): %s" % (
+            subject = "{} ({} IP): {}".format(
                 record.levelname,
                 (
                     "internal"
@@ -111,7 +111,7 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage(),
             )
         except Exception:
-            subject = "%s: %s" % (record.levelname, record.getMessage())
+            subject = "{}: {}".format(record.levelname, record.getMessage())
             request = None
         subject = self.format_subject(subject)
 
@@ -127,7 +127,7 @@ class AdminEmailHandler(logging.Handler):
             exc_info = (None, record.getMessage(), None)
 
         reporter = self.reporter_class(request, is_email=True, *exc_info)
-        message = "%s\n\n%s" % (
+        message = "{}\n\n{}".format(
             self.format(no_exc_record),
             reporter.get_traceback_text(),
         )

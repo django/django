@@ -30,7 +30,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **kwargs):
-        subject = "Test email from %s on %s" % (socket.gethostname(), timezone.now())
+        subject = "Test email from {} on {}".format(
+            socket.gethostname(), timezone.now()
+        )
 
         send_mail(
             subject=subject,

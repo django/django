@@ -263,8 +263,9 @@ class BaseDatabaseWrapper:
     def check_settings(self):
         if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
             raise ImproperlyConfigured(
-                "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
-                % self.alias
+                "Connection '{}' cannot set TIME_ZONE because USE_TZ is False.".format(
+                    self.alias
+                )
             )
 
     @async_unsafe
@@ -645,8 +646,10 @@ class BaseDatabaseWrapper:
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
-                "with alias '%s' was created in thread id %s and this is "
-                "thread id %s." % (self.alias, self._thread_ident, _thread.get_ident())
+                "with alias '{}' was created in thread id {} and this is "
+                "thread id {}.".format(
+                    self.alias, self._thread_ident, _thread.get_ident()
+                )
             )
 
     # ##### Miscellaneous #####

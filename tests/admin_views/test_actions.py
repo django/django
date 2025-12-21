@@ -127,7 +127,7 @@ class AdminActionsTest(TestCase):
         )
         self.assertTemplateUsed(response, "admin/delete_selected_confirmation.html")
         self.assertContains(response, 'value="9999"')  # Instead of 9,999
-        self.assertContains(response, 'value="%s"' % self.s2.pk)
+        self.assertContains(response, 'value="{}"'.format(self.s2.pk))
 
     def test_model_admin_default_delete_action_protected(self):
         """
@@ -153,14 +153,16 @@ class AdminActionsTest(TestCase):
         )
         self.assertContains(
             response,
-            '<li>Answer: <a href="%s">Because.</a></li>'
-            % reverse("admin:admin_views_answer_change", args=(a1.pk,)),
+            '<li>Answer: <a href="{}">Because.</a></li>'.format(
+                reverse("admin:admin_views_answer_change", args=(a1.pk,))
+            ),
             html=True,
         )
         self.assertContains(
             response,
-            '<li>Answer: <a href="%s">Yes.</a></li>'
-            % reverse("admin:admin_views_answer_change", args=(a2.pk,)),
+            '<li>Answer: <a href="{}">Yes.</a></li>'.format(
+                reverse("admin:admin_views_answer_change", args=(a2.pk,))
+            ),
             html=True,
         )
         # A POST request to delete protected objects displays the page which
@@ -190,7 +192,7 @@ class AdminActionsTest(TestCase):
         # No 500 caused by NoReverseMatch. The page doesn't display a link to
         # the nonexistent change page.
         self.assertContains(
-            response, "<li>Unchangeable object: %s</li>" % obj, 1, html=True
+            response, "<li>Unchangeable object: {}</li>".format(obj), 1, html=True
         )
 
     def test_delete_queryset_hook(self):
@@ -416,7 +418,7 @@ action)</option>
         changelist_url = reverse("admin:admin_views_subscriber_changelist")
         response = self.client.get(changelist_url)
         self.assertIsNotNone(response.context["action_form"])
-        response = self.client.get(changelist_url + "?%s" % IS_POPUP_VAR)
+        response = self.client.get(changelist_url + "?{}".format(IS_POPUP_VAR))
         self.assertIsNone(response.context["action_form"])
 
     def test_popup_template_response_on_add(self):
@@ -425,7 +427,7 @@ action)</option>
         easy customization.
         """
         response = self.client.post(
-            reverse("admin:admin_views_actor_add") + "?%s=1" % IS_POPUP_VAR,
+            reverse("admin:admin_views_actor_add") + "?{}=1".format(IS_POPUP_VAR),
             {"name": "Troy McClure", "age": "55", IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)
@@ -443,7 +445,7 @@ action)</option>
         instance = Actor.objects.create(name="David Tennant", age=45)
         response = self.client.post(
             reverse("admin:admin_views_actor_change", args=(instance.pk,))
-            + "?%s=1" % IS_POPUP_VAR,
+            + "?{}=1".format(IS_POPUP_VAR),
             {"name": "David Tennant", "age": "46", IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)
@@ -461,7 +463,7 @@ action)</option>
         instance = Actor.objects.create(name="David Tennant", age=45)
         response = self.client.post(
             reverse("admin:admin_views_actor_delete", args=(instance.pk,))
-            + "?%s=1" % IS_POPUP_VAR,
+            + "?{}=1".format(IS_POPUP_VAR),
             {IS_POPUP_VAR: "1"},
         )
         self.assertEqual(response.status_code, 200)

@@ -91,8 +91,8 @@ class Index:
         if self.name[0] == "_" or self.name[0].isdigit():
             errors.append(
                 checks.Error(
-                    "The index name '%s' cannot start with an underscore "
-                    "or a number." % self.name,
+                    "The index name '{}' cannot start with an underscore "
+                    "or a number.".format(self.name),
                     obj=model,
                     id="models.E033",
                 ),
@@ -130,8 +130,9 @@ class Index:
         ) and any(self.condition is not None for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "%s does not support indexes with conditions."
-                    % connection.display_name,
+                    "{} does not support indexes with conditions.".format(
+                        connection.display_name
+                    ),
                     hint=(
                         "Conditions will be ignored. Silence this warning "
                         "if you don't care about it."
@@ -146,8 +147,9 @@ class Index:
         ) and any(index.include for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "%s does not support indexes with non-key columns."
-                    % connection.display_name,
+                    "{} does not support indexes with non-key columns.".format(
+                        connection.display_name
+                    ),
                     hint=(
                         "Non-key columns will be ignored. Silence this "
                         "warning if you don't care about it."
@@ -162,8 +164,9 @@ class Index:
         ) and any(index.contains_expressions for index in model._meta.indexes):
             errors.append(
                 checks.Warning(
-                    "%s does not support indexes on expressions."
-                    % connection.display_name,
+                    "{} does not support indexes on expressions.".format(
+                        connection.display_name
+                    ),
                     hint=(
                         "An index won't be created. Silence this warning "
                         "if you don't care about it."
@@ -227,7 +230,7 @@ class Index:
         return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        path = "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
         path = path.replace("django.db.models.indexes", "django.db.models")
         kwargs = {"name": self.name}
         if self.fields:
@@ -269,10 +272,10 @@ class Index:
         # The length of the parts of the name is based on the default max
         # length of 30 characters.
         hash_data = [table_name, *column_names_with_order, self.suffix]
-        self.name = "%s_%s_%s" % (
+        self.name = "{}_{}_{}".format(
             table_name[:11],
             column_names[0][:7],
-            "%s_%s" % (names_digest(*hash_data, length=6), self.suffix),
+            "{}_{}".format(names_digest(*hash_data, length=6), self.suffix),
         )
         if len(self.name) > self.max_name_length:
             raise ValueError(
@@ -280,22 +283,26 @@ class Index:
                 "longer than 3 characters?"
             )
         if self.name[0] == "_" or self.name[0].isdigit():
-            self.name = "D%s" % self.name[1:]
+            self.name = "D{}".format(self.name[1:])
 
     def __repr__(self):
-        return "<%s:%s%s%s%s%s%s%s>" % (
+        return "<{}:{}{}{}{}{}{}{}>".format(
             self.__class__.__qualname__,
-            "" if not self.fields else " fields=%s" % repr(self.fields),
-            "" if not self.expressions else " expressions=%s" % repr(self.expressions),
-            "" if not self.name else " name=%s" % repr(self.name),
+            "" if not self.fields else " fields={}".format(repr(self.fields)),
+            (
+                ""
+                if not self.expressions
+                else " expressions={}".format(repr(self.expressions))
+            ),
+            "" if not self.name else " name={}".format(repr(self.name)),
             (
                 ""
                 if self.db_tablespace is None
-                else " db_tablespace=%s" % repr(self.db_tablespace)
+                else " db_tablespace={}".format(repr(self.db_tablespace))
             ),
-            "" if self.condition is None else " condition=%s" % self.condition,
-            "" if not self.include else " include=%s" % repr(self.include),
-            "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
+            "" if self.condition is None else " condition={}".format(self.condition),
+            "" if not self.include else " include={}".format(repr(self.include)),
+            "" if not self.opclasses else " opclasses={}".format(repr(self.opclasses)),
         )
 
     def __eq__(self, other):
@@ -342,17 +349,25 @@ class IndexExpression(Func):
         wrapper_types = [type(wrapper) for wrapper in wrappers]
         if len(wrapper_types) != len(set(wrapper_types)):
             raise ValueError(
-                "Multiple references to %s can't be used in an indexed "
-                "expression."
-                % ", ".join(
-                    [wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes]
+                "Multiple references to {} can't be used in an indexed "
+                "expression.".format(
+                    ", ".join(
+                        [
+                            wrapper_cls.__qualname__
+                            for wrapper_cls in self.wrapper_classes
+                        ]
+                    )
                 )
             )
         if expressions[1 : len(wrappers) + 1] != wrappers:
             raise ValueError(
-                "%s must be topmost expressions in an indexed expression."
-                % ", ".join(
-                    [wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes]
+                "{} must be topmost expressions in an indexed expression.".format(
+                    ", ".join(
+                        [
+                            wrapper_cls.__qualname__
+                            for wrapper_cls in self.wrapper_classes
+                        ]
+                    )
                 )
             )
         # Wrap expressions in parentheses if they are not column references.

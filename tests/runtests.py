@@ -335,7 +335,8 @@ class ActionSelenium(argparse.Action):
                 SeleniumTestCaseBase.import_webdriver(browser)
             except ImportError:
                 raise argparse.ArgumentError(
-                    self, "Selenium browser specification '%s' is not valid." % browser
+                    self,
+                    "Selenium browser specification '{}' is not valid.".format(browser),
                 )
         setattr(namespace, self.dest, browsers)
 
@@ -366,8 +367,8 @@ def django_tests(
         max_parallel = parallel
 
     if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(
-            django.__file__
+        msg = "Testing against Django installed in '{}'".format(
+            os.path.dirname(django.__file__)
         )
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
@@ -418,22 +419,26 @@ def collect_test_modules(start_at, start_after):
 
 
 def get_subprocess_args(options):
-    subprocess_args = [sys.executable, __file__, "--settings=%s" % options.settings]
+    subprocess_args = [
+        sys.executable,
+        __file__,
+        "--settings={}".format(options.settings),
+    ]
     if options.failfast:
         subprocess_args.append("--failfast")
     if options.verbosity:
-        subprocess_args.append("--verbosity=%s" % options.verbosity)
+        subprocess_args.append("--verbosity={}".format(options.verbosity))
     if not options.interactive:
         subprocess_args.append("--noinput")
     if options.tags:
-        subprocess_args.append("--tag=%s" % options.tags)
+        subprocess_args.append("--tag={}".format(options.tags))
     if options.exclude_tags:
-        subprocess_args.append("--exclude_tag=%s" % options.exclude_tags)
+        subprocess_args.append("--exclude_tag={}".format(options.exclude_tags))
     if options.shuffle is not False:
         if options.shuffle is None:
             subprocess_args.append("--shuffle")
         else:
-            subprocess_args.append("--shuffle=%s" % options.shuffle)
+            subprocess_args.append("--shuffle={}".format(options.shuffle))
     return subprocess_args
 
 
@@ -441,7 +446,7 @@ def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
     if not test_labels:
         test_labels = collect_test_modules(start_at, start_after)
 
-    print("***** Bisecting test suite: %s" % " ".join(test_labels))
+    print("***** Bisecting test suite: {}".format(" ".join(test_labels)))
 
     # Make sure the bisection point isn't in the test list
     # Also remove tests that need to be run in specific combinations
@@ -459,11 +464,11 @@ def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
         test_labels_a = test_labels[:midpoint] + [bisection_label]
         test_labels_b = test_labels[midpoint:] + [bisection_label]
         print("***** Pass %da: Running the first half of the test suite" % iteration)
-        print("***** Test labels: %s" % " ".join(test_labels_a))
+        print("***** Test labels: {}".format(" ".join(test_labels_a)))
         failures_a = subprocess.run(subprocess_args + test_labels_a)
 
         print("***** Pass %db: Running the second half of the test suite" % iteration)
-        print("***** Test labels: %s" % " ".join(test_labels_b))
+        print("***** Test labels: {}".format(" ".join(test_labels_b)))
         print("")
         failures_b = subprocess.run(subprocess_args + test_labels_b)
 
@@ -483,7 +488,7 @@ def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
             break
 
     if len(test_labels) == 1:
-        print("***** Source of error: %s" % test_labels[0])
+        print("***** Source of error: {}".format(test_labels[0]))
 
 
 def paired_tests(paired_test, options, test_labels, start_at, start_after):
@@ -509,7 +514,7 @@ def paired_tests(paired_test, options, test_labels, start_at, start_after):
         )
         failures = subprocess.call(subprocess_args + [label, paired_test])
         if failures:
-            print("***** Found problem pair with %s" % label)
+            print("***** Found problem pair with {}".format(label))
             return
 
     print("***** No problem pair found")
@@ -727,8 +732,9 @@ if __name__ == "__main__":
         if opt_val:
             if "." in opt_val:
                 print(
-                    "Aborting: --%s must be a top-level module."
-                    % opt_name.replace("_", "-")
+                    "Aborting: --{} must be a top-level module.".format(
+                        opt_name.replace("_", "-")
+                    )
                 )
                 sys.exit(1)
             setattr(options, opt_name, os.path.normpath(opt_val))

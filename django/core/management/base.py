@@ -74,7 +74,7 @@ class CommandParser(ArgumentParser):
         if self.called_from_command_line:
             super().error(message)
         else:
-            raise CommandError("Error: %s" % message)
+            raise CommandError("Error: {}".format(message))
 
     def add_subparsers(self, **kwargs):
         parser_class = kwargs.get("parser_class", type(self))
@@ -305,7 +305,7 @@ class BaseCommand:
         """
         kwargs.setdefault("formatter_class", DjangoHelpFormatter)
         parser = CommandParser(
-            prog="%s %s" % (os.path.basename(prog_name), subcommand),
+            prog="{} {}".format(os.path.basename(prog_name), subcommand),
             description=self.help or None,
             missing_args_message=getattr(self, "missing_args_message", None),
             called_from_command_line=getattr(self, "_called_from_command_line", None),
@@ -425,7 +425,7 @@ class BaseCommand:
             if isinstance(e, SystemCheckError):
                 self.stderr.write(str(e), lambda x: x)
             else:
-                self.stderr.write("%s: %s" % (e.__class__.__name__, e))
+                self.stderr.write("{}: {}".format(e.__class__.__name__, e))
             sys.exit(e.returncode)
         finally:
             try:
@@ -464,7 +464,7 @@ class BaseCommand:
         if output:
             if self.output_transaction:
                 connection = connections[options.get("database", DEFAULT_DB_ALIAS)]
-                output = "%s\n%s\n%s" % (
+                output = "{}\n{}\n{}".format(
                     self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
                     output,
                     self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
@@ -546,7 +546,7 @@ class BaseCommand:
                         for e in issues
                     )
                     formatted = "\n".join(sorted(formatted))
-                    body += "\n%s:\n%s\n" % (group_name, formatted)
+                    body += "\n{}:\n{}\n".format(group_name, formatted)
 
         if visible_issue_count:
             header = "System check identified some issues:\n"
@@ -554,21 +554,23 @@ class BaseCommand:
         if display_num_errors:
             if visible_issue_count:
                 footer += "\n"
-            footer += "System check identified %s (%s silenced)." % (
+            footer += "System check identified {} ({} silenced).".format(
                 (
                     "no issues"
                     if visible_issue_count == 0
                     else (
                         "1 issue"
                         if visible_issue_count == 1
-                        else "%s issues" % visible_issue_count
+                        else "{} issues".format(visible_issue_count)
                     )
                 ),
                 len(all_issues) - visible_issue_count,
             )
 
         if any(e.is_serious(fail_level) and not e.is_silenced() for e in all_issues):
-            msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
+            msg = (
+                self.style.ERROR("SystemCheckError: {}".format(header)) + body + footer
+            )
             raise SystemCheckError(msg)
         else:
             msg = header + body + footer
@@ -599,13 +601,12 @@ class BaseCommand:
             )
             self.stdout.write(
                 self.style.NOTICE(
-                    "\nYou have %(unapplied_migration_count)s unapplied migration(s). "
+                    "\nYou have {unapplied_migration_count} unapplied migration(s). "
                     "Your project may not work properly until you apply the "
-                    "migrations for app(s): %(apps_waiting_migration)s."
-                    % {
-                        "unapplied_migration_count": len(plan),
-                        "apps_waiting_migration": ", ".join(apps_waiting_migration),
-                    }
+                    "migrations for app(s): {apps_waiting_migration}.".format(
+                        unapplied_migration_count=len(plan),
+                        apps_waiting_migration=", ".join(apps_waiting_migration),
+                    )
                 )
             )
             self.stdout.write(
@@ -648,7 +649,7 @@ class AppCommand(BaseCommand):
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
             raise CommandError(
-                "%s. Are you sure your INSTALLED_APPS setting is correct?" % e
+                "{}. Are you sure your INSTALLED_APPS setting is correct?".format(e)
             )
         output = []
         for app_config in app_configs:

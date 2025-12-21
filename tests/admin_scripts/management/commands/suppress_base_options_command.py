@@ -20,4 +20,8 @@ class Command(BaseCommand):
         self.add_base_argument(parser, "file", nargs="?", help="input file")
 
     def handle(self, *labels, **options):
-        print("EXECUTE:SuppressBaseOptionsCommand options=%s" % sorted(options.items()))
+        print(
+            "EXECUTE:SuppressBaseOptionsCommand options={}".format(
+                sorted(options.items())
+            )
+        )

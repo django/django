@@ -82,9 +82,8 @@ class ResolverMatch:
         else:
             func = self._func_path
         return (
-            "ResolverMatch(func=%s, args=%r, kwargs=%r, url_name=%r, "
-            "app_names=%r, namespaces=%r, route=%r%s%s)"
-            % (
+            "ResolverMatch(func={}, args={!r}, kwargs={!r}, url_name={!r}, "
+            "app_names={!r}, namespaces={!r}, route={!r}{}{})".format(
                 func,
                 self.args,
                 self.kwargs,
@@ -401,7 +400,7 @@ class LocalePrefixPattern:
         if language_code == settings.LANGUAGE_CODE and not self.prefix_default_language:
             return ""
         else:
-            return "%s/" % language_code
+            return "{}/".format(language_code)
 
     def match(self, path):
         language_prefix = self.language_prefix
@@ -427,7 +426,7 @@ class URLPattern:
         self.name = name
 
     def __repr__(self):
-        return "<%s %s>" % (self.__class__.__name__, self.pattern.describe())
+        return "<{} {}>".format(self.__class__.__name__, self.pattern.describe())
 
     def check(self):
         warnings = self._check_pattern_name()
@@ -456,9 +455,8 @@ class URLPattern:
         if inspect.isclass(view) and issubclass(view, View):
             return [
                 Error(
-                    "Your URL pattern %s has an invalid view, pass %s.as_view() "
-                    "instead of %s."
-                    % (
+                    "Your URL pattern {} has an invalid view, pass {}.as_view() "
+                    "instead of {}.".format(
                         self.pattern.describe(),
                         view.__name__,
                         view.__name__,
@@ -525,10 +523,10 @@ class URLResolver:
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
             # Don't bother to output the whole list, it can be huge
-            urlconf_repr = "<%s list>" % self.urlconf_name[0].__class__.__name__
+            urlconf_repr = "<{} list>".format(self.urlconf_name[0].__class__.__name__)
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return "<%s %s (%s:%s) %s>" % (
+        return "<{} {} ({}:{}) {}>".format(
             self.__class__.__name__,
             urlconf_repr,
             self.app_name,
@@ -740,13 +738,13 @@ class URLResolver:
         return patterns
 
     def resolve_error_handler(self, view_type):
-        callback = getattr(self.urlconf_module, "handler%s" % view_type, None)
+        callback = getattr(self.urlconf_module, "handler{}".format(view_type), None)
         if not callback:
             # No handler specified in file; use lazy import, since
             # django.conf.urls imports this file.
             from django.conf import urls
 
-            callback = getattr(urls, "handler%s" % view_type)
+            callback = getattr(urls, "handler{}".format(view_type))
         return get_callable(callback)
 
     def reverse(self, lookup_view, *args, **kwargs):
@@ -801,7 +799,7 @@ class URLResolver:
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = _prefix.replace("%", "%%") + result
                 if re.search(
-                    "^%s%s" % (re.escape(_prefix), pattern),
+                    "^{}{}".format(re.escape(_prefix), pattern),
                     candidate_pat % text_candidate_subs,
                 ):
                     # safe characters from `pchar` definition of RFC 3986
@@ -816,16 +814,16 @@ class URLResolver:
         m = getattr(lookup_view, "__module__", None)
         n = getattr(lookup_view, "__name__", None)
         if m is not None and n is not None:
-            lookup_view_s = "%s.%s" % (m, n)
+            lookup_view_s = "{}.{}".format(m, n)
         else:
             lookup_view_s = lookup_view
 
         patterns = [pattern for (_, pattern, _, _) in possibilities]
         if patterns:
             if args:
-                arg_msg = "arguments '%s'" % (args,)
+                arg_msg = "arguments '{}'".format(args)
             elif kwargs:
-                arg_msg = "keyword arguments '%s'" % kwargs
+                arg_msg = "keyword arguments '{}'".format(kwargs)
             else:
                 arg_msg = "no arguments"
             msg = "Reverse for '%s' with %s not found. %d pattern(s) tried: %s" % (
@@ -836,7 +834,7 @@ class URLResolver:
             )
         else:
             msg = (
-                "Reverse for '%(view)s' not found. '%(view)s' is not "
-                "a valid view function or pattern name." % {"view": lookup_view_s}
+                "Reverse for '{view}' not found. '{view}' is not "
+                "a valid view function or pattern name.".format(view=lookup_view_s)
             )
         raise NoReverseMatch(msg)

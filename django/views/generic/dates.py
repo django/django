@@ -229,7 +229,7 @@ class WeekMixin:
         elif week_format == "%U":  # week starts on Sunday
             return (date.weekday() + 1) % 7
         else:
-            raise ValueError("unknown week format: %s" % week_format)
+            raise ValueError("unknown week format: {}".format(week_format))
 
 
 class DateMixin:
@@ -242,7 +242,7 @@ class DateMixin:
         """Get the name of the date field to be used to filter by."""
         if self.date_field is None:
             raise ImproperlyConfigured(
-                "%s.date_field is required." % self.__class__.__name__
+                "{}.date_field is required.".format(self.__class__.__name__)
             )
         return self.date_field
 
@@ -291,8 +291,8 @@ class DateMixin:
             since = self._make_date_lookup_arg(date)
             until = self._make_date_lookup_arg(date + datetime.timedelta(days=1))
             return {
-                "%s__gte" % date_field: since,
-                "%s__lt" % date_field: until,
+                "{}__gte".format(date_field): since,
+                "{}__lt".format(date_field): until,
             }
         else:
             # Skip self._make_date_lookup_arg, it's a no-op in this branch.
@@ -327,7 +327,11 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         Return the field or fields to use for ordering the queryset; use the
         date field by default.
         """
-        return "-%s" % self.get_date_field() if self.ordering is None else self.ordering
+        return (
+            "-{}".format(self.get_date_field())
+            if self.ordering is None
+            else self.ordering
+        )
 
     def get_dated_queryset(self, **lookup):
         """
@@ -342,7 +346,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
         if not allow_future:
             now = timezone.now() if self.uses_datetime_field else timezone_today()
-            qs = qs.filter(**{"%s__lte" % date_field: now})
+            qs = qs.filter(**{"{}__lte".format(date_field): now})
 
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
@@ -436,8 +440,8 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
         since = self._make_date_lookup_arg(date)
         until = self._make_date_lookup_arg(self._get_next_year(date))
         lookup_kwargs = {
-            "%s__gte" % date_field: since,
-            "%s__lt" % date_field: until,
+            "{}__gte".format(date_field): since,
+            "{}__lt".format(date_field): until,
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
@@ -494,8 +498,8 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
         since = self._make_date_lookup_arg(date)
         until = self._make_date_lookup_arg(self._get_next_month(date))
         lookup_kwargs = {
-            "%s__gte" % date_field: since,
-            "%s__lt" % date_field: until,
+            "{}__gte".format(date_field): since,
+            "{}__lt".format(date_field): until,
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
@@ -537,8 +541,7 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
             week_start = week_choices[week_format]
         except KeyError:
             raise ValueError(
-                "Unknown week format %r. Choices are: %s"
-                % (
+                "Unknown week format {!r}. Choices are: {}".format(
                     week_format,
                     ", ".join(sorted(week_choices)),
                 )
@@ -546,9 +549,8 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
         year_format = self.get_year_format()
         if week_format == "%V" and year_format != "%G":
             raise ValueError(
-                "ISO week directive '%s' is incompatible with the year "
-                "directive '%s'. Use the ISO year '%%G' instead."
-                % (
+                "ISO week directive '{}' is incompatible with the year "
+                "directive '{}'. Use the ISO year '%G' instead.".format(
                     week_format,
                     year_format,
                 )
@@ -557,8 +559,8 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
         since = self._make_date_lookup_arg(date)
         until = self._make_date_lookup_arg(self._get_next_week(date))
         lookup_kwargs = {
-            "%s__gte" % date_field: since,
-            "%s__lt" % date_field: until,
+            "{}__gte".format(date_field): since,
+            "{}__lt".format(date_field): until,
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
@@ -755,8 +757,8 @@ def _get_next_prev(generic_view, date, is_previous, period):
     allow_empty = generic_view.get_allow_empty()
     allow_future = generic_view.get_allow_future()
 
-    get_current = getattr(generic_view, "_get_current_%s" % period)
-    get_next = getattr(generic_view, "_get_next_%s" % period)
+    get_current = getattr(generic_view, "_get_current_{}".format(period))
+    get_next = getattr(generic_view, "_get_next_{}".format(period))
 
     # Bounds of the current interval
     start, end = get_current(date), get_next(date)
@@ -780,10 +782,14 @@ def _get_next_prev(generic_view, date, is_previous, period):
         # Construct a lookup and an ordering depending on whether we're doing
         # a previous date or a next date lookup.
         if is_previous:
-            lookup = {"%s__lt" % date_field: generic_view._make_date_lookup_arg(start)}
-            ordering = "-%s" % date_field
+            lookup = {
+                "{}__lt".format(date_field): generic_view._make_date_lookup_arg(start)
+            }
+            ordering = "-{}".format(date_field)
         else:
-            lookup = {"%s__gte" % date_field: generic_view._make_date_lookup_arg(end)}
+            lookup = {
+                "{}__gte".format(date_field): generic_view._make_date_lookup_arg(end)
+            }
             ordering = date_field
 
         # Filter out objects in the future if appropriate.
@@ -794,7 +800,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
                 now = timezone.now()
             else:
                 now = timezone_today()
-            lookup["%s__lte" % date_field] = now
+            lookup["{}__lte".format(date_field)] = now
 
         qs = generic_view.get_queryset().filter(**lookup).order_by(ordering)
 

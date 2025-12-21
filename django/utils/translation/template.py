@@ -75,7 +75,7 @@ def templatize(src, origin=None):
                         translators_comment_start is not None
                         and lineno >= translators_comment_start
                     ):
-                        out.write(" # %s" % line)
+                        out.write(" # {}".format(line))
                     else:
                         out.write(" #\n")
                 incomment = False
@@ -137,16 +137,16 @@ def templatize(src, origin=None):
                 else:
                     filemsg = ""
                     if origin:
-                        filemsg = "file %s, " % origin
+                        filemsg = "file {}, ".format(origin)
                     raise SyntaxError(
                         "Translation blocks must not include other block tags: "
                         "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
                     )
             elif t.token_type == TokenType.VAR:
                 if inplural:
-                    plural.append("%%(%s)s" % t.contents)
+                    plural.append("%({})s".format(t.contents))
                 else:
-                    singular.append("%%(%s)s" % t.contents)
+                    singular.append("%({})s".format(t.contents))
             elif t.token_type == TokenType.TEXT:
                 contents = t.contents.replace("%", "%%")
                 if inplural:
@@ -163,7 +163,7 @@ def templatize(src, origin=None):
                         for c in lineno_comment_map[comment_lineno_cache]:
                             filemsg = ""
                             if origin:
-                                filemsg = "file %s, " % origin
+                                filemsg = "file {}, ".format(origin)
                             warn_msg = (
                                 "The translator-targeted comment '%s' "
                                 "(%sline %d) was ignored, because it wasn't "
@@ -173,7 +173,9 @@ def templatize(src, origin=None):
                         lineno_comment_map[comment_lineno_cache] = []
                 else:
                     out.write(
-                        "# %s" % " | ".join(lineno_comment_map[comment_lineno_cache])
+                        "# {}".format(
+                            " | ".join(lineno_comment_map[comment_lineno_cache])
+                        )
                     )
                 comment_lineno_cache = None
 
@@ -206,7 +208,7 @@ def templatize(src, origin=None):
                         out.write(" gettext({p}{!r}) ".format(g, p=raw_prefix))
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
-                        out.write(" _(%s) " % fmatch)
+                        out.write(" _({}) ".format(fmatch))
                     if bmatch[1]:
                         # A context is provided
                         context_match = context_re.match(bmatch[1])
@@ -222,7 +224,7 @@ def templatize(src, origin=None):
                     plural = []
                 elif cmatches:
                     for cmatch in cmatches:
-                        out.write(" _(%s) " % cmatch)
+                        out.write(" _({}) ".format(cmatch))
                 elif t.contents == "comment":
                     incomment = True
                 else:
@@ -231,10 +233,10 @@ def templatize(src, origin=None):
                 parts = t.contents.split("|")
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(" _(%s) " % cmatch[1])
+                    out.write(" _({}) ".format(cmatch[1]))
                 for p in parts[1:]:
                     if p.find(":_(") >= 0:
-                        out.write(" %s " % p.split(":", 1)[1])
+                        out.write(" {} ".format(p.split(":", 1)[1]))
                     else:
                         out.write(blankout(p, "F"))
             elif t.token_type == TokenType.COMMENT:

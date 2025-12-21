@@ -132,7 +132,7 @@ class Lookup(Expression):
             # precedence but avoid double wrapping as it can be misinterpreted
             # on some backends (e.g. subqueries on SQLite).
             if not isinstance(value, Value) and sql and sql[0] != "(":
-                sql = "(%s)" % sql
+                sql = "({})".format(sql)
             return sql, params
         else:
             return self.get_db_prep_lookup(value, connection)
@@ -239,7 +239,7 @@ class BuiltinLookup(Lookup):
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         params = (*params, *rhs_params)
         rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        return "%s %s" % (lhs_sql, rhs_sql), params
+        return "{} {}".format(lhs_sql, rhs_sql), params
 
     def get_rhs_op(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
@@ -358,7 +358,7 @@ class PostgresOperatorLookup(Lookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = tuple(lhs_params) + tuple(rhs_params)
-        return "%s %s %s" % (lhs, self.postgres_operator, rhs), params
+        return "{} {} {}".format(lhs, self.postgres_operator, rhs), params
 
 
 @Field.register_lookup
@@ -538,7 +538,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return super().process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
-        return "IN %s" % rhs
+        return "IN {}".format(rhs)
 
     def as_sql(self, compiler, connection):
         max_in_list_size = connection.ops.max_in_list_size()
@@ -561,7 +561,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         for offset in range(0, len(rhs_params), max_in_list_size):
             if offset > 0:
                 in_clause_elements.append(" OR ")
-            in_clause_elements.append("%s IN (" % lhs)
+            in_clause_elements.append("{} IN (".format(lhs))
             params.extend(lhs_params)
             sqls = rhs[offset : offset + max_in_list_size]
             sqls_params = rhs_params[offset : offset + max_in_list_size]
@@ -642,7 +642,7 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "range"
 
     def get_rhs_op(self, connection, rhs):
-        return "BETWEEN %s AND %s" % (rhs[0], rhs[1])
+        return "BETWEEN {} AND {}".format(rhs[0], rhs[1])
 
 
 @Field.register_lookup
@@ -666,9 +666,9 @@ class IsNull(BuiltinLookup):
             raise result_exception
         sql, params = self.process_lhs(compiler, connection)
         if self.rhs:
-            return "%s IS NULL" % sql, params
+            return "{} IS NULL".format(sql), params
         else:
-            return "%s IS NOT NULL" % sql, params
+            return "{} IS NOT NULL".format(sql), params
 
 
 @Field.register_lookup
@@ -721,7 +721,7 @@ class YearLookup(Lookup):
             rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
             start, finish = self.year_lookup_bounds(connection, self.rhs)
             params = (*params, *self.get_bound_params(start, finish))
-            return "%s %s" % (lhs_sql, rhs_sql), params
+            return "{} {}".format(lhs_sql, rhs_sql), params
         return super().as_sql(compiler, connection)
 
     def get_direct_rhs_sql(self, connection, rhs):

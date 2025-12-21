@@ -93,7 +93,7 @@ class PasswordResetTokenGenerator:
         ).hexdigest()[
             ::2
         ]  # Limit to shorten the URL.
-        return "%s-%s" % (ts_b36, hash_string)
+        return "{}-{}".format(ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
         """

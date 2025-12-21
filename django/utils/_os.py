@@ -59,5 +59,5 @@ def to_path(value):
     if isinstance(value, Path):
         return value
     elif not isinstance(value, str):
-        raise TypeError("Invalid path type: %s" % type(value).__name__)
+        raise TypeError("Invalid path type: {}".format(type(value).__name__))
     return Path(value)

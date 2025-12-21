@@ -140,7 +140,7 @@ class Book(models.Model):
         ordering = ("name",)
 
     def __str__(self):
-        return "%s by %s (available at %s)" % (
+        return "{} by {} (available at {})".format(
             self.name,
             self.author.name,
             ", ".join(s.name for s in self.stores.all()),
@@ -180,7 +180,7 @@ class NKChild(Parent):
         return (self.data,)
 
     def __str__(self):
-        return "NKChild %s:%s" % (self.name, self.data)
+        return "NKChild {}:{}".format(self.name, self.data)
 
 
 class RefToNKChild(models.Model):
@@ -189,7 +189,7 @@ class RefToNKChild(models.Model):
     nk_m2m = models.ManyToManyField(NKChild, related_name="ref_m2ms")
 
     def __str__(self):
-        return "%s: Reference to %s [%s]" % (
+        return "{}: Reference to {} [{}]".format(
             self.text,
             self.nk_fk,
             ", ".join(str(o) for o in self.nk_m2m.all()),

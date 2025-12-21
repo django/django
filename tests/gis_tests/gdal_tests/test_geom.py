@@ -84,7 +84,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             # First with ewkt output when no SRID in EWKT
             self.assertEqual(ewkt_val, OGRGeometry(ewkt_val).ewkt)
             # No test consumption with an SRID specified.
-            ewkt_val = "SRID=4326;%s" % ewkt_val
+            ewkt_val = "SRID=4326;{}".format(ewkt_val)
             geom = OGRGeometry(ewkt_val)
             self.assertEqual(ewkt_val, geom.ewkt)
             self.assertEqual(4326, geom.srs.srid)

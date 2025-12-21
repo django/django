@@ -131,7 +131,7 @@ class WriterProfile(models.Model):
     age = models.PositiveIntegerField()
 
     def __str__(self):
-        return "%s is %s" % (self.writer, self.age)
+        return "{} is {}".format(self.writer, self.age)
 
 
 class Document(models.Model):
@@ -171,7 +171,7 @@ try:
     class ImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or "tests"
-            return "%s/%s" % (path, filename)
+            return "{}/{}".format(path, filename)
 
         description = models.CharField(max_length=20)
 
@@ -193,7 +193,7 @@ try:
     class OptionalImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or "tests"
-            return "%s/%s" % (path, filename)
+            return "{}/{}".format(path, filename)
 
         description = models.CharField(max_length=20)
         image = models.ImageField(
@@ -244,7 +244,7 @@ class Price(models.Model):
         unique_together = (("price", "quantity"),)
 
     def __str__(self):
-        return "%s for %s" % (self.quantity, self.price)
+        return "{} for {}".format(self.quantity, self.price)
 
 
 class Triple(models.Model):

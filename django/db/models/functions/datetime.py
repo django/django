@@ -104,8 +104,9 @@ class Extract(TimezoneMixin, Transform):
             "second",
         ):
             raise ValueError(
-                "Cannot extract time component '%s' from DateField '%s'."
-                % (copy.lookup_name, field.name)
+                "Cannot extract time component '{}' from DateField '{}'.".format(
+                    copy.lookup_name, field.name
+                )
             )
         if isinstance(field, DurationField) and copy.lookup_name in (
             "year",
@@ -117,8 +118,9 @@ class Extract(TimezoneMixin, Transform):
             "quarter",
         ):
             raise ValueError(
-                "Cannot extract component '%s' from DurationField '%s'."
-                % (copy.lookup_name, field.name)
+                "Cannot extract component '{}' from DurationField '{}'.".format(
+                    copy.lookup_name, field.name
+                )
             )
         return copy
 
@@ -292,7 +294,9 @@ class TruncBase(TimezoneMixin, Transform):
         # DateTimeField is a subclass of DateField so this works for both.
         if not isinstance(field, (DateField, TimeField)):
             raise TypeError(
-                "%r isn't a DateField, TimeField, or DateTimeField." % field.name
+                "{!r} isn't a DateField, TimeField, or DateTimeField.".format(
+                    field.name
+                )
             )
         # If self.output_field was None, then accessing the field will trigger
         # the resolver to assign it to self.lhs.output_field.
@@ -316,8 +320,7 @@ class TruncBase(TimezoneMixin, Transform):
             or copy.kind in ("hour", "minute", "second", "time")
         ):
             raise ValueError(
-                "Cannot truncate DateField '%s' to %s."
-                % (
+                "Cannot truncate DateField '{}' to {}.".format(
                     field.name,
                     (
                         output_field.__class__.__name__
@@ -331,8 +334,7 @@ class TruncBase(TimezoneMixin, Transform):
             or copy.kind in ("year", "quarter", "month", "week", "day", "date")
         ):
             raise ValueError(
-                "Cannot truncate TimeField '%s' to %s."
-                % (
+                "Cannot truncate TimeField '{}' to {}.".format(
                     field.name,
                     (
                         output_field.__class__.__name__

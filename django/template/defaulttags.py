@@ -309,7 +309,7 @@ class IfNode(Node):
         self.conditions_nodelists = conditions_nodelists
 
     def __repr__(self):
-        return "<%s>" % self.__class__.__name__
+        return "<{}>".format(self.__class__.__name__)
 
     def __iter__(self):
         for _, nodelist in self.conditions_nodelists:
@@ -351,7 +351,7 @@ class LoremNode(Node):
         else:
             paras = paragraphs(count, common=self.common)
         if self.method == "p":
-            paras = ["<p>%s</p>" % p for p in paras]
+            paras = ["<p>{}</p>".format(p) for p in paras]
         return "\n\n".join(paras)
 
 
@@ -483,7 +483,7 @@ class URLNode(Node):
         self.asvar = asvar
 
     def __repr__(self):
-        return "<%s view_name='%s' args=%s kwargs=%s as=%s>" % (
+        return "<{} view_name='{}' args={} kwargs={} as={}>".format(
             self.__class__.__qualname__,
             self.view_name,
             repr(self.args),
@@ -573,7 +573,7 @@ class WithNode(Node):
             self.extra_context[name] = var
 
     def __repr__(self):
-        return "<%s>" % self.__class__.__name__
+        return "<{}>".format(self.__class__.__name__)
 
     def render(self, context):
         values = {key: val.resolve(context) for key, val in self.extra_context.items()}
@@ -664,10 +664,10 @@ def cycle(parser, token):
         name = args[1]
         if not hasattr(parser, "_named_cycle_nodes"):
             raise TemplateSyntaxError(
-                "No named cycles in template. '%s' is not defined" % name
+                "No named cycles in template. '{}' is not defined".format(name)
             )
         if name not in parser._named_cycle_nodes:
-            raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
+            raise TemplateSyntaxError("Named cycle '{}' does not exist".format(name))
         return parser._named_cycle_nodes[name]
 
     as_form = False
@@ -677,8 +677,9 @@ def cycle(parser, token):
         if args[-3] == "as":
             if args[-1] != "silent":
                 raise TemplateSyntaxError(
-                    "Only 'silent' flag is allowed after cycle's name, not '%s'."
-                    % args[-1]
+                    "Only 'silent' flag is allowed after cycle's name, not '{}'.".format(
+                        args[-1]
+                    )
                 )
             as_form = True
             silent = True
@@ -742,13 +743,14 @@ def do_filter(parser, token):
     # token.split_contents() isn't useful here because this tag doesn't accept
     # variable as arguments.
     _, rest = token.contents.split(None, 1)
-    filter_expr = parser.compile_filter("var|%s" % (rest))
+    filter_expr = parser.compile_filter("var|{}".format(rest))
     for func, unused in filter_expr.filters:
         filter_name = getattr(func, "_filter_name", None)
         if filter_name in ("escape", "safe"):
             raise TemplateSyntaxError(
-                '"filter %s" is not permitted. Use the "autoescape" tag instead.'
-                % filter_name
+                '"filter {}" is not permitted. Use the "autoescape" tag instead.'.format(
+                    filter_name
+                )
             )
     nodelist = parser.parse(("endfilter",))
     parser.delete_first_token()
@@ -871,7 +873,9 @@ def do_for(parser, token):
     bits = token.split_contents()
     if len(bits) < 4:
         raise TemplateSyntaxError(
-            "'for' statements should have at least four words: %s" % token.contents
+            "'for' statements should have at least four words: {}".format(
+                token.contents
+            )
         )
 
     is_reversed = bits[-1] == "reversed"
@@ -879,7 +883,7 @@ def do_for(parser, token):
     if bits[in_index] != "in":
         raise TemplateSyntaxError(
             "'for' statements should use the format"
-            " 'for x in y': %s" % token.contents
+            " 'for x in y': {}".format(token.contents)
         )
 
     invalid_chars = frozenset((" ", '"', "'", FILTER_SEPARATOR))
@@ -887,7 +891,7 @@ def do_for(parser, token):
     for var in loopvars:
         if not var or not invalid_chars.isdisjoint(var):
             raise TemplateSyntaxError(
-                "'for' tag received an invalid argument: %s" % token.contents
+                "'for' tag received an invalid argument: {}".format(token.contents)
             )
 
     sequence = parser.compile_filter(bits[in_index + 1])
@@ -1067,8 +1071,7 @@ def find_library(parser, name):
         return parser.libraries[name]
     except KeyError:
         raise TemplateSyntaxError(
-            "'%s' is not a registered tag library. Must be one of:\n%s"
-            % (
+            "'{}' is not a registered tag library. Must be one of:\n{}".format(
                 name,
                 "\n".join(sorted(parser.libraries)),
             ),
@@ -1090,8 +1093,7 @@ def load_from_library(library, label, names):
             subset.filters[name] = library.filters[name]
         if found is False:
             raise TemplateSyntaxError(
-                "'%s' is not a valid tag or filter in tag library '%s'"
-                % (
+                "'{}' is not a valid tag or filter in tag library '{}'".format(
                     name,
                     label,
                 ),
@@ -1174,7 +1176,7 @@ def lorem(parser, token):
         count = "1"
     count = parser.compile_filter(count)
     if len(bits) != 1:
-        raise TemplateSyntaxError("Incorrect format for %r tag" % tagname)
+        raise TemplateSyntaxError("Incorrect format for {!r} tag".format(tagname))
     return LoremNode(count, method, common)
 
 
@@ -1329,14 +1331,14 @@ def querystring(context, *args, **kwargs):
         if not isinstance(d, Mapping):
             raise TemplateSyntaxError(
                 "querystring requires mappings for positional arguments (got "
-                "%r instead)." % d
+                "{!r} instead).".format(d)
             )
         items = d.lists() if isinstance(d, QueryDict) else d.items()
         for key, value in items:
             if not isinstance(key, str):
                 raise TemplateSyntaxError(
-                    "querystring requires strings for mapping keys (got %r "
-                    "instead)." % key
+                    "querystring requires strings for mapping keys (got {!r} "
+                    "instead).".format(key)
                 )
             if value is None:
                 params.pop(key, None)
@@ -1429,14 +1431,16 @@ def resetcycle(parser, token):
     args = token.split_contents()
 
     if len(args) > 2:
-        raise TemplateSyntaxError("%r tag accepts at most one argument." % args[0])
+        raise TemplateSyntaxError(
+            "{!r} tag accepts at most one argument.".format(args[0])
+        )
 
     if len(args) == 2:
         name = args[1]
         try:
             return ResetCycleNode(parser._named_cycle_nodes[name])
         except (AttributeError, KeyError):
-            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
+            raise TemplateSyntaxError("Named cycle '{}' does not exist.".format(name))
     try:
         return ResetCycleNode(parser._last_cycle_node)
     except AttributeError:
@@ -1505,8 +1509,8 @@ def templatetag(parser, token):
     tag = bits[1]
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError(
-            "Invalid templatetag argument: '%s'."
-            " Must be one of: %s" % (tag, list(TemplateTagNode.mapping))
+            "Invalid templatetag argument: '{}'."
+            " Must be one of: {}".format(tag, list(TemplateTagNode.mapping))
         )
     return TemplateTagNode(tag)
 
@@ -1560,7 +1564,7 @@ def url(parser, token):
     bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError(
-            "'%s' takes at least one argument, a URL pattern name." % bits[0]
+            "'{}' takes at least one argument, a URL pattern name.".format(bits[0])
         )
     viewname = parser.compile_filter(bits[1])
     args = []
@@ -1676,11 +1680,11 @@ def do_with(parser, token):
     extra_context = token_kwargs(remaining_bits, parser, support_legacy=True)
     if not extra_context:
         raise TemplateSyntaxError(
-            "%r expected at least one variable assignment" % bits[0]
+            "{!r} expected at least one variable assignment".format(bits[0])
         )
     if remaining_bits:
         raise TemplateSyntaxError(
-            "%r received an invalid token: %r" % (bits[0], remaining_bits[0])
+            "{!r} received an invalid token: {!r}".format(bits[0], remaining_bits[0])
         )
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()

@@ -63,7 +63,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         else:
             raise ImproperlyConfigured(
                 "Unable to load the SpatiaLite library extension. "
-                "Library names tried: %s" % ", ".join(self.lib_spatialite_paths)
+                "Library names tried: {}".format(", ".join(self.lib_spatialite_paths))
             )
         return conn
 

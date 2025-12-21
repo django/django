@@ -118,7 +118,7 @@ class Person(models.Model):
     custom_init_queryset_manager = CustomInitQuerySet.as_manager()
 
     def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class FunPerson(models.Model):

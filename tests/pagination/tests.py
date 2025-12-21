@@ -55,8 +55,9 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             got,
-            "For '%s', expected %s but got %s. Paginator parameters were: %s"
-            % (name, expected, got, params),
+            "For '{}', expected {} but got {}. Paginator parameters were: {}".format(
+                name, expected, got, params
+            ),
         )
 
     async def check_attribute_async(self, name, paginator, expected, params):
@@ -65,8 +66,9 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             await got(),
-            "For '%s', expected %s but got %s. Paginator parameters were: %s"
-            % (name, expected, got, params),
+            "For '{}', expected {} but got {}. Paginator parameters were: {}".format(
+                name, expected, got, params
+            ),
         )
 
     def get_test_cases_for_test_paginator(self):

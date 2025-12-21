@@ -227,9 +227,9 @@ class BaseDatabaseOperations:
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
-        return "FOR%s UPDATE%s%s%s" % (
+        return "FOR{} UPDATE{}{}{}".format(
             " NO KEY" if no_key else "",
-            " OF %s" % ", ".join(of) if of else "",
+            " OF {}".format(", ".join(of)) if of else "",
             " NOWAIT" if nowait else "",
             " SKIP LOCKED" if skip_locked else "",
         )
@@ -291,7 +291,7 @@ class BaseDatabaseOperations:
         else:
             u_params = {to_string(k): to_string(v) for k, v in params.items()}
 
-        return "QUERY = %r - PARAMS = %r" % (sql, u_params)
+        return "QUERY = {!r} - PARAMS = {!r}".format(sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -372,14 +372,13 @@ class BaseDatabaseOperations:
         if not fields:
             return "", ()
         columns = [
-            "%s.%s"
-            % (
+            "{}.{}".format(
                 self.quote_name(field.model._meta.db_table),
                 self.quote_name(field.column),
             )
             for field in fields
         ]
-        return "RETURNING %s" % ", ".join(columns), ()
+        return "RETURNING {}".format(", ".join(columns)), ()
 
     def fetch_returned_rows(self, cursor, returning_params):
         """
@@ -426,19 +425,19 @@ class BaseDatabaseOperations:
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
-        return "SAVEPOINT %s" % self.quote_name(sid)
+        return "SAVEPOINT {}".format(self.quote_name(sid))
 
     def savepoint_commit_sql(self, sid):
         """
         Return the SQL for committing the given savepoint.
         """
-        return "RELEASE SAVEPOINT %s" % self.quote_name(sid)
+        return "RELEASE SAVEPOINT {}".format(self.quote_name(sid))
 
     def savepoint_rollback_sql(self, sid):
         """
         Return the SQL for rolling back the given savepoint.
         """
-        return "ROLLBACK TO SAVEPOINT %s" % self.quote_name(sid)
+        return "ROLLBACK TO SAVEPOINT {}".format(self.quote_name(sid))
 
     def set_time_zone_sql(self):
         """
@@ -697,7 +696,7 @@ class BaseDatabaseOperations:
         can vary between backends (e.g., Oracle with %% and &) and between
         subexpression types (e.g., date expressions).
         """
-        conn = " %s " % connector
+        conn = " {} ".format(connector)
         return conn.join(sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
@@ -729,9 +728,9 @@ class BaseDatabaseOperations:
         if self.connection.features.supports_temporal_subtraction:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "(%s - %s)" % (lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
+            return "({} - {})".format(lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
         raise NotSupportedError(
-            "This backend does not support %s subtraction." % internal_type
+            "This backend does not support {} subtraction.".format(internal_type)
         )
 
     def window_frame_value(self, value):
@@ -767,14 +766,15 @@ class BaseDatabaseOperations:
         ):
             raise ValueError(
                 "start argument must be a negative integer, zero, or None, "
-                "but got '%s'." % start
+                "but got '{}'.".format(start)
             )
         if (end is not None and not isinstance(end, int)) or (
             isinstance(end, int) and end < 0
         ):
             raise ValueError(
-                "end argument must be a positive integer, zero, or None, but got '%s'."
-                % end
+                "end argument must be a positive integer, zero, or None, but got '{}'.".format(
+                    end
+                )
             )
         start_ = self.window_frame_value(start) or self.UNBOUNDED_PRECEDING
         end_ = self.window_frame_value(end) or self.UNBOUNDED_FOLLOWING
@@ -783,8 +783,8 @@ class BaseDatabaseOperations:
             (start and start < 0) or (end and end > 0)
         ):
             raise NotSupportedError(
-                "%s only supports UNBOUNDED together with PRECEDING and "
-                "FOLLOWING." % self.connection.display_name
+                "{} only supports UNBOUNDED together with PRECEDING and "
+                "FOLLOWING.".format(self.connection.display_name)
             )
         return start_, end_
 
@@ -797,16 +797,20 @@ class BaseDatabaseOperations:
             supported_formats = self.connection.features.supported_explain_formats
             normalized_format = format.upper()
             if normalized_format not in supported_formats:
-                msg = "%s is not a recognized format." % normalized_format
+                msg = "{} is not a recognized format.".format(normalized_format)
                 if supported_formats:
-                    msg += " Allowed formats: %s" % ", ".join(sorted(supported_formats))
+                    msg += " Allowed formats: {}".format(
+                        ", ".join(sorted(supported_formats))
+                    )
                 else:
                     msg += (
                         f" {self.connection.display_name} does not support any formats."
                     )
                 raise ValueError(msg)
         if options:
-            raise ValueError("Unknown options: %s" % ", ".join(sorted(options.keys())))
+            raise ValueError(
+                "Unknown options: {}".format(", ".join(sorted(options.keys())))
+            )
         return self.explain_prefix
 
     def insert_statement(self, on_conflict=None):
@@ -829,7 +833,7 @@ class BaseDatabaseOperations:
         """
         Hook for backends to customize array indexing in JSON paths.
         """
-        return "[%s]" % num
+        return "[{}]".format(num)
 
     def compile_json_path(self, key_transforms, include_root=True):
         """

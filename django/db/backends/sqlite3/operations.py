@@ -187,7 +187,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"%s"' % name
+        return '"{}"'.format(name)
 
     def no_limit_value(self):
         return -1
@@ -225,8 +225,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 chain.from_iterable(self._references_graph(table) for table in tables)
             )
         sql = [
-            "%s %s %s;"
-            % (
+            "{} {} {};".format(
                 style.SQL_KEYWORD("DELETE"),
                 style.SQL_KEYWORD("FROM"),
                 style.SQL_FIELD(self.quote_name(table)),
@@ -242,8 +241,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if not sequences:
             return []
         return [
-            "%s %s %s %s = 0 %s %s %s (%s);"
-            % (
+            "{} {} {} {} = 0 {} {} {} ({});".format(
                 style.SQL_KEYWORD("UPDATE"),
                 style.SQL_TABLE(self.quote_name("sqlite_sequence")),
                 style.SQL_KEYWORD("SET"),
@@ -252,7 +250,10 @@ class DatabaseOperations(BaseDatabaseOperations):
                 style.SQL_FIELD(self.quote_name("name")),
                 style.SQL_KEYWORD("IN"),
                 ", ".join(
-                    ["'%s'" % sequence_info["table"] for sequence_info in sequences]
+                    [
+                        "'{}'".format(sequence_info["table"])
+                        for sequence_info in sequences
+                    ]
                 ),
             ),
         ]
@@ -355,18 +356,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         # SQLite doesn't have a ^ operator, so use the user-defined POWER
         # function that's registered in connect().
         if connector == "^":
-            return "POWER(%s)" % ",".join(sub_expressions)
+            return "POWER({})".format(",".join(sub_expressions))
         elif connector == "#":
-            return "BITXOR(%s)" % ",".join(sub_expressions)
+            return "BITXOR({})".format(",".join(sub_expressions))
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
-            raise DatabaseError("Invalid connector for timedelta: %s." % connector)
-        fn_params = ["'%s'" % connector, *sub_expressions]
+            raise DatabaseError(
+                "Invalid connector for timedelta: {}.".format(connector)
+            )
+        fn_params = ["'{}'".format(connector), *sub_expressions]
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
-        return "django_format_dtdelta(%s)" % ", ".join(fn_params)
+        return "django_format_dtdelta({})".format(", ".join(fn_params))
 
     def integer_field_range(self, internal_type):
         # SQLite doesn't enforce any integer constraints, but sqlite3 supports
@@ -384,8 +387,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         params = (*lhs_params, *rhs_params)
         if internal_type == "TimeField":
-            return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), params
-        return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), params
+            return "django_time_diff({}, {})".format(lhs_sql, rhs_sql), params
+        return "django_timestamp_diff({}, {})".format(lhs_sql, rhs_sql), params
 
     def insert_statement(self, on_conflict=None):
         if on_conflict == OnConflict.IGNORE:
@@ -397,7 +400,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             on_conflict == OnConflict.UPDATE
             and self.connection.features.supports_update_conflicts_with_target
         ):
-            return "ON CONFLICT(%s) DO UPDATE SET %s" % (
+            return "ON CONFLICT({}) DO UPDATE SET {}".format(
                 ", ".join(map(self.quote_name, unique_fields)),
                 ", ".join(
                     [
@@ -417,4 +420,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
 
     def format_json_path_numeric_index(self, num):
-        return "[#%s]" % num if num < 0 else super().format_json_path_numeric_index(num)
+        return (
+            "[#{}]".format(num)
+            if num < 0
+            else super().format_json_path_numeric_index(num)
+        )

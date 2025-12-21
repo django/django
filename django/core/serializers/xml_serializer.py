@@ -68,7 +68,9 @@ class Serializer(base.Serializer):
         """
         if not hasattr(obj, "_meta"):
             raise base.SerializationError(
-                "Non-model object (%s) encountered during serialization" % type(obj)
+                "Non-model object ({}) encountered during serialization".format(
+                    type(obj)
+                )
             )
 
         self.indent(1)
@@ -112,8 +114,9 @@ class Serializer(base.Serializer):
                 self.xml.characters(value)
             except UnserializableContentError:
                 raise ValueError(
-                    "%s.%s (pk:%s) contains unserializable characters"
-                    % (obj.__class__.__name__, field.name, obj.pk)
+                    "{}.{} (pk:{}) contains unserializable characters".format(
+                        obj.__class__.__name__, field.name, obj.pk
+                    )
                 )
         else:
             self.xml.addQuickElement("None")
@@ -403,15 +406,17 @@ class Deserializer(base.Deserializer):
         model_identifier = node.getAttribute(attr)
         if not model_identifier:
             raise base.DeserializationError(
-                "<%s> node is missing the required '%s' attribute"
-                % (node.nodeName, attr)
+                "<{}> node is missing the required '{}' attribute".format(
+                    node.nodeName, attr
+                )
             )
         try:
             return apps.get_model(model_identifier)
         except (LookupError, TypeError):
             raise base.DeserializationError(
-                "<%s> node has invalid model identifier: '%s'"
-                % (node.nodeName, model_identifier)
+                "<{}> node has invalid model identifier: '{}'".format(
+                    node.nodeName, model_identifier
+                )
             )
 
 

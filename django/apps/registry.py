@@ -92,7 +92,7 @@ class Apps:
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
-                        "duplicates: %s" % app_config.label
+                        "duplicates: {}".format(app_config.label)
                     )
 
                 self.app_configs[app_config.label] = app_config
@@ -106,7 +106,7 @@ class Apps:
             if duplicates:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
-                    "duplicates: %s" % ", ".join(duplicates)
+                    "duplicates: {}".format(", ".join(duplicates))
                 )
 
             self.apps_ready = True
@@ -157,10 +157,10 @@ class Apps:
         try:
             return self.app_configs[app_label]
         except KeyError:
-            message = "No installed app with label '%s'." % app_label
+            message = "No installed app with label '{}'.".format(app_label)
             for app_config in self.get_app_configs():
                 if app_config.name == app_label:
-                    message += " Did you mean '%s'?" % app_config.label
+                    message += " Did you mean '{}'?".format(app_config.label)
                     break
             raise LookupError(message)
 
@@ -224,16 +224,17 @@ class Apps:
                 and model.__module__ == app_models[model_name].__module__
             ):
                 warnings.warn(
-                    "Model '%s.%s' was already registered. Reloading models is not "
+                    "Model '{}.{}' was already registered. Reloading models is not "
                     "advised as it can lead to inconsistencies, most notably with "
-                    "related models." % (app_label, model_name),
+                    "related models.".format(app_label, model_name),
                     RuntimeWarning,
                     stacklevel=2,
                 )
             else:
                 raise RuntimeError(
-                    "Conflicting '%s' models in application '%s': %s and %s."
-                    % (model_name, app_label, app_models[model_name], model)
+                    "Conflicting '{}' models in application '{}': {} and {}.".format(
+                        model_name, app_label, app_models[model_name], model
+                    )
                 )
         app_models[model_name] = model
         self.do_pending_operations(model)
@@ -277,7 +278,9 @@ class Apps:
         """
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
-            raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
+            raise LookupError(
+                "Model '{}.{}' not registered.".format(app_label, model_name)
+            )
         return model
 
     @functools.cache
@@ -319,8 +322,9 @@ class Apps:
         installed = {app_config.name for app_config in self.get_app_configs()}
         if not available.issubset(installed):
             raise ValueError(
-                "Available apps isn't a subset of installed apps, extra apps: %s"
-                % ", ".join(available - installed)
+                "Available apps isn't a subset of installed apps, extra apps: {}".format(
+                    ", ".join(available - installed)
+                )
             )
 
         self.stored_app_configs.append(self.app_configs)

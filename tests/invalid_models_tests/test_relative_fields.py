@@ -911,13 +911,15 @@ class RelativeFieldTests(SimpleTestCase):
         whitespace = "\t"
 
         invalid_related_names = [
-            "%s_begins_with_digit" % digit,
-            "%s_begins_with_illegal_non_alphanumeric" % illegal_non_alphanumeric,
-            "%s_begins_with_whitespace" % whitespace,
-            "contains_%s_illegal_non_alphanumeric" % illegal_non_alphanumeric,
-            "contains_%s_whitespace" % whitespace,
-            "ends_with_with_illegal_non_alphanumeric_%s" % illegal_non_alphanumeric,
-            "ends_with_whitespace_%s" % whitespace,
+            "{}_begins_with_digit".format(digit),
+            "{}_begins_with_illegal_non_alphanumeric".format(illegal_non_alphanumeric),
+            "{}_begins_with_whitespace".format(whitespace),
+            "contains_{}_illegal_non_alphanumeric".format(illegal_non_alphanumeric),
+            "contains_{}_whitespace".format(whitespace),
+            "ends_with_with_illegal_non_alphanumeric_{}".format(
+                illegal_non_alphanumeric
+            ),
+            "ends_with_whitespace_{}".format(whitespace),
             "with",  # a Python keyword
             "related_name\n",
             "",
@@ -929,7 +931,7 @@ class RelativeFieldTests(SimpleTestCase):
 
         for invalid_related_name in invalid_related_names:
             Child = type(
-                "Child%s" % invalid_related_name,
+                "Child{}".format(invalid_related_name),
                 (models.Model,),
                 {
                     "parent": models.ForeignKey(
@@ -944,8 +946,9 @@ class RelativeFieldTests(SimpleTestCase):
                 Child.check(),
                 [
                     Error(
-                        "The name '%s' is invalid related_name for field Child%s.parent"
-                        % (invalid_related_name, invalid_related_name),
+                        "The name '{}' is invalid related_name for field Child{}.parent".format(
+                            invalid_related_name, invalid_related_name
+                        ),
                         hint=(
                             "Related name must be a valid Python identifier or end "
                             "with a '+'"
@@ -962,10 +965,10 @@ class RelativeFieldTests(SimpleTestCase):
         digit = 0
 
         related_names = [
-            "%s_starts_with_lowercase" % lowercase,
-            "%s_tarts_with_uppercase" % uppercase,
+            "{}_starts_with_lowercase".format(lowercase),
+            "{}_tarts_with_uppercase".format(uppercase),
             "_starts_with_underscore",
-            "contains_%s_digit" % digit,
+            "contains_{}_digit".format(digit),
             "ends_with_plus+",
             "_+",
             "+",
@@ -978,7 +981,7 @@ class RelativeFieldTests(SimpleTestCase):
 
         for related_name in related_names:
             Child = type(
-                "Child%s" % related_name,
+                "Child{}".format(related_name),
                 (models.Model,),
                 {
                     "parent": models.ForeignKey(
@@ -2000,13 +2003,16 @@ class ComplexClashTests(SimpleTestCase):
             Child.check(),
             [
                 Error(
-                    "Reverse %s%s for 'invalid_models_tests.Child.%s' clashes with "
-                    "reverse %s for 'invalid_models_tests.Child.%s'."
-                    % (attr, rel_name, field_name, attr, clash_name),
+                    "Reverse {}{} for 'invalid_models_tests.Child.{}' clashes with "
+                    "reverse {} for 'invalid_models_tests.Child.{}'.".format(
+                        attr, rel_name, field_name, attr, clash_name
+                    ),
                     hint=(
                         "Add or change a related_name argument to the definition "
-                        "for 'invalid_models_tests.Child.%s' or "
-                        "'invalid_models_tests.Child.%s'." % (field_name, clash_name)
+                        "for 'invalid_models_tests.Child.{}' or "
+                        "'invalid_models_tests.Child.{}'.".format(
+                            field_name, clash_name
+                        )
                     ),
                     obj=Child._meta.get_field(field_name),
                     id=error_id,

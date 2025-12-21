@@ -114,19 +114,19 @@ class AutocompleteMixinTests(TestCase):
         # With 'band', a ForeignKey.
         form = AlbumForm(initial={"band": beatles.uuid})
         output = form.as_table()
-        selected_option = (
-            '<option value="%s" selected>The Beatles</option>' % beatles.uuid
+        selected_option = '<option value="{}" selected>The Beatles</option>'.format(
+            beatles.uuid
         )
-        option = '<option value="%s">The Who</option>' % who.uuid
+        option = '<option value="{}">The Who</option>'.format(who.uuid)
         self.assertIn(selected_option, output)
         self.assertNotIn(option, output)
         # With 'featuring', a ManyToManyField.
         form = AlbumForm(initial={"featuring": [beatles.pk, who.pk]})
         output = form.as_table()
-        selected_option = (
-            '<option value="%s" selected>The Beatles</option>' % beatles.pk
+        selected_option = '<option value="{}" selected>The Beatles</option>'.format(
+            beatles.pk
         )
-        option = '<option value="%s" selected>The Who</option>' % who.pk
+        option = '<option value="{}" selected>The Who</option>'.format(who.pk)
         self.assertIn(selected_option, output)
         self.assertIn(option, output)
 
@@ -150,8 +150,8 @@ class AutocompleteMixinTests(TestCase):
         )
         form = VideoStreamForm(initial={"release_event": release_event.pk})
         output = form.as_table()
-        selected_option = (
-            '<option value="%s" selected>Test Target</option>' % release_event.pk
+        selected_option = '<option value="{}" selected>Test Target</option>'.format(
+            release_event.pk
         )
         self.assertIn(selected_option, output)
 
@@ -186,7 +186,7 @@ class AutocompleteMixinTests(TestCase):
                 if select_lang:
                     expected_files = (
                         base_files[:2]
-                        + (("admin/js/vendor/select2/i18n/%s.js" % select_lang),)
+                        + (("admin/js/vendor/select2/i18n/{}.js".format(select_lang)),)
                         + base_files[2:]
                     )
                 else:

@@ -101,7 +101,7 @@ class Join:
         )
         if extra_cond:
             extra_sql, extra_params = compiler.compile(extra_cond)
-            join_conditions.append("(%s)" % extra_sql)
+            join_conditions.append("({})".format(extra_sql))
             params.extend(extra_params)
         if self.filtered_relation:
             try:
@@ -109,20 +109,24 @@ class Join:
             except FullResultSet:
                 pass
             else:
-                join_conditions.append("(%s)" % extra_sql)
+                join_conditions.append("({})".format(extra_sql))
                 params.extend(extra_params)
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
             declared_field = getattr(self.join_field, "field", self.join_field)
             raise ValueError(
-                "Join generated an empty ON clause. %s did not yield either "
-                "joining columns or extra restrictions." % declared_field.__class__
+                "Join generated an empty ON clause. {} did not yield either "
+                "joining columns or extra restrictions.".format(
+                    declared_field.__class__
+                )
             )
         on_clause_sql = " AND ".join(join_conditions)
         alias_str = (
-            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+            ""
+            if self.table_alias == self.table_name
+            else (" {}".format(self.table_alias))
         )
-        sql = "%s %s%s ON (%s)" % (
+        sql = "{} {}{} ON ({})".format(
             self.join_type,
             qn(self.table_name),
             alias_str,
@@ -194,7 +198,9 @@ class BaseTable:
 
     def as_sql(self, compiler, connection):
         alias_str = (
-            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+            ""
+            if self.table_alias == self.table_name
+            else (" {}".format(self.table_alias))
         )
         base_sql = compiler.quote_name_unless_alias(self.table_name)
         return base_sql + alias_str, []

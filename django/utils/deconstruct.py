@@ -33,13 +33,13 @@ def deconstructible(*args, path=None):
             module = import_module(module_name)
             if not hasattr(module, name):
                 raise ValueError(
-                    "Could not find object %s in %s.\n"
+                    "Could not find object {} in {}.\n"
                     "Please note that you cannot serialize things like inner "
                     "classes. Please move the object into the main module "
                     "body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/"
-                    "#serializing-values" % (name, module_name, get_docs_version())
+                    "https://docs.djangoproject.com/en/{}/topics/migrations/"
+                    "#serializing-values".format(name, module_name, get_docs_version())
                 )
             return (
                 (

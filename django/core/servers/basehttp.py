@@ -49,8 +49,8 @@ def get_internal_wsgi_application():
         return import_string(app_path)
     except ImportError as err:
         raise ImproperlyConfigured(
-            "WSGI application '%s' could not be loaded; "
-            "Error importing module." % app_path
+            "WSGI application '{}' could not be loaded; "
+            "Error importing module.".format(app_path)
         ) from err
 
 

@@ -123,7 +123,7 @@ class SpatialRefSysMixin:
                 radius, flattening = sphere_params[0], sphere_params[2]
             else:
                 radius, flattening = sphere_params
-            return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
+            return 'SPHEROID["{}",{},{}]'.format(sphere_name, radius, flattening)
 
     def __str__(self):
         """

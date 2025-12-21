@@ -203,7 +203,7 @@ def setup_databases(
             # Actually create the database for the first connection
             if first_alias is None:
                 first_alias = alias
-                with time_keeper.timed("  Creating '%s'" % alias):
+                with time_keeper.timed("  Creating '{}'".format(alias)):
                     connection.creation.create_test_db(
                         verbosity=verbosity,
                         autoclobber=not interactive,
@@ -213,7 +213,7 @@ def setup_databases(
                         serialize_connections.append(connection)
                 if parallel > 1:
                     for index in range(parallel):
-                        with time_keeper.timed("  Cloning '%s'" % alias):
+                        with time_keeper.timed("  Cloning '{}'".format(alias)):
                             connection.creation.clone_test_db(
                                 suffix=str(index + 1),
                                 verbosity=verbosity,
@@ -287,8 +287,8 @@ def dependency_ordered(test_databases, dependencies):
             all_deps.update(dependencies.get(alias, []))
         if not all_deps.isdisjoint(aliases):
             raise ImproperlyConfigured(
-                "Circular dependency: databases %r depend on each other, "
-                "but are aliases." % aliases
+                "Circular dependency: databases {!r} depend on each other, "
+                "but are aliases.".format(aliases)
             )
         dependencies_map[sig] = all_deps
 
@@ -464,7 +464,7 @@ class TestContextDecorator:
             return self.decorate_class(decorated)
         elif callable(decorated):
             return self.decorate_callable(decorated)
-        raise TypeError("Cannot decorate object of type %s" % type(decorated))
+        raise TypeError("Cannot decorate object of type {}".format(type(decorated)))
 
 
 class override_settings(TestContextDecorator):
@@ -597,7 +597,7 @@ class modify_settings(override_settings):
                 elif action == "remove":
                     value = [item for item in value if item not in items]
                 else:
-                    raise ValueError("Unsupported action: %s" % action)
+                    raise ValueError("Unsupported action: {}".format(action))
             self.options[name] = value
         super().enable()
 
@@ -960,7 +960,7 @@ class TimeKeeper:
     def print_results(self):
         for name, end_times in self.records.items():
             for record_time in end_times:
-                record = "%s took %.3fs" % (name, record_time)
+                record = "{} took {:.3f}s".format(name, record_time)
                 sys.stderr.write(record + os.linesep)
 
 

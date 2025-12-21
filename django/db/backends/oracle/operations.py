@@ -139,7 +139,7 @@ END;
         if not (settings.USE_TZ and tzname):
             return sql, params
         if not self._tzname_re.match(tzname):
-            raise ValueError("Invalid time zone name: %s" % tzname)
+            raise ValueError("Invalid time zone name: {}".format(tzname))
         # Convert from connection timezone to the local time, returning
         # TIMESTAMP WITH TIME ZONE and cast it back to TIMESTAMP to strip the
         # TIME ZONE details.
@@ -305,14 +305,13 @@ END;
         params = []
         for field in fields:
             field_names.append(
-                "%s.%s"
-                % (
+                "{}.{}".format(
                     self.quote_name(field.model._meta.db_table),
                     self.quote_name(field.column),
                 )
             )
             params.append(BoundVar(field))
-        return "RETURNING %s INTO %s" % (
+        return "RETURNING {} INTO {}".format(
             ", ".join(field_names),
             ", ".join(["%s"] * len(params)),
         ), tuple(params)
@@ -356,7 +355,7 @@ END;
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
-        cursor.execute('"%s".currval' % sq_name)
+        cursor.execute('"{}".currval'.format(sq_name))
         return cursor.fetchone()[0]
 
     def lookup_cast(self, lookup_type, internal_type=None):
@@ -392,7 +391,7 @@ END;
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % truncate_name(name, self.max_name_length())
+            name = '"{}"'.format(truncate_name(name, self.max_name_length()))
         # Oracle puts the query text into a (query % args) construct, so %
         # signs in names need to be escaped. The '%%' will be collapsed back to
         # '%' at that stage so we aren't really making the name longer here.
@@ -404,7 +403,7 @@ END;
             match_option = "'c'"
         else:
             match_option = "'i'"
-        return "REGEXP_LIKE(%%s, %%s, %s)" % match_option
+        return "REGEXP_LIKE(%s, %s, {})".format(match_option)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:
@@ -473,8 +472,7 @@ END;
                 constraints.add((foreign_table, constraint))
         sql = (
             [
-                "%s %s %s %s %s %s %s %s;"
-                % (
+                "{} {} {} {} {} {} {} {};".format(
                     style.SQL_KEYWORD("ALTER"),
                     style.SQL_KEYWORD("TABLE"),
                     style.SQL_FIELD(self.quote_name(table)),
@@ -487,8 +485,7 @@ END;
                 for table, constraint in constraints
             ]
             + [
-                "%s %s %s;"
-                % (
+                "{} {} {};".format(
                     style.SQL_KEYWORD("TRUNCATE"),
                     style.SQL_KEYWORD("TABLE"),
                     style.SQL_FIELD(self.quote_name(table)),
@@ -496,8 +493,7 @@ END;
                 for table in truncated_tables
             ]
             + [
-                "%s %s %s %s %s %s;"
-                % (
+                "{} {} {} {} {} {};".format(
                     style.SQL_KEYWORD("ALTER"),
                     style.SQL_KEYWORD("TABLE"),
                     style.SQL_FIELD(self.quote_name(table)),
@@ -570,9 +566,9 @@ END;
 
     def tablespace_sql(self, tablespace, inline=False):
         if inline:
-            return "USING INDEX TABLESPACE %s" % self.quote_name(tablespace)
+            return "USING INDEX TABLESPACE {}".format(self.quote_name(tablespace))
         else:
-            return "TABLESPACE %s" % self.quote_name(tablespace)
+            return "TABLESPACE {}".format(self.quote_name(tablespace))
 
     def adapt_datefield_value(self, value):
         """
@@ -629,17 +625,17 @@ END;
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
         if connector == "%%":
-            return "MOD(%s)" % ",".join(sub_expressions)
+            return "MOD({})".format(",".join(sub_expressions))
         elif connector == "&":
-            return "BITAND(%s)" % ",".join(sub_expressions)
+            return "BITAND({})".format(",".join(sub_expressions))
         elif connector == "|":
-            return "BITAND(-%(lhs)s-1,%(rhs)s)+%(lhs)s" % {"lhs": lhs, "rhs": rhs}
+            return "BITAND(-{lhs}-1,{rhs})+{lhs}".format(lhs=lhs, rhs=rhs)
         elif connector == "<<":
-            return "(%(lhs)s * POWER(2, %(rhs)s))" % {"lhs": lhs, "rhs": rhs}
+            return "({lhs} * POWER(2, {rhs}))".format(lhs=lhs, rhs=rhs)
         elif connector == ">>":
-            return "FLOOR(%(lhs)s / POWER(2, %(rhs)s))" % {"lhs": lhs, "rhs": rhs}
+            return "FLOOR({lhs} / POWER(2, {rhs}))".format(lhs=lhs, rhs=rhs)
         elif connector == "^":
-            return "POWER(%s)" % ",".join(sub_expressions)
+            return "POWER({})".format(",".join(sub_expressions))
         elif connector == "#":
             raise NotSupportedError("Bitwise XOR is not supported in Oracle.")
         return super().combine_expression(connector, sub_expressions)
@@ -650,7 +646,7 @@ END;
         AutoFields that aren't Oracle identity columns.
         """
         name_length = self.max_name_length() - 3
-        return "%s_SQ" % truncate_name(strip_quotes(table), name_length).upper()
+        return "{}_SQ".format(truncate_name(strip_quotes(table), name_length).upper())
 
     def _get_sequence_name(self, cursor, table, pk_name):
         cursor.execute(
@@ -683,14 +679,14 @@ END;
                 # column ambiguously defined" when two or more columns in the
                 # first select have the same value.
                 if not query:
-                    placeholder = "%s col_%s" % (placeholder, i)
+                    placeholder = "{} col_{}".format(placeholder, i)
                 select.append(placeholder)
             suffix = self.connection.features.bare_select_suffix
             query.append(f"SELECT %s{suffix}" % ", ".join(select))
         # Bulk insert to tables with Oracle identity columns causes Oracle to
         # add sequence.nextval to it. Sequence.nextval cannot be used with the
         # UNION operator. To prevent incorrect SQL, move UNION to a subquery.
-        return "SELECT * FROM (%s)" % " UNION ALL ".join(query)
+        return "SELECT * FROM ({})".format(" UNION ALL ".join(query))
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if internal_type == "DateField":
@@ -698,7 +694,7 @@ END;
             rhs_sql, rhs_params = rhs
             params = (*lhs_params, *rhs_params)
             return (
-                "NUMTODSINTERVAL(TO_NUMBER(%s - %s), 'DAY')" % (lhs_sql, rhs_sql),
+                "NUMTODSINTERVAL(TO_NUMBER({} - {}), 'DAY')".format(lhs_sql, rhs_sql),
                 params,
             )
         return super().subtract_temporals(internal_type, lhs, rhs)
@@ -732,5 +728,5 @@ END;
 
     def format_json_path_numeric_index(self, num):
         if num < 0:
-            return "[last-%s]" % abs(num + 1)  # Indexing is zero-based.
+            return "[last-{}]".format(abs(num + 1))  # Indexing is zero-based.
         return super().format_json_path_numeric_index(num)

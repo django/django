@@ -217,7 +217,7 @@ class LastExecutedQueryTest(TestCase):
         self.assertEqual(connection.queries[-1]["sql"], substituted)
 
     def test_parameter_count_exceeds_variable_or_column_limit(self):
-        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 1001)
+        sql = "SELECT MAX({})".format(", ".join(["%s"] * 1001))
         params = list(range(1001))
         for label, limit, current_limit in [
             (

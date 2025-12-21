@@ -73,13 +73,17 @@ class DataSource(GDALBase):
             except GDALException:
                 # Making the error message more clear rather than something
                 # like "Invalid pointer returned from OGROpen".
-                raise GDALException('Could not open the datasource at "%s"' % ds_input)
+                raise GDALException(
+                    'Could not open the datasource at "{}"'.format(ds_input)
+                )
         elif isinstance(ds_input, self.ptr_type) and isinstance(
             ds_driver, Driver.ptr_type
         ):
             ds = ds_input
         else:
-            raise GDALException("Invalid data source input type: %s" % type(ds_input))
+            raise GDALException(
+                "Invalid data source input type: {}".format(type(ds_input))
+            )
 
         if ds:
             self.ptr = ds
@@ -87,7 +91,7 @@ class DataSource(GDALBase):
             self.driver = Driver(driver)
         else:
             # Raise an exception if the returned pointer is NULL
-            raise GDALException('Invalid data source file "%s"' % ds_input)
+            raise GDALException('Invalid data source file "{}"'.format(ds_input))
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
@@ -95,17 +99,18 @@ class DataSource(GDALBase):
             try:
                 layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
             except GDALException:
-                raise IndexError("Invalid OGR layer name given: %s." % index)
+                raise IndexError("Invalid OGR layer name given: {}.".format(index))
         elif isinstance(index, int):
             if 0 <= index < self.layer_count:
                 layer = capi.get_layer(self._ptr, index)
             else:
                 raise IndexError(
-                    "Index out of range when accessing layers in a datasource: %s."
-                    % index
+                    "Index out of range when accessing layers in a datasource: {}.".format(
+                        index
+                    )
                 )
         else:
-            raise TypeError("Invalid index type: %s" % type(index))
+            raise TypeError("Invalid index type: {}".format(type(index)))
         return Layer(layer, self)
 
     def __len__(self):
@@ -114,7 +119,7 @@ class DataSource(GDALBase):
 
     def __str__(self):
         "Return OGR GetName and Driver for the Data Source."
-        return "%s (%s)" % (self.name, self.driver)
+        return "{} ({})".format(self.name, self.driver)
 
     @property
     def layer_count(self):

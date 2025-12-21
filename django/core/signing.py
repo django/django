@@ -186,15 +186,15 @@ class Signer:
             else settings.SECRET_KEY_FALLBACKS
         )
         self.sep = sep
-        self.salt = salt or "%s.%s" % (
+        self.salt = salt or "{}.{}".format(
             self.__class__.__module__,
             self.__class__.__name__,
         )
         self.algorithm = algorithm or "sha256"
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
-                "Unsafe Signer separator: %r (cannot be empty or consist of "
-                "only A-z0-9-_=)" % sep,
+                "Unsafe Signer separator: {!r} (cannot be empty or consist of "
+                "only A-z0-9-_=)".format(sep),
             )
 
     def signature(self, value, key=None):
@@ -202,16 +202,16 @@ class Signer:
         return base64_hmac(self.salt + "signer", value, key, algorithm=self.algorithm)
 
     def sign(self, value):
-        return "%s%s%s" % (value, self.sep, self.signature(value))
+        return "{}{}{}".format(value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
-            raise BadSignature('No "%s" found in value' % self.sep)
+            raise BadSignature('No "{}" found in value'.format(self.sep))
         value, sig = signed_value.rsplit(self.sep, 1)
         for key in [self.key, *self.fallback_keys]:
             if constant_time_compare(sig, self.signature(value, key)):
                 return value
-        raise BadSignature('Signature "%s" does not match' % sig)
+        raise BadSignature('Signature "{}" does not match'.format(sig))
 
     def sign_object(self, obj, serializer=JSONSerializer, compress=False):
         """
@@ -257,7 +257,7 @@ class TimestampSigner(Signer):
         return b62_encode(int(time.time()))
 
     def sign(self, value):
-        value = "%s%s%s" % (value, self.sep, self.timestamp())
+        value = "{}{}{}".format(value, self.sep, self.timestamp())
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -274,5 +274,7 @@ class TimestampSigner(Signer):
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:
-                raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
+                raise SignatureExpired(
+                    "Signature age {} > {} seconds".format(age, max_age)
+                )
         return value

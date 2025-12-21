@@ -13,7 +13,7 @@ class Entry(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return "/blog/%s/" % self.pk
+        return "/blog/{}/".format(self.pk)
 
 
 class Article(models.Model):

@@ -161,7 +161,9 @@ class Command(BaseCommand):
                 except OperationalError as error:
                     warnings.warn(
                         "Got an error checking a consistent migration history "
-                        "performed for database connection '%s': %s" % (alias, error),
+                        "performed for database connection '{}': {}".format(
+                            alias, error
+                        ),
                         RuntimeWarning,
                     )
         # Before anything else, see if there's conflicting apps and drop out
@@ -179,12 +181,13 @@ class Command(BaseCommand):
 
         if conflicts and not self.merge:
             name_str = "; ".join(
-                "%s in %s" % (", ".join(names), app) for app, names in conflicts.items()
+                "{} in {}".format(", ".join(names), app)
+                for app, names in conflicts.items()
             )
             raise CommandError(
                 "Conflicting migrations detected; multiple leaf nodes in the "
-                "migration graph: (%s).\nTo fix them run "
-                "'python manage.py makemigrations --merge'" % name_str
+                "migration graph: ({}).\nTo fix them run "
+                "'python manage.py makemigrations --merge'".format(name_str)
             )
 
         # If they want to merge and there's nothing to merge, then politely
@@ -247,11 +250,14 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 if app_labels:
                     if len(app_labels) == 1:
-                        self.log("No changes detected in app '%s'" % app_labels.pop())
+                        self.log(
+                            "No changes detected in app '{}'".format(app_labels.pop())
+                        )
                     else:
                         self.log(
-                            "No changes detected in apps '%s'"
-                            % ("', '".join(app_labels))
+                            "No changes detected in apps '{}'".format(
+                                "', '".join(app_labels)
+                            )
                         )
                 else:
                     self.log("No changes detected")
@@ -341,7 +347,9 @@ class Command(BaseCommand):
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
-                self.log(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
+                self.log(
+                    self.style.MIGRATE_HEADING("Migrations for '{}':".format(app_label))
+                )
             for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration, self.include_header)
@@ -349,9 +357,11 @@ class Command(BaseCommand):
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
                     migration_string = self.get_relative_path(writer.path)
-                    self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
+                    self.log(
+                        "  {}\n".format(self.style.MIGRATE_LABEL(migration_string))
+                    )
                     for operation in migration.operations:
-                        self.log("    %s" % operation.formatted_description())
+                        self.log("    {}".format(operation.formatted_description()))
                     if self.scriptable:
                         self.stdout.write(migration_string)
                 if not self.dry_run:
@@ -390,7 +400,7 @@ class Command(BaseCommand):
                     # the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
-                            "Full migrations file '%s':" % writer.filename
+                            "Full migrations file '{}':".format(writer.filename)
                         )
                     )
                     self.log(writer.as_string())
@@ -441,7 +451,7 @@ class Command(BaseCommand):
             )
             if not common_ancestor_count:
                 raise ValueError(
-                    "Could not find common ancestor of %s" % migration_names
+                    "Could not find common ancestor of {}".format(migration_names)
                 )
             # Now work out the operations along each divergent branch
             for migration in merge_migrations:
@@ -455,11 +465,13 @@ class Command(BaseCommand):
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
             if self.verbosity > 0:
-                self.log(self.style.MIGRATE_HEADING("Merging %s" % app_label))
+                self.log(self.style.MIGRATE_HEADING("Merging {}".format(app_label)))
                 for migration in merge_migrations:
-                    self.log(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
+                    self.log(
+                        self.style.MIGRATE_LABEL("  Branch {}".format(migration.name))
+                    )
                     for operation in migration.merged_operations:
-                        self.log("    %s" % operation.formatted_description())
+                        self.log("    {}".format(operation.formatted_description()))
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
@@ -503,7 +515,7 @@ class Command(BaseCommand):
                         fh.write(writer.as_string())
                     run_formatters([writer.path], stderr=self.stderr)
                     if self.verbosity > 0:
-                        self.log("\nCreated new merge migration %s" % writer.path)
+                        self.log("\nCreated new merge migration {}".format(writer.path))
                         if self.scriptable:
                             self.stdout.write(writer.path)
                 elif self.verbosity == 3:
@@ -512,7 +524,7 @@ class Command(BaseCommand):
                     # saving the file to the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
-                            "Full merge migrations file '%s':" % writer.filename
+                            "Full merge migrations file '{}':".format(writer.filename)
                         )
                     )
                     self.log(writer.as_string())

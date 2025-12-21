@@ -75,7 +75,7 @@ class IndexNameTests(ColumnsTests):
     def setUp(self):
         def create_index_name(table_name, column_names, suffix):
             return ", ".join(
-                "%s_%s_%s" % (table_name, column_name, suffix)
+                "{}_{}_{}".format(table_name, column_name, suffix)
                 for column_name in column_names
             )
 
@@ -99,7 +99,7 @@ class ForeignKeyNameTests(IndexNameTests):
     def setUp(self):
         def create_foreign_key_name(table_name, column_names, suffix):
             return ", ".join(
-                "%s_%s_%s" % (table_name, column_name, suffix)
+                "{}_{}_{}".format(table_name, column_name, suffix)
                 for column_name in column_names
             )
 
@@ -288,8 +288,7 @@ class ExpressionsTests(TransactionTestCase):
         self.assertIs(self.expressions.references_table(table), False)
         self.assertIs(self.expressions.references_table("other"), True)
         self.assertIn(
-            "%s.%s"
-            % (
+            "{}.{}".format(
                 self.editor.quote_name("other"),
                 self.editor.quote_name("first_name"),
             ),
@@ -311,7 +310,7 @@ class ExpressionsTests(TransactionTestCase):
         expressions.rename_table_references(table, "other")
         self.assertIs(expressions.references_table(table), False)
         self.assertIs(expressions.references_table("other"), True)
-        expected_str = "(UPPER(%s)), %s" % (
+        expected_str = "(UPPER({})), {}".format(
             self.editor.quote_name("last_name"),
             self.editor.quote_name("first_name"),
         )
@@ -323,13 +322,15 @@ class ExpressionsTests(TransactionTestCase):
         self.assertIs(self.expressions.references_column(table, "other"), True)
         self.assertIs(self.expressions.references_column(table, "first_name"), False)
         self.assertIn(
-            "%s.%s" % (self.editor.quote_name(table), self.editor.quote_name("other")),
+            "{}.{}".format(
+                self.editor.quote_name(table), self.editor.quote_name("other")
+            ),
             str(self.expressions),
         )
 
     def test_str(self):
         table_name = self.editor.quote_name(Person._meta.db_table)
-        expected_str = "%s.%s, %s.%s DESC, (UPPER(%s.%s))" % (
+        expected_str = "{}.{}, {}.{} DESC, (UPPER({}.{}))".format(
             table_name,
             self.editor.quote_name("first_name"),
             table_name,

@@ -29,7 +29,7 @@ class SQLiteNumericMixin:
         sql, params = self.as_sql(compiler, connection, **extra_context)
         try:
             if self.output_field.get_internal_type() == "DecimalField":
-                sql = "(CAST(%s AS NUMERIC))" % sql
+                sql = "(CAST({} AS NUMERIC))".format(sql)
         except FieldError:
             pass
         return sql, params
@@ -364,9 +364,8 @@ class BaseExpression:
             for source in sources_iter:
                 if not isinstance(output_field, source.__class__):
                     raise FieldError(
-                        "Expression contains mixed types: %s, %s. You must "
-                        "set output_field."
-                        % (
+                        "Expression contains mixed types: {}, {}. You must "
+                        "set output_field.".format(
                             output_field.__class__.__name__,
                             source.__class__.__name__,
                         )
@@ -1058,8 +1057,7 @@ class Func(SQLiteNumericMixin, Expression):
     def __init__(self, *expressions, output_field=None, **extra):
         if self.arity is not None and len(expressions) != self.arity:
             raise TypeError(
-                "'%s' takes exactly %s %s (%s given)"
-                % (
+                "'{}' takes exactly {} {} ({} given)".format(
                     self.__class__.__name__,
                     self.arity,
                     "argument" if self.arity == 1 else "arguments",
@@ -1234,7 +1232,7 @@ class RawSQL(Expression):
         return "{}({}, {})".format(self.__class__.__name__, self.sql, self.params)
 
     def as_sql(self, compiler, connection):
-        return "(%s)" % self.sql, self.params
+        return "({})".format(self.sql), self.params
 
     def get_group_by_cols(self):
         return [self]
@@ -1612,10 +1610,10 @@ class When(Expression):
         self.result = self._parse_expressions(then)[0]
 
     def __str__(self):
-        return "WHEN %r THEN %r" % (self.condition, self.result)
+        return "WHEN {!r} THEN {!r}".format(self.condition, self.result)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return "<{}: {}>".format(self.__class__.__name__, self)
 
     def get_source_expressions(self):
         return [self.condition, self.result]
@@ -1692,13 +1690,13 @@ class Case(SQLiteNumericMixin, Expression):
         self.extra = extra
 
     def __str__(self):
-        return "CASE %s, ELSE %r" % (
+        return "CASE {}, ELSE {!r}".format(
             ", ".join(str(c) for c in self.cases),
             self.default,
         )
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return "<{}: {}>".format(self.__class__.__name__, self)
 
     def get_source_expressions(self):
         return [*self.cases, self.default]
@@ -1908,18 +1906,18 @@ class OrderBy(Expression):
         template = template or self.template
         if connection.features.supports_order_by_nulls_modifier:
             if self.nulls_last:
-                template = "%s NULLS LAST" % template
+                template = "{} NULLS LAST".format(template)
             elif self.nulls_first:
-                template = "%s NULLS FIRST" % template
+                template = "{} NULLS FIRST".format(template)
         else:
             if self.nulls_last and not (
                 self.descending and connection.features.order_by_nulls_first
             ):
-                template = "%%(expression)s IS NULL, %s" % template
+                template = "%(expression)s IS NULL, {}".format(template)
             elif self.nulls_first and not (
                 not self.descending and connection.features.order_by_nulls_first
             ):
-                template = "%%(expression)s IS NOT NULL, %s" % template
+                template = "%(expression)s IS NOT NULL, {}".format(template)
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {
@@ -1992,8 +1990,9 @@ class Window(SQLiteNumericMixin, Expression):
 
         if not getattr(expression, "window_compatible", False):
             raise ValueError(
-                "Expression '%s' isn't compatible with OVER clauses."
-                % expression.__class__.__name__
+                "Expression '{}' isn't compatible with OVER clauses.".format(
+                    expression.__class__.__name__
+                )
             )
 
         if self.partition_by is not None:
@@ -2066,7 +2065,7 @@ class Window(SQLiteNumericMixin, Expression):
         )
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return "<{}: {}>".format(self.__class__.__name__, self)
 
     def get_group_by_cols(self):
         group_by_cols = []
@@ -2140,7 +2139,7 @@ class WindowFrame(Expression):
         )
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return "<{}: {}>".format(self.__class__.__name__, self)
 
     def get_group_by_cols(self):
         return []

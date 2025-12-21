@@ -414,8 +414,8 @@ class TestQuerying(TestCase):
                     for value in values
                 ]
                 query = NullableJSONModel.objects.filter(
-                    **{"%s__name__isnull" % field_name: False},
-                ).order_by("%s__ord" % field_name)
+                    **{"{}__name__isnull".format(field_name): False},
+                ).order_by("{}__ord".format(field_name))
                 expected = [objs[4], objs[2], objs[3], objs[1], objs[0]]
                 if mariadb or connection.vendor == "oracle":
                     # MariaDB and Oracle return JSON values as strings.

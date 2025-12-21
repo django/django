@@ -14,7 +14,8 @@ from django.test.utils import captured_stderr
 class DatabaseCreationTests(SimpleTestCase):
     def _execute_raise_database_exists(self, cursor, parameters, keepdb=False):
         raise DatabaseError(
-            1007, "Can't create database '%s'; database exists" % parameters["dbname"]
+            1007,
+            "Can't create database '{}'; database exists".format(parameters["dbname"]),
         )
 
     def _execute_raise_access_denied(self, cursor, parameters, keepdb=False):

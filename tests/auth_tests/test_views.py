@@ -125,7 +125,9 @@ class AuthViewNamedURLTests(AuthViewsTestCase):
                     reverse(name, args=args, kwargs=kwargs)
                 except NoReverseMatch:
                     self.fail(
-                        "Reversal of url named '%s' failed with NoReverseMatch" % name
+                        "Reversal of url named '{}' failed with NoReverseMatch".format(
+                            name
+                        )
                     )
 
 
@@ -435,7 +437,7 @@ class PasswordResetTest(AuthViewsTestCase):
         # {{ form.user }}`` is rendered in the template
         # registration/password_reset_confirm.html.
         username = User.objects.get(email="staffmember@example.com").username
-        self.assertContains(response, "Hello, %s." % username)
+        self.assertContains(response, "Hello, {}.".format(username))
         # However, the view should NOT pass any user object on a form if the
         # password reset link was invalid.
         response = self.client.get("/reset/zzzzzzzzzzzzz/1-1/")
@@ -449,7 +451,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = client.get(path)
         token = response.resolver_match.kwargs["token"]
         uuidb64 = response.resolver_match.kwargs["uidb64"]
-        self.assertRedirects(response, "/reset/%s/set-password/" % uuidb64)
+        self.assertRedirects(response, "/reset/{}/set-password/".format(uuidb64))
         self.assertEqual(client.session["_password_reset_token"], token)
 
     def test_confirm_custom_reset_url_token_link_redirects_to_set_password_page(self):
@@ -460,14 +462,14 @@ class PasswordResetTest(AuthViewsTestCase):
         token = response.resolver_match.kwargs["token"]
         uuidb64 = response.resolver_match.kwargs["uidb64"]
         self.assertRedirects(
-            response, "/reset/custom/token/%s/set-passwordcustom/" % uuidb64
+            response, "/reset/custom/token/{}/set-passwordcustom/".format(uuidb64)
         )
         self.assertEqual(client.session["_password_reset_token"], token)
 
     def test_invalid_link_if_going_directly_to_the_final_reset_password_url(self):
         url, path = self._test_confirm_start()
         _, uuidb64, _ = path.strip("/").split("/")
-        response = Client().get("/reset/%s/set-password/" % uuidb64)
+        response = Client().get("/reset/{}/set-password/".format(uuidb64))
         self.assertContains(response, "The password reset link was invalid")
 
     def test_missing_kwargs(self):
@@ -783,11 +785,11 @@ class LoginTest(AuthViewsTestCase):
         )
         for bad_url in bad_urls:
             with self.subTest(bad_url=bad_url):
-                nasty_url = "%(url)s?%(next)s=%(bad_url)s" % {
-                    "url": login_url,
-                    "next": REDIRECT_FIELD_NAME,
-                    "bad_url": quote(bad_url),
-                }
+                nasty_url = "{url}?{next}={bad_url}".format(
+                    url=login_url,
+                    next=REDIRECT_FIELD_NAME,
+                    bad_url=quote(bad_url),
+                )
                 response = self.client.post(
                     nasty_url,
                     {
@@ -797,7 +799,7 @@ class LoginTest(AuthViewsTestCase):
                 )
                 self.assertEqual(response.status_code, 302)
                 self.assertNotIn(
-                    bad_url, response.url, "%s should be blocked" % bad_url
+                    bad_url, response.url, "{} should be blocked".format(bad_url)
                 )
 
         # These URLs should pass the security check.
@@ -813,11 +815,11 @@ class LoginTest(AuthViewsTestCase):
         )
         for good_url in good_urls:
             with self.subTest(good_url=good_url):
-                safe_url = "%(url)s?%(next)s=%(good_url)s" % {
-                    "url": login_url,
-                    "next": REDIRECT_FIELD_NAME,
-                    "good_url": quote(good_url),
-                }
+                safe_url = "{url}?{next}={good_url}".format(
+                    url=login_url,
+                    next=REDIRECT_FIELD_NAME,
+                    good_url=quote(good_url),
+                )
                 response = self.client.post(
                     safe_url,
                     {
@@ -826,16 +828,18 @@ class LoginTest(AuthViewsTestCase):
                     },
                 )
                 self.assertEqual(response.status_code, 302)
-                self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
+                self.assertIn(
+                    good_url, response.url, "{} should be allowed".format(good_url)
+                )
 
     def test_security_check_https(self):
         login_url = reverse("login")
         non_https_next_url = "http://testserver/path"
-        not_secured_url = "%(url)s?%(next)s=%(next_url)s" % {
-            "url": login_url,
-            "next": REDIRECT_FIELD_NAME,
-            "next_url": quote(non_https_next_url),
-        }
+        not_secured_url = "{url}?{next}={next_url}".format(
+            url=login_url,
+            next=REDIRECT_FIELD_NAME,
+            next_url=quote(non_https_next_url),
+        )
         post_data = {
             "username": "testclient",
             "password": "password",
@@ -1001,13 +1005,13 @@ class LoginURLSettings(AuthViewsTestCase):
     @override_settings(LOGIN_URL="http://remote.example.com/login")
     def test_remote_login_url(self):
         quoted_next = quote("http://testserver/login_required/")
-        expected = "http://remote.example.com/login?next=%s" % quoted_next
+        expected = "http://remote.example.com/login?next={}".format(quoted_next)
         self.assertLoginURLEquals(expected)
 
     @override_settings(LOGIN_URL="https:///login/")
     def test_https_login_url(self):
         quoted_next = quote("http://testserver/login_required/")
-        expected = "https:///login/?next=%s" % quoted_next
+        expected = "https:///login/?next={}".format(quoted_next)
         self.assertLoginURLEquals(expected)
 
     @override_settings(LOGIN_URL="/login/?pretty=1")
@@ -1017,7 +1021,7 @@ class LoginURLSettings(AuthViewsTestCase):
     @override_settings(LOGIN_URL="http://remote.example.com/login/?next=/default/")
     def test_remote_login_url_with_next_querystring(self):
         quoted_next = quote("http://testserver/login_required/")
-        expected = "http://remote.example.com/login/?next=%s" % quoted_next
+        expected = "http://remote.example.com/login/?next={}".format(quoted_next)
         self.assertLoginURLEquals(expected)
 
     @override_settings(LOGIN_URL=reverse_lazy("login"))
@@ -1356,16 +1360,16 @@ class LogoutTest(AuthViewsTestCase):
         )
         for bad_url in bad_urls:
             with self.subTest(bad_url=bad_url):
-                nasty_url = "%(url)s?%(next)s=%(bad_url)s" % {
-                    "url": logout_url,
-                    "next": REDIRECT_FIELD_NAME,
-                    "bad_url": quote(bad_url),
-                }
+                nasty_url = "{url}?{next}={bad_url}".format(
+                    url=logout_url,
+                    next=REDIRECT_FIELD_NAME,
+                    bad_url=quote(bad_url),
+                )
                 self.login()
                 response = self.client.post(nasty_url)
                 self.assertEqual(response.status_code, 302)
                 self.assertNotIn(
-                    bad_url, response.url, "%s should be blocked" % bad_url
+                    bad_url, response.url, "{} should be blocked".format(bad_url)
                 )
                 self.confirm_logged_out()
 
@@ -1382,25 +1386,27 @@ class LogoutTest(AuthViewsTestCase):
         )
         for good_url in good_urls:
             with self.subTest(good_url=good_url):
-                safe_url = "%(url)s?%(next)s=%(good_url)s" % {
-                    "url": logout_url,
-                    "next": REDIRECT_FIELD_NAME,
-                    "good_url": quote(good_url),
-                }
+                safe_url = "{url}?{next}={good_url}".format(
+                    url=logout_url,
+                    next=REDIRECT_FIELD_NAME,
+                    good_url=quote(good_url),
+                )
                 self.login()
                 response = self.client.post(safe_url)
                 self.assertEqual(response.status_code, 302)
-                self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
+                self.assertIn(
+                    good_url, response.url, "{} should be allowed".format(good_url)
+                )
                 self.confirm_logged_out()
 
     def test_security_check_https(self):
         logout_url = reverse("logout")
         non_https_next_url = "http://testserver/"
-        url = "%(url)s?%(next)s=%(next_url)s" % {
-            "url": logout_url,
-            "next": REDIRECT_FIELD_NAME,
-            "next_url": quote(non_https_next_url),
-        }
+        url = "{url}?{next}={next_url}".format(
+            url=logout_url,
+            next=REDIRECT_FIELD_NAME,
+            next_url=quote(non_https_next_url),
+        )
         self.login()
         response = self.client.post(url, secure=True)
         self.assertRedirects(response, logout_url, fetch_redirect_response=False)
@@ -1720,10 +1726,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         # The password value is hashed.
         self.assertContains(
             response,
-            "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
-            "<strong>salt</strong>: <bdi>%s********************</bdi>\n\n"
-            "<strong>hash</strong>: <bdi>%s**************************</bdi>\n\n"
-            % (
+            "<strong>algorithm</strong>: <bdi>{}</bdi>\n\n"
+            "<strong>salt</strong>: <bdi>{}********************</bdi>\n\n"
+            "<strong>hash</strong>: <bdi>{}**************************</bdi>\n\n".format(
                 algo,
                 salt[:2],
                 hash_string[:6],

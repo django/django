@@ -22,7 +22,7 @@ class Employee(models.Model):
     based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
-        return "%s %s" % (self.firstname, self.lastname)
+        return "{} {}".format(self.firstname, self.lastname)
 
 
 class RemoteEmployee(Employee):
@@ -58,8 +58,12 @@ class Number(models.Model):
     def __str__(self):
         return "%i, %s, %s" % (
             self.integer,
-            "%.3f" % self.float if self.float is not None else None,
-            "%.17f" % self.decimal_value if self.decimal_value is not None else None,
+            "{:.3f}".format(self.float) if self.float is not None else None,
+            (
+                "{:.17f}".format(self.decimal_value)
+                if self.decimal_value is not None
+                else None
+            ),
         )
 
 
@@ -85,7 +89,7 @@ class Result(models.Model):
     result_time = models.DateTimeField()
 
     def __str__(self):
-        return "Result at %s" % self.result_time
+        return "Result at {}".format(self.result_time)
 
 
 class Time(models.Model):
@@ -101,7 +105,7 @@ class SimulationRun(models.Model):
     midpoint = models.TimeField()
 
     def __str__(self):
-        return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
+        return "{} ({} to {})".format(self.midpoint, self.start, self.end)
 
 
 class UUIDPK(models.Model):

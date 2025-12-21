@@ -1867,7 +1867,9 @@ class Queries5Tests(TestCase):
             [self.rank1, self.rank2, self.rank3],
         )
 
-        sql = "case when %s > 2 then 1 else 0 end" % connection.ops.quote_name("rank")
+        sql = "case when {} > 2 then 1 else 0 end".format(
+            connection.ops.quote_name("rank")
+        )
         qs = Ranking.objects.extra(select={"good": sql})
         self.assertEqual(
             [o.good for o in qs.extra(order_by=("-good",))], [True, False, False]
@@ -1885,7 +1887,9 @@ class Queries5Tests(TestCase):
     def test_ticket7256(self):
         # An empty values() call includes all aliases, including those from an
         # extra()
-        sql = "case when %s > 2 then 1 else 0 end" % connection.ops.quote_name("rank")
+        sql = "case when {} > 2 then 1 else 0 end".format(
+            connection.ops.quote_name("rank")
+        )
         qs = Ranking.objects.extra(select={"good": sql})
         dicts = qs.values().order_by("id")
         for d in dicts:
@@ -2205,7 +2209,7 @@ class Queries6Tests(TestCase):
                 {"tag_per_parent__max": 2},
             )
         sql = captured_queries[0]["sql"]
-        self.assertIn("AS %s" % connection.ops.quote_name("parent"), sql)
+        self.assertIn("AS {}".format(connection.ops.quote_name("parent")), sql)
 
     def test_xor_subquery(self):
         self.assertSequenceEqual(
@@ -2762,9 +2766,8 @@ class ValuesQuerysetTests(TestCase):
 
     def test_field_error_values_list(self):
         # see #23443
-        msg = (
-            "Cannot resolve keyword %r into field. Join on 'name' not permitted."
-            % "foo"
+        msg = "Cannot resolve keyword {!r} into field. Join on 'name' not permitted.".format(
+            "foo"
         )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.values_list("name__foo")
@@ -3307,7 +3310,7 @@ class ExcludeTests(TestCase):
         sql = ctx.captured_queries[0]["sql"]
         # Company's ID should appear in SELECT and INNER JOIN, not in EXISTS as
         # the outer query reference is not necessary when an alias is reused.
-        company_id = "%s.%s" % (
+        company_id = "{}.{}".format(
             connection.ops.quote_name(Company._meta.db_table),
             connection.ops.quote_name(Company._meta.get_field("id").column),
         )
@@ -4414,7 +4417,7 @@ class ValuesJoinPromotionTests(TestCase):
         )
         self.assertEqual(qs.count(), 1)
         tblname = connection.ops.quote_name(ObjectB._meta.db_table)
-        self.assertIn(" LEFT OUTER JOIN %s" % tblname, str(qs.query))
+        self.assertIn(" LEFT OUTER JOIN {}".format(tblname), str(qs.query))
 
 
 class ForeignKeyToBaseExcludeTests(TestCase):

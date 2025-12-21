@@ -112,15 +112,16 @@ class OGRGeometry(GDALBase):
             g = geom_input
         else:
             raise GDALException(
-                "Invalid input type for OGR Geometry construction: %s"
-                % type(geom_input)
+                "Invalid input type for OGR Geometry construction: {}".format(
+                    type(geom_input)
+                )
             )
 
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
             raise GDALException(
-                "Cannot create OGR Geometry from input: %s" % geom_input
+                "Cannot create OGR Geometry from input: {}".format(geom_input)
             )
         self.ptr = g
 
@@ -165,8 +166,9 @@ class OGRGeometry(GDALBase):
         "Construct a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry(
-            "POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))"
-            % (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0)
+            "POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))".format(
+                x0, y0, x0, y1, x1, y1, x1, y0, x0, y0
+            )
         )
 
     @staticmethod
@@ -339,7 +341,9 @@ class OGRGeometry(GDALBase):
             srs_ptr = None
         else:
             raise TypeError(
-                "Cannot assign spatial reference with object of type: %s" % type(srs)
+                "Cannot assign spatial reference with object of type: {}".format(
+                    type(srs)
+                )
             )
         capi.assign_srs(self.ptr, srs_ptr)
 
@@ -440,7 +444,7 @@ class OGRGeometry(GDALBase):
         "Return the EWKT representation of the Geometry."
         srs = self.srs
         if srs and srs.srid:
-            return "SRID=%s;%s" % (srs.srid, self.wkt)
+            return "SRID={};{}".format(srs.srid, self.wkt)
         else:
             return self.wkt
 
@@ -655,7 +659,9 @@ class LineString(OGRGeometry):
                 return (x.value, y.value)
         else:
             raise IndexError(
-                "Index out of range when accessing points of a line string: %s." % index
+                "Index out of range when accessing points of a line string: {}.".format(
+                    index
+                )
             )
 
     def __len__(self):
@@ -717,7 +723,9 @@ class Polygon(OGRGeometry):
             )
         else:
             raise IndexError(
-                "Index out of range when accessing rings of a polygon: %s." % index
+                "Index out of range when accessing rings of a polygon: {}.".format(
+                    index
+                )
             )
 
     # Polygon Properties
@@ -766,8 +774,9 @@ class GeometryCollection(OGRGeometry):
             )
         else:
             raise IndexError(
-                "Index out of range when accessing geometry in a collection: %s."
-                % index
+                "Index out of range when accessing geometry in a collection: {}.".format(
+                    index
+                )
             )
 
     def __len__(self):

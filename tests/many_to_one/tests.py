@@ -300,7 +300,7 @@ class ManyToOneTests(TestCase):
         self.assertQuerySetEqual(
             (
                 Article.objects.filter(reporter__first_name__exact="John").extra(
-                    where=["many_to_one_reporter.last_name='%s'" % "Smith"]
+                    where=["many_to_one_reporter.last_name='{}'".format("Smith")]
                 )
             ),
             [new_article1, self.a],
@@ -747,7 +747,11 @@ class ManyToOneTests(TestCase):
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
-        msg = 'Cannot assign "%r": "Child.parent" must be a "Parent" instance.' % c
+        msg = (
+            'Cannot assign "{!r}": "Child.parent" must be a "Parent" instance.'.format(
+                c
+            )
+        )
         with self.assertRaisesMessage(ValueError, msg):
             Child.objects.create(name="Grandchild", parent=c)
 
@@ -889,7 +893,7 @@ class ManyToOneTests(TestCase):
     def test_add_remove_set_by_pk_raises(self):
         usa = Country.objects.create(name="United States")
         chicago = City.objects.create(name="Chicago")
-        msg = "'City' instance expected, got %s" % chicago.pk
+        msg = "'City' instance expected, got {}".format(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):
             usa.cities.add(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):

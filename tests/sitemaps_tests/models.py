@@ -7,7 +7,7 @@ class TestModel(models.Model):
     lastmod = models.DateTimeField(null=True)
 
     def get_absolute_url(self):
-        return "/testmodel/%s/" % self.id
+        return "/testmodel/{}/".format(self.id)
 
 
 class I18nTestModel(models.Model):

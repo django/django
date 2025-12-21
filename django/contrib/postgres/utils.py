@@ -40,7 +40,7 @@ class CheckPostgresInstalledMixin:
             return [
                 checks.Error(
                     "'django.contrib.postgres' must be in INSTALLED_APPS in "
-                    "order to use %s." % self.__class__.__name__,
+                    "order to use {}.".format(self.__class__.__name__),
                     obj=obj,
                     id="postgres.E005",
                 )

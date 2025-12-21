@@ -90,7 +90,7 @@ class GDALRaster(GDALRasterBase):
                 ds_input
             ):
                 raise GDALException(
-                    'Unable to read raster source input "%s".' % ds_input
+                    'Unable to read raster source input "{}".'.format(ds_input)
                 )
             try:
                 # GDALOpen will auto-detect the data source type.
@@ -225,7 +225,7 @@ class GDALRaster(GDALRasterBase):
         """
         Short-hand representation because WKB may be very large.
         """
-        return "<Raster object at %s>" % hex(addressof(self._ptr))
+        return "<Raster object at {}>".format(hex(addressof(self._ptr)))
 
     def _flush(self):
         """

@@ -107,7 +107,9 @@ def generic_inlineformset_factory(
         not isinstance(ct_field, models.ForeignKey)
         or ct_field.remote_field.model != ContentType
     ):
-        raise Exception("fk_name '%s' is not a ForeignKey to ContentType" % ct_field)
+        raise Exception(
+            "fk_name '{}' is not a ForeignKey to ContentType".format(ct_field)
+        )
     fk_field = opts.get_field(fk_field)  # let the exception propagate
     exclude = [*(exclude or []), ct_field.name, fk_field.name]
     FormSet = modelformset_factory(

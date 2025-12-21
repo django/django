@@ -32,9 +32,13 @@ __M = r"(?P<mon>\w{3})"
 __Y = r"(?P<year>[0-9]{4})"
 __Y2 = r"(?P<year>[0-9]{2})"
 __T = r"(?P<hour>[0-9]{2}):(?P<min>[0-9]{2}):(?P<sec>[0-9]{2})"
-RFC1123_DATE = _lazy_re_compile(r"^\w{3}, %s %s %s %s GMT$" % (__D, __M, __Y, __T))
-RFC850_DATE = _lazy_re_compile(r"^\w{6,9}, %s-%s-%s %s GMT$" % (__D, __M, __Y2, __T))
-ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
+RFC1123_DATE = _lazy_re_compile(
+    r"^\w{{3}}, {} {} {} {} GMT$".format(__D, __M, __Y, __T)
+)
+RFC850_DATE = _lazy_re_compile(
+    r"^\w{{6,9}}, {}-{}-{} {} GMT$".format(__D, __M, __Y2, __T)
+)
+ASCTIME_DATE = _lazy_re_compile(r"^\w{{3}} {} {} {} {}$".format(__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
@@ -55,8 +59,8 @@ def urlencode(query, doseq=False):
     for key, value in query:
         if value is None:
             raise TypeError(
-                "Cannot encode None for key '%s' in a query string. Did you "
-                "mean to pass an empty string or omit the value?" % key
+                "Cannot encode None for key '{}' in a query string. Did you "
+                "mean to pass an empty string or omit the value?".format(key)
             )
         elif not doseq or isinstance(value, (str, bytes)):
             query_val = value
@@ -72,9 +76,9 @@ def urlencode(query, doseq=False):
                 for item in itr:
                     if item is None:
                         raise TypeError(
-                            "Cannot encode None for key '%s' in a query "
+                            "Cannot encode None for key '{}' in a query "
                             "string. Did you mean to pass an empty string or "
-                            "omit the value?" % key
+                            "omit the value?".format(key)
                         )
                     elif not isinstance(item, bytes):
                         item = str(item)
@@ -114,7 +118,7 @@ def parse_http_date(date):
         if m is not None:
             break
     else:
-        raise ValueError("%r is not in a valid HTTP date format" % date)
+        raise ValueError("{!r} is not in a valid HTTP date format".format(date))
     try:
         year = int(m["year"])
         if year < 100:
@@ -134,7 +138,7 @@ def parse_http_date(date):
         result = datetime(year, month, day, hour, min, sec, tzinfo=UTC)
         return int(result.timestamp())
     except Exception as exc:
-        raise ValueError("%r is not a valid date" % date) from exc
+        raise ValueError("{!r} is not a valid date".format(date)) from exc
 
 
 def parse_http_date_safe(date):
@@ -219,7 +223,7 @@ def quote_etag(etag_str):
     if ETAG_MATCH.match(etag_str):
         return etag_str
     else:
-        return '"%s"' % etag_str
+        return '"{}"'.format(etag_str)
 
 
 def is_same_domain(host, pattern):

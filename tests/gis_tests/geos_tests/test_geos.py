@@ -1041,7 +1041,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             with self.subTest(srid=srid):
                 self.assertTrue(
                     pnt.ewkt.startswith(
-                        ("SRID=%s;" % srid if srid else "") + "POINT (111200"
+                        ("SRID={};".format(srid) if srid else "") + "POINT (111200"
                     )
                 )
                 self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
@@ -1336,7 +1336,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         coll.extend(mls.wkt for mls in self.geometries.multilinestrings)
         coll.extend(p.wkt for p in self.geometries.polygons)
         coll.extend(mp.wkt for mp in self.geometries.multipoints)
-        gc_wkt = "GEOMETRYCOLLECTION(%s)" % ",".join(coll)
+        gc_wkt = "GEOMETRYCOLLECTION({})".format(",".join(coll))
 
         # Should construct ok from WKT
         gc1 = GEOSGeometry(gc_wkt)

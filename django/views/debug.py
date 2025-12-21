@@ -510,8 +510,8 @@ class ExceptionReporter:
             exc_value = self._get_explicit_or_implicit_cause(exc_value)
             if exc_value in exceptions:
                 warnings.warn(
-                    "Cycle in the exception chain detected: exception '%s' "
-                    "encountered again." % exc_value,
+                    "Cycle in the exception chain detected: exception '{}' "
+                    "encountered again.".format(exc_value),
                     ExceptionCycleWarning,
                 )
                 # Avoid infinite loop if there's a cyclic reference (#29393).

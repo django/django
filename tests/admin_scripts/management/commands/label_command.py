@@ -7,6 +7,7 @@ class Command(LabelCommand):
 
     def handle_label(self, label, **options):
         print(
-            "EXECUTE:LabelCommand label=%s, options=%s"
-            % (label, sorted(options.items()))
+            "EXECUTE:LabelCommand label={}, options={}".format(
+                label, sorted(options.items())
+            )
         )

@@ -254,14 +254,14 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         Book.objects.create(
             name="The New New Testement", pages=600, pubdate=datetime.date(year, 1, 1)
         )
-        res = self.client.get("/dates/books/%s/" % year)
+        res = self.client.get("/dates/books/{}/".format(year))
         self.assertEqual(res.status_code, 404)
 
-        res = self.client.get("/dates/books/%s/allow_empty/" % year)
+        res = self.client.get("/dates/books/{}/allow_empty/".format(year))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context["book_list"]), [])
 
-        res = self.client.get("/dates/books/%s/allow_future/" % year)
+        res = self.client.get("/dates/books/{}/allow_future/".format(year))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context["date_list"]), [datetime.date(year, 1, 1)])
 
@@ -428,11 +428,11 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
         # allow_future = False, future month
-        res = self.client.get("/dates/books/%s/" % urlbit)
+        res = self.client.get("/dates/books/{}/".format(urlbit))
         self.assertEqual(res.status_code, 404)
 
         # allow_future = True, valid future month
-        res = self.client.get("/dates/books/%s/allow_future/" % urlbit)
+        res = self.client.get("/dates/books/{}/allow_future/".format(urlbit))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["date_list"][0], b.pubdate)
         self.assertEqual(list(res.context["book_list"]), [b])
@@ -588,10 +588,12 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         future_sunday = future - datetime.timedelta(days=(future.weekday() + 1) % 7)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
-        res = self.client.get("/dates/books/%s/week/1/" % future.year)
+        res = self.client.get("/dates/books/{}/week/1/".format(future.year))
         self.assertEqual(res.status_code, 404)
 
-        res = self.client.get("/dates/books/%s/week/1/allow_future/" % future.year)
+        res = self.client.get(
+            "/dates/books/{}/week/1/allow_future/".format(future.year)
+        )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context["book_list"]), [b])
         self.assertEqual(res.context["week"], future_sunday)
@@ -720,11 +722,11 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
         # allow_future = False, future month
-        res = self.client.get("/dates/books/%s/" % urlbit)
+        res = self.client.get("/dates/books/{}/".format(urlbit))
         self.assertEqual(res.status_code, 404)
 
         # allow_future = True, valid future month
-        res = self.client.get("/dates/books/%s/allow_future/" % urlbit)
+        res = self.client.get("/dates/books/{}/allow_future/".format(urlbit))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context["book_list"]), [b])
         self.assertEqual(res.context["day"], future)
@@ -743,8 +745,9 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
         res = self.client.get(
-            "/dates/books/%s/allow_empty_and_future/"
-            % yesterday.strftime("%Y/%b/%d").lower()
+            "/dates/books/{}/allow_empty_and_future/".format(
+                yesterday.strftime("%Y/%b/%d").lower()
+            )
         )
         self.assertEqual(res.context["next_day"], today)
 
@@ -820,7 +823,7 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
 @override_settings(ROOT_URLCONF="generic_views.urls")
 class DateDetailViewTests(TestDataMixin, TestCase):
     def test_date_detail_by_pk(self):
-        res = self.client.get("/dates/books/2008/oct/01/%s/" % self.book1.pk)
+        res = self.client.get("/dates/books/2008/oct/01/{}/".format(self.book1.pk))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["object"], self.book1)
         self.assertEqual(res.context["book"], self.book1)
@@ -832,7 +835,7 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context["book"], Book.objects.get(slug="dreaming-in-code"))
 
     def test_date_detail_custom_month_format(self):
-        res = self.client.get("/dates/books/2008/10/01/%s/" % self.book1.pk)
+        res = self.client.get("/dates/books/2008/10/01/{}/".format(self.book1.pk))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["book"], self.book1)
 
@@ -843,10 +846,10 @@ class DateDetailViewTests(TestDataMixin, TestCase):
             name="The New New Testement", slug="new-new", pages=600, pubdate=future
         )
 
-        res = self.client.get("/dates/books/%s/new-new/" % urlbit)
+        res = self.client.get("/dates/books/{}/new-new/".format(urlbit))
         self.assertEqual(res.status_code, 404)
 
-        res = self.client.get("/dates/books/%s/%s/allow_future/" % (urlbit, b.id))
+        res = self.client.get("/dates/books/{}/{}/allow_future/".format(urlbit, b.id))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["book"], b)
         self.assertTemplateUsed(res, "generic_views/book_detail.html")
@@ -877,7 +880,9 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         BaseDateDetailView.get_object().
         """
         res = self.client.get(
-            "/dates/books/get_object_custom_queryset/2006/may/01/%s/" % self.book2.pk
+            "/dates/books/get_object_custom_queryset/2006/may/01/{}/".format(
+                self.book2.pk
+            )
         )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["object"], self.book2)

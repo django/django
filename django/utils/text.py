@@ -279,7 +279,9 @@ def get_valid_filename(name):
     s = str(name).strip().replace(" ", "_")
     s = re.sub(r"(?u)[^-\w.]", "", s)
     if s in {"", ".", ".."}:
-        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+        raise SuspiciousFileOperation(
+            "Could not derive file name from '{}'".format(name)
+        )
     return s
 
 
@@ -301,7 +303,7 @@ def get_text_list(list_, last_word=gettext_lazy("or")):
         return ""
     if len(list_) == 1:
         return str(list_[0])
-    return "%s %s %s" % (
+    return "{} {} {}".format(
         # Translators: This string is used as a separator between list elements
         _(", ").join(str(i) for i in list_[:-1]),
         str(last_word),
@@ -460,9 +462,9 @@ def unescape_string_literal(s):
         "'ab' c"
     """
     if not s or s[0] not in "\"'" or s[-1] != s[0]:
-        raise ValueError("Not a string literal: %r" % s)
+        raise ValueError("Not a string literal: {!r}".format(s))
     quote = s[0]
-    return s[1:-1].replace(r"\%s" % quote, quote).replace(r"\\", "\\")
+    return s[1:-1].replace(r"\{}".format(quote), quote).replace(r"\\", "\\")
 
 
 @keep_lazy_text

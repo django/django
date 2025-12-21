@@ -37,7 +37,9 @@ urlpatterns = [
 ]
 
 
-@override_settings(ROOT_URLCONF=__name__, DATABASE_ROUTERS=["%s.Router" % __name__])
+@override_settings(
+    ROOT_URLCONF=__name__, DATABASE_ROUTERS=["{}.Router".format(__name__)]
+)
 class MultiDatabaseTests(TestCase):
     databases = {"default", "other"}
     READ_ONLY_METHODS = {"get", "options", "head", "trace"}

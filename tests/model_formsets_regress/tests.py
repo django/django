@@ -50,7 +50,7 @@ class InlineFormsetTests(TestCase):
         if form.is_valid():
             user = form.save()
         else:
-            self.fail("Errors found on form:%s" % form_set)
+            self.fail("Errors found on form:{}".format(form_set))
 
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
@@ -59,7 +59,7 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(usersite[0]["data"], 10)
             self.assertEqual(usersite[0]["user_id"], "apollo13")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
         # Now update the UserSite instance
         data = {
@@ -77,7 +77,7 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(usersite[0]["data"], 11)
             self.assertEqual(usersite[0]["user_id"], "apollo13")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
         # Now add a new UserSite instance
         data = {
@@ -99,7 +99,7 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(usersite[1]["data"], 42)
             self.assertEqual(usersite[1]["user_id"], "apollo13")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
     def test_formset_over_inherited_model(self):
         """
@@ -126,7 +126,7 @@ class InlineFormsetTests(TestCase):
         if form.is_valid():
             restaurant = form.save()
         else:
-            self.fail("Errors found on form:%s" % form_set)
+            self.fail("Errors found on form:{}".format(form_set))
 
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
@@ -134,7 +134,7 @@ class InlineFormsetTests(TestCase):
             manager = Manager.objects.values()
             self.assertEqual(manager[0]["name"], "Guido Van Rossum")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
         # Now update the Manager instance
         data = {
@@ -150,7 +150,7 @@ class InlineFormsetTests(TestCase):
             manager = Manager.objects.values()
             self.assertEqual(manager[0]["name"], "Terry Gilliam")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
         # Now add a new Manager instance
         data = {
@@ -168,7 +168,7 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(manager[0]["name"], "John Cleese")
             self.assertEqual(manager[1]["name"], "Terry Gilliam")
         else:
-            self.fail("Errors found on formset:%s" % form_set.errors)
+            self.fail("Errors found on formset:{}".format(form_set.errors))
 
     def test_inline_model_with_to_field(self):
         """

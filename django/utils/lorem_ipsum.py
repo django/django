@@ -237,7 +237,7 @@ def sentence():
     ]
     s = ", ".join(sections)
     # Convert to sentence case and add end punctuation.
-    return "%s%s%s" % (s[0].upper(), s[1:], random.choice("?."))
+    return "{}{}{}".format(s[0].upper(), s[1:], random.choice("?."))
 
 
 def paragraph():

@@ -703,8 +703,8 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
                     '{% load i18n %}{% blocktranslate context with month="May" %}'
                     "{{ month }}{% endblocktranslate %}"
                 )
-            msg = (
-                '"context" in %r tag expected exactly one argument.' % "blocktranslate"
+            msg = '"context" in {!r} tag expected exactly one argument.'.format(
+                "blocktranslate"
             )
             with self.assertRaisesMessage(TemplateSyntaxError, msg):
                 self.get_template(

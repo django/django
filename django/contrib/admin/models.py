@@ -188,7 +188,7 @@ class LogEntry(models.Model):
         Return the admin URL to edit the object represented by this log entry.
         """
         if self.content_type and self.object_id:
-            url_name = "admin:%s_%s_change" % (
+            url_name = "admin:{}_{}_change".format(
                 self.content_type.app_label,
                 self.content_type.model,
             )

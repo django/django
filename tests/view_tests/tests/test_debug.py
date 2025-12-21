@@ -317,7 +317,7 @@ class DebugViewTests(SimpleTestCase):
             self.assertFalse(
                 re.search(b"[^c0-9]", id_repr),
                 "Numeric IDs in debug response HTML page shouldn't be localized "
-                "(value: %s)." % id_repr.decode(),
+                "(value: {}).".format(id_repr.decode()),
             )
 
     def test_template_exceptions(self):
@@ -330,7 +330,7 @@ class DebugViewTests(SimpleTestCase):
                     raising_loc.find('raise Exception("boom")'),
                     -1,
                     "Failed to find 'raise Exception' in last frame of "
-                    "traceback, instead found: %s" % raising_loc,
+                    "traceback, instead found: {}".format(raising_loc),
                 )
 
     @skipIf(
@@ -380,7 +380,7 @@ class DebugViewTests(SimpleTestCase):
                 )
             self.assertContains(
                 response,
-                "%s (Source does not exist)" % template_path,
+                "{} (Source does not exist)".format(template_path),
                 status_code=500,
                 count=2,
             )
@@ -388,8 +388,9 @@ class DebugViewTests(SimpleTestCase):
             self.assertContains(
                 response,
                 "<li><code>django.template.loaders.filesystem.Loader</code>: "
-                "%s (Source does not exist)</li>"
-                % os.path.join(tempdir, "notfound.html"),
+                "{} (Source does not exist)</li>".format(
+                    os.path.join(tempdir, "notfound.html")
+                ),
                 status_code=500,
                 html=True,
             )
@@ -1347,11 +1348,11 @@ class PlainTextReportTests(SimpleTestCase):
         )
         self.assertIn(
             "Template error:\n"
-            "In template %(path)s, error at line 2\n"
+            "In template {path}, error at line 2\n"
             "   'cycle' tag requires at least two arguments\n"
             "   1 : Template with error:\n"
-            "   2 :  {%% cycle %%} \n"
-            "   3 : " % {"path": templ_path},
+            "   2 :  {{% cycle %}} \n"
+            "   3 : ".format(path=templ_path),
             text,
         )
 
@@ -1970,7 +1971,9 @@ class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
 
 @override_settings(
     ROOT_URLCONF="view_tests.urls",
-    DEFAULT_EXCEPTION_REPORTER_FILTER="%s.CustomExceptionReporterFilter" % __name__,
+    DEFAULT_EXCEPTION_REPORTER_FILTER="{}.CustomExceptionReporterFilter".format(
+        __name__
+    ),
 )
 class CustomExceptionReporterFilterTests(SimpleTestCase):
     def setUp(self):

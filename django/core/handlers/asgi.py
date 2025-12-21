@@ -90,7 +90,7 @@ class ASGIRequest(HttpRequest):
             elif name == "content-type":
                 corrected_name = "CONTENT_TYPE"
             else:
-                corrected_name = "HTTP_%s" % name.upper().replace("-", "_")
+                corrected_name = "HTTP_{}".format(name.upper().replace("-", "_"))
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
@@ -159,7 +159,9 @@ class ASGIHandler(base.BaseHandler):
         # FIXME: Allow to override this.
         if scope["type"] != "http":
             raise ValueError(
-                "Django can only handle ASGI/HTTP connections, not %s." % scope["type"]
+                "Django can only handle ASGI/HTTP connections, not {}.".format(
+                    scope["type"]
+                )
             )
 
         async with ThreadSensitiveContext():
@@ -216,7 +218,9 @@ class ASGIHandler(base.BaseHandler):
         if message["type"] == "http.disconnect":
             raise RequestAborted()
         # This should never happen.
-        assert False, "Invalid ASGI message after request body: %s" % message["type"]
+        assert False, "Invalid ASGI message after request body: {}".format(
+            message["type"]
+        )
 
     async def run_get_response(self, request):
         """Get async response."""

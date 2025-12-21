@@ -20,7 +20,7 @@ class File(FileProxyMixin):
         return self.name or ""
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self or "None")
+        return "<{}: {}>".format(self.__class__.__name__, self or "None")
 
     def __bool__(self):
         return bool(self.name)

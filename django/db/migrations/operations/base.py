@@ -107,7 +107,7 @@ class Operation:
         """
         Output a brief summary of what the action does.
         """
-        return "%s: %s" % (self.__class__.__name__, self._constructor_args)
+        return "{}: {}".format(self.__class__.__name__, self._constructor_args)
 
     def formatted_description(self):
         """Output a description prefixed by a category symbol."""
@@ -170,8 +170,8 @@ class Operation:
         return False
 
     def __repr__(self):
-        return "<%s %s%s>" % (
+        return "<{} {}{}>".format(
             self.__class__.__name__,
             ", ".join(map(repr, self._constructor_args[0])),
-            ",".join(" %s=%r" % x for x in self._constructor_args[1].items()),
+            ",".join(" {}={!r}".format(*x) for x in self._constructor_args[1].items()),
         )

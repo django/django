@@ -51,7 +51,7 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             "mysql",
             "--user=optionuser",
             "--host=optionhost",
-            "--port=%s" % options_port,
+            "--port={}".format(options_port),
             "optiondbname",
         ]
         expected_env = {"MYSQL_PWD": "optionpassword"}

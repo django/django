@@ -97,11 +97,11 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             23,
             # Hangs "forever" before fixing a catastrophic backtracking,
             # see #11198.
-            "http://%s" % ("X" * 60,),
+            "http://{}".format("X" * 60),
             # A second example, to make sure the problem is really addressed,
             # even on domains that don't fail the domain label length check in
             # the regex.
-            "http://%s" % ("X" * 200,),
+            "http://{}".format("X" * 200),
             # urlsplit() raises ValueError.
             "////]@N.AN",
             # Empty hostname.

@@ -169,7 +169,9 @@ class ClientTest(TestCase):
                         response = client_method(
                             "/json_view/", data, content_type="application/json"
                         )
-                        self.assertContains(response, "Viewing %s page." % method_name)
+                        self.assertContains(
+                            response, "Viewing {} page.".format(method_name)
+                        )
                         self.assertEqual(response.context["data"], expected)
 
     def test_json_encoder_argument(self):
@@ -355,7 +357,9 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_%s/" % code, data={"value": "test"}, follow=True
+                    "/redirect_view_{}/".format(code),
+                    data={"value": "test"},
+                    follow=True,
                 )
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.request["PATH_INFO"], "/post_view/")
@@ -368,7 +372,7 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_%s_query_string/" % code,
+                    "/redirect_view_{}_query_string/".format(code),
                     data={"value": "test"},
                     follow=True,
                 )
@@ -384,7 +388,7 @@ class ClientTest(TestCase):
             with self.subTest(method=method, code=code):
                 req_method = getattr(self.client, method)
                 response = req_method(
-                    "/redirect_view_%s_query_string/" % code,
+                    "/redirect_view_{}_query_string/".format(code),
                     data={"value": "test"},
                     follow=True,
                 )
@@ -397,7 +401,9 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.post(
-                    "/redirect_view_%s/" % code, data={"value": "test"}, follow=True
+                    "/redirect_view_{}/".format(code),
+                    data={"value": "test"},
+                    follow=True,
                 )
                 self.assertContains(response, "test is the value")
 
@@ -405,7 +411,9 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.put(
-                    "/redirect_view_%s/?to=/put_view/" % code, data="a=b", follow=True
+                    "/redirect_view_{}/?to=/put_view/".format(code),
+                    data="a=b",
+                    follow=True,
                 )
                 self.assertContains(response, "a=b is the body")
 
@@ -414,7 +422,7 @@ class ClientTest(TestCase):
         for code in (307, 308):
             with self.subTest(code=code):
                 response = self.client.get(
-                    "/redirect_view_%s/" % code, data=data, follow=True
+                    "/redirect_view_{}/".format(code), data=data, follow=True
                 )
                 self.assertContains(response, "30 is the value")
 

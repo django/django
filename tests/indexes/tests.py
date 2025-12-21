@@ -74,7 +74,7 @@ class SchemaIndexesTests(TestCase):
         index = Index(fields=["headline"], name="whitespace_idx")
         editor = connection.schema_editor()
         self.assertIn(
-            "(%s)" % editor.quote_name("headline"),
+            "({})".format(editor.quote_name("headline")),
             str(index.create_sql(Article, editor)),
         )
 
@@ -83,7 +83,7 @@ class SchemaIndexesTests(TestCase):
         index = Index(fields=["-headline"], name="whitespace_idx")
         editor = connection.schema_editor()
         self.assertIn(
-            "(%s DESC)" % editor.quote_name("headline"),
+            "({} DESC)".format(editor.quote_name("headline")),
             str(index.create_sql(Article, editor)),
         )
 
@@ -137,7 +137,7 @@ class PartialIndexConditionIgnoredTests(TransactionTestCase):
             editor.add_index(Article, index)
 
         self.assertNotIn(
-            "WHERE %s" % editor.quote_name("published"),
+            "WHERE {}".format(editor.quote_name("published")),
             str(index.create_sql(Article, editor)),
         )
 
@@ -308,7 +308,7 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             self.assertIn(
-                "(%s text_pattern_ops)" % editor.quote_name("headline"),
+                "({} text_pattern_ops)".format(editor.quote_name("headline")),
                 str(index.create_sql(Article, editor)),
             )
 
@@ -320,7 +320,7 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             self.assertIn(
-                "(%s text_pattern_ops DESC)" % editor.quote_name("headline"),
+                "({} text_pattern_ops DESC)".format(editor.quote_name("headline")),
                 str(index.create_sql(Article, editor)),
             )
 
@@ -399,7 +399,7 @@ class PartialIndexTests(TransactionTestCase):
                 ),
             )
             self.assertIn(
-                "WHERE %s" % editor.quote_name("pub_date"),
+                "WHERE {}".format(editor.quote_name("pub_date")),
                 str(index.create_sql(Article, schema_editor=editor)),
             )
             editor.add_index(index=index, model=Article)
@@ -421,7 +421,7 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(pk__gt=1),
             )
             self.assertIn(
-                "WHERE %s" % editor.quote_name("id"),
+                "WHERE {}".format(editor.quote_name("id")),
                 str(index.create_sql(Article, schema_editor=editor)),
             )
             editor.add_index(index=index, model=Article)
@@ -443,7 +443,7 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(published=True),
             )
             self.assertIn(
-                "WHERE %s" % editor.quote_name("published"),
+                "WHERE {}".format(editor.quote_name("published")),
                 str(index.create_sql(Article, schema_editor=editor)),
             )
             editor.add_index(index=index, model=Article)
@@ -477,7 +477,7 @@ class PartialIndexTests(TransactionTestCase):
             )
             sql = str(index.create_sql(Article, schema_editor=editor))
             where = sql.find("WHERE")
-            self.assertIn("WHERE (%s" % editor.quote_name("pub_date"), sql)
+            self.assertIn("WHERE ({}".format(editor.quote_name("pub_date")), sql)
             # Because each backend has different syntax for the operators,
             # check ONLY the occurrence of headline in the SQL.
             self.assertGreater(sql.rfind("headline"), where)
@@ -500,7 +500,7 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(pub_date__isnull=False),
             )
             self.assertIn(
-                "WHERE %s IS NOT NULL" % editor.quote_name("pub_date"),
+                "WHERE {} IS NOT NULL".format(editor.quote_name("pub_date")),
                 str(index.create_sql(Article, schema_editor=editor)),
             )
             editor.add_index(index=index, model=Article)
@@ -528,9 +528,9 @@ class PartialIndexTests(TransactionTestCase):
         table = Article._meta.db_table
         self.assertIs(sql.references_column(table, "headline"), True)
         sql = str(sql)
-        self.assertIn("LOWER(%s)" % editor.quote_name("headline"), sql)
+        self.assertIn("LOWER({})".format(editor.quote_name("headline")), sql)
         self.assertIn(
-            "WHERE %s IS NOT NULL" % editor.quote_name("pub_date"),
+            "WHERE {} IS NOT NULL".format(editor.quote_name("pub_date")),
             sql,
         )
         self.assertGreater(sql.find("WHERE"), sql.find("LOWER"))
@@ -566,8 +566,7 @@ class CoveringIndexTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             self.assertIn(
-                "(%s) INCLUDE (%s, %s)"
-                % (
+                "({}) INCLUDE ({}, {})".format(
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
                     editor.quote_name("published"),
@@ -605,12 +604,11 @@ class CoveringIndexTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             extra_sql = ""
             if settings.DEFAULT_INDEX_TABLESPACE:
-                extra_sql = "TABLESPACE %s " % editor.quote_name(
-                    settings.DEFAULT_INDEX_TABLESPACE
+                extra_sql = "TABLESPACE {} ".format(
+                    editor.quote_name(settings.DEFAULT_INDEX_TABLESPACE)
                 )
             self.assertIn(
-                "(%s) INCLUDE (%s) %sWHERE %s "
-                % (
+                "({}) INCLUDE ({}) {}WHERE {} ".format(
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
                     extra_sql,
@@ -649,8 +647,8 @@ class CoveringIndexTests(TransactionTestCase):
         table = Article._meta.db_table
         self.assertIs(sql.references_column(table, "headline"), True)
         sql = str(sql)
-        self.assertIn("LOWER(%s)" % editor.quote_name("headline"), sql)
-        self.assertIn("INCLUDE (%s)" % editor.quote_name("pub_date"), sql)
+        self.assertIn("LOWER({})".format(editor.quote_name("headline")), sql)
+        self.assertIn("INCLUDE ({})".format(editor.quote_name("pub_date")), sql)
         self.assertGreater(sql.find("INCLUDE"), sql.find("LOWER"))
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(
@@ -684,6 +682,6 @@ class CoveringIndexIgnoredTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_index(Article, index)
         self.assertNotIn(
-            "INCLUDE (%s)" % editor.quote_name("headline"),
+            "INCLUDE ({})".format(editor.quote_name("headline")),
             str(index.create_sql(Article, editor)),
         )

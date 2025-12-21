@@ -55,8 +55,8 @@ def get_tag_uri(url, date):
     bits = urlparse(url)
     d = ""
     if date is not None:
-        d = ",%s" % date.strftime("%Y-%m-%d")
-    return "tag:%s%s:%s/%s" % (bits.hostname, d, bits.path, bits.fragment)
+        d = ",{}".format(date.strftime("%Y-%m-%d"))
+    return "tag:{}{}:{}/{}".format(bits.hostname, d, bits.path, bits.fragment)
 
 
 def _guess_stylesheet_mimetype(url):
@@ -369,7 +369,7 @@ class Rss201rev2Feed(RssFeed):
         # Author information.
         if item["author_name"] and item["author_email"]:
             handler.addQuickElement(
-                "author", "%s (%s)" % (item["author_email"], item["author_name"])
+                "author", "{} ({})".format(item["author_email"], item["author_name"])
             )
         elif item["author_email"]:
             handler.addQuickElement("author", item["author_email"])

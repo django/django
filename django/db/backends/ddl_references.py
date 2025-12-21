@@ -40,7 +40,7 @@ class Reference:
         pass
 
     def __repr__(self):
-        return "<%s %r>" % (self.__class__.__name__, str(self))
+        return "<{} {!r}>".format(self.__class__.__name__, str(self))
 
     def __str__(self):
         raise NotImplementedError(

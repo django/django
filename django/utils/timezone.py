@@ -97,7 +97,7 @@ def activate(timezone):
     elif isinstance(timezone, str):
         _active.value = zoneinfo.ZoneInfo(timezone)
     else:
-        raise ValueError("Invalid timezone: %r" % timezone)
+        raise ValueError("Invalid timezone: {!r}".format(timezone))
 
 
 def deactivate():
@@ -240,7 +240,7 @@ def make_aware(value, timezone=None):
         timezone = get_current_timezone()
     # Check that we won't overwrite the timezone of an aware datetime.
     if is_aware(value):
-        raise ValueError("make_aware expects a naive datetime, got %s" % value)
+        raise ValueError("make_aware expects a naive datetime, got {}".format(value))
     # This may be wrong around DST changes!
     return value.replace(tzinfo=timezone)
 

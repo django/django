@@ -43,8 +43,8 @@ class BaseHandler:
             middleware_can_async = getattr(middleware, "async_capable", False)
             if not middleware_can_sync and not middleware_can_async:
                 raise RuntimeError(
-                    "Middleware %s must have at least one of "
-                    "sync_capable/async_capable set to True." % middleware_path
+                    "Middleware {} must have at least one of "
+                    "sync_capable/async_capable set to True.".format(middleware_path)
                 )
             elif not handler_is_async and middleware_can_sync:
                 middleware_is_async = False
@@ -57,7 +57,7 @@ class BaseHandler:
                     handler,
                     handler_is_async,
                     debug=settings.DEBUG,
-                    name="middleware %s" % middleware_path,
+                    name="middleware {}".format(middleware_path),
                 )
                 mw_instance = middleware(adapted_handler)
             except MiddlewareNotUsed as exc:
@@ -72,7 +72,7 @@ class BaseHandler:
 
             if mw_instance is None:
                 raise ImproperlyConfigured(
-                    "Middleware factory %s returned None." % middleware_path
+                    "Middleware factory {} returned None.".format(middleware_path)
                 )
 
             if hasattr(mw_instance, "process_view"):
@@ -122,7 +122,7 @@ class BaseHandler:
         if method_is_async is None:
             method_is_async = iscoroutinefunction(method)
         if debug and not name:
-            name = name or "method %s()" % method.__qualname__
+            name = name or "method {}()".format(method.__qualname__)
         if is_async:
             if not method_is_async:
                 if debug:
@@ -214,8 +214,9 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name="{}.process_template_response".format(
+                        middleware_method.__self__.__class__.__name__
+                    ),
                 )
             try:
                 response = response.render()
@@ -275,8 +276,9 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name="{}.process_template_response".format(
+                        middleware_method.__self__.__class__.__name__
+                    ),
                 )
             try:
                 if iscoroutinefunction(response.render):
@@ -323,22 +325,22 @@ class BaseHandler:
             return
         if not name:
             if isinstance(callback, types.FunctionType):  # FBV
-                name = "The view %s.%s" % (callback.__module__, callback.__name__)
+                name = "The view {}.{}".format(callback.__module__, callback.__name__)
             else:  # CBV
-                name = "The view %s.%s.__call__" % (
+                name = "The view {}.{}.__call__".format(
                     callback.__module__,
                     callback.__class__.__name__,
                 )
         if response is None:
             raise ValueError(
-                "%s didn't return an HttpResponse object. It returned None "
-                "instead." % name
+                "{} didn't return an HttpResponse object. It returned None "
+                "instead.".format(name)
             )
         elif asyncio.iscoroutine(response):
             raise ValueError(
-                "%s didn't return an HttpResponse object. It returned an "
+                "{} didn't return an HttpResponse object. It returned an "
                 "unawaited coroutine instead. You may need to add an 'await' "
-                "into your view." % name
+                "into your view.".format(name)
             )
 
     # Other utility methods.

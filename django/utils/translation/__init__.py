@@ -128,9 +128,9 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     return values[number]
                 except KeyError:
                     raise KeyError(
-                        "Your dictionary lacks key '%s'. Please provide "
+                        "Your dictionary lacks key '{}'. Please provide "
                         "it, because it is required to determine whether "
-                        "string is singular or plural." % number
+                        "string is singular or plural.".format(number)
                     )
 
             def _translate(self, number_value):
@@ -277,13 +277,13 @@ def get_language_info(lang_code):
             info = lang_info
     except KeyError:
         if "-" not in lang_code:
-            raise KeyError("Unknown language code %s." % lang_code)
+            raise KeyError("Unknown language code {}.".format(lang_code))
         generic_lang_code = lang_code.split("-")[0]
         try:
             info = LANG_INFO[generic_lang_code]
         except KeyError:
             raise KeyError(
-                "Unknown language code %s and %s." % (lang_code, generic_lang_code)
+                "Unknown language code {} and {}.".format(lang_code, generic_lang_code)
             )
 
     if info:

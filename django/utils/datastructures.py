@@ -75,7 +75,7 @@ class MultiValueDict(dict):
         super().__init__(key_to_list_mapping)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, super().__repr__())
+        return "<{}: {}>".format(self.__class__.__name__, super().__repr__())
 
     def __getitem__(self, key):
         """
@@ -342,7 +342,7 @@ class CaseInsensitiveMapping(Mapping):
                 )
             if not isinstance(elem[0], str):
                 raise ValueError(
-                    "Element key %r invalid, only strings are allowed" % elem[0]
+                    "Element key {!r} invalid, only strings are allowed".format(elem[0])
                 )
             yield elem
 

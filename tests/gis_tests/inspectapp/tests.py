@@ -163,7 +163,7 @@ class OGRInspectTest(SimpleTestCase):
             self.assertIn("    f_float = models.FloatField()", model_def)
         max_length = 0 if connection.vendor == "sqlite" else 10
         self.assertIn(
-            "    f_char = models.CharField(max_length=%s)" % max_length, model_def
+            "    f_char = models.CharField(max_length={})".format(max_length), model_def
         )
         self.assertIn("    f_date = models.DateField()", model_def)
 

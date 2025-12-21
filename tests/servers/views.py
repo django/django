@@ -27,7 +27,7 @@ def create_model_instance(request):
 
 def environ_view(request):
     return HttpResponse(
-        "\n".join("%s: %r" % (k, v) for k, v in request.environ.items())
+        "\n".join("{}: {!r}".format(k, v) for k, v in request.environ.items())
     )
 
 

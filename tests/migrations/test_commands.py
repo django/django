@@ -505,8 +505,10 @@ class MigrateTests(MigrationTestBase):
         )
         self.assertEqual(
             "migrations\n"
-            " [x] 0001_initial (applied at %s)\n"
-            " [ ] 0002_second\n" % migration1.applied.strftime("%Y-%m-%d %H:%M:%S"),
+            " [x] 0001_initial (applied at {})\n"
+            " [ ] 0002_second\n".format(
+                migration1.applied.strftime("%Y-%m-%d %H:%M:%S")
+            ),
             out.getvalue().lower(),
         )
         # Cleanup by unmigrating everything
@@ -927,7 +929,9 @@ class MigrateTests(MigrationTestBase):
             ],
         )
         self.assertIn(
-            "create table %s" % connection.ops.quote_name("migrations_author").lower(),
+            "create table {}".format(
+                connection.ops.quote_name("migrations_author").lower()
+            ),
             lines[3].lower(),
         )
         pos = lines.index("--", 3)
@@ -940,7 +944,9 @@ class MigrateTests(MigrationTestBase):
             ],
         )
         self.assertIn(
-            "create table %s" % connection.ops.quote_name("migrations_tribble").lower(),
+            "create table {}".format(
+                connection.ops.quote_name("migrations_tribble").lower()
+            ),
             lines[pos + 3].lower(),
         )
         pos = lines.index("--", pos + 3)
@@ -1014,9 +1020,8 @@ class MigrateTests(MigrationTestBase):
                 ],
             )
             next_pos = lines.index("--", pos + 3)
-            drop_table_sql = (
-                "drop table %s"
-                % connection.ops.quote_name("migrations_tribble").lower()
+            drop_table_sql = "drop table {}".format(
+                connection.ops.quote_name("migrations_tribble").lower()
             )
             for line in lines[pos + 3 : next_pos]:
                 if drop_table_sql in line.lower():
@@ -1032,8 +1037,8 @@ class MigrateTests(MigrationTestBase):
                     "--",
                 ],
             )
-            drop_table_sql = (
-                "drop table %s" % connection.ops.quote_name("migrations_author").lower()
+            drop_table_sql = "drop table {}".format(
+                connection.ops.quote_name("migrations_author").lower()
             )
             for line in lines[pos + 3 :]:
                 if drop_table_sql in line.lower():
@@ -1232,7 +1237,7 @@ class MigrateTests(MigrationTestBase):
         table_name = truncate_name(
             "unmigrated_app_syncdb_classroom", connection.ops.max_name_length()
         )
-        self.assertIn("Creating table %s" % table_name, stdout)
+        self.assertIn("Creating table {}".format(table_name), stdout)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_syncdb_app_with_migrations(self):
@@ -1946,7 +1951,9 @@ class MakeMigrationsTests(MigrationTestBase):
             else:
                 target_str = "('migrations', '0002_conflicting_second')"
             self.assertIn(target_str, content)
-        self.assertIn("Created new merge migration %s" % merge_file, out.getvalue())
+        self.assertIn(
+            "Created new merge migration {}".format(merge_file), out.getvalue()
+        )
 
     @mock.patch("django.db.migrations.utils.datetime")
     def test_makemigrations_auto_merge_name(self, mock_datetime):
@@ -2539,7 +2546,7 @@ class MakeMigrationsTests(MigrationTestBase):
                     *args,
                 )
                 migration_file = os.path.join(
-                    migration_dir, "%s_%s.py" % (migration_count, migration_name)
+                    migration_dir, "{}_{}.py".format(migration_count, migration_name)
                 )
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
@@ -2976,12 +2983,12 @@ class SquashMigrationsTests(MigrationTestBase):
             " - 0002_second\n"
             "Optimizing...\n"
             "  Optimized from 8 operations to 2 operations.\n"
-            "Created new squashed migration %s\n"
+            "Created new squashed migration {}\n"
             "  You should commit this migration but leave the old ones in place;\n"
             "  the new migration will be used for new installs. Once you are sure\n"
             "  all instances of the codebase have applied the migrations you "
             "squashed,\n"
-            "  you can delete them.\n" % squashed_migration_file,
+            "  you can delete them.\n".format(squashed_migration_file),
         )
 
     def test_squashmigrations_replacement_cycle(self):
@@ -3335,7 +3342,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 verbosity=0,
             )
             squashed_migration_file = os.path.join(
-                migration_dir, "0001_%s.py" % squashed_name
+                migration_dir, "0001_{}.py".format(squashed_name)
             )
             self.assertTrue(os.path.exists(squashed_migration_file))
 
@@ -3354,7 +3361,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 verbosity=0,
             )
             squashed_migration_file = os.path.join(
-                migration_dir, "0001_%s.py" % squashed_name
+                migration_dir, "0001_{}.py".format(squashed_name)
             )
             self.assertTrue(os.path.exists(squashed_migration_file))
 

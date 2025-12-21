@@ -84,7 +84,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             else:
                 os.makedirs(directory, exist_ok=True)
         except FileExistsError:
-            raise FileExistsError("%s exists and is not a directory." % directory)
+            raise FileExistsError("{} exists and is not a directory.".format(directory))
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the

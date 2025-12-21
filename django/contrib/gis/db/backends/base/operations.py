@@ -94,7 +94,7 @@ class BaseSpatialOperations:
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
-        return "'%s'" % name
+        return "'{}'".format(name)
 
     # GeometryField operations
     def geo_db_type(self, f):
@@ -128,29 +128,30 @@ class BaseSpatialOperations:
 
         if hasattr(value, "as_sql"):
             return (
-                "%s(%%s, %s)" % (self.spatial_function_name("Transform"), f.srid)
+                "{}(%s, {})".format(self.spatial_function_name("Transform"), f.srid)
                 if transform_value(value.output_field, f)
                 else "%s"
             )
         if transform_value(value, f):
             # Add Transform() to the SQL placeholder.
-            return "%s(%s(%%s,%s), %s)" % (
+            return "{}({}(%s,{}), {})".format(
                 self.spatial_function_name("Transform"),
                 self.from_text,
                 value.srid,
                 f.srid,
             )
         elif self.connection.features.has_spatialrefsys_table:
-            return "%s(%%s,%s)" % (self.from_text, f.srid)
+            return "{}(%s,{})".format(self.from_text, f.srid)
         else:
             # For backwards compatibility on MySQL (#27464).
-            return "%s(%%s)" % self.from_text
+            return "{}(%s)".format(self.from_text)
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):
             raise NotSupportedError(
-                "%s spatial aggregation is not supported by this database backend."
-                % expression.name
+                "{} spatial aggregation is not supported by this database backend.".format(
+                    expression.name
+                )
             )
         super().check_expression_support(expression)
 
@@ -162,7 +163,7 @@ class BaseSpatialOperations:
     def spatial_function_name(self, func_name):
         if func_name in self.unsupported_functions:
             raise NotSupportedError(
-                "This backend doesn't support the %s function." % func_name
+                "This backend doesn't support the {} function.".format(func_name)
             )
         return self.function_names.get(func_name, self.geom_func_prefix + func_name)
 

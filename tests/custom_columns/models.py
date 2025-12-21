@@ -28,7 +28,7 @@ class Author(models.Model):
         ordering = ("last_name", "first_name")
 
     def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class Article(models.Model):

@@ -28,13 +28,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
-            return "'%s'" % value
+            return "'{}'".format(value)
         elif isinstance(value, datetime.timedelta):
-            return "'%s'" % duration_iso_string(value)
+            return "'{}'".format(duration_iso_string(value))
         elif isinstance(value, str):
-            return "'%s'" % value.replace("'", "''")
+            return "'{}'".format(value.replace("'", "''"))
         elif isinstance(value, (bytes, bytearray, memoryview)):
-            return "'%s'" % value.hex()
+            return "'{}'".format(value.hex())
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
@@ -57,17 +57,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 i INTEGER;
             BEGIN
                 SELECT COUNT(1) INTO i FROM USER_SEQUENCES
-                    WHERE SEQUENCE_NAME = '%(sq_name)s';
+                    WHERE SEQUENCE_NAME = '{sq_name}';
                 IF i = 1 THEN
-                    EXECUTE IMMEDIATE 'DROP SEQUENCE "%(sq_name)s"';
+                    EXECUTE IMMEDIATE 'DROP SEQUENCE "{sq_name}"';
                 END IF;
             END;
-        /"""
-            % {
-                "sq_name": self.connection.ops._get_no_autofield_sequence_name(
+        /""".format(
+                sq_name=self.connection.ops._get_no_autofield_sequence_name(
                     model._meta.db_table
-                )
-            }
+                ),
+            )
         )
 
     def alter_field(self, model, old_field, new_field, strict=False):
@@ -128,23 +127,26 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
         if re.match("^N?CLOB", old_type):
-            new_value = "TO_CHAR(%s)" % new_value
+            new_value = "TO_CHAR({})".format(new_value)
             old_type = "VARCHAR2"
         if re.match("^N?VARCHAR2", old_type):
             new_internal_type = new_field.get_internal_type()
             if new_internal_type == "DateField":
-                new_value = "TO_DATE(%s, 'YYYY-MM-DD')" % new_value
+                new_value = "TO_DATE({}, 'YYYY-MM-DD')".format(new_value)
             elif new_internal_type == "DateTimeField":
-                new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
+                new_value = "TO_TIMESTAMP({}, 'YYYY-MM-DD HH24:MI:SS.FF')".format(
+                    new_value
+                )
             elif new_internal_type == "TimeField":
                 # TimeField are stored as TIMESTAMP with a 1900-01-01 date
                 # part.
-                new_value = "CONCAT('1900-01-01 ', %s)" % new_value
-                new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
+                new_value = "CONCAT('1900-01-01 ', {})".format(new_value)
+                new_value = "TO_TIMESTAMP({}, 'YYYY-MM-DD HH24:MI:SS.FF')".format(
+                    new_value
+                )
         # Transfer values across
         self.execute(
-            "UPDATE %s set %s=%s"
-            % (
+            "UPDATE {} set {}={}".format(
                 self.quote_name(model._meta.db_table),
                 self.quote_name(new_temp_field.column),
                 new_value,
@@ -230,11 +232,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _drop_identity(self, table_name, column_name):
         self.execute(
-            "ALTER TABLE %(table)s MODIFY %(column)s DROP IDENTITY"
-            % {
-                "table": self.quote_name(table_name),
-                "column": self.quote_name(column_name),
-            }
+            "ALTER TABLE {table} MODIFY {column} DROP IDENTITY".format(
+                table=self.quote_name(table_name),
+                column=self.quote_name(column_name),
+            )
         )
 
     def _get_default_collation(self, table_name):

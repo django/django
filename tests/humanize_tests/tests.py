@@ -33,13 +33,16 @@ class HumanizeTests(SimpleTestCase):
     ):
         for test_content, result in zip(test_list, result_list):
             with self.subTest(test_content):
-                t = Template("{%% load humanize %%}{{ test_content|%s }}" % method)
+                t = Template(
+                    "{{% load humanize %}}{{{{ test_content|{} }}}}".format(method)
+                )
                 rendered = t.render(Context(locals())).strip()
                 self.assertEqual(
                     rendered,
                     normalize_result_func(result),
-                    msg="%s test failed, produced '%s', should've produced '%s'"
-                    % (method, rendered, result),
+                    msg="{} test failed, produced '{}', should've produced '{}'".format(
+                        method, rendered, result
+                    ),
                 )
 
     def test_ordinal(self):

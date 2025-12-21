@@ -67,7 +67,7 @@ class AdminSidebarTests(TestCase):
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
         self.assertContains(
-            response, '<a href="%s" aria-current="page">Users</a>' % url
+            response, '<a href="{}" aria-current="page">Users</a>'.format(url)
         )
 
     @override_settings(
@@ -92,7 +92,7 @@ class AdminSidebarTests(TestCase):
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
         # Does not include aria-current attribute.
-        self.assertContains(response, '<a href="%s">Users</a>' % url)
+        self.assertContains(response, '<a href="{}">Users</a>'.format(url))
 
     @override_settings(DEBUG=True)
     def test_included_app_list_template_context_fully_set(self):

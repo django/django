@@ -226,7 +226,7 @@ class ValidationError(Exception):
         return repr(list(self))
 
     def __repr__(self):
-        return "ValidationError(%s)" % self
+        return "ValidationError({})".format(self)
 
     def __eq__(self, other):
         if not isinstance(other, ValidationError):

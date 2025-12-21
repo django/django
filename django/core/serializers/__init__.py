@@ -242,11 +242,12 @@ def sort_dependencies(app_list, allow_cycles=False):
                 model_list.append(model)
             else:
                 raise RuntimeError(
-                    "Can't resolve dependencies for %s in serialized app list."
-                    % ", ".join(
-                        model._meta.label
-                        for model, deps in sorted(
-                            skipped, key=lambda obj: obj[0].__name__
+                    "Can't resolve dependencies for {} in serialized app list.".format(
+                        ", ".join(
+                            model._meta.label
+                            for model, deps in sorted(
+                                skipped, key=lambda obj: obj[0].__name__
+                            )
                         )
                     ),
                 )

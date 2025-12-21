@@ -157,7 +157,7 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return "%s | %s" % (
+        return "{} | {}".format(
             model._meta.app_config.verbose_name,
             model._meta.verbose_name,
         )

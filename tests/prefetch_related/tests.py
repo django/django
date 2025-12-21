@@ -83,8 +83,9 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         self.assertEqual(
             sql.count(str(needle), where_idx),
             1,
-            msg="WHERE clause doesn't contain %s, actual SQL: %s"
-            % (needle, sql[where_idx:]),
+            msg="WHERE clause doesn't contain {}, actual SQL: {}".format(
+                needle, sql[where_idx:]
+            ),
         )
 
     def test_m2m_forward(self):
@@ -1173,8 +1174,9 @@ class DefaultManagerTests(TestCase):
             # related qualifications, since this will do one query per teacher.
             qs = Department.objects.prefetch_related("teachers")
             depts = "".join(
-                "%s department: %s\n"
-                % (dept.name, ", ".join(str(t) for t in dept.teachers.all()))
+                "{} department: {}\n".format(
+                    dept.name, ", ".join(str(t) for t in dept.teachers.all())
+                )
                 for dept in qs
             )
 
@@ -1616,8 +1618,9 @@ class MultiDbTests(TestCase):
         qs1 = B.prefetch_related("authors")
         with self.assertNumQueries(2, using="other"):
             books = "".join(
-                "%s (%s)\n"
-                % (book.title, ", ".join(a.name for a in book.authors.all()))
+                "{} ({})\n".format(
+                    book.title, ", ".join(a.name for a in book.authors.all())
+                )
                 for book in qs1
             )
         self.assertEqual(
@@ -1632,8 +1635,9 @@ class MultiDbTests(TestCase):
         qs2 = A.prefetch_related("books")
         with self.assertNumQueries(2, using="other"):
             authors = "".join(
-                "%s: %s\n"
-                % (author.name, ", ".join(b.title for b in author.books.all()))
+                "{}: {}\n".format(
+                    author.name, ", ".join(b.title for b in author.books.all())
+                )
                 for author in qs2
             )
         self.assertEqual(
@@ -1663,8 +1667,9 @@ class MultiDbTests(TestCase):
         # Reverse
         with self.assertNumQueries(2, using="other"):
             books = "".join(
-                "%s (%s)\n"
-                % (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
+                "{} ({})\n".format(
+                    b.title, ", ".join(a.name for a in b.first_time_authors.all())
+                )
                 for b in B.prefetch_related("first_time_authors")
             )
         self.assertEqual(
@@ -1707,8 +1712,9 @@ class MultiDbTests(TestCase):
         with self.assertNumQueries(2, using="other"):
             prefetch = Prefetch("first_time_authors", queryset=Author.objects.all())
             books = "".join(
-                "%s (%s)\n"
-                % (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
+                "{} ({})\n".format(
+                    b.title, ", ".join(a.name for a in b.first_time_authors.all())
+                )
                 for b in B.prefetch_related(prefetch)
             )
         self.assertEqual(
@@ -1721,8 +1727,9 @@ class MultiDbTests(TestCase):
                 "first_time_authors", queryset=Author.objects.using("other")
             )
             books = "".join(
-                "%s (%s)\n"
-                % (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
+                "{} ({})\n".format(
+                    b.title, ", ".join(a.name for a in b.first_time_authors.all())
+                )
                 for b in B.prefetch_related(prefetch)
             )
         self.assertEqual(
@@ -1739,8 +1746,9 @@ class MultiDbTests(TestCase):
                 "first_time_authors", queryset=Author.objects.using("default")
             )
             books = "".join(
-                "%s (%s)\n"
-                % (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
+                "{} ({})\n".format(
+                    b.title, ", ".join(a.name for a in b.first_time_authors.all())
+                )
                 for b in B.prefetch_related(prefetch)
             )
         self.assertEqual(books, "Poems ()\n" "Sense and Sensibility ()\n")

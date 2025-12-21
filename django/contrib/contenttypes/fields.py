@@ -88,7 +88,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
             return [
                 checks.Error(
                     "The GenericForeignKey object ID references the "
-                    "nonexistent field '%s'." % self.fk_field,
+                    "nonexistent field '{}'.".format(self.fk_field),
                     obj=self,
                     id="contenttypes.E001",
                 )
@@ -107,8 +107,9 @@ class GenericForeignKey(FieldCacheMixin, Field):
             return [
                 checks.Error(
                     "The GenericForeignKey content type references the "
-                    "nonexistent field '%s.%s'."
-                    % (self.model._meta.object_name, self.ct_field),
+                    "nonexistent field '{}.{}'.".format(
+                        self.model._meta.object_name, self.ct_field
+                    ),
                     obj=self,
                     id="contenttypes.E002",
                 )
@@ -117,8 +118,9 @@ class GenericForeignKey(FieldCacheMixin, Field):
             if not isinstance(field, models.ForeignKey):
                 return [
                     checks.Error(
-                        "'%s.%s' is not a ForeignKey."
-                        % (self.model._meta.object_name, self.ct_field),
+                        "'{}.{}' is not a ForeignKey.".format(
+                            self.model._meta.object_name, self.ct_field
+                        ),
                         hint=(
                             "GenericForeignKeys must use a ForeignKey to "
                             "'contenttypes.ContentType' as the 'content_type' field."
@@ -130,8 +132,9 @@ class GenericForeignKey(FieldCacheMixin, Field):
             elif field.remote_field.model != ContentType:
                 return [
                     checks.Error(
-                        "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'."
-                        % (self.model._meta.object_name, self.ct_field),
+                        "'{}.{}' is not a ForeignKey to 'contenttypes.ContentType'.".format(
+                            self.model._meta.object_name, self.ct_field
+                        ),
                         hint=(
                             "GenericForeignKeys must use a ForeignKey to "
                             "'contenttypes.ContentType' as the 'content_type' field."
@@ -410,8 +413,9 @@ class GenericRelation(ForeignObject):
                 return [
                     checks.Error(
                         "The GenericRelation defines a relation with the model "
-                        "'%s', but that model does not have a GenericForeignKey."
-                        % target._meta.label,
+                        "'{}', but that model does not have a GenericForeignKey.".format(
+                            target._meta.label
+                        ),
                         obj=self,
                         id="contenttypes.E004",
                     )
@@ -577,11 +581,12 @@ class GenericRelation(ForeignObject):
         """
         return self.remote_field.model._base_manager.db_manager(using).filter(
             **{
-                "%s__pk"
-                % self.content_type_field_name: ContentType.objects.db_manager(using)
+                "{}__pk".format(
+                    self.content_type_field_name
+                ): ContentType.objects.db_manager(using)
                 .get_for_model(self.model, for_concrete_model=self.for_concrete_model)
                 .pk,
-                "%s__in" % self.object_id_field_name: [obj.pk for obj in objs],
+                "{}__in".format(self.object_id_field_name): [obj.pk for obj in objs],
             }
         )
 
@@ -632,7 +637,7 @@ def create_generic_related_manager(superclass, rel):
             self.pk_val = instance.pk
 
             self.core_filters = {
-                "%s__pk" % self.content_type_field_name: self.content_type.id,
+                "{}__pk".format(self.content_type_field_name): self.content_type.id,
                 self.object_id_field_name: self.pk_val,
             }
 
@@ -696,7 +701,7 @@ def create_generic_related_manager(superclass, rel):
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
-            content_type_id_field_name = "%s_id" % self.content_type_field_name
+            content_type_id_field_name = "{}_id".format(self.content_type_field_name)
             return (
                 queryset.filter(query),
                 lambda relobj: (
@@ -716,8 +721,9 @@ def create_generic_related_manager(superclass, rel):
             def check_and_update_obj(obj):
                 if not isinstance(obj, self.model):
                     raise TypeError(
-                        "'%s' instance expected, got %r"
-                        % (self.model._meta.object_name, obj)
+                        "'{}' instance expected, got {!r}".format(
+                            self.model._meta.object_name, obj
+                        )
                     )
                 setattr(obj, self.content_type_field_name, self.content_type)
                 setattr(obj, self.object_id_field_name, self.pk_val)
@@ -727,8 +733,8 @@ def create_generic_related_manager(superclass, rel):
                 for obj in objs:
                     if obj._state.adding or obj._state.db != db:
                         raise ValueError(
-                            "%r instance isn't saved. Use bulk=False or save "
-                            "the object first." % obj
+                            "{!r} instance isn't saved. Use bulk=False or save "
+                            "the object first.".format(obj)
                         )
                     check_and_update_obj(obj)
                     pks.append(obj.pk)

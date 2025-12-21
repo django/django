@@ -171,11 +171,11 @@ class Options:
 
     @property
     def label(self):
-        return "%s.%s" % (self.app_label, self.object_name)
+        return "{}.{}".format(self.app_label, self.object_name)
 
     @property
     def label_lower(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        return "{}.{}".format(self.app_label, self.model_name)
 
     @property
     def app_config(self):
@@ -232,7 +232,9 @@ class Options:
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
                 raise TypeError(
-                    "'class Meta' got invalid attribute(s): %s" % ",".join(meta_attrs)
+                    "'class Meta' got invalid attribute(s): {}".format(
+                        ",".join(meta_attrs)
+                    )
                 )
         else:
             self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
@@ -240,7 +242,7 @@ class Options:
 
         # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.model_name)
+            self.db_table = "{}_{}".format(self.app_label, self.model_name)
             self.db_table = truncate_name(
                 self.db_table, connection.ops.max_name_length()
             )
@@ -302,7 +304,7 @@ class Options:
                 )
             except StopIteration:
                 raise FieldDoesNotExist(
-                    "%s has no field named '%s'" % (self.object_name, query)
+                    "{} has no field named '{}'".format(self.object_name, query)
                 )
 
             self.ordering = ("_order",)
@@ -387,7 +389,7 @@ class Options:
         self.db_table = target._meta.db_table
 
     def __repr__(self):
-        return "<Options for %s>" % self.object_name
+        return "<Options for {}>".format(self.object_name)
 
     def __str__(self):
         return self.label_lower
@@ -440,7 +442,7 @@ class Options:
                     return swapped_for
 
                 if (
-                    "%s.%s" % (swapped_label, swapped_object.lower())
+                    "{}.{}".format(swapped_label, swapped_object.lower())
                     != self.label_lower
                 ):
                     return swapped_for
@@ -490,8 +492,7 @@ class Options:
                 return self.managers_map[base_manager_name]
             except KeyError:
                 raise ValueError(
-                    "%s has no manager named %r"
-                    % (
+                    "{} has no manager named {!r}".format(
                         self.object_name,
                         base_manager_name,
                     )
@@ -518,8 +519,7 @@ class Options:
                 return self.managers_map[default_manager_name]
             except KeyError:
                 raise ValueError(
-                    "%s has no manager named %r"
-                    % (
+                    "{} has no manager named {!r}".format(
                         self.object_name,
                         default_manager_name,
                     )
@@ -680,9 +680,9 @@ class Options:
             # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.models_ready:
                 raise FieldDoesNotExist(
-                    "%s has no field named '%s'. The app cache isn't ready yet, "
+                    "{} has no field named '{}'. The app cache isn't ready yet, "
                     "so if this is an auto-created related field, it won't "
-                    "be available yet." % (self.object_name, field_name)
+                    "be available yet.".format(self.object_name, field_name)
                 )
 
         try:
@@ -691,7 +691,7 @@ class Options:
             return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist(
-                "%s has no field named '%s'" % (self.object_name, field_name)
+                "{} has no field named '{}'".format(self.object_name, field_name)
             )
 
     def get_base_chain(self, model):
@@ -899,7 +899,7 @@ class Options:
         """
         if include_parents not in (True, False, PROXY_PARENTS):
             raise TypeError(
-                "Invalid argument for include_parents: %s" % (include_parents,)
+                "Invalid argument for include_parents: {}".format(include_parents)
             )
         # This helper function is used to allow recursion in ``get_fields()``
         # implementation and to provide a fast way for Django's internals to

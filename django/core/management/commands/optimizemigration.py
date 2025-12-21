@@ -86,8 +86,8 @@ class Command(BaseCommand):
                 raise CommandError(
                     "Migration will require manual porting but is already a squashed "
                     "migration.\nTransition to a normal migration first: "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/"
-                    "#squashing-migrations" % get_docs_version()
+                    "https://docs.djangoproject.com/en/{}/topics/migrations/"
+                    "#squashing-migrations".format(get_docs_version())
                 )
             # Make a new migration with those operations.
             subclass = type(
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                     "replaces": [(migration.app_label, migration.name)],
                 },
             )
-            optimized_migration_name = "%s_optimized" % migration.name
+            optimized_migration_name = "{}_optimized".format(migration.name)
             optimized_migration = subclass(optimized_migration_name, app_label)
             writer = MigrationWriter(optimized_migration)
             migration_file_string = writer.as_string()

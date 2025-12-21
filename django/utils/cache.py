@@ -55,7 +55,7 @@ def patch_cache_control(response, **kwargs):
         if t[1] is True:
             return t[0]
         else:
-            return "%s=%s" % (t[0], t[1])
+            return "{}={}".format(t[0], t[1])
 
     cc = defaultdict(set)
     if response.get("Cache-Control"):
@@ -342,9 +342,9 @@ def _i18n_cache_key_suffix(request, cache_key):
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
         # which in turn can also fall back to settings.LANGUAGE_CODE
-        cache_key += ".%s" % getattr(request, "LANGUAGE_CODE", get_language())
+        cache_key += ".{}".format(getattr(request, "LANGUAGE_CODE", get_language()))
     if settings.USE_TZ:
-        cache_key += ".%s" % get_current_timezone_name()
+        cache_key += ".{}".format(get_current_timezone_name())
     return cache_key
 
 
@@ -356,7 +356,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         if value is not None:
             ctx.update(value.encode())
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
-    cache_key = "views.decorators.cache.cache_page.%s.%s.%s.%s" % (
+    cache_key = "views.decorators.cache.cache_page.{}.{}.{}.{}".format(
         key_prefix,
         method,
         url.hexdigest(),
@@ -368,7 +368,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
-    cache_key = "views.decorators.cache.cache_header.%s.%s" % (
+    cache_key = "views.decorators.cache.cache_header.{}.{}".format(
         key_prefix,
         url.hexdigest(),
     )

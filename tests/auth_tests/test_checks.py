@@ -190,16 +190,16 @@ class UserModelChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Critical(
-                    "%s.is_anonymous must be an attribute or property rather than "
+                    "{}.is_anonymous must be an attribute or property rather than "
                     "a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!" % BadUser,
+                    "users will be treated as authenticated!".format(BadUser),
                     obj=BadUser,
                     id="auth.C009",
                 ),
                 checks.Critical(
-                    "%s.is_authenticated must be an attribute or property rather "
+                    "{}.is_authenticated must be an attribute or property rather "
                     "than a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!" % BadUser,
+                    "users will be treated as authenticated!".format(BadUser),
                     obj=BadUser,
                     id="auth.C010",
                 ),
@@ -229,16 +229,20 @@ class UserModelChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Critical(
-                    "%s.is_anonymous must be an attribute or property rather than "
+                    "{}.is_anonymous must be an attribute or property rather than "
                     "a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!" % VulnerableStaticUser,
+                    "users will be treated as authenticated!".format(
+                        VulnerableStaticUser
+                    ),
                     obj=VulnerableStaticUser,
                     id="auth.C009",
                 ),
                 checks.Critical(
-                    "%s.is_authenticated must be an attribute or property rather "
+                    "{}.is_authenticated must be an attribute or property rather "
                     "than a method. Ignoring this is a security issue as anonymous "
-                    "users will be treated as authenticated!" % VulnerableStaticUser,
+                    "users will be treated as authenticated!".format(
+                        VulnerableStaticUser
+                    ),
                     obj=VulnerableStaticUser,
                     id="auth.C010",
                 ),
@@ -332,9 +336,9 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The name of model 'auth_tests.%s' must be at most 93 "
+                    "The name of model 'auth_tests.{}' must be at most 93 "
                     "characters for its builtin permission codenames to be at "
-                    "most 100 characters." % model_name,
+                    "most 100 characters.".format(model_name),
                     obj=model,
                     id="auth.E011",
                 ),
@@ -357,8 +361,8 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The permission named '%s' of model 'auth_tests.Checked' is longer "
-                    "than 255 characters." % custom_permission_name,
+                    "The permission named '{}' of model 'auth_tests.Checked' is longer "
+                    "than 255 characters.".format(custom_permission_name),
                     obj=Checked,
                     id="auth.E008",
                 ),
@@ -379,8 +383,8 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The permission codenamed '%s' of model 'auth_tests.Checked' "
-                    "is longer than 100 characters." % custom_permission_codename,
+                    "The permission codenamed '{}' of model 'auth_tests.Checked' "
+                    "is longer than 100 characters.".format(custom_permission_codename),
                     obj=Checked,
                     id="auth.E012",
                 ),

@@ -28,7 +28,8 @@ def update_proxy_model_permissions(apps, schema_editor, reverse=False):
         if not opts.proxy:
             continue
         proxy_default_permissions_codenames = [
-            "%s_%s" % (action, opts.model_name) for action in opts.default_permissions
+            "{}_{}".format(action, opts.model_name)
+            for action in opts.default_permissions
         ]
         permissions_query = Q(codename__in=proxy_default_permissions_codenames)
         for codename, name in opts.permissions:

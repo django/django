@@ -70,7 +70,7 @@ class M2mThroughTests(TestCase):
 
     def test_add_on_m2m_with_intermediate_model_callable_through_default(self):
         def invite_reason_callable():
-            return "They were good at %s" % datetime.now()
+            return "They were good at {}".format(datetime.now())
 
         self.rock.members.add(
             self.bob,

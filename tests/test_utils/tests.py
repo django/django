@@ -65,7 +65,7 @@ class SkippingTestCase(SimpleTestCase):
                 with self.assertRaises(expected_exc):
                     func()
         except unittest.SkipTest:
-            self.fail("%s should not result in a skipped test." % func.__name__)
+            self.fail("{} should not result in a skipped test.".format(func.__name__))
 
     def test_skip_unless_db_feature(self):
         """
@@ -225,16 +225,16 @@ class AssertNumQueriesTests(TestCase):
         person = Person.objects.create(name="test")
 
         self.assertNumQueries(
-            1, self.client.get, "/test_utils/get_person/%s/" % person.pk
+            1, self.client.get, "/test_utils/get_person/{}/".format(person.pk)
         )
 
         self.assertNumQueries(
-            1, self.client.get, "/test_utils/get_person/%s/" % person.pk
+            1, self.client.get, "/test_utils/get_person/{}/".format(person.pk)
         )
 
         def test_func():
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get("/test_utils/get_person/{}/".format(person.pk))
+            self.client.get("/test_utils/get_person/{}/".format(person.pk))
 
         self.assertNumQueries(2, test_func)
 
@@ -351,7 +351,7 @@ class AssertQuerySetEqualTests(TestCase):
         )
 
     def test_maxdiff(self):
-        names = ["Joe Smith %s" % i for i in range(20)]
+        names = ["Joe Smith {}".format(i) for i in range(20)]
         Person.objects.bulk_create([Person(name=name) for name in names])
         names.append("Extra Person")
 
@@ -730,13 +730,13 @@ class HTMLEqualTests(SimpleTestCase):
     def test_void_elements(self):
         for tag in VOID_ELEMENTS:
             with self.subTest(tag):
-                dom = parse_html("<p>Hello <%s> world</p>" % tag)
+                dom = parse_html("<p>Hello <{}> world</p>".format(tag))
                 self.assertEqual(len(dom.children), 3)
                 self.assertEqual(dom[0], "Hello")
                 self.assertEqual(dom[1].name, tag)
                 self.assertEqual(dom[2], "world")
 
-                dom = parse_html("<p>Hello <%s /> world</p>" % tag)
+                dom = parse_html("<p>Hello <{} /> world</p>".format(tag))
                 self.assertEqual(len(dom.children), 3)
                 self.assertEqual(dom[0], "Hello")
                 self.assertEqual(dom[1].name, tag)

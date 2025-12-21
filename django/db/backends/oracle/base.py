@@ -34,9 +34,9 @@ def _setup_environment(environ):
             import ctypes
         except ImportError as e:
             raise ImproperlyConfigured(
-                "Error loading ctypes: %s; "
+                "Error loading ctypes: {}; "
                 "the Oracle backend requires ctypes to "
-                "operate correctly under Cygwin." % e
+                "operate correctly under Cygwin.".format(e)
             )
         kernel32 = ctypes.CDLL("kernel32")
         for name, value in environ:
@@ -109,7 +109,7 @@ class _UninitializedOperatorsDescriptor:
 def _get_decimal_column(data):
     if data["max_digits"] is None and data["decimal_places"] is None:
         return "NUMBER"
-    return "NUMBER(%(max_digits)s, %(decimal_places)s)" % data
+    return "NUMBER({max_digits}, {decimal_places})".format(**data)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -335,8 +335,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor = self.create_cursor()
             try:
                 cursor.execute(
-                    "SELECT 1 FROM DUAL WHERE DUMMY %s"
-                    % self._standard_operators["contains"],
+                    "SELECT 1 FROM DUAL WHERE DUMMY {}".format(
+                        self._standard_operators["contains"]
+                    ),
                     ["X"],
                 )
             except Database.DatabaseError:
@@ -366,7 +367,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.queries_logged:
             self.queries_log.append(
                 {
-                    "sql": "-- RELEASE SAVEPOINT %s (faked)" % self.ops.quote_name(sid),
+                    "sql": "-- RELEASE SAVEPOINT {} (faked)".format(
+                        self.ops.quote_name(sid)
+                    ),
                     "time": "0.000",
                 }
             )
@@ -595,7 +598,7 @@ class FormatStylePlaceholderCursor:
             params = []
         elif hasattr(params, "keys"):
             # Handle params as dict
-            args = {k: ":%s" % k for k in params}
+            args = {k: ":{}".format(k) for k in params}
             query %= args
         elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their

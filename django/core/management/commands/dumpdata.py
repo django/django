@@ -146,7 +146,7 @@ class Command(BaseCommand):
                         model = app_config.get_model(model_label)
                     except LookupError:
                         raise CommandError(
-                            "Unknown model: %s.%s" % (app_label, model_label)
+                            "Unknown model: {}.{}".format(app_label, model_label)
                         )
 
                     app_list_value = app_list.setdefault(app_config, [])
@@ -179,7 +179,7 @@ class Command(BaseCommand):
             except serializers.SerializerDoesNotExist:
                 pass
 
-            raise CommandError("Unknown serialization format: %s" % format)
+            raise CommandError("Unknown serialization format: {}".format(format))
 
         def get_objects(count_only=False):
             """
@@ -204,8 +204,9 @@ class Command(BaseCommand):
                     continue
                 if model._meta.proxy and model._meta.proxy_for_model not in models:
                     warnings.warn(
-                        "%s is a proxy model and won't be serialized."
-                        % model._meta.label,
+                        "{} is a proxy model and won't be serialized.".format(
+                            model._meta.label
+                        ),
                         category=ProxyModelWarning,
                     )
                 if not model._meta.proxy and router.allow_migrate_model(using, model):
@@ -283,4 +284,4 @@ class Command(BaseCommand):
         except Exception as e:
             if show_traceback:
                 raise
-            raise CommandError("Unable to serialize database: %s" % e)
+            raise CommandError("Unable to serialize database: {}".format(e))

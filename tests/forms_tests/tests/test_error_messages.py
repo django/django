@@ -239,8 +239,9 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
                 if not self:
                     return ""
                 return mark_safe(
-                    '<div class="error">%s</div>'
-                    % "".join("<p>%s</p>" % e for e in self)
+                    '<div class="error">{}</div>'.format(
+                        "".join("<p>{}</p>".format(e) for e in self)
+                    )
                 )
 
         # This form should print errors the default way.

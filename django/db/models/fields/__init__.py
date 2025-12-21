@@ -251,15 +251,15 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, "model"):
             return super().__str__()
         model = self.model
-        return "%s.%s" % (model._meta.label, self.name)
+        return "{}.{}".format(model._meta.label, self.name)
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
+        path = "{}.{}".format(self.__class__.__module__, self.__class__.__qualname__)
         name = getattr(self, "name", None)
         if name is not None:
-            return "<%s: %s>" % (path, name)
-        return "<%s>" % path
+            return "<{}: {}>".format(path, name)
+        return "<{}>".format(path)
 
     def check(self, **kwargs):
         return [
@@ -292,7 +292,7 @@ class Field(RegisterLookupMixin):
         elif LOOKUP_SEP in self.name:
             return [
                 checks.Error(
-                    'Field names must not contain "%s".' % LOOKUP_SEP,
+                    'Field names must not contain "{}".'.format(LOOKUP_SEP),
                     obj=self,
                     id="fields.E002",
                 )
@@ -515,8 +515,8 @@ class Field(RegisterLookupMixin):
                 checks.Error(
                     self.system_check_removed_details.get(
                         "msg",
-                        "%s has been removed except for support in historical "
-                        "migrations." % self.__class__.__name__,
+                        "{} has been removed except for support in historical "
+                        "migrations.".format(self.__class__.__name__),
                     ),
                     hint=self.system_check_removed_details.get("hint"),
                     obj=self,
@@ -527,7 +527,7 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Warning(
                     self.system_check_deprecated_details.get(
-                        "msg", "%s has been deprecated." % self.__class__.__name__
+                        "msg", "{} has been deprecated.".format(self.__class__.__name__)
                     ),
                     hint=self.system_check_deprecated_details.get("hint"),
                     obj=self,
@@ -645,7 +645,7 @@ class Field(RegisterLookupMixin):
                 if value is not default:
                     keywords[name] = value
         # Work out path - we shorten it for known Django core fields
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
+        path = "{}.{}".format(self.__class__.__module__, self.__class__.__qualname__)
         if path.startswith("django.db.models.fields.related"):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         elif path.startswith("django.db.models.fields.files"):
@@ -958,10 +958,10 @@ class Field(RegisterLookupMixin):
             # this class, but don't check methods derived from inheritance, to
             # allow overriding inherited choices. For more complex inheritance
             # structures users should override contribute_to_class().
-            if "get_%s_display" % self.name not in cls.__dict__:
+            if "get_{}_display".format(self.name) not in cls.__dict__:
                 setattr(
                     cls,
-                    "get_%s_display" % self.name,
+                    "get_{}_display".format(self.name),
                     partialmethod(cls._get_FIELD_display, field=self),
                 )
 
@@ -1267,8 +1267,8 @@ class CharField(Field):
             ):
                 errors.append(
                     checks.Error(
-                        "%s does not support a database collation on "
-                        "CharFields." % connection.display_name,
+                        "{} does not support a database collation on "
+                        "CharFields.".format(connection.display_name),
                         obj=self,
                         id="fields.E190",
                     ),
@@ -1518,14 +1518,14 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.null:
             setattr(
                 cls,
-                "get_next_by_%s" % self.name,
+                "get_next_by_{}".format(self.name),
                 partialmethod(
                     cls._get_next_or_previous_by_FIELD, field=self, is_next=True
                 ),
             )
             setattr(
                 cls,
-                "get_previous_by_%s" % self.name,
+                "get_previous_by_{}".format(self.name),
                 partialmethod(
                     cls._get_next_or_previous_by_FIELD, field=self, is_next=False
                 ),
@@ -1664,12 +1664,12 @@ class DateTimeField(DateField):
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
             try:
-                name = "%s.%s" % (self.model.__name__, self.name)
+                name = "{}.{}".format(self.model.__name__, self.name)
             except AttributeError:
                 name = "(unbound)"
             warnings.warn(
-                "DateTimeField %s received a naive datetime (%s)"
-                " while time zone support is active." % (name, value),
+                "DateTimeField {} received a naive datetime ({})"
+                " while time zone support is active.".format(name, value),
                 RuntimeWarning,
             )
             default_timezone = timezone.get_default_timezone()
@@ -2058,7 +2058,7 @@ class FloatField(Field):
             return float(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '%s' expected a number but got %r." % (self.name, value),
+                "Field '{}' expected a number but got {!r}.".format(self.name, value),
             ) from e
 
     def get_internal_type(self):
@@ -2102,8 +2102,9 @@ class IntegerField(Field):
         if self.max_length is not None:
             return [
                 checks.Warning(
-                    "'max_length' is ignored when used with %s."
-                    % self.__class__.__name__,
+                    "'max_length' is ignored when used with {}.".format(
+                        self.__class__.__name__
+                    ),
                     hint="Remove 'max_length' from field",
                     obj=self,
                     id="fields.W122",
@@ -2154,7 +2155,7 @@ class IntegerField(Field):
             return int(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '%s' expected a number but got %r." % (self.name, value),
+                "Field '{}' expected a number but got {!r}.".format(self.name, value),
             ) from e
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -2496,8 +2497,8 @@ class TextField(Field):
             ):
                 errors.append(
                     checks.Error(
-                        "%s does not support a database collation on "
-                        "TextFields." % connection.display_name,
+                        "{} does not support a database collation on "
+                        "TextFields.".format(connection.display_name),
                         obj=self,
                         id="fields.E190",
                     ),
@@ -2854,8 +2855,9 @@ class AutoFieldMixin:
     def contribute_to_class(self, cls, name, **kwargs):
         if cls._meta.auto_field:
             raise ValueError(
-                "Model %s can't have more than one auto-generated field."
-                % cls._meta.label
+                "Model {} can't have more than one auto-generated field.".format(
+                    cls._meta.label
+                )
             )
         super().contribute_to_class(cls, name, **kwargs)
         cls._meta.auto_field = self

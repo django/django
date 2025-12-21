@@ -14,7 +14,7 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     def __str__(self):
-        return "%s the place" % self.name
+        return "{} the place".format(self.name)
 
 
 class Restaurant(models.Model):
@@ -23,7 +23,7 @@ class Restaurant(models.Model):
     serves_pizza = models.BooleanField(default=False)
 
     def __str__(self):
-        return "%s the restaurant" % self.place.name
+        return "{} the restaurant".format(self.place.name)
 
 
 class Bar(models.Model):
@@ -41,7 +41,7 @@ class Waiter(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
-        return "%s the waiter at %s" % (self.name, self.restaurant)
+        return "{} the waiter at {}".format(self.name, self.restaurant)
 
 
 class Favorites(models.Model):
@@ -65,7 +65,7 @@ class MultiModel(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
-        return "Multimodel %s" % self.name
+        return "Multimodel {}".format(self.name)
 
 
 class Target(models.Model):

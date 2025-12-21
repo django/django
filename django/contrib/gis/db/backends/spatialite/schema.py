@@ -186,10 +186,10 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                     self.sql_rename_table
                     % {
                         "old_table": self.quote_name(
-                            "idx_%s_%s" % (old_db_table, field.column)
+                            "idx_{}_{}".format(old_db_table, field.column)
                         ),
                         "new_table": self.quote_name(
-                            "idx_%s_%s" % (new_db_table, field.column)
+                            "idx_{}_{}".format(new_db_table, field.column)
                         ),
                     }
                 )

@@ -114,7 +114,7 @@ class TupleLookupMixin:
         else:
             sql, params = compiler.compile(self.rhs)
             if isinstance(self.rhs, ColPairs):
-                return "(%s)" % sql, params
+                return "({})".format(sql), params
             elif isinstance(self.rhs, Query):
                 return super().process_rhs(compiler, connection)
             else:

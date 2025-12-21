@@ -98,8 +98,10 @@ class CheckRegistry:
             new_errors = check(app_configs=app_configs, databases=databases)
             if not isinstance(new_errors, Iterable):
                 raise TypeError(
-                    "The function %r did not return a list. All functions "
-                    "registered with the checks registry must return a list." % check,
+                    "The function {!r} did not return a list. All functions "
+                    "registered with the checks registry must return a list.".format(
+                        check
+                    ),
                 )
             errors.extend(new_errors)
         return errors

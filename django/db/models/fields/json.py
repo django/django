@@ -69,7 +69,9 @@ class JSONField(CheckFieldDefaultMixin, Field):
             ):
                 errors.append(
                     checks.Error(
-                        "%s does not support JSONFields." % connection.display_name,
+                        "{} does not support JSONFields.".format(
+                            connection.display_name
+                        ),
                         obj=self.model,
                         id="fields.E180",
                     )
@@ -185,7 +187,7 @@ class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = tuple(lhs_params) + tuple(rhs_params)
-        return "JSON_CONTAINS(%s, %s)" % (lhs, rhs), params
+        return "JSON_CONTAINS({}, {})".format(lhs, rhs), params
 
 
 class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
@@ -200,7 +202,7 @@ class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = tuple(rhs_params) + tuple(lhs_params)
-        return "JSON_CONTAINS(%s, %s)" % (rhs, lhs), params
+        return "JSON_CONTAINS({}, {})".format(rhs, lhs), params
 
 
 class HasKeyLookup(PostgresOperatorLookup):
@@ -208,7 +210,7 @@ class HasKeyLookup(PostgresOperatorLookup):
 
     def compile_json_path_final_key(self, connection, key_transform):
         # Compile the final key without interpreting ints as array elements.
-        return ".%s" % json.dumps(key_transform)
+        return ".{}".format(json.dumps(key_transform))
 
     def _as_sql_parts(self, compiler, connection):
         # Process JSON path from the left-hand side.
@@ -239,7 +241,7 @@ class HasKeyLookup(PostgresOperatorLookup):
     def _combine_sql_parts(self, parts):
         # Add condition for each key.
         if self.logical_operator:
-            return "(%s)" % self.logical_operator.join(parts)
+            return "({})".format(self.logical_operator.join(parts))
         return "".join(parts)
 
     def as_sql(self, compiler, connection, template=None):
@@ -325,13 +327,13 @@ class CaseInsensitiveMixin:
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if connection.vendor == "mysql":
-            return "LOWER(%s)" % lhs, lhs_params
+            return "LOWER({})".format(lhs), lhs_params
         return lhs, lhs_params
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
         if connection.vendor == "mysql":
-            return "LOWER(%s)" % rhs, rhs_params
+            return "LOWER({})".format(rhs), rhs_params
         return rhs, rhs_params
 
 
@@ -412,13 +414,13 @@ class ProcessJSONLHSMixin:
             [repr(value) for value in connection.ops.jsonfield_datatype_values]
         )
         return (
-            "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
-            "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
-        ) % (sql, datatype_values, sql, sql), (*params, json_path) * 3
+            "(CASE WHEN JSON_TYPE({}, %s) IN ({}) "
+            "THEN JSON_TYPE({}, %s) ELSE JSON_EXTRACT({}, %s) END)"
+        ).format(sql, datatype_values, sql, sql), (*params, json_path) * 3
 
     def _process_as_mysql(self, sql, params, connection, key_transforms=None):
         json_path = self._get_json_path(connection, key_transforms)
-        return "JSON_EXTRACT(%s, %%s)" % sql, (*params, json_path)
+        return "JSON_EXTRACT({}, %s)".format(sql), (*params, json_path)
 
 
 class JSONIn(ProcessJSONLHSMixin, lookups.In):
@@ -445,7 +447,7 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
             ):
                 sql = "JSON_EXTRACT(%s, '$')"
         if connection.vendor == "mysql" and connection.mysql_is_mariadb:
-            sql = "JSON_UNQUOTE(%s)" % sql
+            sql = "JSON_UNQUOTE({})".format(sql)
         return sql, params
 
     def process_lhs(self, compiler, connection):
@@ -523,13 +525,13 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         if len(key_transforms) > 1:
-            sql = "(%s %s %%s)" % (lhs, self.postgres_nested_operator)
+            sql = "({} {} %s)".format(lhs, self.postgres_nested_operator)
             return sql, (*params, key_transforms)
         try:
             lookup = int(self.key_name)
         except ValueError:
             lookup = self.key_name
-        return "(%s %s %%s)" % (lhs, self.postgres_operator), (*params, lookup)
+        return "({} {} %s)".format(lhs, self.postgres_operator), (*params, lookup)
 
     def as_sqlite(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
@@ -549,11 +551,11 @@ class KeyTextTransform(KeyTransform):
             or getattr(self.lhs.output_field, "model", None) is None
         ):
             sql, params = super().as_mysql(compiler, connection)
-            return "JSON_UNQUOTE(%s)" % sql, params
+            return "JSON_UNQUOTE({})".format(sql), params
         else:
             lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
             json_path = connection.ops.compile_json_path(key_transforms)
-            return "(%s ->> %%s)" % lhs, (*params, json_path)
+            return "({} ->> %s)".format(lhs), (*params, json_path)
 
     @classmethod
     def from_lookup(cls, lookup):
@@ -601,7 +603,9 @@ class KeyTransformIsNull(lookups.IsNull):
             return sql, params
         # Column doesn't have a key or IS NULL.
         lhs, lhs_params, _ = self.lhs.preprocess_lhs(compiler, connection)
-        return "(NOT %s OR %s IS NULL)" % (sql, lhs), tuple(params) + tuple(lhs_params)
+        return "(NOT {} OR {} IS NULL)".format(sql, lhs), tuple(params) + tuple(
+            lhs_params
+        )
 
     def as_sqlite(self, compiler, connection):
         template = "JSON_TYPE(%s, %s) IS NULL"
@@ -656,7 +660,7 @@ class KeyTransformExact(JSONExact):
             is_null_expr = self.lhs.get_lookup("isnull")(self.lhs, True)
             is_null_sql, is_null_params = is_null_expr.as_sql(compiler, connection)
             return (
-                "%s AND %s" % (has_key_sql, is_null_sql),
+                "{} AND {}".format(has_key_sql, is_null_sql),
                 tuple(has_key_params) + tuple(is_null_params),
             )
         return super().as_sql(compiler, connection)

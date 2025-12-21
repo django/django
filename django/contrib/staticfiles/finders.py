@@ -77,8 +77,8 @@ class FileSystemFinder(BaseFinder):
                 if prefix.endswith("/"):
                     errors.append(
                         Error(
-                            "The prefix %r in the STATICFILES_DIRS setting must "
-                            "not end with a slash." % prefix,
+                            "The prefix {!r} in the STATICFILES_DIRS setting must "
+                            "not end with a slash.".format(prefix),
                             id="staticfiles.E003",
                         )
                     )
@@ -123,7 +123,7 @@ class FileSystemFinder(BaseFinder):
         absolute path (or ``None`` if no match).
         """
         if prefix:
-            prefix = "%s%s" % (prefix, os.sep)
+            prefix = "{}{}".format(prefix, os.sep)
             if not path.startswith(prefix):
                 return None
             path = path.removeprefix(prefix)
@@ -221,9 +221,9 @@ class BaseStorageFinder(BaseFinder):
             self.storage = storage
         if self.storage is None:
             raise ImproperlyConfigured(
-                "The staticfiles storage finder %r "
+                "The staticfiles storage finder {!r} "
                 "doesn't have a storage class "
-                "assigned." % self.__class__
+                "assigned.".format(self.__class__)
             )
         # Make sure we have a storage instance here.
         if not isinstance(self.storage, (Storage, LazyObject)):
@@ -269,8 +269,8 @@ class DefaultStorageFinder(BaseStorageFinder):
         if not base_location:
             raise ImproperlyConfigured(
                 "The storage backend of the "
-                "staticfiles finder %r doesn't have "
-                "a valid location." % self.__class__
+                "staticfiles finder {!r} doesn't have "
+                "a valid location.".format(self.__class__)
             )
 
 
@@ -310,6 +310,6 @@ def get_finder(import_path):
     Finder = import_string(import_path)
     if not issubclass(Finder, BaseFinder):
         raise ImproperlyConfigured(
-            'Finder "%s" is not a subclass of "%s"' % (Finder, BaseFinder)
+            'Finder "{}" is not a subclass of "{}"'.format(Finder, BaseFinder)
         )
     return Finder()

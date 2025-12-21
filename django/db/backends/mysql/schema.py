@@ -91,11 +91,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if self.skip_default(field) and field.default not in (None, NOT_PROVIDED):
             effective_default = self.effective_default(field)
             self.execute(
-                "UPDATE %(table)s SET %(column)s = %%s"
-                % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "column": self.quote_name(field.column),
-                },
+                "UPDATE {table} SET {column} = %s".format(
+                    table=self.quote_name(model._meta.db_table),
+                    column=self.quote_name(field.column),
+                ),
                 [effective_default],
             )
 
@@ -240,10 +239,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         new_db_params = new_field.db_parameters(connection=self.connection)
         type_sql = self._set_field_new_type(new_field, new_db_params["type"])
         return (
-            "MODIFY %(column)s %(type)s"
-            % {
-                "column": self.quote_name(new_field.column),
-                "type": type_sql,
-            },
+            "MODIFY {column} {type}".format(
+                column=self.quote_name(new_field.column),
+                type=type_sql,
+            ),
             [],
         )

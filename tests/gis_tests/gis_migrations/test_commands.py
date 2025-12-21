@@ -54,8 +54,10 @@ class MigrateTests(TransactionTestCase):
         else:
             qs = GeoColumn.objects.filter(
                 **{
-                    "%s__in"
-                    % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]
+                    "{}__in".format(GeoColumn.table_name_col()): [
+                        "gis_neighborhood",
+                        "gis_household",
+                    ]
                 }
             )
             self.assertEqual(qs.count(), 0)

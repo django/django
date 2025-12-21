@@ -18,8 +18,9 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         klass = apps.get_model(label, model)
     except LookupError:
         raise Http404(
-            'You must supply a valid app label and module name. Got "%s.%s"'
-            % (label, model)
+            'You must supply a valid app label and module name. Got "{}.{}"'.format(
+                label, model
+            )
         )
 
     if field_name:
@@ -41,7 +42,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         placemarks = []
         if connection.features.has_Transform_function:
             qs = klass._default_manager.using(using).annotate(
-                **{"%s_4326" % field_name: Transform(field_name, 4326)}
+                **{"{}_4326".format(field_name): Transform(field_name, 4326)}
             )
             field_name += "_4326"
         else:

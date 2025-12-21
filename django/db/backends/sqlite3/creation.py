@@ -19,7 +19,9 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict["TEST"]["NAME"] or ":memory:"
         if test_database_name == ":memory:":
-            return "file:memorydb_%s?mode=memory&cache=shared" % self.connection.alias
+            return "file:memorydb_{}?mode=memory&cache=shared".format(
+                self.connection.alias
+            )
         return test_database_name
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
@@ -31,20 +33,23 @@ class DatabaseCreation(BaseDatabaseCreation):
             # Erase the old test database
             if verbosity >= 1:
                 self.log(
-                    "Destroying old test database for alias %s..."
-                    % (self._get_database_display_str(verbosity, test_database_name),)
+                    "Destroying old test database for alias {}...".format(
+                        self._get_database_display_str(verbosity, test_database_name)
+                    )
                 )
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
                     confirm = input(
                         "Type 'yes' if you would like to try deleting the test "
-                        "database '%s', or 'no' to cancel: " % test_database_name
+                        "database '{}', or 'no' to cancel: ".format(test_database_name)
                     )
                 if autoclobber or confirm == "yes":
                     try:
                         os.remove(test_database_name)
                     except Exception as e:
-                        self.log("Got an error deleting the old test database: %s" % e)
+                        self.log(
+                            "Got an error deleting the old test database: {}".format(e)
+                        )
                         sys.exit(2)
                 else:
                     self.log("Tests cancelled.")
@@ -81,8 +86,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     return
                 if verbosity >= 1:
                     self.log(
-                        "Destroying old test database for alias %s..."
-                        % (
+                        "Destroying old test database for alias {}...".format(
                             self._get_database_display_str(
                                 verbosity, target_database_name
                             ),
@@ -91,12 +95,14 @@ class DatabaseCreation(BaseDatabaseCreation):
                 try:
                     os.remove(target_database_name)
                 except Exception as e:
-                    self.log("Got an error deleting the old test database: %s" % e)
+                    self.log(
+                        "Got an error deleting the old test database: {}".format(e)
+                    )
                     sys.exit(2)
             try:
                 shutil.copy(source_database_name, target_database_name)
             except Exception as e:
-                self.log("Got an error cloning the test database: %s" % e)
+                self.log("Got an error cloning the test database: {}".format(e))
                 sys.exit(2)
         # Forking automatically makes a copy of an in-memory database.
         # Forkserver and spawn require migrating to disk which will be

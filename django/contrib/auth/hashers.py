@@ -112,7 +112,9 @@ def make_password(password, salt=None, hasher="default"):
         )
     if not isinstance(password, (bytes, str)):
         raise TypeError(
-            "Password must be a string or bytes, got %s." % type(password).__qualname__
+            "Password must be a string or bytes, got {}.".format(
+                type(password).__qualname__
+            )
         )
     hasher = get_hasher(hasher)
     salt = salt or hasher.salt()
@@ -127,7 +129,7 @@ def get_hashers():
         hasher = hasher_cls()
         if not getattr(hasher, "algorithm"):
             raise ImproperlyConfigured(
-                "hasher doesn't specify an algorithm name: %s" % hasher_path
+                "hasher doesn't specify an algorithm name: {}".format(hasher_path)
             )
         hashers.append(hasher)
     return hashers
@@ -164,9 +166,9 @@ def get_hasher(algorithm="default"):
             return hashers[algorithm]
         except KeyError:
             raise ValueError(
-                "Unknown password hashing algorithm '%s'. "
+                "Unknown password hashing algorithm '{}'. "
                 "Did you specify it in the PASSWORD_HASHERS "
-                "setting?" % algorithm
+                "setting?".format(algorithm)
             )
 
 
@@ -231,12 +233,15 @@ class BasePasswordHasher:
                 module = importlib.import_module(mod_path)
             except ImportError as e:
                 raise ValueError(
-                    "Couldn't load %r algorithm library: %s"
-                    % (self.__class__.__name__, e)
+                    "Couldn't load {!r} algorithm library: {}".format(
+                        self.__class__.__name__, e
+                    )
                 )
             return module
         raise ValueError(
-            "Hasher %r doesn't specify a library attribute" % self.__class__.__name__
+            "Hasher {!r} doesn't specify a library attribute".format(
+                self.__class__.__name__
+            )
         )
 
     def salt(self):
@@ -516,7 +521,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             password = binascii.hexlify(self.digest(password).digest())
 
         data = bcrypt.hashpw(password, salt)
-        return "%s$%s" % (self.algorithm, data.decode("ascii"))
+        return "{}${}".format(self.algorithm, data.decode("ascii"))
 
     def decode(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split("$", 4)
@@ -667,7 +672,7 @@ class MD5PasswordHasher(BasePasswordHasher):
         password = force_str(password)
         salt = force_str(salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
-        return "%s$%s$%s" % (self.algorithm, salt, hash)
+        return "{}${}${}".format(self.algorithm, salt, hash)
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split("$", 2)

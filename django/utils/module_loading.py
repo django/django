@@ -24,14 +24,17 @@ def import_string(dotted_path):
     try:
         module_path, class_name = dotted_path.rsplit(".", 1)
     except ValueError as err:
-        raise ImportError("%s doesn't look like a module path" % dotted_path) from err
+        raise ImportError(
+            "{} doesn't look like a module path".format(dotted_path)
+        ) from err
 
     try:
         return cached_import(module_path, class_name)
     except AttributeError as err:
         raise ImportError(
-            'Module "%s" does not define a "%s" attribute/class'
-            % (module_path, class_name)
+            'Module "{}" does not define a "{}" attribute/class'.format(
+                module_path, class_name
+            )
         ) from err
 
 
@@ -55,7 +58,7 @@ def autodiscover_modules(*args, **kwargs):
                 if register_to:
                     before_import_registry = copy.copy(register_to._registry)
 
-                import_module("%s.%s" % (app_config.name, module_to_search))
+                import_module("{}.{}".format(app_config.name, module_to_search))
             except Exception:
                 # Reset the registry to the state before the last import
                 # as this import will have to reoccur on the next request and
@@ -104,4 +107,4 @@ def module_dir(module):
         filename = getattr(module, "__file__", None)
         if filename is not None:
             return os.path.dirname(filename)
-    raise ValueError("Cannot determine directory containing %s" % module)
+    raise ValueError("Cannot determine directory containing {}".format(module))

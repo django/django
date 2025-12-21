@@ -138,7 +138,7 @@ def result_headers(cl):
         if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
-            th_classes.append("sorted %sending" % order_type)
+            th_classes.append("sorted {}ending".format(order_type))
             new_order_type = {"asc": "desc", "desc": "asc"}[order_type]
 
         # build new ordering param
@@ -183,7 +183,9 @@ def result_headers(cl):
 
 def _boolean_icon(field_val):
     icon_url = static(
-        "admin/img/icon-%s.svg" % {True: "yes", False: "no", None: "unknown"}[field_val]
+        "admin/img/icon-{}.svg".format(
+            {True: "yes", False: "no", None: "unknown"}[field_val]
+        )
     )
     return format_html('<img src="{}" alt="{}">', icon_url, field_val)
 
@@ -216,7 +218,7 @@ def items_for_result(cl, result, form):
     pk = cl.lookup_opts.pk.attname
     for field_index, field_name in enumerate(cl.list_display):
         empty_value_display = cl.model_admin.get_empty_value_display()
-        row_classes = ["field-%s" % _coerce_field_name(field_name, field_index)]
+        row_classes = ["field-{}".format(_coerce_field_name(field_name, field_index))]
         link_to_changelist = link_in_col(first, field_name, cl)
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
@@ -256,7 +258,7 @@ def items_for_result(cl, result, form):
                     f, (models.DateField, models.TimeField, models.ForeignKey)
                 ):
                     row_classes.append("nowrap")
-        row_class = SafeString(' class="%s"' % " ".join(row_classes))
+        row_class = SafeString(' class="{}"'.format(" ".join(row_classes)))
         # If list_display_links not defined, add the link tag to the first
         # field
         if link_to_changelist:
@@ -383,10 +385,10 @@ def date_hierarchy(cl):
             dates_or_datetimes = "datetimes"
         else:
             dates_or_datetimes = "dates"
-        year_field = "%s__year" % field_name
-        month_field = "%s__month" % field_name
-        day_field = "%s__day" % field_name
-        field_generic = "%s__" % field_name
+        year_field = "{}__year".format(field_name)
+        month_field = "{}__month".format(field_name)
+        day_field = "{}__day".format(field_name)
+        field_generic = "{}__".format(field_name)
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)

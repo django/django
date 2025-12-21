@@ -92,7 +92,7 @@ class Layer(GDALBase):
                 if feat.fid == feat_id:
                     return feat
         # Should have returned a Feature, raise an IndexError.
-        raise IndexError("Invalid feature id: %s." % feat_id)
+        raise IndexError("Invalid feature id: {}.".format(feat_id))
 
     # #### Layer properties ####
     @property
@@ -208,7 +208,7 @@ class Layer(GDALBase):
         in the Layer.
         """
         if field_name not in self.fields:
-            raise GDALException("invalid field name: %s" % field_name)
+            raise GDALException("invalid field name: {}".format(field_name))
         return [feat.get(field_name) for feat in self]
 
     def get_geoms(self, geos=False):

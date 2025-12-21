@@ -19,8 +19,9 @@ def skipUnlessGISLookup(*gis_lookups):
         def skip_wrapper(*args, **kwargs):
             if any(key not in connection.ops.gis_operators for key in gis_lookups):
                 raise unittest.SkipTest(
-                    "Database doesn't support all the lookups: %s"
-                    % ", ".join(gis_lookups)
+                    "Database doesn't support all the lookups: {}".format(
+                        ", ".join(gis_lookups)
+                    )
                 )
             return test_func(*args, **kwargs)
 
@@ -52,8 +53,8 @@ class FuncTestMixin:
                 func.output_field
                 __dict__original = copy.deepcopy(func.__dict__)
                 result = original_as_sql(*args, **kwargs)
-                msg = (
-                    "%s Func was mutated during compilation." % func.__class__.__name__
+                msg = "{} Func was mutated during compilation.".format(
+                    func.__class__.__name__
                 )
                 self.assertEqual(func.__dict__, __dict__original, msg)
                 return result

@@ -44,7 +44,7 @@ class Formatter:
                 if type(self.data) is date and hasattr(TimeFormat, piece):
                     raise TypeError(
                         "The format for date objects may not contain "
-                        "time-related format specifiers (found '%s')." % piece
+                        "time-related format specifiers (found '{}').".format(piece)
                     )
                 pieces.append(str(getattr(self, piece)()))
             elif piece:
@@ -153,7 +153,7 @@ class TimeFormat(Formatter):
             return _("midnight")
         if self.data.minute == 0 and self.data.hour == 12:
             return _("noon")
-        return "%s %s" % (self.f(), self.a())
+        return "{} {}".format(self.f(), self.a())
 
     def s(self):
         "Seconds; i.e. '00' to '59'"

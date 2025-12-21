@@ -77,7 +77,9 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
 
         def assertFieldType(name, definition):
-            out_def = re.search(r"^\s*%s = (models.*)$" % name, output, re.MULTILINE)[1]
+            out_def = re.search(
+                r"^\s*{} = (models.*)$".format(name), output, re.MULTILINE
+            )[1]
             self.assertEqual(definition, out_def)
 
         return assertFieldType
@@ -122,7 +124,7 @@ class InspectDBTestCase(TestCase):
         elif not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType("gen_ip_address_field", "models.CharField(max_length=39)")
         assertFieldType(
-            "time_field", "models.%s()" % introspected_field_types["TimeField"]
+            "time_field", "models.{}()".format(introspected_field_types["TimeField"])
         )
         if connection.features.has_native_uuid_field:
             assertFieldType("uuid_field", "models.UUIDField()")
@@ -167,13 +169,13 @@ class InspectDBTestCase(TestCase):
         if not connection.features.interprets_empty_strings_as_nulls:
             self.assertIn(
                 "char_field = models.CharField(max_length=10, "
-                "db_collation='%s')" % test_collation,
+                "db_collation='{}')".format(test_collation),
                 output,
             )
         else:
             self.assertIn(
                 "char_field = models.CharField(max_length=10, "
-                "db_collation='%s', blank=True, null=True)" % test_collation,
+                "db_collation='{}', blank=True, null=True)".format(test_collation),
                 output,
             )
 
@@ -185,13 +187,15 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         if not connection.features.interprets_empty_strings_as_nulls:
             self.assertIn(
-                "text_field = models.TextField(db_collation='%s')" % test_collation,
+                "text_field = models.TextField(db_collation='{}')".format(
+                    test_collation
+                ),
                 output,
             )
         else:
             self.assertIn(
-                "text_field = models.TextField(db_collation='%s, blank=True, "
-                "null=True)" % test_collation,
+                "text_field = models.TextField(db_collation='{}, blank=True, "
+                "null=True)".format(test_collation),
                 output,
             )
 
@@ -217,11 +221,13 @@ class InspectDBTestCase(TestCase):
         auto_field_type = connection.features.introspected_field_types["AutoField"]
         if auto_field_type != "AutoField":
             assertFieldType(
-                "id", "models.%s(primary_key=True)  # AutoField?" % auto_field_type
+                "id",
+                "models.{}(primary_key=True)  # AutoField?".format(auto_field_type),
             )
 
         assertFieldType(
-            "big_int_field", "models.%s()" % introspected_field_types["BigIntegerField"]
+            "big_int_field",
+            "models.{}()".format(introspected_field_types["BigIntegerField"]),
         )
 
         bool_field_type = introspected_field_types["BooleanField"]
@@ -240,23 +246,23 @@ class InspectDBTestCase(TestCase):
 
         assertFieldType("float_field", "models.FloatField()")
         assertFieldType(
-            "int_field", "models.%s()" % introspected_field_types["IntegerField"]
+            "int_field", "models.{}()".format(introspected_field_types["IntegerField"])
         )
         assertFieldType(
             "pos_int_field",
-            "models.%s()" % introspected_field_types["PositiveIntegerField"],
+            "models.{}()".format(introspected_field_types["PositiveIntegerField"]),
         )
         assertFieldType(
             "pos_big_int_field",
-            "models.%s()" % introspected_field_types["PositiveBigIntegerField"],
+            "models.{}()".format(introspected_field_types["PositiveBigIntegerField"]),
         )
         assertFieldType(
             "pos_small_int_field",
-            "models.%s()" % introspected_field_types["PositiveSmallIntegerField"],
+            "models.{}()".format(introspected_field_types["PositiveSmallIntegerField"]),
         )
         assertFieldType(
             "small_int_field",
-            "models.%s()" % introspected_field_types["SmallIntegerField"],
+            "models.{}()".format(introspected_field_types["SmallIntegerField"]),
         )
 
     @skipUnlessDBFeature("can_introspect_foreign_keys")
@@ -336,22 +342,22 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
         self.assertNotIn(
-            "    123 = models.%s" % char_field_type, output, msg=error_message
+            "    123 = models.{}".format(char_field_type), output, msg=error_message
         )
-        self.assertIn("number_123 = models.%s" % char_field_type, output)
+        self.assertIn("number_123 = models.{}".format(char_field_type), output)
 
         error_message = (
             "inspectdb generated a model field name which starts with a digit"
         )
         self.assertNotIn(
-            "    4extra = models.%s" % char_field_type, output, msg=error_message
+            "    4extra = models.{}".format(char_field_type), output, msg=error_message
         )
-        self.assertIn("number_4extra = models.%s" % char_field_type, output)
+        self.assertIn("number_4extra = models.{}".format(char_field_type), output)
 
         self.assertNotIn(
-            "    45extra = models.%s" % char_field_type, output, msg=error_message
+            "    45extra = models.{}".format(char_field_type), output, msg=error_message
         )
-        self.assertIn("number_45extra = models.%s" % char_field_type, output)
+        self.assertIn("number_45extra = models.{}".format(char_field_type), output)
 
     def test_special_column_name_introspection(self):
         """
@@ -365,25 +371,27 @@ class InspectDBTestCase(TestCase):
         integer_field_type = connection.features.introspected_field_types[
             "IntegerField"
         ]
-        self.assertIn("field = models.%s()" % integer_field_type, output)
+        self.assertIn("field = models.{}()".format(integer_field_type), output)
         self.assertIn(
-            "field_field = models.%s(db_column='%s_')"
-            % (integer_field_type, base_name),
+            "field_field = models.{}(db_column='{}_')".format(
+                integer_field_type, base_name
+            ),
             output,
         )
         self.assertIn(
-            "field_field_0 = models.%s(db_column='%s__')"
-            % (integer_field_type, base_name),
+            "field_field_0 = models.{}(db_column='{}__')".format(
+                integer_field_type, base_name
+            ),
             output,
         )
         self.assertIn(
-            "field_field_1 = models.%s(db_column='__field')" % integer_field_type,
+            "field_field_1 = models.{}(db_column='__field')".format(integer_field_type),
             output,
         )
         self.assertIn(
             "prc_x = models.{}(db_column='prc(%) x')".format(integer_field_type), output
         )
-        self.assertIn("tamaño = models.%s()" % integer_field_type, output)
+        self.assertIn("tamaño = models.{}()".format(integer_field_type), output)
 
     def test_table_name_introspection(self):
         """
@@ -456,9 +464,10 @@ class InspectDBTestCase(TestCase):
     def test_unsupported_unique_together(self):
         """Unsupported index types (COALESCE here) are skipped."""
         cursor_execute(
-            "CREATE UNIQUE INDEX Findex ON %s "
-            "(id, people_unique_id, COALESCE(message_id, -1))"
-            % PeopleMoreData._meta.db_table
+            "CREATE UNIQUE INDEX Findex ON {} "
+            "(id, people_unique_id, COALESCE(message_id, -1))".format(
+                PeopleMoreData._meta.db_table
+            )
         )
         self.addCleanup(cursor_execute, "DROP INDEX Findex")
         out = StringIO()

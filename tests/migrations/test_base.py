@@ -387,7 +387,7 @@ class OperationTestBase(MigrationTestBase):
                         ),
                         ("cuteness", models.IntegerField(default=1)),
                     ],
-                    bases=["%s.Pony" % app_label],
+                    bases=["{}.Pony".format(app_label)],
                 )
             )
         if proxy_model:
@@ -396,7 +396,7 @@ class OperationTestBase(MigrationTestBase):
                     "ProxyPony",
                     fields=[],
                     options={"proxy": True},
-                    bases=["%s.Pony" % app_label],
+                    bases=["{}.Pony".format(app_label)],
                 )
             )
         if manager_model:
@@ -440,13 +440,15 @@ class OptimizerTestBase(SimpleTestCase):
         self.assertEqual(expected, result)
         if exact is not None and iterations != exact:
             raise self.failureException(
-                "Optimization did not take exactly %s iterations (it took %s)"
-                % (exact, iterations)
+                "Optimization did not take exactly {} iterations (it took {})".format(
+                    exact, iterations
+                )
             )
         if less_than is not None and iterations >= less_than:
             raise self.failureException(
-                "Optimization did not take less than %s iterations (it took %s)"
-                % (less_than, iterations)
+                "Optimization did not take less than {} iterations (it took {})".format(
+                    less_than, iterations
+                )
             )
 
     def assertDoesNotOptimize(self, operations, **kwargs):

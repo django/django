@@ -74,13 +74,13 @@ def method_decorator(decorator, name=""):
         if not (name and hasattr(obj, name)):
             raise ValueError(
                 "The keyword argument `name` must be the name of a method "
-                "of the decorated class: %s. Got '%s' instead." % (obj, name)
+                "of the decorated class: {}. Got '{}' instead.".format(obj, name)
             )
         method = getattr(obj, name)
         if not callable(method):
             raise TypeError(
-                "Cannot decorate '%s' as it isn't a callable attribute of "
-                "%s (%s)." % (name, obj, method)
+                "Cannot decorate '{}' as it isn't a callable attribute of "
+                "{} ({}).".format(name, obj, method)
             )
         _wrapper = _multi_decorate(decorator, method)
         setattr(obj, name, _wrapper)
@@ -92,7 +92,7 @@ def method_decorator(decorator, name=""):
         update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
     obj = decorator if hasattr(decorator, "__name__") else decorator.__class__
-    _dec.__name__ = "method_decorator(%s)" % obj.__name__
+    _dec.__name__ = "method_decorator({})".format(obj.__name__)
     return _dec
 
 

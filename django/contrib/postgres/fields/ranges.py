@@ -35,7 +35,7 @@ class RangeBoundary(models.Expression):
         self.upper = "]" if inclusive_upper else ")"
 
     def as_sql(self, compiler, connection):
-        return "'%s%s'" % (self.lower, self.upper), []
+        return "'{}{}'".format(self.lower, self.upper), []
 
 
 class RangeOperators:
@@ -72,7 +72,7 @@ class RangeField(CheckPostgresInstalledMixin, models.Field):
             return self.__dict__["model"]
         except KeyError:
             raise AttributeError(
-                "'%s' object has no attribute 'model'" % self.__class__.__name__
+                "'{}' object has no attribute 'model'".format(self.__class__.__name__)
             )
 
     @model.setter
@@ -253,7 +253,7 @@ class DateTimeRangeContains(PostgresOperatorLookup):
         ):
             cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
             cast_sql = "::{}".format(connection.data_types.get(cast_internal_type))
-        return "%s%s" % (sql, cast_sql), params
+        return "{}{}".format(sql, cast_sql), params
 
 
 DateRangeField.register_lookup(DateTimeRangeContains)
@@ -278,14 +278,14 @@ class RangeContainedBy(PostgresOperatorLookup):
         # Ignore precision for DecimalFields.
         db_type = self.lhs.output_field.cast_db_type(connection).split("(")[0]
         cast_type = self.type_mapping[db_type]
-        return "%s::%s" % (rhs, cast_type), rhs_params
+        return "{}::{}".format(rhs, cast_type), rhs_params
 
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if isinstance(self.lhs.output_field, models.FloatField):
-            lhs = "%s::numeric" % lhs
+            lhs = "{}::numeric".format(lhs)
         elif isinstance(self.lhs.output_field, models.SmallIntegerField):
-            lhs = "%s::integer" % lhs
+            lhs = "{}::integer".format(lhs)
         return lhs, lhs_params
 
     def get_prep_lookup(self):

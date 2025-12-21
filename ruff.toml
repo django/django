@@ -36,7 +36,7 @@ select = [
     "UP028",  # yield-in-for-loop
     "UP029",  # unnecessary-builtin-import
     "UP030",  # format-literals
-#   "UP031",  # printf-string-formatting
+    "UP031",  # printf-string-formatting
 #   "UP032",  # f-string
     "UP033",  # lru-cache-with-maxsize-none
     "UP034",  # extraneous-parentheses

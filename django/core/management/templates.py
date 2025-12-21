@@ -99,7 +99,7 @@ class TemplateCommand(BaseCommand):
             try:
                 os.makedirs(top_dir)
             except FileExistsError:
-                raise CommandError("'%s' already exists" % top_dir)
+                raise CommandError("'{}' already exists".format(top_dir))
             except OSError as e:
                 raise CommandError(e)
         else:
@@ -126,17 +126,19 @@ class TemplateCommand(BaseCommand):
                 excluded_directories.append(directory.strip())
         if self.verbosity >= 2:
             self.stdout.write(
-                "Rendering %s template files with extensions: %s"
-                % (app_or_project, ", ".join(extensions))
+                "Rendering {} template files with extensions: {}".format(
+                    app_or_project, ", ".join(extensions)
+                )
             )
             self.stdout.write(
-                "Rendering %s template files with filenames: %s"
-                % (app_or_project, ", ".join(extra_files))
+                "Rendering {} template files with filenames: {}".format(
+                    app_or_project, ", ".join(extra_files)
+                )
             )
-        base_name = "%s_name" % app_or_project
-        base_subdir = "%s_template" % app_or_project
-        base_directory = "%s_directory" % app_or_project
-        camel_case_name = "camel_case_%s_name" % app_or_project
+        base_name = "{}_name".format(app_or_project)
+        base_subdir = "{}_template".format(app_or_project)
+        base_directory = "{}_directory".format(app_or_project)
+        camel_case_name = "camel_case_{}_name".format(app_or_project)
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
         context = Context(
@@ -188,9 +190,8 @@ class TemplateCommand(BaseCommand):
 
                 if os.path.exists(new_path):
                     raise CommandError(
-                        "%s already exists. Overlaying %s %s into an existing "
-                        "directory won't replace conflicting files."
-                        % (
+                        "{} already exists. Overlaying {} {} into an existing "
+                        "directory won't replace conflicting files.".format(
                             new_path,
                             self.a_or_an,
                             app_or_project,
@@ -210,15 +211,15 @@ class TemplateCommand(BaseCommand):
                     shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
-                    self.stdout.write("Creating %s" % new_path)
+                    self.stdout.write("Creating {}".format(new_path))
                 try:
                     self.apply_umask(old_path, new_path)
                     self.make_writeable(new_path)
                 except OSError:
                     self.stderr.write(
-                        "Notice: Couldn't set permission bits on %s. You're "
+                        "Notice: Couldn't set permission bits on {}. You're "
                         "probably using an uncommon filesystem setup. No "
-                        "problem." % new_path,
+                        "problem.".format(new_path),
                         self.style.NOTICE,
                     )
 
@@ -256,7 +257,7 @@ class TemplateCommand(BaseCommand):
                 return self.extract(absolute_path)
 
         raise CommandError(
-            "couldn't handle %s template %s." % (self.app_or_project, template)
+            "couldn't handle {} template {}.".format(self.app_or_project, template)
         )
 
     def validate_name(self, name, name_or_dir="name"):
@@ -304,13 +305,13 @@ class TemplateCommand(BaseCommand):
                 display_url = url
             return filename, display_url
 
-        prefix = "django_%s_template_" % self.app_or_project
+        prefix = "django_{}_template_".format(self.app_or_project)
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_download")
         self.paths_to_remove.append(tempdir)
         filename, display_url = cleanup_url(url)
 
         if self.verbosity >= 2:
-            self.stdout.write("Downloading %s" % display_url)
+            self.stdout.write("Downloading {}".format(display_url))
 
         the_path = os.path.join(tempdir, filename)
         opener = build_opener()
@@ -321,7 +322,7 @@ class TemplateCommand(BaseCommand):
                 target.write(source.read())
         except OSError as e:
             raise CommandError(
-                "couldn't download URL %s to %s: %s" % (url, filename, e)
+                "couldn't download URL {} to {}: {}".format(url, filename, e)
             )
 
         used_name = the_path.split("/")[-1]
@@ -367,17 +368,17 @@ class TemplateCommand(BaseCommand):
         Extract the given file to a temporary directory and return
         the path of the directory with the extracted content.
         """
-        prefix = "django_%s_template_" % self.app_or_project
+        prefix = "django_{}_template_".format(self.app_or_project)
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_extract")
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:
-            self.stdout.write("Extracting %s" % filename)
+            self.stdout.write("Extracting {}".format(filename))
         try:
             archive.extract(filename, tempdir)
             return tempdir
         except (archive.ArchiveException, OSError) as e:
             raise CommandError(
-                "couldn't extract file %s to %s: %s" % (filename, tempdir, e)
+                "couldn't extract file {} to {}: {}".format(filename, tempdir, e)
             )
 
     def is_url(self, template):

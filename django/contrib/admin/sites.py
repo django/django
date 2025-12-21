@@ -111,23 +111,26 @@ class AdminSite:
         for model in model_or_iterable:
             if model._meta.abstract:
                 raise ImproperlyConfigured(
-                    "The model %s is abstract, so it cannot be registered with admin."
-                    % model.__name__
+                    "The model {} is abstract, so it cannot be registered with admin.".format(
+                        model.__name__
+                    )
                 )
             if model._meta.is_composite_pk:
                 raise ImproperlyConfigured(
-                    "The model %s has a composite primary key, so it cannot be "
-                    "registered with admin." % model.__name__
+                    "The model {} has a composite primary key, so it cannot be "
+                    "registered with admin.".format(model.__name__)
                 )
 
             if self.is_registered(model):
                 registered_admin = str(self.get_model_admin(model))
-                msg = "The model %s is already registered " % model.__name__
+                msg = "The model {} is already registered ".format(model.__name__)
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
-                    msg += "in app %r." % registered_admin.removesuffix(".ModelAdmin")
+                    msg += "in app {!r}.".format(
+                        registered_admin.removesuffix(".ModelAdmin")
+                    )
                 else:
-                    msg += "with %r." % registered_admin
+                    msg += "with {!r}.".format(registered_admin)
                 raise AlreadyRegistered(msg)
 
             # Ignore the registration if the model has been
@@ -141,7 +144,7 @@ class AdminSite:
                     # wrong place, which causes issues later on.
                     options["__module__"] = __name__
                     admin_class = type(
-                        "%sAdmin" % model.__name__, (admin_class,), options
+                        "{}Admin".format(model.__name__), (admin_class,), options
                     )
 
                 # Instantiate the admin class to save in the registry
@@ -157,7 +160,9 @@ class AdminSite:
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if not self.is_registered(model):
-                raise NotRegistered("The model %s is not registered" % model.__name__)
+                raise NotRegistered(
+                    "The model {} is not registered".format(model.__name__)
+                )
             del self._registry[model]
 
     def is_registered(self, model):
@@ -300,7 +305,7 @@ class AdminSite:
         for model, model_admin in self._registry.items():
             urlpatterns += [
                 path(
-                    "%s/%s/" % (model._meta.app_label, model._meta.model_name),
+                    "{}/{}/".format(model._meta.app_label, model._meta.model_name),
                     include(model_admin.urls),
                 ),
             ]
@@ -455,7 +460,7 @@ class AdminSite:
         if settings.APPEND_SLASH and not url.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
             try:
-                match = resolve("%s/" % request.path_info, urlconf)
+                match = resolve("{}/".format(request.path_info), urlconf)
             except Resolver404:
                 pass
             else:
@@ -508,14 +513,14 @@ class AdminSite:
                 model_dict["view_only"] = not perms.get("change")
                 try:
                     model_dict["admin_url"] = reverse(
-                        "admin:%s_%s_changelist" % info, current_app=self.name
+                        "admin:{}_{}_changelist".format(*info), current_app=self.name
                     )
                 except NoReverseMatch:
                     pass
             if perms.get("add"):
                 try:
                     model_dict["add_url"] = reverse(
-                        "admin:%s_%s_add" % info, current_app=self.name
+                        "admin:{}_{}_add".format(*info), current_app=self.name
                     )
                 except NoReverseMatch:
                     pass
@@ -594,7 +599,7 @@ class AdminSite:
         return TemplateResponse(
             request,
             self.app_index_template
-            or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
+            or ["admin/{}/app_index.html".format(app_label), "admin/app_index.html"],
             context,
         )
 

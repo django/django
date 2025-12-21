@@ -44,8 +44,8 @@ class SingleObjectMixin(ContextMixin):
         # If none of those are defined, it's an error.
         if pk is None and slug is None:
             raise AttributeError(
-                "Generic detail view %s must be called with either an object "
-                "pk or a slug in the URLconf." % self.__class__.__name__
+                "Generic detail view {} must be called with either an object "
+                "pk or a slug in the URLconf.".format(self.__class__.__name__)
             )
 
         try:
@@ -70,9 +70,9 @@ class SingleObjectMixin(ContextMixin):
                 return self.model._default_manager.all()
             else:
                 raise ImproperlyConfigured(
-                    "%(cls)s is missing a QuerySet. Define "
-                    "%(cls)s.model, %(cls)s.queryset, or override "
-                    "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
+                    "{cls} is missing a QuerySet. Define "
+                    "{cls}.model, {cls}.queryset, or override "
+                    "{cls}.get_queryset().".format(cls=self.__class__.__name__)
                 )
         return self.queryset.all()
 
@@ -150,8 +150,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
                 names.append(
-                    "%s/%s%s.html"
-                    % (
+                    "{}/{}{}.html".format(
                         object_meta.app_label,
                         object_meta.model_name,
                         self.template_name_suffix,
@@ -161,8 +160,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                 self.model, models.Model
             ):
                 names.append(
-                    "%s/%s%s.html"
-                    % (
+                    "{}/{}{}.html".format(
                         self.model._meta.app_label,
                         self.model._meta.model_name,
                         self.template_name_suffix,

@@ -91,7 +91,7 @@ class GeoIP2:
             'GeoLite2-City.mmdb'; overrides the GEOIP_CITY setting.
         """
         if cache not in self.cache_options:
-            raise GeoIP2Exception("Invalid GeoIP caching option: %s" % cache)
+            raise GeoIP2Exception("Invalid GeoIP caching option: {}".format(cache))
 
         path = path or getattr(settings, "GEOIP_PATH", None)
         city = city or getattr(settings, "GEOIP_CITY", "GeoLite2-City.mmdb")
@@ -145,7 +145,7 @@ class GeoIP2:
         if not isinstance(query, (str, ipaddress.IPv4Address, ipaddress.IPv6Address)):
             raise TypeError(
                 "GeoIP query must be a string or instance of IPv4Address or "
-                "IPv6Address, not type %s" % type(query).__name__,
+                "IPv6Address, not type {}".format(type(query).__name__),
             )
 
         if require_city and not self.is_city:

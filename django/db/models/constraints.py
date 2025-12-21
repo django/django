@@ -103,8 +103,9 @@ class BaseConstraint:
             ):
                 errors.append(
                     checks.Error(
-                        "'constraints' refers to the joined field '%s'."
-                        % LOOKUP_SEP.join([field_name, *lookups]),
+                        "'constraints' refers to the joined field '{}'.".format(
+                            LOOKUP_SEP.join([field_name, *lookups])
+                        ),
                         obj=model,
                         id="models.E041",
                     )
@@ -113,7 +114,7 @@ class BaseConstraint:
         return errors
 
     def deconstruct(self):
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        path = "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
         path = path.replace("django.db.models.constraints", "django.db.models")
         kwargs = {"name": self.name}
         if (
@@ -218,20 +219,22 @@ class CheckConstraint(BaseConstraint):
             )
 
     def __repr__(self):
-        return "<%s: condition=%s name=%s%s%s>" % (
+        return "<{}: condition={} name={}{}{}>".format(
             self.__class__.__qualname__,
             self.condition,
             repr(self.name),
             (
                 ""
                 if self.violation_error_code is None
-                else " violation_error_code=%r" % self.violation_error_code
+                else " violation_error_code={!r}".format(self.violation_error_code)
             ),
             (
                 ""
                 if self.violation_error_message is None
                 or self.violation_error_message == self.default_violation_error_message
-                else " violation_error_message=%r" % self.violation_error_message
+                else " violation_error_message={!r}".format(
+                    self.violation_error_message
+                )
             ),
         )
 
@@ -510,30 +513,40 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __repr__(self):
-        return "<%s:%s%s%s%s%s%s%s%s%s%s>" % (
+        return "<{}:{}{}{}{}{}{}{}{}{}{}>".format(
             self.__class__.__qualname__,
-            "" if not self.fields else " fields=%s" % repr(self.fields),
-            "" if not self.expressions else " expressions=%s" % repr(self.expressions),
-            " name=%s" % repr(self.name),
-            "" if self.condition is None else " condition=%s" % self.condition,
-            "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
-            "" if not self.include else " include=%s" % repr(self.include),
-            "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
+            "" if not self.fields else " fields={}".format(repr(self.fields)),
+            (
+                ""
+                if not self.expressions
+                else " expressions={}".format(repr(self.expressions))
+            ),
+            " name={}".format(repr(self.name)),
+            "" if self.condition is None else " condition={}".format(self.condition),
+            (
+                ""
+                if self.deferrable is None
+                else " deferrable={!r}".format(self.deferrable)
+            ),
+            "" if not self.include else " include={}".format(repr(self.include)),
+            "" if not self.opclasses else " opclasses={}".format(repr(self.opclasses)),
             (
                 ""
                 if self.nulls_distinct is None
-                else " nulls_distinct=%r" % self.nulls_distinct
+                else " nulls_distinct={!r}".format(self.nulls_distinct)
             ),
             (
                 ""
                 if self.violation_error_code is None
-                else " violation_error_code=%r" % self.violation_error_code
+                else " violation_error_code={!r}".format(self.violation_error_code)
             ),
             (
                 ""
                 if self.violation_error_message is None
                 or self.violation_error_message == self.default_violation_error_message
-                else " violation_error_message=%r" % self.violation_error_message
+                else " violation_error_message={!r}".format(
+                    self.violation_error_message
+                )
             ),
         )
 

@@ -52,7 +52,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             for browser in test_class.browsers[1:]:
                 browser_test_class = cls.__new__(
                     cls,
-                    "%s%s" % (capfirst(browser), name),
+                    "{}{}".format(capfirst(browser), name),
                     (test_class,),
                     {
                         "browser": browser,
@@ -69,11 +69,13 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
     @classmethod
     def import_webdriver(cls, browser):
-        return import_string("selenium.webdriver.%s.webdriver.WebDriver" % browser)
+        return import_string(
+            "selenium.webdriver.{}.webdriver.WebDriver".format(browser)
+        )
 
     @classmethod
     def import_options(cls, browser):
-        return import_string("selenium.webdriver.%s.options.Options" % browser)
+        return import_string("selenium.webdriver.{}.options.Options".format(browser))
 
     @classmethod
     def get_capability(cls, browser):
@@ -158,7 +160,9 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
 
     @classproperty
     def live_server_url(cls):
-        return "http://%s:%s" % (cls.external_host or cls.host, cls.server_thread.port)
+        return "http://{}:{}".format(
+            cls.external_host or cls.host, cls.server_thread.port
+        )
 
     @classproperty
     def allowed_host(cls):

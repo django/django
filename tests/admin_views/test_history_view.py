@@ -46,7 +46,7 @@ class AdminHistoryViewTests(TestCase):
             logentry.get_change_message(),
             "Changed State name (from form’s Meta.labels), "
             "nolabel_form_field and not_a_form_field. "
-            "Changed City verbose_name for city “%s”." % city,
+            "Changed City verbose_name for city “{}”.".format(city),
         )
 
 
@@ -82,7 +82,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         paginator = self.selenium.find_element(By.CSS_SELECTOR, ".paginator")
         self.assertEqual(paginator.tag_name, "nav")
         labelledby = paginator.get_attribute("aria-labelledby")
-        description = self.selenium.find_element(By.CSS_SELECTOR, "#%s" % labelledby)
+        description = self.selenium.find_element(
+            By.CSS_SELECTOR, "#{}".format(labelledby)
+        )
         self.assertHTMLEqual(
             description.get_attribute("outerHTML"),
             '<h2 id="pagination" class="visually-hidden">Pagination user entries</h2>',
@@ -94,7 +96,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         current_page_link = aria_current_link[0]
         self.assertEqual(current_page_link.get_attribute("aria-current"), "page")
         self.assertEqual(current_page_link.get_attribute("href"), "")
-        self.assertIn("%s entries" % LogEntry.objects.count(), paginator.text)
+        self.assertIn("{} entries".format(LogEntry.objects.count()), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         self.assertEqual(current_page_link.text, "1")
         # The last page.

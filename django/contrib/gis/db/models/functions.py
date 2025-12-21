@@ -80,8 +80,7 @@ class GeoFuncMixin:
             field = source_fields[pos]
             if not isinstance(field, GeometryField):
                 raise TypeError(
-                    "%s function requires a GeometryField in position %s, got %s."
-                    % (
+                    "{} function requires a GeometryField in position {}, got {}.".format(
                         self.name,
                         pos + 1,
                         type(field).__name__,
@@ -103,8 +102,9 @@ class GeoFuncMixin:
         if not hasattr(value, "resolve_expression"):
             if check_types and not isinstance(value, check_types):
                 raise TypeError(
-                    "The %s parameter has the wrong type: should be %s."
-                    % (param_name, check_types)
+                    "The {} parameter has the wrong type: should be {}.".format(
+                        param_name, check_types
+                    )
                 )
         return value
 
@@ -453,7 +453,7 @@ class IsEmpty(GeoFuncMixin, Transform):
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = super().as_sql(compiler, connection, **extra_context)
-        return "NULLIF(%s, -1)" % sql, params
+        return "NULLIF({}, -1)".format(sql), params
 
 
 @BaseSpatialField.register_lookup
@@ -463,7 +463,7 @@ class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
 
     def as_oracle(self, compiler, connection, **extra_context):
         sql, params = super().as_oracle(compiler, connection, **extra_context)
-        return "CASE %s WHEN 'TRUE' THEN 1 ELSE 0 END" % sql, params
+        return "CASE {} WHEN 'TRUE' THEN 1 ELSE 0 END".format(sql), params
 
 
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):

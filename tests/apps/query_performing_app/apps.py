@@ -59,8 +59,7 @@ class CursorQueryManyAppConfig(BaseAppConfig):
         table_meta = TotallyNormal._meta
         with connection.cursor() as cursor:
             cursor.executemany(
-                "INSERT INTO %s (%s) VALUES(%%s)"
-                % (
+                "INSERT INTO {} ({}) VALUES(%s)".format(
                     connection.introspection.identifier_converter(table_meta.db_table),
                     connection.ops.quote_name(table_meta.get_field("name").column),
                 ),

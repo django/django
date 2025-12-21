@@ -69,13 +69,13 @@ class Migration:
         )
 
     def __repr__(self):
-        return "<Migration %s.%s>" % (self.app_label, self.name)
+        return "<Migration {}.{}>".format(self.app_label, self.name)
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.name)
+        return "{}.{}".format(self.app_label, self.name)
 
     def __hash__(self):
-        return hash("%s.%s" % (self.app_label, self.name))
+        return hash("{}.{}".format(self.app_label, self.name))
 
     def mutate_state(self, project_state, preserve=True):
         """
@@ -105,7 +105,7 @@ class Migration:
             # there instead
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                schema_editor.collected_sql.append("-- %s" % operation.describe())
+                schema_editor.collected_sql.append("-- {}".format(operation.describe()))
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     schema_editor.collected_sql.append(
@@ -157,7 +157,7 @@ class Migration:
             # If it's irreversible, error out
             if not operation.reversible:
                 raise IrreversibleError(
-                    "Operation %s in %s is not reversible" % (operation, self)
+                    "Operation {} in {} is not reversible".format(operation, self)
                 )
             # Preserve new state from previous run to not tamper the same state
             # over all operations
@@ -170,7 +170,7 @@ class Migration:
         for operation, to_state, from_state in to_run:
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                schema_editor.collected_sql.append("-- %s" % operation.describe())
+                schema_editor.collected_sql.append("-- {}".format(operation.describe()))
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     schema_editor.collected_sql.append(
@@ -210,7 +210,7 @@ class Migration:
         fragments = [re.sub(r"\W+", "_", name) for name in raw_fragments if name]
 
         if not fragments or len(fragments) != len(self.operations):
-            return "auto_%s" % get_migration_name_timestamp()
+            return "auto_{}".format(get_migration_name_timestamp())
 
         name = fragments[0]
         for fragment in fragments[1:]:

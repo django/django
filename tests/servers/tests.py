@@ -311,7 +311,7 @@ class LiveServerViews(LiveServerBase):
             self.assertEqual(f.read().rstrip(b"\r\n"), b"example media file")
 
     def test_environ(self):
-        with self.urlopen("/environ_view/?%s" % urlencode({"q": "тест"})) as f:
+        with self.urlopen("/environ_view/?{}".format(urlencode({"q": "тест"}))) as f:
             self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
@@ -412,15 +412,19 @@ class LiveServerThreadedTests(LiveServerBase):
     """If LiveServerTestCase isn't threaded, these tests will hang."""
 
     def test_view_calls_subview(self):
-        url = "/subview_calling_view/?%s" % urlencode({"url": self.live_server_url})
+        url = "/subview_calling_view/?{}".format(
+            urlencode({"url": self.live_server_url})
+        )
         with self.urlopen(url) as f:
             self.assertEqual(f.read(), b"subview calling view: subview")
 
     def test_check_model_instance_from_subview(self):
-        url = "/check_model_instance_from_subview/?%s" % urlencode(
-            {
-                "url": self.live_server_url,
-            }
+        url = "/check_model_instance_from_subview/?{}".format(
+            urlencode(
+                {
+                    "url": self.live_server_url,
+                }
+            )
         )
         with self.urlopen(url) as f:
             self.assertIn(b"emily", f.read())

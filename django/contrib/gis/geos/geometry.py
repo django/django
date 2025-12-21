@@ -89,7 +89,7 @@ class GEOSGeometryBase(GEOSBase):
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
-        return "<%s object at %s>" % (self.geom_type, hex(addressof(self.ptr)))
+        return "<{} object at {}>".format(self.geom_type, hex(addressof(self.ptr)))
 
     # Pickling support
     def _to_pickle_wkb(self):
@@ -394,7 +394,7 @@ class GEOSGeometryBase(GEOSBase):
         Return the EWKT (SRID + WKT) of the Geometry.
         """
         srid = self.srid
-        return "SRID=%s;%s" % (srid, self.wkt) if srid else self.wkt
+        return "SRID={};{}".format(srid, self.wkt) if srid else self.wkt
 
     @property
     def wkt(self):
@@ -452,7 +452,7 @@ class GEOSGeometryBase(GEOSBase):
     def kml(self):
         "Return the KML representation of this Geometry."
         gtype = self.geom_type
-        return "<%s>%s</%s>" % (gtype, self.coord_seq.kml, gtype)
+        return "<{}>{}</{}>".format(gtype, self.coord_seq.kml, gtype)
 
     @property
     def prepared(self):
@@ -783,7 +783,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)
         else:
-            raise TypeError("Improper geometry input type: %s" % type(geo_input))
+            raise TypeError("Improper geometry input type: {}".format(type(geo_input)))
 
         if not g:
             raise GEOSException("Could not initialize GEOS Geometry with given input.")

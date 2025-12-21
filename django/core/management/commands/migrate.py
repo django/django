@@ -122,12 +122,13 @@ class Command(BaseCommand):
         conflicts = executor.loader.detect_conflicts()
         if conflicts:
             name_str = "; ".join(
-                "%s in %s" % (", ".join(names), app) for app, names in conflicts.items()
+                "{} in {}".format(", ".join(names), app)
+                for app, names in conflicts.items()
             )
             raise CommandError(
                 "Conflicting migrations detected; multiple leaf nodes in the "
-                "migration graph: (%s).\nTo fix them run "
-                "'python manage.py makemigrations --merge'" % name_str
+                "migration graph: ({}).\nTo fix them run "
+                "'python manage.py makemigrations --merge'".format(name_str)
             )
 
         # If they supplied command line arguments, work out what they mean.
@@ -143,11 +144,14 @@ class Command(BaseCommand):
             if run_syncdb:
                 if app_label in executor.loader.migrated_apps:
                     raise CommandError(
-                        "Can't use run_syncdb with app '%s' as it has migrations."
-                        % app_label
+                        "Can't use run_syncdb with app '{}' as it has migrations.".format(
+                            app_label
+                        )
                     )
             elif app_label not in executor.loader.migrated_apps:
-                raise CommandError("App '%s' does not have migrations." % app_label)
+                raise CommandError(
+                    "App '{}' does not have migrations.".format(app_label)
+                )
 
         if options["app_label"] and options["migration_name"]:
             migration_name = options["migration_name"]
@@ -160,13 +164,14 @@ class Command(BaseCommand):
                     )
                 except AmbiguityError:
                     raise CommandError(
-                        "More than one migration matches '%s' in app '%s'. "
-                        "Please be more specific." % (migration_name, app_label)
+                        "More than one migration matches '{}' in app '{}'. "
+                        "Please be more specific.".format(migration_name, app_label)
                     )
                 except KeyError:
                     raise CommandError(
-                        "Cannot find a migration matching '%s' from app '%s'."
-                        % (migration_name, app_label)
+                        "Cannot find a migration matching '{}' from app '{}'.".format(
+                            migration_name, app_label
+                        )
                     )
                 target = (app_label, migration.name)
                 # Partially applied squashed migrations are not included in the
@@ -271,7 +276,7 @@ class Command(BaseCommand):
                 if options["app_label"]:
                     self.stdout.write(
                         self.style.MIGRATE_LABEL(
-                            "  Synchronize unmigrated app: %s" % app_label
+                            "  Synchronize unmigrated app: {}".format(app_label)
                         )
                     )
                 else:
@@ -293,7 +298,7 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(
                         self.style.MIGRATE_LABEL("  Target specific migration: ")
-                        + "%s, from %s" % (targets[0][1], targets[0][0])
+                        + "{}, from {}".format(targets[0][1], targets[0][0])
                     )
 
         pre_migrate_state = executor._create_project_state(with_applied_migrations=True)
@@ -334,9 +339,11 @@ class Command(BaseCommand):
                 if changes:
                     self.stdout.write(
                         self.style.NOTICE(
-                            "  Your models in app(s): %s have changes that are not "
+                            "  Your models in app(s): {} have changes that are not "
                             "yet reflected in a migration, and so won't be "
-                            "applied." % ", ".join(repr(app) for app in sorted(changes))
+                            "applied.".format(
+                                ", ".join(repr(app) for app in sorted(changes))
+                            )
                         )
                     )
                     self.stdout.write(
@@ -393,7 +400,7 @@ class Command(BaseCommand):
             if action == "apply_start":
                 if compute_time:
                     self.start = time.monotonic()
-                self.stdout.write("  Applying %s..." % migration, ending="")
+                self.stdout.write("  Applying {}...".format(migration), ending="")
                 self.stdout.flush()
             elif action == "apply_success":
                 elapsed = (
@@ -406,7 +413,7 @@ class Command(BaseCommand):
             elif action == "unapply_start":
                 if compute_time:
                     self.start = time.monotonic()
-                self.stdout.write("  Unapplying %s..." % migration, ending="")
+                self.stdout.write("  Unapplying {}...".format(migration), ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
                 elapsed = (
@@ -471,12 +478,13 @@ class Command(BaseCommand):
                         continue
                     if self.verbosity >= 3:
                         self.stdout.write(
-                            "    Processing %s.%s model"
-                            % (app_name, model._meta.object_name)
+                            "    Processing {}.{} model".format(
+                                app_name, model._meta.object_name
+                            )
                         )
                     if self.verbosity >= 1:
                         self.stdout.write(
-                            "    Creating table %s" % model._meta.db_table
+                            "    Creating table {}".format(model._meta.db_table)
                         )
                     editor.create_model(model)
 

@@ -229,7 +229,7 @@ class BaseDatabaseSchemaEditor:
             # Autoincrement SQL (for backends with inline variant).
             col_type_suffix = field.db_type_suffix(connection=self.connection)
             if col_type_suffix:
-                definition += " %s" % col_type_suffix
+                definition += " {}".format(col_type_suffix)
             params.extend(extra_params)
             # FK.
             if field.remote_field and field.db_constraint:
@@ -251,8 +251,7 @@ class BaseDatabaseSchemaEditor:
                     )
             # Add the SQL to our big list.
             column_sqls.append(
-                "%s %s"
-                % (
+                "{} {}".format(
                     self.quote_name(field.column),
                     definition,
                 )
@@ -674,8 +673,7 @@ class BaseDatabaseSchemaEditor:
                 constraint_names = [default_name]
         if len(constraint_names) != 1:
             raise ValueError(
-                "Found wrong number (%s) of constraints for %s(%s)"
-                % (
+                "Found wrong number ({}) of constraints for {}({})".format(
                     len(constraint_names),
                     model._meta.db_table,
                     ", ".join(columns),
@@ -758,7 +756,7 @@ class BaseDatabaseSchemaEditor:
                 definition += " " + self.sql_create_column_inline_fk % {
                     "name": self._fk_constraint_name(model, field, constraint_suffix),
                     "namespace": (
-                        "%s." % self.quote_name(namespace) if namespace else ""
+                        "{}.".format(self.quote_name(namespace)) if namespace else ""
                     ),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),
@@ -864,9 +862,10 @@ class BaseDatabaseSchemaEditor:
             new_type is None and new_field.remote_field is None
         ):
             raise ValueError(
-                "Cannot alter field %s into %s - they do not properly define "
-                "db_type (are you using a badly-written custom field?)"
-                % (old_field, new_field),
+                "Cannot alter field {} into {} - they do not properly define "
+                "db_type (are you using a badly-written custom field?)".format(
+                    old_field, new_field
+                ),
             )
         elif (
             old_type is None
@@ -893,9 +892,9 @@ class BaseDatabaseSchemaEditor:
             return
         elif old_type is None or new_type is None:
             raise ValueError(
-                "Cannot alter field %s into %s - they are not compatible types "
+                "Cannot alter field {} into {} - they are not compatible types "
                 "(you cannot alter to or from M2M fields, or add or remove "
-                "through= on M2M fields)" % (old_field, new_field)
+                "through= on M2M fields)".format(old_field, new_field)
             )
         elif old_field.generated != new_field.generated or (
             new_field.generated and old_field.db_persist != new_field.db_persist
@@ -976,8 +975,7 @@ class BaseDatabaseSchemaEditor:
             )
             if strict and len(fk_names) != 1:
                 raise ValueError(
-                    "Found wrong number (%s) of foreign key constraints for %s.%s"
-                    % (
+                    "Found wrong number ({}) of foreign key constraints for {}.{}".format(
                         len(fk_names),
                         model._meta.db_table,
                         old_field.column,
@@ -1003,8 +1001,7 @@ class BaseDatabaseSchemaEditor:
             )
             if strict and len(constraint_names) != 1:
                 raise ValueError(
-                    "Found wrong number (%s) of unique constraints for %s.%s"
-                    % (
+                    "Found wrong number ({}) of unique constraints for {}.{}".format(
                         len(constraint_names),
                         model._meta.db_table,
                         old_field.column,
@@ -1080,8 +1077,7 @@ class BaseDatabaseSchemaEditor:
             )
             if strict and len(constraint_names) != 1:
                 raise ValueError(
-                    "Found wrong number (%s) of check constraints for %s.%s"
-                    % (
+                    "Found wrong number ({}) of check constraints for {}.{}".format(
                         len(constraint_names),
                         model._meta.db_table,
                         old_field.column,
@@ -1514,20 +1510,22 @@ class BaseDatabaseSchemaEditor:
         and a unique digest and suffix.
         """
         _, table_name = split_identifier(table_name)
-        hash_suffix_part = "%s%s" % (
+        hash_suffix_part = "{}{}".format(
             names_digest(table_name, *column_names, length=8),
             suffix,
         )
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
-        index_name = "%s_%s_%s" % (table_name, "_".join(column_names), hash_suffix_part)
+        index_name = "{}_{}_{}".format(
+            table_name, "_".join(column_names), hash_suffix_part
+        )
         if len(index_name) <= max_length:
             return index_name
         # Shorten a long suffix.
         if len(hash_suffix_part) > max_length / 3:
             hash_suffix_part = hash_suffix_part[: max_length // 3]
         other_length = (max_length - len(hash_suffix_part)) // 2 - 1
-        index_name = "%s_%s_%s" % (
+        index_name = "{}_{}_{}".format(
             table_name[:other_length],
             "_".join(column_names)[:other_length],
             hash_suffix_part,
@@ -1535,7 +1533,7 @@ class BaseDatabaseSchemaEditor:
         # Prepend D if needed to prevent the name from starting with an
         # underscore or a number (not permitted on Oracle).
         if index_name[0] == "_" or index_name[0].isdigit():
-            index_name = "D%s" % index_name[:-1]
+            index_name = "D{}".format(index_name[:-1])
         return index_name
 
     def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
@@ -2051,8 +2049,7 @@ class BaseDatabaseSchemaEditor:
         constraint_names = self._constraint_names(model, primary_key=True)
         if strict and len(constraint_names) != 1:
             raise ValueError(
-                "Found wrong number (%s) of PK constraints for %s"
-                % (
+                "Found wrong number ({}) of PK constraints for {}".format(
                     len(constraint_names),
                     model._meta.db_table,
                 )

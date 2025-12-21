@@ -19,7 +19,7 @@ from django.utils.version import get_version_tuple
 class SpatialiteNullCheckOperator(SpatialOperator):
     def as_sql(self, connection, lookup, template_params, sql_params):
         sql, params = super().as_sql(connection, lookup, template_params, sql_params)
-        return "%s > 0" % sql, params
+        return "{} > 0".format(sql), params
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -100,9 +100,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             version = self.spatialite_version_tuple()[1:]
         except Exception as exc:
             raise ImproperlyConfigured(
-                'Cannot determine the SpatiaLite version for the "%s" database. '
-                "Was the SpatiaLite initialization SQL loaded on this database?"
-                % (self.connection.settings_dict["NAME"],)
+                'Cannot determine the SpatiaLite version for the "{}" database. '
+                "Was the SpatiaLite initialization SQL loaded on this database?".format(
+                    self.connection.settings_dict["NAME"]
+                )
             ) from exc
         if version < (4, 3, 0):
             raise ImproperlyConfigured("GeoDjango supports SpatiaLite 4.3.0 and above.")
@@ -158,7 +159,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         cursor = self.connection._cursor()
         try:
-            cursor.execute("SELECT %s" % func)
+            cursor.execute("SELECT {}".format(func))
             row = cursor.fetchone()
         finally:
             cursor.close()

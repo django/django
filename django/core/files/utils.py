@@ -7,7 +7,9 @@ from django.core.exceptions import SuspiciousFileOperation
 def validate_file_name(name, allow_relative_path=False):
     # Remove potentially dangerous names
     if os.path.basename(name) in {"", ".", ".."}:
-        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+        raise SuspiciousFileOperation(
+            "Could not derive file name from '{}'".format(name)
+        )
 
     if allow_relative_path:
         # Ensure that name can be treated as a pure posix path, i.e. Unix
@@ -15,10 +17,12 @@ def validate_file_name(name, allow_relative_path=False):
         path = pathlib.PurePosixPath(str(name).replace("\\", "/"))
         if path.is_absolute() or ".." in path.parts:
             raise SuspiciousFileOperation(
-                "Detected path traversal attempt in '%s'" % name
+                "Detected path traversal attempt in '{}'".format(name)
             )
     elif name != os.path.basename(name):
-        raise SuspiciousFileOperation("File name '%s' includes path elements" % name)
+        raise SuspiciousFileOperation(
+            "File name '{}' includes path elements".format(name)
+        )
 
     return name
 

@@ -93,7 +93,7 @@ class SetCookieTests(SimpleTestCase):
         response.set_cookie("example", httponly=True)
         example_cookie = response.cookies["example"]
         self.assertIn(
-            "; %s" % cookies.Morsel._reserved["httponly"], str(example_cookie)
+            "; {}".format(cookies.Morsel._reserved["httponly"]), str(example_cookie)
         )
         self.assertIs(example_cookie["httponly"], True)
 
@@ -140,7 +140,7 @@ class DeleteCookieTests(SimpleTestCase):
         response = HttpResponse()
         for prefix in ("Secure", "Host"):
             with self.subTest(prefix=prefix):
-                cookie_name = "__%s-c" % prefix
+                cookie_name = "__{}-c".format(prefix)
                 response.delete_cookie(cookie_name)
                 self.assertIs(response.cookies[cookie_name]["secure"], True)
 

@@ -162,7 +162,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
 
-        self.selenium.get("%s%s" % (self.live_server_url, login_url))
+        self.selenium.get("{}{}".format(self.live_server_url, login_url))
         username_input = self.selenium.find_element(By.NAME, "username")
         username_input.send_keys(username)
         password_input = self.selenium.find_element(By.NAME, "password")
@@ -170,7 +170,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         login_text = _("Log in")
         with self.wait_page_loaded():
             self.selenium.find_element(
-                By.XPATH, '//input[@value="%s"]' % login_text
+                By.XPATH, '//input[@value="{}"]'.format(login_text)
             ).click()
 
     def select_option(self, selector, value):
@@ -233,14 +233,14 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Assert that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
         """
-        self._assertOptionsValues("%s > option" % selector, values)
+        self._assertOptionsValues("{} > option".format(selector), values)
 
     def assertSelectedOptions(self, selector, values):
         """
         Assert that the <SELECT> widget identified by `selector` has the
         selected options with the given `values`.
         """
-        self._assertOptionsValues("%s > option:checked" % selector, values)
+        self._assertOptionsValues("{} > option:checked".format(selector), values)
 
     def is_disabled(self, selector):
         """

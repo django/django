@@ -34,9 +34,9 @@ class MultipleObjectMixin(ContextMixin):
             queryset = self.model._default_manager.all()
         else:
             raise ImproperlyConfigured(
-                "%(cls)s is missing a QuerySet. Define "
-                "%(cls)s.model, %(cls)s.queryset, or override "
-                "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
+                "{cls} is missing a QuerySet. Define "
+                "{cls}.model, {cls}.queryset, or override "
+                "{cls}.get_queryset().".format(cls=self.__class__.__name__)
             )
         ordering = self.get_ordering()
         if ordering:
@@ -115,7 +115,7 @@ class MultipleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, "model"):
-            return "%s_list" % object_list.model._meta.model_name
+            return "{}_list".format(object_list.model._meta.model_name)
         else:
             return None
 
@@ -203,16 +203,16 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         if hasattr(self.object_list, "model"):
             opts = self.object_list.model._meta
             names.append(
-                "%s/%s%s.html"
-                % (opts.app_label, opts.model_name, self.template_name_suffix)
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                )
             )
         elif not names:
             raise ImproperlyConfigured(
-                "%(cls)s requires either a 'template_name' attribute "
-                "or a get_queryset() method that returns a QuerySet."
-                % {
-                    "cls": self.__class__.__name__,
-                }
+                "{cls} requires either a 'template_name' attribute "
+                "or a get_queryset() method that returns a QuerySet.".format(
+                    cls=self.__class__.__name__,
+                )
             )
         return names
 

@@ -33,7 +33,9 @@ class Node:
         return str(self.key)
 
     def __repr__(self):
-        return "<%s: (%r, %r)>" % (self.__class__.__name__, self.key[0], self.key[1])
+        return "<{}: ({!r}, {!r})>".format(
+            self.__class__.__name__, self.key[0], self.key[1]
+        )
 
     def add_child(self, child):
         self.children.add(child)
@@ -106,14 +108,14 @@ class MigrationGraph:
         """
         if child not in self.nodes:
             error_message = (
-                "Migration %s dependencies reference nonexistent"
-                " child node %r" % (migration, child)
+                "Migration {} dependencies reference nonexistent"
+                " child node {!r}".format(migration, child)
             )
             self.add_dummy_node(child, migration, error_message)
         if parent not in self.nodes:
             error_message = (
-                "Migration %s dependencies reference nonexistent"
-                " parent node %r" % (migration, parent)
+                "Migration {} dependencies reference nonexistent"
+                " parent node {!r}".format(migration, parent)
             )
             self.add_dummy_node(parent, migration, error_message)
         self.node_map[child].add_parent(self.node_map[parent])
@@ -133,8 +135,8 @@ class MigrationGraph:
             replacement_node = self.node_map[replacement]
         except KeyError as err:
             raise NodeNotFoundError(
-                "Unable to find replacement node %r. It was either never added"
-                " to the migration graph, or has been removed." % (replacement,),
+                "Unable to find replacement node {!r}. It was either never added"
+                " to the migration graph, or has been removed.".format(replacement),
                 replacement,
             ) from err
         for replaced_key in replaced:
@@ -169,9 +171,10 @@ class MigrationGraph:
             replacement_node = self.node_map.pop(replacement)
         except KeyError as err:
             raise NodeNotFoundError(
-                "Unable to remove replacement node %r. It was either never added"
-                " to the migration graph, or has been removed already."
-                % (replacement,),
+                "Unable to remove replacement node {!r}. It was either never added"
+                " to the migration graph, or has been removed already.".format(
+                    replacement
+                ),
                 replacement,
             ) from err
         replaced_nodes = set()
@@ -205,7 +208,7 @@ class MigrationGraph:
         follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+            raise NodeNotFoundError("Node {!r} not a valid node".format(target), target)
         return self.iterative_dfs(self.node_map[target])
 
     def backwards_plan(self, target):
@@ -215,7 +218,7 @@ class MigrationGraph:
         would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+            raise NodeNotFoundError("Node {!r} not a valid node".format(target), target)
         return self.iterative_dfs(self.node_map[target], forwards=False)
 
     def iterative_dfs(self, start, forwards=True):
@@ -283,7 +286,7 @@ class MigrationGraph:
                     if node in stack:
                         cycle = stack[stack.index(node) :]
                         raise CircularDependencyError(
-                            ", ".join("%s.%s" % n for n in cycle)
+                            ", ".join("{}.{}".format(*n) for n in cycle)
                         )
                     if node in todo:
                         stack.append(node)
@@ -293,11 +296,11 @@ class MigrationGraph:
                     node = stack.pop()
 
     def __str__(self):
-        return "Graph: %s nodes, %s edges" % self._nodes_and_edges()
+        return "Graph: {} nodes, {} edges".format(*self._nodes_and_edges())
 
     def __repr__(self):
         nodes, edges = self._nodes_and_edges()
-        return "<%s: nodes=%s, edges=%s>" % (self.__class__.__name__, nodes, edges)
+        return "<{}: nodes={}, edges={}>".format(self.__class__.__name__, nodes, edges)
 
     def _nodes_and_edges(self):
         return len(self.nodes), sum(

@@ -77,8 +77,8 @@ class Command(BaseCommand):
         loader = MigrationLoader(None)
         if app_label not in loader.migrated_apps:
             raise CommandError(
-                "App '%s' does not have migrations (so squashmigrations on "
-                "it makes no sense)" % app_label
+                "App '{}' does not have migrations (so squashmigrations on "
+                "it makes no sense)".format(app_label)
             )
 
         migration = self.find_migration(loader, app_label, migration_name)
@@ -104,11 +104,11 @@ class Command(BaseCommand):
                 migrations_to_squash = migrations_to_squash[start_index:]
             except ValueError:
                 raise CommandError(
-                    "The migration '%s' cannot be found. Maybe it comes after "
-                    "the migration '%s'?\n"
+                    "The migration '{}' cannot be found. Maybe it comes after "
+                    "the migration '{}'?\n"
                     "Have a look at:\n"
-                    "  python manage.py showmigrations %s\n"
-                    "to debug this issue." % (start_migration, migration, app_label)
+                    "  python manage.py showmigrations {}\n"
+                    "to debug this issue.".format(start_migration, migration, app_label)
                 )
 
         # Tell them what we're doing and optionally ask if we should proceed
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                 self.style.MIGRATE_HEADING("Will squash the following migrations:")
             )
             for migration in migrations_to_squash:
-                self.stdout.write(" - %s" % migration.name)
+                self.stdout.write(" - {}".format(migration.name))
 
             if self.interactive:
                 answer = None
@@ -169,8 +169,9 @@ class Command(BaseCommand):
                     self.stdout.write("  No optimizations possible.")
                 else:
                     self.stdout.write(
-                        "  Optimized from %s operations to %s operations."
-                        % (len(operations), len(new_operations))
+                        "  Optimized from {} operations to {} operations.".format(
+                            len(operations), len(new_operations)
+                        )
                     )
 
         replaces = [(m.app_label, m.name) for m in migrations_to_squash]
@@ -189,13 +190,13 @@ class Command(BaseCommand):
             if squashed_name:
                 # Use the name from --squashed-name.
                 prefix, _ = start_migration.name.split("_", 1)
-                name = "%s_%s" % (prefix, squashed_name)
+                name = "{}_{}".format(prefix, squashed_name)
             else:
                 # Generate a name.
-                name = "%s_squashed_%s" % (start_migration.name, migration.name)
+                name = "{}_squashed_{}".format(start_migration.name, migration.name)
             new_migration = subclass(name, app_label)
         else:
-            name = "0001_%s" % (squashed_name or "squashed_%s" % migration.name)
+            name = "0001_%s" % (squashed_name or "squashed_{}".format(migration.name))
             new_migration = subclass(name, app_label)
             new_migration.initial = True
 
@@ -212,7 +213,7 @@ class Command(BaseCommand):
         if self.verbosity > 0:
             self.stdout.write(
                 self.style.MIGRATE_HEADING(
-                    "Created new squashed migration %s" % writer.path
+                    "Created new squashed migration {}".format(writer.path)
                 )
                 + "\n"
                 "  You should commit this migration but leave the old ones in place;\n"
@@ -243,11 +244,12 @@ class Command(BaseCommand):
             return loader.get_migration_by_prefix(app_label, name)
         except AmbiguityError:
             raise CommandError(
-                "More than one migration matches '%s' in app '%s'. Please be "
-                "more specific." % (name, app_label)
+                "More than one migration matches '{}' in app '{}'. Please be "
+                "more specific.".format(name, app_label)
             )
         except KeyError:
             raise CommandError(
-                "Cannot find a migration matching '%s' from app '%s'."
-                % (name, app_label)
+                "Cannot find a migration matching '{}' from app '{}'.".format(
+                    name, app_label
+                )
             )

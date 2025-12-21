@@ -136,7 +136,7 @@ class BaseFormSet(RenderableFormMixin):
                 and not self._non_form_errors
                 and not any(form_errors for form_errors in self._errors)
             )
-        return "<%s: bound=%s valid=%s total_forms=%s>" % (
+        return "<{}: bound={} valid={} total_forms={}>".format(
             self.__class__.__qualname__,
             self.is_bound,
             is_valid,
@@ -276,7 +276,9 @@ class BaseFormSet(RenderableFormMixin):
         """
         if not self.is_valid():
             raise AttributeError(
-                "'%s' object has no attribute 'cleaned_data'" % self.__class__.__name__
+                "'{}' object has no attribute 'cleaned_data'".format(
+                    self.__class__.__name__
+                )
             )
         return [form.cleaned_data for form in self.forms]
 
@@ -305,7 +307,9 @@ class BaseFormSet(RenderableFormMixin):
         """
         if not self.is_valid() or not self.can_order:
             raise AttributeError(
-                "'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__
+                "'{}' object has no attribute 'ordered_forms'".format(
+                    self.__class__.__name__
+                )
             )
         # Construct _ordering, which is a list of (form_index,
         # order_field_value) tuples. After constructing this list, we'll sort
@@ -502,7 +506,7 @@ class BaseFormSet(RenderableFormMixin):
             )
 
     def add_prefix(self, index):
-        return "%s-%s" % (self.prefix, index)
+        return "{}-{}".format(self.prefix, index)
 
     def is_multipart(self):
         """

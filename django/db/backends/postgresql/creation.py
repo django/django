@@ -47,7 +47,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         except Exception as e:
             if not isinstance(e.__cause__, errors.DuplicateDatabase):
                 # All errors except "database already exists" cancel tests.
-                self.log("Got an error creating the test database: %s" % e)
+                self.log("Got an error creating the test database: {}".format(e))
                 sys.exit(2)
             elif not keepdb:
                 # If the database should be kept, ignore "database already
@@ -73,17 +73,16 @@ class DatabaseCreation(BaseDatabaseCreation):
                 try:
                     if verbosity >= 1:
                         self.log(
-                            "Destroying old test database for alias %s..."
-                            % (
+                            "Destroying old test database for alias {}...".format(
                                 self._get_database_display_str(
                                     verbosity, target_database_name
                                 ),
                             )
                         )
-                    cursor.execute("DROP DATABASE %(dbname)s" % test_db_params)
+                    cursor.execute("DROP DATABASE {dbname}".format(**test_db_params))
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
-                    self.log("Got an error cloning the test database: %s" % e)
+                    self.log("Got an error cloning the test database: {}".format(e))
                     sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):

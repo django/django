@@ -159,7 +159,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
         cursor.execute(
-            "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
+            "SELECT * FROM {} LIMIT 1".format(
+                self.connection.ops.quote_name(table_name)
+            )
         )
 
         def to_int(i):
@@ -338,7 +340,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 # a column.
                 if set(constraint_columns) == {constraint}:
                     unnamed_constraints_index += 1
-                    constraint = "__unnamed_constraint_%s__" % unnamed_constraints_index
+                    constraint = "__unnamed_constraint_{}__".format(
+                        unnamed_constraints_index
+                    )
                 constraints[constraint] = {
                     "columns": constraint_columns,
                     "primary_key": False,
@@ -349,7 +353,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 }
         # Now add in the indexes
         cursor.execute(
-            "SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name)
+            "SHOW INDEX FROM {}".format(self.connection.ops.quote_name(table_name))
         )
         for table, non_unique, index, colseq, column, order, type_ in [
             x[:6] + (x[10],) for x in cursor.fetchall()

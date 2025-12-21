@@ -19,13 +19,15 @@ def get_callable(lookup_view):
 
     if not isinstance(lookup_view, str):
         raise ViewDoesNotExist(
-            "'%s' is not a callable or a dot-notation path" % lookup_view
+            "'{}' is not a callable or a dot-notation path".format(lookup_view)
         )
 
     mod_name, func_name = get_mod_func(lookup_view)
     if not func_name:  # No '.' in lookup_view
         raise ImportError(
-            "Could not import '%s'. The path must be fully qualified." % lookup_view
+            "Could not import '{}'. The path must be fully qualified.".format(
+                lookup_view
+            )
         )
 
     try:
@@ -34,8 +36,9 @@ def get_callable(lookup_view):
         parentmod, submod = get_mod_func(mod_name)
         if submod and not module_has_submodule(import_module(parentmod), submod):
             raise ViewDoesNotExist(
-                "Could not import '%s'. Parent module %s does not exist."
-                % (lookup_view, mod_name)
+                "Could not import '{}'. Parent module {} does not exist.".format(
+                    lookup_view, mod_name
+                )
             )
         else:
             raise
@@ -44,14 +47,16 @@ def get_callable(lookup_view):
             view_func = getattr(mod, func_name)
         except AttributeError:
             raise ViewDoesNotExist(
-                "Could not import '%s'. View does not exist in module %s."
-                % (lookup_view, mod_name)
+                "Could not import '{}'. View does not exist in module {}.".format(
+                    lookup_view, mod_name
+                )
             )
         else:
             if not callable(view_func):
                 raise ViewDoesNotExist(
-                    "Could not import '%s.%s'. View is not callable."
-                    % (mod_name, func_name)
+                    "Could not import '{}.{}'. View is not callable.".format(
+                        mod_name, func_name
+                    )
                 )
             return view_func
 

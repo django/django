@@ -40,7 +40,7 @@ class TestRss2Feed(views.Feed):
         return Entry.objects.all()
 
     def item_description(self, item):
-        return "Overridden description: %s" % item
+        return "Overridden description: {}".format(item)
 
     def item_pubdate(self, item):
         return item.published
@@ -49,7 +49,7 @@ class TestRss2Feed(views.Feed):
         return item.updated
 
     def item_comments(self, item):
-        return "%scomments" % item.get_absolute_url()
+        return "{}comments".format(item.get_absolute_url())
 
     item_author_name = "Sally Smith"
     item_author_email = "test@example.com"
@@ -224,16 +224,16 @@ class TestGetObjectFeed(TestRss2Feed):
         return Article.objects.filter(entry=obj)
 
     def item_link(self, item):
-        return "%sarticle/%s/" % (item.entry.get_absolute_url(), item.pk)
+        return "{}article/{}/".format(item.entry.get_absolute_url(), item.pk)
 
     def item_comments(self, item):
-        return "%scomments" % self.item_link(item)
+        return "{}comments".format(self.item_link(item))
 
     def item_description(self, item):
-        return "Article description: %s" % item.title
+        return "Article description: {}".format(item.title)
 
     def item_title(self, item):
-        return "Title: %s" % item.title
+        return "Title: {}".format(item.title)
 
 
 class TestFeedWithStylesheets(TestRss2Feed):

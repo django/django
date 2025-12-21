@@ -45,7 +45,7 @@ def load_command_class(app_name, name):
     class instance. Allow all errors raised by the import process
     (ImportError, AttributeError) to propagate.
     """
-    module = import_module("%s.management.commands.%s" % (app_name, name))
+    module = import_module("{}.management.commands.{}".format(app_name, name))
     return module.Command()
 
 
@@ -109,7 +109,7 @@ def call_command(command_name, *args, **options):
         try:
             app_name = get_commands()[command_name]
         except KeyError:
-            raise CommandError("Unknown command: %r" % command_name)
+            raise CommandError("Unknown command: {!r}".format(command_name))
 
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -179,9 +179,8 @@ def call_command(command_name, *args, **options):
     unknown_options = set(options) - valid_options
     if unknown_options:
         raise TypeError(
-            "Unknown option(s) for %s command: %s. "
-            "Valid options are: %s."
-            % (
+            "Unknown option(s) for {} command: {}. "
+            "Valid options are: {}.".format(
                 command_name,
                 ", ".join(sorted(unknown_options)),
                 ", ".join(sorted(valid_options)),
@@ -214,8 +213,9 @@ class ManagementUtility:
         else:
             usage = [
                 "",
-                "Type '%s help <subcommand>' for help on a specific subcommand."
-                % self.prog_name,
+                "Type '{} help <subcommand>' for help on a specific subcommand.".format(
+                    self.prog_name
+                ),
                 "",
                 "Available subcommands:",
             ]
@@ -229,16 +229,17 @@ class ManagementUtility:
             style = color_style()
             for app in sorted(commands_dict):
                 usage.append("")
-                usage.append(style.NOTICE("[%s]" % app))
+                usage.append(style.NOTICE("[{}]".format(app)))
                 for name in sorted(commands_dict[app]):
-                    usage.append("    %s" % name)
+                    usage.append("    {}".format(name))
             # Output an extra note if settings are not properly configured
             if self.settings_exception is not None:
                 usage.append(
                     style.NOTICE(
                         "Note that only Django core commands are listed "
-                        "as settings are not properly configured (error: %s)."
-                        % self.settings_exception
+                        "as settings are not properly configured (error: {}).".format(
+                            self.settings_exception
+                        )
                     )
                 )
 
@@ -264,10 +265,10 @@ class ManagementUtility:
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
-            sys.stderr.write("Unknown command: %r" % subcommand)
+            sys.stderr.write("Unknown command: {!r}".format(subcommand))
             if possible_matches:
-                sys.stderr.write(". Did you mean %s?" % possible_matches[0])
-            sys.stderr.write("\nType '%s help' for usage.\n" % self.prog_name)
+                sys.stderr.write(". Did you mean {}?".format(possible_matches[0]))
+            sys.stderr.write("\nType '{} help' for usage.\n".format(self.prog_name))
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.

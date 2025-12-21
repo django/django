@@ -20,18 +20,20 @@ class EmailBackend(ConsoleEmailBackend):
             os.makedirs(self.file_path, exist_ok=True)
         except FileExistsError:
             raise ImproperlyConfigured(
-                "Path for saving email messages exists, but is not a directory: %s"
-                % self.file_path
+                "Path for saving email messages exists, but is not a directory: {}".format(
+                    self.file_path
+                )
             )
         except OSError as err:
             raise ImproperlyConfigured(
-                "Could not create directory for saving email messages: %s (%s)"
-                % (self.file_path, err)
+                "Could not create directory for saving email messages: {} ({})".format(
+                    self.file_path, err
+                )
             )
         # Make sure that self.file_path is writable.
         if not os.access(self.file_path, os.W_OK):
             raise ImproperlyConfigured(
-                "Could not write to directory: %s" % self.file_path
+                "Could not write to directory: {}".format(self.file_path)
             )
         # Finally, call super().
         # Since we're using the console-based backend as a base,
@@ -48,7 +50,7 @@ class EmailBackend(ConsoleEmailBackend):
         """Return a unique file name."""
         if self._fname is None:
             timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-            fname = "%s-%s.log" % (timestamp, abs(id(self)))
+            fname = "{}-{}.log".format(timestamp, abs(id(self)))
             self._fname = os.path.join(self.file_path, fname)
         return self._fname
 

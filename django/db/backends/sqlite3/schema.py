@@ -58,17 +58,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, (Decimal, float, int)):
             return str(value)
         elif isinstance(value, str):
-            return "'%s'" % value.replace("'", "''")
+            return "'{}'".format(value.replace("'", "''"))
         elif value is None:
             return "NULL"
         elif isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character.
-            return "X'%s'" % value.hex()
+            return "X'{}'".format(value.hex())
         else:
             raise ValueError(
-                "Cannot quote parameter value %r of type %s" % (value, type(value))
+                "Cannot quote parameter value {!r} of type {}".format(
+                    value, type(value)
+                )
             )
 
     def prepare_default(self, value):
@@ -165,10 +167,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     default = self.prepare_default(self.effective_default(new_field))
                 else:
                     default, _ = self.db_default_sql(new_field)
-                case_sql = "coalesce(%(col)s, %(default)s)" % {
-                    "col": self.quote_name(old_field.column),
-                    "default": default,
-                }
+                case_sql = "coalesce({col}, {default})".format(
+                    col=self.quote_name(old_field.column),
+                    default=default,
+                )
                 mapping[new_field.column] = case_sql
             else:
                 mapping[new_field.column] = self.quote_name(old_field.column)
@@ -227,7 +229,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body_copy = copy.deepcopy(body)
         meta_contents = {
             "app_label": model._meta.app_label,
-            "db_table": "new__%s" % strip_quotes(model._meta.db_table),
+            "db_table": "new__{}".format(strip_quotes(model._meta.db_table)),
             "unique_together": unique_together,
             "indexes": indexes,
             "constraints": constraints,
@@ -236,7 +238,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         meta = type("Meta", (), meta_contents)
         body_copy["Meta"] = meta
         body_copy["__module__"] = model.__module__
-        new_model = type("New%s" % model._meta.object_name, model.__bases__, body_copy)
+        new_model = type(
+            "New{}".format(model._meta.object_name), model.__bases__, body_copy
+        )
 
         # Remove the automatically recreated default primary key, if it has
         # been deleted.
@@ -251,8 +255,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Copy data from the old table into the new table
         self.execute(
-            "INSERT INTO %s (%s) SELECT %s FROM %s"
-            % (
+            "INSERT INTO {} ({}) SELECT {} FROM {}".format(
                 self.quote_name(new_model._meta.db_table),
                 ", ".join(self.quote_name(x) for x in mapping),
                 ", ".join(mapping.values()),
@@ -454,8 +457,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(new_field.remote_field.through)
         # Copy the data across
         self.execute(
-            "INSERT INTO %s (%s) SELECT %s FROM %s"
-            % (
+            "INSERT INTO {} ({}) SELECT {} FROM {}".format(
                 self.quote_name(new_field.remote_field.through._meta.db_table),
                 ", ".join(
                     [

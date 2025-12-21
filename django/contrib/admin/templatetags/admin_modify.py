@@ -26,10 +26,11 @@ def prepopulated_fields_js(context):
     for field in prepopulated_fields:
         prepopulated_fields_json.append(
             {
-                "id": "#%s" % field["field"].auto_id,
+                "id": "#{}".format(field["field"].auto_id),
                 "name": field["field"].name,
                 "dependency_ids": [
-                    "#%s" % dependency.auto_id for dependency in field["dependencies"]
+                    "#{}".format(dependency.auto_id)
+                    for dependency in field["dependencies"]
                 ],
                 "dependency_list": [
                     dependency.name for dependency in field["dependencies"]

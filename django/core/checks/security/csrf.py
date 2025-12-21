@@ -49,9 +49,8 @@ def check_csrf_failure_view(app_configs, **kwargs):
     try:
         view = _get_failure_view()
     except ImportError:
-        msg = (
-            "The CSRF failure view '%s' could not be imported."
-            % settings.CSRF_FAILURE_VIEW
+        msg = "The CSRF failure view '{}' could not be imported.".format(
+            settings.CSRF_FAILURE_VIEW
         )
         errors.append(Error(msg, id="security.E102"))
     else:
@@ -59,8 +58,8 @@ def check_csrf_failure_view(app_configs, **kwargs):
             inspect.signature(view).bind(None, reason=None)
         except TypeError:
             msg = (
-                "The CSRF failure view '%s' does not take the correct number of "
-                "arguments." % settings.CSRF_FAILURE_VIEW
+                "The CSRF failure view '{}' does not take the correct number of "
+                "arguments.".format(settings.CSRF_FAILURE_VIEW)
             )
             errors.append(Error(msg, id="security.E101"))
     return errors

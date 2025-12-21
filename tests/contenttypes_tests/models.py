@@ -16,7 +16,7 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
 
     def get_absolute_url(self):
-        return "/authors/%s/" % self.id
+        return "/authors/{}/".format(self.id)
 
 
 class Article(models.Model):
@@ -58,7 +58,7 @@ class FooWithUrl(FooWithoutUrl):
     """
 
     def get_absolute_url(self):
-        return "/users/%s/" % quote(self.name)
+        return "/users/{}/".format(quote(self.name))
 
 
 class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
@@ -67,7 +67,7 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
     """
 
     def get_absolute_url(self):
-        return "/users/%s/" % self.unknown_field
+        return "/users/{}/".format(self.unknown_field)
 
 
 class Question(models.Model):
@@ -104,7 +104,7 @@ class ModelWithNullFKToSite(models.Model):
     post = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
 
     def get_absolute_url(self):
-        return "/title/%s/" % quote(self.title)
+        return "/title/{}/".format(quote(self.title))
 
 
 class ModelWithM2MToSite(models.Model):
@@ -112,11 +112,11 @@ class ModelWithM2MToSite(models.Model):
     sites = models.ManyToManyField(Site)
 
     def get_absolute_url(self):
-        return "/title/%s/" % quote(self.title)
+        return "/title/{}/".format(quote(self.title))
 
 
 class UUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     def get_absolute_url(self):
-        return "/uuid/%s/" % self.pk
+        return "/uuid/{}/".format(self.pk)

@@ -56,7 +56,7 @@ class PostGISOperator(SpatialOperator):
                     "Band indices are not allowed for this operator, it works on bbox "
                     "only."
                 )
-            template_params["lhs"] = "%s, %s" % (
+            template_params["lhs"] = "{}, {}".format(
                 template_params["lhs"],
                 lookup.band_lhs,
             )
@@ -67,7 +67,7 @@ class PostGISOperator(SpatialOperator):
                     "Band indices are not allowed for this operator, it works on bbox "
                     "only."
                 )
-            template_params["rhs"] = "%s, %s" % (
+            template_params["rhs"] = "{}, {}".format(
                 template_params["rhs"],
                 lookup.band_rhs,
             )
@@ -76,16 +76,16 @@ class PostGISOperator(SpatialOperator):
         if not self.raster or spheroid:
             # Operators without raster support.
             if lhs_is_raster:
-                template_params["lhs"] = "ST_Polygon(%s)" % template_params["lhs"]
+                template_params["lhs"] = "ST_Polygon({})".format(template_params["lhs"])
             if rhs_is_raster:
-                template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
+                template_params["rhs"] = "ST_Polygon({})".format(template_params["rhs"])
         elif self.raster == BILATERAL:
             # Operators with raster support but don't support mixed (rast-geom)
             # lookups.
             if lhs_is_raster and not rhs_is_raster:
-                template_params["lhs"] = "ST_Polygon(%s)" % template_params["lhs"]
+                template_params["lhs"] = "ST_Polygon({})".format(template_params["lhs"])
             elif rhs_is_raster and not lhs_is_raster:
-                template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
+                template_params["rhs"] = "ST_Polygon({})".format(template_params["rhs"])
 
         return template_params
 
@@ -203,11 +203,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 vtup = self.postgis_version_tuple()
             except ProgrammingError:
                 raise ImproperlyConfigured(
-                    'Cannot determine PostGIS version for database "%s" '
+                    'Cannot determine PostGIS version for database "{}" '
                     'using command "SELECT postgis_lib_version()". '
                     "GeoDjango requires at least PostGIS version 3.2. "
                     "Was the database created from a spatial database "
-                    "template?" % self.connection.settings_dict["NAME"]
+                    "template?".format(self.connection.settings_dict["NAME"])
                 )
             version = vtup[1:]
         return version
@@ -309,7 +309,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             if value.field.srid == f.srid:
                 placeholder = "%s"
             else:
-                placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
+                placeholder = "{}(%s, {})".format(transform_func, f.srid)
             return placeholder
 
         # Get the srid for this object
@@ -323,7 +323,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             placeholder = "%s"
         else:
-            placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
+            placeholder = "{}(%s, {})".format(transform_func, f.srid)
 
         return placeholder
 
@@ -334,7 +334,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         # Close out the connection. See #9437.
         with self.connection.temporary_connection() as cursor:
-            cursor.execute("SELECT %s()" % func)
+            cursor.execute("SELECT {}()".format(func))
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):

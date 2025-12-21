@@ -124,7 +124,7 @@ class JsonlSerializerTestCase(SerializersTestBase, TestCase):
             '"meta_data": ["doesnotexist","metadata"]}}'
         )
         key = ["doesnotexist", "metadata"]
-        expected = "(serializers.category:pk=1) field_value was '%r'" % key
+        expected = "(serializers.category:pk=1) field_value was '{!r}'".format(key)
         with self.assertRaisesMessage(DeserializationError, expected):
             list(serializers.deserialize("jsonl", test_string))
 
@@ -192,7 +192,7 @@ class JsonlSerializerTestCase(SerializersTestBase, TestCase):
         ]
         test_string = "\n".join([s.replace("\n", "") for s in test_strings])
         key = ["doesnotexist", "meta1"]
-        expected = "(serializers.article:pk=1) field_value was '%r'" % key
+        expected = "(serializers.article:pk=1) field_value was '{!r}'".format(key)
         with self.assertRaisesMessage(DeserializationError, expected):
             for obj in serializers.deserialize("jsonl", test_string):
                 obj.save()

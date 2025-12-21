@@ -132,8 +132,8 @@ class CommandTests(SimpleTestCase):
         """
         Management commands can also be loaded from Python eggs.
         """
-        egg_dir = "%s/eggs" % os.path.dirname(__file__)
-        egg_name = "%s/basic.egg" % egg_dir
+        egg_dir = "{}/eggs".format(os.path.dirname(__file__))
+        egg_name = "{}/basic.egg".format(egg_dir)
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=["commandegg"]):
                 cmds = find_commands(
@@ -319,11 +319,11 @@ class CommandTests(SimpleTestCase):
         ]
         for arg, value in tests:
             out = StringIO()
-            expected_output = "%s=%s" % (arg, value)
+            expected_output = "{}={}".format(arg, value)
             with self.subTest(arg=arg):
                 management.call_command(
                     "mutually_exclusive_required",
-                    "--%s" % arg,
+                    "--{}".format(arg),
                     stdout=out,
                 )
                 self.assertIn(expected_output, out.getvalue())
@@ -395,7 +395,7 @@ class CommandTests(SimpleTestCase):
             "flag_true": True,
         }
         expected_output = "\n".join(
-            "%s=%s" % (arg, value) for arg, value in args.items()
+            "{}={}".format(arg, value) for arg, value in args.items()
         )
         out = StringIO()
         management.call_command(

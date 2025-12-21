@@ -74,17 +74,17 @@ class MeasureBase:
         if name in self.UNITS:
             return self.standard / self.UNITS[name]
         else:
-            raise AttributeError("Unknown unit type: %s" % name)
+            raise AttributeError("Unknown unit type: {}".format(name))
 
     def __repr__(self):
-        return "%s(%s=%s)" % (
+        return "{}({}={})".format(
             pretty_name(self),
             self._default_unit,
             getattr(self, self._default_unit),
         )
 
     def __str__(self):
-        return "%s %s" % (getattr(self, self._default_unit), self._default_unit)
+        return "{} {}".format(getattr(self, self._default_unit), self._default_unit)
 
     # **** Comparison methods ****
 
@@ -225,7 +225,7 @@ class MeasureBase:
                     val += self.UNITS[u] * value
                     default_unit = u
                 else:
-                    raise AttributeError("Unknown unit type: %s" % unit)
+                    raise AttributeError("Unknown unit type: {}".format(unit))
         return val, default_unit
 
     @classmethod
@@ -338,20 +338,19 @@ class Distance(MeasureBase):
             )
         else:
             raise TypeError(
-                "%(distance)s must be multiplied with number or %(distance)s"
-                % {
-                    "distance": pretty_name(self.__class__),
-                }
+                "{distance} must be multiplied with number or {distance}".format(
+                    distance=pretty_name(self.__class__),
+                )
             )
 
 
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = {"%s%s" % (AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()} | {
+    UNITS = {"{}{}".format(AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()} | {
         "ha": 10000,
     }
-    ALIAS = {k: "%s%s" % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()} | {
+    ALIAS = {k: "{}{}".format(AREA_PREFIX, v) for k, v in Distance.ALIAS.items()} | {
         "hectare": "ha",
     }
 

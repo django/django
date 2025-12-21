@@ -86,13 +86,13 @@ from .schema import DatabaseSchemaEditor  # NOQA isort:skip
 def _get_varchar_column(data):
     if data["max_length"] is None:
         return "varchar"
-    return "varchar(%(max_length)s)" % data
+    return "varchar({max_length})".format(**data)
 
 
 def _get_decimal_column(data):
     if data["max_digits"] is None and data["decimal_places"] is None:
         return "numeric"
-    return "numeric(%(max_digits)s, %(decimal_places)s)" % data
+    return "numeric({max_digits}, {decimal_places})".format(**data)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -616,5 +616,5 @@ else:
                 return self.cursor.copy_expert(sql, file, *args)
 
         def copy_to(self, file, table, *args, **kwargs):
-            with self.debug_sql(sql="COPY %s TO STDOUT" % table):
+            with self.debug_sql(sql="COPY {} TO STDOUT".format(table)):
                 return self.cursor.copy_to(file, table, *args, **kwargs)

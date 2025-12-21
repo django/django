@@ -80,7 +80,7 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32 (C0), 127(C0),
 # or 128-159(C1).
 _js_escapes.update(
-    (ord("%c" % z), "\\u%04X" % z) for z in chain(range(32), range(0x7F, 0xA0))
+    (ord("%c" % z), "\\u{:04X}".format(z)) for z in chain(range(32), range(0x7F, 0xA0))
 )
 
 
@@ -177,9 +177,9 @@ def linebreaks(value, autoescape=False):
     value = normalize_newlines(value)
     paras = re.split("\n{2,}", str(value))
     if autoescape:
-        paras = ["<p>%s</p>" % escape(p).replace("\n", "<br>") for p in paras]
+        paras = ["<p>{}</p>".format(escape(p).replace("\n", "<br>")) for p in paras]
     else:
-        paras = ["<p>%s</p>" % p.replace("\n", "<br>") for p in paras]
+        paras = ["<p>{}</p>".format(p.replace("\n", "<br>")) for p in paras]
     return "\n\n".join(paras)
 
 
@@ -193,10 +193,10 @@ class MLStripper(HTMLParser):
         self.fed.append(d)
 
     def handle_entityref(self, name):
-        self.fed.append("&%s;" % name)
+        self.fed.append("&{};".format(name))
 
     def handle_charref(self, name):
-        self.fed.append("&#%s;" % name)
+        self.fed.append("&#{};".format(name))
 
     def get_data(self):
         return "".join(self.fed)
@@ -412,7 +412,7 @@ class Urlizer:
     def trim_url(self, x, *, limit):
         if limit is None or len(x) <= limit:
             return x
-        return "%s…" % x[: max(0, limit - 1)]
+        return "{}…".format(x[: max(0, limit - 1)])
 
     @cached_property
     def wrapping_punctuation_openings(self):
@@ -520,13 +520,13 @@ def html_safe(klass):
     """
     if "__html__" in klass.__dict__:
         raise ValueError(
-            "can't apply @html_safe to %s because it defines "
-            "__html__()." % klass.__name__
+            "can't apply @html_safe to {} because it defines "
+            "__html__().".format(klass.__name__)
         )
     if "__str__" not in klass.__dict__:
         raise ValueError(
-            "can't apply @html_safe to %s because it doesn't "
-            "define __str__()." % klass.__name__
+            "can't apply @html_safe to {} because it doesn't "
+            "define __str__().".format(klass.__name__)
         )
     klass_str = klass.__str__
     klass.__str__ = lambda self: mark_safe(klass_str(self))

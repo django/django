@@ -39,8 +39,8 @@ class TagTestCase(SimpleTestCase):
 
     def verify_tag(self, tag, name):
         self.assertEqual(tag.__name__, name)
-        self.assertEqual(tag.__doc__, "Expected %s __doc__" % name)
-        self.assertEqual(tag.__dict__["anything"], "Expected %s __dict__" % name)
+        self.assertEqual(tag.__doc__, "Expected {} __doc__".format(name))
+        self.assertEqual(tag.__dict__["anything"], "Expected {} __dict__".format(name))
 
 
 class SimpleTagTests(TagTestCase):
@@ -125,9 +125,9 @@ class SimpleTagTests(TagTestCase):
 
         for entry in templates:
             t = self.engine.from_string(
-                "%s as var %%}Result: {{ var }}" % entry[0][0:-2]
+                "{} as var %}}Result: {{{{ var }}}}".format(entry[0][0:-2])
             )
-            self.assertEqual(t.render(c), "Result: %s" % entry[1])
+            self.assertEqual(t.render(c), "Result: {}".format(entry[1]))
 
     def test_simple_tag_errors(self):
         errors = [
@@ -181,7 +181,7 @@ class SimpleTagTests(TagTestCase):
 
         for entry in errors:
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
-                self.engine.from_string("%s as var %%}" % entry[1][0:-2])
+                self.engine.from_string("{} as var %}}".format(entry[1][0:-2]))
 
     def test_simple_tag_escaping_autoescape_off(self):
         c = Context({"name": "Jack & Jill"}, autoescape=False)
@@ -866,7 +866,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             Engine(libraries={"broken_tag": "template_tests.broken_tag"})
 
     def test_load_error_egg(self):
-        egg_name = "%s/tagsegg.egg" % self.egg_dir
+        egg_name = "{}/tagsegg.egg".format(self.egg_dir)
         msg = (
             "Invalid template library specified. ImportError raised when "
             "trying to load 'tagsegg.templatetags.broken_egg': cannot "
@@ -878,7 +878,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
-        egg_name = "%s/tagsegg.egg" % self.egg_dir
+        egg_name = "{}/tagsegg.egg".format(self.egg_dir)
         with extend_sys_path(egg_name):
             engine = Engine(
                 libraries={

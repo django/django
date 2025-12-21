@@ -252,7 +252,7 @@ class AdminReadonlyField:
         )
 
     def get_admin_url(self, remote_field, remote_obj):
-        url_name = "admin:%s_%s_change" % (
+        url_name = "admin:{}_{}_change".format(
             remote_field.model._meta.app_label,
             remote_field.model._meta.model_name,
         )
@@ -424,7 +424,7 @@ class InlineAdminFormSet:
         verbose_name = self.opts.verbose_name
         return json.dumps(
             {
-                "name": "#%s" % self.formset.prefix,
+                "name": "#{}".format(self.formset.prefix),
                 "options": {
                     "prefix": self.formset.prefix,
                     "addText": gettext("Add another %(verbose_name)s")

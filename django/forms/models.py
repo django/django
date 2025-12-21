@@ -207,8 +207,8 @@ def fields_for_model(
                 and (exclude is None or f.name not in exclude)
             ):
                 raise FieldError(
-                    "'%s' cannot be specified for %s model form as it is a "
-                    "non-editable field" % (f.name, model.__name__)
+                    "'{}' cannot be specified for {} model form as it is a "
+                    "non-editable field".format(f.name, model.__name__)
                 )
             continue
         if fields is not None and f.name not in fields:
@@ -287,13 +287,12 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             value = getattr(opts, opt)
             if isinstance(value, str) and value != ALL_FIELDS:
                 msg = (
-                    "%(model)s.Meta.%(opt)s cannot be a string. "
-                    "Did you mean to type: ('%(value)s',)?"
-                    % {
-                        "model": new_class.__name__,
-                        "opt": opt,
-                        "value": value,
-                    }
+                    "{model}.Meta.{opt} cannot be a string. "
+                    "Did you mean to type: ('{value}',)?".format(
+                        model=new_class.__name__,
+                        opt=opt,
+                        value=value,
+                    )
                 )
                 raise TypeError(msg)
 
@@ -302,8 +301,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             if opts.fields is None and opts.exclude is None:
                 raise ImproperlyConfigured(
                     "Creating a ModelForm without either the 'fields' attribute "
-                    "or the 'exclude' attribute is prohibited; form %s "
-                    "needs updating." % name
+                    "or the 'exclude' attribute is prohibited; form {} "
+                    "needs updating.".format(name)
                 )
 
             if opts.fields == ALL_FIELDS:
@@ -563,8 +562,7 @@ class BaseModelForm(BaseForm, AltersData):
         """
         if self.errors:
             raise ValueError(
-                "The %s could not be %s because the data didn't validate."
-                % (
+                "The {} could not be {} because the data didn't validate.".format(
                     self.instance._meta.object_name,
                     "created" if self.instance._state.adding else "changed",
                 )
@@ -736,7 +734,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                pk_key = "{}-{}".format(self.add_prefix(i), self.model._meta.pk.name)
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
@@ -1256,12 +1254,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 )
             ):
                 raise ValueError(
-                    "fk_name '%s' is not a ForeignKey to '%s'."
-                    % (fk_name, parent_model._meta.label)
+                    "fk_name '{}' is not a ForeignKey to '{}'.".format(
+                        fk_name, parent_model._meta.label
+                    )
                 )
         elif not fks_to_parent:
             raise ValueError(
-                "'%s' has no field named '%s'." % (model._meta.label, fk_name)
+                "'{}' has no field named '{}'.".format(model._meta.label, fk_name)
             )
     else:
         # Try to discover what the ForeignKey from model to parent_model is
@@ -1285,17 +1284,15 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if can_fail:
                 return
             raise ValueError(
-                "'%s' has no ForeignKey to '%s'."
-                % (
+                "'{}' has no ForeignKey to '{}'.".format(
                     model._meta.label,
                     parent_model._meta.label,
                 )
             )
         else:
             raise ValueError(
-                "'%s' has more than one ForeignKey to '%s'. You must specify "
-                "a 'fk_name' attribute."
-                % (
+                "'{}' has more than one ForeignKey to '{}'. You must specify "
+                "a 'fk_name' attribute.".format(
                     model._meta.label,
                     parent_model._meta.label,
                 )
@@ -1675,7 +1672,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     code="invalid_pk_value",
                     params={"pk": pk},
                 )
-        qs = self.queryset.filter(**{"%s__in" % key: value})
+        qs = self.queryset.filter(**{"{}__in".format(key): value})
         pks = {str(getattr(o, key)) for o in qs}
         for val in value:
             if str(val) not in pks:

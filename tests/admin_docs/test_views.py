@@ -362,7 +362,9 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(self.response, company_markup)
 
         # foreign keys with help text
-        self.assertContains(self.response, "%s\n - place of work" % company_markup)
+        self.assertContains(
+            self.response, "{}\n - place of work".format(company_markup)
+        )
 
         # many to many fields
         self.assertContains(

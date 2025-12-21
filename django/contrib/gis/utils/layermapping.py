@@ -173,7 +173,9 @@ class LayerMapping:
         elif transaction_mode == "commit_on_success":
             self.transaction_decorator = transaction.atomic
         else:
-            raise LayerMapError("Unrecognized transaction mode: %s" % transaction_mode)
+            raise LayerMapError(
+                "Unrecognized transaction mode: {}".format(transaction_mode)
+            )
 
     # Checking routines used during initialization.
     def check_fid_range(self, fid_range):
@@ -211,7 +213,9 @@ class LayerMapping:
                 idx = ogr_fields.index(ogr_map_fld)
             except ValueError:
                 raise LayerMapError(
-                    'Given mapping OGR field "%s" not found in OGR Layer.' % ogr_map_fld
+                    'Given mapping OGR field "{}" not found in OGR Layer.'.format(
+                        ogr_map_fld
+                    )
                 )
             return idx
 
@@ -224,7 +228,9 @@ class LayerMapping:
                 model_field = self.model._meta.get_field(field_name)
             except FieldDoesNotExist:
                 raise LayerMapError(
-                    'Given mapping field "%s" not in given Model fields.' % field_name
+                    'Given mapping field "{}" not in given Model fields.'.format(
+                        field_name
+                    )
                 )
 
             # Getting the string name for the Django field class (e.g.,
@@ -248,7 +254,7 @@ class LayerMapping:
                         gtype = OGRGeomType(ogr_name)
                 except GDALException:
                     raise LayerMapError(
-                        'Invalid mapping for GeometryField "%s".' % field_name
+                        'Invalid mapping for GeometryField "{}".'.format(field_name)
                     )
 
                 # Making sure that the OGR Layer's Geometry is compatible.
@@ -258,9 +264,10 @@ class LayerMapping:
                     or self.make_multi(ltype, model_field)
                 ):
                     raise LayerMapError(
-                        "Invalid mapping geometry; model has %s%s, "
-                        "layer geometry type is %s."
-                        % (fld_name, "(dim=3)" if coord_dim == 3 else "", ltype)
+                        "Invalid mapping geometry; model has {}{}, "
+                        "layer geometry type is {}.".format(
+                            fld_name, "(dim=3)" if coord_dim == 3 else "", ltype
+                        )
                     )
 
                 # Setting the `geom_field` attribute w/the name of the model
@@ -279,8 +286,9 @@ class LayerMapping:
                             rel_model._meta.get_field(rel_name)
                         except FieldDoesNotExist:
                             raise LayerMapError(
-                                'ForeignKey mapping field "%s" not in %s fields.'
-                                % (rel_name, rel_model.__class__.__name__)
+                                'ForeignKey mapping field "{}" not in {} fields.'.format(
+                                    rel_name, rel_model.__class__.__name__
+                                )
                             )
                     fields_val = rel_model
                 else:
@@ -289,7 +297,9 @@ class LayerMapping:
                 # Is the model field type supported by LayerMapping?
                 if model_field.__class__ not in self.FIELD_TYPES:
                     raise LayerMapError(
-                        'Django field type "%s" has no OGR mapping (yet).' % fld_name
+                        'Django field type "{}" has no OGR mapping (yet).'.format(
+                            fld_name
+                        )
                     )
 
                 # Is the OGR field in the Layer?
@@ -299,8 +309,9 @@ class LayerMapping:
                 # Can the OGR field type be mapped to the Django field type?
                 if not issubclass(ogr_field, self.FIELD_TYPES[model_field.__class__]):
                     raise LayerMapError(
-                        'OGR field "%s" (of type %s) cannot be mapped to Django %s.'
-                        % (ogr_field, ogr_field.__name__, fld_name)
+                        'OGR field "{}" (of type {}) cannot be mapped to Django {}.'.format(
+                            ogr_field, ogr_field.__name__, fld_name
+                        )
                     )
                 fields_val = model_field
 
@@ -406,8 +417,9 @@ class LayerMapping:
                 and len(val) > model_field.max_length
             ):
                 raise InvalidString(
-                    "%s model field maximum string length is %s, given %s characters."
-                    % (model_field.name, model_field.max_length, len(val))
+                    "{} model field maximum string length is {}, given {} characters.".format(
+                        model_field.name, model_field.max_length, len(val)
+                    )
                 )
         elif isinstance(ogr_field, OFTReal) and isinstance(
             model_field, models.DecimalField
@@ -417,7 +429,7 @@ class LayerMapping:
                 d = Decimal(str(ogr_field.value))
             except DecimalInvalidOperation:
                 raise InvalidDecimal(
-                    "Could not construct decimal from: %s" % ogr_field.value
+                    "Could not construct decimal from: {}".format(ogr_field.value)
                 )
 
             # Getting the decimal value as a tuple.
@@ -454,7 +466,7 @@ class LayerMapping:
                 val = int(ogr_field.value)
             except ValueError:
                 raise InvalidInteger(
-                    "Could not construct integer from: %s" % ogr_field.value
+                    "Could not construct integer from: {}".format(ogr_field.value)
                 )
         else:
             val = ogr_field.value
@@ -481,8 +493,9 @@ class LayerMapping:
             return rel_model.objects.using(self.using).get(**fk_kwargs)
         except ObjectDoesNotExist:
             raise MissingForeignKey(
-                "No ForeignKey %s model found with keyword arguments: %s"
-                % (rel_model.__name__, fk_kwargs)
+                "No ForeignKey {} model found with keyword arguments: {}".format(
+                    rel_model.__name__, fk_kwargs
+                )
             )
 
     def verify_geom(self, geom, model_field):
@@ -553,7 +566,7 @@ class LayerMapping:
         """
         return (
             geom_type.num in self.MULTI_TYPES
-            and model_field.__class__.__name__ == "Multi%s" % geom_type.django
+            and model_field.__class__.__name__ == "Multi{}".format(geom_type.django)
         )
 
     def save(
@@ -633,7 +646,7 @@ class LayerMapping:
                         raise
                     elif not silent:
                         stream.write(
-                            "Ignoring Feature ID %s because: %s\n" % (feat.fid, msg)
+                            "Ignoring Feature ID {} because: {}\n".format(feat.fid, msg)
                         )
                 else:
                     # Constructing the model using the keyword args
@@ -673,21 +686,27 @@ class LayerMapping:
                         num_saved += 1
                         if verbose:
                             stream.write(
-                                "%s: %s\n" % ("Updated" if is_update else "Saved", m)
+                                "{}: {}\n".format(
+                                    "Updated" if is_update else "Saved", m
+                                )
                             )
                     except Exception as msg:
                         if strict:
                             # Bailing out if the `strict` keyword is set.
                             if not silent:
                                 stream.write(
-                                    "Failed to save the feature (id: %s) into the "
-                                    "model with the keyword arguments:\n" % feat.fid
+                                    "Failed to save the feature (id: {}) into the "
+                                    "model with the keyword arguments:\n".format(
+                                        feat.fid
+                                    )
                                 )
-                                stream.write("%s\n" % kwargs)
+                                stream.write("{}\n".format(kwargs))
                             raise
                         elif not silent:
                             stream.write(
-                                "Failed to save %s:\n %s\nContinuing\n" % (kwargs, msg)
+                                "Failed to save {}:\n {}\nContinuing\n".format(
+                                    kwargs, msg
+                                )
                             )
 
                 # Printing progress information, if requested.
@@ -728,7 +747,7 @@ class LayerMapping:
                     beg = end
                 except Exception:  # Deliberately catch everything
                     stream.write(
-                        "%s\nFailed to save slice: %s\n" % ("=-" * 20, step_slice)
+                        "{}\nFailed to save slice: {}\n".format("=-" * 20, step_slice)
                     )
                     raise
         else:

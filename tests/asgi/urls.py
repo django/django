@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 def hello(request):
     name = request.GET.get("name") or "World"
-    return HttpResponse("Hello %s!" % name)
+    return HttpResponse("Hello {}!".format(name))
 
 
 def hello_with_delay(request):
@@ -20,7 +20,7 @@ def hello_with_delay(request):
 
 def hello_meta(request):
     return HttpResponse(
-        "From %s" % request.META.get("HTTP_REFERER") or "",
+        "From {}".format(request.META.get("HTTP_REFERER")) or "",
         content_type=request.META.get("CONTENT_TYPE"),
     )
 

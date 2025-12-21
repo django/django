@@ -62,7 +62,7 @@ def view_with_argument(request, name):
     if name == "Arthur Dent":
         return HttpResponse("Hi, Arthur")
     else:
-        return HttpResponse("Howdy, %s" % name)
+        return HttpResponse("Howdy, {}".format(name))
 
 
 def nested_view(request):
@@ -84,7 +84,7 @@ def redirect_to_self_with_changing_query_view(request):
     query = request.GET.copy()
     query["counter"] += "0"
     return HttpResponseRedirect(
-        "/redirect_to_self_with_changing_query_view/?%s" % urlencode(query)
+        "/redirect_to_self_with_changing_query_view/?{}".format(urlencode(query))
     )
 
 
@@ -101,7 +101,7 @@ def check_session_view(request):
 
 def request_methods_view(request):
     "A view that responds with the request method"
-    return HttpResponse("request method: %s" % request.method)
+    return HttpResponse("request method: {}".format(request.method))
 
 
 def return_unicode(request):
@@ -136,14 +136,14 @@ def return_text_file(request):
         charset = settings.DEFAULT_CHARSET
 
     return HttpResponse(
-        request.body, status=200, content_type="text/plain; charset=%s" % charset
+        request.body, status=200, content_type="text/plain; charset={}".format(charset)
     )
 
 
 def check_headers(request):
     "A view that responds with value of the X-ARG-CHECK header"
     return HttpResponse(
-        "HTTP_X_ARG_CHECK: %s" % request.META.get("HTTP_X_ARG_CHECK", "Undefined")
+        "HTTP_X_ARG_CHECK: {}".format(request.META.get("HTTP_X_ARG_CHECK", "Undefined"))
     )
 
 

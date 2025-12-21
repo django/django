@@ -132,7 +132,7 @@ class Teacher(models.Model):
         ordering = ["id"]
 
     def __str__(self):
-        return "%s (%s)" % (
+        return "{} ({})".format(
             self.name,
             ", ".join(q.name for q in self.qualifications.all()),
         )

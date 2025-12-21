@@ -15,16 +15,16 @@ class DatabaseValidation(BaseDatabaseValidation):
         ):
             return [
                 checks.Warning(
-                    "%s Strict Mode is not set for database connection '%s'"
-                    % (self.connection.display_name, self.connection.alias),
+                    "{} Strict Mode is not set for database connection '{}'".format(
+                        self.connection.display_name, self.connection.alias
+                    ),
                     hint=(
-                        "%s's Strict Mode fixes many data integrity problems in "
-                        "%s, such as data truncation upon insertion, by "
+                        "{}'s Strict Mode fixes many data integrity problems in "
+                        "{}, such as data truncation upon insertion, by "
                         "escalating warnings into errors. It is strongly "
                         "recommended you activate it. See: "
-                        "https://docs.djangoproject.com/en/%s/ref/databases/"
-                        "#mysql-sql-mode"
-                        % (
+                        "https://docs.djangoproject.com/en/{}/ref/databases/"
+                        "#mysql-sql-mode".format(
                             self.connection.display_name,
                             self.connection.display_name,
                             get_docs_version(),
@@ -50,12 +50,12 @@ class DatabaseValidation(BaseDatabaseValidation):
         ):
             errors.append(
                 checks.Warning(
-                    "%s may not allow unique CharFields to have a max_length "
-                    "> 255." % self.connection.display_name,
+                    "{} may not allow unique CharFields to have a max_length "
+                    "> 255.".format(self.connection.display_name),
                     obj=field,
                     hint=(
-                        "See: https://docs.djangoproject.com/en/%s/ref/"
-                        "databases/#mysql-character-fields" % get_docs_version()
+                        "See: https://docs.djangoproject.com/en/{}/ref/"
+                        "databases/#mysql-character-fields".format(get_docs_version())
                     ),
                     id="mysql.W003",
                 )
@@ -64,8 +64,9 @@ class DatabaseValidation(BaseDatabaseValidation):
         if field.db_index and field_type.lower() in self.connection._limited_data_types:
             errors.append(
                 checks.Warning(
-                    "%s does not support a database index on %s columns."
-                    % (self.connection.display_name, field_type),
+                    "{} does not support a database index on {} columns.".format(
+                        self.connection.display_name, field_type
+                    ),
                     hint=(
                         "An index won't be created. Silence this warning if "
                         "you don't care about it."

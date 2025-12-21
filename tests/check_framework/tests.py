@@ -86,8 +86,8 @@ class SystemCheckFrameworkTests(SimpleTestCase):
             return Error("Message")
 
         msg = (
-            "The function %r did not return a list. All functions registered "
-            "with the checks registry must return a list." % return_non_iterable
+            "The function {!r} did not return a list. All functions registered "
+            "with the checks registry must return a list.".format(return_non_iterable)
         )
         with self.assertRaisesMessage(TypeError, msg):
             registry.run_checks()
@@ -377,20 +377,23 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
             ),
             Error(
                 "The 'ModelWithFieldCalledCheck.check()' class method is "
-                "currently overridden by %r." % ModelWithFieldCalledCheck.check,
+                "currently overridden by {!r}.".format(ModelWithFieldCalledCheck.check),
                 obj=ModelWithFieldCalledCheck,
                 id="models.E020",
             ),
             Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
-                "currently overridden by %r."
-                % ModelWithRelatedManagerCalledCheck.check,
+                "currently overridden by {!r}.".format(
+                    ModelWithRelatedManagerCalledCheck.check
+                ),
                 obj=ModelWithRelatedManagerCalledCheck,
                 id="models.E020",
             ),
             Error(
                 "The 'ModelWithDescriptorCalledCheck.check()' class method is "
-                "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
+                "currently overridden by {!r}.".format(
+                    ModelWithDescriptorCalledCheck.check
+                ),
                 obj=ModelWithDescriptorCalledCheck,
                 id="models.E020",
             ),

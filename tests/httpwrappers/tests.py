@@ -350,7 +350,7 @@ class HttpResponseTests(SimpleTestCase):
         h = HttpResponse()
         f = b"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88"
         f = f.decode("utf-8")
-        h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
+        h.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(f)
         # This one is triggering https://bugs.python.org/issue20747, that is
         # Python will itself insert a newline in the header
         h.headers["Content-Disposition"] = (
@@ -810,7 +810,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
 
     def test_text_attribute_error(self):
         r = StreamingHttpResponse(iter(["hello", "world"]))
-        msg = "This %s instance has no `text` attribute." % r.__class__.__name__
+        msg = "This {} instance has no `text` attribute.".format(r.__class__.__name__)
 
         with self.assertRaisesMessage(AttributeError, msg):
             r.text
@@ -978,7 +978,7 @@ class CookieTests(unittest.TestCase):
 
     def test_pickle(self):
         rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'
-        expected_output = "Set-Cookie: %s" % rawdata
+        expected_output = "Set-Cookie: {}".format(rawdata)
 
         C = SimpleCookie()
         C.load(rawdata)

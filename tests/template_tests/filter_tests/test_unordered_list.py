@@ -125,7 +125,7 @@ class FunctionTests(SimpleTestCase):
                 self.title = title
 
             def __str__(self):
-                return "ulitem-%s" % str(self.title)
+                return "ulitem-{}".format(str(self.title))
 
         a = ULItem("a")
         b = ULItem("b")
@@ -166,7 +166,7 @@ class FunctionTests(SimpleTestCase):
                 self.title = title
 
             def __str__(self):
-                return "ulitem-%s" % str(self.title)
+                return "ulitem-{}".format(str(self.title))
 
         a = ULItem("a")
         b = ULItem("b")

@@ -158,7 +158,7 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
             ("red%09rosé#red", "red%09ros%C3%A9#red"),
             ("/blog/for/Jürgen Münster/", "/blog/for/J%C3%BCrgen%20M%C3%BCnster/"),
             (
-                "locations/%s" % quote_plus("Paris & Orléans"),
+                "locations/{}".format(quote_plus("Paris & Orléans")),
                 "locations/Paris+%26+Orl%C3%A9ans",
             ),
             # Reserved chars remain unescaped.

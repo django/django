@@ -59,8 +59,9 @@ def get_srid_info(srid, connection):
         _srid_cache[alias][srid] = SRIDCacheEntry(
             units=units,
             units_name=units_name,
-            spheroid='SPHEROID["%s",%s,%s]'
-            % (srs["spheroid"], srs.semi_major, srs.inverse_flattening),
+            spheroid='SPHEROID["{}",{},{}]'.format(
+                srs["spheroid"], srs.semi_major, srs.inverse_flattening
+            ),
             geodetic=srs.geographic,
         )
 
@@ -183,7 +184,9 @@ class BaseSpatialField(Field):
                 return gdal.GDALRaster(value)
             except GDALException:
                 raise ValueError(
-                    "Couldn't create spatial object from lookup value '%s'." % value
+                    "Couldn't create spatial object from lookup value '{}'.".format(
+                        value
+                    )
                 )
 
     def get_prep_value(self, value):
@@ -210,12 +213,15 @@ class BaseSpatialField(Field):
                     obj = GEOSGeometry(obj)
                 except (GEOSException, GDALException):
                     raise ValueError(
-                        "Couldn't create spatial object from lookup value '%s'." % obj
+                        "Couldn't create spatial object from lookup value '{}'.".format(
+                            obj
+                        )
                     )
             else:
                 raise ValueError(
-                    "Cannot use object with type %s for a spatial lookup parameter."
-                    % type(obj).__name__
+                    "Cannot use object with type {} for a spatial lookup parameter.".format(
+                        type(obj).__name__
+                    )
                 )
 
         # Assigning the SRID value.

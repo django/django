@@ -113,7 +113,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
+            self.stream.writeln("{}: {}".format(flavour, self.getDescription(test)))
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
@@ -143,7 +143,7 @@ class PDBDebugResult(unittest.TextTestResult):
         self._restoreStdout()
         self.buffer = False
         exc_type, exc_value, traceback = error
-        print("\nOpening PDB: %r" % exc_value)
+        print("\nOpening PDB: {!r}".format(exc_value))
         if PY313:
             pdb.post_mortem(exc_value)
         else:
@@ -770,7 +770,7 @@ class DiscoverRunner:
             # unittest does not export the _convert_select_pattern function
             # that converts command-line arguments to patterns.
             self.test_name_patterns = {
-                pattern if "*" in pattern else "*%s*" % pattern
+                pattern if "*" in pattern else "*{}*".format(pattern)
                 for pattern in test_name_patterns
             }
         self.shuffle = shuffle
@@ -990,12 +990,14 @@ class DiscoverRunner:
         if self.tags or self.exclude_tags:
             if self.tags:
                 self.log(
-                    "Including test tag(s): %s." % ", ".join(sorted(self.tags)),
+                    "Including test tag(s): {}.".format(", ".join(sorted(self.tags))),
                     level=logging.DEBUG,
                 )
             if self.exclude_tags:
                 self.log(
-                    "Excluding test tag(s): %s." % ", ".join(sorted(self.exclude_tags)),
+                    "Excluding test tag(s): {}.".format(
+                        ", ".join(sorted(self.exclude_tags))
+                    ),
                     level=logging.DEBUG,
                 )
             all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
@@ -1112,8 +1114,9 @@ class DiscoverRunner:
         unused_databases = [alias for alias in connections if alias not in databases]
         if unused_databases:
             self.log(
-                "Skipping setup of unused database(s): %s."
-                % ", ".join(sorted(unused_databases)),
+                "Skipping setup of unused database(s): {}.".format(
+                    ", ".join(sorted(unused_databases))
+                ),
                 level=logging.DEBUG,
             )
         return databases

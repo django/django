@@ -50,7 +50,7 @@ elif os.name == "posix":
         "gdal3.3.0",
     ]
 else:
-    raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
+    raise ImproperlyConfigured('GDAL is unsupported on OS "{}".'.format(os.name))
 
 # Using the ctypes `find_library` utility to find the
 # path to the GDAL library from the list of library names.
@@ -62,9 +62,10 @@ if lib_names:
 
 if lib_path is None:
     raise ImproperlyConfigured(
-        'Could not find the GDAL library (tried "%s"). Is GDAL installed? '
-        "If it is, try setting GDAL_LIBRARY_PATH in your settings."
-        % '", "'.join(lib_names)
+        'Could not find the GDAL library (tried "{}"). Is GDAL installed? '
+        "If it is, try setting GDAL_LIBRARY_PATH in your settings.".format(
+            '", "'.join(lib_names)
+        )
     )
 
 # This loads the GDAL/OGR C library
@@ -113,7 +114,7 @@ def gdal_version_info():
     ver = gdal_version()
     m = re.match(rb"^(?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<subminor>\d+))?", ver)
     if not m:
-        raise GDALException('Could not parse GDAL version string "%s"' % ver)
+        raise GDALException('Could not parse GDAL version string "{}"'.format(ver))
     major, minor, subminor = m.groups()
     return (int(major), int(minor), subminor and int(subminor))
 

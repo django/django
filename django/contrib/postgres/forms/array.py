@@ -126,13 +126,15 @@ class SplitArrayWidget(forms.Widget):
 
     def value_from_datadict(self, data, files, name):
         return [
-            self.widget.value_from_datadict(data, files, "%s_%s" % (name, index))
+            self.widget.value_from_datadict(data, files, "{}_{}".format(name, index))
             for index in range(self.size)
         ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            self.widget.value_omitted_from_data(data, files, "%s_%s" % (name, index))
+            self.widget.value_omitted_from_data(
+                data, files, "{}_{}".format(name, index)
+            )
             for index in range(self.size)
         )
 
@@ -157,11 +159,11 @@ class SplitArrayWidget(forms.Widget):
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = {**final_attrs, "id": "%s_%s" % (id_, i)}
+                final_attrs = {**final_attrs, "id": "{}_{}".format(id_, i)}
             context["widget"]["subwidgets"].append(
-                self.widget.get_context(name + "_%s" % i, widget_value, final_attrs)[
-                    "widget"
-                ]
+                self.widget.get_context(
+                    name + "_{}".format(i), widget_value, final_attrs
+                )["widget"]
             )
         return context
 

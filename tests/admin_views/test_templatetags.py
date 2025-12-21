@@ -193,14 +193,14 @@ class DateHierarchyTests(TestCase):
         )
         for query, expected_choices in tests:
             with self.subTest(query=query):
-                query = {"posted__%s" % q: val for q, val in query.items()}
+                query = {"posted__{}".format(q): val for q, val in query.items()}
                 request = self.factory.get("/", query)
                 request.user = self.superuser
                 changelist = modeladmin.get_changelist_instance(request)
                 spec = date_hierarchy(changelist)
                 choices = [choice["link"] for choice in spec["choices"]]
                 expected_choices = [
-                    "&".join("posted__%s" % c for c in choice)
+                    "&".join("posted__{}".format(c) for c in choice)
                     for choice in expected_choices
                 ]
                 expected_choices = [
@@ -242,14 +242,14 @@ class DateHierarchyTests(TestCase):
         ]
         for query, expected_choices in tests:
             with self.subTest(query=query):
-                query = {"expires__%s" % q: val for q, val in query.items()}
+                query = {"expires__{}".format(q): val for q, val in query.items()}
                 request = self.factory.get("/", query)
                 request.user = self.superuser
                 changelist = modeladmin.get_changelist_instance(request)
                 spec = date_hierarchy(changelist)
                 choices = [choice["link"] for choice in spec["choices"]]
                 expected_choices = [
-                    "?" + "&".join("expires__%s" % c for c in choice)
+                    "?" + "&".join("expires__{}".format(c) for c in choice)
                     for choice in expected_choices
                 ]
                 self.assertEqual(choices, expected_choices)

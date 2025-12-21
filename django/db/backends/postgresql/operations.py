@@ -76,8 +76,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
             # varchar(255) -> varchar.
-            return (
-                "CAST(%%s AS %s)" % output_field.db_type(self.connection).split("(")[0]
+            return "CAST(%s AS {})".format(
+                output_field.db_type(self.connection).split("(")[0]
             )
         return "%s"
 
@@ -176,7 +176,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         # Use UPPER(x) for case-insensitive lookups; it's faster.
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
-            lookup = "UPPER(%s)" % lookup
+            lookup = "UPPER({})".format(lookup)
 
         return lookup
 
@@ -189,7 +189,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"%s"' % name
+        return '"{}"'.format(name)
 
     def compose_sql(self, sql, params):
         return mogrify(sql, params, self.connection)
@@ -211,7 +211,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql_parts.append(style.SQL_KEYWORD("RESTART IDENTITY"))
         if allow_cascade:
             sql_parts.append(style.SQL_KEYWORD("CASCADE"))
-        return ["%s;" % " ".join(sql_parts)]
+        return ["{};".format(" ".join(sql_parts))]
 
     def sequence_reset_by_name_sql(self, style, sequences):
         # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL
@@ -223,8 +223,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # intermediate table (see BaseDatabaseIntrospection.sequence_list).
             column_name = sequence_info["column"] or "id"
             sql.append(
-                "%s setval(pg_get_serial_sequence('%s','%s'), 1, false);"
-                % (
+                "{} setval(pg_get_serial_sequence('{}','{}'), 1, false);".format(
                     style.SQL_KEYWORD("SELECT"),
                     style.SQL_TABLE(self.quote_name(table_name)),
                     style.SQL_FIELD(column_name),
@@ -234,9 +233,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def tablespace_sql(self, tablespace, inline=False):
         if inline:
-            return "USING INDEX TABLESPACE %s" % self.quote_name(tablespace)
+            return "USING INDEX TABLESPACE {}".format(self.quote_name(tablespace))
         else:
-            return "TABLESPACE %s" % self.quote_name(tablespace)
+            return "TABLESPACE {}".format(self.quote_name(tablespace))
 
     def sequence_reset_sql(self, style, model_list):
         from django.db import models
@@ -254,9 +253,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
                     output.append(
-                        "%s setval(pg_get_serial_sequence('%s','%s'), "
-                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;"
-                        % (
+                        "{} setval(pg_get_serial_sequence('{}','{}'), "
+                        "coalesce(max({}), 1), max({}) {} null) {} {};".format(
                             style.SQL_KEYWORD("SELECT"),
                             style.SQL_TABLE(qn(model._meta.db_table)),
                             style.SQL_FIELD(f.column),
@@ -291,7 +289,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def distinct_sql(self, fields, params):
         if fields:
             params = [param for param_list in params for param in param_list]
-            return (["DISTINCT ON (%s)" % ", ".join(fields)], params)
+            return (["DISTINCT ON ({})".format(", ".join(fields))], params)
         else:
             return ["DISTINCT"], []
 
@@ -349,7 +347,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             params = (*lhs_params, *rhs_params)
-            return "(interval '1 day' * (%s - %s))" % (lhs_sql, rhs_sql), params
+            return "(interval '1 day' * ({} - {}))".format(lhs_sql, rhs_sql), params
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def explain_query_prefix(self, format=None, **options):
@@ -371,14 +369,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         if format:
             extra["FORMAT"] = format
         if extra:
-            prefix += " (%s)" % ", ".join("%s %s" % i for i in extra.items())
+            prefix += " ({})".format(
+                ", ".join("{} {}".format(*i) for i in extra.items())
+            )
         return prefix
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if on_conflict == OnConflict.IGNORE:
             return "ON CONFLICT DO NOTHING"
         if on_conflict == OnConflict.UPDATE:
-            return "ON CONFLICT(%s) DO UPDATE SET %s" % (
+            return "ON CONFLICT({}) DO UPDATE SET {}".format(
                 ", ".join(map(self.quote_name, unique_fields)),
                 ", ".join(
                     [

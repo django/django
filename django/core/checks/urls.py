@@ -135,7 +135,7 @@ def check_custom_error_handlers(app_configs, **kwargs):
         try:
             handler = resolver.resolve_error_handler(status_code)
         except (ImportError, ViewDoesNotExist) as e:
-            path = getattr(resolver.urlconf_module, "handler%s" % status_code)
+            path = getattr(resolver.urlconf_module, "handler{}".format(status_code))
             msg = (
                 "The custom handler{status_code} view '{path}' could not be "
                 "imported."

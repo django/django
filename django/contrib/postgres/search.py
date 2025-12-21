@@ -65,7 +65,7 @@ class SearchVectorExact(Lookup):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
         params = (*lhs_params, *rhs_params)
-        return "%s @@ %s" % (lhs, rhs), params
+        return "{} @@ {}".format(lhs, rhs), params
 
 
 class SearchVectorField(CheckPostgresInstalledMixin, Field):
@@ -104,7 +104,7 @@ class SearchConfig(Expression):
 
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.config)
-        return "%s::regconfig" % sql, params
+        return "{}::regconfig".format(sql), params
 
 
 class SearchVectorCombinable:
@@ -114,7 +114,7 @@ class SearchVectorCombinable:
         if not isinstance(other, SearchVectorCombinable):
             raise TypeError(
                 "SearchVector can only be combined with other SearchVector "
-                "instances, got %s." % type(other).__name__
+                "instances, got {}.".format(type(other).__name__)
             )
         if reversed:
             return CombinedSearchVector(other, connector, self, self.config)
@@ -202,7 +202,7 @@ class SearchQueryCombinable:
         if not isinstance(other, SearchQueryCombinable):
             raise TypeError(
                 "SearchQuery can only be combined with other SearchQuery "
-                "instances, got %s." % type(other).__name__
+                "instances, got {}.".format(type(other).__name__)
             )
         if reversed:
             return CombinedSearchQuery(other, connector, self, self.config)
@@ -247,7 +247,7 @@ class SearchQuery(SearchQueryCombinable, Func):
 
         self.function = self.SEARCH_TYPES.get(search_type)
         if self.function is None:
-            raise ValueError("Unknown search_type argument '%s'." % search_type)
+            raise ValueError("Unknown search_type argument '{}'.".format(search_type))
         if not hasattr(value, "resolve_expression"):
             value = Value(value)
         expressions = (value,)
@@ -260,7 +260,7 @@ class SearchQuery(SearchQueryCombinable, Func):
     def as_sql(self, compiler, connection, function=None, template=None):
         sql, params = super().as_sql(compiler, connection, function, template)
         if self.invert:
-            sql = "!!(%s)" % sql
+            sql = "!!({})".format(sql)
         return sql, params
 
     def __invert__(self):
@@ -270,7 +270,7 @@ class SearchQuery(SearchQueryCombinable, Func):
 
     def __str__(self):
         result = super().__str__()
-        return ("~%s" % result) if self.invert else result
+        return ("~{}".format(result)) if self.invert else result
 
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
@@ -279,7 +279,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
         super().__init__(lhs, connector, rhs, output_field)
 
     def __str__(self):
-        return "(%s)" % super().__str__()
+        return "({})".format(super().__str__())
 
 
 class SearchRank(Func):

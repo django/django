@@ -293,7 +293,7 @@ def make_context(context, request=None, **kwargs):
     """
     if context is not None and not isinstance(context, dict):
         raise TypeError(
-            "context must be a dict rather than %s." % context.__class__.__name__
+            "context must be a dict rather than {}.".format(context.__class__.__name__)
         )
     if request is None:
         context = Context(context, **kwargs)

@@ -341,7 +341,7 @@ class LogEntryTests(TestCase):
         """
         response = self.client.get(reverse("admin:index"))
         link = reverse("admin:admin_utils_article_change", args=(quote(self.a1.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (
+        should_contain = """<a href="{}">{}</a>""".format(
             escape(link),
             escape(str(self.a1)),
         )

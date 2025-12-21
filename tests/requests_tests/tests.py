@@ -1350,7 +1350,7 @@ class HostValidationTests(SimpleTestCase):
             ("12.34.56.78", 443),
             ("[2001:19f0:feee::dead:beef:cafe]", 8080),
         ]:
-            host = "%s:%s" % (domain, port)
+            host = "{}:{}".format(domain, port)
             request = HttpRequest()
             request.META = {"HTTP_HOST": host}
             with self.assertRaisesMessage(

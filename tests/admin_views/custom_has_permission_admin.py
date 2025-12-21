@@ -10,8 +10,8 @@ from django.core.exceptions import ValidationError
 from . import admin as base_admin
 from . import models
 
-PERMISSION_NAME = "admin_views.%s" % get_permission_codename(
-    "change", models.Article._meta
+PERMISSION_NAME = "admin_views.{}".format(
+    get_permission_codename("change", models.Article._meta)
 )
 
 

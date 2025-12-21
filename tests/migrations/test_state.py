@@ -1965,7 +1965,7 @@ class RelatedModelsTests(SimpleTestCase):
             "Meta": meta,
             "__module__": "__fake__",
         }
-        fname_base = fname = "%s_%%d" % name.lower()
+        fname_base = fname = "{}_%d".format(name.lower())
         for i, fk in enumerate(foreign_keys, 1):
             fname = fname_base % i
             body[fname] = fk

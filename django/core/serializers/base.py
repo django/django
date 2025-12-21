@@ -32,8 +32,9 @@ class DeserializationError(Exception):
         explanatory message.
         """
         return cls(
-            "%s: (%s:pk=%s) field_value was '%s'"
-            % (original_exc, model, fk, field_value)
+            "{}: ({}:pk={}) field_value was '{}'".format(
+                original_exc, model, fk, field_value
+            )
         )
 
 
@@ -281,7 +282,7 @@ class DeserializedObject:
         self.deferred_fields = deferred_fields
 
     def __repr__(self):
-        return "<%s: %s(pk=%s)>" % (
+        return "<{}: {}(pk={})>".format(
             self.__class__.__name__,
             self.object._meta.label,
             self.object.pk,

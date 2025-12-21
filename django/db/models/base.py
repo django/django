@@ -82,7 +82,7 @@ def subclass_exception(name, bases, module, attached_to):
         bases,
         {
             "__module__": module,
-            "__qualname__": "%s.%s" % (attached_to.__qualname__, name),
+            "__qualname__": "{}.{}".format(attached_to.__qualname__, name),
         },
     )
 
@@ -135,9 +135,9 @@ class ModelBase(type):
             if app_config is None:
                 if not abstract:
                     raise RuntimeError(
-                        "Model class %s.%s doesn't declare an explicit "
+                        "Model class {}.{} doesn't declare an explicit "
                         "app_label and isn't in an application in "
-                        "INSTALLED_APPS." % (module, name)
+                        "INSTALLED_APPS.".format(module, name)
                     )
 
             else:
@@ -205,7 +205,9 @@ class ModelBase(type):
         # hasn't been swapped out.
         if is_proxy and base_meta and base_meta.swapped:
             raise TypeError(
-                "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
+                "{} cannot proxy the swapped model '{}'.".format(
+                    name, base_meta.swapped
+                )
             )
 
         # Add remaining attributes (those with a contribute_to_class() method)
@@ -229,7 +231,7 @@ class ModelBase(type):
                     if parent._meta.fields:
                         raise TypeError(
                             "Abstract base class containing model fields not "
-                            "permitted for proxy model '%s'." % name
+                            "permitted for proxy model '{}'.".format(name)
                         )
                     else:
                         continue
@@ -237,12 +239,14 @@ class ModelBase(type):
                     base = parent
                 elif parent._meta.concrete_model is not base._meta.concrete_model:
                     raise TypeError(
-                        "Proxy model '%s' has more than one non-abstract model base "
-                        "class." % name
+                        "Proxy model '{}' has more than one non-abstract model base "
+                        "class.".format(name)
                     )
             if base is None:
                 raise TypeError(
-                    "Proxy model '%s' has no non-abstract model base class." % name
+                    "Proxy model '{}' has no non-abstract model base class.".format(
+                        name
+                    )
                 )
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
@@ -281,9 +285,8 @@ class ModelBase(type):
                 for field in parent_fields:
                     if field.name in field_names:
                         raise FieldError(
-                            "Local field %r in class %r clashes with field of "
-                            "the same name from base class %r."
-                            % (
+                            "Local field {!r} in class {!r} clashes with field of "
+                            "the same name from base class {!r}.".format(
                                 field.name,
                                 name,
                                 base.__name__,
@@ -298,7 +301,7 @@ class ModelBase(type):
                 if base_key in parent_links:
                     field = parent_links[base_key]
                 elif not is_proxy:
-                    attr_name = "%s_ptr" % base._meta.model_name
+                    attr_name = "{}_ptr".format(base._meta.model_name)
                     field = OneToOneField(
                         base,
                         on_delete=CASCADE,
@@ -309,10 +312,9 @@ class ModelBase(type):
 
                     if attr_name in field_names:
                         raise FieldError(
-                            "Auto-generated field '%s' in class %r for "
-                            "parent_link to base class %r clashes with "
-                            "declared field of the same name."
-                            % (
+                            "Auto-generated field '{}' in class {!r} for "
+                            "parent_link to base class {!r} clashes with "
+                            "declared field of the same name.".format(
                                 attr_name,
                                 name,
                                 base.__name__,
@@ -354,9 +356,8 @@ class ModelBase(type):
                 if field.name in field_names:
                     if not base._meta.abstract:
                         raise FieldError(
-                            "Local field %r in class %r clashes with field of "
-                            "the same name from base class %r."
-                            % (
+                            "Local field {!r} in class {!r} clashes with field of "
+                            "the same name from base class {!r}.".format(
                                 field.name,
                                 name,
                                 base.__name__,
@@ -420,7 +421,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (
+            cls.__doc__ = "{}({})".format(
                 cls.__name__,
                 ", ".join(f.name for f in opts.fields),
             )
@@ -434,8 +435,8 @@ class ModelBase(type):
         if not opts.managers:
             if any(f.name == "objects" for f in opts.fields):
                 raise ValueError(
-                    "Model %s must specify a custom Manager, because it has a "
-                    "field named 'objects'." % cls.__name__
+                    "Model {} must specify a custom Manager, because it has a "
+                    "field named 'objects'.".format(cls.__name__)
                 )
             manager = Manager()
             manager.auto_created = True
@@ -630,10 +631,10 @@ class Model(AltersData, metaclass=ModelBase):
         return new
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return "<{}: {}>".format(self.__class__.__name__, self)
 
     def __str__(self):
-        return "%s object (%s)" % (self.__class__.__name__, self.pk)
+        return "{} object ({})".format(self.__class__.__name__, self.pk)
 
     def __eq__(self, other):
         if not isinstance(other, Model):
@@ -678,9 +679,10 @@ class Model(AltersData, metaclass=ModelBase):
         if pickled_version:
             if pickled_version != django.__version__:
                 warnings.warn(
-                    "Pickled model instance's Django version %s does not "
-                    "match the current version %s."
-                    % (pickled_version, django.__version__),
+                    "Pickled model instance's Django version {} does not "
+                    "match the current version {}.".format(
+                        pickled_version, django.__version__
+                    ),
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -752,8 +754,8 @@ class Model(AltersData, metaclass=ModelBase):
                 return
             if any(LOOKUP_SEP in f for f in fields):
                 raise ValueError(
-                    'Found "%s" in fields argument. Relations and transforms '
-                    "are not allowed in fields." % LOOKUP_SEP
+                    'Found "{}" in fields argument. Relations and transforms '
+                    "are not allowed in fields.".format(LOOKUP_SEP)
                 )
 
         if from_queryset is None:
@@ -872,8 +874,9 @@ class Model(AltersData, metaclass=ModelBase):
             if not_updatable_fields:
                 raise ValueError(
                     "The following fields do not exist in this model, are m2m "
-                    "fields, primary keys, or are non-concrete fields: %s"
-                    % ", ".join(not_updatable_fields)
+                    "fields, primary keys, or are non-concrete fields: {}".format(
+                        ", ".join(not_updatable_fields)
+                    )
                 )
 
         # If saving to the same database, and this model is deferred, then
@@ -1280,8 +1283,8 @@ class Model(AltersData, metaclass=ModelBase):
                     if not field.remote_field.multiple:
                         field.remote_field.delete_cached_value(obj)
                     raise ValueError(
-                        "%s() prohibited to prevent data loss due to unsaved "
-                        "related object '%s'." % (operation_name, field.name)
+                        "{}() prohibited to prevent data loss due to unsaved "
+                        "related object '{}'.".format(operation_name, field.name)
                     )
                 elif getattr(self, field.attname) in field.empty_values:
                     # Set related object if it has been saved after an
@@ -1312,8 +1315,8 @@ class Model(AltersData, metaclass=ModelBase):
     def delete(self, using=None, keep_parents=False):
         if not self._is_pk_set():
             raise ValueError(
-                "%s object can't be deleted because its %s attribute is set "
-                "to None." % (self._meta.object_name, self._meta.pk.attname)
+                "{} object can't be deleted because its {} attribute is set "
+                "to None.".format(self._meta.object_name, self._meta.pk.attname)
             )
         using = using or router.db_for_write(self.__class__, instance=self)
         collector = Collector(using=using, origin=self)
@@ -1350,17 +1353,19 @@ class Model(AltersData, metaclass=ModelBase):
             self.__class__._default_manager.using(self._state.db)
             .filter(**kwargs)
             .filter(q)
-            .order_by("%s%s" % (order, field.name), "%spk" % order)
+            .order_by("{}{}".format(order, field.name), "{}pk".format(order))
         )
         try:
             return qs[0]
         except IndexError:
             raise self.DoesNotExist(
-                "%s matching query does not exist." % self.__class__._meta.object_name
+                "{} matching query does not exist.".format(
+                    self.__class__._meta.object_name
+                )
             )
 
     def _get_next_or_previous_in_order(self, is_next):
-        cachename = "__%s_order_cache" % is_next
+        cachename = "__{}_order_cache".format(is_next)
         if not hasattr(self, cachename):
             op = "gt" if is_next else "lt"
             order = "_order" if is_next else "-_order"
@@ -1370,10 +1375,9 @@ class Model(AltersData, metaclass=ModelBase):
                 self.__class__._default_manager.filter(**filter_args)
                 .filter(
                     **{
-                        "_order__%s"
-                        % op: self.__class__._default_manager.values("_order").filter(
-                            **{self._meta.pk.name: self.pk}
-                        )
+                        "_order__{}".format(op): self.__class__._default_manager.values(
+                            "_order"
+                        ).filter(**{self._meta.pk.name: self.pk})
                     }
                 )
                 .order_by(order)[:1]
@@ -1431,7 +1435,9 @@ class Model(AltersData, metaclass=ModelBase):
     def prepare_database_save(self, field):
         if not self._is_pk_set():
             raise ValueError(
-                "Unsaved model instance %r cannot be used in an ORM query." % self
+                "Unsaved model instance {!r} cannot be used in an ORM query.".format(
+                    self
+                )
             )
         return getattr(self, field.remote_field.get_related_field().attname)
 
@@ -1588,11 +1594,11 @@ class Model(AltersData, metaclass=ModelBase):
             if date is None:
                 continue
             if lookup_type == "date":
-                lookup_kwargs["%s__day" % unique_for] = date.day
-                lookup_kwargs["%s__month" % unique_for] = date.month
-                lookup_kwargs["%s__year" % unique_for] = date.year
+                lookup_kwargs["{}__day".format(unique_for)] = date.day
+                lookup_kwargs["{}__month".format(unique_for)] = date.month
+                lookup_kwargs["{}__year".format(unique_for)] = date.year
             else:
-                lookup_kwargs["%s__%s" % (unique_for, lookup_type)] = getattr(
+                lookup_kwargs["{}__{}".format(unique_for, lookup_type)] = getattr(
                     date, lookup_type
                 )
             lookup_kwargs[field] = getattr(self, field)
@@ -1890,8 +1896,9 @@ class Model(AltersData, metaclass=ModelBase):
             except ValueError:
                 errors.append(
                     checks.Error(
-                        "'%s' is not of the form 'app_label.app_name'."
-                        % cls._meta.swappable,
+                        "'{}' is not of the form 'app_label.app_name'.".format(
+                            cls._meta.swappable
+                        ),
                         id="models.E001",
                     )
                 )
@@ -1899,9 +1906,10 @@ class Model(AltersData, metaclass=ModelBase):
                 app_label, model_name = cls._meta.swapped.split(".")
                 errors.append(
                     checks.Error(
-                        "'%s' references '%s.%s', which has not been "
-                        "installed, or is abstract."
-                        % (cls._meta.swappable, app_label, model_name),
+                        "'{}' references '{}.{}', which has not been "
+                        "installed, or is abstract.".format(
+                            cls._meta.swappable, app_label, model_name
+                        ),
                         id="models.E002",
                     )
                 )
@@ -1914,7 +1922,7 @@ class Model(AltersData, metaclass=ModelBase):
             if cls._meta.local_fields or cls._meta.local_many_to_many:
                 errors.append(
                     checks.Error(
-                        "Proxy model '%s' contains model fields." % cls.__name__,
+                        "Proxy model '{}' contains model fields.".format(cls.__name__),
                         id="models.E017",
                     )
                 )
@@ -1966,8 +1974,9 @@ class Model(AltersData, metaclass=ModelBase):
                 errors.append(
                     checks.Error(
                         "The model has two identical many-to-many relations "
-                        "through the intermediate model '%s'."
-                        % f.remote_field.through._meta.label,
+                        "through the intermediate model '{}'.".format(
+                            f.remote_field.through._meta.label
+                        ),
                         obj=cls,
                         id="models.E003",
                     )
@@ -2008,10 +2017,11 @@ class Model(AltersData, metaclass=ModelBase):
                 if clash:
                     errors.append(
                         checks.Error(
-                            "The field '%s' from parent model "
-                            "'%s' clashes with the field '%s' "
-                            "from parent model '%s'."
-                            % (clash.name, clash.model._meta, f.name, f.model._meta),
+                            "The field '{}' from parent model "
+                            "'{}' clashes with the field '{}' "
+                            "from parent model '{}'.".format(
+                                clash.name, clash.model._meta, f.name, f.model._meta
+                            ),
                             obj=cls,
                             id="models.E005",
                         )
@@ -2054,8 +2064,10 @@ class Model(AltersData, metaclass=ModelBase):
             if clash and not id_conflict:
                 errors.append(
                     checks.Error(
-                        "The field '%s' clashes with the field '%s' "
-                        "from model '%s'." % (f.name, clash.name, clash.model._meta),
+                        "The field '{}' clashes with the field '{}' "
+                        "from model '{}'.".format(
+                            f.name, clash.name, clash.model._meta
+                        ),
                         obj=f,
                         id="models.E006",
                     )
@@ -2079,8 +2091,8 @@ class Model(AltersData, metaclass=ModelBase):
             if column_name and column_name in used_column_names:
                 errors.append(
                     checks.Error(
-                        "Field '%s' has column name '%s' that is used by "
-                        "another field." % (f.name, column_name),
+                        "Field '{}' has column name '{}' that is used by "
+                        "another field.".format(f.name, column_name),
                         hint="Specify a 'db_column' for the field.",
                         obj=cls,
                         id="models.E007",
@@ -2098,8 +2110,8 @@ class Model(AltersData, metaclass=ModelBase):
         if model_name.startswith("_") or model_name.endswith("_"):
             errors.append(
                 checks.Error(
-                    "The model name '%s' cannot start or end with an underscore "
-                    "as it collides with the query lookup syntax." % model_name,
+                    "The model name '{}' cannot start or end with an underscore "
+                    "as it collides with the query lookup syntax.".format(model_name),
                     obj=cls,
                     id="models.E023",
                 )
@@ -2107,8 +2119,8 @@ class Model(AltersData, metaclass=ModelBase):
         elif LOOKUP_SEP in model_name:
             errors.append(
                 checks.Error(
-                    "The model name '%s' cannot contain double underscores as "
-                    "it collides with the query lookup syntax." % model_name,
+                    "The model name '{}' cannot contain double underscores as "
+                    "it collides with the query lookup syntax.".format(model_name),
                     obj=cls,
                     id="models.E024",
                 )
@@ -2128,8 +2140,8 @@ class Model(AltersData, metaclass=ModelBase):
             if accessor in property_names:
                 errors.append(
                     checks.Error(
-                        "The property '%s' clashes with a related field "
-                        "accessor." % accessor,
+                        "The property '{}' clashes with a related field "
+                        "accessor.".format(accessor),
                         obj=cls,
                         id="models.E025",
                     )
@@ -2210,8 +2222,7 @@ class Model(AltersData, metaclass=ModelBase):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the nonexistent field '%s'."
-                        % (
+                        "'{}' refers to the nonexistent field '{}'.".format(
                             option,
                             field_name,
                         ),
@@ -2223,9 +2234,8 @@ class Model(AltersData, metaclass=ModelBase):
                 if isinstance(field.remote_field, models.ManyToManyRel):
                     errors.append(
                         checks.Error(
-                            "'%s' refers to a ManyToManyField '%s', but "
-                            "ManyToManyFields are not permitted in '%s'."
-                            % (
+                            "'{}' refers to a ManyToManyField '{}', but "
+                            "ManyToManyFields are not permitted in '{}'.".format(
                                 option,
                                 field_name,
                                 option,
@@ -2261,8 +2271,8 @@ class Model(AltersData, metaclass=ModelBase):
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
-                            "'%s' refers to field '%s' which is not local to model "
-                            "'%s'." % (option, field_name, cls._meta.object_name),
+                            "'{}' refers to field '{}' which is not local to model "
+                            "'{}'.".format(option, field_name, cls._meta.object_name),
                             hint="This issue may be caused by multi-table inheritance.",
                             obj=cls,
                             id="models.E016",
@@ -2339,7 +2349,7 @@ class Model(AltersData, metaclass=ModelBase):
                         errors.append(
                             checks.Error(
                                 "'ordering' refers to the nonexistent field, "
-                                "related field, or lookup '%s'." % field,
+                                "related field, or lookup '{}'.".format(field),
                                 obj=cls,
                                 id="models.E015",
                             )
@@ -2372,7 +2382,7 @@ class Model(AltersData, metaclass=ModelBase):
             errors.append(
                 checks.Error(
                     "'ordering' refers to the nonexistent field, related "
-                    "field, or lookup '%s'." % invalid_field,
+                    "field, or lookup '{}'.".format(invalid_field),
                     obj=cls,
                     id="models.E015",
                 )
@@ -2421,9 +2431,10 @@ class Model(AltersData, metaclass=ModelBase):
             ):
                 errors.append(
                     checks.Error(
-                        'Autogenerated column name too long for field "%s". '
-                        'Maximum length is "%s" for database "%s".'
-                        % (column_name, allowed_len, db_alias),
+                        'Autogenerated column name too long for field "{}". '
+                        'Maximum length is "{}" for database "{}".'.format(
+                            column_name, allowed_len, db_alias
+                        ),
                         hint="Set the column name manually using 'db_column'.",
                         obj=cls,
                         id="models.E018",
@@ -2446,8 +2457,9 @@ class Model(AltersData, metaclass=ModelBase):
                     errors.append(
                         checks.Error(
                             "Autogenerated column name too long for M2M field "
-                            '"%s". Maximum length is "%s" for database "%s".'
-                            % (rel_name, allowed_len, db_alias),
+                            '"{}". Maximum length is "{}" for database "{}".'.format(
+                                rel_name, allowed_len, db_alias
+                            ),
                             hint=(
                                 "Use 'through' to create a separate model for "
                                 "M2M and then set column_name using 'db_column'."
@@ -2536,12 +2548,12 @@ def method_get_order(self, ordered_obj):
 def make_foreign_order_accessors(model, related_model):
     setattr(
         related_model,
-        "get_%s_order" % model.__name__.lower(),
+        "get_{}_order".format(model.__name__.lower()),
         partialmethod(method_get_order, model),
     )
     setattr(
         related_model,
-        "set_%s_order" % model.__name__.lower(),
+        "set_{}_order".format(model.__name__.lower()),
         partialmethod(method_set_order, model),
     )
 

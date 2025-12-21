@@ -464,7 +464,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         # URL with scheme and domain should also be ignored
-        self.req.META["HTTP_REFERER"] = "http://testserver%s" % self.req.path
+        self.req.META["HTTP_REFERER"] = "http://testserver{}".format(self.req.path)
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
 
@@ -477,7 +477,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_referer_equal_to_requested_url_on_another_domain(self):
-        self.req.META["HTTP_REFERER"] = "http://anotherserver%s" % self.req.path
+        self.req.META["HTTP_REFERER"] = "http://anotherserver{}".format(self.req.path)
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 

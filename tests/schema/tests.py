@@ -1832,7 +1832,7 @@ class SchemaTests(TransactionTestCase):
         for details in constraints.values():
             if details["foreign_key"]:
                 self.fail(
-                    "Found an unexpected FK constraint to %s" % details["columns"]
+                    "Found an unexpected FK constraint to {}".format(details["columns"])
                 )
         old_field = LocalBook._meta.get_field("author")
         new_field = ForeignKey(Author, CASCADE)
@@ -3579,7 +3579,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(constraints[constraint.name]["unique"], True)
         # SQL contains a database function.
         self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIn("UPPER(%s)" % editor.quote_name("name"), str(sql))
+        self.assertIn("UPPER({})".format(editor.quote_name("name")), str(sql))
         # Remove constraint.
         with connection.schema_editor() as editor:
             editor.remove_constraint(Author, constraint)
@@ -3607,8 +3607,8 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "slug"), True)
         sql = str(sql)
-        self.assertIn("UPPER(%s)" % editor.quote_name("title"), sql)
-        self.assertIn("LOWER(%s)" % editor.quote_name("slug"), sql)
+        self.assertIn("UPPER({})".format(editor.quote_name("title")), sql)
+        self.assertIn("LOWER({})".format(editor.quote_name("slug")), sql)
         self.assertLess(sql.index("UPPER"), sql.index("LOWER"))
         # Remove constraint.
         with connection.schema_editor() as editor:
@@ -3640,7 +3640,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(sql.references_column(table, "height"), True)
         self.assertIs(sql.references_column(table, "name"), True)
         self.assertIs(sql.references_column(table, "uuid"), True)
-        self.assertIn("LOWER(%s)" % editor.quote_name("name"), str(sql))
+        self.assertIn("LOWER({})".format(editor.quote_name("name")), str(sql))
         # Remove constraint.
         with connection.schema_editor() as editor:
             editor.remove_constraint(Author, constraint)
@@ -3664,9 +3664,9 @@ class SchemaTests(TransactionTestCase):
         self.assertIn(constraint.name, constraints)
         self.assertIs(constraints[constraint.name]["unique"], True)
         self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIn("UPPER(%s)" % editor.quote_name("name"), str(sql))
+        self.assertIn("UPPER({})".format(editor.quote_name("name")), str(sql))
         self.assertIn(
-            "WHERE %s IS NOT NULL" % editor.quote_name("weight"),
+            "WHERE {} IS NOT NULL".format(editor.quote_name("weight")),
             str(sql),
         )
         # Remove constraint.
@@ -3698,10 +3698,9 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(sql.references_column(table, "name"), True)
         self.assertIs(sql.references_column(table, "weight"), True)
         self.assertIs(sql.references_column(table, "height"), True)
-        self.assertIn("UPPER(%s)" % editor.quote_name("name"), str(sql))
+        self.assertIn("UPPER({})".format(editor.quote_name("name")), str(sql))
         self.assertIn(
-            "INCLUDE (%s, %s)"
-            % (
+            "INCLUDE ({}, {})".format(
                 editor.quote_name("weight"),
                 editor.quote_name("height"),
             ),
@@ -3764,7 +3763,7 @@ class SchemaTests(TransactionTestCase):
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "slug"), True)
-        self.assertIn("COLLATE %s" % editor.quote_name(collation), str(sql))
+        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
         # Remove constraint.
         with connection.schema_editor() as editor:
             editor.remove_constraint(BookWithSlug, constraint)
@@ -4145,8 +4144,9 @@ class SchemaTests(TransactionTestCase):
     def test_func_index_multiple_wrapper_references(self):
         index = Index(OrderBy(F("name").desc(), descending=True), name="name")
         msg = (
-            "Multiple references to %s can't be used in an indexed expression."
-            % self._index_expressions_wrappers()
+            "Multiple references to {} can't be used in an indexed expression.".format(
+                self._index_expressions_wrappers()
+            )
         )
         with connection.schema_editor() as editor:
             with self.assertRaisesMessage(ValueError, msg):
@@ -4155,9 +4155,8 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_invalid_topmost_expressions(self):
         index = Index(Upper(F("name").desc()), name="name")
-        msg = (
-            "%s must be topmost expressions in an indexed expression."
-            % self._index_expressions_wrappers()
+        msg = "{} must be topmost expressions in an indexed expression.".format(
+            self._index_expressions_wrappers()
         )
         with connection.schema_editor() as editor:
             with self.assertRaisesMessage(ValueError, msg):
@@ -4177,7 +4176,7 @@ class SchemaTests(TransactionTestCase):
             self.assertIndexOrder(table, index.name, ["DESC"])
         # SQL contains a database function.
         self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIn("LOWER(%s)" % editor.quote_name("name"), str(sql))
+        self.assertIn("LOWER({})".format(editor.quote_name("name")), str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Author, index)
@@ -4242,8 +4241,8 @@ class SchemaTests(TransactionTestCase):
         # SQL contains database functions.
         self.assertIs(sql.references_column(table, "name"), True)
         sql = str(sql)
-        self.assertIn("LOWER(%s)" % editor.quote_name("name"), sql)
-        self.assertIn("UPPER(%s)" % editor.quote_name("name"), sql)
+        self.assertIn("LOWER({})".format(editor.quote_name("name")), sql)
+        self.assertIn("UPPER({})".format(editor.quote_name("name")), sql)
         self.assertLess(sql.index("LOWER"), sql.index("UPPER"))
         # Remove index.
         with connection.schema_editor() as editor:
@@ -4275,7 +4274,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(sql.references_column(table, "author_id"), True)
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "pub_date"), True)
-        self.assertIn("LOWER(%s)" % editor.quote_name("title"), str(sql))
+        self.assertIn("LOWER({})".format(editor.quote_name("title")), str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Book, index)
@@ -4348,7 +4347,7 @@ class SchemaTests(TransactionTestCase):
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "title"), True)
         self.assertIs(sql.references_column(table, "slug"), True)
-        self.assertIn("COLLATE %s" % editor.quote_name(collation), str(sql))
+        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Book, index)
@@ -4376,7 +4375,7 @@ class SchemaTests(TransactionTestCase):
             self.assertIndexOrder(table, index.name, ["DESC"])
         # SQL contains columns and a collation.
         self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIn("COLLATE %s" % editor.quote_name(collation), str(sql))
+        self.assertIn("COLLATE {}".format(editor.quote_name(collation)), str(sql))
         # Remove index.
         with connection.schema_editor() as editor:
             editor.remove_index(Author, index)
@@ -4647,7 +4646,7 @@ class SchemaTests(TransactionTestCase):
             except OperationalError as e:
                 self.fail(
                     "Errors when applying initial migration for a model "
-                    "with a table named after an SQL reserved word: %s" % e
+                    "with a table named after an SQL reserved word: {}".format(e)
                 )
         # The table is there
         list(Thing.objects.all())
@@ -5556,7 +5555,7 @@ class SchemaTests(TransactionTestCase):
             max_name_length = connection.ops.max_name_length() or 200
             namespace = "n" * max_name_length
             table_name = "t" * max_name_length
-            namespaced_table_name = '"%s"."%s"' % (namespace, table_name)
+            namespaced_table_name = '"{}"."{}"'.format(namespace, table_name)
             self.assertEqual(
                 editor._create_index_name(table_name, []),
                 editor._create_index_name(namespaced_table_name, []),
@@ -5574,7 +5573,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = "schema"
                 apps = new_apps
-                db_table = '"%s"."DJANGO_STUDENT_TABLE"' % oracle_user
+                db_table = '"{}"."DJANGO_STUDENT_TABLE"'.format(oracle_user)
 
         class Document(Model):
             name = CharField(max_length=30)
@@ -5583,7 +5582,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = "schema"
                 apps = new_apps
-                db_table = '"%s"."DJANGO_DOCUMENT_TABLE"' % oracle_user
+                db_table = '"{}"."DJANGO_DOCUMENT_TABLE"'.format(oracle_user)
 
         self.isolated_local_models = [Student, Document]
 

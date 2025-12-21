@@ -18,27 +18,35 @@ class CacheNode(Node):
             expire_time = self.expire_time_var.resolve(context)
         except VariableDoesNotExist:
             raise TemplateSyntaxError(
-                '"cache" tag got an unknown variable: %r' % self.expire_time_var.var
+                '"cache" tag got an unknown variable: {!r}'.format(
+                    self.expire_time_var.var
+                )
             )
         if expire_time is not None:
             try:
                 expire_time = int(expire_time)
             except (ValueError, TypeError):
                 raise TemplateSyntaxError(
-                    '"cache" tag got a non-integer timeout value: %r' % expire_time
+                    '"cache" tag got a non-integer timeout value: {!r}'.format(
+                        expire_time
+                    )
                 )
         if self.cache_name:
             try:
                 cache_name = self.cache_name.resolve(context)
             except VariableDoesNotExist:
                 raise TemplateSyntaxError(
-                    '"cache" tag got an unknown variable: %r' % self.cache_name.var
+                    '"cache" tag got an unknown variable: {!r}'.format(
+                        self.cache_name.var
+                    )
                 )
             try:
                 fragment_cache = caches[cache_name]
             except InvalidCacheBackendError:
                 raise TemplateSyntaxError(
-                    "Invalid cache name specified for cache tag: %r" % cache_name
+                    "Invalid cache name specified for cache tag: {!r}".format(
+                        cache_name
+                    )
                 )
         else:
             try:
@@ -85,7 +93,9 @@ def do_cache(parser, token):
     parser.delete_first_token()
     tokens = token.split_contents()
     if len(tokens) < 3:
-        raise TemplateSyntaxError("'%r' tag requires at least 2 arguments." % tokens[0])
+        raise TemplateSyntaxError(
+            "'{!r}' tag requires at least 2 arguments.".format(tokens[0])
+        )
     if len(tokens) > 3 and tokens[-1].startswith("using="):
         cache_name = parser.compile_filter(tokens[-1].removeprefix("using="))
         tokens = tokens[:-1]

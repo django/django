@@ -40,7 +40,7 @@ __all__ = (
 
 
 BOUNDARY = "BoUnDaRyStRiNg"
-MULTIPART_CONTENT = "multipart/form-data; boundary=%s" % BOUNDARY
+MULTIPART_CONTENT = "multipart/form-data; boundary={}".format(BOUNDARY)
 CONTENT_TYPE_RE = _lazy_re_compile(r".*; charset=([\w-]+);?")
 # Structured suffix spec: https://tools.ietf.org/html/rfc6838#section-4.2.8
 JSON_CONTENT_TYPE_RE = _lazy_re_compile(r"^application\/(.+\+)?json")
@@ -298,8 +298,8 @@ def encode_multipart(boundary, data):
     for key, value in data.items():
         if value is None:
             raise TypeError(
-                "Cannot encode None for key '%s' as POST data. Did you mean "
-                "to pass an empty string or omit the value?" % key
+                "Cannot encode None for key '{}' as POST data. Did you mean "
+                "to pass an empty string or omit the value?".format(key)
             )
         elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
@@ -311,8 +311,8 @@ def encode_multipart(boundary, data):
                     lines.extend(
                         to_bytes(val)
                         for val in [
-                            "--%s" % boundary,
-                            'Content-Disposition: form-data; name="%s"' % key,
+                            "--{}".format(boundary),
+                            'Content-Disposition: form-data; name="{}"'.format(key),
                             "",
                             item,
                         ]
@@ -321,8 +321,8 @@ def encode_multipart(boundary, data):
             lines.extend(
                 to_bytes(val)
                 for val in [
-                    "--%s" % boundary,
-                    'Content-Disposition: form-data; name="%s"' % key,
+                    "--{}".format(boundary),
+                    'Content-Disposition: form-data; name="{}"'.format(key),
                     "",
                     value,
                 ]
@@ -330,7 +330,7 @@ def encode_multipart(boundary, data):
 
     lines.extend(
         [
-            to_bytes("--%s--" % boundary),
+            to_bytes("--{}--".format(boundary)),
             b"",
         ]
     )
@@ -357,11 +357,13 @@ def encode_file(boundary, key, file):
         content_type = "application/octet-stream"
     filename = filename or key
     return [
-        to_bytes("--%s" % boundary),
+        to_bytes("--{}".format(boundary)),
         to_bytes(
-            'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename)
+            'Content-Disposition: form-data; name="{}"; filename="{}"'.format(
+                key, filename
+            )
         ),
-        to_bytes("Content-Type: %s" % content_type),
+        to_bytes("Content-Type: {}".format(content_type)),
         b"",
         to_bytes(file.read()),
     ]
@@ -409,7 +411,7 @@ class RequestFactory:
         return {
             "HTTP_COOKIE": "; ".join(
                 sorted(
-                    "%s=%s" % (morsel.key, morsel.coded_value)
+                    "{}={}".format(morsel.key, morsel.coded_value)
                     for morsel in self.cookies.values()
                 )
             ),
@@ -708,7 +710,7 @@ class AsyncRequestFactory(RequestFactory):
                 b"cookie",
                 b"; ".join(
                     sorted(
-                        ("%s=%s" % (morsel.key, morsel.coded_value)).encode("ascii")
+                        ("{}={}".format(morsel.key, morsel.coded_value)).encode("ascii")
                         for morsel in self.cookies.values()
                     )
                 ),
@@ -946,8 +948,9 @@ class ClientMixin:
         if not hasattr(response, "_json"):
             if not JSON_CONTENT_TYPE_RE.match(response.get("Content-Type")):
                 raise ValueError(
-                    'Content-Type header is "%s", not "application/json"'
-                    % response.get("Content-Type")
+                    'Content-Type header is "{}", not "application/json"'.format(
+                        response.get("Content-Type")
+                    )
                 )
             response._json = json.loads(response.text, **extra)
         return response._json
@@ -1073,10 +1076,10 @@ class Client(ClientMixin, RequestFactory):
         # callback function.
         data = {}
         on_template_render = partial(store_rendered_templates, data)
-        signal_uid = "template-render-%s" % id(request)
+        signal_uid = "template-render-{}".format(id(request))
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
-        exception_uid = "request-exception-%s" % id(request)
+        exception_uid = "request-exception-{}".format(id(request))
         got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
             response = self.handler(environ)
@@ -1430,10 +1433,10 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         # callback function.
         data = {}
         on_template_render = partial(store_rendered_templates, data)
-        signal_uid = "template-render-%s" % id(request)
+        signal_uid = "template-render-{}".format(id(request))
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
-        exception_uid = "request-exception-%s" % id(request)
+        exception_uid = "request-exception-{}".format(id(request))
         got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
             response = await self.handler(scope)

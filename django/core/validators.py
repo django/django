@@ -355,18 +355,18 @@ def ip_address_validators(protocol, unpack_ipv4):
         return ip_address_validator_map[protocol.lower()]
     except KeyError:
         raise ValueError(
-            "The protocol '%s' is unknown. Supported: %s"
-            % (protocol, list(ip_address_validator_map))
+            "The protocol '{}' is unknown. Supported: {}".format(
+                protocol, list(ip_address_validator_map)
+            )
         )
 
 
 def int_list_validator(sep=",", message=None, code="invalid", allow_negative=False):
     regexp = _lazy_re_compile(
-        r"^%(neg)s\d+(?:%(sep)s%(neg)s\d+)*\Z"
-        % {
-            "neg": "(-)?" if allow_negative else "",
-            "sep": re.escape(sep),
-        }
+        r"^{neg}\d+(?:{sep}{neg}\d+)*\Z".format(
+            neg="(-)?" if allow_negative else "",
+            sep=re.escape(sep),
+        )
     )
     return RegexValidator(regexp, message=message, code=code)
 

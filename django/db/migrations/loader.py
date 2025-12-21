@@ -69,7 +69,7 @@ class MigrationLoader:
             return settings.MIGRATION_MODULES[app_label], True
         else:
             app_package_name = apps.get_app_config(app_label).name
-            return "%s.%s" % (app_package_name, MIGRATIONS_MODULE_NAME), False
+            return "{}.{}".format(app_package_name, MIGRATIONS_MODULE_NAME), False
 
     def load_disk(self):
         """Load the migrations from all INSTALLED_APPS from disk."""
@@ -116,21 +116,22 @@ class MigrationLoader:
             ]
             # Load migrations
             for migration_name in migration_names:
-                migration_path = "%s.%s" % (module_name, migration_name)
+                migration_path = "{}.{}".format(module_name, migration_name)
                 try:
                     migration_module = import_module(migration_path)
                 except ImportError as e:
                     if "bad magic number" in str(e):
                         raise ImportError(
-                            "Couldn't import %r as it appears to be a stale "
-                            ".pyc file." % migration_path
+                            "Couldn't import {!r} as it appears to be a stale "
+                            ".pyc file.".format(migration_path)
                         ) from e
                     else:
                         raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
-                        "Migration %s in app %s has no Migration class"
-                        % (migration_name, app_config.label)
+                        "Migration {} in app {} has no Migration class".format(
+                            migration_name, app_config.label
+                        )
                     )
                 self.disk_migrations[app_config.label, migration_name] = (
                     migration_module.Migration(
@@ -157,8 +158,9 @@ class MigrationLoader:
                 results.append((migration_app_label, migration_name))
         if len(results) > 1:
             raise AmbiguityError(
-                "There is more than one migration for '%s' with the prefix '%s'"
-                % (app_label, name_prefix)
+                "There is more than one migration for '{}' with the prefix '{}'".format(
+                    app_label, name_prefix
+                )
             )
         elif not results:
             raise KeyError(
@@ -194,9 +196,9 @@ class MigrationLoader:
                     return None
                 else:
                     raise ValueError(
-                        "Dependency on app with no migrations: %s" % key[0]
+                        "Dependency on app with no migrations: {}".format(key[0])
                     )
-        raise ValueError("Dependency on unknown app: %s" % key[0])
+        raise ValueError("Dependency on unknown app: {}".format(key[0]))
 
     def add_internal_dependencies(self, key, migration):
         """
@@ -328,7 +330,7 @@ class MigrationLoader:
                     candidate in self.graph.nodes for candidate in candidates
                 )
                 if not is_replaced:
-                    tries = ", ".join("%s.%s" % c for c in candidates)
+                    tries = ", ".join("{}.{}".format(*c) for c in candidates)
                     raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
                         "Django tried to replace migration {1}.{2} with any of [{3}] "

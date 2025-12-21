@@ -67,7 +67,7 @@ class CommonMiddleware(MiddlewareMixin):
         if settings.APPEND_SLASH and not request.path_info.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
             if not is_valid_path(request.path_info, urlconf):
-                match = is_valid_path("%s/" % request.path_info, urlconf)
+                match = is_valid_path("{}/".format(request.path_info), urlconf)
                 if match:
                     view = match.func
                     return getattr(view, "should_append_slash", True)
@@ -85,15 +85,14 @@ class CommonMiddleware(MiddlewareMixin):
         new_path = escape_leading_slashes(new_path)
         if settings.DEBUG and request.method in ("DELETE", "POST", "PUT", "PATCH"):
             raise RuntimeError(
-                "You called this URL via %(method)s, but the URL doesn't end "
+                "You called this URL via {method}, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
-                "redirect to the slash URL while maintaining %(method)s data. "
-                "Change your form to point to %(url)s (note the trailing "
-                "slash), or set APPEND_SLASH=False in your Django settings."
-                % {
-                    "method": request.method,
-                    "url": request.get_host() + new_path,
-                }
+                "redirect to the slash URL while maintaining {method} data. "
+                "Change your form to point to {url} (note the trailing "
+                "slash), or set APPEND_SLASH=False in your Django settings.".format(
+                    method=request.method,
+                    url=request.get_host() + new_path,
+                )
             )
         return new_path
 
@@ -129,8 +128,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                 ua = request.META.get("HTTP_USER_AGENT", "<none>")
                 ip = request.META.get("REMOTE_ADDR", "<none>")
                 mail_managers(
-                    "Broken %slink on %s"
-                    % (
+                    "Broken {}link on {}".format(
                         (
                             "INTERNAL "
                             if self.is_internal_request(domain, referer)
@@ -138,8 +136,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                         ),
                         domain,
                     ),
-                    "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
-                    "IP address: %s\n" % (referer, path, ua, ip),
+                    "Referrer: {}\nRequested URL: {}\nUser agent: {}\n"
+                    "IP address: {}\n".format(referer, path, ua, ip),
                     fail_silently=True,
                 )
         return response
@@ -150,7 +148,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         request.
         """
         # Different subdomains are treated as different domains.
-        return bool(re.match("^https?://%s/" % re.escape(domain), referer))
+        return bool(re.match("^https?://{}/".format(re.escape(domain)), referer))
 
     def is_ignorable_request(self, request, uri, domain, referer):
         """

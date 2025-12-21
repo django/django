@@ -468,7 +468,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
         manifest_content = storage.staticfiles_storage.read_manifest()
         self.assertIn(
-            '"version": "%s"' % storage.staticfiles_storage.manifest_version,
+            '"version": "{}"'.format(storage.staticfiles_storage.manifest_version),
             manifest_content,
         )
 
@@ -513,13 +513,13 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # File name not found in manifest
         with self.assertRaisesMessage(
             ValueError,
-            "Missing staticfiles manifest entry for '%s'" % missing_file_name,
+            "Missing staticfiles manifest entry for '{}'".format(missing_file_name),
         ):
             self.hashed_file_path(missing_file_name)
 
         configured_storage.manifest_strict = False
         # File doesn't exist on disk
-        err_msg = "The file '%s' could not be found with %r." % (
+        err_msg = "The file '{}' could not be found with {!r}.".format(
             missing_file_name,
             configured_storage._wrapped,
         )

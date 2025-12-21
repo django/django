@@ -11,7 +11,7 @@ class TestGeoRSS1(feeds.Feed):
         return City.objects.all()
 
     def item_link(self, item):
-        return "/city/%s/" % item.pk
+        return "/city/{}/".format(item.pk)
 
     def item_geometry(self, item):
         return item.point

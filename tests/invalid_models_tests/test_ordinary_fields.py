@@ -53,8 +53,9 @@ class AutoFieldTests(SimpleTestCase):
             field.check(),
             [
                 DjangoWarning(
-                    "'max_length' is ignored when used with %s."
-                    % field.__class__.__name__,
+                    "'max_length' is ignored when used with {}.".format(
+                        field.__class__.__name__
+                    ),
                     hint="Remove 'max_length' from field",
                     obj=field,
                     id="fields.W122",
@@ -440,11 +441,11 @@ class CharFieldTests(TestCase):
             validator.check_field(field),
             [
                 DjangoWarning(
-                    "%s may not allow unique CharFields to have a max_length > "
-                    "255." % connection.display_name,
+                    "{} may not allow unique CharFields to have a max_length > "
+                    "255.".format(connection.display_name),
                     hint=(
-                        "See: https://docs.djangoproject.com/en/%s/ref/databases/"
-                        "#mysql-character-fields" % get_docs_version()
+                        "See: https://docs.djangoproject.com/en/{}/ref/databases/"
+                        "#mysql-character-fields".format(get_docs_version())
                     ),
                     obj=field,
                     id="mysql.W003",
@@ -458,8 +459,9 @@ class CharFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         error = Error(
-            "%s does not support a database collation on CharFields."
-            % connection.display_name,
+            "{} does not support a database collation on CharFields.".format(
+                connection.display_name
+            ),
             id="fields.E190",
             obj=field,
         )
@@ -888,8 +890,9 @@ class IntegerFieldTests(SimpleTestCase):
                     field.check(),
                     [
                         DjangoWarning(
-                            "'max_length' is ignored when used with %s."
-                            % field.__class__.__name__,
+                            "'max_length' is ignored when used with {}.".format(
+                                field.__class__.__name__
+                            ),
                             hint="Remove 'max_length' from field",
                             obj=field,
                             id="fields.W122",
@@ -1041,8 +1044,9 @@ class TextFieldTests(TestCase):
             field.check(databases=self.databases),
             [
                 DjangoWarning(
-                    "%s does not support a database index on %s columns."
-                    % (connection.display_name, field_type),
+                    "{} does not support a database index on {} columns.".format(
+                        connection.display_name, field_type
+                    ),
                     hint=(
                         "An index won't be created. Silence this warning if you "
                         "don't care about it."
@@ -1059,8 +1063,9 @@ class TextFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         error = Error(
-            "%s does not support a database collation on TextFields."
-            % connection.display_name,
+            "{} does not support a database collation on TextFields.".format(
+                connection.display_name
+            ),
             id="fields.E190",
             obj=field,
         )

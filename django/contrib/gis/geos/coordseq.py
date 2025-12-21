@@ -186,9 +186,8 @@ class GEOSCoordSeq(GEOSBase):
             substr = "%s,%s,%s "
         else:
             substr = "%s,%s,0 "
-        return (
-            "<coordinates>%s</coordinates>"
-            % "".join(substr % self[i] for i in range(len(self))).strip()
+        return "<coordinates>{}</coordinates>".format(
+            "".join(substr % self[i] for i in range(len(self))).strip()
         )
 
     @property
@@ -206,6 +205,8 @@ class GEOSCoordSeq(GEOSBase):
         ret = c_byte()
         if not capi.cs_is_ccw(self.ptr, byref(ret)):
             raise GEOSException(
-                'Error encountered in GEOS C function "%s".' % capi.cs_is_ccw.func_name
+                'Error encountered in GEOS C function "{}".'.format(
+                    capi.cs_is_ccw.func_name
+                )
             )
         return ret.value == 1

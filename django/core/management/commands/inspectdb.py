@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 "# Feel free to rename the models, but don't rename db_table values or "
                 "field names."
             )
-            yield "from %s import models" % self.db_module
+            yield "from {} import models".format(self.db_module)
             known_models = []
             # Determine types of tables and/or views to be introspected.
             types = {"t"}
@@ -123,14 +123,14 @@ class Command(BaseCommand):
                         cursor, table_name
                     )
                 except Exception as e:
-                    yield "# Unable to inspect table '%s'" % table_name
-                    yield "# The error was: %s" % e
+                    yield "# Unable to inspect table '{}'".format(table_name)
+                    yield "# The error was: {}".format(e)
                     continue
 
                 model_name = self.normalize_table_name(table_name)
                 yield ""
                 yield ""
-                yield "class %s(models.Model):" % model_name
+                yield "class {}(models.Model):".format(model_name)
                 known_models.append(model_name)
 
                 if len(primary_key_columns) > 1:
@@ -186,11 +186,11 @@ class Command(BaseCommand):
                             else self.normalize_table_name(ref_db_table)
                         )
                         if rel_to in known_models:
-                            field_type = "%s(%s" % (rel_type, rel_to)
+                            field_type = "{}({}".format(rel_type, rel_to)
                         else:
-                            field_type = "%s('%s'" % (rel_type, rel_to)
+                            field_type = "{}('{}'".format(rel_type, rel_to)
                         if rel_to in used_relations:
-                            extra_params["related_name"] = "%s_%s_set" % (
+                            extra_params["related_name"] = "{}_{}_set".format(
                                 model_name.lower(),
                                 att_name,
                             )
@@ -226,7 +226,7 @@ class Command(BaseCommand):
                         extra_params["blank"] = True
                         extra_params["null"] = True
 
-                    field_desc = "%s = %s%s" % (
+                    field_desc = "{} = {}{}".format(
                         att_name,
                         # Custom fields will have a dotted path
                         "" if "." in field_type else "models.",
@@ -247,12 +247,12 @@ class Command(BaseCommand):
                         if not field_desc.endswith("("):
                             field_desc += ", "
                         field_desc += ", ".join(
-                            "%s=%r" % (k, v) for k, v in extra_params.items()
+                            "{}={!r}".format(k, v) for k, v in extra_params.items()
                         )
                     field_desc += ")"
                     if comment_notes:
                         field_desc += "  # " + " ".join(comment_notes)
-                    yield "    %s" % field_desc
+                    yield "    {}".format(field_desc)
                 comment = None
                 if info := table_info.get(table_name):
                     is_view = info.type == "v"
@@ -303,11 +303,11 @@ class Command(BaseCommand):
                 )
 
         if new_name.startswith("_"):
-            new_name = "field%s" % new_name
+            new_name = "field{}".format(new_name)
             field_notes.append("Field renamed because it started with '_'.")
 
         if new_name.endswith("_"):
-            new_name = "%sfield" % new_name
+            new_name = "{}field".format(new_name)
             field_notes.append("Field renamed because it ended with '_'.")
 
         if keyword.iskeyword(new_name):
@@ -315,7 +315,7 @@ class Command(BaseCommand):
             field_notes.append("Field renamed because it was a Python reserved word.")
 
         if new_name[0].isdigit():
-            new_name = "number_%s" % new_name
+            new_name = "number_{}".format(new_name)
             field_notes.append(
                 "Field renamed because it wasn't a valid Python identifier."
             )
@@ -410,12 +410,12 @@ class Command(BaseCommand):
             meta.append("    # A unique constraint could not be introspected.")
         meta += [
             "    class Meta:",
-            "        managed = False%s" % managed_comment,
-            "        db_table = %r" % table_name,
+            "        managed = False{}".format(managed_comment),
+            "        db_table = {!r}".format(table_name),
         ]
         if unique_together:
             tup = "(" + ", ".join(unique_together) + ",)"
-            meta += ["        unique_together = %s" % tup]
+            meta += ["        unique_together = {}".format(tup)]
         if comment:
             meta += [f"        db_table_comment = {comment!r}"]
         return meta

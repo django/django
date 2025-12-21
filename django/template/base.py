@@ -120,7 +120,7 @@ class Origin:
         return self.name
 
     def __repr__(self):
-        return "<%s name=%r>" % (self.__class__.__qualname__, self.name)
+        return "<{} name={!r}>".format(self.__class__.__qualname__, self.name)
 
     def __eq__(self, other):
         return (
@@ -132,7 +132,7 @@ class Origin:
     @property
     def loader_name(self):
         if self.loader:
-            return "%s.%s" % (
+            return "{}.{}".format(
                 self.loader.__module__,
                 self.loader.__class__.__name__,
             )
@@ -157,7 +157,7 @@ class Template:
         self.nodelist = self.compile_nodelist()
 
     def __repr__(self):
-        return '<%s template_string="%s...">' % (
+        return '<{} template_string="{}...">'.format(
             self.__class__.__qualname__,
             self.source[:20].replace("\n", ""),
         )
@@ -382,7 +382,7 @@ class Token:
 
     def __repr__(self):
         token_name = self.token_type.name.capitalize()
-        return '<%s token: "%s...">' % (
+        return '<{} token: "{}...">'.format(
             token_name,
             self.contents[:20].replace("\n", ""),
         )
@@ -409,7 +409,7 @@ class Lexer:
         self.verbatim = False
 
     def __repr__(self):
-        return '<%s template_string="%s...", verbatim=%s>' % (
+        return '<{} template_string="{}...", verbatim={}>'.format(
             self.__class__.__qualname__,
             self.template_string[:20].replace("\n", ""),
             self.verbatim,
@@ -452,7 +452,7 @@ class Lexer:
                     self.verbatim = False
                 elif content[:9] in ("verbatim", "verbatim "):
                     # Then a verbatim block is starting.
-                    self.verbatim = "end%s" % content
+                    self.verbatim = "end{}".format(content)
                 return Token(TokenType.BLOCK, content, position, lineno)
             if not self.verbatim:
                 content = token_string[2:-2].strip()
@@ -524,7 +524,7 @@ class Parser:
         self.origin = origin
 
     def __repr__(self):
-        return "<%s tokens=%r>" % (self.__class__.__qualname__, self.tokens)
+        return "<{} tokens={!r}>".format(self.__class__.__qualname__, self.tokens)
 
     def parse(self, parse_until=None):
         """
@@ -606,7 +606,9 @@ class Parser:
                 origin = "the template"
             raise self.error(
                 token,
-                "{%% %s %%} must be the first tag in %s." % (token.contents, origin),
+                "{{% {} %}} must be the first tag in {}.".format(
+                    token.contents, origin
+                ),
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
@@ -638,7 +640,7 @@ class Parser:
                 % (
                     token.lineno,
                     command,
-                    get_text_list(["'%s'" % p for p in parse_until], "or"),
+                    get_text_list(["'{}'".format(p) for p in parse_until], "or"),
                 ),
             )
         raise self.error(
@@ -679,42 +681,42 @@ class Parser:
         if filter_name in self.filters:
             return self.filters[filter_name]
         else:
-            raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+            raise TemplateSyntaxError("Invalid filter: '{}'".format(filter_name))
 
 
 # This only matches constant *strings* (things in quotes or marked for
 # translation). Numbers are treated as variables for implementation reasons
 # (so that they retain their type when passed to filters).
 constant_string = r"""
-(?:%(i18n_open)s%(strdq)s%(i18n_close)s|
-%(i18n_open)s%(strsq)s%(i18n_close)s|
-%(strdq)s|
-%(strsq)s)
-""" % {
-    "strdq": r'"[^"\\]*(?:\\.[^"\\]*)*"',  # double-quoted string
-    "strsq": r"'[^'\\]*(?:\\.[^'\\]*)*'",  # single-quoted string
-    "i18n_open": re.escape("_("),
-    "i18n_close": re.escape(")"),
-}
+(?:{i18n_open}{strdq}{i18n_close}|
+{i18n_open}{strsq}{i18n_close}|
+{strdq}|
+{strsq})
+""".format(
+    strdq=r'"[^"\\]*(?:\\.[^"\\]*)*"',
+    strsq=r"'[^'\\]*(?:\\.[^'\\]*)*'",
+    i18n_open=re.escape("_("),
+    i18n_close=re.escape(")"),
+)
 constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
-^(?P<constant>%(constant)s)|
-^(?P<var>[%(var_chars)s]+)|
- (?:\s*%(filter_sep)s\s*
+^(?P<constant>{constant})|
+^(?P<var>[{var_chars}]+)|
+ (?:\s*{filter_sep}\s*
      (?P<filter_name>\w+)
-         (?:%(arg_sep)s
+         (?:{arg_sep}
              (?:
-              (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>[%(var_chars)s]+)
+              (?P<constant_arg>{constant})|
+              (?P<var_arg>[{var_chars}]+)
              )
          )?
- )""" % {
-    "constant": constant_string,
-    "var_chars": r"\w\.\+-",
-    "filter_sep": re.escape(FILTER_SEPARATOR),
-    "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),
-}
+ )""".format(
+    constant=constant_string,
+    var_chars=r"\w\.\+-",
+    filter_sep=re.escape(FILTER_SEPARATOR),
+    arg_sep=re.escape(FILTER_ARGUMENT_SEPARATOR),
+)
 
 filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
@@ -747,7 +749,7 @@ class FilterExpression:
             if upto != start:
                 raise TemplateSyntaxError(
                     "Could not parse some characters: "
-                    "%s|%s|%s" % (token[:upto], token[upto:start], token[start:])
+                    "{}|{}|{}".format(token[:upto], token[upto:start], token[start:])
                 )
             if var_obj is None:
                 if constant := match["constant"]:
@@ -757,7 +759,7 @@ class FilterExpression:
                         var_obj = None
                 elif (var := match["var"]) is None:
                     raise TemplateSyntaxError(
-                        "Could not find variable at start of %s." % token
+                        "Could not find variable at start of {}.".format(token)
                     )
                 else:
                     var_obj = Variable(var)
@@ -774,8 +776,8 @@ class FilterExpression:
             upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError(
-                "Could not parse the remainder: '%s' "
-                "from '%s'" % (token[upto:], token)
+                "Could not parse the remainder: '{}' "
+                "from '{}'".format(token[upto:], token)
             )
 
         self.filters = filters
@@ -844,7 +846,7 @@ class FilterExpression:
         return self.token
 
     def __repr__(self):
-        return "<%s %r>" % (self.__class__.__qualname__, self.token)
+        return "<{} {!r}>".format(self.__class__.__qualname__, self.token)
 
 
 class Variable:
@@ -876,7 +878,9 @@ class Variable:
         self.message_context = None
 
         if not isinstance(var, str):
-            raise TypeError("Variable must be a string or number, got %s" % type(var))
+            raise TypeError(
+                "Variable must be a string or number, got {}".format(type(var))
+            )
         try:
             # First try to treat this variable as a number.
             #
@@ -910,14 +914,16 @@ class Variable:
                 if VARIABLE_ATTRIBUTE_SEPARATOR + "_" in var or var[0] == "_":
                     raise TemplateSyntaxError(
                         "Variables and attributes may "
-                        "not begin with underscores: '%s'" % var
+                        "not begin with underscores: '{}'".format(var)
                     )
                 # Disallow characters that are allowed in numbers but not in a
                 # variable name.
                 for c in ["+", "-"]:
                     if c in var:
                         raise TemplateSyntaxError(
-                            "Invalid character ('%s') in variable name: '%s'" % (c, var)
+                            "Invalid character ('{}') in variable name: '{}'".format(
+                                c, var
+                            )
                         )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
 
@@ -940,7 +946,7 @@ class Variable:
         return value
 
     def __repr__(self):
-        return "<%s: %r>" % (self.__class__.__name__, self.var)
+        return "<{}: {!r}>".format(self.__class__.__name__, self.var)
 
     def __str__(self):
         return self.var
@@ -1105,7 +1111,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
+        return "<{}: {!r}>".format(self.__class__.__name__, self.s[:25])
 
     def render(self, context):
         return self.s
@@ -1143,7 +1149,7 @@ class VariableNode(Node):
         self.filter_expression = filter_expression
 
     def __repr__(self):
-        return "<Variable Node: %s>" % self.filter_expression
+        return "<Variable Node: {}>".format(self.filter_expression)
 
     def render(self, context):
         try:

@@ -13,6 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *labels, **options):
         print(
-            "EXECUTE:BaseCommand labels=%s, options=%s"
-            % (labels, sorted(options.items()))
+            "EXECUTE:BaseCommand labels={}, options={}".format(
+                labels, sorted(options.items())
+            )
         )

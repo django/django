@@ -932,7 +932,7 @@ aria-describedby="id_birthday_error">
             "</label>",
         )
         self.assertHTMLEqual(
-            "\n".join("<div>%s</div>" % bf for bf in f["name"]),
+            "\n".join("<div>{}</div>".format(bf) for bf in f["name"]),
             """
             <div><label>
             <input type="radio" name="name" value="john" required> John</label></div>
@@ -1413,14 +1413,17 @@ aria-describedby="id_birthday_error">
 
             def clean_special_name(self):
                 raise ValidationError(
-                    "Something's wrong with '%s'" % self.cleaned_data["special_name"]
+                    "Something's wrong with '{}'".format(
+                        self.cleaned_data["special_name"]
+                    )
                 )
 
             def clean_special_safe_name(self):
                 raise ValidationError(
                     mark_safe(
-                        "'<b>%s</b>' is a safe string"
-                        % self.cleaned_data["special_safe_name"]
+                        "'<b>{}</b>' is a safe string".format(
+                            self.cleaned_data["special_safe_name"]
+                        )
                     )
                 )
 
@@ -3483,7 +3486,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
             def add_prefix(self, field_name):
                 return (
-                    "%s-prefix-%s" % (self.prefix, field_name)
+                    "{}-prefix-{}".format(self.prefix, field_name)
                     if self.prefix
                     else field_name
                 )
@@ -4049,7 +4052,7 @@ aria-describedby="id_age_error"></td></tr>""",
 
             def compress(self, data_list):
                 if data_list:
-                    return "%s.%s ext. %s (label: %s)" % tuple(data_list)
+                    return "{}.{} ext. {} (label: {})".format(*tuple(data_list))
                 return None
 
         # An empty value for any field will raise a `required` error on a
@@ -5347,7 +5350,7 @@ class TemplateTests(SimpleTestCase):
                 form = UserRegistration(auto_id=False)
 
             if form.is_valid():
-                return "VALID: %r" % sorted(form.cleaned_data.items())
+                return "VALID: {!r}".format(sorted(form.cleaned_data.items()))
 
             t = Template(
                 '<form method="post">'

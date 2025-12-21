@@ -66,7 +66,9 @@ def _get_backend_from_user(user, backend=None):
     else:
         if not isinstance(backend, str):
             raise TypeError(
-                "backend must be a dotted import path string (got %r)." % backend
+                "backend must be a dotted import path string (got {!r}).".format(
+                    backend
+                )
             )
     return backend
 
@@ -265,8 +267,9 @@ def get_user_model():
         )
     except LookupError:
         raise ImproperlyConfigured(
-            "AUTH_USER_MODEL refers to model '%s' that has not been installed"
-            % settings.AUTH_USER_MODEL
+            "AUTH_USER_MODEL refers to model '{}' that has not been installed".format(
+                settings.AUTH_USER_MODEL
+            )
         )
 
 
@@ -359,7 +362,7 @@ def get_permission_codename(action, opts):
     """
     Return the codename of the permission for the specified action.
     """
-    return "%s_%s" % (action, opts.model_name)
+    return "{}_{}".format(action, opts.model_name)
 
 
 def update_session_auth_hash(request, user):

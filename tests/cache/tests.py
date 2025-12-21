@@ -769,7 +769,7 @@ class BaseCacheTests:
         key = ("a" * 250) + "清"
         expected_warning = (
             "Cache key will cause errors if used with memcached: "
-            "%r (longer than %s)" % (key, 250)
+            "{!r} (longer than {})".format(key, 250)
         )
         self._perform_invalid_key_test(key, expected_warning)
 
@@ -782,7 +782,7 @@ class BaseCacheTests:
         key = "a" * 249
         expected_warning = (
             "Cache key will cause errors if used with memcached: "
-            "%r (longer than %s)" % (key_func(key), 250)
+            "{!r} (longer than {})".format(key_func(key), 250)
         )
         self._perform_invalid_key_test(key, expected_warning, key_func=key_func)
 
@@ -1158,7 +1158,7 @@ class BaseCacheTests:
 
     def test_get_or_set_racing(self):
         with mock.patch(
-            "%s.%s" % (settings.CACHES["default"]["BACKEND"], "add")
+            "{}.{}".format(settings.CACHES["default"]["BACKEND"], "add")
         ) as cache_add:
             # Simulate cache.add() failing to add a value. In that case, the
             # default value should be returned.
@@ -1273,7 +1273,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def drop_table(self):
         with connection.cursor() as cursor:
             table_name = connection.ops.quote_name("test cache table")
-            cursor.execute("DROP TABLE %s" % table_name)
+            cursor.execute("DROP TABLE {}".format(table_name))
 
     def test_get_many_num_queries(self):
         cache.set_many({"a": 1, "b": 2})
@@ -1623,7 +1623,7 @@ class BaseMemcachedTests(BaseCacheTests):
         key = "a" * 248
         expected_warning = (
             "Cache key will cause errors if used with memcached: "
-            "%r (longer than %s)" % (key, 250)
+            "{!r} (longer than {})".format(key, 250)
         )
         self._perform_invalid_key_test(key, expected_warning)
 
@@ -2594,7 +2594,7 @@ class PrefixedCacheI18nTest(CacheI18nTest):
 
 
 def hello_world_view(request, value):
-    return HttpResponse("Hello World %s" % value)
+    return HttpResponse("Hello World {}".format(value))
 
 
 def csrf_view(request):

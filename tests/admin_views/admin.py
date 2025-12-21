@@ -1118,14 +1118,14 @@ class CityAdmin(admin.ModelAdmin):
 
 class WorkerAdmin(admin.ModelAdmin):
     def view_on_site(self, obj):
-        return "/worker/%s/%s/" % (obj.surname, obj.name)
+        return "/worker/{}/{}/".format(obj.surname, obj.name)
 
 
 class WorkerInlineAdmin(admin.TabularInline):
     model = Worker
 
     def view_on_site(self, obj):
-        return "/worker_inline/%s/%s/" % (obj.surname, obj.name)
+        return "/worker_inline/{}/{}/".format(obj.surname, obj.name)
 
 
 class RestaurantAdmin(admin.ModelAdmin):

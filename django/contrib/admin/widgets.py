@@ -164,8 +164,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if self.admin_site.is_registered(rel_to):
             # The related object is registered with the same AdminSite
             related_url = reverse(
-                "admin:%s_%s_changelist"
-                % (
+                "admin:{}_{}_changelist".format(
                     rel_to._meta.app_label,
                     rel_to._meta.model_name,
                 ),
@@ -214,8 +213,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
         try:
             url = reverse(
-                "%s:%s_%s_change"
-                % (
+                "{}:{}_{}_change".format(
                     self.admin_site.name,
                     obj._meta.app_label,
                     obj._meta.model_name,
@@ -326,7 +324,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def get_related_url(self, info, action, *args):
         return reverse(
-            "admin:%s_%s_%s" % (*info, action),
+            "admin:{}_{}_{}".format(*info, action),
             current_app=self.admin_site.name,
             args=args,
         )
@@ -338,7 +336,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
         url_params = "&".join(
-            "%s=%s" % param
+            "{}={}".format(*param)
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
@@ -572,7 +570,7 @@ class AutocompleteMixin:
         choices = (
             (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
             for obj in self.choices.queryset.using(self.db).filter(
-                **{"%s__in" % to_field_name: selected_choices}
+                **{"{}__in".format(to_field_name): selected_choices}
             )
         )
         for option_value, option_label in choices:
@@ -593,21 +591,21 @@ class AutocompleteMixin:
     def media(self):
         extra = "" if settings.DEBUG else ".min"
         i18n_file = (
-            ("admin/js/vendor/select2/i18n/%s.js" % self.i18n_name,)
+            ("admin/js/vendor/select2/i18n/{}.js".format(self.i18n_name),)
             if self.i18n_name
             else ()
         )
         return forms.Media(
             js=(
-                "admin/js/vendor/jquery/jquery%s.js" % extra,
-                "admin/js/vendor/select2/select2.full%s.js" % extra,
+                "admin/js/vendor/jquery/jquery{}.js".format(extra),
+                "admin/js/vendor/select2/select2.full{}.js".format(extra),
                 *i18n_file,
                 "admin/js/jquery.init.js",
                 "admin/js/autocomplete.js",
             ),
             css={
                 "screen": (
-                    "admin/css/vendor/select2/select2%s.css" % extra,
+                    "admin/css/vendor/select2/select2{}.css".format(extra),
                     "admin/css/autocomplete.css",
                 ),
             },

@@ -134,8 +134,9 @@ class JavaScriptCatalog(View):
         if len(app_configs) < len(packages):
             excluded = [p for p in packages if p not in allowable_packages]
             raise ValueError(
-                "Invalid package(s) provided to JavaScriptCatalog: %s"
-                % ",".join(excluded)
+                "Invalid package(s) provided to JavaScriptCatalog: {}".format(
+                    ",".join(excluded)
+                )
             )
         # paths of requested packages
         return [os.path.join(app.path, "locale") for app in app_configs]

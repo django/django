@@ -61,7 +61,7 @@ class GeographyTest(TestCase):
         functions are not available.
         """
         z = Zipcode.objects.get(code="77002")
-        point_field = "%s.%s::geometry" % (
+        point_field = "{}.{}::geometry".format(
             connection.ops.quote_name(City._meta.db_table),
             connection.ops.quote_name("point"),
         )

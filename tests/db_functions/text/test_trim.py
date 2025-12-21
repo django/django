@@ -36,6 +36,6 @@ class TrimTests(TestCase):
             with self.subTest(transform=transform):
                 with register_lookup(CharField, transform):
                     authors = Author.objects.filter(
-                        **{"name__%s" % transform.lookup_name: trimmed_name}
+                        **{"name__{}".format(transform.lookup_name): trimmed_name}
                     )
                     self.assertQuerySetEqual(authors, [" John  "], lambda a: a.name)

@@ -72,14 +72,15 @@ class MultiPartParser:
         # Content-Type should contain multipart and the boundary information.
         content_type = META.get("CONTENT_TYPE", "")
         if not content_type.startswith("multipart/"):
-            raise MultiPartParserError("Invalid Content-Type: %s" % content_type)
+            raise MultiPartParserError("Invalid Content-Type: {}".format(content_type))
 
         try:
             content_type.encode("ascii")
         except UnicodeEncodeError:
             raise MultiPartParserError(
-                "Invalid non-ASCII Content-Type in multipart: %s"
-                % force_str(content_type)
+                "Invalid non-ASCII Content-Type in multipart: {}".format(
+                    force_str(content_type)
+                )
             )
 
         # Parse the header to get the boundary to split the parts.
@@ -87,7 +88,7 @@ class MultiPartParser:
         boundary = opts.get("boundary")
         if not boundary or not self.boundary_re.fullmatch(boundary):
             raise MultiPartParserError(
-                "Invalid boundary in multipart: %s" % force_str(boundary)
+                "Invalid boundary in multipart: {}".format(force_str(boundary))
             )
 
         # Content-Length should contain the length of the body we are about
@@ -99,7 +100,9 @@ class MultiPartParser:
 
         if content_length < 0:
             # This means we shouldn't continue...raise an error.
-            raise MultiPartParserError("Invalid content length: %r" % content_length)
+            raise MultiPartParserError(
+                "Invalid content length: {!r}".format(content_length)
+            )
 
         self._boundary = boundary.encode("ascii")
         self._input_data = input_data

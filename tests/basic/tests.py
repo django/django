@@ -530,7 +530,7 @@ class ModelTest(TestCase):
     def test_multiple_objects_max_num_fetched(self):
         max_results = MAX_GET_RESULTS - 1
         Article.objects.bulk_create(
-            Article(headline="Area %s" % i, pub_date=datetime(2005, 7, 28))
+            Article(headline="Area {}".format(i), pub_date=datetime(2005, 7, 28))
             for i in range(max_results)
         )
         self.assertRaisesMessage(
@@ -540,7 +540,7 @@ class ModelTest(TestCase):
             headline__startswith="Area",
         )
         Article.objects.create(
-            headline="Area %s" % max_results, pub_date=datetime(2005, 7, 28)
+            headline="Area {}".format(max_results), pub_date=datetime(2005, 7, 28)
         )
         self.assertRaisesMessage(
             MultipleObjectsReturned,

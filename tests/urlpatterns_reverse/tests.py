@@ -711,26 +711,29 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(
             len(e.args[0]["tried"]),
             len(url_types_names),
-            "Wrong number of tried URLs returned. Expected %s, got %s."
-            % (len(url_types_names), len(e.args[0]["tried"])),
+            "Wrong number of tried URLs returned. Expected {}, got {}.".format(
+                len(url_types_names), len(e.args[0]["tried"])
+            ),
         )
         for tried, expected in zip(e.args[0]["tried"], url_types_names):
             for t, e in zip(tried, expected):
                 with self.subTest(t):
                     self.assertIsInstance(
                         t, e["type"]
-                    ), "%s is not an instance of %s" % (t, e["type"])
+                    ), "{} is not an instance of {}".format(t, e["type"])
                     if "name" in e:
                         if not e["name"]:
                             self.assertIsNone(
-                                t.name, "Expected no URL name but found %s." % t.name
+                                t.name,
+                                "Expected no URL name but found {}.".format(t.name),
                             )
                         else:
                             self.assertEqual(
                                 t.name,
                                 e["name"],
-                                'Wrong URL name. Expected "%s", got "%s".'
-                                % (e["name"], t.name),
+                                'Wrong URL name. Expected "{}", got "{}".'.format(
+                                    e["name"], t.name
+                                ),
                             )
 
     def test_namespaced_view_detail(self):
@@ -787,7 +790,7 @@ class ReverseLazyTest(TestCase):
 
     def test_inserting_reverse_lazy_into_string(self):
         self.assertEqual(
-            "Some URL: %s" % reverse_lazy("some-login-page"), "Some URL: /login/"
+            "Some URL: {}".format(reverse_lazy("some-login-page")), "Some URL: /login/"
         )
 
     def test_build_absolute_uri(self):
@@ -1442,7 +1445,7 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.ChangeURLconfMiddleware" % middleware.__name__,
+            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
         ]
     )
     def test_urlconf_overridden(self):
@@ -1456,7 +1459,7 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.NullChangeURLconfMiddleware" % middleware.__name__,
+            "{}.NullChangeURLconfMiddleware".format(middleware.__name__),
         ]
     )
     def test_urlconf_overridden_with_null(self):
@@ -1476,8 +1479,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.ChangeURLconfMiddleware" % middleware.__name__,
-            "%s.ReverseInnerInResponseMiddleware" % middleware.__name__,
+            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
+            "{}.ReverseInnerInResponseMiddleware".format(middleware.__name__),
         ]
     )
     def test_reverse_inner_in_response_middleware(self):
@@ -1491,8 +1494,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.ChangeURLconfMiddleware" % middleware.__name__,
-            "%s.ReverseOuterInResponseMiddleware" % middleware.__name__,
+            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
+            "{}.ReverseOuterInResponseMiddleware".format(middleware.__name__),
         ]
     )
     def test_reverse_outer_in_response_middleware(self):
@@ -1509,8 +1512,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.ChangeURLconfMiddleware" % middleware.__name__,
-            "%s.ReverseInnerInStreaming" % middleware.__name__,
+            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
+            "{}.ReverseInnerInStreaming".format(middleware.__name__),
         ]
     )
     def test_reverse_inner_in_streaming(self):
@@ -1524,8 +1527,8 @@ class RequestURLconfTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "%s.ChangeURLconfMiddleware" % middleware.__name__,
-            "%s.ReverseOuterInStreaming" % middleware.__name__,
+            "{}.ChangeURLconfMiddleware".format(middleware.__name__),
+            "{}.ReverseOuterInStreaming".format(middleware.__name__),
         ]
     )
     def test_reverse_outer_in_streaming(self):
@@ -1542,7 +1545,7 @@ class RequestURLconfTests(SimpleTestCase):
         """The URLconf is reset after each request."""
         self.assertIsNone(get_urlconf())
         with override_settings(
-            MIDDLEWARE=["%s.ChangeURLconfMiddleware" % middleware.__name__]
+            MIDDLEWARE=["{}.ChangeURLconfMiddleware".format(middleware.__name__)]
         ):
             self.client.get(reverse("inner"))
         self.assertIsNone(get_urlconf())

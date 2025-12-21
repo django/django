@@ -36,7 +36,7 @@ class SchemaIndexesTests(TransactionTestCase):
         index = Index(fields=["point"])
         editor = connection.schema_editor()
         self.assertIn(
-            "%s USING " % editor.quote_name(City._meta.db_table),
+            "{} USING ".format(editor.quote_name(City._meta.db_table)),
             str(index.create_sql(City, editor)),
         )
 
@@ -56,7 +56,7 @@ class SchemaIndexesTests(TransactionTestCase):
         editor = connection.schema_editor()
         create_index_sql = str(index.create_sql(SchemaCity, editor))
         self.assertIn(
-            "%s USING " % editor.quote_name(SchemaCity._meta.db_table),
+            "{} USING ".format(editor.quote_name(SchemaCity._meta.db_table)),
             create_index_sql,
         )
         self.assertIn(

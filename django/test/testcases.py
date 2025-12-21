@@ -94,7 +94,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = "%s\n%s" % (msg, e)
+        standardMsg = "{}\n{}".format(msg, e)
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -232,9 +232,8 @@ class SimpleTestCase(unittest.TestCase):
         for alias in cls.databases:
             if alias not in connections:
                 message = (
-                    "%s.%s.databases refers to %r which is not defined in "
-                    "settings.DATABASES."
-                    % (
+                    "{}.{}.databases refers to {!r} which is not defined in "
+                    "settings.DATABASES.".format(
                         cls.__module__,
                         cls.__qualname__,
                         alias,
@@ -242,7 +241,7 @@ class SimpleTestCase(unittest.TestCase):
                 )
                 close_matches = get_close_matches(alias, list(connections))
                 if close_matches:
-                    message += " Did you mean %r?" % close_matches[0]
+                    message += " Did you mean {!r}?".format(close_matches[0])
                 raise ImproperlyConfigured(message)
         return frozenset(cls.databases)
 
@@ -255,7 +254,7 @@ class SimpleTestCase(unittest.TestCase):
             connection = connections[alias]
             for name, operation in cls._disallowed_connection_methods:
                 message = cls._disallowed_database_msg % {
-                    "test": "%s.%s" % (cls.__module__, cls.__qualname__),
+                    "test": "{}.{}".format(cls.__module__, cls.__qualname__),
                     "alias": alias,
                     "operation": operation,
                 }
@@ -488,11 +487,12 @@ class SimpleTestCase(unittest.TestCase):
                 domain, port = split_domain_port(netloc)
                 if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
                     raise ValueError(
-                        "The test client is unable to fetch remote URLs (got %s). "
-                        "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
+                        "The test client is unable to fetch remote URLs (got {}). "
+                        "If the host is served by Django, add '{}' to ALLOWED_HOSTS. "
                         "Otherwise, use "
-                        "assertRedirects(..., fetch_redirect_response=False)."
-                        % (url, domain)
+                        "assertRedirects(..., fetch_redirect_response=False).".format(
+                            url, domain
+                        )
                     )
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
@@ -520,7 +520,7 @@ class SimpleTestCase(unittest.TestCase):
             url,
             expected_url,
             msg_prefix
-            + "Response redirected to '%s', expected '%s'" % (url, expected_url),
+            + "Response redirected to '{}', expected '{}'".format(url, expected_url),
         )
 
     def assertURLEqual(self, url1, url2, msg_prefix=""):
@@ -544,13 +544,13 @@ class SimpleTestCase(unittest.TestCase):
         self.assertEqual(
             normalize(url1),
             normalize(url2),
-            msg_prefix + "Expected '%s' to equal '%s'." % (url1, url2),
+            msg_prefix + "Expected '{}' to equal '{}'.".format(url1, url2),
         )
 
     def _text_repr(self, content, force_string):
         if isinstance(content, bytes) and not force_string:
             return safe_repr(content)
-        return "'%s'" % str(content)
+        return "'{}'".format(str(content))
 
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
@@ -664,14 +664,16 @@ class SimpleTestCase(unittest.TestCase):
     ):
         if not form.is_bound:
             self.fail(
-                "%sThe %s is not bound, it will never have any errors."
-                % (msg_prefix, self._form_repr(form, formset, form_index))
+                "{}The {} is not bound, it will never have any errors.".format(
+                    msg_prefix, self._form_repr(form, formset, form_index)
+                )
             )
 
         if field is not None and field not in form.fields:
             self.fail(
-                "%sThe %s does not contain the field %r."
-                % (msg_prefix, self._form_repr(form, formset, form_index), field)
+                "{}The {} does not contain the field {!r}.".format(
+                    msg_prefix, self._form_repr(form, formset, form_index), field
+                )
             )
         field_errors = (
             form.non_field_errors() if field is None else form.errors.get(field, [])
@@ -682,11 +684,11 @@ class SimpleTestCase(unittest.TestCase):
 
         # Use assertEqual to show detailed diff if errors don't match.
         if field is None:
-            failure_message = "The non-field errors of %s don't match." % (
+            failure_message = "The non-field errors of {} don't match.".format(
                 self._form_repr(form, formset, form_index),
             )
         else:
-            failure_message = "The errors of field %r on %s don't match." % (
+            failure_message = "The errors of field {!r} on {} don't match.".format(
                 field,
                 self._form_repr(form, formset, form_index),
             )
@@ -779,9 +781,10 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(msg_prefix + "No templates used to render the response")
         self.assertTrue(
             template_name in template_names,
-            msg_prefix + "Template '%s' was not a template used to render"
-            " the response. Actual template(s) used: %s"
-            % (template_name, ", ".join(template_names)),
+            msg_prefix + "Template '{}' was not a template used to render"
+            " the response. Actual template(s) used: {}".format(
+                template_name, ", ".join(template_names)
+            ),
         )
 
         if count is not None:
@@ -832,8 +835,9 @@ class SimpleTestCase(unittest.TestCase):
         self.assertFalse(
             template_name in template_names,
             msg_prefix
-            + "Template '%s' was used unexpectedly in rendering the response"
-            % template_name,
+            + "Template '{}' was used unexpectedly in rendering the response".format(
+                template_name
+            ),
         )
 
     @contextmanager
@@ -963,7 +967,9 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         if dom1 != dom2:
-            standardMsg = "%s != %s" % (safe_repr(dom1, True), safe_repr(dom2, True))
+            standardMsg = "{} != {}".format(
+                safe_repr(dom1, True), safe_repr(dom2, True)
+            )
             diff = "\n" + "\n".join(
                 difflib.ndiff(
                     str(dom1).splitlines(),
@@ -983,7 +989,9 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         if dom1 == dom2:
-            standardMsg = "%s == %s" % (safe_repr(dom1, True), safe_repr(dom2, True))
+            standardMsg = "{} == {}".format(
+                safe_repr(dom1, True), safe_repr(dom2, True)
+            )
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertInHTML(self, needle, haystack, count=None, msg_prefix=""):
@@ -1032,12 +1040,14 @@ class SimpleTestCase(unittest.TestCase):
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            self.fail("First argument is not valid JSON: %r" % raw)
+            self.fail("First argument is not valid JSON: {!r}".format(raw))
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
-                self.fail("Second argument is not valid JSON: %r" % expected_data)
+                self.fail(
+                    "Second argument is not valid JSON: {!r}".format(expected_data)
+                )
         self.assertEqual(data, expected_data, msg=msg)
 
     def assertJSONNotEqual(self, raw, expected_data, msg=None):
@@ -1049,12 +1059,14 @@ class SimpleTestCase(unittest.TestCase):
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            self.fail("First argument is not valid JSON: %r" % raw)
+            self.fail("First argument is not valid JSON: {!r}".format(raw))
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except json.JSONDecodeError:
-                self.fail("Second argument is not valid JSON: %r" % expected_data)
+                self.fail(
+                    "Second argument is not valid JSON: {!r}".format(expected_data)
+                )
         self.assertNotEqual(data, expected_data, msg=msg)
 
     def assertXMLEqual(self, xml1, xml2, msg=None):
@@ -1066,11 +1078,11 @@ class SimpleTestCase(unittest.TestCase):
         try:
             result = compare_xml(xml1, xml2)
         except Exception as e:
-            standardMsg = "First or second argument is not valid XML\n%s" % e
+            standardMsg = "First or second argument is not valid XML\n{}".format(e)
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if not result:
-                standardMsg = "%s != %s" % (
+                standardMsg = "{} != {}".format(
                     safe_repr(xml1, True),
                     safe_repr(xml2, True),
                 )
@@ -1089,11 +1101,11 @@ class SimpleTestCase(unittest.TestCase):
         try:
             result = compare_xml(xml1, xml2)
         except Exception as e:
-            standardMsg = "First or second argument is not valid XML\n%s" % e
+            standardMsg = "First or second argument is not valid XML\n{}".format(e)
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if result:
-                standardMsg = "%s == %s" % (
+                standardMsg = "{} == {}".format(
                     safe_repr(xml1, True),
                     safe_repr(xml2, True),
                 )
@@ -1369,7 +1381,7 @@ class TestData:
         return data
 
     def __repr__(self):
-        return "<TestData: name=%r, data=%r>" % (self.name, self.data)
+        return "<TestData: name={!r}, data={!r}>".format(self.name, self.data)
 
 
 class TestCase(TransactionTestCase):
@@ -1574,9 +1586,8 @@ def _deferredSkip(condition, reason, name):
                     and connection.alias not in getattr(args[0], "databases", {})
                 ):
                     raise ValueError(
-                        "%s cannot be used on %s as %s doesn't allow queries "
-                        "against the %r database."
-                        % (
+                        "{} cannot be used on {} as {} doesn't allow queries "
+                        "against the {!r} database.".format(
                             name,
                             args[0],
                             args[0].__class__.__qualname__,
@@ -1596,9 +1607,8 @@ def _deferredSkip(condition, reason, name):
                 # Defer raising to allow importing test class's module.
                 def condition():
                     raise ValueError(
-                        "%s cannot be used on %s as it doesn't allow queries "
-                        "against the '%s' database."
-                        % (
+                        "{} cannot be used on {} as it doesn't allow queries "
+                        "against the '{}' database.".format(
                             name,
                             test_item,
                             connection.alias,
@@ -1621,7 +1631,7 @@ def skipIfDBFeature(*features):
     """Skip a test if a database has at least one of the named features."""
     return _deferredSkip(
         lambda: any(getattr(connection.features, feature) for feature in features),
-        "Database has feature(s) %s" % ", ".join(features),
+        "Database has feature(s) {}".format(", ".join(features)),
         "skipIfDBFeature",
     )
 
@@ -1630,7 +1640,7 @@ def skipUnlessDBFeature(*features):
     """Skip a test unless a database has all the named features."""
     return _deferredSkip(
         lambda: not all(getattr(connection.features, feature) for feature in features),
-        "Database doesn't support feature(s): %s" % ", ".join(features),
+        "Database doesn't support feature(s): {}".format(", ".join(features)),
         "skipUnlessDBFeature",
     )
 
@@ -1639,7 +1649,9 @@ def skipUnlessAnyDBFeature(*features):
     """Skip a test unless a database has any of the named features."""
     return _deferredSkip(
         lambda: not any(getattr(connection.features, feature) for feature in features),
-        "Database doesn't support any of the feature(s): %s" % ", ".join(features),
+        "Database doesn't support any of the feature(s): {}".format(
+            ", ".join(features)
+        ),
         "skipUnlessAnyDBFeature",
     )
 
@@ -1806,7 +1818,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classproperty
     def live_server_url(cls):
-        return "http://%s:%s" % (cls.host, cls.server_thread.port)
+        return "http://{}:{}".format(cls.host, cls.server_thread.port)
 
     @classproperty
     def allowed_host(cls):

@@ -778,7 +778,7 @@ def skip_unless_watchman_available():
     try:
         autoreload.WatchmanReloader.check_availability()
     except WatchmanUnavailable as e:
-        return skip("Watchman unavailable: %s" % e)
+        return skip("Watchman unavailable: {}".format(e))
     return lambda func: func
 
 
@@ -803,7 +803,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
             mocked_subscribe.call_args[0],
             [
                 self.tempdir,
-                "glob-parent-does_not_exist:%s" % self.tempdir,
+                "glob-parent-does_not_exist:{}".format(self.tempdir),
                 ["anyof", ["match", "does_not_exist/*", "wholename"]],
             ],
         )
@@ -815,7 +815,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
             mocked_subscribe.call_args[0],
             [
                 self.tempdir,
-                "glob:%s" % self.tempdir,
+                "glob:{}".format(self.tempdir),
                 ["anyof", ["match", "*", "wholename"], ["match", "*.py", "wholename"]],
             ],
         )

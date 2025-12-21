@@ -94,8 +94,9 @@ class UpdateQuery(Query):
                 )
             if not field.concrete:
                 raise FieldError(
-                    "Cannot update model field %r (only concrete fields are permitted)."
-                    % field
+                    "Cannot update model field {!r} (only concrete fields are permitted).".format(
+                        field
+                    )
                 )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)

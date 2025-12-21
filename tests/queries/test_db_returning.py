@@ -13,8 +13,7 @@ class ReturningValuesTests(TestCase):
         with CaptureQueriesContext(connection) as captured_queries:
             DumbCategory.objects.create()
         self.assertIn(
-            "RETURNING %s.%s"
-            % (
+            "RETURNING {}.{}".format(
                 connection.ops.quote_name(DumbCategory._meta.db_table),
                 connection.ops.quote_name(DumbCategory._meta.get_field("id").column),
             ),
@@ -36,8 +35,7 @@ class ReturningValuesTests(TestCase):
             obj = ReturningModel.objects.create()
         table_name = connection.ops.quote_name(ReturningModel._meta.db_table)
         self.assertIn(
-            "RETURNING %s.%s, %s.%s"
-            % (
+            "RETURNING {}.{}, {}.{}".format(
                 table_name,
                 connection.ops.quote_name(ReturningModel._meta.get_field("id").column),
                 table_name,

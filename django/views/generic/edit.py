@@ -101,8 +101,10 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
             if self.fields is None:
                 raise ImproperlyConfigured(
-                    "Using ModelFormMixin (base class of %s) without "
-                    "the 'fields' attribute is prohibited." % self.__class__.__name__
+                    "Using ModelFormMixin (base class of {}) without "
+                    "the 'fields' attribute is prohibited.".format(
+                        self.__class__.__name__
+                    )
                 )
 
             return model_forms.modelform_factory(model, fields=self.fields)

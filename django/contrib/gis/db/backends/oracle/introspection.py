@@ -29,7 +29,7 @@ class OracleIntrospection(DatabaseIntrospection):
             except Exception as exc:
                 raise Exception(
                     "Could not find entry in USER_SDO_GEOM_METADATA "
-                    'corresponding to "%s"."%s"' % (table_name, description.name)
+                    'corresponding to "{}"."{}"'.format(table_name, description.name)
                 ) from exc
 
             # TODO: Research way to find a more specific geometry field type

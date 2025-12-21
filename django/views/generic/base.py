@@ -85,14 +85,14 @@ class View:
         for key in initkwargs:
             if key in cls.http_method_names:
                 raise TypeError(
-                    "The method name %s is not accepted as a keyword argument "
-                    "to %s()." % (key, cls.__name__)
+                    "The method name {} is not accepted as a keyword argument "
+                    "to {}().".format(key, cls.__name__)
                 )
             if not hasattr(cls, key):
                 raise TypeError(
-                    "%s() received an invalid keyword %r. as_view "
+                    "{}() received an invalid keyword {!r}. as_view "
                     "only accepts arguments that are already "
-                    "attributes of the class." % (cls.__name__, key)
+                    "attributes of the class.".format(cls.__name__, key)
                 )
 
         def view(request, *args, **kwargs):
@@ -100,8 +100,8 @@ class View:
             self.setup(request, *args, **kwargs)
             if not hasattr(self, "request"):
                 raise AttributeError(
-                    "%s instance has no 'request' attribute. Did you override "
-                    "setup() and forget to call super()?" % cls.__name__
+                    "{} instance has no 'request' attribute. Did you override "
+                    "setup() and forget to call super()?".format(cls.__name__)
                 )
             return self.dispatch(request, *args, **kwargs)
 

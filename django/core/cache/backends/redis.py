@@ -133,7 +133,7 @@ class RedisCacheClient:
     def incr(self, key, delta):
         client = self.get_client(key, write=True)
         if not client.exists(key):
-            raise ValueError("Key '%s' not found." % key)
+            raise ValueError("Key '{}' not found.".format(key))
         return client.incr(key, delta)
 
     def set_many(self, data, timeout):

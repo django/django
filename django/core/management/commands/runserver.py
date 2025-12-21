@@ -91,19 +91,21 @@ class Command(BaseCommand):
             m = re.match(naiveip_re, options["addrport"])
             if m is None:
                 raise CommandError(
-                    '"%s" is not a valid port number '
-                    "or address:port pair." % options["addrport"]
+                    '"{}" is not a valid port number '
+                    "or address:port pair.".format(options["addrport"])
                 )
             self.addr, _ipv4, _ipv6, _fqdn, self.port = m.groups()
             if not self.port.isdigit():
-                raise CommandError("%r is not a valid port number." % self.port)
+                raise CommandError("{!r} is not a valid port number.".format(self.port))
             if self.addr:
                 if _ipv6:
                     self.addr = self.addr[1:-1]
                     self.use_ipv6 = True
                     self._raw_ipv6 = True
                 elif self.use_ipv6 and not _fqdn:
-                    raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
+                    raise CommandError(
+                        '"{}" is not a valid IPv6 address.'.format(self.addr)
+                    )
         if not self.addr:
             self.addr = self.default_addr_ipv6 if self.use_ipv6 else self.default_addr
             self._raw_ipv6 = self.use_ipv6
@@ -161,7 +163,7 @@ class Command(BaseCommand):
                 error_text = ERRORS[e.errno]
             except KeyError:
                 error_text = e
-            self.stderr.write("Error: %s" % error_text)
+            self.stderr.write("Error: {}".format(error_text))
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:

@@ -382,7 +382,7 @@ class FileStorageTests(SimpleTestCase):
             location=self.temp_dir, base_url="/no_ending_slash"
         )
         self.assertEqual(
-            storage.url("test.file"), "%s%s" % (storage.base_url, "test.file")
+            storage.url("test.file"), "{}{}".format(storage.base_url, "test.file")
         )
 
     def test_listdir(self):
@@ -453,7 +453,7 @@ class FileStorageTests(SimpleTestCase):
             elif path == os.path.join(self.temp_dir, "error"):
                 raise PermissionError()
             else:
-                self.fail("unexpected argument %r" % path)
+                self.fail("unexpected argument {!r}".format(path))
 
         try:
             os.makedirs = fake_makedirs
@@ -489,7 +489,7 @@ class FileStorageTests(SimpleTestCase):
             elif path == os.path.join(self.temp_dir, "error.file"):
                 raise PermissionError()
             else:
-                self.fail("unexpected argument %r" % path)
+                self.fail("unexpected argument {!r}".format(path))
 
         try:
             os.remove = fake_remove
@@ -780,7 +780,9 @@ class FileFieldStorageTests(TestCase):
         obj2 = Storage()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         obj2_name = obj2.normal.name
-        self.assertRegex(obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(
+            obj2_name, "tests/django_test_{}.txt".format(FILE_SUFFIX_REGEX)
+        )
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
@@ -789,7 +791,7 @@ class FileFieldStorageTests(TestCase):
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         self.assertNotEqual(obj2_name, obj2.normal.name)
         self.assertRegex(
-            obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX
+            obj2.normal.name, "tests/django_test_{}.txt".format(FILE_SUFFIX_REGEX)
         )
         obj2.normal.close()
 
@@ -864,8 +866,8 @@ class FileFieldStorageTests(TestCase):
         try:
             # Testing truncation.
             names = [o.limited_length.name for o in objs]
-            self.assertEqual(names[0], "tests/%s" % filename)
-            self.assertRegex(names[1], "tests/fi_%s.ext" % FILE_SUFFIX_REGEX)
+            self.assertEqual(names[0], "tests/{}".format(filename))
+            self.assertRegex(names[1], "tests/fi_{}.ext".format(FILE_SUFFIX_REGEX))
 
             # Testing exception is raised when filename is too short to
             # truncate.
@@ -890,8 +892,8 @@ class FileFieldStorageTests(TestCase):
             self._storage_max_filename_length(temp_storage) - 4
         ) * "a"  # 4 chars for extension.
         obj = Storage()
-        obj.extended_length.save("%s.txt" % filename, ContentFile("Same Content"))
-        self.assertEqual(obj.extended_length.name, "tests/%s.txt" % filename)
+        obj.extended_length.save("{}.txt".format(filename), ContentFile("Same Content"))
+        self.assertEqual(obj.extended_length.name, "tests/{}.txt".format(filename))
         self.assertEqual(obj.extended_length.read(), b"Same Content")
         obj.extended_length.close()
 
@@ -1100,7 +1102,7 @@ class FileSaveRaceConditionTest(SimpleTestCase):
         self.thread.join()
         files = sorted(os.listdir(self.storage_dir))
         self.assertEqual(files[0], "conflict")
-        self.assertRegex(files[1], "conflict_%s" % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], "conflict_{}".format(FILE_SUFFIX_REGEX))
 
 
 @unittest.skipIf(
@@ -1165,7 +1167,7 @@ class FileStoragePathParsing(SimpleTestCase):
         files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
         self.assertEqual(files[0], "test")
-        self.assertRegex(files[1], "test_%s" % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], "test_{}".format(FILE_SUFFIX_REGEX))
 
     def test_first_character_dot(self):
         """
@@ -1178,7 +1180,7 @@ class FileStoragePathParsing(SimpleTestCase):
         files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
         self.assertEqual(files[0], ".test")
-        self.assertRegex(files[1], ".test_%s" % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], ".test_{}".format(FILE_SUFFIX_REGEX))
 
 
 class ContentFileStorageTestCase(unittest.TestCase):

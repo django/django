@@ -168,8 +168,10 @@ class DjangoHTMLTranslator(HTMLTranslator):
         self.body.append(self.starttag(node, "div", CLASS=node["type"]))
         version_text = self.version_text.get(node["type"])
         if version_text:
-            title = "%s%s" % (version_text % node["version"], ":" if len(node) else ".")
-            self.body.append('<span class="title">%s</span> ' % title)
+            title = "{}{}".format(
+                version_text % node["version"], ":" if len(node) else "."
+            )
+            self.body.append('<span class="title">{}</span> '.format(title))
 
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
@@ -186,7 +188,7 @@ class DjangoHTMLTranslator(HTMLTranslator):
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(" ")[0]
     env.ref_context["std:program"] = command
-    title = "django-admin %s" % sig
+    title = "django-admin {}".format(sig)
     signode += addnodes.desc_name(title, title)
     return command
 
@@ -257,14 +259,15 @@ def visit_console_html(self, node):
         uid = node["uid"]
         self.body.append(
             """\
-<div class="console-block" id="console-block-%(id)s">
-<input class="c-tab-unix" id="c-tab-%(id)s-unix" type="radio" name="console-%(id)s" \
+<div class="console-block" id="console-block-{id}">
+<input class="c-tab-unix" id="c-tab-{id}-unix" type="radio" name="console-{id}" \
 checked>
-<label for="c-tab-%(id)s-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
-<input class="c-tab-win" id="c-tab-%(id)s-win" type="radio" name="console-%(id)s">
-<label for="c-tab-%(id)s-win" title="Windows">&#xf17a</label>
-<section class="c-content-unix" id="c-content-%(id)s-unix">\n"""
-            % {"id": uid}
+<label for="c-tab-{id}-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-{id}-win" type="radio" name="console-{id}">
+<label for="c-tab-{id}-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-{id}-unix">\n""".format(
+                id=uid
+            )
         )
         try:
             self.visit_literal_block(node)
@@ -273,7 +276,7 @@ checked>
         self.body.append("</section>\n")
 
         self.body.append(
-            '<section class="c-content-win" id="c-content-%(id)s-win">\n' % {"id": uid}
+            '<section class="c-content-win" id="c-content-{id}-win">\n'.format(id=uid)
         )
         win_text = node["win_console_text"]
         highlight_args = {"force": True}
@@ -402,8 +405,8 @@ def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
     msg = (
-        "Default role used (`single backticks`): %s. Did you mean to use two "
-        "backticks for ``code``, or miss an underscore for a `link`_ ?" % rawtext
+        "Default role used (`single backticks`): {}. Did you mean to use two "
+        "backticks for ``code``, or miss an underscore for a `link`_ ?".format(rawtext)
     )
     logger.warning(msg, location=(inliner.document.current_source, lineno))
     return [nodes.Text(text)], []

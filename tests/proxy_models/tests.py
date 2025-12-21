@@ -228,7 +228,7 @@ class ProxyModelTests(TestCase):
 
         def make_handler(model, event):
             def _handler(*args, **kwargs):
-                output.append("%s %s save" % (model, event))
+                output.append("{} {} save".format(model, event))
 
             return _handler
 
@@ -436,11 +436,11 @@ class ProxyModelAdminTests(TestCase):
         user = TrackerUser.objects.get(name="Django Pony")
         proxy = ProxyTrackerUser.objects.get(name="Django Pony")
 
-        user_str = 'Tracker user: <a href="%s">%s</a>' % (
+        user_str = 'Tracker user: <a href="{}">{}</a>'.format(
             reverse("admin_proxy:proxy_models_trackeruser_change", args=(user.pk,)),
             user,
         )
-        proxy_str = 'Proxy tracker user: <a href="%s">%s</a>' % (
+        proxy_str = 'Proxy tracker user: <a href="{}">{}</a>'.format(
             reverse(
                 "admin_proxy:proxy_models_proxytrackeruser_change", args=(proxy.pk,)
             ),

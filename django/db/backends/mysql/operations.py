@@ -149,7 +149,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return f"TIME({sql})", params
 
     def format_for_duration_arithmetic(self, sql):
-        return "INTERVAL %s MICROSECOND" % sql
+        return "INTERVAL {} MICROSECOND".format(sql)
 
     def force_no_ordering(self):
         """
@@ -173,7 +173,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
             return name  # Quoting once is enough.
-        return "`%s`" % name
+        return "`{}`".format(name)
 
     def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if not tables:
@@ -184,8 +184,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # It's faster to TRUNCATE tables that require a sequence reset
             # since ALTER TABLE AUTO_INCREMENT is slower than TRUNCATE.
             sql.extend(
-                "%s %s;"
-                % (
+                "{} {};".format(
                     style.SQL_KEYWORD("TRUNCATE"),
                     style.SQL_FIELD(self.quote_name(table_name)),
                 )
@@ -195,8 +194,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Otherwise issue a simple DELETE since it's faster than TRUNCATE
             # and preserves sequences.
             sql.extend(
-                "%s %s %s;"
-                % (
+                "{} {} {};".format(
                     style.SQL_KEYWORD("DELETE"),
                     style.SQL_KEYWORD("FROM"),
                     style.SQL_FIELD(self.quote_name(table_name)),
@@ -208,8 +206,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def sequence_reset_by_name_sql(self, style, sequences):
         return [
-            "%s %s %s %s = 1;"
-            % (
+            "{} {} {} {} = 1;".format(
                 style.SQL_KEYWORD("ALTER"),
                 style.SQL_KEYWORD("TABLE"),
                 style.SQL_FIELD(self.quote_name(sequence_info["table"])),
@@ -268,15 +265,15 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def combine_expression(self, connector, sub_expressions):
         if connector == "^":
-            return "POW(%s)" % ",".join(sub_expressions)
+            return "POW({})".format(",".join(sub_expressions))
         # Convert the result to a signed integer since MySQL's binary operators
         # return an unsigned integer.
         elif connector in ("&", "|", "<<", "#"):
             connector = "^" if connector == "#" else connector
-            return "CONVERT(%s, SIGNED)" % connector.join(sub_expressions)
+            return "CONVERT({}, SIGNED)".format(connector.join(sub_expressions))
         elif connector == ">>":
             lhs, rhs = sub_expressions
-            return "FLOOR(%(lhs)s / POW(2, %(rhs)s))" % {"lhs": lhs, "rhs": rhs}
+            return "FLOOR({lhs} / POW(2, {rhs}))".format(lhs=lhs, rhs=rhs)
         return super().combine_expression(connector, sub_expressions)
 
     def get_db_converters(self, expression):
@@ -319,23 +316,23 @@ class DatabaseOperations(BaseDatabaseOperations):
                 # MariaDB includes the microsecond component in TIME_TO_SEC as
                 # a decimal. MySQL returns an integer without microseconds.
                 return (
-                    "CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) "
+                    "CAST((TIME_TO_SEC({lhs}) - TIME_TO_SEC({rhs})) "
                     "* 1000000 AS SIGNED)"
-                ) % {
-                    "lhs": lhs_sql,
-                    "rhs": rhs_sql,
-                }, (
+                ).format(
+                    lhs=lhs_sql,
+                    rhs=rhs_sql,
+                ), (
                     *lhs_params,
                     *rhs_params,
                 )
             return (
-                "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
-                " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
-            ) % {"lhs": lhs_sql, "rhs": rhs_sql}, tuple(lhs_params) * 2 + tuple(
+                "((TIME_TO_SEC({lhs}) * 1000000 + MICROSECOND({lhs})) -"
+                " (TIME_TO_SEC({rhs}) * 1000000 + MICROSECOND({rhs})))"
+            ).format(lhs=lhs_sql, rhs=rhs_sql), tuple(lhs_params) * 2 + tuple(
                 rhs_params
             ) * 2
         params = (*rhs_params, *lhs_params)
-        return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
+        return "TIMESTAMPDIFF(MICROSECOND, {}, {})".format(rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other
@@ -356,7 +353,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             )
         if format and not (analyze and not self.connection.mysql_is_mariadb):
             # Only MariaDB supports the analyze option with formats.
-            prefix += " FORMAT=%s" % format
+            prefix += " FORMAT={}".format(format)
         return prefix
 
     def regex_lookup(self, lookup_type):
@@ -367,7 +364,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "%s REGEXP %s"
 
         match_option = "c" if lookup_type == "regex" else "i"
-        return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
+        return "REGEXP_LIKE(%s, %s, '{}')".format(match_option)
 
     def insert_statement(self, on_conflict=None):
         if on_conflict == OnConflict.IGNORE:

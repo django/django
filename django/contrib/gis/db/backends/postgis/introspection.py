@@ -54,8 +54,9 @@ class PostGISIntrospection(DatabaseIntrospection):
             row = cursor.fetchone()
             if not row:
                 raise Exception(
-                    'Could not find a geometry or geography column for "%s"."%s"'
-                    % (table_name, description.name)
+                    'Could not find a geometry or geography column for "{}"."{}"'.format(
+                        table_name, description.name
+                    )
                 )
             dim, srid, field_type = row
             # OGRGeomType does not require GDAL and makes it easy to convert

@@ -65,10 +65,10 @@ class SelectForUpdateTests(TransactionTestCase):
         # Start a blocking transaction. At some point,
         # end_blocking_transaction() should be called.
         self.cursor = self.new_connection.cursor()
-        sql = "SELECT * FROM %(db_table)s %(for_update)s;" % {
-            "db_table": Person._meta.db_table,
-            "for_update": self.new_connection.ops.for_update_sql(),
-        }
+        sql = "SELECT * FROM {db_table} {for_update};".format(
+            db_table=Person._meta.db_table,
+            for_update=self.new_connection.ops.for_update_sql(),
+        )
         self.cursor.execute(sql, ())
         self.cursor.fetchone()
 
@@ -490,7 +490,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_after_from(self):
         features_class = connections["default"].features.__class__
-        attribute_to_patch = "%s.%s.for_update_after_from" % (
+        attribute_to_patch = "{}.{}.for_update_after_from".format(
             features_class.__module__,
             features_class.__name__,
         )
@@ -621,8 +621,7 @@ class SelectForUpdateTests(TransactionTestCase):
             try:
                 list(
                     Person.objects.raw(
-                        "SELECT * FROM %s %s"
-                        % (
+                        "SELECT * FROM {} {}".format(
                             Person._meta.db_table,
                             connection.ops.for_update_sql(nowait=True),
                         )

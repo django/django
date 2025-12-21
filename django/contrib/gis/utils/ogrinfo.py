@@ -25,19 +25,19 @@ def ogrinfo(data_source, num_features=10):
         )
 
     for i, layer in enumerate(data_source):
-        print("data source : %s" % data_source.name)
-        print("==== layer %s" % i)
-        print("  shape type: %s" % GEO_CLASSES[layer.geom_type.num].__name__)
-        print("  # features: %s" % len(layer))
-        print("         srs: %s" % layer.srs)
+        print("data source : {}".format(data_source.name))
+        print("==== layer {}".format(i))
+        print("  shape type: {}".format(GEO_CLASSES[layer.geom_type.num].__name__))
+        print("  # features: {}".format(len(layer)))
+        print("         srs: {}".format(layer.srs))
         extent_tup = layer.extent.tuple
-        print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
-        print("Displaying the first %s features ====" % num_features)
+        print("      extent: {} - {}".format(extent_tup[0:2], extent_tup[2:4]))
+        print("Displaying the first {} features ====".format(num_features))
 
         width = max(*map(len, layer.fields))
-        fmt = " %%%ss: %%s" % width
+        fmt = " %{}s: %s".format(width)
         for j, feature in enumerate(layer[:num_features]):
-            print("=== Feature %s" % j)
+            print("=== Feature {}".format(j))
             for fld_name in layer.fields:
                 type_name = feature[fld_name].type_name
                 output = fmt % (fld_name, type_name)

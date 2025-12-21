@@ -41,7 +41,9 @@ class FieldFile(File, AltersData):
     def _require_file(self):
         if not self:
             raise ValueError(
-                "The '%s' attribute has no file associated with it." % self.field.name
+                "The '{}' attribute has no file associated with it.".format(
+                    self.field.name
+                )
             )
 
     def _get_file(self):
@@ -255,8 +257,7 @@ class FileField(Field):
             self.storage = self.storage()
             if not isinstance(self.storage, Storage):
                 raise TypeError(
-                    "%s.storage must be a subclass/instance of %s.%s"
-                    % (
+                    "{}.storage must be a subclass/instance of {}.{}".format(
                         self.__class__.__qualname__,
                         Storage.__module__,
                         Storage.__qualname__,
@@ -278,8 +279,9 @@ class FileField(Field):
         if self._primary_key_set_explicitly:
             return [
                 checks.Error(
-                    "'primary_key' is not a valid argument for a %s."
-                    % self.__class__.__name__,
+                    "'primary_key' is not a valid argument for a {}.".format(
+                        self.__class__.__name__
+                    ),
                     obj=self,
                     id="fields.E201",
                 )
@@ -291,8 +293,8 @@ class FileField(Field):
         if isinstance(self.upload_to, str) and self.upload_to.startswith("/"):
             return [
                 checks.Error(
-                    "%s's 'upload_to' argument must be a relative path, not an "
-                    "absolute path." % self.__class__.__name__,
+                    "{}'s 'upload_to' argument must be a relative path, not an "
+                    "absolute path.".format(self.__class__.__name__),
                     obj=self,
                     id="fields.E202",
                     hint="Remove the leading slash.",

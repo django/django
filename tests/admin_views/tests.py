@@ -829,7 +829,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             model.objects.create(stuff="The First Item", order=1)
             model.objects.create(stuff="The Middle Item", order=2)
             response = self.client.get(
-                reverse("admin:admin_views_%s_changelist" % url), {}
+                reverse("admin:admin_views_{}_changelist".format(url)), {}
             )
             # Should have 3 columns including action checkbox col.
             result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
@@ -979,10 +979,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             for value in params["values"]:
                 query_string = urlencode({filter_path: value})
                 # ensure filter link exists
-                self.assertContains(response, '<a href="?%s"' % query_string)
+                self.assertContains(response, '<a href="?{}"'.format(query_string))
                 # ensure link works
                 filtered_response = self.client.get(
-                    "%s?%s" % (changelist_url, query_string)
+                    "{}?{}".format(changelist_url, query_string)
                 )
                 self.assertEqual(filtered_response.status_code, 200)
                 # ensure changelist contains only valid objects
@@ -993,21 +993,21 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """Ensure incorrect lookup parameters are handled gracefully."""
         changelist_url = reverse("admin:admin_views_thing_changelist")
         response = self.client.get(changelist_url, {"notarealfield": "5"})
-        self.assertRedirects(response, "%s?e=1" % changelist_url)
+        self.assertRedirects(response, "{}?e=1".format(changelist_url))
 
         # Spanning relationships through a nonexistent related object (Refs
         # #16716)
         response = self.client.get(changelist_url, {"notarealfield__whatever": "5"})
-        self.assertRedirects(response, "%s?e=1" % changelist_url)
+        self.assertRedirects(response, "{}?e=1".format(changelist_url))
 
         response = self.client.get(
             changelist_url, {"color__id__exact": "StringNotInteger!"}
         )
-        self.assertRedirects(response, "%s?e=1" % changelist_url)
+        self.assertRedirects(response, "{}?e=1".format(changelist_url))
 
         # Regression test for #18530
         response = self.client.get(changelist_url, {"pub_date__gte": "foo"})
-        self.assertRedirects(response, "%s?e=1" % changelist_url)
+        self.assertRedirects(response, "{}?e=1".format(changelist_url))
 
     def test_isnull_lookups(self):
         """Ensure is_null is handled correctly."""
@@ -1032,11 +1032,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_article_changelist"))
         self.assertContains(
             response,
-            '<form id="logout-form" method="post" action="%s">'
-            % reverse("admin:logout"),
+            '<form id="logout-form" method="post" action="{}">'.format(
+                reverse("admin:logout")
+            ),
         )
         self.assertContains(
-            response, '<a href="%s">' % reverse("admin:password_change")
+            response, '<a href="{}">'.format(reverse("admin:password_change"))
         )
 
     def test_named_group_field_choices_change_list(self):
@@ -1054,13 +1055,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<a href="%s">Horizontal</a>' % link1,
+            '<a href="{}">Horizontal</a>'.format(link1),
             msg_prefix=fail_msg,
             html=True,
         )
         self.assertContains(
             response,
-            '<a href="%s">Vertical</a>' % link2,
+            '<a href="{}">Vertical</a>'.format(link2),
             msg_prefix=fail_msg,
             html=True,
         )
@@ -1146,26 +1147,28 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_disallowed_filtering(self):
         with self.assertLogs("django.security.DisallowedModelAdminLookup", "ERROR"):
             response = self.client.get(
-                "%s?owner__email__startswith=fuzzy"
-                % reverse("admin:admin_views_album_changelist")
+                "{}?owner__email__startswith=fuzzy".format(
+                    reverse("admin:admin_views_album_changelist")
+                )
             )
         self.assertEqual(response.status_code, 400)
 
         # Filters are allowed if explicitly included in list_filter
         response = self.client.get(
-            "%s?color__value__startswith=red"
-            % reverse("admin:admin_views_thing_changelist")
+            "{}?color__value__startswith=red".format(
+                reverse("admin:admin_views_thing_changelist")
+            )
         )
         self.assertEqual(response.status_code, 200)
         response = self.client.get(
-            "%s?color__value=red" % reverse("admin:admin_views_thing_changelist")
+            "{}?color__value=red".format(reverse("admin:admin_views_thing_changelist"))
         )
         self.assertEqual(response.status_code, 200)
 
         # Filters should be allowed if they involve a local field without the
         # need to allow them in list_filter or date_hierarchy.
         response = self.client.get(
-            "%s?age__gt=30" % reverse("admin:admin_views_person_changelist")
+            "{}?age__gt=30".format(reverse("admin:admin_views_person_changelist"))
         )
         self.assertEqual(response.status_code, 200)
 
@@ -1271,8 +1274,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         # Filters should be allowed if they are defined on a ForeignKey
         # pointing to this model.
-        url = "%s?leader__name=Palin&leader__age=27" % reverse(
-            "admin:admin_views_inquisition_changelist"
+        url = "{}?leader__name=Palin&leader__age=27".format(
+            reverse("admin:admin_views_inquisition_changelist")
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -1283,9 +1286,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         actor = Actor.objects.create(name="Palin", age=27)
         response = self.client.get(
-            "%s?%s" % (reverse("admin:admin_views_actor_changelist"), IS_POPUP_VAR)
+            "{}?{}".format(reverse("admin:admin_views_actor_changelist"), IS_POPUP_VAR)
         )
-        self.assertContains(response, 'data-popup-opener="%s"' % actor.pk)
+        self.assertContains(response, 'data-popup-opener="{}"'.format(actor.pk))
 
     def test_hide_change_password(self):
         """
@@ -1360,7 +1363,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # Check the format of the shown object -- shouldn't contain a change
         # link
         self.assertContains(
-            response, '<th class="field-__str__">%s</th>' % o, html=True
+            response, '<th class="field-__str__">{}</th>'.format(o), html=True
         )
 
     def test_invalid_appindex_url(self):
@@ -1444,11 +1447,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin6:admin_views_article_changelist"))
         for field_name in expected_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="sortable column-%s">' % field_name
+                response,
+                '<th scope="col" class="sortable column-{}">'.format(field_name),
             )
         for field_name in expected_not_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="column-%s">' % field_name
+                response, '<th scope="col" class="column-{}">'.format(field_name)
             )
 
     def test_get_sortable_by_columns_subset(self):
@@ -1461,7 +1465,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin6:admin_views_chapter_changelist"))
         for field_name in expected_not_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="column-%s">' % field_name
+                response, '<th scope="col" class="column-{}">'.format(field_name)
             )
         self.assertNotContains(response, '<th scope="col" class="sortable column')
 
@@ -1756,7 +1760,8 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         # A custom popup response template may be specified by
         # ModelAdmin.popup_response_template.
         response = self.client.post(
-            reverse("admin:admin_views_customarticle_add") + "?%s=1" % IS_POPUP_VAR,
+            reverse("admin:admin_views_customarticle_add")
+            + "?{}=1".format(IS_POPUP_VAR),
             {
                 "content": "<p>great article</p>",
                 "date_0": "2008-03-18",
@@ -2333,7 +2338,7 @@ class AdminViewPermissionsTest(TestCase):
         Unsuccessful attempts will continue to render the login page with
         a 200 status code.
         """
-        login_url = "%s?next=%s" % (reverse("admin:login"), reverse("admin:index"))
+        login_url = "{}?next={}".format(reverse("admin:login"), reverse("admin:index"))
         # Super User
         response = self.client.get(self.index_url)
         self.assertRedirects(response, login_url)
@@ -2477,18 +2482,18 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 302)
         query_string = "the-answer=42"
-        redirect_url = "%s?%s" % (self.index_url, query_string)
+        redirect_url = "{}?{}".format(self.index_url, query_string)
         new_next = {REDIRECT_FIELD_NAME: redirect_url}
         post_data = self.super_login.copy()
         post_data.pop(REDIRECT_FIELD_NAME)
         login = self.client.post(
-            "%s?%s" % (reverse("admin:login"), urlencode(new_next)), post_data
+            "{}?{}".format(reverse("admin:login"), urlencode(new_next)), post_data
         )
         self.assertRedirects(login, redirect_url)
 
     def test_double_login_is_not_allowed(self):
         """Regression test for #19327"""
-        login_url = "%s?next=%s" % (reverse("admin:login"), reverse("admin:index"))
+        login_url = "{}?next={}".format(reverse("admin:login"), reverse("admin:index"))
 
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 302)
@@ -2605,8 +2610,8 @@ class AdminViewPermissionsTest(TestCase):
         # Add user may login and POST to add view, then redirect to admin root
         self.client.force_login(self.adduser)
         addpage = self.client.get(reverse("admin:admin_views_article_add"))
-        change_list_link = '<a href="%s">Articles</a>' % reverse(
-            "admin:admin_views_article_changelist"
+        change_list_link = '<a href="{}">Articles</a>'.format(
+            reverse("admin:admin_views_article_changelist")
         )
         self.assertNotContains(
             addpage,
@@ -3083,10 +3088,10 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
-        self.assertContains(response, "admin_views/article/%s/" % self.a1.pk)
+        self.assertContains(response, "admin_views/article/{}/".format(self.a1.pk))
 
         response = self.client.get(delete_url)
-        self.assertContains(response, "admin_views/article/%s/" % self.a1.pk)
+        self.assertContains(response, "admin_views/article/{}/".format(self.a1.pk))
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 1</li>")
         post = self.client.post(delete_url, delete_dict)
@@ -3107,7 +3112,7 @@ class AdminViewPermissionsTest(TestCase):
         delete_url = reverse("admin:admin_views_readonlypizza_delete", args=(pizza.pk,))
         self.client.force_login(self.adduser)
         response = self.client.get(delete_url)
-        self.assertContains(response, "admin_views/readonlypizza/%s/" % pizza.pk)
+        self.assertContains(response, "admin_views/readonlypizza/{}/".format(pizza.pk))
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Read only pizzas: 1</li>")
         post = self.client.post(delete_url, {"post": "yes"})
@@ -3654,9 +3659,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         cause them to be scheduled for deletion.
         """
         pattern = re.compile(
-            r'<li>Plot: <a href="%s">World Domination</a>\s*<ul>\s*'
-            r'<li>Plot details: <a href="%s">almost finished</a>'
-            % (
+            r'<li>Plot: <a href="{}">World Domination</a>\s*<ul>\s*'
+            r'<li>Plot details: <a href="{}">almost finished</a>'.format(
                 reverse("admin:admin_views_plot_change", args=(self.pl1.pk,)),
                 reverse("admin:admin_views_plotdetails_change", args=(self.pd1.pk,)),
             )
@@ -3671,10 +3675,10 @@ class AdminViewDeletedObjectsTest(TestCase):
         Cyclic relationships should still cause each object to only be
         listed once.
         """
-        one = '<li>Cyclic one: <a href="%s">I am recursive</a>' % (
+        one = '<li>Cyclic one: <a href="{}">I am recursive</a>'.format(
             reverse("admin:admin_views_cyclicone_change", args=(self.cy1.pk,)),
         )
-        two = '<li>Cyclic two: <a href="%s">I am recursive too</a>' % (
+        two = '<li>Cyclic two: <a href="{}">I am recursive too</a>'.format(
             reverse("admin:admin_views_cyclictwo_change", args=(self.cy2.pk,)),
         )
         response = self.client.get(
@@ -3715,13 +3719,15 @@ class AdminViewDeletedObjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            '<li>Answer: <a href="%s">Because.</a></li>'
-            % reverse("admin:admin_views_answer_change", args=(a1.pk,)),
+            '<li>Answer: <a href="{}">Because.</a></li>'.format(
+                reverse("admin:admin_views_answer_change", args=(a1.pk,))
+            ),
         )
         self.assertContains(
             response,
-            '<li>Answer: <a href="%s">Yes.</a></li>'
-            % reverse("admin:admin_views_answer_change", args=(a2.pk,)),
+            '<li>Answer: <a href="{}">Yes.</a></li>'.format(
+                reverse("admin:admin_views_answer_change", args=(a2.pk,))
+            ),
         )
 
     def test_post_delete_protected(self):
@@ -3752,8 +3758,9 @@ class AdminViewDeletedObjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            '<li>Song: <a href="%s">Unity</a></li>'
-            % reverse("admin:admin_views_song_change", args=(song.pk,)),
+            '<li>Song: <a href="{}">Unity</a></li>'.format(
+                reverse("admin:admin_views_song_change", args=(song.pk,))
+            ),
         )
 
     def test_post_delete_restricted(self):
@@ -3782,8 +3789,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         both of those should be followed in looking for related
         objects to delete.
         """
-        should_contain = '<li>Plot: <a href="%s">World Domination</a>' % reverse(
-            "admin:admin_views_plot_change", args=(self.pl1.pk,)
+        should_contain = '<li>Plot: <a href="{}">World Domination</a>'.format(
+            reverse("admin:admin_views_plot_change", args=(self.pl1.pk,))
         )
         response = self.client.get(
             reverse("admin:admin_views_villain_delete", args=(self.v1.pk,))
@@ -3800,8 +3807,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         another object, the other object should still only be listed
         once.
         """
-        should_contain = '<li>Plot: <a href="%s">World Peace</a></li>' % reverse(
-            "admin:admin_views_plot_change", args=(self.pl2.pk,)
+        should_contain = '<li>Plot: <a href="{}">World Peace</a></li>'.format(
+            reverse("admin:admin_views_plot_change", args=(self.pl2.pk,))
         )
         response = self.client.get(
             reverse("admin:admin_views_villain_delete", args=(self.v2.pk,))
@@ -3815,10 +3822,12 @@ class AdminViewDeletedObjectsTest(TestCase):
         for deletion, as well as any relationships they have.
         """
         should_contain = [
-            '<li>Villain: <a href="%s">Bob</a>'
-            % reverse("admin:admin_views_villain_change", args=(self.sv1.pk,)),
-            '<li>Super villain: <a href="%s">Bob</a>'
-            % reverse("admin:admin_views_supervillain_change", args=(self.sv1.pk,)),
+            '<li>Villain: <a href="{}">Bob</a>'.format(
+                reverse("admin:admin_views_villain_change", args=(self.sv1.pk,))
+            ),
+            '<li>Super villain: <a href="{}">Bob</a>'.format(
+                reverse("admin:admin_views_supervillain_change", args=(self.sv1.pk,))
+            ),
             "<li>Secret hideout: floating castle",
             "<li>Super secret hideout: super floating castle!",
         ]
@@ -3840,8 +3849,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         plot = self.pl3
         tag = FunkyTag.objects.create(content_object=plot, name="hott")
-        should_contain = '<li>Funky tag: <a href="%s">hott' % reverse(
-            "admin:admin_views_funkytag_change", args=(tag.id,)
+        should_contain = '<li>Funky tag: <a href="{}">hott'.format(
+            reverse("admin:admin_views_funkytag_change", args=(tag.id,))
         )
         response = self.client.get(
             reverse("admin:admin_views_plot_delete", args=(plot.pk,))
@@ -3857,7 +3866,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         bookmark = Bookmark.objects.create(name="djangoproject")
         tag = FunkyTag.objects.create(content_object=bookmark, name="django")
         tag_url = reverse("admin:admin_views_funkytag_change", args=(tag.id,))
-        should_contain = '<li>Funky tag: <a href="%s">django' % tag_url
+        should_contain = '<li>Funky tag: <a href="{}">django'.format(tag_url)
         response = self.client.get(
             reverse("admin:admin_views_bookmark_delete", args=(bookmark.pk,))
         )
@@ -3891,7 +3900,7 @@ class TestGenericRelations(TestCase):
     def test_generic_content_object_in_list_display(self):
         FunkyTag.objects.create(content_object=self.pl3, name="hott")
         response = self.client.get(reverse("admin:admin_views_funkytag_changelist"))
-        self.assertContains(response, "%s</td>" % self.pl3)
+        self.assertContains(response, "{}</td>".format(self.pl3))
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -3987,7 +3996,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         change_url = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=("__fk__",)
         ).replace("__fk__", pk_final_url)
-        should_contain = '<th class="field-__str__"><a href="%s">%s</a></th>' % (
+        should_contain = '<th class="field-__str__"><a href="{}">{}</a></th>'.format(
             change_url,
             escape(self.pk),
         )
@@ -4002,7 +4011,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         link = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=(quote(self.pk),)
         )
-        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
+        should_contain = """<a href="{}">{}</a>""".format(escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_description(self):
@@ -4027,7 +4036,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         change_url = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=("__fk__",)
         ).replace("__fk__", escape(iri_to_uri(quote(self.pk))))
-        should_contain = '<a href="%s">%s</a>' % (change_url, escape(self.pk))
+        should_contain = '<a href="{}">{}</a>'.format(change_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
@@ -4092,7 +4101,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
                 args=(quote(model.pk),),
             )
         )
-        should_contain = '/%s/" class="viewsitelink">' % model.pk
+        should_contain = '/{}/" class="viewsitelink">'.format(model.pk)
         self.assertContains(response, should_contain)
 
     def test_change_view_history_link(self):
@@ -4100,20 +4109,22 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         Object history button link should work and contain the pk value quoted.
         """
         url = reverse(
-            "admin:%s_modelwithstringprimarykey_change"
-            % ModelWithStringPrimaryKey._meta.app_label,
+            "admin:{}_modelwithstringprimarykey_change".format(
+                ModelWithStringPrimaryKey._meta.app_label
+            ),
             args=(quote(self.pk),),
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         expected_link = reverse(
-            "admin:%s_modelwithstringprimarykey_history"
-            % ModelWithStringPrimaryKey._meta.app_label,
+            "admin:{}_modelwithstringprimarykey_history".format(
+                ModelWithStringPrimaryKey._meta.app_label
+            ),
             args=(quote(self.pk),),
         )
         self.assertContains(
             response,
-            '<a href="%s" class="historylink"' % escape(expected_link),
+            '<a href="{}" class="historylink"'.format(escape(expected_link)),
         )
 
     def test_redirect_on_add_view_continue_button(self):
@@ -4145,7 +4156,7 @@ class SecureViewTests(TestCase):
         secure_url = reverse("secure_view")
         response = self.client.get(secure_url)
         self.assertRedirects(
-            response, "%s?next=%s" % (reverse("admin:login"), secure_url)
+            response, "{}?next={}".format(reverse("admin:login"), secure_url)
         )
         response = self.client.get(secure_url, follow=True)
         self.assertTemplateUsed(response, "admin/login.html")
@@ -4159,7 +4170,7 @@ class SecureViewTests(TestCase):
         secure_url = "/test_admin/admin/secure-view2/"
         response = self.client.get(secure_url)
         self.assertRedirects(
-            response, "%s?myfield=%s" % (reverse("admin:login"), secure_url)
+            response, "{}?myfield={}".format(reverse("admin:login"), secure_url)
         )
 
 
@@ -4625,7 +4636,7 @@ class AdminViewListEditable(TestCase):
         response = self.client.get(reverse("admin:admin_views_person_changelist"))
         self.assertNotEqual(response.context["cl"].list_editable, ())
         response = self.client.get(
-            reverse("admin:admin_views_person_changelist") + "?%s" % IS_POPUP_VAR
+            reverse("admin:admin_views_person_changelist") + "?{}".format(IS_POPUP_VAR)
         )
         self.assertEqual(response.context["cl"].list_editable, ())
 
@@ -4759,12 +4770,12 @@ class AdminSearchTest(TestCase):
         Refs #10918.
         """
         response = self.client.get(
-            reverse("admin:auth_user_changelist") + "?q=joe&%s=id" % TO_FIELD_VAR
+            reverse("admin:auth_user_changelist") + "?q=joe&{}=id".format(TO_FIELD_VAR)
         )
         self.assertContains(response, "\n1 user\n")
         self.assertContains(
             response,
-            '<input type="hidden" name="%s" value="id">' % TO_FIELD_VAR,
+            '<input type="hidden" name="{}" value="id">'.format(TO_FIELD_VAR),
             html=True,
         )
 
@@ -4868,7 +4879,7 @@ class AdminSearchTest(TestCase):
         for search, hits in tests:
             with self.subTest(search=search):
                 response = self.client.get(url % search)
-                self.assertContains(response, "\n%s person" % hits)
+                self.assertContains(response, "\n{} person".format(hits))
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -4940,13 +4951,13 @@ class AdminInheritedInlinesTest(TestCase):
             "accounts-TOTAL_FORMS": "2",
             "accounts-INITIAL_FORMS": "1",
             "accounts-MAX_NUM_FORMS": "0",
-            "accounts-0-username": "%s-1" % foo_user,
+            "accounts-0-username": "{}-1".format(foo_user),
             "accounts-0-account_ptr": str(foo_id),
             "accounts-0-persona": str(persona_id),
             "accounts-2-TOTAL_FORMS": "2",
             "accounts-2-INITIAL_FORMS": "1",
             "accounts-2-MAX_NUM_FORMS": "0",
-            "accounts-2-0-username": "%s-1" % bar_user,
+            "accounts-2-0-username": "{}-1".format(bar_user),
             "accounts-2-0-account_ptr": str(bar_id),
             "accounts-2-0-persona": str(persona_id),
         }
@@ -4957,8 +4968,8 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(Persona.objects.count(), 1)
         self.assertEqual(FooAccount.objects.count(), 1)
         self.assertEqual(BarAccount.objects.count(), 1)
-        self.assertEqual(FooAccount.objects.all()[0].username, "%s-1" % foo_user)
-        self.assertEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
+        self.assertEqual(FooAccount.objects.all()[0].username, "{}-1".format(foo_user))
+        self.assertEqual(BarAccount.objects.all()[0].username, "{}-1".format(bar_user))
         self.assertEqual(Persona.objects.all()[0].accounts.count(), 2)
 
 
@@ -5028,9 +5039,9 @@ class AdminCustomQuerysetTest(TestCase):
         response = self.client.get(reverse("admin:admin_views_emptymodel_changelist"))
         for i in self.pks:
             if i > 1:
-                self.assertContains(response, "Primary key = %s" % i)
+                self.assertContains(response, "Primary key = {}".format(i))
             else:
-                self.assertNotContains(response, "Primary key = %s" % i)
+                self.assertNotContains(response, "Primary key = {}".format(i))
 
     def test_changelist_view_count_queries(self):
         # create 2 Person objects
@@ -5092,9 +5103,10 @@ class AdminCustomQuerysetTest(TestCase):
         pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The cover letter “<a href="%s">'
-            "Candidate, Best</a>” was added successfully.</li>"
-            % reverse("admin:admin_views_coverletter_change", args=(pk,)),
+            '<li class="success">The cover letter “<a href="{}">'
+            "Candidate, Best</a>” was added successfully.</li>".format(
+                reverse("admin:admin_views_coverletter_change", args=(pk,))
+            ),
             html=True,
         )
 
@@ -5114,9 +5126,10 @@ class AdminCustomQuerysetTest(TestCase):
         sm = ShortMessage.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The short message “<a href="%s">'
-            "%s</a>” was added successfully.</li>"
-            % (reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm),
+            '<li class="success">The short message “<a href="{}">'
+            "{}</a>” was added successfully.</li>".format(
+                reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm
+            ),
             html=True,
         )
 
@@ -5139,9 +5152,10 @@ class AdminCustomQuerysetTest(TestCase):
         pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The telegram “<a href="%s">'
-            "Urgent telegram</a>” was added successfully.</li>"
-            % reverse("admin:admin_views_telegram_change", args=(pk,)),
+            '<li class="success">The telegram “<a href="{}">'
+            "Urgent telegram</a>” was added successfully.</li>".format(
+                reverse("admin:admin_views_telegram_change", args=(pk,))
+            ),
             html=True,
         )
 
@@ -5161,9 +5175,10 @@ class AdminCustomQuerysetTest(TestCase):
         p = Paper.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The paper “<a href="%s">'
-            "%s</a>” was added successfully.</li>"
-            % (reverse("admin:admin_views_paper_change", args=(p.pk,)), p),
+            '<li class="success">The paper “<a href="{}">'
+            "{}</a>” was added successfully.</li>".format(
+                reverse("admin:admin_views_paper_change", args=(p.pk,)), p
+            ),
             html=True,
         )
 
@@ -5190,9 +5205,10 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The cover letter “<a href="%s">'
-            "John Doe II</a>” was changed successfully.</li>"
-            % reverse("admin:admin_views_coverletter_change", args=(cl.pk,)),
+            '<li class="success">The cover letter “<a href="{}">'
+            "John Doe II</a>” was changed successfully.</li>".format(
+                reverse("admin:admin_views_coverletter_change", args=(cl.pk,))
+            ),
             html=True,
         )
 
@@ -5216,9 +5232,10 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The short message “<a href="%s">'
-            "%s</a>” was changed successfully.</li>"
-            % (reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm),
+            '<li class="success">The short message “<a href="{}">'
+            "{}</a>” was changed successfully.</li>".format(
+                reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm
+            ),
             html=True,
         )
 
@@ -5248,9 +5265,10 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The telegram “<a href="%s">'
-            "Telegram without typo</a>” was changed successfully.</li>"
-            % reverse("admin:admin_views_telegram_change", args=(t.pk,)),
+            '<li class="success">The telegram “<a href="{}">'
+            "Telegram without typo</a>” was changed successfully.</li>".format(
+                reverse("admin:admin_views_telegram_change", args=(t.pk,))
+            ),
             html=True,
         )
 
@@ -5277,9 +5295,10 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The paper “<a href="%s">'
-            "%s</a>” was changed successfully.</li>"
-            % (reverse("admin:admin_views_paper_change", args=(p.pk,)), p),
+            '<li class="success">The paper “<a href="{}">'
+            "{}</a>” was changed successfully.</li>".format(
+                reverse("admin:admin_views_paper_change", args=(p.pk,)), p
+            ),
             html=True,
         )
 
@@ -5844,7 +5863,9 @@ class PrePopulatedTest(TestCase):
             reverse("admin7:admin_views_prepopulatedpost_change", args=(self.p1.pk,))
         )
         self.assertContains(response, 'data-prepopulated-fields="[]"')
-        self.assertContains(response, '<div class="readonly">%s</div>' % self.p1.slug)
+        self.assertContains(
+            response, '<div class="readonly">{}</div>'.format(self.p1.slug)
+        )
 
 
 def _clean_sidebar_state(driver):
@@ -6003,7 +6024,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         element = self.selenium.find_elements(
             By.LINK_TEXT, "Add another Related prepopulated"
         )[1]
-        self.selenium.execute_script("window.scrollTo(0, %s);" % element.location["y"])
+        self.selenium.execute_script(
+            "window.scrollTo(0, {});".format(element.location["y"])
+        )
         element.click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
@@ -7246,7 +7269,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         user_url = reverse(f"{admin_site}:auth_user_change", args=(self.superuser.pk,))
         self.assertContains(
             response,
-            '<div class="readonly"><a href="%s">super</a></div>' % user_url,
+            '<div class="readonly"><a href="{}">super</a></div>'.format(user_url),
             html=True,
         )
         # Related ForeignKey with the string primary key registered in admin.
@@ -7256,7 +7279,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<div class="readonly"><a href="%s">_40</a></div>' % language_url,
+            '<div class="readonly"><a href="{}">_40</a></div>'.format(language_url),
             html=True,
         )
         # Related ForeignKey object not registered in admin.
@@ -7304,7 +7327,9 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         field = self.get_admin_readonly_field(response, "plotdetails")
         pd_url = reverse("admin:admin_views_plotdetails_change", args=(pd.pk,))
-        self.assertEqual(field.contents(), '<a href="%s">Brand New Plot</a>' % pd_url)
+        self.assertEqual(
+            field.contents(), '<a href="{}">Brand New Plot</a>'.format(pd_url)
+        )
 
         # The reverse relation also works if the OneToOneField is null.
         pd.plot = None
@@ -7564,9 +7589,10 @@ class UserAdminTest(TestCase):
         response = self.client.get(new_user_url)
         self.assertContains(
             response,
-            '<li class="success">The user “<a href="%s">'
-            "%s</a>” was added successfully. You may edit it again below.</li>"
-            % (new_user_url, new_user),
+            '<li class="success">The user “<a href="{}">'
+            "{}</a>” was added successfully. You may edit it again below.</li>".format(
+                new_user_url, new_user
+            ),
             html=True,
         )
 
@@ -7599,7 +7625,7 @@ class UserAdminTest(TestCase):
             'class="related-widget-wrapper-link add-related" id="add_id_owner"',
         )
         response = self.client.get(
-            reverse("admin:auth_user_add") + "?%s=1" % IS_POPUP_VAR
+            reverse("admin:auth_user_add") + "?{}=1".format(IS_POPUP_VAR)
         )
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
@@ -7611,7 +7637,9 @@ class UserAdminTest(TestCase):
             "_save": "1",
         }
         response = self.client.post(
-            reverse("admin:auth_user_add") + "?%s=1" % IS_POPUP_VAR, data, follow=True
+            reverse("admin:auth_user_add") + "?{}=1".format(IS_POPUP_VAR),
+            data,
+            follow=True,
         )
         self.assertContains(response, "&quot;obj&quot;: &quot;newuser&quot;")
 
@@ -7629,8 +7657,8 @@ class UserAdminTest(TestCase):
             'class="related-widget-wrapper-link change-related" id="change_id_owner"',
         )
         user = User.objects.get(username="changeuser")
-        url = (
-            reverse("admin:auth_user_change", args=(user.pk,)) + "?%s=1" % IS_POPUP_VAR
+        url = reverse("admin:auth_user_change", args=(user.pk,)) + "?{}=1".format(
+            IS_POPUP_VAR
         )
         response = self.client.get(url)
         self.assertNotContains(response, 'name="_continue"')
@@ -7664,8 +7692,8 @@ class UserAdminTest(TestCase):
             'class="related-widget-wrapper-link change-related" id="change_id_owner"',
         )
         user = User.objects.get(username="changeuser")
-        url = (
-            reverse("admin:auth_user_delete", args=(user.pk,)) + "?%s=1" % IS_POPUP_VAR
+        url = reverse("admin:auth_user_delete", args=(user.pk,)) + "?{}=1".format(
+            IS_POPUP_VAR
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -8268,7 +8296,9 @@ class AdminViewLogoutTests(TestCase):
         response = self.client.post(reverse("admin:logout"), follow=True)
         self.assertContains(
             response,
-            '<input type="hidden" name="next" value="%s">' % reverse("admin:index"),
+            '<input type="hidden" name="next" value="{}">'.format(
+                reverse("admin:index")
+            ),
         )
         self.assertTemplateUsed(response, "admin/login.html")
         self.assertEqual(response.request["PATH_INFO"], reverse("admin:login"))
@@ -8292,7 +8322,7 @@ class AdminUserMessageTest(TestCase):
         """
         action_data = {
             ACTION_CHECKBOX_NAME: [1],
-            "action": "message_%s" % level,
+            "action": "message_{}".format(level),
             "index": 0,
         }
 
@@ -8302,7 +8332,7 @@ class AdminUserMessageTest(TestCase):
             follow=True,
         )
         self.assertContains(
-            response, '<li class="%s">Test %s</li>' % (level, level), html=True
+            response, '<li class="{}">Test {}</li>'.format(level, level), html=True
         )
 
     @override_settings(MESSAGE_LEVEL=10)  # Set to DEBUG for this request
@@ -8441,7 +8471,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         return self.joepublicuser.pk
 
     def get_changelist_url(self):
-        return "%s?%s" % (
+        return "{}?{}".format(
             reverse("admin:auth_user_changelist", current_app=self.admin_site.name),
             self.get_changelist_filters_querystring(),
         )
@@ -8449,7 +8479,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def get_add_url(self, add_preserved_filters=True):
         url = reverse("admin:auth_user_add", current_app=self.admin_site.name)
         if add_preserved_filters:
-            url = "%s?%s" % (url, self.get_preserved_filters_querystring())
+            url = "{}?{}".format(url, self.get_preserved_filters_querystring())
         return url
 
     def get_change_url(self, user_id=None, add_preserved_filters=True):
@@ -8459,13 +8489,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
             "admin:auth_user_change", args=(user_id,), current_app=self.admin_site.name
         )
         if add_preserved_filters:
-            url = "%s?%s" % (url, self.get_preserved_filters_querystring())
+            url = "{}?{}".format(url, self.get_preserved_filters_querystring())
         return url
 
     def get_history_url(self, user_id=None):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
+        return "{}?{}".format(
             reverse(
                 "admin:auth_user_history",
                 args=(user_id,),
@@ -8477,7 +8507,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def get_delete_url(self, user_id=None):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
+        return "{}?{}".format(
             reverse(
                 "admin:auth_user_delete",
                 args=(user_id,),
@@ -8508,7 +8538,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             response.text,
         )
         self.assertURLEqual(
-            form_action[1], "?%s" % self.get_preserved_filters_querystring()
+            form_action[1], "?{}".format(self.get_preserved_filters_querystring())
         )
 
         # Check the history link.
@@ -8581,7 +8611,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             response.text,
         )
         self.assertURLEqual(
-            form_action[1], "?%s" % self.get_preserved_filters_querystring()
+            form_action[1], "?{}".format(self.get_preserved_filters_querystring())
         )
 
         post_data = {
@@ -8858,7 +8888,7 @@ class AdminViewOnSiteTests(TestCase):
             reverse("admin:admin_views_worker_change", args=(self.w1.pk,))
         )
         self.assertContains(
-            response, '"/worker/%s/%s/"' % (self.w1.surname, self.w1.name)
+            response, '"/worker/{}/{}/"'.format(self.w1.surname, self.w1.name)
         )
 
     def test_missing_get_absolute_url(self):
@@ -8950,7 +8980,7 @@ class InlineAdminViewOnSiteTest(TestCase):
             reverse("admin:admin_views_restaurant_change", args=(self.r1.pk,))
         )
         self.assertContains(
-            response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name)
+            response, '"/worker_inline/{}/{}/"'.format(self.w1.surname, self.w1.name)
         )
 
 
@@ -9033,7 +9063,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url)
         self.assertRedirects(
-            response, "%s?next=%s" % (reverse("admin:login"), unknown_url)
+            response, "{}?next={}".format(reverse("admin:login"), unknown_url)
         )
 
     def test_unknown_url_404_if_authenticated(self):
@@ -9046,7 +9076,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url)
         self.assertRedirects(
-            response, "%s?next=%s" % (reverse("admin:login"), known_url)
+            response, "{}?next={}".format(reverse("admin:login"), known_url)
         )
 
     def test_known_url_missing_slash_redirects_login_if_not_authenticated(self):
@@ -9054,24 +9084,24 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(known_url)
         # Redirects with the next URL also missing the slash.
         self.assertRedirects(
-            response, "%s?next=%s" % (reverse("admin:login"), known_url)
+            response, "{}?next={}".format(reverse("admin:login"), known_url)
         )
 
     def test_non_admin_url_shares_url_prefix(self):
         url = reverse("non_admin")[:-1]
         response = self.client.get(url)
         # Redirects with the next URL also missing the slash.
-        self.assertRedirects(response, "%s?next=%s" % (reverse("admin:login"), url))
+        self.assertRedirects(response, "{}?next={}".format(reverse("admin:login"), url))
 
     def test_url_without_trailing_slash_if_not_authenticated(self):
         url = reverse("admin:article_extra_json")
         response = self.client.get(url)
-        self.assertRedirects(response, "%s?next=%s" % (reverse("admin:login"), url))
+        self.assertRedirects(response, "{}?next={}".format(reverse("admin:login"), url))
 
     def test_unkown_url_without_trailing_slash_if_not_authenticated(self):
         url = reverse("admin:article_extra_json")[:-1]
         response = self.client.get(url)
-        self.assertRedirects(response, "%s?next=%s" % (reverse("admin:login"), url))
+        self.assertRedirects(response, "{}?next={}".format(reverse("admin:login"), url))
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_unknown_url(self):
@@ -9093,7 +9123,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_query_string(self):
         self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
-        response = self.client.get("%s?id=1" % known_url[:-1])
+        response = self.client.get("{}?id=1".format(known_url[:-1]))
         self.assertRedirects(
             response,
             f"{known_url}?id=1",
@@ -9117,7 +9147,9 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_script_name_query_string(self):
         self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
-        response = self.client.get("%s?id=1" % known_url[:-1], SCRIPT_NAME="/prefix/")
+        response = self.client.get(
+            "{}?id=1".format(known_url[:-1]), SCRIPT_NAME="/prefix/"
+        )
         self.assertRedirects(
             response,
             f"/prefix{known_url}?id=1",
@@ -9151,7 +9183,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_non_staff_user_query_string(self):
         self.client.force_login(self.non_staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
-        response = self.client.get("%s?id=1" % known_url[:-1])
+        response = self.client.get("{}?id=1".format(known_url[:-1]))
         self.assertRedirects(
             response,
             "/test_admin/admin/login/?next=/test_admin/admin/admin_views/article"
@@ -9191,7 +9223,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get(known_url)
         self.assertRedirects(
-            response, "%s?next=%s" % (reverse("admin10:login"), known_url)
+            response, "{}?next={}".format(reverse("admin10:login"), known_url)
         )
 
     def test_known_url_missing_slash_redirects_with_slash_if_not_auth_no_catch_all_view(
@@ -9213,7 +9245,9 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     ):
         url = reverse("admin10:article_extra_json")
         response = self.client.get(url)
-        self.assertRedirects(response, "%s?next=%s" % (reverse("admin10:login"), url))
+        self.assertRedirects(
+            response, "{}?next={}".format(reverse("admin10:login"), url)
+        )
 
     def test_unknown_url_no_trailing_slash_if_not_auth_without_final_catch_all_view(
         self,
@@ -9247,7 +9281,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_query_without_final_catch_all_view(self):
         self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
-        response = self.client.get("%s?id=1" % known_url[:-1])
+        response = self.client.get("{}?id=1".format(known_url[:-1]))
         self.assertRedirects(
             response,
             f"{known_url}?id=1",

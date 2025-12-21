@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 pass
             else:
                 raise CommandError(
-                    'There is no system check with the "%s" tag.' % invalid_tag
+                    'There is no system check with the "{}" tag.'.format(invalid_tag)
                 )
 
         self.check(
