@@ -1,0 +1,11 @@
+target-version = "py312"
+line-length = 88
+unsafe-fixes = true
+extend-exclude = [
+    "tests/test_runner_apps/tagged/tests_syntax_error.py"
+]
+force-exclude = true
+
+[lint]
+preview = true
+select = []
