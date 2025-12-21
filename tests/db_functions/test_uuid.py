@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from django.db import NotSupportedError, connection
 from django.db.models.functions import UUID4, UUID7
@@ -34,16 +34,16 @@ class TestUUID(TestCase):
 
     @skipUnlessDBFeature("supports_uuid7_function_shift")
     def test_uuid7_shift(self):
-        now = datetime.now(timezone.utc)
-        past = datetime(2005, 11, 16, tzinfo=timezone.utc)
+        now = datetime.now(UTC)
+        past = datetime(2005, 11, 16, tzinfo=UTC)
         shift = past - now
         m = UUIDModel.objects.create(uuid=UUID7(shift))
         self.assertTrue(str(m.uuid).startswith("0107965e-e40"), m.uuid)
 
     @skipUnlessDBFeature("supports_uuid7_function_shift")
     def test_uuid7_shift_duration_field(self):
-        now = datetime.now(timezone.utc)
-        past = datetime(2005, 11, 16, tzinfo=timezone.utc)
+        now = datetime.now(UTC)
+        past = datetime(2005, 11, 16, tzinfo=UTC)
         shift = past - now
         m = UUIDModel.objects.create(shift=shift)
         UUIDModel.objects.update(uuid=UUID7("shift"))

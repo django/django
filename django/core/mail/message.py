@@ -3,7 +3,7 @@ import email.policy
 import mimetypes
 import warnings
 from collections import namedtuple
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email import charset as Charset
 from email import generator
 from email.errors import HeaderParseError
@@ -330,7 +330,7 @@ class EmailMessage:
             if settings.EMAIL_USE_LOCALTIME:
                 tz = get_current_timezone()
             else:
-                tz = timezone.utc
+                tz = UTC
             msg["Date"] = datetime.now(tz)
         if "message-id" not in header_names:
             # Use cached DNS_NAME for performance

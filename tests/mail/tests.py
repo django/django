@@ -7,7 +7,7 @@ import shutil
 import socket
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email import message_from_binary_file
 from email import message_from_bytes as _message_from_bytes
 from email import policy
@@ -529,7 +529,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         so that it uses the email header date format.
         """
         email = EmailMessage(
-            headers={"Date": datetime(2001, 11, 9, 1, 8, 47, tzinfo=timezone.utc)},
+            headers={"Date": datetime(2001, 11, 9, 1, 8, 47, tzinfo=UTC)},
         )
         message = email.message()
         self.assertEqual(message["Date"], "Fri, 09 Nov 2001 01:08:47 +0000")

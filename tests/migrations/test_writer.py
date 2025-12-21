@@ -684,7 +684,7 @@ class WriterTests(SimpleTestCase):
             ),
         )
         self.assertSerializedResultEqual(
-            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.UTC),
             (
                 "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
                 {"import datetime"},

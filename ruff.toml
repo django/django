@@ -23,7 +23,7 @@ select = [
     "UP013",  # convert-typed-dict-functional-to-class
     "UP014",  # convert-named-tuple-functional-to-class
     "UP015",  # redundant-open-modes
-#   "UP017",  # datetime-timezone-utc
+    "UP017",  # datetime-timezone-utc
 #   "UP018",  # native-literals
     "UP019",  # typing-text-str-alias
     "UP020",  # open-alias
