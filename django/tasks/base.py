@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -188,7 +188,7 @@ class TaskResult:
     last_attempted_at: Optional[datetime]
 
     args: list  # Arguments to pass to the task function.
-    kwargs: Dict[str, Any]  # Keyword arguments to pass to the task function.
+    kwargs: dict[str, Any]  # Keyword arguments to pass to the task function.
     backend: str
     errors: list[TaskError]  # Errors raised when running the task.
     worker_ids: list[str]  # Workers which have processed the task.
