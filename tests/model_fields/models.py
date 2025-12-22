@@ -730,3 +730,7 @@ class GeneratedModelUniqueConstraintVirtual(GeneratedModelVirtualBase):
                 F("a"), name="Generated model unique constraint virtual a"
             ),
         ]
+
+
+class HighPrecision(models.Model):
+    d = models.DecimalField(max_digits=16, decimal_places=0)
