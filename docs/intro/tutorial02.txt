@@ -308,7 +308,6 @@ database:
     Operations to perform:
       Apply all migrations: admin, auth, contenttypes, polls, sessions
     Running migrations:
-      Rendering model states... DONE
       Applying polls.0001_initial... OK
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
