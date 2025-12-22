@@ -324,13 +324,10 @@ class RoutePattern(CheckURLMixin):
     def match(self, path):
         # Coerce lazy routes to str.
         # path.startswith() does not support lazy objects.
-        route = self._route
+        route = str(self._route)
 
-        # Only use regex overhead if there are converters.
         if self.converters:
             if match := self.regex.search(path):
-                # RoutePattern doesn't allow non-named groups so args are
-                # ignored.
                 kwargs = match.groupdict()
                 for key, value in kwargs.items():
                     converter = self.converters[key]
@@ -339,12 +336,16 @@ class RoutePattern(CheckURLMixin):
                     except ValueError:
                         return None
                 return path[match.end() :], (), kwargs
-        # If this is an endpoint, the path should be exactly the same as the
-        # route.
-        elif not self._is_endpoint:
-            route_str = str(route)
-            if path.startswith(route_str):
-                return path[len(route_str) :], (), {}
+
+        if self._is_endpoint:
+            if route == path:
+                return "", (), {}
+            return None
+
+        # For include() routes: prefix match ONLY, no kwargs
+        if path.startswith(route):
+            return path[len(route) :], (), None
+
         return None
 
     def check(self):
