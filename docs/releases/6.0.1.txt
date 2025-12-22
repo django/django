@@ -16,3 +16,8 @@ Bugfixes
 * Fixed a regression in Django 6.0 that prevented changing the name of a
   :class:`~django.db.models.ManyToManyField` from taking effect when applying
   migrations (:ticket:`36800`).
+
+* Fixed a regression in Django 6.0 where passing :class:`pathlib.Path` objects
+  to :func:`~django.template.loader.get_template` and
+  :func:`~django.template.loader.select_template` raised a :exc:`TypeError`
+  (:ticket:`36817`).

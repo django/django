@@ -44,7 +44,9 @@ def select_template(template_name_list, using=None):
                 chain.append(e)
 
     if template_name_list:
-        raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+        raise TemplateDoesNotExist(
+            ", ".join(str(name) for name in template_name_list), chain=chain
+        )
     else:
         raise TemplateDoesNotExist("No template names provided")
 

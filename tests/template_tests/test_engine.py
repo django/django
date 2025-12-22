@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
@@ -140,3 +141,8 @@ class LoaderTests(SimpleTestCase):
 
         template = engine.get_template("priority/foo.html")
         self.assertEqual(template.render(Context()), "priority\n")
+
+    def test_get_template_path_object(self):
+        engine = Engine(dirs=[TEMPLATE_DIR])
+        template = engine.get_template(Path("index.html"))
+        self.assertEqual(template.origin.template_name, "index.html")

@@ -1,4 +1,5 @@
 import functools
+import pathlib
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
@@ -174,6 +175,9 @@ class Engine:
         Return a compiled Template object for the given template name,
         handling template inheritance recursively.
         """
+        if isinstance(template_name, pathlib.Path):
+            template_name = str(template_name)
+
         original_name = template_name
         try:
             template_name, _, partial_name = template_name.partition("#")

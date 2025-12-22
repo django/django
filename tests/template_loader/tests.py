@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template, render_to_string, select_template
 from django.test import SimpleTestCase, override_settings
@@ -180,3 +182,7 @@ class TemplateLoaderTests(SimpleTestCase):
             ["template_loader/goodbye.html", "template_loader/hello.html"]
         )
         self.assertEqual(content, "Goodbye! (Django templates)\n")
+
+    def test_select_template_path_object(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            select_template([Path("unknown.html")])
