@@ -6675,47 +6675,55 @@ class OperationTests(OperationTestBase):
 
     @skipUnlessDBFeature("supports_foreign_keys")
     def test_delete_model_fails_on_fk_fix(self):
-
-        if connection.vendor not in ("postgresql", "mysql"):
-            return
-
-        app_label = "test_deletemodel_fk_fix"
-
+        """
+        DeleteModel should raise an IntegrityError if the model is still
+        referenced by a ForeignKey.
+        """
+        app_label = "test_dm_fk"
         project_state = self.apply_operations(
             app_label,
             ProjectState(),
             operations=[
                 migrations.CreateModel(
-                    "Bob",
+                    "Author",
                     fields=[("id", models.AutoField(primary_key=True))],
                 ),
                 migrations.CreateModel(
-                    "Jane",
+                    "Book",
                     fields=[
                         ("id", models.AutoField(primary_key=True)),
-                        ("bob", models.ForeignKey(f"{app_label}.Bob", models.CASCADE)),
+                        (
+                            "author",
+                            models.ForeignKey(f"{app_label}.Author", models.CASCADE),
+                        ),
                     ],
                 ),
             ],
         )
+        Author = project_state.apps.get_model(app_label, "Author")
+        Book = project_state.apps.get_model(app_label, "Book")
 
-        Bob = project_state.apps.get_model(app_label, "Bob")
-        Jane = project_state.apps.get_model(app_label, "Jane")
+        author = Author.objects.create()
+        Book.objects.create(author=author)
 
-        bob_instance = Bob.objects.create()
-        Jane.objects.create(bob=bob_instance)
-
-        operation = migrations.DeleteModel(name="Bob")
+        operation = migrations.DeleteModel(name="Author")
         new_state = project_state.clone()
         operation.state_forwards(app_label, new_state)
 
-        with self.assertRaises((IntegrityError, DatabaseError)):
+        try:
+            with self.assertRaises((IntegrityError, DatabaseError)):
+                with transaction.atomic(using=connection.alias):
+                    with connection.schema_editor() as editor:
+                        operation.database_forwards(
+                            app_label, editor, project_state, new_state
+                        )
+        finally:
             with connection.schema_editor() as editor:
-                operation.database_forwards(app_label, editor, project_state, new_state)
-
-        with connection.schema_editor() as editor:
-            editor.delete_model(Jane)
-            editor.delete_model(Bob)
+                for model in [Book, Author]:
+                    try:
+                        editor.delete_model(model)
+                    except DatabaseError:
+                        pass
 
 
 class SwappableOperationTests(OperationTestBase):

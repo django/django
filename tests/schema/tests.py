@@ -159,7 +159,7 @@ class SchemaTests(TransactionTestCase):
         if self.isolated_local_models:
             with connection.schema_editor() as editor:
                 for model in self.isolated_local_models:
-                    editor.delete_model(model)
+                    editor.delete_model(model, cascade=True)
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
