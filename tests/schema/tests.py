@@ -2685,7 +2685,7 @@ class SchemaTests(TransactionTestCase):
         # Remove the through parameter.
         old_field = LocalNoteWithM2MThrough._meta.get_field("authors")
         new_field = ManyToManyField("Author")
-        new_field.set_attributes_from_name("authors")
+        new_field.contribute_to_class(LocalNoteWithM2MThrough, "authors")
         msg = (
             f"Cannot alter field {old_field} into {new_field} - they are not "
             f"compatible types (you cannot alter to or from M2M fields, or add or "
@@ -2694,6 +2694,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             with self.assertRaisesMessage(ValueError, msg):
                 editor.alter_field(LocalNoteWithM2MThrough, old_field, new_field)
+        LocalNoteWithM2MThrough._meta.local_many_to_many.remove(new_field)
 
     def _test_m2m(self, M2MFieldClass):
         """
@@ -2922,6 +2923,47 @@ class SchemaTests(TransactionTestCase):
         self.assertNotIn("authors", new_through_table)
         # Remove the old field from meta for tearDown().
         LocalBook._meta.local_many_to_many.remove(old_field)
+
+    def test_m2m_rename_with_unchanged_db_table_no_op(self):
+        db_table = "test_mrwudbtnoop"
+
+        class LocalBook2(Model):
+            authors = ManyToManyField("schema.Author", db_table=db_table)
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalBook2]
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(LocalBook2)
+        old_field = LocalBook2._meta.get_field("authors")
+        new_field = ManyToManyField("schema.Author", db_table=db_table)
+        new_field.contribute_to_class(LocalBook2, "writers")
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_field(LocalBook2, old_field, new_field, strict=True)
+        LocalBook2._meta.local_many_to_many.remove(old_field)
+
+    def test_m2m_add_explicit_but_unchanged_db_table_no_op(self):
+        class LocalBook3(Model):
+            authors = ManyToManyField("schema.Author")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalBook3]
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(LocalBook3)
+        old_field = LocalBook3._meta.get_field("authors")
+        db_table = old_field.remote_field.through._meta.db_table
+        new_field = ManyToManyField("schema.Author", db_table=db_table)
+        new_field.contribute_to_class(LocalBook3, "writers")
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_field(LocalBook3, old_field, new_field, strict=True)
+        LocalBook3._meta.local_many_to_many.remove(old_field)
 
     @isolate_apps("schema")
     def test_m2m_rename_field_in_target_model(self):
