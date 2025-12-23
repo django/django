@@ -643,7 +643,7 @@ class BaseDatabaseSchemaEditor:
             )
 
         # Create all indexes in the new set
-        for field_names in news:
+        for field_names in news.difference(olds):
             fields = [model._meta.get_field(field) for field in field_names]
             self.execute(self._create_index_sql(model, fields=fields, suffix="_idx"))
 
