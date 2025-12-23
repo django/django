@@ -3,6 +3,7 @@ from datetime import date
 
 from django.db import connection
 from django.db.models.expressions import RawSQL
+from django.db.utils import DataError
 from django.test import TestCase
 
 from ..models import Article, Reporter, Square
@@ -42,3 +43,12 @@ class BulkCreateUnnestTests(TestCase):
         self.assertEqual(
             [article.reporter for article in articles], [reporter, reporter]
         )
+
+    def test_parametrized_db_type(self):
+        with self.assertRaises(DataError):
+            Reporter.objects.bulk_create(
+                [
+                    Reporter(),
+                    Reporter(first_name="a" * 31),
+                ]
+            )
