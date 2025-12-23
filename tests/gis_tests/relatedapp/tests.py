@@ -6,6 +6,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 
+from ..utils import skipUnlessGISLookup
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
 
 
@@ -117,6 +118,7 @@ class RelatedGeoModelTest(TestCase):
         # Regression test for #9752.
         list(DirectoryEntry.objects.select_related())
 
+    @skipUnlessGISLookup("within")
     def test06_f_expressions(self):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for
@@ -229,6 +231,7 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(val_dict["id"], c_id)
             self.assertEqual(val_dict["location__id"], l_id)
 
+    @skipUnlessGISLookup("within")
     def test10_combine(self):
         "Testing the combination of two QuerySets (#10807)."
         buf1 = City.objects.get(name="Aurora").location.point.buffer(0.1)
