@@ -1104,7 +1104,7 @@ class Field(RegisterLookupMixin):
             "label": capfirst(self.verbose_name),
             "help_text": self.help_text,
         }
-        if self.has_default():
+        if self.has_default() and not self.many_to_many:
             if callable(self.default):
                 defaults["initial"] = self.default
                 defaults["show_hidden_initial"] = True
