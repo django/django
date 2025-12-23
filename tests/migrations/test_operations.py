@@ -222,18 +222,20 @@ class OperationTests(OperationTestBase):
     def test_model_indexes_sql_includes_historical_index_together(self):
         """Coverage test for _model_indexes_sql index_together addition."""
         project_state = ProjectState()
-        project_state.add_model(ModelState(
-            "testapp",
-            "CoverageModel",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("f1", models.IntegerField()),
-                ("f2", models.IntegerField()),
-            ],
-            {
-                "index_together": {("f1", "f2")},
-            },
-        ))
+        project_state.add_model(
+            ModelState(
+                "testapp",
+                "CoverageModel",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("f1", models.IntegerField()),
+                    ("f2", models.IntegerField()),
+                ],
+                {
+                    "index_together": {("f1", "f2")},
+                },
+            )
+        )
 
         model = project_state.apps.get_model("testapp", "CoverageModel")
 
