@@ -22,13 +22,13 @@ class ResolverCacheTests(SimpleTestCase):
 class LazyRouteIncludeTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF="urlpatterns.path_urls")
     def test_lazy_route_with_include_resolves(self):
-        match = resolve("/test/child/")
+        match = resolve("/lazy/child/")
         self.assertEqual(match.url_name, "child")
 
 
 class RoutePatternEndpointMatchTests(SimpleTestCase):
     def test_match_endpoint_with_lazy_route(self):
-        pattern = RoutePattern(_("test/"))
+        pattern = RoutePattern("test/")
         result = pattern.match("test/")
         self.assertEqual(
             result,
