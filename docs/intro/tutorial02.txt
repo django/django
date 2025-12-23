@@ -324,7 +324,7 @@ but for now, remember the three-step guide to making model changes:
 
 * Change your models (in ``models.py``).
 * Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
-  migrations for those changes
+  migrations for those changes.
 * Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
   the database.
 
