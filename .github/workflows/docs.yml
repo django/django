@@ -50,20 +50,11 @@ jobs:
         uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v6
+
+      - name: blacken-docs
+        uses: j178/prek-action@91fd7d7cf70ae1dee9f4f44e7dfa5d1073fe6623 # v1.0.11
         with:
-          python-version: '3.14'
-      - run: python -m pip install blacken-docs
-      - name: Build docs
-        run: |
-          cd docs
-          make black
-          RESULT=`cat _build/black/output.txt`
-          if [ "$RESULT" -gt 0 ]; then
-              echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"
-          fi;
-          exit $RESULT
+          extra-args: "run blacken-docs --all-files"
 
   lint-docs:
     runs-on: ubuntu-latest
