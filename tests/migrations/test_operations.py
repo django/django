@@ -6674,7 +6674,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(obj_2.pk, obj_2.id)
 
     @skipUnlessDBFeature("supports_foreign_keys")
-    def test_delete_model_fails_on_fk_fix(self):
+    def test_delete_model_fails_on_fk(self):
         """
         DeleteModel should raise an IntegrityError if the model is still
         referenced by a ForeignKey.

@@ -47,9 +47,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self._drop_identity(model._meta.db_table, field.column)
         super().remove_field(model, field)
 
-    def delete_model(self, model):
+    def delete_model(self, model, *, cascade=False):
         # Run superclass action
-        super().delete_model(model)
+        super().delete_model(model, cascade=cascade)
         # Clean up manually created sequence.
         self.execute(
             """

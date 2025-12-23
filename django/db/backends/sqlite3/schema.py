@@ -278,7 +278,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if restore_pk_field:
             restore_pk_field.primary_key = True
 
-    def delete_model(self, model, handle_autom2m=True):
+    def delete_model(self, model, handle_autom2m=True, *, cascade=False):
         if handle_autom2m:
             super().delete_model(model)
         else:

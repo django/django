@@ -174,7 +174,7 @@ class SchemaTests(TransactionTestCase):
                 if connection.features.ignores_table_name_case:
                     tbl = tbl.lower()
                 if tbl in table_names:
-                    editor.delete_model(model)
+                    editor.delete_model(model, cascade=True)
                     table_names.remove(tbl)
             connection.enable_constraint_checking()
 
