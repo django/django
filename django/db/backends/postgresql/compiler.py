@@ -62,7 +62,9 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
             or any(any(hasattr(value, "as_sql") for value in row) for row in value_rows)
         ):
             return super().assemble_as_sql(fields, value_rows)
-        db_types = [field.db_type(self.connection) for field in fields]
+        # Manually remove parameters from `db_type` to ensure no data
+        # truncation takes place (e.g. varchar[] instead of varchar(50)[]).
+        db_types = [field.db_type(self.connection).split("(")[0] for field in fields]
         return InsertUnnest(["(%%s)::%s[]" % db_type for db_type in db_types]), [
             list(map(list, zip(*value_rows)))
         ]
