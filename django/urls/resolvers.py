@@ -344,7 +344,7 @@ class RoutePattern(CheckURLMixin):
 
         # For include() routes: prefix match ONLY, no kwargs
         if path.startswith(route):
-            return path[len(route) :], (), None
+            return path[len(route) :], (), {}
 
         return None
 

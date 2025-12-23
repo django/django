@@ -35,7 +35,9 @@ urlpatterns = [
         views.empty_view,
         name="regex_only_optional",
     ),
-    path("", include("urlpatterns.more_urls")),  # Removed kwargs
+    path("", include("urlpatterns.more_urls")),
+    path(
+        _("lazy/"), include([path("child/", views.empty_view, name="child")])
+    ),  # No str() wrapper!
     path("<lang>/<path:url>/", views.empty_view, name="lang-and-path"),
-    path(str(_("lazy/")), include([path("child/", views.empty_view, name="child")])),
 ]
