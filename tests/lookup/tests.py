@@ -1855,12 +1855,10 @@ class LookupQueryingTests(TestCase):
                     Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
                 )
 
-    def test_in_lookup_in_filter_text_field(self):
-        self.assertSequenceEqual(
-            Season.objects.filter(
-                In(F("nulled_text_field"), [F("nulled_text_field"), "special_value"])
-            ),
-            [self.s2],
+    def test_in_lookup_in_filter_expression_string(self):
+        self.assertCountEqual(
+            Season.objects.filter(In(F("year"), [F("year"), 2042])),
+            [self.s1, self.s2, self.s3],
         )
 
     def test_filter_lookup_lhs(self):
