@@ -1625,11 +1625,8 @@ class SQLCompiler:
             # Might fail for server-side cursors (e.g. connection closed)
             try:
                 cursor.close()
-            except Exception:
-                # If closing fails, surface only the
-                # original execute() exception.
+            except DatabaseError:
                 raise e from None
-            # If close() succeeds, re-raise normally.
             raise
 
         if result_type == ROW_COUNT:
