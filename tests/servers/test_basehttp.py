@@ -1,3 +1,4 @@
+import socketserver
 from io import BytesIO
 
 from django.core.handlers.wsgi import WSGIRequest
@@ -134,3 +135,102 @@ class WSGIServerTestCase(SimpleTestCase):
                         self.assertEqual(cm.records[0].getMessage(), msg)
                 finally:
                     server.server_close()
+
+
+class WSGIHeadRequestTests(SimpleTestCase):
+    def _build_server(self, app, threaded=True):
+        if threaded:
+            server_class = type(
+                "ThreadedStubServer",
+                (socketserver.ThreadingMixIn,),
+                {},
+            )
+            server = server_class()
+        else:
+            server = Stub()
+        server.base_environ = {}
+        server.get_app = lambda: app
+        return server
+
+    def _perform_request(self, method, app, threaded=True):
+        request_bytes = (f"{method} / HTTP/1.1\r\n" "Host: testserver\r\n\r\n").encode()
+        rfile = BytesIO(request_bytes)
+
+        class ResponseBuffer(BytesIO):
+            def close(self):
+                pass
+
+        wfile = ResponseBuffer()
+
+        def makefile(mode, *args, **kwargs):
+            if mode == "rb":
+                rfile.seek(0)
+                return rfile
+            if mode == "wb":
+                return wfile
+            raise AssertionError("Unexpected mode")
+
+        request = Stub(makefile=makefile)
+        server = self._build_server(app, threaded=threaded)
+        with self.assertLogs("django.server", "INFO"):
+            handler = WSGIRequestHandler(request, "127.0.0.1", server)
+        return handler, wfile.getvalue()
+
+    def test_head_suppresses_iterable_body(self):
+        def app(environ, start_response):
+            start_response("200 OK", [("Content-Length", "4"), ("ETag", '"abc"')])
+            return [b"body"]
+
+        handler, response = self._perform_request("HEAD", app)
+        headers, _, body = response.partition(b"\r\n\r\n")
+
+        self.assertIn(b"Content-Length: 4", headers)
+        self.assertIn(b'ETag: "abc"', headers)
+        self.assertNotIn(b"Transfer-Encoding", headers)
+        self.assertNotIn(b"Connection: close", headers)
+        self.assertEqual(body, b"")
+
+    def test_head_suppresses_write_body(self):
+        def app(environ, start_response):
+            write = start_response(
+                "200 OK", [("Content-Length", "4"), ("ETag", '"abc"')]
+            )
+            write(b"body")
+            return []
+
+        handler, response = self._perform_request("HEAD", app)
+        headers, _, body = response.partition(b"\r\n\r\n")
+
+        self.assertIn(b"Content-Length: 4", headers)
+        self.assertIn(b'ETag: "abc"', headers)
+        self.assertNotIn(b"Transfer-Encoding", headers)
+        self.assertNotIn(b"Connection: close", headers)
+        self.assertEqual(body, b"")
+
+    def test_head_without_content_length_closes_connection(self):
+        def app(environ, start_response):
+            start_response("200 OK", [("ETag", '"abc"')])
+            return [b"body"]
+
+        handler, response = self._perform_request("HEAD", app)
+        headers, _, body = response.partition(b"\r\n\r\n")
+
+        self.assertNotIn(b"Content-Length", headers)
+        self.assertIn(b"Connection: close", headers)
+        self.assertNotIn(b"Transfer-Encoding", headers)
+        self.assertEqual(body, b"")
+        self.assertTrue(handler.close_connection)
+
+    def test_get_retains_body(self):
+        def app(environ, start_response):
+            start_response("200 OK", [("Content-Length", "4"), ("ETag", '"abc"')])
+            return [b"body"]
+
+        handler, response = self._perform_request("GET", app)
+        headers, _, body = response.partition(b"\r\n\r\n")
+
+        self.assertIn(b"Content-Length: 4", headers)
+        self.assertIn(b'ETag: "abc"', headers)
+        self.assertNotIn(b"Transfer-Encoding", headers)
+        self.assertNotIn(b"Connection: close", headers)
+        self.assertEqual(body, b"body")

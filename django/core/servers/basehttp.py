@@ -120,6 +120,7 @@ class ServerHandler(simple_server.ServerHandler):
         shouldn't discard the data since the upstream servers usually do this.
         This fix applies only for testserver/runserver.
         """
+        self._head_request = environ.get("REQUEST_METHOD") == "HEAD"
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
@@ -129,7 +130,8 @@ class ServerHandler(simple_server.ServerHandler):
         )
 
     def cleanup_headers(self):
-        super().cleanup_headers()
+        if not self._head_request:
+            super().cleanup_headers()
         # HTTP/1.1 requires support for persistent connections. Send 'close' if
         # the content length is unknown to prevent clients from reusing the
         # connection.
@@ -142,6 +144,42 @@ class ServerHandler(simple_server.ServerHandler):
         # application sent the header.
         if self.headers.get("Connection") == "close":
             self.request_handler.close_connection = True
+
+    def write(self, data):
+        if type(data) is not bytes:
+            raise AssertionError("write() argument must be a bytes instance")
+
+        if self._head_request:
+            if not self.status:
+                raise AssertionError("write() before start_response()")
+            if not self.headers_sent:
+                self.send_headers()
+            return
+
+        super().write(data)
+
+    def finish_response(self):
+        if self._head_request:
+            try:
+                if not self.headers_sent:
+                    self.send_headers()
+            except Exception:
+                if hasattr(self.result, "close"):
+                    self.result.close()
+                raise
+            else:
+                self.close()
+            return
+
+        super().finish_response()
+
+    def send_headers(self):
+        if self._head_request:
+            transfer_encoding = self.headers.get("Transfer-Encoding")
+            if transfer_encoding and transfer_encoding.lower() == "chunked":
+                del self.headers["Transfer-Encoding"]
+
+        super().send_headers()
 
     def close(self):
         self.get_stdin().read()
