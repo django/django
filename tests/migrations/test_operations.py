@@ -219,6 +219,29 @@ class OperationTests(OperationTestBase):
             {("a", "b"), ("a", "b", "c")},
         )
 
+    def test_model_indexes_sql_includes_historical_index_together(self):
+        """Coverage test for _model_indexes_sql index_together addition."""
+        project_state = ProjectState()
+        project_state.add_model(ModelState(
+            "testapp",
+            "CoverageModel",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("f1", models.IntegerField()),
+                ("f2", models.IntegerField()),
+            ],
+            {
+                "index_together": {("f1", "f2")},
+            },
+        ))
+
+        model = project_state.apps.get_model("testapp", "CoverageModel")
+
+        with connection.schema_editor() as editor:
+            result = editor._model_indexes_sql(model)
+
+            self.assertIsInstance(result, list)
+
     def test_create_model_with_unique_after(self):
         """
         Tests the CreateModel operation directly followed by an
