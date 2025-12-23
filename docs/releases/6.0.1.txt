@@ -4,10 +4,13 @@ Django 6.0.1 release notes
 
 *Expected January 6, 2026*
 
-Django 6.0.1 fixes several bugs in 6.0.
+Django 6.0.1 fixes one data loss bug in Django 5.2 and several bugs in 6.0.
 
 Bugfixes
 ========
+
+* Fixed a bug in Django 5.2 where data exceeding ``max_length`` was silently
+  truncated by :meth:`.QuerySet.bulk_create` on PostgreSQL (:ticket:`33647`).
 
 * Fixed a regression in Django 6.0 where :ttag:`querystring` mishandled
   multi-value :class:`~django.http.QueryDict` keys, both by only preserving the
