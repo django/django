@@ -367,6 +367,9 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+* Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
+  if the management command isn't supported.
+
 :mod:`django.contrib.gis`
 -------------------------
 
