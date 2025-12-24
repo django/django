@@ -1,0 +1,26 @@
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #44b78b;
+    /* Django Green */
+    background: #fff;
+    border: 1px solid #44b78b;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.copy-button:hover {
+    opacity: 1;
+    background: #f0f0f0;
+}
+
+.copy-button.copied {
+    color: #fff;
+    background: #44b78b;
+}

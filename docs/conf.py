@@ -457,3 +457,15 @@ def version_github_linkcode_resolve(domain, info):
 
 
 linkcode_resolve = version_github_linkcode_resolve
+
+
+html_static_path = ['_static']
+
+html_js_files = [
+    'copybutton.js',
+]
+
+html_css_files = [
+    'copybutton.css',
+]
+
