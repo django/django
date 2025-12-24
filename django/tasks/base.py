@@ -43,11 +43,11 @@ class TaskResultStatus(TextChoices):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Task:
-    priority: int
     func: Callable[..., Any]  # The Task function.
-    backend: str
-    queue_name: str
-    run_after: datetime | None  # The earliest this Task will run.
+    priority: int = DEFAULT_TASK_PRIORITY
+    backend: str = DEFAULT_TASK_BACKEND_ALIAS
+    queue_name: str = DEFAULT_TASK_QUEUE_NAME
+    run_after: datetime | None = None  # The earliest this Task will run.
 
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
@@ -137,7 +137,7 @@ def task(function=None, **kwargs):
     if "run_after" in kwargs:
         raise TypeError(
             "run_after cannot be defined statically with the @task decorator. "
-            "Use .using(run_after=...) when enqueuing the task."
+            "Use .using(run_after=...) to set it dynamically."
         )
 
     backend = kwargs.get("backend", DEFAULT_TASK_BACKEND_ALIAS)
