@@ -131,24 +131,21 @@ class Task:
         return f"{self.func.__module__}.{self.func.__qualname__}"
 
 
-def task(
-    function=None,
-    *,
-    priority=DEFAULT_TASK_PRIORITY,
-    queue_name=DEFAULT_TASK_QUEUE_NAME,
-    backend=DEFAULT_TASK_BACKEND_ALIAS,
-    takes_context=False,
-):
+def task(function=None, **kwargs):
     from . import task_backends
+
+    if "run_after" in kwargs:
+        raise TypeError(
+            "run_after cannot be defined statically with the @task decorator. "
+            "Use .using(run_after=...) when enqueuing the task."
+        )
+
+    backend = kwargs.get("backend", DEFAULT_TASK_BACKEND_ALIAS)
 
     def wrapper(f):
         return task_backends[backend].task_class(
-            priority=priority,
             func=f,
-            queue_name=queue_name,
-            backend=backend,
-            takes_context=takes_context,
-            run_after=None,
+            **kwargs,
         )
 
     if function:
