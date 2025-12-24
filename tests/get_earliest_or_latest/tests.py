@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db.models import Avg
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Article, Comment, IndexErrorArticle, Person
 
@@ -265,3 +266,47 @@ class TestFirstLast(TestCase):
             qs.first()
         with self.assertRaisesMessage(TypeError, msg % "last"):
             qs.last()
+
+    def test_first_last_empty_order_by_deprecation(self):
+        a1 = Article.objects.create(
+            headline="Article 1",
+            pub_date=datetime(2006, 9, 10),
+            expire_date=datetime(2056, 9, 11),
+        )
+
+        # order_by() without arguments followed by first() triggers a
+        # deprecation warning.
+        msg_first = (
+            "Calling first() after order_by() with no arguments will stop "
+            "adding implicit 'pk' ordering in Django 7.0. Pass a field name "
+            "to order_by() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg_first):
+            result = Article.objects.order_by().first()
+        self.assertEqual(result, a1)
+
+        # order_by() without arguments followed by last() triggers a
+        # deprecation warning.
+        msg_last = (
+            "Calling last() after order_by() with no arguments will stop "
+            "adding implicit '-pk' ordering in Django 7.0. Pass a field name "
+            "to order_by() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg_last):
+            result = Article.objects.order_by().last()
+        self.assertEqual(result, a1)
+
+        # Explicit ordering does not trigger a deprecation warning.
+        result = Article.objects.order_by("pk").first()
+        self.assertEqual(result, a1)
+
+        result = Article.objects.order_by("pk").last()
+        self.assertEqual(result, a1)
+
+        # first()/last() without order_by() does not trigger a deprecation
+        # warning.
+        result = Article.objects.first()
+        self.assertEqual(result, a1)
+
+        result = Article.objects.last()
+        self.assertEqual(result, a1)

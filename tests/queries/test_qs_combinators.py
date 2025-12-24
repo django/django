@@ -416,7 +416,7 @@ class QuerySetSetOperationTests(TestCase):
         base_qs = Author.objects.order_by()
         qs1 = base_qs.filter(name="a1")
         qs2 = base_qs.filter(name="a2")
-        self.assertEqual(qs1.union(qs2).first(), a1)
+        self.assertEqual(qs1.union(qs2).order_by("pk").first(), a1)
 
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
