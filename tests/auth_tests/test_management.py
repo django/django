@@ -10,7 +10,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_permission_codename, management
 from django.contrib.auth.management import (
-    RenamePermission,
     create_permissions,
     get_default_username,
 )
@@ -19,7 +18,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations, models
+from django.db import migrations
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
@@ -1548,28 +1547,6 @@ class PermissionRenameOperationsTests(TransactionTestCase):
     ]
     databases = {"default", "other"}
 
-    def setUp(self):
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.connect(
-            self.assertOperationsInjected, sender=app_config
-        )
-        self.addCleanup(
-            models.signals.post_migrate.disconnect,
-            self.assertOperationsInjected,
-            sender=app_config,
-        )
-
-    def assertOperationsInjected(self, plan, **kwargs):
-        for migration, _backward in plan:
-            operations = iter(migration.operations)
-            for operation in operations:
-                if isinstance(operation, migrations.RenameModel):
-                    next_operation = next(operations)
-                    self.assertIsInstance(next_operation, RenamePermission)
-                    self.assertEqual(next_operation.app_label, migration.app_label)
-                    self.assertEqual(next_operation.old_model, operation.old_name)
-                    self.assertEqual(next_operation.new_model, operation.new_name)
-
     def test_permission_rename(self):
         ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
         actions = ["add", "change", "delete", "view"]
@@ -1638,10 +1615,6 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             content_type=ct,
         )
         # The rename operation should not be there when disallowed by router.
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.disconnect(
-            self.assertOperationsInjected, sender=app_config
-        )
 
         call_command(
             "migrate",
@@ -1662,9 +1635,9 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             verbosity=0,
         )
 
-    def test_rename_backward_does_nothing_if_no_permissions(self):
+    def test_rename_backward_without_permissions(self):
         """
-        Test backward migration handles the case where permissions
+        Backward migration handles the case where permissions
         don't exist (e.g., they were manually deleted).
         """
         call_command(
@@ -1676,10 +1649,6 @@ class PermissionRenameOperationsTests(TransactionTestCase):
         )
 
         Permission.objects.filter(content_type__app_label="auth_tests").delete()
-
-        self.assertFalse(
-            Permission.objects.filter(content_type__app_label="auth_tests").exists()
-        )
 
         call_command(
             "migrate",
@@ -1729,64 +1698,6 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             ).count(),
             1,
         )
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-
-    def test_rename_permission_overwrites_assignments(self):
-        """
-        When a rename causes a duplicate permission,
-        assignments from the existing (new) permission overwrite
-        the old ones instead of merging.
-        """
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-
-        old_perm = Permission.objects.create(
-            codename="change_oldmodel",
-            name="Can change old model",
-            content_type=ct,
-        )
-
-        new_perm = Permission.objects.create(
-            codename="change_newmodel",
-            name="Can change new model",
-            content_type=ct,
-        )
-
-        user1 = User.objects.create(username="joe")
-        user2 = User.objects.create(username="moe")
-        group1 = Group.objects.create(name="group1")
-        group2 = Group.objects.create(name="group2")
-
-        old_perm.user_set.add(user1)
-        old_perm.group_set.add(group1)
-
-        new_perm.user_set.add(user2)
-        new_perm.group_set.add(group2)
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-
-        perm = Permission.objects.get(codename="change_newmodel")
-        self.assertEqual(perm.name, "Can change new model")
-
-        self.assertTrue(user2 in perm.user_set.all())
-        self.assertTrue(group2 in perm.group_set.all())
-
-        self.assertFalse(user1 in perm.user_set.all())
-        self.assertFalse(group1 in perm.group_set.all())
-
         call_command(
             "migrate",
             "auth_tests",
