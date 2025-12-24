@@ -10,7 +10,6 @@ all about the internals of models in order to get the information it needs.
 import copy
 import difflib
 import functools
-import inspect
 import sys
 import warnings
 from collections import Counter, namedtuple
@@ -44,7 +43,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -52,12 +51,12 @@ from django.utils.tree import Node
 __all__ = ["Query", "RawQuery"]
 
 # RemovedInDjango70Warning: When the deprecation ends, replace with:
-# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs
-# or inline SQL comments are forbidden in column aliases.
-# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|--|/\*|\*/")
-# Quotation marks ('"`[]), whitespace characters, semicolons, or inline
+# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs,
+# hashes, or inline SQL comments are forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|#|--|/\*|\*/")
+# Quotation marks ('"`[]), whitespace characters, semicolons, hashes, or inline
 # SQL comments are forbidden in column aliases.
-FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|#|--|/\*|\*/")
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -535,7 +534,8 @@ class Query(BaseExpression):
             # Queries with distinct_fields need ordering and when a limit is
             # applied we must take the slice from the ordered query. Otherwise
             # no need for ordering.
-            inner_query.clear_ordering(force=False)
+            if inner_query.orderby_issubset_groupby:
+                inner_query.clear_ordering(force=False)
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
@@ -1216,23 +1216,19 @@ class Query(BaseExpression):
     def check_alias(self, alias):
         # RemovedInDjango70Warning: When the deprecation ends, remove.
         if "%" in alias:
-            if "aggregate" in {frame.function for frame in inspect.stack()}:
-                stacklevel = 5
-            else:
-                # annotate(), alias(), and values().
-                stacklevel = 6
             warnings.warn(
                 "Using percent signs in a column alias is deprecated.",
-                stacklevel=stacklevel,
                 category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
             )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
-                "Column aliases cannot contain whitespace characters, quotation marks, "
+                "Column aliases cannot contain whitespace characters, hashes, "
                 # RemovedInDjango70Warning: When the deprecation ends, replace
                 # with:
-                # "semicolons, percent signs, or SQL comments."
-                "semicolons, or SQL comments."
+                # "quotation marks, semicolons, percent signs, or SQL "
+                # "comments."
+                "quotation marks, semicolons, or SQL comments."
             )
 
     def add_annotation(self, annotation, alias, select=True):
@@ -1249,12 +1245,11 @@ class Query(BaseExpression):
 
     @property
     def _subquery_fields_len(self):
-        if self.has_select_fields:
-            return sum(
-                len(self.model._meta.pk_fields) if field == "pk" else 1
-                for field in self.selected
-            )
-        return len(self.model._meta.pk_fields)
+        if not self.has_select_fields or not self.select:
+            return len(self.model._meta.pk_fields)
+        return len(self.select) + sum(
+            len(expr.targets) - 1 for expr in self.select if isinstance(expr, ColPairs)
+        )
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
@@ -1824,7 +1819,7 @@ class Query(BaseExpression):
                     available = sorted(
                         [
                             *get_field_names_from_opts(opts),
-                            *self.annotation_select,
+                            *self.annotations,
                             *self._filtered_relations,
                         ]
                     )
@@ -2343,6 +2338,33 @@ class Query(BaseExpression):
             self.order_by += ordering
         else:
             self.default_ordering = False
+
+    @property
+    def orderby_issubset_groupby(self):
+        if self.extra_order_by:
+            # Raw SQL from extra(order_by=...) can't be reliably compared
+            # against resolved OrderBy/Col expressions. Treat as not a subset.
+            return False
+        if self.group_by in (None, True):
+            # There is either no aggregation at all (None), or the group by
+            # is generated automatically from model fields (True), in which
+            # case the order by is necessarily a subset of them.
+            return True
+        if not self.order_by:
+            # Although an empty set is always a subset, there's no point in
+            # clearing ordering when there isn't any. Avoid the clone() below.
+            return True
+        # Don't pollute the original query (might disrupt joins).
+        q = self.clone()
+        order_by_set = {
+            (
+                order_by.resolve_expression(q)
+                if hasattr(order_by, "resolve_expression")
+                else F(order_by).resolve_expression(q)
+            )
+            for order_by in q.order_by
+        }
+        return order_by_set.issubset(self.group_by)
 
     def clear_ordering(self, force=False, clear_default=True):
         """

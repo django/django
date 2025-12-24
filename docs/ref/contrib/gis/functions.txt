@@ -621,10 +621,15 @@ Miscellaneous
 
 .. class:: IsEmpty(expr)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__,
+SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is an empty
 geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
+
+.. versionchanged:: 6.1
+
+    SpatiaLite support was added.
 
 ``IsValid``
 -----------
@@ -663,6 +668,19 @@ Accepts a geographic field or expression and returns its geometry type.
 
 Accepts a single geographic field or expression and returns the memory size
 (number of bytes) that the geometry field takes.
+
+``NumDimensions``
+-----------------
+
+.. versionadded:: 6.1
+
+.. class:: NumDimensions(expression, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Accepts a single geometry field or expression and returns the number of
+dimensions used by the geometry.
 
 ``NumGeometries``
 -----------------

@@ -1,0 +1,38 @@
+==========================
+Django 5.2.8 release notes
+==========================
+
+*November 5, 2025*
+
+Django 5.2.8 fixes one security issue with severity "high", one security issue
+with severity "moderate", and several bugs in 5.2.7. It also adds compatibility
+with Python 3.14.
+
+CVE-2025-64458: Potential denial-of-service vulnerability in ``HttpResponseRedirect`` and ``HttpResponsePermanentRedirect`` on Windows
+======================================================================================================================================
+
+Python's :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
+Windows. As a consequence, :class:`~django.http.HttpResponseRedirect`,
+:class:`~django.http.HttpResponsePermanentRedirect`, and the shortcut
+:func:`redirect() <django.shortcuts.redirect>` were subject to a potential
+denial-of-service attack via certain inputs with a very large number of Unicode
+characters (follow up to :cve:`2025-27556`).
+
+CVE-2025-64459: Potential SQL injection via ``_connector`` keyword argument
+===========================================================================
+
+:meth:`.QuerySet.filter`, :meth:`~.QuerySet.exclude`, :meth:`~.QuerySet.get`,
+and :class:`~.Q` were subject to SQL injection using a suitably crafted
+dictionary, with dictionary expansion, as the ``_connector`` argument.
+
+Bugfixes
+========
+
+* Added compatibility for ``oracledb`` 3.4.0 (:ticket:`36646`).
+
+* Fixed a bug in Django 5.2 where ``QuerySet.first()`` and ``QuerySet.last()``
+  raised an error on querysets performing aggregation that selected all fields
+  of a composite primary key (:ticket:`36648`).
+
+* Fixed a bug in Django 5.2 where proxy models having a ``CompositePrimaryKey``
+  incorrectly raised a ``models.E042`` system check error (:ticket:`36704`).

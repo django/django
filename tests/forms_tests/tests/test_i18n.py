@@ -59,14 +59,14 @@ class FormsI18nTests(SimpleTestCase):
         )
         self.assertHTMLEqual(
             f["field_1"].legend_tag(),
-            '<legend for="id_field_1">field_1:</legend>',
+            "<legend>field_1:</legend>",
         )
         self.assertHTMLEqual(
             f["field_2"].label_tag(), '<label for="field_2_id">field_2:</label>'
         )
         self.assertHTMLEqual(
             f["field_2"].legend_tag(),
-            '<legend for="field_2_id">field_2:</legend>',
+            "<legend>field_2:</legend>",
         )
 
     def test_non_ascii_choices(self):

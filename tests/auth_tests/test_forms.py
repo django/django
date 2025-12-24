@@ -350,6 +350,9 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
 
+    def test_user_creation_form_class_getitem(self):
+        self.assertIs(BaseUserCreationForm["MyCustomUser"], BaseUserCreationForm)
+
 
 class CustomUserCreationFormTest(TestDataMixin, TestCase):
 

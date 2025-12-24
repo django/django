@@ -12,13 +12,14 @@
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 # Raphael Michel <mail@raphaelmichel.de>, 2021
 # Ronny Vedrilla, 2025
+# Sarah Boyce, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
-"Last-Translator: Ronny Vedrilla, 2025\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Sarah Boyce, 2025\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -380,7 +381,7 @@ msgstr ""
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
-msgstr ""
+msgstr "Bitte eine gültige %(protocol)s-Adresse eingeben."
 
 msgid "IPv4"
 msgstr "IPv4"
@@ -495,7 +496,9 @@ msgstr "und"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr "%(model_name)s mit diesem %(field_labels)s existiert bereits."
+msgstr ""
+"%(model_name)s mit diesem Wert für das Feld %(field_labels)s existiert "
+"bereits."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
@@ -513,7 +516,9 @@ msgstr "Dieses Feld darf nicht leer sein."
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s mit diesem %(field_label)s existiert bereits."
+msgstr ""
+"%(model_name)s mit diesem Wert für das Feld %(field_label)s existiert "
+"bereits."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or
 #. 'month'. Eg: "Title must be unique for pub_date year"

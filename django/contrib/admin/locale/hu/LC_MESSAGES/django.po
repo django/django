@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
 "Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
@@ -335,11 +335,8 @@ msgstr ""
 "Hiba történt. Az oldal kezelőjét e-mailben értesítettük, a hiba rövidesen "
 "javítva lesz. Köszönjük a türelmet."
 
-msgid "Run the selected action"
-msgstr "Kiválasztott művelet futtatása"
-
-msgid "Go"
-msgstr "Mehet"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "Kattintson ide több oldalnyi objektum kiválasztásához"
@@ -404,10 +401,10 @@ msgid ""
 msgstr ""
 
 msgid "Disable password-based authentication"
-msgstr ""
+msgstr "Jelszavas bejelentkezés letiltása"
 
 msgid "Enable password-based authentication"
-msgstr ""
+msgstr "Jelszavas bejelentkezés engedélyezése"
 
 msgid "Skip to main content"
 msgstr "Ugrás az oldal fő részéhez"
@@ -446,6 +443,9 @@ msgstr "Számok megjelenítése"
 msgid "Clear all filters"
 msgstr "Összes szűrő törlése"
 
+msgid "Save"
+msgstr "Mentés"
+
 msgid "Remove from sorting"
 msgstr "Eltávolítás a rendezésből"
 
@@ -467,29 +467,22 @@ msgstr "Téma váltás (jelenleg: sötét)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"\"%(escaped_object)s\" %(object_name)s törlése a kapcsolódó objektumok "
-"törlését is eredményezi, de a hozzáférése nem engedi a következő típusú "
-"objektumok törlését:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"\"%(escaped_object)s\" %(object_name)s törlése az alábbi kapcsolódó "
-"objektumok törlését is maga után vonja:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Biztos hogy törli a következőt: \"%(escaped_object)s\" (típus: "
-"%(object_name)s)? A összes további kapcsolódó elem is törlődik:"
 
 msgid "Objects"
 msgstr "Objektumok"
@@ -598,6 +591,10 @@ msgstr "Felhasználó"
 msgid "Action"
 msgstr "Művelet"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "bejegyzés"
@@ -610,14 +607,19 @@ msgstr ""
 "Ennek az objektumnak nincs változás naplója. Valószínűleg nem az admin "
 "felületen keresztül lett rögzítve."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Mutassa mindet"
 
-msgid "Save"
-msgstr "Mentés"
-
 msgid "Popup closing…"
 msgstr "A popup bezáródik…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Keresés"

@@ -30,7 +30,7 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.duration import duration_microseconds, duration_string
+from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
@@ -155,8 +155,6 @@ class Field(RegisterLookupMixin):
         "error_messages",
         "help_text",
         "limit_choices_to",
-        # Database-level options are not supported, see #21961.
-        "on_delete",
         "related_name",
         "related_query_name",
         "validators",
@@ -318,11 +316,13 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        if not isinstance(self.choices, Iterable) or isinstance(self.choices, str):
+        if not isinstance(self.choices, Iterable) or isinstance(
+            self.choices, (str, set, frozenset)
+        ):
             return [
                 checks.Error(
-                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
-                    "(e.g. a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
                     obj=self,
                     id="fields.E004",
                 )
@@ -1727,54 +1727,84 @@ class DecimalField(Field):
         return errors
 
     def _check_decimal_places(self):
-        try:
-            decimal_places = int(self.decimal_places)
-            if decimal_places < 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'decimal_places' attribute.",
-                    obj=self,
-                    id="fields.E130",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'decimal_places' must be a non-negative integer.",
-                    obj=self,
-                    id="fields.E131",
-                )
-            ]
+        if self.decimal_places is None:
+            if (
+                not connection.features.supports_no_precision_decimalfield
+                and "supports_no_precision_decimalfield"
+                not in self.model._meta.required_db_features
+            ):
+                return [
+                    checks.Error(
+                        "DecimalFields must define a 'decimal_places' attribute.",
+                        obj=self,
+                        id="fields.E130",
+                    )
+                ]
+            elif self.max_digits is not None:
+                return [
+                    checks.Error(
+                        "DecimalField’s max_digits and decimal_places must both "
+                        "be defined or both omitted.",
+                        obj=self,
+                        id="fields.E135",
+                    ),
+                ]
         else:
-            return []
+            try:
+                decimal_places = int(self.decimal_places)
+                if decimal_places < 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'decimal_places' must be a non-negative integer.",
+                        obj=self,
+                        id="fields.E131",
+                    )
+                ]
+        return []
 
     def _check_max_digits(self):
-        try:
-            max_digits = int(self.max_digits)
-            if max_digits <= 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'max_digits' attribute.",
-                    obj=self,
-                    id="fields.E132",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'max_digits' must be a positive integer.",
-                    obj=self,
-                    id="fields.E133",
-                )
-            ]
+        if self.max_digits is None:
+            if (
+                not connection.features.supports_no_precision_decimalfield
+                and "supports_no_precision_decimalfield"
+                not in self.model._meta.required_db_features
+            ):
+                return [
+                    checks.Error(
+                        "DecimalFields must define a 'max_digits' attribute.",
+                        obj=self,
+                        id="fields.E132",
+                    )
+                ]
+            elif self.decimal_places is not None:
+                return [
+                    checks.Error(
+                        "DecimalField’s max_digits and decimal_places must both "
+                        "be defined or both omitted.",
+                        obj=self,
+                        id="fields.E135",
+                    ),
+                ]
         else:
-            return []
+            try:
+                max_digits = int(self.max_digits)
+                if max_digits <= 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'max_digits' must be a positive integer.",
+                        obj=self,
+                        id="fields.E133",
+                    )
+                ]
+        return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
+        if self.decimal_places is None or self.max_digits is None:
+            return []
         if int(self.decimal_places) > int(self.max_digits):
             return [
                 checks.Error(
@@ -1890,11 +1920,7 @@ class DurationField(Field):
         )
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if connection.features.has_native_duration_field:
-            return value
-        if value is None:
-            return None
-        return duration_microseconds(value)
+        return connection.ops.adapt_durationfield_value(value)
 
     def get_db_converters(self, connection):
         converters = []
@@ -2816,10 +2842,14 @@ class AutoFieldMixin:
         pass
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
-            value = connection.ops.validate_autopk_value(value)
-        return value
+        return value if prepared else self.get_prep_value(value)
+
+    def get_db_prep_save(self, value, connection):
+        if hasattr(value, "as_sql"):
+            return value
+        value = self.get_prep_value(value)
+        value = connection.ops.validate_autopk_value(value)
+        return self.get_db_prep_value(value, connection=connection, prepared=True)
 
     def contribute_to_class(self, cls, name, **kwargs):
         if cls._meta.auto_field:

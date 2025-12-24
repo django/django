@@ -228,6 +228,13 @@ class SQLCompiler:
             ]
         return expressions
 
+    @classmethod
+    def get_select_from_parent(cls, klass_info):
+        for ki in klass_info["related_klass_infos"]:
+            if ki["from_parent"]:
+                ki["select_fields"] = klass_info["select_fields"] + ki["select_fields"]
+            cls.get_select_from_parent(ki)
+
     def get_select(self, with_col_aliases=False):
         """
         Return three values:
@@ -300,15 +307,7 @@ class SQLCompiler:
             related_klass_infos = self.get_related_selections(select, select_mask)
             klass_info["related_klass_infos"] = related_klass_infos
 
-            def get_select_from_parent(klass_info):
-                for ki in klass_info["related_klass_infos"]:
-                    if ki["from_parent"]:
-                        ki["select_fields"] = (
-                            klass_info["select_fields"] + ki["select_fields"]
-                        )
-                    get_select_from_parent(ki)
-
-            get_select_from_parent(klass_info)
+            self.get_select_from_parent(klass_info)
 
         ret = []
         col_idx = 1
@@ -554,6 +553,14 @@ class SQLCompiler:
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
         """
+        if (
+            self.connection.features.prohibits_dollar_signs_in_column_aliases
+            and "$" in name
+        ):
+            raise ValueError(
+                "Dollar signs are not permitted in column aliases on "
+                f"{self.connection.display_name}."
+            )
         if name in self.quote_cache:
             return self.quote_cache[name]
         if (
@@ -1704,8 +1711,8 @@ class SQLInsertCompiler(SQLCompiler):
             sql, params = "%s", [val]
 
         # The following hook is only used by Oracle Spatial, which sometimes
-        # needs to yield 'NULL' and [] as its placeholder and params instead
-        # of '%s' and [None]. The 'NULL' placeholder is produced earlier by
+        # needs to yield 'NULL' and () as its placeholder and params instead
+        # of '%s' and (None,). The 'NULL' placeholder is produced earlier by
         # OracleOperations.get_geom_placeholder(). The following line removes
         # the corresponding None parameter. See ticket #10888.
         params = self.connection.ops.modify_insert_params(sql, params)
@@ -2020,6 +2027,9 @@ class SQLDeleteCompiler(SQLCompiler):
 
 
 class SQLUpdateCompiler(SQLCompiler):
+    returning_fields = None
+    returning_params = ()
+
     def as_sql(self):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -2087,6 +2097,15 @@ class SQLUpdateCompiler(SQLCompiler):
             params = []
         else:
             result.append("WHERE %s" % where)
+        if self.returning_fields:
+            # Skip empty r_sql to allow subclasses to customize behavior for
+            # 3rd party backends. Refs #19096.
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
+                self.returning_fields
+            )
+            if r_sql:
+                result.append(r_sql)
+                params.extend(self.returning_params)
         return " ".join(result), tuple(update_params + params)
 
     def execute_sql(self, result_type):
@@ -2109,6 +2128,38 @@ class SQLUpdateCompiler(SQLCompiler):
                 row_count = aux_row_count
                 is_empty = False
         return row_count
+
+    def execute_returning_sql(self, returning_fields):
+        """
+        Execute the specified update and return rows of the returned columns
+        associated with the specified returning_field if the backend supports
+        it.
+        """
+        if self.query.get_related_updates():
+            raise NotImplementedError(
+                "Update returning is not implemented for queries with related updates."
+            )
+
+        if (
+            not returning_fields
+            or not self.connection.features.can_return_rows_from_update
+        ):
+            row_count = self.execute_sql(ROW_COUNT)
+            return [()] * row_count
+
+        self.returning_fields = returning_fields
+        with self.connection.cursor() as cursor:
+            sql, params = self.as_sql()
+            cursor.execute(sql, params)
+            rows = self.connection.ops.fetch_returned_rows(
+                cursor, self.returning_params
+            )
+        opts = self.query.get_meta()
+        cols = [field.get_col(opts.db_table) for field in self.returning_fields]
+        converters = self.get_converters(cols)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+        return list(rows)
 
     def pre_sql_setup(self):
         """

@@ -147,6 +147,15 @@ The functions defined in this module share the following properties:
     ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or PostgreSQL's
     day-time interval format (e.g. ``3 days 04:05:06``).
 
+    .. admonition:: Years and months not supported
+
+        ISO 8601 years (``Y``) and months (``M``) are unsupported as they
+        cannot be represented by :class:`~datetime.timedelta`.
+
+    .. versionchanged:: 6.1
+
+        ISO 8601 duration parsing now supports weeks (``PnW``).
+
 ``django.utils.decorators``
 ===========================
 
@@ -338,8 +347,6 @@ compatibility
 ``Stylesheet``
 --------------
 
-.. versionadded:: 5.2
-
 .. class:: Stylesheet(url, mimetype="", media="screen")
 
     Represents an RSS stylesheet.
@@ -383,10 +390,6 @@ compatibility
         * ``stylesheets`` should be a sequence of either strings or
           :class:`Stylesheet` instances.
 
-        .. versionchanged:: 5.2
-
-            The ``stylesheets`` argument was added.
-
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
         Adds an item to the feed. All args are expected to be strings except
@@ -407,8 +410,6 @@ compatibility
         Called from ``write()``.
 
     .. method:: add_stylesheets(self, handler)
-
-        .. versionadded:: 5.2
 
         Add stylesheet information to the document.
         Called from ``write()``.
@@ -719,10 +720,6 @@ escaping HTML.
             '<li data-id="{id}">{id} {title}</li>',
             ({"id": b.id, "title": b.title} for b in books),
         )
-
-    .. versionchanged:: 5.2
-
-        Support for mappings in ``args_generator`` was added.
 
 .. function:: json_script(value, element_id=None, encoder=None)
 

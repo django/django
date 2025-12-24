@@ -1,5 +1,5 @@
 from .article import Article, ArticleIdea, ArticleTag, ArticleTranslation, NewsArticle
-from .customers import Address, Contact, Customer
+from .customers import Address, Contact, Customer, CustomerTab
 from .empty_join import SlugPage
 from .person import Country, Friendship, Group, Membership, Person
 
@@ -12,6 +12,7 @@ __all__ = [
     "Contact",
     "Country",
     "Customer",
+    "CustomerTab",
     "Friendship",
     "Group",
     "Membership",

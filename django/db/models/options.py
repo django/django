@@ -100,6 +100,13 @@ class Options:
         "managers_map",
         "base_manager",
         "default_manager",
+        "db_returning_fields",
+        "_property_names",
+        "pk_fields",
+        "total_unique_constraints",
+        "all_parents",
+        "swapped",
+        "verbose_name_raw",
     }
     REVERSE_PROPERTIES = {"related_objects", "fields_map", "_relation_tree"}
 

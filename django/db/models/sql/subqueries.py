@@ -92,10 +92,10 @@ class UpdateQuery(Query):
                 raise FieldError(
                     "Composite primary key fields must be updated individually."
                 )
-            if not field.concrete or (field.is_relation and field.many_to_many):
+            if not field.concrete:
                 raise FieldError(
-                    "Cannot update model field %r (only non-relations and "
-                    "foreign keys permitted)." % field
+                    "Cannot update model field %r (only concrete fields are permitted)."
+                    % field
                 )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)

@@ -2874,8 +2874,6 @@ is linked to the document in ``{% block dark-mode-vars %}``.
 ``extrabody`` block
 ===================
 
-.. versionadded:: 5.2
-
 You can add custom HTML, JavaScript, or other content to appear just before the
 closing ``</body>`` tag of templates that extend ``admin/base.html`` by
 extending the ``extrabody`` block. For example, if you want an alert to appear

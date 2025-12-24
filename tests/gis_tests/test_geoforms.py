@@ -507,7 +507,6 @@ class GeometryWidgetTests(SimpleTestCase):
                         "map_srid": 4326,
                         "geom_name": "Geometry",
                         "geom_type": "GEOMETRY",
-                        "display_raw": False,
                     },
                     "name": "name",
                     "template_name": "",

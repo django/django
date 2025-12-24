@@ -289,9 +289,10 @@ this handler to your upload handlers like this::
 
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
 
-You'd probably want to use ``list.insert()`` in this case (instead of
-``append()``) because a progress bar handler would need to run *before* any
-other handlers. Remember, the upload handlers are processed in order.
+Using ``list.insert()``, as shown above, ensures that the progress bar handler
+is placed at the beginning of the list. Since upload handlers are executed in
+order, this placement guarantees that the progress bar handler runs before the
+default handlers, allowing it to track progress across the entire upload.
 
 If you want to replace the upload handlers completely, you can assign a new
 list::

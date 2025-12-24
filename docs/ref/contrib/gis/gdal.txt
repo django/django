@@ -600,20 +600,14 @@ coordinate transformation:
 
     .. attribute:: has_curve
 
-    .. versionadded:: 5.2
-
     A boolean indicating if this geometry is or contains a curve geometry.
 
     .. method:: get_linear_geometry
-
-    .. versionadded:: 5.2
 
     Returns a linear version of the geometry. If no conversion can be made, the
     original geometry is returned.
 
     .. method:: get_curve_geometry
-
-    .. versionadded:: 5.2
 
     Returns a curved version of the geometry. If no conversion can be made, the
     original geometry is returned.

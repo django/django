@@ -2,25 +2,26 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# coby2023t, 2024-2025
+# yubike, 2024-2025
 # Eric Ho <eric913@gmail.com>, 2013
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # 0a3cb7bfd0810218facdfb511e592a6d_8d19d07 <c136e508049103f37d35b6c3314e9b1d_5225>, 2011
+# Natalia, 2025
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# coby2023t, 2024
+# yubike, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: coby2023t, 2024-2025\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Natalia, 2025\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -842,7 +843,7 @@ msgstr "否"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "是、否、也許"
+msgstr "是,否,也許"
 
 #, python-format
 msgid "%(size)d byte"

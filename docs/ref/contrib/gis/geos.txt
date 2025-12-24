@@ -712,7 +712,7 @@ Other Properties & Methods
     the input vertices. If the geometry is already valid, it is returned
     untouched. This is similar to the
     :class:`~django.contrib.gis.db.models.functions.MakeValid` database
-    function. Requires GEOS 3.8.
+    function.
 
 .. method:: GEOSGeometry.normalize(clone=False)
 

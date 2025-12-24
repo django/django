@@ -5,7 +5,7 @@
 # Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Huanqun Yang, 2022
-# jack yang, 2023
+# sunfkny, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -21,6 +21,7 @@
 # Suntravel Chris <chrisfromcn@gmail.com>, 2019
 # Wentao Han <wentao.han@gmail.com>, 2018,2020
 # xuyi wang <xuyi.wg@gmail.com>, 2018
+# DWXXX, 2025
 # yf zhan <daxian12345@gmail.com>, 2018
 # dykai <yingkaidang@gmail.com>, 2019
 # ced773123cfad7b4e8b79ca80f736af9, 2012
@@ -35,9 +36,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: 千百度, 2024\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: DWXXX, 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -58,8 +59,8 @@ msgstr "成功删除了 %(count)d 个 %(items)s"
 msgid "Cannot delete %(name)s"
 msgstr "无法删除 %(name)s"
 
-msgid "Are you sure?"
-msgstr "你确定吗？"
+msgid "Delete multiple objects"
+msgstr "删除多个对象"
 
 msgid "Administration"
 msgstr "管理"
@@ -279,6 +280,9 @@ msgstr[0] "选中了 %(total_count)s 个"
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 个中 0 个被选"
 
+msgid "Delete"
+msgstr "删除"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "变更历史： %s"
@@ -339,11 +343,8 @@ msgstr ""
 "发生了错误，已经通过电子邮件报告给了网站管理员。我们会尽快修复，感谢您的耐心"
 "等待。"
 
-msgid "Run the selected action"
-msgstr "运行选中的动作"
-
-msgid "Go"
-msgstr "执行"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "点击此处选择所有页面中包含的对象。"
@@ -362,6 +363,15 @@ msgstr "条形导航"
 msgid "Models in the %(name)s application"
 msgstr "在应用程序 %(name)s 中的模型"
 
+msgid "Model name"
+msgstr "型号名称"
+
+msgid "Add link"
+msgstr "增加连接"
+
+msgid "Change or view list link"
+msgstr "更改或查看清单连接"
+
 msgid "Add"
 msgstr "增加"
 
@@ -371,13 +381,11 @@ msgstr "查看"
 msgid "You don’t have permission to view or edit anything."
 msgstr "你没有查看或编辑的权限。"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr "输入用户名和密码后，你将能够编辑更多的用户选项。"
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "创建用户后，你可以编辑更多的用户选项。"
 
-msgid "Enter a username and password."
-msgstr "输入用户名和密码"
+msgid "Error:"
+msgstr "错误："
 
 msgid "Change password"
 msgstr "修改密码"
@@ -441,6 +449,9 @@ msgstr "显示计数"
 msgid "Clear all filters"
 msgstr "清除所有筛选"
 
+msgid "Save"
+msgstr "保存"
+
 msgid "Remove from sorting"
 msgstr "删除排序"
 
@@ -460,32 +471,24 @@ msgstr "切换主题（当前主题：浅色）"
 msgid "Toggle theme (current theme: dark)"
 msgstr "切换主题（当前主题：深色）"
 
-msgid "Delete"
-msgstr "删除"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"删除 %(object_name)s  '%(escaped_object)s' 会导致删除相关的对象，但你的帐号无"
-"权删除下列类型的对象："
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"要删除 %(object_name)s '%(escaped_object)s', 将要求删除以下受保护的相关对象:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"你确认想要删除 %(object_name)s \"%(escaped_object)s\"？ 下列所有相关的项目都"
-"将被删除："
 
 msgid "Objects"
 msgstr "对象"
@@ -495,9 +498,6 @@ msgstr "是的，我确定"
 
 msgid "No, take me back"
 msgstr "不，返回"
-
-msgid "Delete multiple objects"
-msgstr "删除多个对象"
 
 #, python-format
 msgid ""
@@ -569,8 +569,8 @@ msgstr ""
 "您当前以%(username)s登录，但是没有这个页面的访问权限。您想使用另外一个账号登"
 "录吗？"
 
-msgid "Forgotten your password or username?"
-msgstr "忘记了您的密码或用户名？"
+msgid "Forgotten your login credentials?"
+msgstr "已忘记你的登录凭证？"
 
 msgid "Toggle navigation"
 msgstr "切换导航"
@@ -593,6 +593,10 @@ msgstr "用户"
 msgid "Action"
 msgstr "动作"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "条目"
@@ -602,14 +606,19 @@ msgid ""
 "admin site."
 msgstr "此对象没有修改历史。它可能不是通过管理站点添加的。"
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "显示全部"
 
-msgid "Save"
-msgstr "保存"
-
 msgid "Popup closing…"
 msgstr "弹窗关闭中..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "搜索"
@@ -722,8 +731,8 @@ msgstr "你收到这封邮件是因为你请求重置你在网站 %(site_name)s�
 msgid "Please go to the following page and choose a new password:"
 msgstr "请访问该页面并选择一个新密码："
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "提醒一下，你的用户名是："
+msgid "In case you’ve forgotten, you are:"
+msgstr "以防你已经忘记，你是："
 
 msgid "Thanks for using our site!"
 msgstr "感谢使用我们的站点！"

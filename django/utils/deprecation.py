@@ -18,7 +18,7 @@ def django_file_prefixes():
     return (os.path.dirname(file),)
 
 
-class RemovedInDjango61Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
@@ -26,7 +26,6 @@ class RemovedInDjango70Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango61Warning
 RemovedAfterNextVersionWarning = RemovedInDjango70Warning
 
 

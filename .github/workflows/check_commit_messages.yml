@@ -8,25 +8,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   check-commit-prefix:
     if: startsWith(github.event.pull_request.base.ref, 'stable/')
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Calculate commit prefix
         id: vars
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
         run: |
-          BASE="${{ github.event.pull_request.base.ref }}"
           echo "BASE=$BASE" >> $GITHUB_ENV
           VERSION="${BASE#stable/}"
           echo "prefix=[$VERSION]" >> $GITHUB_OUTPUT
 
       - name: Check PR title prefix
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          PREFIX: ${{ steps.vars.outputs.prefix }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
-          PREFIX="${{ steps.vars.outputs.prefix }}"
           if [[ "$TITLE" != "$PREFIX"* ]]; then
             echo "❌ PR title must start with the required prefix: $PREFIX"
             exit 1
@@ -39,8 +47,9 @@ jobs:
           git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
 
       - name: Check commit messages prefix
+        env:
+          PREFIX: ${{ steps.vars.outputs.prefix }}
         run: |
-          PREFIX="${{ steps.vars.outputs.prefix }}"
           COMMITS=$(git rev-list base..pr)
           echo "Checking commit messages for required prefix: $PREFIX"
           FAIL=0

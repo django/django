@@ -6,6 +6,13 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
     friends = models.ManyToManyField("self")
 
+    system_check_run_count = 0
+
+    @classmethod
+    def check(cls, *args, **kwargs):
+        cls.system_check_run_count += 1
+        return super().check(**kwargs)
+
 
 # A set of models that use a non-abstract inherited 'through' model.
 class ThroughBase(models.Model):

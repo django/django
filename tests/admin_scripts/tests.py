@@ -38,7 +38,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313, get_docs_version
+from django.utils.version import PY313, PY314, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -168,6 +168,16 @@ class AdminScriptTestCase(SimpleTestCase):
             fp.write(manage_py_contents)
 
         return self.run_test(["./manage.py", *args], settings_file)
+
+    def assertInAfterFormatting(self, member, container, msg=None):
+        if HAS_BLACK:
+            import black
+
+            # Black does not have a stable API, but this is still less fragile
+            # than attempting to filter out all paths where it is available.
+            member = black.format_str(member, mode=black.FileMode())
+
+        self.assertIn(member, container, msg=msg)
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
@@ -744,10 +754,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "settings_test"' if HAS_BLACK else "name = 'settings_test'",
-                content,
-            )
+            self.assertInAfterFormatting("name = 'settings_test'", content)
 
     def test_setup_environ_custom_template(self):
         """
@@ -772,9 +779,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
-            )
+            self.assertInAfterFormatting("name = 'こんにちは'", content)
 
     def test_builtin_command(self):
         """
@@ -2441,10 +2446,16 @@ class Discovery(SimpleTestCase):
 
 class CommandDBOptionChoiceTests(SimpleTestCase):
     def test_invalid_choice_db_option(self):
-        expected_error = (
-            r"Error: argument --database: invalid choice: 'deflaut' "
-            r"\(choose from '?default'?, '?other'?\)"
-        )
+        if PY314:
+            expected_error = (
+                r"Error: argument --database: invalid choice: 'deflaut', "
+                r"maybe you meant 'default'\? \(choose from default, other\)"
+            )
+        else:
+            expected_error = (
+                r"Error: argument --database: invalid choice: 'deflaut' "
+                r"\(choose from '?default'?, '?other'?\)"
+            )
         args = [
             "changepassword",
             "createsuperuser",
@@ -2855,8 +2866,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         test_manage_py = os.path.join(testproject_dir, "manage.py")
         with open(test_manage_py) as fp:
             content = fp.read()
-            self.assertIn('project_name = "another_project"', content)
-            self.assertIn('project_directory = "%s"' % testproject_dir, content)
+            self.assertInAfterFormatting('project_name = "another_project"', content)
+            self.assertInAfterFormatting(
+                'project_directory = "%s"' % testproject_dir, content
+            )
 
     def test_no_escaping_of_project_variables(self):
         "Make sure template context variables are not html escaped"
@@ -2966,7 +2979,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         render_py_path = os.path.join(testproject_dir, ".hidden", "render.py")
         with open(render_py_path) as fp:
-            self.assertIn(
+            self.assertInAfterFormatting(
                 f"# The {project_name} should be rendered.",
                 fp.read(),
             )
@@ -3126,10 +3139,7 @@ class StartApp(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class NewAppConfig(AppConfig)", content)
-            self.assertIn(
-                'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
-                content,
-            )
+            self.assertInAfterFormatting("name = 'new_app'", content)
 
     def test_creates_directory_when_custom_app_destination_missing(self):
         args = [

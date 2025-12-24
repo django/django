@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.db import connection, transaction
+from django.db.models import FETCH_PEERS
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
@@ -588,6 +589,46 @@ class ManyToManyTests(TestCase):
                 instances=articles,
                 querysets=[Publication.objects.all(), Publication.objects.all()],
             )
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        a = Article.objects.fetch_mode(FETCH_PEERS).get(pk=self.a1.pk)
+        self.assertEqual(a._state.fetch_mode, FETCH_PEERS)
+        p = a.publications.earliest("pk")
+        self.assertEqual(
+            p._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        articles = list(Article.objects.fetch_mode(FETCH_PEERS))
+        a = articles[0]
+        self.assertEqual(a._state.fetch_mode, FETCH_PEERS)
+        publications = list(a.publications.all())
+        p = publications[0]
+        self.assertEqual(
+            p._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        p1 = Publication.objects.fetch_mode(FETCH_PEERS).get(pk=self.p1.pk)
+        self.assertEqual(p1._state.fetch_mode, FETCH_PEERS)
+        a = p1.article_set.earliest("pk")
+        self.assertEqual(
+            a._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        publications = list(Publication.objects.fetch_mode(FETCH_PEERS))
+        p = publications[0]
+        self.assertEqual(p._state.fetch_mode, FETCH_PEERS)
+        articles = list(p.article_set.all())
+        a = articles[0]
+        self.assertEqual(
+            a._state.fetch_mode,
+            FETCH_PEERS,
+        )
 
 
 class ManyToManyQueryTests(TestCase):

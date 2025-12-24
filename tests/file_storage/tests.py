@@ -29,6 +29,7 @@ from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
+from django.utils.functional import empty
 
 from .models import (
     Storage,
@@ -670,9 +671,11 @@ class OverwritingStorageTests(FileStorageTests):
         content_1 = b"content one"
         content_2 = b"second content"
         f_1 = TemporaryUploadedFile("tmp1", "text/plain", 11, "utf8")
+        self.addCleanup(f_1.close)
         f_1.write(content_1)
         f_1.seek(0)
         f_2 = TemporaryUploadedFile("tmp2", "text/plain", 14, "utf8")
+        self.addCleanup(f_2.close)
         f_2.write(content_2)
         f_2.seek(0)
         stored_name_1 = self.storage.save(name, f_1)
@@ -1267,3 +1270,11 @@ class StorageHandlerTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidStorageError, msg):
             test_storages["invalid_backend"]
+
+
+class StorageLazyObjectTests(SimpleTestCase):
+    def test_lazy_object_is_not_evaluated_before_manual_access(self):
+        obj = Storage()
+        self.assertIs(obj.lazy_storage.storage._wrapped, empty)
+        # assertEqual triggers resolution.
+        self.assertEqual(obj.lazy_storage.storage, temp_storage)

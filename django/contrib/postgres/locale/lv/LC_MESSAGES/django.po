@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
@@ -11,9 +12,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-19 09:22+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-09-17 09:22+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,21 +24,21 @@ msgstr ""
 "2);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "PostgreSQL paplašinājums"
+msgstr "PostgreSQL paplašinājumi"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "Masīva %(nth)s elements nav pareizs:"
+msgstr "Masīva %(nth)s vienums nav derīgs:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Iekļauto masīvu garumam jābūt vienādam."
 
 msgid "Map of strings to strings/nulls"
-msgstr "Virkņu karte uz virknēm/tukšumiem"
+msgstr "Virkņu karte uz virknēm / tukšām vērtībām (null)"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr "\"%(key)s\" vērtība nav teksta rinda vai nulles simbols."
+msgstr "\"%(key)s\" vērtība nav virkne vai tukša vērtība."
 
 msgid "Could not load JSON data."
 msgstr "Nevarēja ielādēt JSON datus."
@@ -46,22 +47,22 @@ msgid "Input must be a JSON dictionary."
 msgstr "Ieejošajiem datiem ir jābūt JSON vārdnīcai."
 
 msgid "Enter two valid values."
-msgstr "Ievadi divas derīgas vērtības."
+msgstr "Jāievada divas derīgas vērtības."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Diapazona sākums nedrīkst būt liekāks par beigām."
+msgstr "Apgabala sākums nedrīkst būt liekāks par beigām."
 
 msgid "Enter two whole numbers."
-msgstr "Ievadiet divus veselus skaitļus."
+msgstr "Jāievada divi veseli skaitļi."
 
 msgid "Enter two numbers."
-msgstr "Ievadiet divus skaitļus."
+msgstr "Jāievada divi skaitļi."
 
 msgid "Enter two valid date/times."
-msgstr "Ievadiet divus derīgus datumus/laikus."
+msgstr "Jāievada divi derīgi datumi/laiki."
 
 msgid "Enter two valid dates."
-msgstr "Ievadiet divus korektus datumus."
+msgstr "Jāievada divi derīgi datumi."
 
 #, python-format
 msgid ""
@@ -71,13 +72,13 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur ne vairāk kā "
+"Sarakstā ir%(show_value)d vienumu, bet tam jāsatur ne vairāk kā "
 "%(limit_value)d."
 msgstr[1] ""
-"Saraksts satur %(show_value)d ierakstu, bet tam jāsatur ne vairāk kā "
+"Sarakstā ir %(show_value)d vienums, bet tam jāsatur ne vairāk kā "
 "%(limit_value)d."
 msgstr[2] ""
-"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur ne vairāk kā "
+"Sarakstā ir %(show_value)d vienumi, bet tam jāsatur ne vairāk kā "
 "%(limit_value)d."
 
 #, python-format
@@ -88,14 +89,11 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur vismaz "
-"%(limit_value)d."
+"Sarakstā ir %(show_value)d vienumu, bet tam jāsatur vismaz %(limit_value)d."
 msgstr[1] ""
-"Saraksts satur %(show_value)d ierakstu, bet tam jāsatur vismaz "
-"%(limit_value)d."
+"Sarakstā ir %(show_value)d vienums, bet tam jāsatur vismaz %(limit_value)d."
 msgstr[2] ""
-"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur vismaz "
-"%(limit_value)d."
+"Sarakstā ir %(show_value)d vienumi, bet tam jāsatur vismaz %(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
@@ -109,10 +107,10 @@ msgstr "Tika norādītas dažas nezināmas atslēgas: %(keys)s"
 msgid ""
 "Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Pārliecinieties, ka diapazona augšējā robeža nav lielāka par %(limit_value)s."
+"Jānodrošina, ka apgabala augšējā robeža nav lielāka par %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Pārliecinieties, ka diapazona apakšējā robeža nav mazāka par %(limit_value)s."
+"Jānodrošina, ka apgabala apakšējā robeža nav mazāka par %(limit_value)s."

@@ -627,8 +627,15 @@ fields you also select in a ``values()`` call.
     You might reasonably ask why Django doesn't remove the extraneous columns
     for you. The main reason is consistency with ``distinct()`` and other
     places: Django **never** removes ordering constraints that you have
-    specified (and we can't change those other methods' behavior, as that
-    would violate our :doc:`/misc/api-stability` policy).
+    specified *explicitly with* ``order_by()`` (and we can't change those
+    other methods' behavior, as that would violate our
+    :doc:`/misc/api-stability` policy).
+
+.. admonition:: Default ordering not applied to GROUP BY
+
+    ``GROUP BY`` queries (for example, those using ``.values()`` and
+    ``.annotate()``) don't use the model's default ordering.
+    Use ``order_by()`` explicitly when a given order is needed.
 
 Aggregating annotations
 -----------------------

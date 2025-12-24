@@ -3,8 +3,9 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2020-2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -326,11 +327,8 @@ msgstr ""
 "Der opstod en fejl. Fejlen er rapporteret til website-administratoren via e-"
 "mail, og vil blive rettet hurtigst muligt. Tak for din tålmodighed."
 
-msgid "Run the selected action"
-msgstr "Udfør den valgte handling"
-
-msgid "Go"
-msgstr "Udfør"
+msgid "Run"
+msgstr "Kør"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klik her for at vælge objekter på tværs af alle sider"
@@ -439,6 +437,9 @@ msgstr "Vis antal"
 msgid "Clear all filters"
 msgstr "Nulstil alle filtre"
 
+msgid "Save"
+msgstr "Gem"
+
 msgid "Remove from sorting"
 msgstr "Fjern fra sortering"
 
@@ -460,28 +461,28 @@ msgstr "Skift tema (nuværende tema: mørkt)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Hvis du sletter %(object_name)s '%(escaped_object)s', vil du også slette  "
-"relaterede objekter, men din konto har ikke rettigheder til at slette "
+"Sletning af %(object_name)s “%(escaped_object)s” ville kræve sletning af "
+"relaterede objekter, men din konto har ikke rettigheder til at slette de "
 "følgende objekttyper:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Sletning af %(object_name)s  ' %(escaped_object)s ' vil kræve sletning af "
+"Sletning af %(object_name)s “%(escaped_object)s” ville kræve sletning af de "
 "følgende beskyttede relaterede objekter:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Er du sikker på du vil slette %(object_name)s \"%(escaped_object)s\"? Alle "
+"Er du sikker på at du vil slette %(object_name)s “%(escaped_object)s”? Alle "
 "de følgende relaterede objekter vil blive slettet:"
 
 msgid "Objects"
@@ -591,6 +592,10 @@ msgstr "Bruger"
 msgid "Action"
 msgstr "Funktion"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paginering %(name)s poster"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "post"
@@ -603,14 +608,19 @@ msgstr ""
 "Dette objekt har ingen ændringshistorik. Det blev formentlig ikke tilføjet "
 "via dette administrations-site"
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginering %(name)s"
+
 msgid "Show all"
 msgstr "Vis alle"
 
-msgid "Save"
-msgstr "Gem"
-
 msgid "Popup closing…"
 msgstr "Popup lukker…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Søg %(name)s"
 
 msgid "Search"
 msgstr "Søg"

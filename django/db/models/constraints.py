@@ -51,9 +51,12 @@ class BaseConstraint:
     def _expression_refs_exclude(cls, model, expression, exclude):
         get_field = model._meta.get_field
         for field_name, *__ in model._get_expr_references(expression):
-            if field_name in exclude:
+            if field_name == "pk":
+                field = model._meta.pk
+            else:
+                field = get_field(field_name)
+            if field_name in exclude or field.name in exclude:
                 return True
-            field = get_field(field_name)
             if field.generated and cls._expression_refs_exclude(
                 model, field.expression, exclude
             ):
@@ -262,7 +265,7 @@ class UniqueConstraint(BaseConstraint):
         self,
         *expressions,
         fields=(),
-        name=None,
+        name,
         condition=None,
         deferrable=None,
         include=None,
@@ -405,8 +408,8 @@ class UniqueConstraint(BaseConstraint):
         ):
             errors.append(
                 checks.Warning(
-                    f"{connection.display_name} does not support unique constraints "
-                    "with nulls distinct.",
+                    f"{connection.display_name} does not support "
+                    "UniqueConstraint.nulls_distinct.",
                     hint=(
                         "A constraint won't be created. Silence this warning if you "
                         "don't care about it."

@@ -9,6 +9,7 @@ from ..fields import (
     EnumField,
     HStoreField,
     IntegerRangeField,
+    OffByOneField,
     SearchVectorField,
 )
 from ..models import TagField
@@ -564,5 +565,27 @@ class Migration(migrations.Migration):
             options={
                 "required_db_vendor": "postgresql",
             },
+        ),
+        migrations.CreateModel(
+            name="OffByOneModel",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "one_off",
+                    OffByOneField(),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
         ),
     ]

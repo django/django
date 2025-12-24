@@ -299,14 +299,14 @@ for more information on the model's ``clean()`` hook.
 Considerations regarding model's ``error_messages``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Error messages defined at the
-:attr:`form field <django.forms.Field.error_messages>` level or at the
+Error messages defined at the form field level (
+:attr:`django.forms.Field.error_messages`) or at the
 :ref:`form Meta <modelforms-overriding-default-fields>` level always take
-precedence over the error messages defined at the
-:attr:`model field <django.db.models.Field.error_messages>` level.
+precedence over the error messages defined at the model field level
+(:attr:`django.db.models.Field.error_messages`).
 
-Error messages  defined on :attr:`model fields
-<django.db.models.Field.error_messages>` are only used when the
+Error messages defined on model fields
+(:attr:`django.db.models.Field.error_messages`) are only used when the
 ``ValidationError`` is raised during the :ref:`model validation
 <validating-objects>` step and no corresponding error messages are defined at
 the form level.

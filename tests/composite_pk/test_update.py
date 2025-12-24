@@ -172,7 +172,7 @@ class CompositePKUpdateTests(TestCase):
     def test_cant_update_relation(self):
         msg = (
             "Cannot update model field <django.db.models.fields.related.ForeignObject: "
-            "user> (only non-relations and foreign keys permitted)"
+            "user> (only concrete fields are permitted)"
         )
 
         with self.assertRaisesMessage(FieldError, msg):

@@ -330,6 +330,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def adapt_datetimefield_value(self, value):
         return value
 
+    def adapt_durationfield_value(self, value):
+        return value
+
     def adapt_timefield_value(self, value):
         return value
 

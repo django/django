@@ -349,7 +349,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             format = "TREE"
         analyze = options.pop("analyze", False)
         prefix = super().explain_query_prefix(format, **options)
-        if analyze and self.connection.features.supports_explain_analyze:
+        if analyze:
             # MariaDB uses ANALYZE instead of EXPLAIN ANALYZE.
             prefix = (
                 "ANALYZE" if self.connection.mysql_is_mariadb else prefix + " ANALYZE"
@@ -407,15 +407,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if on_conflict == OnConflict.UPDATE:
             conflict_suffix_sql = "ON DUPLICATE KEY UPDATE %(fields)s"
-            # The use of VALUES() is deprecated in MySQL 8.0.20+. Instead, use
-            # aliases for the new row and its columns available in MySQL
-            # 8.0.19+.
+            # The use of VALUES() is not supported in MySQL. Instead, use
+            # aliases for the new row and its columns.
             if not self.connection.mysql_is_mariadb:
-                if self.connection.mysql_version >= (8, 0, 19):
-                    conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
-                    field_sql = "%(field)s = new.%(field)s"
-                else:
-                    field_sql = "%(field)s = VALUES(%(field)s)"
+                conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
+                field_sql = "%(field)s = new.%(field)s"
             # Use VALUE() on MariaDB.
             else:
                 field_sql = "%(field)s = VALUE(%(field)s)"

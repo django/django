@@ -2,6 +2,7 @@ import gzip
 import random
 import re
 import struct
+import zlib
 from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
@@ -880,8 +881,8 @@ class GZipMiddlewareTest(SimpleTestCase):
 
     @staticmethod
     def decompress(gzipped_string):
-        with gzip.GzipFile(mode="rb", fileobj=BytesIO(gzipped_string)) as f:
-            return f.read()
+        # Use zlib to ensure gzipped_string contains exactly one gzip stream.
+        return zlib.decompress(gzipped_string, zlib.MAX_WBITS | 16)
 
     @staticmethod
     def get_mtime(gzipped_string):

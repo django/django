@@ -4,6 +4,7 @@ import threading
 import traceback
 import unittest
 import warnings
+from functools import partial
 from io import StringIO
 from unittest import mock
 
@@ -644,6 +645,53 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             self.assertTemplateUsed(response, "template.html")
         with self.assertRaisesMessage(ValueError, msg % "assertTemplateNotUsed"):
             self.assertTemplateNotUsed(response, "template.html")
+
+
+@override_settings(ROOT_URLCONF="test_utils.urls")
+class AssertTemplateUsedPartialTests(SimpleTestCase):
+    def test_template_used_pass(self):
+        with self.assertTemplateUsed("template_used/partials.html#hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass(self):
+        with self.assertTemplateNotUsed("hello"):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_used_fail(self):
+        msg = "Template 'hello' was not a template used to render the response."
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("hello"),
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_not_used_fail(self):
+        msg = (
+            "Template 'template_used/partials.html#hello' was used "
+            "unexpectedly in rendering the response"
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateNotUsed("template_used/partials.html#hello"),
+        ):
+            render_to_string("template_used/partials.html#hello")
+
+    def test_template_not_used_pass_non_partial(self):
+        with self.assertTemplateNotUsed(
+            "template_used/base.html#template_used/base.html"
+        ):
+            render_to_string("template_used/base.html")
+
+    def test_template_used_fail_non_partial(self):
+        msg = (
+            "Template 'template_used/base.html#template_used/base.html' was not a "
+            "template used to render the response."
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertTemplateUsed("template_used/base.html#template_used/base.html"),
+        ):
+            render_to_string("template_used/base.html")
 
 
 class HTMLEqualTests(SimpleTestCase):
@@ -2092,6 +2140,33 @@ class CaptureOnCommitCallbacksTests(TestCase):
             log_record.getMessage(),
             "Error calling CaptureOnCommitCallbacksTests.test_execute_robust.<locals>."
             "hook in on_commit() (robust callback).",
+        )
+        self.assertIsNotNone(log_record.exc_info)
+        raised_exception = log_record.exc_info[1]
+        self.assertIsInstance(raised_exception, MyException)
+        self.assertEqual(str(raised_exception), "robust callback")
+
+    def test_execute_robust_with_callback_as_partial(self):
+        class MyException(Exception):
+            pass
+
+        def hook():
+            self.callback_called = True
+            raise MyException("robust callback")
+
+        hook_partial = partial(hook)
+
+        with self.assertLogs("django.test", "ERROR") as cm:
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                transaction.on_commit(hook_partial, robust=True)
+
+        self.assertEqual(len(callbacks), 1)
+        self.assertIs(self.callback_called, True)
+
+        log_record = cm.records[0]
+        self.assertEqual(
+            log_record.getMessage(),
+            f"Error calling {hook_partial} in on_commit() (robust callback).",
         )
         self.assertIsNotNone(log_record.exc_info)
         raised_exception = log_record.exc_info[1]

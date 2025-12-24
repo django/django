@@ -3,7 +3,8 @@ from unittest import mock
 from django.core.checks import Error
 from django.core.checks import Warning as DjangoWarning
 from django.db import connection, models
-from django.test.testcases import SimpleTestCase
+from django.test import skipUnlessDBFeature
+from django.test.testcases import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps, modify_settings, override_settings
 
 
@@ -741,6 +742,29 @@ class RelativeFieldTests(SimpleTestCase):
             [
                 Error(
                     "Field specifies on_delete=SET_NULL, but cannot be null.",
+                    hint=(
+                        "Set null=True argument on the field, or change the on_delete "
+                        "rule."
+                    ),
+                    obj=field,
+                    id="fields.E320",
+                ),
+            ],
+        )
+
+    def test_on_delete_db_set_null_on_non_nullable_field(self):
+        class Person(models.Model):
+            pass
+
+        class Model(models.Model):
+            foreign_key = models.ForeignKey("Person", models.DB_SET_NULL)
+
+        field = Model._meta.get_field("foreign_key")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field specifies on_delete=DB_SET_NULL, but cannot be null.",
                     hint=(
                         "Set null=True argument on the field, or change the on_delete "
                         "rule."
@@ -2259,3 +2283,248 @@ class M2mThroughFieldsTests(SimpleTestCase):
                 ),
             ],
         )
+
+
+@isolate_apps("invalid_models_tests")
+class DatabaseLevelOnDeleteTests(TestCase):
+
+    def test_db_cascade_support(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_CASCADE)
+
+        field = Child._meta.get_field("parent")
+        expected = (
+            []
+            if connection.features.supports_on_delete_db_cascade
+            else [
+                Error(
+                    f"{connection.display_name} does not support a DB_CASCADE.",
+                    hint="Change the on_delete rule to CASCADE.",
+                    obj=field,
+                    id="fields.E324",
+                )
+            ]
+        )
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_cascade_required_db_features(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_CASCADE)
+
+            class Meta:
+                required_db_features = {"supports_on_delete_db_cascade"}
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
+    def test_db_set_default_support(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(
+                Parent, models.DB_SET_DEFAULT, db_default=models.Value(1)
+            )
+
+        field = Child._meta.get_field("parent")
+        expected = (
+            []
+            if connection.features.supports_on_delete_db_default
+            else [
+                Error(
+                    f"{connection.display_name} does not support a DB_SET_DEFAULT.",
+                    hint="Change the on_delete rule to SET_DEFAULT.",
+                    obj=field,
+                    id="fields.E324",
+                )
+            ]
+        )
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_set_default_required_db_features(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(
+                Parent, models.DB_SET_DEFAULT, db_default=models.Value(1)
+            )
+
+            class Meta:
+                required_db_features = {"supports_on_delete_db_default"}
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature("supports_on_delete_db_default")
+    def test_db_set_default_no_db_default(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_DEFAULT)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "Field specifies on_delete=DB_SET_DEFAULT, but has no db_default "
+                    "value.",
+                    hint="Set a db_default value, or change the on_delete rule.",
+                    obj=field,
+                    id="fields.E322",
+                )
+            ],
+        )
+
+    def test_db_set_null_support(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+        field = Child._meta.get_field("parent")
+        expected = (
+            []
+            if connection.features.supports_on_delete_db_null
+            else [
+                Error(
+                    f"{connection.display_name} does not support a DB_SET_NULL.",
+                    hint="Change the on_delete rule to SET_NULL.",
+                    obj=field,
+                    id="fields.E324",
+                )
+            ]
+        )
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_set_null_required_db_features(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+            class Meta:
+                required_db_features = {"supports_on_delete_db_null"}
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
+    def test_python_db_chain(self):
+        class GrandParent(models.Model):
+            pass
+
+        class Parent(models.Model):
+            grand_parent = models.ForeignKey(GrandParent, models.DB_CASCADE)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.RESTRICT)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "Field specifies Python-level on_delete variant, but referenced "
+                    "model uses database-level variant.",
+                    hint=(
+                        "Use either database or Python on_delete variants uniformly in "
+                        "the references chain."
+                    ),
+                    obj=field,
+                    id="fields.E323",
+                )
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_on_delete_db_null")
+    def test_db_python_chain(self):
+        class GrandParent(models.Model):
+            pass
+
+        class Parent(models.Model):
+            grand_parent = models.ForeignKey(GrandParent, models.CASCADE)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "Field specifies database-level on_delete variant, but referenced "
+                    "model uses Python-level variant.",
+                    hint=(
+                        "Use either database or Python on_delete variants uniformly in "
+                        "the references chain."
+                    ),
+                    obj=field,
+                    id="fields.E323",
+                )
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
+    def test_db_python_chain_auto_created(self):
+        class GrandParent(models.Model):
+            pass
+
+        class Parent(GrandParent):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, on_delete=models.DB_CASCADE)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "Field specifies database-level on_delete variant, but referenced "
+                    "model uses Python-level variant.",
+                    hint=(
+                        "Use either database or Python on_delete variants uniformly in "
+                        "the references chain."
+                    ),
+                    obj=field,
+                    id="fields.E323",
+                )
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_on_delete_db_null")
+    def test_db_do_nothing_chain(self):
+        class GrandParent(models.Model):
+            pass
+
+        class Parent(models.Model):
+            grand_parent = models.ForeignKey(GrandParent, models.DO_NOTHING)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DB_SET_NULL, null=True)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])
+
+    def test_do_nothing_db_chain(self):
+        class GrandParent(models.Model):
+            pass
+
+        class Parent(models.Model):
+            grand_parent = models.ForeignKey(GrandParent, models.DB_SET_NULL, null=True)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.DO_NOTHING)
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(field.check(databases=self.databases), [])

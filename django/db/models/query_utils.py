@@ -48,8 +48,12 @@ class Q(tree.Node):
     XOR = "XOR"
     default = AND
     conditional = True
+    connectors = (None, AND, OR, XOR)
 
     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        if _connector not in self.connectors:
+            connector_reprs = ", ".join(f"{conn!r}" for conn in self.connectors[1:])
+            raise ValueError(f"_connector must be one of {connector_reprs}, or None.")
         super().__init__(
             children=[*args, *sorted(kwargs.items())],
             connector=_connector,
@@ -264,7 +268,8 @@ class DeferredAttribute:
                         f"Cannot retrieve deferred field {field_name!r} "
                         "from an unsaved model."
                     )
-                instance.refresh_from_db(fields=[field_name])
+
+                instance._state.fetch_mode.fetch(self, instance)
             else:
                 data[field_name] = val
         return data[field_name]
@@ -280,6 +285,20 @@ class DeferredAttribute:
         if self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
+
+    def fetch_one(self, instance):
+        instance.refresh_from_db(fields=[self.field.attname])
+
+    def fetch_many(self, instances):
+        attname = self.field.attname
+        db = instances[0]._state.db
+        value_by_pk = (
+            self.field.model._base_manager.using(db)
+            .values_list(attname)
+            .in_bulk({i.pk for i in instances})
+        )
+        for instance in instances:
+            setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:

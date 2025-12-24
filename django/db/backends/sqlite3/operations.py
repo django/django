@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import sqlite3
 import uuid
 from functools import lru_cache
 from itertools import chain
@@ -143,16 +144,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         Only for last_executed_query! Don't use this to execute SQL queries!
         """
-        # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
-        # number of return values, default = 2000). Since Python's sqlite3
-        # module doesn't expose the get_limit() C API, assume the default
-        # limits are in effect and split the work in batches if needed.
-        BATCH_SIZE = 999
-        if len(params) > BATCH_SIZE:
+        connection = self.connection.connection
+        variable_limit = self.connection.features.max_query_params
+        column_limit = connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN)
+        batch_size = min(variable_limit, column_limit)
+
+        if len(params) > batch_size:
             results = ()
-            for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index : index + BATCH_SIZE]
+            for index in range(0, len(params), batch_size):
+                chunk = params[index : index + batch_size]
                 results += self._quote_params_for_last_executed_query(chunk)
             return results
 

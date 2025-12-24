@@ -18,6 +18,8 @@ from django.db import (
 from django.db.backends.utils import truncate_name
 from django.db.models import (
     CASCADE,
+    DB_CASCADE,
+    DB_SET_NULL,
     PROTECT,
     AutoField,
     BigAutoField,
@@ -411,6 +413,40 @@ class SchemaTests(TransactionTestCase):
         )
 
     @skipUnlessDBFeature("can_create_inline_fk")
+    def test_inline_fk_db_on_delete(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+            editor.create_model(Note)
+        self.assertForeignKeyNotExists(Note, "book_id", "schema_book")
+        # Add a foreign key from model to the other.
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
+            new_field = ForeignKey(Book, DB_CASCADE)
+            new_field.set_attributes_from_name("book")
+            editor.add_field(Note, new_field)
+        self.assertForeignKeyExists(Note, "book_id", "schema_book")
+        # Creating a FK field with a constraint uses a single statement without
+        # a deferred ALTER TABLE.
+        self.assertFalse(
+            [
+                sql
+                for sql in (str(statement) for statement in editor.deferred_sql)
+                if sql.startswith("ALTER TABLE") and "ADD CONSTRAINT" in sql
+            ]
+        )
+        # ON DELETE clause is used.
+        self.assertTrue(
+            any(
+                capture_query["sql"].startswith("ALTER TABLE")
+                and "ON DELETE" in capture_query["sql"]
+                for capture_query in ctx.captured_queries
+            )
+        )
+
+    @skipUnlessDBFeature("can_create_inline_fk")
     def test_add_inline_fk_update_data(self):
         with connection.schema_editor() as editor:
             editor.create_model(Node)
@@ -565,6 +601,63 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field2, new_field, strict=True)
         self.assertForeignKeyNotExists(Author, "tag_id", "schema_tag")
+
+    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    def test_fk_alter_on_delete(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        self.assertForeignKeyExists(Book, "author_id", "schema_author")
+        # Change CASCADE to DB_CASCADE.
+        old_field = Book._meta.get_field("author")
+        new_field = ForeignKey(Author, DB_CASCADE)
+        new_field.set_attributes_from_name("author")
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
+            editor.alter_field(Book, old_field, new_field)
+        self.assertForeignKeyExists(Book, "author_id", "schema_author")
+        self.assertIs(
+            any("ON DELETE" in query["sql"] for query in ctx.captured_queries), True
+        )
+        # Change DB_CASCADE to CASCADE.
+        old_field = new_field
+        new_field = ForeignKey(Author, CASCADE)
+        new_field.set_attributes_from_name("author")
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
+            editor.alter_field(Book, old_field, new_field)
+        self.assertForeignKeyExists(Book, "author_id", "schema_author")
+        self.assertIs(
+            any("ON DELETE" in query["sql"] for query in ctx.captured_queries), False
+        )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    def test_create_model_db_on_delete(self):
+        class Parent(Model):
+            class Meta:
+                app_label = "schema"
+
+        class Child(Model):
+            parent_fk = ForeignKey(Parent, DB_SET_NULL, null=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Parent)
+        with CaptureQueriesContext(connection) as ctx:
+            with connection.schema_editor() as editor:
+                editor.create_model(Child)
+
+        self.assertForeignKeyNotExists(Child, "parent_id", "schema_parent")
+        self.assertIs(
+            any("ON DELETE" in query["sql"] for query in ctx.captured_queries), True
+        )
 
     @isolate_apps("schema")
     def test_no_db_constraint_added_during_primary_key_change(self):
@@ -936,7 +1029,7 @@ class SchemaTests(TransactionTestCase):
         class GeneratedFieldIndexedModel(Model):
             number = IntegerField(default=1)
             generated = GeneratedField(
-                expression=F("number"),
+                expression=F("number") + 1,
                 db_persist=True,
                 output_field=IntegerField(),
             )
@@ -949,7 +1042,7 @@ class SchemaTests(TransactionTestCase):
 
         old_field = GeneratedFieldIndexedModel._meta.get_field("generated")
         new_field = GeneratedField(
-            expression=F("number"),
+            expression=F("number") + 1,
             db_persist=True,
             db_index=True,
             output_field=IntegerField(),
@@ -2796,6 +2889,40 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_repoint_inherited(self):
         self._test_m2m_repoint(InheritedManyToManyField)
 
+    def test_m2m_rename(self):
+        class LocalBook(Model):
+            authors = ManyToManyField("schema.Author")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalBook]
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(LocalBook)
+        old_field = LocalBook._meta.get_field("authors")
+        new_field = ManyToManyField("schema.Author")
+        new_field.contribute_to_class(LocalBook, "writers")
+        with connection.schema_editor() as editor:
+            editor.alter_field(LocalBook, old_field, new_field, strict=True)
+        # Ensure old M2M is gone.
+        with self.assertRaises(DatabaseError):
+            self.column_classes(
+                LocalBook._meta.get_field("authors").remote_field.through
+            )
+        if connection.features.supports_foreign_keys:
+            self.assertForeignKeyExists(
+                new_field.remote_field.through,
+                "author_id",
+                "schema_author",
+            )
+        new_through_table = new_field.remote_field.through._meta.db_table
+        self.assertIn("writers", new_through_table)
+        self.assertNotIn("authors", new_through_table)
+        # Remove the old field from meta for tearDown().
+        LocalBook._meta.local_many_to_many.remove(old_field)
+
     @isolate_apps("schema")
     def test_m2m_rename_field_in_target_model(self):
         class LocalTagM2MTest(Model):
@@ -4598,6 +4725,7 @@ class SchemaTests(TransactionTestCase):
                         "to_table": editor.quote_name(table),
                         "to_column": editor.quote_name(model._meta.auto_field.column),
                         "deferrable": connection.ops.deferrable_sql(),
+                        "on_delete_db": "",
                     }
                 )
                 self.assertIn(
@@ -4784,7 +4912,7 @@ class SchemaTests(TransactionTestCase):
             error_messages={"invalid": "error message"},
             help_text="help text",
             limit_choices_to={"limit": "choice"},
-            on_delete=PROTECT,
+            on_delete=CASCADE,
             related_name="related_name",
             related_query_name="related_query_name",
             validators=[lambda x: x],

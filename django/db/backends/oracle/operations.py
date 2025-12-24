@@ -273,12 +273,12 @@ END;
         return value
 
     def convert_datefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.date()
         return value
 
     def convert_timefield_value(self, value, expression, connection):
-        if isinstance(value, Database.Timestamp):
+        if isinstance(value, datetime.datetime):
             value = value.time()
         return value
 
@@ -608,6 +608,9 @@ END;
 
         return Oracle_datetime.from_datetime(value)
 
+    def adapt_durationfield_value(self, value):
+        return value
+
     def adapt_timefield_value(self, value):
         if value is None:
             return None
@@ -726,3 +729,8 @@ END;
         if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False
+
+    def format_json_path_numeric_index(self, num):
+        if num < 0:
+            return "[last-%s]" % abs(num + 1)  # Indexing is zero-based.
+        return super().format_json_path_numeric_index(num)

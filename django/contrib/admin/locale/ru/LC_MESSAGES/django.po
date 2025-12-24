@@ -10,16 +10,16 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025
 # Дмитрий <nerosketch@gmail.com>, 2019
 # Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -42,8 +42,8 @@ msgstr "Успешно удалены %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не удается удалить %(name)s"
 
-msgid "Are you sure?"
-msgstr "Вы уверены?"
+msgid "Delete multiple objects"
+msgstr "Удалить несколько объектов"
 
 msgid "Administration"
 msgstr "Администрирование"
@@ -276,6 +276,9 @@ msgstr[3] "Выбраны все %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Выбрано 0 объектов из %(cnt)s "
 
+msgid "Delete"
+msgstr "Удалить"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "История изменений: %s"
@@ -359,6 +362,15 @@ msgstr "Хлебные крошки"
 msgid "Models in the %(name)s application"
 msgstr "Модели в приложении %(name)s"
 
+msgid "Model name"
+msgstr "Имя модели"
+
+msgid "Add link"
+msgstr "Добавить"
+
+msgid "Change or view list link"
+msgstr "Просмотреть или редактировать"
+
 msgid "Add"
 msgstr "Добавить"
 
@@ -368,15 +380,13 @@ msgstr "Просмотреть"
 msgid "You don’t have permission to view or edit anything."
 msgstr "У вас недостаточно полномочий для просмотра или изменения чего либо."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Сначала введите имя пользователя и пароль. Затем вы сможете ввести больше "
-"информации о пользователе."
+"После того, как вы создадите пользователя, у вас появится больше "
+"возможностей по редактированию."
 
-msgid "Enter a username and password."
-msgstr "Введите имя пользователя и пароль."
+msgid "Error:"
+msgstr "Ошибка:"
 
 msgid "Change password"
 msgstr "Изменить пароль"
@@ -464,9 +474,6 @@ msgstr "Переключить тему (текущая: светлая)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Переключить тему (текущая: тёмная)"
 
-msgid "Delete"
-msgstr "Удалить"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -501,9 +508,6 @@ msgstr "Да, я уверен"
 
 msgid "No, take me back"
 msgstr "Нет, отменить и вернуться к выбору"
-
-msgid "Delete multiple objects"
-msgstr "Удалить несколько объектов"
 
 #, python-format
 msgid ""
@@ -579,8 +583,8 @@ msgstr ""
 "просмотра данной страницы. Возможно, вы хотели бы войти в систему, используя "
 "другую учётную запись?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыли свой пароль или имя пользователя?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыли пароль?"
 
 msgid "Toggle navigation"
 msgstr "Переключить навигацию"
@@ -750,8 +754,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Пожалуйста, перейдите на эту страницу и введите новый пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Ваше имя пользователя (на случай, если вы его забыли):"
+msgid "In case you’ve forgotten, you are:"
+msgstr "На случай, если вы забыли, вы: "
 
 msgid "Thanks for using our site!"
 msgstr "Спасибо, что используете наш сайт!"

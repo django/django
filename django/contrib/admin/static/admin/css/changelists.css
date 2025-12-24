@@ -265,7 +265,8 @@
     font-weight: bold;
 }
 
-.change-list .toplinks a {
+.change-list .toplinks a,
+.change-list .toplinks span {
     font-size: 0.8125rem;
 }
 

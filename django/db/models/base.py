@@ -30,8 +30,9 @@ from django.db import (
 )
 from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, Collector
+from django.db.models.deletion import CASCADE, DO_NOTHING, Collector, DatabaseOnDelete
 from django.db.models.expressions import DatabaseDefault
+from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.fields.related import (
     ForeignObjectRel,
@@ -466,6 +467,14 @@ class ModelStateFieldsCacheDescriptor:
         return res
 
 
+class ModelStateFetchModeDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.fetch_mode = FETCH_ONE
+        return res
+
+
 class ModelState:
     """Store model instance state."""
 
@@ -476,6 +485,17 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    fetch_mode = ModelStateFetchModeDescriptor()
+    peers = ()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Weak references can't be pickled.
+        state.pop("peers", None)
+        return state
+
+    def __del__(self):
+        self.fields_cache.clear()
 
 
 class Model(AltersData, metaclass=ModelBase):
@@ -595,7 +615,7 @@ class Model(AltersData, metaclass=ModelBase):
         post_init.send(sender=cls, instance=self)
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         if len(values) != len(cls._meta.concrete_fields):
             values_iter = iter(values)
             values = [
@@ -605,6 +625,8 @@ class Model(AltersData, metaclass=ModelBase):
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
+        if fetch_mode is not None:
+            new._state.fetch_mode = fetch_mode
         return new
 
     def __repr__(self):
@@ -714,8 +736,8 @@ class Model(AltersData, metaclass=ModelBase):
         should be an iterable of field attnames. If fields is None, then
         all non-deferred fields are reloaded.
 
-        When accessing deferred fields of an instance, the deferred loading
-        of the field will call this method.
+        When fetching deferred fields for a single instance (the FETCH_ONE
+        fetch mode), the deferred loading uses this method.
         """
         if fields is None:
             self._prefetched_objects_cache = {}
@@ -1094,12 +1116,33 @@ class Model(AltersData, metaclass=ModelBase):
             ]
             forced_update = update_fields or force_update
             pk_val = self._get_pk_val(meta)
-            updated = self._do_update(
-                base_qs, using, pk_val, values, update_fields, forced_update
+            returning_fields = [
+                f
+                for f in meta.local_concrete_fields
+                if (
+                    f.generated
+                    and f.referenced_fields.intersection(non_pks_non_generated)
+                )
+            ]
+            for field, _model, value in values:
+                if (update_fields is None or field.name in update_fields) and hasattr(
+                    value, "resolve_expression"
+                ):
+                    returning_fields.append(field)
+            results = self._do_update(
+                base_qs,
+                using,
+                pk_val,
+                values,
+                update_fields,
+                forced_update,
+                returning_fields,
             )
-            if force_update and not updated:
+            if updated := bool(results):
+                self._assign_returned_values(results[0], returning_fields)
+            elif force_update:
                 raise self.NotUpdated("Forced update did not affect any rows.")
-            if update_fields and not updated:
+            elif update_fields:
                 raise self.NotUpdated(
                     "Save with update_fields did not affect any rows."
                 )
@@ -1121,24 +1164,49 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
-            fields = [
+            insert_fields = [
                 f
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            returning_fields = meta.db_returning_fields
+            returning_fields = list(meta.db_returning_fields)
+            can_return_columns_from_insert = connections[
+                using
+            ].features.can_return_columns_from_insert
+            for field in insert_fields:
+                value = (
+                    getattr(self, field.attname) if raw else field.pre_save(self, False)
+                )
+                if hasattr(value, "resolve_expression"):
+                    if field not in returning_fields:
+                        returning_fields.append(field)
+                elif (
+                    field.db_returning
+                    and not can_return_columns_from_insert
+                    and not (pk_set and field is meta.auto_field)
+                ):
+                    returning_fields.remove(field)
             results = self._do_insert(
-                cls._base_manager, using, fields, returning_fields, raw
+                cls._base_manager, using, insert_fields, returning_fields, raw
             )
             if results:
-                for value, field in zip(results[0], returning_fields):
-                    setattr(self, field.attname, value)
+                self._assign_returned_values(results[0], returning_fields)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
+    def _do_update(
+        self,
+        base_qs,
+        using,
+        pk_val,
+        values,
+        update_fields,
+        forced_update,
+        returning_fields,
+    ):
         """
-        Try to update the model. Return True if the model was updated (if an
-        update query was done and a matching row was found in the DB).
+        Try to update the model. Return a list of updated fields if the model
+        was updated (if an update query was done and a matching row was
+        found in the DB).
         """
         filtered = base_qs.filter(pk=pk_val)
         if not values:
@@ -1147,22 +1215,23 @@ class Model(AltersData, metaclass=ModelBase):
             # case we just say the update succeeded. Another case ending up
             # here is a model with just PK - in that case check that the PK
             # still exists.
-            return update_fields is not None or filtered.exists()
+            if update_fields is not None or filtered.exists():
+                return [()]
+            return []
         if self._meta.select_on_save and not forced_update:
-            return (
-                filtered.exists()
-                and
-                # It may happen that the object is deleted from the DB right
-                # after this check, causing the subsequent UPDATE to return
-                # zero matching rows. The same result can occur in some rare
-                # cases when the database returns zero despite the UPDATE being
-                # executed successfully (a row is matched and updated). In
-                # order to distinguish these two cases, the object's existence
-                # in the database is again checked for if the UPDATE query
-                # returns 0.
-                (filtered._update(values) > 0 or filtered.exists())
-            )
-        return filtered._update(values) > 0
+            # It may happen that the object is deleted from the DB right after
+            # this check, causing the subsequent UPDATE to return zero matching
+            # rows. The same result can occur in some rare cases when the
+            # database returns zero despite the UPDATE being executed
+            # successfully (a row is matched and updated). In order to
+            # distinguish these two cases, the object's existence in the
+            # database is again checked for if the UPDATE query returns 0.
+            if not filtered.exists():
+                return []
+            if results := filtered._update(values, returning_fields):
+                return results
+            return [()] if filtered.exists() else []
+        return filtered._update(values, returning_fields)
 
     def _do_insert(self, manager, using, fields, returning_fields, raw):
         """
@@ -1176,6 +1245,15 @@ class Model(AltersData, metaclass=ModelBase):
             using=using,
             raw=raw,
         )
+
+    def _assign_returned_values(self, returned_values, returning_fields):
+        returning_fields_iter = iter(returning_fields)
+        for value, field in zip(returned_values, returning_fields_iter):
+            setattr(self, field.attname, value)
+        # Defer all fields that were meant to be updated with their database
+        # resolved values but couldn't as they are effectively stale.
+        for field in returning_fields_iter:
+            self.__dict__.pop(field.attname, None)
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to
@@ -1310,7 +1388,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = meta or self._meta
         field_map = {}
         generated_fields = []
-        for field in meta.local_concrete_fields:
+        for field in meta.local_fields:
             if field.name in exclude:
                 continue
             if field.generated:
@@ -1321,7 +1399,19 @@ class Model(AltersData, metaclass=ModelBase):
                     continue
                 generated_fields.append(field)
                 continue
-            value = getattr(self, field.attname)
+            if (
+                isinstance(field.remote_field, ForeignObjectRel)
+                and field not in meta.local_concrete_fields
+            ):
+                value = tuple(
+                    getattr(self, from_field) for from_field in field.from_fields
+                )
+                if len(value) == 1:
+                    value = value[0]
+            elif field.concrete:
+                value = getattr(self, field.attname)
+            else:
+                continue
             if not value or not hasattr(value, "resolve_expression"):
                 value = Value(value, field)
             field_map[field.name] = value
@@ -1683,6 +1773,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_fields(**kwargs),
                 *cls._check_m2m_through_same_relationship(),
                 *cls._check_long_column_names(databases),
+                *cls._check_related_fields(),
             ]
             clash_errors = (
                 *cls._check_id_field(),
@@ -1713,7 +1804,7 @@ class Model(AltersData, metaclass=ModelBase):
         meta = cls._meta
         pk = meta.pk
 
-        if not isinstance(pk, CompositePrimaryKey):
+        if meta.proxy or not isinstance(pk, CompositePrimaryKey):
             return errors
 
         seen_columns = defaultdict(list)
@@ -2153,6 +2244,20 @@ class Model(AltersData, metaclass=ModelBase):
                             id="models.E048",
                         )
                     )
+                elif (
+                    isinstance(field.remote_field, ForeignObjectRel)
+                    and field not in cls._meta.local_concrete_fields
+                    and len(field.from_fields) > 1
+                ):
+                    errors.append(
+                        checks.Error(
+                            f"{option!r} refers to a ForeignObject {field_name!r} with "
+                            "multiple 'from_fields', which is not supported for that "
+                            "option.",
+                            obj=cls,
+                            id="models.E049",
+                        )
+                    )
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
@@ -2353,6 +2458,29 @@ class Model(AltersData, metaclass=ModelBase):
                     )
 
         return errors
+
+    @classmethod
+    def _check_related_fields(cls):
+        has_db_variant = False
+        has_python_variant = False
+        for rel in cls._meta.get_fields():
+            if rel.related_model:
+                if not (on_delete := getattr(rel.remote_field, "on_delete", None)):
+                    continue
+                if isinstance(on_delete, DatabaseOnDelete):
+                    has_db_variant = True
+                elif on_delete != DO_NOTHING:
+                    has_python_variant = True
+                if has_db_variant and has_python_variant:
+                    return [
+                        checks.Error(
+                            "The model cannot have related fields with both "
+                            "database-level and Python-level on_delete variants.",
+                            obj=cls,
+                            id="models.E050",
+                        )
+                    ]
+        return []
 
     @classmethod
     def _get_expr_references(cls, expr):

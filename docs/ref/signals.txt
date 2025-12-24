@@ -303,6 +303,15 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``raw``
+
+    .. versionadded:: 6.1
+
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
+
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this::
 
@@ -357,6 +366,8 @@ Argument        Value
 ``pk_set``      ``{t.id}`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
+
+``raw``         ``False`` (since it is not loaded from a fixture)
 ==============  ============================================================
 
 And if we would then do something like this:
@@ -387,6 +398,8 @@ Argument        Value
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
+
+``raw``         ``False`` (since it is not loaded from a fixture)
 ==============  ============================================================
 
 ``class_prepared``
@@ -703,3 +716,58 @@ Arguments sent with this signal:
     The database connection that was opened. This can be used in a
     multiple-database configuration to differentiate connection signals
     from different databases.
+
+Tasks signals
+=============
+
+.. versionadded:: 6.0
+
+Signals sent by the :doc:`tasks </ref/tasks>` framework.
+
+``task_enqueued``
+-----------------
+
+.. data:: django.tasks.signals.task_enqueued
+   :module:
+
+Sent once a Task has been enqueued.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The enqueued :class:`TaskResult <django.tasks.TaskResult>`.
+
+``task_started``
+----------------
+
+.. data:: django.tasks.signals.task_started
+   :module:
+
+Sent when a Task has started executing.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The started :class:`TaskResult <django.tasks.TaskResult>`.
+
+``task_finished``
+-----------------
+
+.. data:: django.tasks.signals.task_finished
+   :module:
+
+Sent once a Task has finished executing, successfully or otherwise.
+
+Arguments sent with this signal:
+
+``sender``
+    The backend class which the Task was enqueued on to.
+
+``task_result``
+    The finished :class:`TaskResult <django.tasks.TaskResult>`.

@@ -560,6 +560,10 @@ input[type="submit"], button {
         margin-top: 5px;
     }
 
+    form .aligned fieldset div.flex-container {
+        display: unset;
+    }
+
     /* Related widget */
 
     .related-widget-wrapper {
