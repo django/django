@@ -214,7 +214,7 @@ class BaseCommand:
        SQL statements, will be wrapped in ``BEGIN`` and ``COMMIT``.
 
     4. If ``handle()`` or ``execute()`` raised any exception (e.g.
-       ``CommandError``), ``run_from_argv()`` will  instead print an error
+       ``CommandError``), ``run_from_argv()`` will instead print an error
        message to ``stderr``.
 
     Thus, the ``handle()`` method is typically the starting point for

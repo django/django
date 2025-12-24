@@ -74,14 +74,27 @@ class DatabaseCreation(BaseDatabaseCreation):
         load_cmd = cmd_args
         load_cmd[-1] = target_database_name
 
-        with subprocess.Popen(
-            dump_cmd, stdout=subprocess.PIPE, env=dump_env
-        ) as dump_proc:
-            with subprocess.Popen(
+        with (
+            subprocess.Popen(
+                dump_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dump_env
+            ) as dump_proc,
+            subprocess.Popen(
                 load_cmd,
                 stdin=dump_proc.stdout,
                 stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
                 env=load_env,
-            ):
-                # Allow dump_proc to receive a SIGPIPE if the load process exits.
-                dump_proc.stdout.close()
+            ) as load_proc,
+        ):
+            # Allow dump_proc to receive a SIGPIPE if the load process exits.
+            dump_proc.stdout.close()
+            dump_err = dump_proc.stderr.read().decode(errors="replace")
+            load_err = load_proc.stderr.read().decode(errors="replace")
+        if dump_proc.returncode != 0:
+            self.log(
+                f"Got an error on mysqldump when cloning the test database: {dump_err}"
+            )
+            sys.exit(dump_proc.returncode)
+        if load_proc.returncode != 0:
+            self.log(f"Got an error cloning the test database: {load_err}")
+            sys.exit(load_proc.returncode)

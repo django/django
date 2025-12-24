@@ -229,7 +229,8 @@ class ListViewTests(TestCase):
         # 1 query for authors
         with self.assertNumQueries(1):
             self.client.get("/list/authors/notempty/")
-        # same as above + 1 query to test if authors exist + 1 query for pagination
+        # same as above + 1 query to test if authors exist + 1 query for
+        # pagination
         with self.assertNumQueries(3):
             self.client.get("/list/authors/notempty/paginated/")
 

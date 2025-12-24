@@ -21,8 +21,8 @@ At the highest level, you can serialize data like this::
 
     data = serializers.serialize("xml", SomeModel.objects.all())
 
-The arguments to the ``serialize`` function are the format to serialize the data
-to (see `Serialization formats`_) and a
+The arguments to the ``serialize`` function are the format to serialize the
+data to (see `Serialization formats`_) and a
 :class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
 argument can be any iterator that yields Django model instances, but it'll
 almost always be a QuerySet).
@@ -61,8 +61,8 @@ specify a ``fields`` argument to the serializer::
     data = serializers.serialize("xml", SomeModel.objects.all(), fields=["name", "size"])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
-be serialized. The primary key is always serialized as the ``pk`` element in the
-resulting output; it never appears in the ``fields`` part.
+be serialized. The primary key is always serialized as the ``pk`` element in
+the resulting output; it never appears in the ``fields`` part.
 
 .. note::
 
@@ -224,7 +224,8 @@ the ``auth.User`` model has such a relation to the ``auth.Permission`` model:
         </field>
     </object>
 
-This example links the given user with the permission models with PKs 46 and 47.
+This example links the given user with the permission models with PKs 46 and
+47.
 
 .. admonition:: Control characters
 
@@ -604,9 +605,9 @@ When ``use_natural_foreign_keys=True`` is specified, Django will use the
 ``natural_key()`` method to serialize any foreign key reference to objects
 of the type that defines the method.
 
-When ``use_natural_primary_keys=True`` is specified, Django will not provide the
-primary key in the serialized data of this object since it can be calculated
-during deserialization::
+When ``use_natural_primary_keys=True`` is specified, Django will not provide
+the primary key in the serialized data of this object since it can be
+calculated during deserialization::
 
     ...
     {

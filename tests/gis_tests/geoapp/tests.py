@@ -133,7 +133,7 @@ class GeoModelTest(TestCase):
             tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
         self.assertEqual("Texas", tx.name)
 
-        # Creating San Antonio.  Remember the Alamo.
+        # Creating San Antonio. Remember the Alamo.
         sa = City.objects.create(name="San Antonio", point=other_srid_pnt)
 
         # Now verifying that San Antonio was transformed correctly
@@ -367,14 +367,15 @@ class GeoLookupTest(TestCase):
         "Testing the 'left' and 'right' lookup types."
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B)
-        # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
+        # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in
+        # PostGIS source.
 
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name="Colorado").poly
         ks_border = State.objects.get(name="Kansas").poly
 
-        # Note: Wellington has an 'X' value of 174, so it will not be considered
-        # to the left of CO.
+        # Note: Wellington has an 'X' value of 174, so it will not be
+        # considered to the left of CO.
 
         # These cities should be strictly to the right of the CO border.
         cities = [
@@ -397,7 +398,8 @@ class GeoLookupTest(TestCase):
         for c in qs:
             self.assertIn(c.name, cities)
 
-        # Note: Wellington has an 'X' value of 174, so it will not be considered
+        # Note: Wellington has an 'X' value of 174, so it will not be
+        # considered
         #  to the left of CO.
         vic = City.objects.get(point__left=co_border)
         self.assertEqual("Victoria", vic.name)
@@ -441,7 +443,8 @@ class GeoLookupTest(TestCase):
         nullqs = State.objects.filter(poly__isnull=True)
         validqs = State.objects.filter(poly__isnull=False)
 
-        # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
+        # Puerto Rico should be NULL (it's a commonwealth unincorporated
+        # territory)
         self.assertEqual(1, len(nullqs))
         self.assertEqual("Puerto Rico", nullqs[0].name)
         # GeometryField=None is an alias for __isnull=True.
@@ -535,8 +538,8 @@ class GeoLookupTest(TestCase):
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
-        # To make things more interesting, we will have our Texas reference point in
-        # different SRIDs.
+        # To make things more interesting, we will have our Texas reference
+        # point in different SRIDs.
         pnt1 = fromstr("POINT (649287.0363174 4177429.4494686)", srid=2847)
         pnt2 = fromstr("POINT(-98.4919715741052 29.4333344025053)", srid=4326)
 
@@ -578,7 +581,12 @@ class GeoLookupTest(TestCase):
         # Testing within relation mask.
         ks = State.objects.get(name="Kansas")
         self.assertEqual(
-            "Lawrence", City.objects.get(point__relate=(ks.poly, within_mask)).name
+            "Lawrence",
+            # Remove ".filter(name="Lawrence")" once PostGIS 3.5.4 is released.
+            # https://lists.osgeo.org/pipermail/postgis-devel/2025-July/030581.html
+            City.objects.filter(name="Lawrence")
+            .get(point__relate=(ks.poly, within_mask))
+            .name,
         )
 
         # Testing intersection relation mask.
@@ -648,7 +656,8 @@ class GeoQuerySetTest(TestCase):
         #  SELECT ST_extent(point)
         #  FROM geoapp_city
         #  WHERE (name='Houston' or name='Dallas');`
-        #  => BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
+        #  => BOX(-96.8016128540039 29.7633724212646,-95.3631439208984
+        #  32.7820587158203)
         expected = (
             -96.8016128540039,
             29.7633724212646,
@@ -705,7 +714,8 @@ class GeoQuerySetTest(TestCase):
         Testing the `Union` aggregate.
         """
         tx = Country.objects.get(name="Texas").mpoly
-        # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
+        # Houston, Dallas -- Ordering may differ depending on backend or GEOS
+        # version.
         union = GEOSGeometry("MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)")
         qs = City.objects.filter(point__within=tx)
         with self.assertRaises(ValueError):

@@ -198,8 +198,9 @@ class LiveServerViews(LiveServerBase):
         development server is rather simple we support it only in cases where
         we can detect a content length from the response. This should be doable
         for all simple views and streaming responses where an iterable with
-        length of one is passed. The latter follows as result of `set_content_length`
-        from https://github.com/python/cpython/blob/main/Lib/wsgiref/handlers.py.
+        length of one is passed. The latter follows as result of
+        `set_content_length` from
+        https://github.com/python/cpython/blob/main/Lib/wsgiref/handlers.py.
 
         If we cannot detect a content length we explicitly set the `Connection`
         header to `close` to notify the client that we do not actually support

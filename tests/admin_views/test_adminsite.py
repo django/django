@@ -30,8 +30,8 @@ urlpatterns = [
 @override_settings(ROOT_URLCONF="admin_views.test_adminsite")
 class SiteEachContextTest(TestCase):
     """
-    Check each_context contains the documented variables and that available_apps context
-    variable structure is the expected one.
+    Check each_context contains the documented variables and that
+    available_apps context variable structure is the expected one.
     """
 
     request_factory = RequestFactory()

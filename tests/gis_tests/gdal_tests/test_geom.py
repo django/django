@@ -521,7 +521,8 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(3, geom[0].coord_dim)
         self.assertEqual(wkt_3d, geom.wkt)
 
-    # Testing binary predicates, `assertIs` is used to check that bool is returned.
+    # Testing binary predicates, `assertIs` is used to check that bool is
+    # returned.
 
     def test_equivalence_regression(self):
         "Testing equivalence methods with non-OGRGeometry instances."

@@ -3,11 +3,13 @@ from decimal import Decimal
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.point import Point
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError
 from django.db.models import (
     BinaryField,
     BooleanField,
+    CharField,
     FloatField,
     Func,
     IntegerField,
@@ -119,8 +121,8 @@ class GeomOutputGeoFunc(GeoFunc):
 
 class SQLiteDecimalToFloatMixin:
     """
-    By default, Decimal values are converted to str by the SQLite backend, which
-    is not acceptable by the GIS functions expecting numeric values.
+    By default, Decimal values are converted to str by the SQLite backend,
+    which is not acceptable by the GIS functions expecting numeric values.
     """
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -422,6 +424,29 @@ class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
 
 
 @BaseSpatialField.register_lookup
+class GeometryType(GeoFuncMixin, Transform):
+    output_field = CharField()
+    lookup_name = "geom_type"
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        lhs, params = compiler.compile(self.lhs)
+        sql = (
+            "(SELECT DECODE("
+            f"SDO_GEOMETRY.GET_GTYPE({lhs}),"
+            "1, 'POINT',"
+            "2, 'LINESTRING',"
+            "3, 'POLYGON',"
+            "4, 'COLLECTION',"
+            "5, 'MULTIPOINT',"
+            "6, 'MULTILINESTRING',"
+            "7, 'MULTIPOLYGON',"
+            "8, 'SOLID',"
+            "'UNKNOWN'))"
+        )
+        return sql, params
+
+
+@BaseSpatialField.register_lookup
 class IsEmpty(GeoFuncMixin, Transform):
     lookup_name = "isempty"
     output_field = BooleanField()
@@ -458,7 +483,8 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
         if self.source_is_geography():
             clone.source_expressions.append(Value(self.spheroid))
         elif self.geo_field.geodetic(connection):
-            # Geometry fields with geodetic (lon/lat) coordinates need length_spheroid
+            # Geometry fields with geodetic (lon/lat) coordinates need
+            # length_spheroid
             function = connection.ops.spatial_function_name("LengthSpheroid")
             clone.source_expressions.append(Value(self.geo_field.spheroid(connection)))
         else:
@@ -527,6 +553,19 @@ class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):
 
 class Reverse(GeoFunc):
     arity = 1
+
+
+class Rotate(GeomOutputGeoFunc):
+    def __init__(self, expression, angle, origin=None, **extra):
+        expressions = [
+            expression,
+            self._handle_param(angle, "angle", NUMERIC_TYPES),
+        ]
+        if origin is not None:
+            if not isinstance(origin, Point):
+                raise TypeError("origin argument must be a Point")
+            expressions.append(Value(origin.wkt, output_field=GeometryField()))
+        super().__init__(*expressions, **extra)
 
 
 class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):

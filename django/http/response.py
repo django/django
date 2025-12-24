@@ -240,8 +240,8 @@ class HttpResponseBase:
         if expires is not None:
             if isinstance(expires, datetime.datetime):
                 if timezone.is_naive(expires):
-                    expires = timezone.make_aware(expires, datetime.timezone.utc)
-                delta = expires - datetime.datetime.now(tz=datetime.timezone.utc)
+                    expires = timezone.make_aware(expires, datetime.UTC)
+                delta = expires - datetime.datetime.now(tz=datetime.UTC)
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).
@@ -323,7 +323,8 @@ class HttpResponseBase:
     # See https://docs.python.org/library/io.html#io.IOBase
 
     # The WSGI server must call this method upon completion of the request.
-    # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
+    # See
+    # http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closer in self._resource_closers:
             try:

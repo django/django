@@ -16,7 +16,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
     sql_alter_table_comment = None
@@ -207,9 +206,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Construct a new model with the new fields to allow self referential
         # primary key to resolve to. This model won't ever be materialized as a
-        # table and solely exists for foreign key reference resolution purposes.
-        # This wouldn't be required if the schema editor was operating on model
-        # states instead of rendered models.
+        # table and solely exists for foreign key reference resolution
+        # purposes. This wouldn't be required if the schema editor was
+        # operating on model states instead of rendered models.
         meta_contents = {
             "app_label": model._meta.app_label,
             "db_table": model._meta.db_table,
@@ -304,10 +303,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             self.create_model(field.remote_field.through)
         elif isinstance(field, CompositePrimaryKey):
-            # If a CompositePrimaryKey field was added, the existing primary key field
-            # had to be altered too, resulting in an AddField, AlterField migration.
-            # The table cannot be re-created on AddField, it would result in a
-            # duplicate primary key error.
+            # If a CompositePrimaryKey field was added, the existing primary
+            # key field had to be altered too, resulting in an AddField,
+            # AlterField migration. The table cannot be re-created on AddField,
+            # it would result in a duplicate primary key error.
             return
         elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
@@ -405,7 +404,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     related_models.add(remote_field.through)
             if new_field.primary_key:
                 for many_to_many in opts.many_to_many:
-                    # Ignore self-relationship since the table was already rebuilt.
+                    # Ignore self-relationship since the table was already
+                    # rebuilt.
                     if many_to_many.related_model == model:
                         continue
                     if many_to_many.remote_field.through._meta.auto_created:

@@ -17,8 +17,8 @@ Code style
   for indentation, but there are some exceptions.
 
 * When naming variables, use ``camelCase`` instead of ``underscore_case``.
-  Different JavaScript files sometimes use a different code style. Please try to
-  conform to the code style of each file.
+  Different JavaScript files sometimes use a different code style. Please try
+  to conform to the code style of each file.
 
 * Use the `ESLint`_ code linter to check your code for bugs and style errors.
   ESLint will be run when you run the JavaScript tests. We also recommended
@@ -89,8 +89,8 @@ The JavaScript tests may be run from a web browser or from the command line.
 Testing from a web browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run the tests from a web browser, open up :source:`js_tests/tests.html` in your
-browser.
+To run the tests from a web browser, open up :source:`js_tests/tests.html` in
+your browser.
 
 To measure code coverage when running the tests, you need to view that file
 over HTTP. To view code coverage:

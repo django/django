@@ -100,8 +100,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         opclasses = None
         fields = [field]
         if field.geom_type == "RASTER":
-            # For raster fields, wrap index creation SQL statement with ST_ConvexHull.
-            # Indexes on raster columns are based on the convex hull of the raster.
+            # For raster fields, wrap index creation SQL statement with
+            # ST_ConvexHull. Indexes on raster columns are based on the convex
+            # hull of the raster.
             expressions = Func(Col(None, field), template=self.rast_index_template)
             fields = None
         elif field.dim > 2 and not field.geography:

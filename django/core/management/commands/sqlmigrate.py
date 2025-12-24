@@ -74,8 +74,8 @@ class Command(BaseCommand):
             migration.atomic and connection.features.can_rollback_ddl
         )
 
-        # Make a plan that represents just the requested migrations and show SQL
-        # for it
+        # Make a plan that represents just the requested migrations and show
+        # SQL for it
         plan = [(loader.graph.nodes[target], options["backwards"])]
         sql_statements = loader.collect_sql(plan)
         if not sql_statements and options["verbosity"] >= 1:

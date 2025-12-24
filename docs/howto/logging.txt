@@ -25,7 +25,7 @@ To send a log message from within your code, you place a logging call into it.
     logging, use a view function as suggested in the example below.
 
 First, import the Python logging library, and then obtain a logger instance
-with :py:func:`logging.getLogger`. Provide the ``getLogger()`` method with a
+with :func:`logging.getLogger`. Provide the ``getLogger()`` method with a
 name to identify it and the records it emits. A good option is to use
 ``__name__`` (see :ref:`naming-loggers` below for more on this) which will
 provide the name of the current Python module as a dotted path::
@@ -43,7 +43,7 @@ And then in a function, for example in a view, send a record to the logger::
         if some_risky_state:
             logger.warning("Platform is running at risk")
 
-When this code is executed, a :py:class:`~logging.LogRecord` containing that
+When this code is executed, a :class:`~logging.LogRecord` containing that
 message will be sent to the logger. If you're using Django's default logging
 configuration, the message will appear in the console.
 
@@ -129,7 +129,7 @@ file ``general.log`` (at the project root):
 Different handler classes take different configuration options. For more
 information on available handler classes, see the
 :class:`~django.utils.log.AdminEmailHandler` provided by Django and the various
-:py:mod:`handler classes <logging.handlers>` provided by Python.
+:mod:`handler classes <logging.handlers>` provided by Python.
 
 Logging levels can also be set on the handlers (by default, they accept log
 messages of all levels). Using the example above, adding:
@@ -238,7 +238,7 @@ application. A named logging configuration will capture logs only from loggers
 with matching names.
 
 The namespace of a logger instance is defined using
-:py:func:`~logging.getLogger`. For example in ``views.py`` of ``my_app``::
+:func:`~logging.getLogger`. For example in ``views.py`` of ``my_app``::
 
     logger = logging.getLogger(__name__)
 

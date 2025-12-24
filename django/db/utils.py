@@ -64,6 +64,9 @@ class DatabaseErrorWrapper:
         """
         self.wrapper = wrapper
 
+    def __del__(self):
+        del self.wrapper
+
     def __enter__(self):
         pass
 
@@ -221,7 +224,8 @@ class ConnectionRouter:
                 try:
                     method = getattr(router, action)
                 except AttributeError:
-                    # If the router doesn't have a method, skip to the next one.
+                    # If the router doesn't have a method, skip to the next
+                    # one.
                     pass
                 else:
                     chosen_db = method(model, **hints)

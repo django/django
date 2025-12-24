@@ -9,7 +9,7 @@
 #
 # The different databases that Django supports behave differently in certain
 # situations, so it is recommended to run the test suite against as many
-# database backends as possible.  You may want to create a separate settings
+# database backends as possible. You may want to create a separate settings
 # file for each of the backends you test against.
 
 DATABASES = {
@@ -27,7 +27,5 @@ SECRET_KEY = "django_tests_secret_key"
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
-
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 USE_TZ = False

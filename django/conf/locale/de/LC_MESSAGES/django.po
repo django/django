@@ -3,7 +3,7 @@
 # Translators:
 # André Hagenbruch, 2011-2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
-# Daniel Roschka <dunedan@phoenitydawn.de>, 2016
+# Daniel Roschka, 2016
 # Florian Apolloner <florian@apolloner.eu>, 2018,2020-2023
 # jnns, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
@@ -11,13 +11,14 @@
 # Markus Holtermann <info@markusholtermann.eu>, 2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 # Raphael Michel <mail@raphaelmichel.de>, 2021
+# Ronny Vedrilla, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2023\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Ronny Vedrilla, 2025\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -351,6 +352,9 @@ msgstr "Diese Seite enthält keine Ergebnisse"
 msgid "Enter a valid value."
 msgstr "Bitte einen gültigen Wert eingeben."
 
+msgid "Enter a valid domain name."
+msgstr "Bitte eine gültige Domain eingeben."
+
 msgid "Enter a valid URL."
 msgstr "Bitte eine gültige Adresse eingeben."
 
@@ -374,14 +378,18 @@ msgstr ""
 "Bitte ein gültiges Kürzel eingeben, bestehend aus Buchstaben (Unicode), "
 "Ziffern, Unter- und Bindestrichen."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Bitte eine gültige IPv4-Adresse eingeben."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Bitte eine gültige IPv6-Adresse eingeben."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Bitte eine gültige IPv4- oder IPv6-Adresse eingeben"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 oder IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Bitte nur durch Komma getrennte Ziffern eingeben."
@@ -696,8 +704,8 @@ msgid "Value must be valid JSON."
 msgstr "Wert muss gültiges JSON sein."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Objekt vom Typ %(model)s mit %(field)s %(value)r existiert nicht."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Fremdschlüssel (Typ definiert durch verknüpftes Feld)"

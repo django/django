@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2013-2017,2019,2021,2023-2024
+# Ramiro Morales, 2013-2017,2019,2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
-"Last-Translator: Ramiro Morales, 2013-2017,2019,2021,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Ramiro Morales, 2013-2017,2019,2021,2023-2025\n"
 "Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -57,11 +57,11 @@ msgstr "contraseña"
 msgid "last login"
 msgstr "último ingreso"
 
-msgid "No password set."
-msgstr "No se ha establecido una contraseña."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de contraseña inválido o algoritmo de hashing desconocido."
+
+msgid "No password set."
+msgstr "No se ha establecido una contraseña."
 
 msgid "Reset password"
 msgstr "Restablecer contraseña"
@@ -72,15 +72,6 @@ msgstr "Establecer contraseña"
 msgid "The two password fields didn’t match."
 msgstr "Los dos campos de contraseñas no coinciden entre si."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Determina si el usuario podrá autenticarse usando una contraseña. Si está "
-"desactivado, el usuario aún podría autenticarse mediante otros métodos, como "
-"Single Sign-On o LDAP."
-
 msgid "Password"
 msgstr "Contraseña"
 
@@ -90,6 +81,15 @@ msgstr "Confirmación de contraseña"
 msgid "Enter the same password as before, for verification."
 msgstr ""
 "Introduzca la misma contraseña nuevamente, para poder verificar la misma."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Determina si el usuario podrá autenticarse usando una contraseña. Si está "
+"desactivado, el usuario aún podría autenticarse mediante otros métodos, como "
+"Single Sign-On o LDAP."
 
 msgid "Password-based authentication"
 msgstr "Autenticación basada en contraseñas"
@@ -266,26 +266,20 @@ msgid "users"
 msgstr "usuarios"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
-"caracter."
+"La contraseña es demasiado corta. Debe contener por lo menos %d carácter."
 msgstr[1] ""
-"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
-"caracteres."
+"La contraseña es demasiado corta. Debe contener por lo menos %d caracteres."
 msgstr[2] ""
-"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
-"caracteres."
+"La contraseña es demasiado corta. Debe contener por lo menos %d caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d caracter."
+msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d carácter."
 msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
 msgstr[2] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
 

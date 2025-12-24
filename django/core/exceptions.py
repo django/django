@@ -25,6 +25,10 @@ class ObjectDoesNotExist(Exception):
     silent_variable_failure = True
 
 
+class ObjectNotUpdated(Exception):
+    """The updated object no longer exists."""
+
+
 class MultipleObjectsReturned(Exception):
     """The query returned multiple objects when only one was expected."""
 

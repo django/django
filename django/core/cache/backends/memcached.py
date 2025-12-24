@@ -56,7 +56,8 @@ class BaseMemcachedCache(BaseCache):
             timeout = -1
 
         if timeout > 2592000:  # 60*60*24*30, 30 days
-            # See https://github.com/memcached/memcached/wiki/Programming#expiration
+            # See:
+            # https://github.com/memcached/memcached/wiki/Programming#expiration
             # "Expiration times can be set from 0, meaning "never expire", to
             # 30 days. Any time higher than 30 days is interpreted as a Unix
             # timestamp date. If you want to expire an object on January 1st of

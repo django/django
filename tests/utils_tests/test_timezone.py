@@ -8,7 +8,7 @@ from django.utils import timezone
 PARIS_ZI = zoneinfo.ZoneInfo("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)  # Asia/Bangkok
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 
 class TimezoneTests(SimpleTestCase):

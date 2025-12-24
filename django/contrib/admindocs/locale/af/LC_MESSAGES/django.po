@@ -2,14 +2,14 @@
 #
 # Translators:
 # Charl du Plessis <cjdupless@gmail.com>, 2021
-# F Wolff <friedel@translate.org.za>, 2019,2023
+# F Wolff <friedel@translate.org.za>, 2019,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2023-12-04 20:19+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023,2025\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -162,7 +162,7 @@ msgid "(does not exist)"
 msgstr "(bestaan nie)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Terug na Dokumentasie"
 
 msgid "Template filters"
 msgstr ""
@@ -199,10 +199,10 @@ msgid "View: %(name)s"
 msgstr ""
 
 msgid "Context:"
-msgstr ""
+msgstr "Konteks:"
 
 msgid "Templates:"
-msgstr ""
+msgstr "Sjablone:"
 
 msgid "Back to View documentation"
 msgstr "Terug na Sien dokumentasie"
@@ -211,10 +211,10 @@ msgid "View documentation"
 msgstr "Sien dokumentasie"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Spring na naamruimte"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Leë naamruimte"
 
 #, python-format
 msgid "Views by namespace %(name)s"

@@ -48,9 +48,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "relate": SpatialiteNullCheckOperator(func="Relate"),
         "coveredby": SpatialiteNullCheckOperator(func="CoveredBy"),
         "covers": SpatialiteNullCheckOperator(func="Covers"),
-        # Returns true if B's bounding box completely contains A's bounding box.
+        # Returns true if B's bounding box completely contains A's bounding
+        # box.
         "contained": SpatialOperator(func="MbrWithin"),
-        # Returns true if A's bounding box completely contains B's bounding box.
+        # Returns true if A's bounding box completely contains B's bounding
+        # box.
         "bbcontains": SpatialOperator(func="MbrContains"),
         # Returns true if A's bounding box overlaps B's bounding box.
         "bboverlaps": SpatialOperator(func="MbrOverlaps"),
@@ -82,7 +84,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"GeometryDistance", "IsEmpty", "MemSize"}
+        unsupported = {"GeometryDistance", "IsEmpty", "MemSize", "Rotate"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
         if self.spatial_version < (5, 1):
@@ -196,7 +198,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         minor, subminor).
         """
         version = self.spatialite_version()
-        return (version,) + get_version_tuple(version)
+        return (version, *get_version_tuple(version))
 
     def spatial_aggregate_name(self, agg_name):
         """

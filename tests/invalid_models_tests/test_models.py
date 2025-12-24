@@ -175,7 +175,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["missing_field"], name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to the nonexistent field 'missing_field'.",
@@ -193,7 +193,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["m2m"], name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to a ManyToManyField 'm2m', but "
@@ -215,7 +215,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["field2", "field1"], name="name")]
 
         self.assertEqual(
-            Bar.check(),
+            Bar.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to field 'field1' which is not local to "
@@ -244,7 +244,7 @@ class IndexesTests(TestCase):
                     models.Index(fields=["foo_1_id", "foo_2"], name="index_name")
                 ]
 
-        self.assertEqual(Bar.check(), [])
+        self.assertEqual(Bar.check(databases=self.databases), [])
 
     def test_pointing_to_composite_primary_key(self):
         class Model(models.Model):
@@ -256,7 +256,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["pk", "name"], name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to a CompositePrimaryKey 'pk', but "
@@ -276,7 +276,7 @@ class IndexesTests(TestCase):
                 ]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "The index name '%sindex_name' cannot start with an "
@@ -296,7 +296,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["id"], name=index_name)]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "The index name '%s' cannot be longer than 30 characters."
@@ -499,7 +499,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(fields=["name"], include=["pk"], name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to a CompositePrimaryKey 'pk', but "
@@ -539,6 +539,7 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_complex_expression_custom_lookup(self):
         class Model(models.Model):
             height = models.IntegerField()
@@ -554,15 +555,16 @@ class IndexesTests(TestCase):
                 ]
 
         with register_lookup(models.IntegerField, Abs):
-            self.assertEqual(Model.check(), [])
+            self.assertEqual(Model.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
                 indexes = [models.Index(Lower("missing_field").desc(), name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to the nonexistent field 'missing_field'.",
@@ -572,6 +574,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_missing_field_nested(self):
         class Model(models.Model):
             class Meta:
@@ -580,7 +583,7 @@ class IndexesTests(TestCase):
                 ]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to the nonexistent field 'missing_field'.",
@@ -590,6 +593,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("self")
@@ -598,7 +602,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(Lower("m2m"), name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to a ManyToManyField 'm2m', but "
@@ -609,6 +613,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_non_local_field(self):
         class Foo(models.Model):
             field1 = models.CharField(max_length=15)
@@ -618,7 +623,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(Lower("field1"), name="name")]
 
         self.assertEqual(
-            Bar.check(),
+            Bar.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to field 'field1' which is not local to "
@@ -630,6 +635,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_fk(self):
         class Foo(models.Model):
             pass
@@ -643,8 +649,9 @@ class IndexesTests(TestCase):
                     models.Index(Lower("foo_1_id"), Lower("foo_2"), name="index_name"),
                 ]
 
-        self.assertEqual(Bar.check(), [])
+        self.assertEqual(Bar.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_composite_primary_key(self):
         class Model(models.Model):
             pk = models.CompositePrimaryKey("version", "name")
@@ -655,7 +662,7 @@ class IndexesTests(TestCase):
                 indexes = [models.Index(Abs("pk"), name="name")]
 
         self.assertEqual(
-            Model.check(),
+            Model.check(databases=self.databases),
             [
                 Error(
                     "'indexes' refers to a CompositePrimaryKey 'pk', but "

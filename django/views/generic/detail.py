@@ -144,8 +144,9 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                 if name:
                     names.insert(0, name)
 
-            # The least-specific option is the default <app>/<model>_detail.html;
-            # only use this if the object in question is a model.
+            # The least-specific option is the default
+            # <app>/<model>_detail.html; only use this if the object in
+            # question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
                 names.append(
@@ -185,5 +186,6 @@ class DetailView(SingleObjectTemplateResponseMixin, BaseDetailView):
     Render a "detail" view of an object.
 
     By default this is a model instance looked up from `self.queryset`, but the
-    view will support display of *any* object by overriding `self.get_object()`.
+    view will support display of *any* object by overriding
+    `self.get_object()`.
     """

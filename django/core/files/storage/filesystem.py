@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -104,8 +104,9 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The combination of O_CREAT and O_EXCL makes os.open() raises an
-                    # OSError if the file already exists before it's opened.
+                    # The combination of O_CREAT and O_EXCL makes os.open()
+                    # raises an OSError if the file already exists before it's
+                    # opened.
                     open_flags = (
                         os.O_WRONLY
                         | os.O_CREAT
@@ -113,7 +114,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                         | getattr(os, "O_BINARY", 0)
                     )
                     if self._allow_overwrite:
-                        open_flags = open_flags & ~os.O_EXCL
+                        open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
                     fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
@@ -215,7 +216,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        tz = timezone.utc if settings.USE_TZ else None
+        tz = UTC if settings.USE_TZ else None
         return datetime.fromtimestamp(ts, tz=tz)
 
     def get_accessed_time(self, name):

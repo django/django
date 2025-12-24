@@ -3,8 +3,8 @@ How to create CSV output
 ========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
-using Django views. To do this, you can either use the Python CSV library or the
-Django template system.
+using Django views. To do this, you can either use the Python CSV library or
+the Django template system.
 
 Using the Python CSV library
 ============================
@@ -101,9 +101,10 @@ the assembly and transmission of a large CSV file::
 Using the template system
 =========================
 
-Alternatively, you can use the :doc:`Django template system </topics/templates>`
-to generate CSV. This is lower-level than using the convenient Python :mod:`csv`
-module, but the solution is presented here for completeness.
+Alternatively, you can use the :doc:`Django template system
+</topics/templates>` to generate CSV. This is lower-level than using the
+convenient Python :mod:`csv` module, but the solution is presented here for
+completeness.
 
 The idea here is to pass a list of items to your template, and have the
 template output the commas in a :ttag:`for` loop.
@@ -121,7 +122,7 @@ Here's an example, which generates the same CSV file as above::
             headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )
 
-        # The data is hard-coded here, but you could load it from a database or
+        # The data is hardcoded here, but you could load it from a database or
         # some other source.
         csv_data = (
             ("First row", "Foo", "Bar", "Baz"),

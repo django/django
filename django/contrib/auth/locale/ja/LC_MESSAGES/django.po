@@ -5,15 +5,15 @@
 # arupakan125 <koh@arupaka.net>, 2020
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023-2024
+# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>, "
-"2013-2016,2021,2023-2024\n"
+"2013-2016,2021,2023-2025\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -61,11 +61,11 @@ msgstr "パスワード"
 msgid "last login"
 msgstr "最終ログイン"
 
-msgid "No password set."
-msgstr "パスワードは設定されませんでした。"
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無効なパスワードか不明なハッシュアルゴリズムです。"
+
+msgid "No password set."
+msgstr "パスワードは設定されませんでした。"
 
 msgid "Reset password"
 msgstr "パスワードをリセット"
@@ -76,14 +76,6 @@ msgstr "パスワードを設定"
 msgid "The two password fields didn’t match."
 msgstr "確認用パスワードが一致しません。"
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"ユーザーがパスワードを使用して認証できるかどうか。無効にしても、シングルサイ"
-"ンオンや LDAP などの他のバックエンドを使用して認証できる可能性があります。"
-
 msgid "Password"
 msgstr "パスワード"
 
@@ -92,6 +84,14 @@ msgstr "パスワード(確認用)"
 
 msgid "Enter the same password as before, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ユーザーがパスワードを使用して認証できるかどうか。無効にしても、シングルサイ"
+"ンオンや LDAP などの他のバックエンドを使用して認証できる可能性があります。"
 
 msgid "Password-based authentication"
 msgstr "パスワードによる認証"
@@ -261,13 +261,10 @@ msgid "users"
 msgstr "ユーザー"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "このパスワードは短すぎます。最低 %(min_length)d 文字以上必要です。"
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "このパスワードは短すぎます。最低 %d 文字以上必要です。"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

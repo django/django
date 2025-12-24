@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -64,11 +64,11 @@ msgstr "parole"
 msgid "last login"
 msgstr "pēdējoreiz pieslēdzies"
 
-msgid "No password set."
-msgstr "Nav norādīta parole"
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
+
+msgid "No password set."
+msgstr "Nav norādīta parole"
 
 msgid "Reset password"
 msgstr "Atiestatīt paroli"
@@ -79,6 +79,15 @@ msgstr "Iestatīt paroli"
 msgid "The two password fields didn’t match."
 msgstr "Paroles lauki nesakrita."
 
+msgid "Password"
+msgstr "Parole"
+
+msgid "Password confirmation"
+msgstr "Paroles apstiprinājums"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
+
 msgid ""
 "Whether the user will be able to authenticate using a password or not. If "
 "disabled, they may still be able to authenticate using other backends, such "
@@ -88,15 +97,6 @@ msgstr ""
 "atspējots, lietotāji joprojām varēs autentificēties, izmantojot citas "
 "autentifikācijas sistēmas, piemēram, vienreizējo pierakstīšanos (Single Sign-"
 "On) vai LDAP."
-
-msgid "Password"
-msgstr "Parole"
-
-msgid "Password confirmation"
-msgstr "Paroles apstiprinājums"
-
-msgid "Enter the same password as before, for verification."
-msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
 
 msgid "Password-based authentication"
 msgstr "Paroles bāzēta autentifikācija"
@@ -268,18 +268,12 @@ msgid "users"
 msgstr "lietotāji"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmes garai."
-msgstr[1] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai.."
-msgstr[2] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmēm garai."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmes garai."
+msgstr[1] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmi garai."
+msgstr[2] "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %d zīmēm garai."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

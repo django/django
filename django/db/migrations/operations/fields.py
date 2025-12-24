@@ -1,5 +1,6 @@
 from django.db.migrations.utils import field_references
-from django.db.models import NOT_PROVIDED
+from django.db.models import NOT_PROVIDED, Model
+from django.utils.copy import replace
 from django.utils.functional import cached_property
 
 from .base import Operation, OperationCategory
@@ -48,12 +49,19 @@ class FieldOperation(Operation):
         if model_name_lower == self.model_name_lower:
             if name == self.name:
                 return True
-            elif (
-                self.field
-                and hasattr(self.field, "from_fields")
-                and name in self.field.from_fields
-            ):
-                return True
+            if self.field:
+                if (
+                    hasattr(self.field, "from_fields")
+                    and name in self.field.from_fields
+                ):
+                    return True
+                elif self.field.generated and any(
+                    field_name == name
+                    for field_name, *_ in Model._get_expr_references(
+                        self.field.expression
+                    )
+                ):
+                    return True
         # Check if this operation remotely references the field.
         if self.field is None:
             return False
@@ -134,8 +142,8 @@ class AddField(FieldOperation):
         ):
             if isinstance(operation, AlterField):
                 return [
-                    AddField(
-                        model_name=self.model_name,
+                    replace(
+                        self,
                         name=operation.name,
                         field=operation.field,
                     ),
@@ -143,13 +151,7 @@ class AddField(FieldOperation):
             elif isinstance(operation, RemoveField):
                 return []
             elif isinstance(operation, RenameField):
-                return [
-                    AddField(
-                        model_name=self.model_name,
-                        name=operation.new_name,
-                        field=self.field,
-                    ),
-                ]
+                return [replace(self, name=operation.new_name)]
         return super().reduce(operation, app_label)
 
 
@@ -264,11 +266,7 @@ class AlterField(FieldOperation):
         ):
             return [
                 operation,
-                AlterField(
-                    model_name=self.model_name,
-                    name=operation.new_name,
-                    field=self.field,
-                ),
+                replace(self, name=operation.new_name),
             ]
         return super().reduce(operation, app_label)
 
@@ -350,13 +348,7 @@ class RenameField(FieldOperation):
             and self.is_same_model_operation(operation)
             and self.new_name_lower == operation.old_name_lower
         ):
-            return [
-                RenameField(
-                    self.model_name,
-                    self.old_name,
-                    operation.new_name,
-                ),
-            ]
+            return [replace(self, new_name=operation.new_name)]
         # Skip `FieldOperation.reduce` as we want to run `references_field`
         # against self.old_name and self.new_name.
         return super(FieldOperation, self).reduce(operation, app_label) or not (

@@ -37,9 +37,9 @@ class CPointerBaseTests(SimpleTestCase):
                 fg.ptr
 
         # Anything that's either not None or the acceptable pointer type
-        # results in a TypeError when trying to assign it to the `ptr` property.
-        # Thus, memory addresses (integers) and pointers of the incorrect type
-        # (in `bad_ptrs`) aren't allowed.
+        # results in a TypeError when trying to assign it to the `ptr`
+        # property. Thus, memory addresses (integers) and pointers of the
+        # incorrect type (in `bad_ptrs`) aren't allowed.
         bad_ptrs = (5, ctypes.c_char_p(b"foobar"))
         for bad_ptr in bad_ptrs:
             for fg in (fg1, fg2):

@@ -58,7 +58,7 @@ class SimpleModel(models.Model):
 
 
 class Point2D(SimpleModel):
-    point = models.PointField()
+    point = models.PointField(null=True)
 
 
 class Point3D(SimpleModel):

@@ -25,7 +25,7 @@ def _subclass_index(class_path, candidate_paths):
     return -1
 
 
-def check_user_model(app_configs=None, **kwargs):
+def check_user_model(app_configs, **kwargs):
     if app_configs is None:
         cls = apps.get_model(settings.AUTH_USER_MODEL)
     else:
@@ -121,7 +121,7 @@ def check_user_model(app_configs=None, **kwargs):
     return errors
 
 
-def check_models_permissions(app_configs=None, **kwargs):
+def check_models_permissions(app_configs, **kwargs):
     if app_configs is None:
         models = apps.get_models()
     else:

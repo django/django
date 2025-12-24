@@ -11,15 +11,21 @@ from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
     "FieldInfo",
-    BaseFieldInfo._fields
-    + ("extra", "is_unsigned", "has_json_constraint", "comment", "data_type"),
+    [
+        *BaseFieldInfo._fields,
+        "extra",
+        "is_unsigned",
+        "has_json_constraint",
+        "comment",
+        "data_type",
+    ],
 )
 InfoLine = namedtuple(
     "InfoLine",
     "col_name data_type max_len num_prec num_scale extra column_default "
     "collation is_unsigned comment",
 )
-TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
+TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -125,9 +131,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         )
         row = cursor.fetchone()
         default_column_collation = row[0] if row else ""
-        # information_schema database gives more accurate results for some figures:
-        # - varchar length returned by cursor.description is an internal length,
-        #   not visible length (#5725)
+        # information_schema database gives more accurate results for some
+        # figures:
+        # - varchar length returned by cursor.description is an internal
+        #   length, not visible length (#5725)
         # - precision and scale (for decimal fields) (#5014)
         # - auto_increment is not available in cursor.description
         cursor.execute(
@@ -189,8 +196,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all foreign keys in the given table.
+        Return a dictionary of {field_name: (field_name_other_table,
+        other_table)} representing all foreign keys in the given table.
         """
         cursor.execute(
             """

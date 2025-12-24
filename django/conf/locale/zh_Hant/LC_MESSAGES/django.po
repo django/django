@@ -2,7 +2,7 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# yubike, 2024
+# coby2023t, 2024-2025
 # Eric Ho <eric913@gmail.com>, 2013
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,15 +12,15 @@
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# yubike, 2024
+# coby2023t, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: YAO WEN LIANG, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: coby2023t, 2024-2025\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -667,8 +667,8 @@ msgid "Value must be valid JSON."
 msgstr "必須是有效的 JSON 值"
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s 為 %(value)r 的 %(model)s 物件不存在。"
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s 實體配 %(field)s %(value)r 並不是合法選項。"
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "外鍵（類型由相關欄位決定）"

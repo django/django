@@ -36,7 +36,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                     )
                 except Exception as e:
                     if "ORA-01543" not in str(e):
-                        # All errors except "tablespace already exists" cancel tests
+                        # All errors except "tablespace already exists" cancel
+                        # tests
                         self.log("Got an error creating the test database: %s" % e)
                         sys.exit(2)
                     if not autoclobber:
@@ -406,7 +407,8 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _test_database_passwd(self):
         password = self._test_settings_get("PASSWORD")
         if password is None and self._test_user_create():
-            # Oracle passwords are limited to 30 chars and can't contain symbols.
+            # Oracle passwords are limited to 30 chars and can't contain
+            # symbols.
             password = get_random_string(30)
         return password
 

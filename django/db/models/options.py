@@ -348,9 +348,10 @@ class Options:
         # being referenced, because there will be new relationships in the
         # cache. Otherwise, expire the cache of references *to* this field.
         # The mechanism for getting at the related model is slightly odd -
-        # ideally, we'd just ask for field.related_model. However, related_model
-        # is a cached property, and all the models haven't been loaded yet, so
-        # we need to make sure we don't cache a string reference.
+        # ideally, we'd just ask for field.related_model. However,
+        # related_model is a cached property, and all the models haven't been
+        # loaded yet, so we need to make sure we don't cache a string
+        # reference.
         if (
             field.is_relation
             and hasattr(field.remote_field, "model")
@@ -427,8 +428,8 @@ class Options:
                 except ValueError:
                     # setting not in the format app_label.model_name
                     # raising ImproperlyConfigured here causes problems with
-                    # test cleanup code - instead it is raised in get_user_model
-                    # or as part of validation.
+                    # test cleanup code - instead it is raised in
+                    # get_user_model or as part of validation.
                     return swapped_for
 
                 if (
@@ -534,10 +535,10 @@ class Options:
         # For legacy reasons, the fields property should only contain forward
         # fields that are not private or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
-        # The third lambda is a longwinded way of checking f.related_model - we don't
-        # use that property directly because related_model is a cached property,
-        # and all the models may not have been loaded yet; we don't want to cache
-        # the string reference to the related_model.
+        # The third filter is a longwinded way of checking f.related_model - we
+        # don't use that property directly because related_model is a cached
+        # property, and all the models may not have been loaded yet; we don't
+        # want to cache the string reference to the related_model.
         def is_not_an_m2m_field(f):
             return not (f.is_relation and f.many_to_many)
 
@@ -707,7 +708,8 @@ class Options:
     def all_parents(self):
         """
         Return all the ancestors of this model as a tuple ordered by MRO.
-        Useful for determining if something is an ancestor, regardless of lineage.
+        Useful for determining if something is an ancestor, regardless of
+        lineage.
         """
         result = OrderedSet(self.parents)
         for parent in self.parents:
@@ -800,8 +802,8 @@ class Options:
         """
         This method is used by each model to find its reverse objects. As this
         method is very expensive and is accessed frequently (it looks up every
-        field in a model, in every app), it is computed on first access and then
-        is set as a property on every model.
+        field in a model, in every app), it is computed on first access and
+        then is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
 

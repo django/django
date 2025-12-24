@@ -25,17 +25,17 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup()`
-    #. :meth:`~django.views.generic.base.View.dispatch()`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
-    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
-    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
-    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
-    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
-    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
+    #. :meth:`~django.views.generic.base.View.setup`
+    #. :meth:`~django.views.generic.base.View.dispatch`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
     #. :meth:`~django.views.generic.detail.BaseDetailView.get`
-    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
     **Example myapp/views.py**::
 
@@ -116,15 +116,15 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup()`
-    #. :meth:`~django.views.generic.base.View.dispatch()`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
-    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
-    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
-    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
+    #. :meth:`~django.views.generic.base.View.setup`
+    #. :meth:`~django.views.generic.base.View.dispatch`
+    #. :meth:`~django.views.generic.base.View.http_method_not_allowed`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`
+    #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data`
     #. :meth:`~django.views.generic.list.BaseListView.get`
-    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
+    #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
     **Example views.py**::
 

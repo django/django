@@ -61,9 +61,9 @@ current time, you would write::
 
     now = datetime.datetime.now()
 
-When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Django uses
-time-zone-aware datetime objects. If your code creates datetime objects, they
-should be aware too. In this mode, the example above becomes::
+When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Django
+uses time-zone-aware datetime objects. If your code creates datetime objects,
+they should be aware too. In this mode, the example above becomes::
 
     from django.utils import timezone
 
@@ -136,8 +136,9 @@ used.
     backwards-compatibility with applications that still rely on local time.
     However, :ref:`as explained above <naive-datetime-objects>`, this isn't
     entirely reliable, and you should always work with aware datetimes in UTC
-    in your own code. For instance, use :meth:`~datetime.datetime.fromtimestamp`
-    and set the ``tz`` parameter to :attr:`~datetime.timezone.utc`.
+    in your own code. For instance, use
+    :meth:`~datetime.datetime.fromtimestamp` and set the ``tz`` parameter to
+    :obj:`datetime.UTC`.
 
 Selecting the current time zone
 -------------------------------
@@ -206,7 +207,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
         {% csrf_token %}
         <label for="timezone">Time zone:</label>
         <select name="timezone">
-            {% for city, tz in timezones %}
+            {% for city, tz in timezones.items %}
             <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ city }}</option>
             {% endfor %}
         </select>

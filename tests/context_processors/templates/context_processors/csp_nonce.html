@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSP Nonce Test</title>
+</head>
+<body>
+    <h1>CSP Nonce Test</h1>
+    <p>CSP Nonce is present: {{ csp_nonce }}</p>
+    <script nonce="{{ csp_nonce }}">
+        console.log("This script is allowed to run due to the nonce.");
+    </script>
+    <script>
+        console.log("This script might be blocked by CSP if a nonce is required.");
+    </script>
+</body>
+</html>

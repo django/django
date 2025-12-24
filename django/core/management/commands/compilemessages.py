@@ -74,7 +74,7 @@ class Command(BaseCommand):
         ignore_patterns = set(options["ignore_patterns"])
         self.verbosity = options["verbosity"]
         if options["fuzzy"]:
-            self.program_options = self.program_options + ["-f"]
+            self.program_options = [*self.program_options, "-f"]
 
         if find_command(self.program) is None:
             raise CommandError(

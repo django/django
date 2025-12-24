@@ -22,7 +22,7 @@ jobs:
       python_versions_output: ${{ steps.set-matrix.outputs.python_versions }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - id: set-matrix
         run: |
           python_versions=$(sed -n "s/^.*Programming Language :: Python :: \([[:digit:]]\+\.[[:digit:]]\+\).*$/'\1', /p" pyproject.toml | tr -d '\n' | sed 's/, $//g')
@@ -36,9 +36,9 @@ jobs:
         python-version: ${{ fromJson(needs.define-matrix.outputs.python_versions_output) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'

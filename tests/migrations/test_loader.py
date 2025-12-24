@@ -515,7 +515,9 @@ class LoaderTests(TestCase):
         }
     )
     def test_loading_squashed_ref_squashed(self):
-        "Tests loading a squashed migration with a new migration referencing it"
+        """
+        Tests loading a squashed migration with a new migration referencing it
+        """
         r"""
         The sample migrations are structured like this:
 

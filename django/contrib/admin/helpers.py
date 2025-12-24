@@ -173,6 +173,7 @@ class AdminField:
         self.is_first = is_first  # Whether this field is first on the line
         self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
         self.is_readonly = False
+        self.is_fieldset = self.field.field.widget.use_fieldset
 
     def label_tag(self):
         classes = []
@@ -185,12 +186,14 @@ class AdminField:
         if not self.is_first:
             classes.append("inline")
         attrs = {"class": " ".join(classes)} if classes else {}
+        tag = "legend" if self.is_fieldset else None
         # checkboxes should not have a label suffix as the checkbox appears
         # to the left of the label.
         return self.field.label_tag(
             contents=mark_safe(contents),
             attrs=attrs,
             label_suffix="" if self.is_checkbox else None,
+            tag=tag,
         )
 
     def errors(self):
@@ -276,12 +279,6 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
-            if field in self.form.fields:
-                widget = self.form[field].field.widget
-                # This isn't elegant but suffices for contrib.auth's
-                # ReadOnlyPasswordHashWidget.
-                if getattr(widget, "read_only", False):
-                    return widget.render(field, value)
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)

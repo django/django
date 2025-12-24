@@ -34,9 +34,9 @@ class MigrationLoader:
     Some migrations will be marked as "replacing" another set of migrations.
     These are loaded into a separate set of migrations away from the main ones.
     If all the migrations they replace are either unapplied or missing from
-    disk, then they are injected into the main set, replacing the named migrations.
-    Any dependency pointers to the replaced migrations are re-pointed to the
-    new migration.
+    disk, then they are injected into the main set, replacing the named
+    migrations. Any dependency pointers to the replaced migrations are
+    re-pointed to the new migration.
 
     This does mean that this class MUST also talk to the database as well as
     to disk, but this is probably fine. We're already not just operating
@@ -145,7 +145,8 @@ class MigrationLoader:
 
     def get_migration_by_prefix(self, app_label, name_prefix):
         """
-        Return the migration(s) which match the given app label and name_prefix.
+        Return the migration(s) which match the given app label and
+        name_prefix.
         """
         # Do the search
         results = []
@@ -274,7 +275,8 @@ class MigrationLoader:
         """
         Build a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
-        usually a problem as generally migration stuff runs in a one-shot process.
+        usually a problem as generally migration stuff runs in a one-shot
+        process.
         """
         # Load disk data
         self.load_disk()
@@ -285,7 +287,8 @@ class MigrationLoader:
             recorder = MigrationRecorder(self.connection)
             self.applied_migrations = recorder.applied_migrations()
         # To start, populate the migration graph with nodes for ALL migrations
-        # and their dependencies. Also make note of replacing migrations at this step.
+        # and their dependencies. Also make note of replacing migrations at
+        # this step.
         self.graph = MigrationGraph()
         self.replacements = {}
         for key, migration in self.disk_migrations.items():
@@ -296,7 +299,8 @@ class MigrationLoader:
         for key, migration in self.disk_migrations.items():
             # Internal (same app) dependencies.
             self.add_internal_dependencies(key, migration)
-        # Add external dependencies now that the internal ones have been resolved.
+        # Add external dependencies now that the internal ones have been
+        # resolved.
         for key, migration in self.disk_migrations.items():
             self.add_external_dependencies(key, migration)
         # Carry out replacements where possible and if enabled.
@@ -310,8 +314,8 @@ class MigrationLoader:
         except NodeNotFoundError as exc:
             # Check if the missing node could have been replaced by any squash
             # migration but wasn't because the squash migration was partially
-            # applied before. In that case raise a more understandable exception
-            # (#23556).
+            # applied before. In that case raise a more understandable
+            # exception (#23556).
             # Get reverse replacements.
             reverse_replacements = {}
             for key, migration in self.replacements.items():

@@ -82,7 +82,6 @@ def check_errors(fn):
 
 
 def raise_last_exception():
-    global _exception
     if _exception is not None:
         raise _exception[1]
 
@@ -194,7 +193,7 @@ def common_roots(paths):
     # Turn the tree into a list of Path instances.
     def _walk(node, path):
         for prefix, child in node.items():
-            yield from _walk(child, path + (prefix,))
+            yield from _walk(child, [*path, prefix])
         if not node:
             yield Path(*path)
 
@@ -469,8 +468,9 @@ class WatchmanReloader(BaseReloader):
 
     def _subscribe(self, directory, name, expression):
         root, rel_path = self._watch_root(directory)
-        # Only receive notifications of files changing, filtering out other types
-        # like special files: https://facebook.github.io/watchman/docs/type
+        # Only receive notifications of files changing, filtering out other
+        # types like special files:
+        # https://facebook.github.io/watchman/docs/type
         only_files_expression = [
             "allof",
             ["anyof", ["type", "f"], ["type", "l"]],

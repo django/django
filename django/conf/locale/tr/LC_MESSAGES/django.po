@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2024
+# BouRock, 2015-2025
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: BouRock, 2015-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: BouRock, 2015-2025\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -702,8 +702,8 @@ msgid "Value must be valid JSON."
 msgstr "Değer geçerli JSON olmak zorundadır."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s %(value)r olan %(model)s benzeri mevcut değil."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(field)s %(value)r olan %(model)s benzeri geçerli bir seçim değil."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Dış Anahtar (türü ilgili alana göre belirlenir)"

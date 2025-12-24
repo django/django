@@ -181,8 +181,8 @@ class PickleabilityTestCase(TestCase):
 
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
-        #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()
-        caused subsequent QuerySet pickling to fail.
+        #24831 -- Cached properties on ManyToOneRel created in
+        QuerySet.delete() caused subsequent QuerySet pickling to fail.
         """
         g = Group.objects.create(name="foo")
         m2m = M2MModel.objects.create()

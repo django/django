@@ -295,8 +295,7 @@ the search vector you wish to use. For example::
         name="search_vector_idx",
     )
 
-The PostgreSQL documentation has details on
-`creating indexes for full text search
+The PostgreSQL docs has details on `creating indexes for full text search
 <https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``

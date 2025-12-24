@@ -1,15 +1,16 @@
 # Django documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 27 09:06:53 2008.
 #
-# This file is execfile()d with the current directory set to its containing dir.
+# This file is execfile()d with the current directory set to its containing
+# dir.
 #
 # The contents of this file are pickled, so don't put values in the namespace
-# that aren't picklable (module imports are okay, they're removed automatically).
+# that aren't picklable (module imports are okay, they're removed
+# automatically).
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import functools
 import sys
 from os.path import abspath, dirname, join
 
@@ -36,13 +37,13 @@ sys.path.append(abspath(join(dirname(__file__), "_ext")))
 # it lives in has been added to sys.path.
 import github_links  # NOQA
 
-# -- General configuration -----------------------------------------------------
+# -- General configuration --
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "4.5.0"
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "djangodocs",
     "sphinx.ext.extlinks",
@@ -80,7 +81,8 @@ linkcheck_ignore = [
 ]
 
 # Spelling check needs an additional module that is not installed by default.
-# Add it only if spelling check is requested so docs can be generated without it.
+# Add it only if spelling check is requested so docs can be generated without
+# it.
 if "spelling" in sys.argv:
     extensions.append("sphinxcontrib.spelling")
 
@@ -166,7 +168,8 @@ today_fmt = "%B %d, %Y"
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build", "_theme", "requirements.txt"]
 
-# The reST default role (used for this markup: `text`) to use for all documents.
+# The reST default role (used for this markup: `text`) to use for all
+# documents.
 default_role = "default-role-error"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -195,27 +198,27 @@ intersphinx_mapping = {
 intersphinx_cache_limit = 90  # days
 
 # The 'versionadded' and 'versionchanged' directives are overridden.
-suppress_warnings = ["app.add_directive"]
+suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output --
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
+# The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
 html_theme = "djangodocs"
 
 # Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
+# further. For a list of options available for each theme, see the
 # documentation.
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_theme"]
 
-# The name for this set of Sphinx documents.  If None, it defaults to
+# The name for this set of Sphinx documents. If None, it defaults to
 # "<project> v<release> documentation".
 # html_title = None
 
-# A shorter title for the navigation bar.  Default is the same as html_title.
+# A shorter title for the navigation bar. Default is the same as html_title.
 # html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
@@ -223,7 +226,7 @@ html_theme_path = ["_theme"]
 # html_logo = None
 
 # The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
+# docs. This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 # html_favicon = None
 
@@ -265,7 +268,7 @@ html_additional_pages = {}
 # html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
-# contain a <link> tag referring to it.  The value of this option must be the
+# contain a <link> tag referring to it. The value of this option must be the
 # base URL from which the finished HTML is served.
 # html_use_opensearch = ''
 
@@ -285,7 +288,7 @@ rst_epilog = """
 .. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
 """  # NOQA
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output --
 
 # Use XeLaTeX for Unicode support.
 latex_engine = "xelatex"
@@ -311,7 +314,7 @@ latex_elements = {
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, document class [howto/manual]).
+# (source start file, target name, title, author, document class).
 # latex_documents = []
 latex_documents = [
     (
@@ -344,7 +347,7 @@ latex_documents = [
 # latex_domain_indices = True
 
 
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output --
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
@@ -359,7 +362,7 @@ man_pages = [
 ]
 
 
-# -- Options for Texinfo output ------------------------------------------------
+# -- Options for Texinfo output --
 
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
@@ -377,7 +380,7 @@ texinfo_documents = [
 ]
 
 
-# -- Options for Epub output ---------------------------------------------------
+# -- Options for Epub output --
 
 # Bibliographic Dublin Core info.
 epub_title = project
@@ -388,10 +391,10 @@ epub_copyright = copyright
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = 'Django'
 
-# The HTML theme for the epub output. Since the default themes are not optimized
-# for small screen space, using the same theme for HTML and epub output is
-# usually not wise. This defaults to 'epub', a theme designed to save visual
-# space.
+# The HTML theme for the epub output. Since the default themes are not
+# optimized for small screen space, using the same theme for HTML and epub
+# output is usually not wise. This defaults to 'epub', a theme designed to save
+# visual space.
 epub_theme = "djangodocs-epub"
 
 # The language of the text. It defaults to the language option
@@ -446,8 +449,11 @@ epub_cover = ("", "epub-cover.html")
 # If false, no index is generated.
 # epub_use_index = True
 
-linkcode_resolve = functools.partial(
-    github_links.github_linkcode_resolve,
-    version=version,
-    next_version=django_next_version,
-)
+
+def version_github_linkcode_resolve(domain, info):
+    return github_links.github_linkcode_resolve(
+        domain, info, version=version, next_version=django_next_version
+    )
+
+
+linkcode_resolve = version_github_linkcode_resolve

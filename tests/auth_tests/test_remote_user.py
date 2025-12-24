@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
@@ -13,6 +13,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango61Warning
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
@@ -197,7 +198,7 @@ class RemoteUserTest(TestCase):
         # Set last_login to something so we can determine if it changes.
         default_login = datetime(2000, 1, 1)
         if settings.USE_TZ:
-            default_login = default_login.replace(tzinfo=timezone.utc)
+            default_login = default_login.replace(tzinfo=UTC)
         user.last_login = default_login
         user.save()
 
@@ -216,7 +217,7 @@ class RemoteUserTest(TestCase):
         # Set last_login to something so we can determine if it changes.
         default_login = datetime(2000, 1, 1)
         if settings.USE_TZ:
-            default_login = default_login.replace(tzinfo=timezone.utc)
+            default_login = default_login.replace(tzinfo=UTC)
         user.last_login = default_login
         await user.asave()
 
@@ -242,7 +243,8 @@ class RemoteUserTest(TestCase):
         # Known user authenticates
         response = self.client.get("/remote_user/", **{self.header: self.known_user})
         self.assertEqual(response.context["user"].username, "knownuser")
-        # During the session, the REMOTE_USER header disappears. Should trigger logout.
+        # During the session, the REMOTE_USER header disappears. Should trigger
+        # logout.
         response = self.client.get("/remote_user/")
         self.assertTrue(response.context["user"].is_anonymous)
         # verify the remoteuser middleware will not remove a user
@@ -261,7 +263,8 @@ class RemoteUserTest(TestCase):
             "/remote_user/", **{self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
-        # During the session, the REMOTE_USER header disappears. Should trigger logout.
+        # During the session, the REMOTE_USER header disappears. Should trigger
+        # logout.
         response = await self.async_client.get("/remote_user/")
         self.assertTrue(response.context["user"].is_anonymous)
         # verify the remoteuser middleware will not remove a user
@@ -487,3 +490,51 @@ class PersistentRemoteUserTest(RemoteUserTest):
         response = await self.async_client.get("/remote_user/")
         self.assertFalse(response.context["user"].is_anonymous)
         self.assertEqual(response.context["user"].username, "knownuser")
+
+
+# RemovedInDjango61Warning.
+class CustomProcessRequestMiddlewareSyncOnly(RemoteUserMiddleware):
+    def process_request(self, request):
+        raise NotImplementedError("process_request has not been implemented.")
+
+
+# RemovedInDjango61Warning.
+class CustomProcessRequestMiddleware(RemoteUserMiddleware):
+    def process_request(self, request):
+        raise NotImplementedError("process_request has not been implemented.")
+
+    async def aprocess_request(self, request):
+        raise NotImplementedError("aprocess_request has not been implemented.")
+
+
+# RemovedInDjango61Warning.
+@override_settings(ROOT_URLCONF="auth_tests.urls")
+class CustomProcessRequestMiddlewareTest(TestCase):
+    @modify_settings(
+        MIDDLEWARE={
+            "append": "auth_tests.test_remote_user."
+            "CustomProcessRequestMiddlewareSyncOnly"
+        }
+    )
+    async def test_async_warns_sync_only_middleware(self):
+        deprecation_msg = (
+            "Support for subclasses of RemoteUserMiddleware that override "
+            "process_request() without overriding aprocess_request() is "
+            "deprecated."
+        )
+        error_msg = "process_request has not been implemented."
+        with (
+            self.assertWarnsMessage(RemovedInDjango61Warning, deprecation_msg),
+            self.assertRaisesMessage(NotImplementedError, error_msg),
+        ):
+            await self.async_client.get("/remote_user/")
+
+    @modify_settings(
+        MIDDLEWARE={
+            "append": "auth_tests.test_remote_user.CustomProcessRequestMiddleware"
+        }
+    )
+    async def test_async_no_warning_sync_and_async_middleware(self):
+        error_msg = "aprocess_request has not been implemented."
+        with self.assertRaisesMessage(NotImplementedError, error_msg):
+            await self.async_client.get("/remote_user/")

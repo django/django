@@ -5,7 +5,7 @@ Timezone-related classes and functions.
 import functools
 import zoneinfo
 from contextlib import ContextDecorator
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import UTC, datetime, timedelta, timezone, tzinfo
 
 from asgiref.local import Local
 
@@ -201,7 +201,7 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    return datetime.now(tz=timezone.utc if settings.USE_TZ else None)
+    return datetime.now(tz=UTC if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.

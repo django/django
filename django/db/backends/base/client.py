@@ -13,6 +13,9 @@ class BaseDatabaseClient:
         # connection is an instance of BaseDatabaseWrapper.
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     @classmethod
     def settings_to_cmd_args_env(cls, settings_dict, parameters):
         raise NotImplementedError(

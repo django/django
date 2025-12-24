@@ -407,7 +407,7 @@ Models
   SQL on MySQL by using ``DELETE`` instead of ``TRUNCATE`` statements for
   tables which don't require resetting sequences.
 
-* SQLite functions are now marked as :py:meth:`deterministic
+* SQLite functions are now marked as :meth:`deterministic
   <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
   in check constraints and partial indexes.
 
@@ -654,7 +654,7 @@ Miscellaneous
   :attr:`~django.http.HttpResponse.content`.
 
 * ``django.utils.decorators.classproperty()`` decorator is made public and
-  moved to :class:`django.utils.functional.classproperty()`.
+  moved to :class:`django.utils.functional.classproperty`.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.

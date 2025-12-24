@@ -2,6 +2,7 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
+# coby2023t, 2025
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
@@ -10,15 +11,15 @@
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# yubike, 2024
+# coby2023t, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: YAO WEN LIANG, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: coby2023t, 2025\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -39,8 +40,8 @@ msgstr "成功的刪除了 %(count)d 個 %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "無法刪除 %(name)s"
 
-msgid "Are you sure?"
-msgstr "你確定嗎？"
+msgid "Delete multiple objects"
+msgstr "刪除多個物件"
 
 msgid "Administration"
 msgstr "管理"
@@ -259,6 +260,9 @@ msgstr[0] "選取了 %(total_count)s 個"
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 中 0 個被選取"
 
+msgid "Delete"
+msgstr "刪除"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "修改歷史: %s"
@@ -342,6 +346,15 @@ msgstr "導覽路徑"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s 應用程式中的模型"
 
+msgid "Model name"
+msgstr "型號"
+
+msgid "Add link"
+msgstr "加入鏈結"
+
+msgid "Change or view list link"
+msgstr "更改或檢視列表鏈結"
+
 msgid "Add"
 msgstr "新增"
 
@@ -351,13 +364,11 @@ msgstr "查看"
 msgid "You don’t have permission to view or edit anything."
 msgstr "你沒有查看或編輯的權限。"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr "輸入使用者名稱和密碼後，你可以編輯更多使用者選項。"
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "建立帳號後即可編輯更多用戶選項。"
 
-msgid "Enter a username and password."
-msgstr "輸入使用者名稱和密碼。"
+msgid "Error:"
+msgstr "錯誤:"
 
 msgid "Change password"
 msgstr "修改密碼"
@@ -440,9 +451,6 @@ msgstr "切換主題（當前主題:淺色）"
 msgid "Toggle theme (current theme: dark)"
 msgstr "切換主題（當前主題:深色）"
 
-msgid "Delete"
-msgstr "刪除"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -475,9 +483,6 @@ msgstr "是的，我確定"
 
 msgid "No, take me back"
 msgstr "不，返回"
-
-msgid "Delete multiple objects"
-msgstr "刪除多個物件"
 
 #, python-format
 msgid ""
@@ -548,8 +553,8 @@ msgstr ""
 "您目前以%(username)s登入，但並沒有瀏覽此頁面的權限。您是否希望以其他帳號登"
 "入？"
 
-msgid "Forgotten your password or username?"
-msgstr "忘記您的密碼或是使用者名稱？"
+msgid "Forgotten your login credentials?"
+msgstr "忘記您的簽入証 ?"
 
 msgid "Toggle navigation"
 msgstr "切換導航"
@@ -701,8 +706,8 @@ msgstr "這封電子郵件來自 %(site_name)s，因為您要求為帳號重新�
 msgid "Please go to the following page and choose a new password:"
 msgstr "請到該頁面選擇一個新的密碼："
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "提醒一下，您的用戶名是："
+msgid "In case you’ve forgotten, you are:"
+msgstr "如果您真忘了，您是: "
 
 msgid "Thanks for using our site!"
 msgstr "感謝使用本網站！"

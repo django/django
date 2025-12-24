@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020-2022
+# Aarni Koskela, 2015,2017,2020-2022,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Aarni Koskela, 2015,2017,2020-2022,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -26,12 +26,8 @@ msgstr "Mahdolliset %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Tämä on lista saatavilla olevista %s. Valitse alla olevasta laatikosta "
-"haluamasi ja siirrä ne valittuihin klikkamalla \"Valitse\"-nuolta "
-"laatikoiden välillä."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +36,17 @@ msgstr "Kirjoita tähän listaan suodattaaksesi %s-listaa."
 msgid "Filter"
 msgstr "Suodatin"
 
-msgid "Choose all"
-msgstr "Valitse kaikki"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klikkaa valitaksesi kaikki %s kerralla."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Valitse"
-
-msgid "Remove"
-msgstr "Poista"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,29 +54,25 @@ msgstr "Valitut %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Tämä on lista valituista %s. Voit poistaa valintoja valitsemalla ne "
-"allaolevasta laatikosta ja siirtämällä ne takaisin valitsemattomiin "
-"klikkamalla \"Poista\"-nuolta laatikoiden välillä."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
+msgstr "Kirjoita tähän listaan suodattaaksesi valittujen %s-kohteiden listaa."
+
+msgid "(click to clear)"
 msgstr ""
 
-msgid "Remove all"
-msgstr "Poista kaikki"
-
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klikkaa poistaaksesi kaikki valitut %s kerralla."
+msgid "Remove all %s"
+msgstr ""
 
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s valittu kohde ei näkyvissä"
+msgstr[1] "%s valittua kohdetta ei näkyvissä"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -321,9 +312,3 @@ msgstr "Pe"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "La"
-
-msgid "Show"
-msgstr "Näytä"
-
-msgid "Hide"
-msgstr "Piilota"

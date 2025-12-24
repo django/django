@@ -5,7 +5,7 @@
 # Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin <martinpajuste@gmail.com>, 2015,2022-2024
+# Martin <martinpajuste@gmail.com>, 2015,2022-2025
 # Martin <martinpajuste@gmail.com>, 2016,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2025\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -36,8 +36,8 @@ msgstr "%(count)d %(items)s kustutamine õnnestus."
 msgid "Cannot delete %(name)s"
 msgstr "Ei saa kustutada %(name)s"
 
-msgid "Are you sure?"
-msgstr "Kas olete kindel?"
+msgid "Delete multiple objects"
+msgstr "Kustuta mitu objekti"
 
 msgid "Administration"
 msgstr "Administreerimine"
@@ -263,6 +263,9 @@ msgstr[1] "Kõik %(total_count)s valitud"
 msgid "0 of %(cnt)s selected"
 msgstr "valitud 0/%(cnt)s"
 
+msgid "Delete"
+msgstr "Kustuta"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
@@ -346,6 +349,15 @@ msgstr "Lingirivi"
 msgid "Models in the %(name)s application"
 msgstr "Rakenduse %(name)s moodulid"
 
+msgid "Model name"
+msgstr "Mudeli nimi"
+
+msgid "Add link"
+msgstr "Lisa link"
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Lisa"
 
@@ -355,15 +367,11 @@ msgstr "Vaata"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Teil pole õigust midagi vaadata ega muuta."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Kõigepealt sisestage kasutajatunnus ja salasõna. Seejärel saate muuta "
-"täiendavaid kasutajaandmeid."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Pärast kasutaja loomist saate muuta täiendavaid kasutajaandmeid."
 
-msgid "Enter a username and password."
-msgstr "Sisestage kasutajanimi ja salasõna."
+msgid "Error:"
+msgstr "Viga:"
 
 msgid "Change password"
 msgstr "Muuda salasõna"
@@ -386,10 +394,10 @@ msgid ""
 msgstr ""
 
 msgid "Disable password-based authentication"
-msgstr ""
+msgstr "Paroolipõhise autentimise väljalülitamine"
 
 msgid "Enable password-based authentication"
-msgstr ""
+msgstr "Paroolipõhise autentimise lubamine"
 
 msgid "Skip to main content"
 msgstr "Liigu põhisisu juurde"
@@ -447,9 +455,6 @@ msgstr "Teema lülitamine (hetkel: hele)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Teema lülitamine (hetkel: tume)"
 
-msgid "Delete"
-msgstr "Kustuta"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -485,9 +490,6 @@ msgstr "Jah, olen kindel"
 
 msgid "No, take me back"
 msgstr "Ei, mine tagasi"
-
-msgid "Delete multiple objects"
-msgstr "Kustuta mitu objekti"
 
 #, python-format
 msgid ""
@@ -561,8 +563,8 @@ msgstr ""
 "Olete sisse logitud kasutajana %(username)s, kuid teil puudub ligipääs "
 "lehele. Kas te soovite teise kontoga sisse logida?"
 
-msgid "Forgotten your password or username?"
-msgstr "Unustasite oma parooli või kasutajanime?"
+msgid "Forgotten your login credentials?"
+msgstr "Unustasid oma sisselogimisandmed?"
 
 msgid "Toggle navigation"
 msgstr "Lülita navigeerimine sisse"
@@ -727,8 +729,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Palun minge järmisele lehele ning sisestage uus salasõna"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Teie kasutajatunnus juhuks, kui olete unustanud:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Kui olete unustanud, siis olete:"
 
 msgid "Thanks for using our site!"
 msgstr "Täname meie lehte külastamast!"

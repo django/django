@@ -148,7 +148,7 @@ class FeedgeneratorTests(SimpleTestCase):
                 rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
                 self.assertEqual(
                     rss_feed.latest_post_date().tzinfo,
-                    datetime.timezone.utc,
+                    datetime.UTC,
                 )
 
     def test_stylesheet_keeps_lazy_urls(self):

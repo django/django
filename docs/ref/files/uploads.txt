@@ -25,8 +25,8 @@ You'll usually use one of these methods to access the uploaded content:
 .. method:: UploadedFile.multiple_chunks(chunk_size=None)
 
     Returns ``True`` if the uploaded file is big enough to require reading in
-    multiple chunks. By default this will be any file larger than 2.5 megabytes,
-    but that's configurable; see below.
+    multiple chunks. By default this will be any file larger than 2.5
+    megabytes, but that's configurable; see below.
 
 .. method:: UploadedFile.chunks(chunk_size=None)
 

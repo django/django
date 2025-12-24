@@ -1,8 +1,15 @@
 import itertools
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models import Field
-from django.db.models.expressions import ColPairs, Func, ResolvedOuterRef, Value
+from django.db import NotSupportedError, models
+from django.db.models.expressions import (
+    ColPairs,
+    Exists,
+    Func,
+    ResolvedOuterRef,
+    Subquery,
+    Value,
+)
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -19,13 +26,24 @@ from django.db.models.sql.where import AND, OR, WhereNode
 class Tuple(Func):
     allows_composite_expressions = True
     function = ""
-    output_field = Field()
+    output_field = models.Field()
 
     def __len__(self):
         return len(self.source_expressions)
 
     def __iter__(self):
         return iter(self.source_expressions)
+
+    def as_sqlite(self, compiler, connection):
+        if connection.get_database_version() < (3, 37) and isinstance(
+            first_expr := self.source_expressions[0], Tuple
+        ):
+            first_expr = first_expr.copy()
+            first_expr.function = "VALUES"
+            return Tuple(first_expr, *self.source_expressions[1:]).as_sql(
+                compiler, connection
+            )
+        return self.as_sql(compiler, connection)
 
 
 class TupleLookupMixin:
@@ -36,7 +54,8 @@ class TupleLookupMixin:
             self.check_rhs_is_tuple_or_list()
             self.check_rhs_length_equals_lhs_length()
         else:
-            self.check_rhs_is_outer_ref()
+            self.check_rhs_is_supported_expression()
+            super().get_prep_lookup()
         return self.rhs
 
     def check_rhs_is_tuple_or_list(self):
@@ -54,13 +73,13 @@ class TupleLookupMixin:
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
 
-    def check_rhs_is_outer_ref(self):
-        if not isinstance(self.rhs, ResolvedOuterRef):
+    def check_rhs_is_supported_expression(self):
+        if not isinstance(self.rhs, (ResolvedOuterRef, Query)):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
                 f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"only supports OuterRef objects (received {rhs_cls!r})"
+                f"only supports OuterRef and QuerySet objects (received {rhs_cls!r})"
             )
 
     def get_lhs_str(self):
@@ -84,21 +103,55 @@ class TupleLookupMixin:
     def process_rhs(self, compiler, connection):
         if self.rhs_is_direct_value():
             args = [
-                Value(val, output_field=col.output_field)
+                (
+                    val
+                    if hasattr(val, "as_sql")
+                    else Value(val, output_field=col.output_field)
+                )
                 for col, val in zip(self.lhs, self.rhs)
             ]
-            return Tuple(*args).as_sql(compiler, connection)
+            return compiler.compile(Tuple(*args))
         else:
             sql, params = compiler.compile(self.rhs)
-            if not isinstance(self.rhs, ColPairs):
+            if isinstance(self.rhs, ColPairs):
+                return "(%s)" % sql, params
+            elif isinstance(self.rhs, Query):
+                return super().process_rhs(compiler, connection)
+            else:
                 raise ValueError(
                     "Composite field lookups only work with composite expressions."
                 )
-            return "(%s)" % sql, params
+
+    def get_fallback_sql(self, compiler, connection):
+        raise NotImplementedError(
+            f"{self.__class__.__name__}.get_fallback_sql() must be implemented "
+            f"for backends that don't have the supports_tuple_lookups feature enabled."
+        )
+
+    def as_sql(self, compiler, connection):
+        if (
+            not connection.features.supports_tuple_comparison_against_subquery
+            and isinstance(self.rhs, Query)
+            and self.rhs.subquery
+            and isinstance(
+                self, (GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual)
+            )
+        ):
+            lookup = self.lookup_name
+            msg = (
+                f'"{lookup}" cannot be used to target composite fields '
+                "through subqueries on this backend"
+            )
+            raise NotSupportedError(msg)
+        if not connection.features.supports_tuple_lookups:
+            return self.get_fallback_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 class TupleExact(TupleLookupMixin, Exact):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
+        if isinstance(self.rhs, Query):
+            return super(TupleLookupMixin, self).as_sql(compiler, connection)
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) == (x, y, z) as SQL:
@@ -132,7 +185,7 @@ class TupleIsNull(TupleLookupMixin, IsNull):
 
 
 class TupleGreaterThan(TupleLookupMixin, GreaterThan):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) > (x, y, z) as SQL:
@@ -160,7 +213,7 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
 
 
 class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
@@ -188,7 +241,7 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
 
 
 class TupleLessThan(TupleLookupMixin, LessThan):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
@@ -216,7 +269,7 @@ class TupleLessThan(TupleLookupMixin, LessThan):
 
 
 class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
@@ -251,7 +304,7 @@ class TupleIn(TupleLookupMixin, In):
             self.check_rhs_elements_length_equals_lhs_length()
         else:
             self.check_rhs_is_query()
-            self.check_rhs_select_length_equals_lhs_length()
+            super(TupleLookupMixin, self).get_prep_lookup()
 
         return self.rhs  # skip checks from mixin
 
@@ -273,7 +326,7 @@ class TupleIn(TupleLookupMixin, In):
             )
 
     def check_rhs_is_query(self):
-        if not isinstance(self.rhs, Query):
+        if not isinstance(self.rhs, (Query, Subquery)):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
@@ -281,19 +334,10 @@ class TupleIn(TupleLookupMixin, In):
                 f"must be a Query object (received {rhs_cls!r})"
             )
 
-    def check_rhs_select_length_equals_lhs_length(self):
-        len_rhs = len(self.rhs.select)
-        if len_rhs == 1 and isinstance(self.rhs.select[0], ColPairs):
-            len_rhs = len(self.rhs.select[0])
-        len_lhs = len(self.lhs)
-        if len_rhs != len_lhs:
-            lhs_str = self.get_lhs_str()
-            raise ValueError(
-                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"must have {len_lhs} fields (received {len_rhs})"
-            )
-
     def process_rhs(self, compiler, connection):
+        if not self.rhs_is_direct_value():
+            return super(TupleLookupMixin, self).process_rhs(compiler, connection)
+
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
@@ -304,48 +348,66 @@ class TupleIn(TupleLookupMixin, In):
         lhs = self.lhs
 
         for vals in rhs:
+            # Remove any tuple containing None from the list as NULL is never
+            # equal to anything.
+            if any(val is None for val in vals):
+                continue
             result.append(
                 Tuple(
                     *[
-                        Value(val, output_field=col.output_field)
+                        (
+                            val
+                            if hasattr(val, "as_sql")
+                            else Value(val, output_field=col.output_field)
+                        )
                         for col, val in zip(lhs, vals)
                     ]
                 )
             )
 
-        return Tuple(*result).as_sql(compiler, connection)
+        if not result:
+            raise EmptyResultSet
 
-    def as_sql(self, compiler, connection):
-        if not self.rhs_is_direct_value():
-            return self.as_subquery(compiler, connection)
-        return super().as_sql(compiler, connection)
+        return compiler.compile(Tuple(*result))
 
-    def as_sqlite(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
-        if not self.rhs_is_direct_value():
-            return self.as_subquery(compiler, connection)
+        if isinstance(rhs, Query):
+            rhs_exprs = itertools.chain.from_iterable(
+                (
+                    select_expr
+                    if isinstance((select_expr := select[0]), ColPairs)
+                    else [select_expr]
+                )
+                for select in rhs.get_compiler(connection=connection).get_select()[0]
+            )
+            rhs = rhs.clone()
+            rhs.add_q(
+                models.Q(*[Exact(col, val) for col, val in zip(self.lhs, rhs_exprs)])
+            )
+            return compiler.compile(Exists(rhs))
+        elif not self.rhs_is_direct_value():
+            return super(TupleLookupMixin, self).as_sql(compiler, connection)
 
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
-        # WHERE (a = x1 AND b = y1 AND c = z1) OR (a = x2 AND b = y2 AND c = z2)
+        # WHERE (a = x1 AND b = y1 AND c = z1)
+        #    OR (a = x2 AND b = y2 AND c = z2)
         root = WhereNode([], connector=OR)
         lhs = self.lhs
 
         for vals in rhs:
+            # Remove any tuple containing None from the list as NULL is never
+            # equal to anything.
+            if any(val is None for val in vals):
+                continue
             lookups = [Exact(col, val) for col, val in zip(lhs, vals)]
             root.children.append(WhereNode(lookups, connector=AND))
 
+        if not root.children:
+            raise EmptyResultSet
         return root.as_sql(compiler, connection)
-
-    def as_subquery(self, compiler, connection):
-        lhs = self.lhs
-        rhs = self.rhs
-        if isinstance(lhs, ColPairs):
-            rhs = rhs.clone()
-            rhs.set_values([source.name for source in lhs.sources])
-            lhs = Tuple(lhs)
-        return compiler.compile(In(lhs, rhs))
 
 
 tuple_lookups = {

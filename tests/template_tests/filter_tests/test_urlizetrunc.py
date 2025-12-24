@@ -1,5 +1,6 @@
 from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -48,6 +49,7 @@ class UrlizetruncTests(SimpleTestCase):
         )
 
 
+@override_settings(URLIZE_ASSUME_HTTPS=True)
 class FunctionTests(SimpleTestCase):
     def test_truncate(self):
         uri = "http://31characteruri.com/test/"
@@ -93,13 +95,13 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 10),
-            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com'
-            "</a> &quot;&gt;bar&lt;/a&gt;buz",
+            'foo&lt;a href=&quot; <a href="https://google.com" rel="nofollow">'
+            "google.com</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 9, autoescape=False),
-            'foo<a href=" <a href="http://google.com" rel="nofollow">google.c…</a> ">'
+            'foo<a href=" <a href="https://google.com" rel="nofollow">google.c…</a> ">'
             "bar</a>buz",
         )

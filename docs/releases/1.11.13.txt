@@ -18,5 +18,5 @@ Bugfixes
 
 * Fixed a regression in Django 1.11.12 where ``QuerySet.values()`` or
   ``values_list()`` after combining an annotated and unannotated queryset with
-  ``union()``, ``difference()``, or ``intersection()`` crashed due to mismatching
-  columns (:ticket:`29286`).
+  ``union()``, ``difference()``, or ``intersection()`` crashed due to
+  mismatching columns (:ticket:`29286`).

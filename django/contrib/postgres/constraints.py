@@ -9,6 +9,8 @@ from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql import Query
 
+from .utils import CheckPostgresInstalledMixin
+
 __all__ = ["ExclusionConstraint"]
 
 
@@ -16,7 +18,7 @@ class ExclusionConstraintExpression(IndexExpression):
     template = "%(expressions)s WITH %(operator)s"
 
 
-class ExclusionConstraint(BaseConstraint):
+class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
     template = (
         "CONSTRAINT %(name)s EXCLUDE USING %(index_type)s "
         "(%(expressions)s)%(include)s%(where)s%(deferrable)s"
@@ -76,13 +78,15 @@ class ExclusionConstraint(BaseConstraint):
             expressions.append(expression)
         return ExpressionList(*expressions).resolve_expression(query)
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
+        errors = super().check(model, connection)
         references = set()
         for expr, _ in self.expressions:
             if isinstance(expr, str):
                 expr = F(expr)
             references.update(model._get_expr_references(expr))
-        return self._check_references(model, references)
+        errors.extend(self._check_references(model, references))
+        return errors
 
     def _get_condition_sql(self, compiler, schema_editor, query):
         if self.condition is None:
@@ -206,6 +210,11 @@ class ExclusionConstraint(BaseConstraint):
                     self.get_violation_error_message(), code=self.violation_error_code
                 )
         else:
+            # Ignore constraints with excluded fields in condition.
+            if exclude and self._expression_refs_exclude(
+                model, self.condition, exclude
+            ):
+                return
             if (self.condition & Exists(queryset.filter(self.condition))).check(
                 replacement_map, using=using
             ):

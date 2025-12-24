@@ -4,7 +4,7 @@
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
 # András Veres-Szentkirályi, 2016,2018-2020,2023
-# Balázs R, 2023
+# Balázs R, 2023,2025
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2017
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: András Veres-Szentkirályi, 2016,2018-2020,2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -39,8 +39,8 @@ msgstr "%(count)d %(items)s sikeresen törölve lett."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s törlése nem sikerült"
 
-msgid "Are you sure?"
-msgstr "Biztos benne?"
+msgid "Delete multiple objects"
+msgstr "Több elem törlése"
 
 msgid "Administration"
 msgstr "Adminisztráció"
@@ -211,10 +211,6 @@ msgid ""
 msgstr "A(z) \"{obj}\" {name} sikeresen módosítva. Alább újra szerkesztheti."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "A(z) \"{obj}\" {name} sikeresen hozzáadva. Alább újra szerkesztheti."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -275,6 +271,9 @@ msgstr[1] "%(total_count)s kiválasztva"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 kiválasztva ennyiből: %(cnt)s"
+
+msgid "Delete"
+msgstr "Törlés"
 
 #, python-format
 msgid "Change history: %s"
@@ -359,6 +358,15 @@ msgstr "Breadcrumb navigáció"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s alkalmazásban elérhető modellek."
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Új"
 
@@ -368,18 +376,17 @@ msgstr "Megtekintés"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Jelenleg nincs jogosultsága bármit megtekinteni vagy szerkeszteni."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Először adjon meg egy felhasználónevet és jelszót. A mentés után a többi "
-"felhasználói adat is szerkeszthető lesz."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "A felhasználó létrehozása után a többi adat is szerkeszthető lesz."
 
-msgid "Enter a username and password."
-msgstr "Írjon be egy felhasználónevet és jelszót."
+msgid "Error:"
+msgstr "Hiba:"
 
 msgid "Change password"
 msgstr "Jelszó megváltoztatása"
+
+msgid "Set password"
+msgstr "Jelszó beállítása"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -390,6 +397,17 @@ msgstr[1] "Kérem javítsa a lenti hibákat."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Adjon meg egy új jelszót <strong>%(username)s</strong> nevű felhasználónak."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Ugrás az oldal fő részéhez"
@@ -447,9 +465,6 @@ msgstr "Téma váltás (jelenleg: világos)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Téma váltás (jelenleg: sötét)"
 
-msgid "Delete"
-msgstr "Törlés"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -484,9 +499,6 @@ msgstr "Igen, biztos vagyok benne"
 
 msgid "No, take me back"
 msgstr "Nem, forduljunk vissza"
-
-msgid "Delete multiple objects"
-msgstr "Több elem törlése"
 
 #, python-format
 msgid ""
@@ -562,8 +574,8 @@ msgstr ""
 "Jelenleg be vagy lépve mint %(username)s, de nincs jogod elérni ezt az "
 "oldalt. Szeretnél belépni egy másik fiókkal?"
 
-msgid "Forgotten your password or username?"
-msgstr "Elfelejtette jelszavát vagy felhasználónevét?"
+msgid "Forgotten your login credentials?"
+msgstr "Elfelejtette a bejelentkezési adatait?"
 
 msgid "Toggle navigation"
 msgstr "Navigáció megjelenítése/elrejtése"
@@ -728,8 +740,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Kérjük látogassa meg a következő oldalt, és válasszon egy új jelszót:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "A felhasználóneve, amennyiben nem emlékezne rá:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Ha esetleg elfelejtette volna, a felhasználóneve: "
 
 msgid "Thanks for using our site!"
 msgstr "Köszönjük, hogy használta honlapunkat!"

@@ -1,0 +1,25 @@
+==========================
+Django 5.1.8 release notes
+==========================
+
+*April 2, 2025*
+
+Django 5.1.8 fixes a security issue with severity "moderate" and several bugs
+in 5.1.7.
+
+CVE-2025-27556: Potential denial-of-service vulnerability in ``LoginView``, ``LogoutView``, and ``set_language()`` on Windows
+=============================================================================================================================
+
+Python's :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
+Windows. As a consequence, :class:`~django.contrib.auth.views.LoginView`,
+:class:`~django.contrib.auth.views.LogoutView`, and
+:func:`~django.views.i18n.set_language` were subject to a potential
+denial-of-service attack via certain inputs with a very large number of Unicode
+characters.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1.7 where the removal of the ``single_object``
+  parameter unintentionally altered the signature and return type of
+  ``LogEntryManager.log_actions()`` (:ticket:`36234`).

@@ -488,8 +488,8 @@ class CommandRunTests(AdminScriptTestCase):
             "settings.py",
             apps=["django.contrib.staticfiles", "user_commands"],
             sdict={
-                # (staticfiles.E001) The STATICFILES_DIRS setting is not a tuple or
-                # list.
+                # (staticfiles.E001) The STATICFILES_DIRS setting is not a
+                # tuple or list.
                 "STATICFILES_DIRS": '"foo"',
             },
         )
@@ -565,11 +565,15 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
 
     def test_run_formatters_handles_oserror_for_black_path(self):
+        test_files_path = Path(__file__).parent / "test_files"
         cases = [
-            (FileNotFoundError, "nonexistent"),
+            (
+                FileNotFoundError,
+                str(test_files_path / "nonexistent"),
+            ),
             (
                 OSError if sys.platform == "win32" else PermissionError,
-                str(Path(__file__).parent / "test_files" / "black"),
+                str(test_files_path / "black"),
             ),
         ]
         for exception, location in cases:

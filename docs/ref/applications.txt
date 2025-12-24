@@ -271,7 +271,7 @@ Methods
 
     Requires the app registry to be fully populated unless the
     ``require_ready`` argument is set to ``False``. ``require_ready`` behaves
-    exactly as in :meth:`apps.get_model()`.
+    exactly as in :meth:`apps.get_model`.
 
 .. method:: AppConfig.ready()
 
@@ -309,24 +309,24 @@ Methods
     .. warning::
 
         Although you can access model classes as described above, avoid
-        interacting with the database in your :meth:`ready()` implementation.
+        interacting with the database in your :meth:`ready` implementation.
         This includes model methods that execute queries
-        (:meth:`~django.db.models.Model.save()`,
-        :meth:`~django.db.models.Model.delete()`, manager methods etc.), and
+        (:meth:`~django.db.models.Model.save`,
+        :meth:`~django.db.models.Model.delete`, manager methods etc.), and
         also raw SQL queries via ``django.db.connection``. Your
-        :meth:`ready()` method will run during startup of every management
+        :meth:`ready` method will run during startup of every management
         command. For example, even though the test database configuration is
         separate from the production settings, ``manage.py test`` would still
         execute some queries against your **production** database!
 
     .. note::
 
-        In the usual initialization process, the ``ready`` method is only called
-        once by Django. But in some corner cases, particularly in tests which
-        are fiddling with installed applications, ``ready`` might be called more
-        than once. In that case, either write idempotent methods, or put a flag
-        on your ``AppConfig`` classes to prevent rerunning code which should
-        be executed exactly one time.
+        In the usual initialization process, the ``ready`` method is only
+        called once by Django. But in some corner cases, particularly in tests
+        which are fiddling with installed applications, ``ready`` might be
+        called more than once. In that case, either write idempotent methods,
+        or put a flag on your ``AppConfig`` classes to prevent rerunning code
+        which should be executed exactly one time.
 
 .. _namespace package:
 
@@ -416,7 +416,7 @@ Initialization process
 How applications are loaded
 ---------------------------
 
-When Django starts, :func:`django.setup()` is responsible for populating the
+When Django starts, :func:`django.setup` is responsible for populating the
 application registry.
 
 .. currentmodule:: django
@@ -463,7 +463,7 @@ processes all applications in the order of :setting:`INSTALLED_APPS`.
    import any models at this stage.
 
    Once this stage completes, APIs that operate on application configurations
-   such as :meth:`~apps.get_app_config()` become usable.
+   such as :meth:`~apps.get_app_config` become usable.
 
 #. Then Django attempts to import the ``models`` submodule of each application,
    if there is one.
@@ -473,9 +473,9 @@ processes all applications in the order of :setting:`INSTALLED_APPS`.
    populated at this point, which could cause the ORM to malfunction.
 
    Once this stage completes, APIs that operate on models such as
-   :meth:`~apps.get_model()` become usable.
+   :meth:`~apps.get_model` become usable.
 
-#. Finally Django runs the :meth:`~AppConfig.ready()` method of each application
+#. Finally Django runs the :meth:`~AppConfig.ready` method of each application
    configuration.
 
 .. _applications-troubleshooting:
@@ -489,10 +489,10 @@ Here are some common problems that you may encounter during initialization:
   importing an application configuration or a models module triggers code that
   depends on the app registry.
 
-  For example, :func:`~django.utils.translation.gettext()` uses the app
+  For example, :func:`~django.utils.translation.gettext` uses the app
   registry to look up translation catalogs in applications. To translate at
-  import time, you need :func:`~django.utils.translation.gettext_lazy()`
-  instead. (Using :func:`~django.utils.translation.gettext()` would be a bug,
+  import time, you need :func:`~django.utils.translation.gettext_lazy`
+  instead. (Using :func:`~django.utils.translation.gettext` would be a bug,
   because the translation would happen at import time, rather than at each
   request depending on the active language.)
 
@@ -500,7 +500,7 @@ Here are some common problems that you may encounter during initialization:
   will also trigger this exception. The ORM cannot function properly until all
   models are available.
 
-  This exception also happens if you forget to call :func:`django.setup()` in
+  This exception also happens if you forget to call :func:`django.setup` in
   a standalone Python script.
 
 * ``ImportError: cannot import name ...`` This happens if the import sequence

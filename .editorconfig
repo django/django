@@ -18,11 +18,6 @@ max_line_length = 88
 [*.html]
 indent_size = 2
 
-# The JSON files contain newlines inconsistently
-[*.json]
-indent_size = 2
-insert_final_newline = ignore
-
 [**/admin/js/vendor/**]
 indent_style = ignore
 indent_size = ignore

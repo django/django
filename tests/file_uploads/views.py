@@ -135,7 +135,8 @@ def file_upload_interrupted_temporary_file(request):
 
 def file_upload_getlist_count(request):
     """
-    Check the .getlist() function to ensure we receive the correct number of files.
+    Check the .getlist() function to ensure we receive the correct number of
+    files.
     """
     file_counts = {}
 

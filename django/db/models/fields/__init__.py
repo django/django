@@ -932,9 +932,7 @@ class Field(RegisterLookupMixin):
     @property
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
-        return (
-            self.has_db_default() and connection.features.can_return_columns_from_insert
-        )
+        return self.has_db_default()
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
@@ -997,7 +995,8 @@ class Field(RegisterLookupMixin):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         """
-        Return field's value prepared for interacting with the database backend.
+        Return field's value prepared for interacting with the database
+        backend.
 
         Used by the default implementations of get_db_prep_save().
         """
@@ -1339,7 +1338,7 @@ class CommaSeparatedIntegerField(CharField):
 
 def _to_naive(value):
     if timezone.is_aware(value):
-        value = timezone.make_naive(value, datetime.timezone.utc)
+        value = timezone.make_naive(value, datetime.UTC)
     return value
 
 
@@ -1788,8 +1787,9 @@ class DecimalField(Field):
 
     @cached_property
     def validators(self):
-        return super().validators + [
-            validators.DecimalValidator(self.max_digits, self.decimal_places)
+        return [
+            *super().validators,
+            validators.DecimalValidator(self.max_digits, self.decimal_places),
         ]
 
     @cached_property
@@ -1926,8 +1926,8 @@ class EmailField(CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        # We do not exclude max_length if it matches default as we want to change
-        # the default in future.
+        # We do not exclude max_length if it matches default as we want to
+        # change the default in future.
         return name, path, args, kwargs
 
     def formfield(self, **kwargs):

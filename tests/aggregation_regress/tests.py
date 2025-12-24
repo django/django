@@ -314,7 +314,8 @@ class AggregationTests(TestCase):
             publisher_id=self.p2.id,
             rating=3.0,
         )
-        # Different DB backends return different types for the extra select computation
+        # Different DB backends return different types for the extra select
+        # computation
         self.assertIn(obj.manufacture_cost, (11.545, Decimal("11.545")))
 
         # Order of the annotate/extra in the query doesn't matter
@@ -335,7 +336,8 @@ class AggregationTests(TestCase):
             publisher_id=self.p2.id,
             rating=3.0,
         )
-        # Different DB backends return different types for the extra select computation
+        # Different DB backends return different types for the extra select
+        # computation
         self.assertIn(obj.manufacture_cost, (11.545, Decimal("11.545")))
 
         # Values queries can be combined with annotate and extra
@@ -498,8 +500,8 @@ class AggregationTests(TestCase):
             },
         )
 
-        # Regression for #15624 - Missing SELECT columns when using values, annotate
-        # and aggregate in a single query
+        # Regression for #15624 - Missing SELECT columns when using values,
+        # annotate and aggregate in a single query
         self.assertEqual(
             Book.objects.annotate(c=Count("authors")).values("c").aggregate(Max("c")),
             {"c__max": 3},
@@ -935,11 +937,13 @@ class AggregationTests(TestCase):
             .order_by()
             .query
         )
-        # There is just one GROUP BY clause (zero commas means at most one clause).
+        # There is just one GROUP BY clause (zero commas means at most one
+        # clause).
         self.assertEqual(qstr[qstr.index("GROUP BY") :].count(", "), 0)
 
     def test_duplicate_alias(self):
-        # Regression for #11256 - duplicating a default alias raises ValueError.
+        # Regression for #11256 - duplicating a default alias raises
+        # ValueError.
         msg = (
             "The named annotation 'authors__age__avg' conflicts with "
             "the default name for another annotation."
@@ -1004,7 +1008,8 @@ class AggregationTests(TestCase):
 
     def test_reverse_relation_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
-        # that conflicts with a reverse-related name on the model raises ValueError
+        # that conflicts with a reverse-related name on the model raises
+        # ValueError
         msg = "The annotation 'book_contact_set' conflicts with a field on the model."
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(book_contact_set=Avg("friends__age"))
@@ -1417,8 +1422,8 @@ class AggregationTests(TestCase):
     def test_annotate_joins(self):
         """
         The base table's join isn't promoted to LOUTER. This could
-        cause the query generation to fail if there is an exclude() for fk-field
-        in the query, too. Refs #19087.
+        cause the query generation to fail if there is an exclude() for
+        fk-field in the query, too. Refs #19087.
         """
         qs = Book.objects.annotate(n=Count("pk"))
         self.assertIs(qs.query.alias_map["aggregation_regress_book"].join_type, None)
@@ -1934,8 +1939,8 @@ class JoinPromotionTests(TestCase):
             Count("alfa__name")
         )
         self.assertIn(" INNER JOIN ", str(qs.query))
-        # Also, the existing join is unpromoted when doing filtering for already
-        # promoted join.
+        # Also, the existing join is unpromoted when doing filtering for
+        # already promoted join.
         qs = Charlie.objects.annotate(Count("alfa__name")).filter(
             alfa__name__isnull=False
         )

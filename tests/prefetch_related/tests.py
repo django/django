@@ -3,7 +3,7 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models import F, Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -16,10 +16,12 @@ from django.test.utils import CaptureQueriesContext
 
 from .models import (
     Article,
+    ArticleCustomUUID,
     Author,
     Author2,
     AuthorAddress,
     AuthorWithAge,
+    AuthorWithAgeChild,
     Bio,
     Book,
     Bookmark,
@@ -36,6 +38,7 @@ from .models import (
     Qualification,
     Reader,
     Room,
+    SelfDirectedEmployee,
     TaggedItem,
     Teacher,
     WordEntry,
@@ -361,7 +364,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                     Query,
                     "add_q",
                     autospec=True,
-                    side_effect=lambda self, q: add_q(self, q),
+                    side_effect=lambda self, q, reuse_all: add_q(self, q),
                 ) as add_q_mock:
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
@@ -391,6 +394,58 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
+
+    def test_m2m_join_reuse(self):
+        FavoriteAuthors.objects.bulk_create(
+            [
+                FavoriteAuthors(
+                    author=self.author1, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author1,
+                    likes_author=self.author4,
+                    is_active=False,
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author4, is_active=True
+                ),
+            ]
+        )
+        with self.assertNumQueries(2):
+            authors = list(
+                Author.objects.filter(
+                    pk__in=[self.author1.pk, self.author2.pk]
+                ).prefetch_related(
+                    Prefetch(
+                        "favorite_authors",
+                        queryset=(
+                            Author.objects.annotate(
+                                active_favorite=F("likes_me__is_active"),
+                            ).filter(active_favorite=True)
+                        ),
+                        to_attr="active_favorite_authors",
+                    )
+                )
+            )
+        self.assertEqual(authors[0].active_favorite_authors, [self.author3])
+        self.assertEqual(
+            authors[1].active_favorite_authors, [self.author3, self.author4]
+        )
+
+    def test_prefetch_queryset_child_class(self):
+        employee = SelfDirectedEmployee.objects.create(name="Foo")
+        employee.boss = employee
+        employee.save()
+        with self.assertNumQueries(2):
+            retrieved_employee = SelfDirectedEmployee.objects.prefetch_related(
+                Prefetch("boss", SelfDirectedEmployee.objects.all())
+            ).get()
+        with self.assertNumQueries(0):
+            self.assertEqual(retrieved_employee, employee)
+            self.assertEqual(retrieved_employee.boss, retrieved_employee)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -431,9 +486,10 @@ class CustomPrefetchTests(TestCase):
     @classmethod
     def traverse_qs(cls, obj_iter, path):
         """
-        Helper method that returns a list containing a list of the objects in the
-        obj_iter. Then for each object in the obj_iter, the path will be
-        recursively travelled and the found objects are added to the return value.
+        Helper method that returns a list containing a list of the objects in
+        the obj_iter. Then for each object in the obj_iter, the path will be
+        recursively travelled and the found objects are added to the return
+        value.
         """
         ret_val = []
 
@@ -1009,7 +1065,8 @@ class CustomPrefetchTests(TestCase):
             Prefetch("houses", House.objects.values("pk"))
         with self.assertRaisesMessage(ValueError, msg):
             Prefetch("houses", House.objects.values_list("pk"))
-        # That error doesn't affect managers with custom ModelIterable subclasses
+        # That error doesn't affect managers with custom ModelIterable
+        # subclasses
         self.assertIs(
             Teacher.objects_custom.all()._iterable_class, ModelIterableSubclass
         )
@@ -1046,7 +1103,7 @@ class CustomPrefetchTests(TestCase):
             Query,
             "add_q",
             autospec=True,
-            side_effect=lambda self, q: add_q(self, q),
+            side_effect=lambda self, q, reuse_all: add_q(self, q),
         ) as add_q_mock:
             list(
                 House.objects.prefetch_related(
@@ -1079,8 +1136,8 @@ class DefaultManagerTests(TestCase):
     def test_m2m_then_m2m(self):
         with self.assertNumQueries(3):
             # When we prefetch the teachers, and force the query, we don't want
-            # the default manager on teachers to immediately get all the related
-            # qualifications, since this will do one query per teacher.
+            # the default manager on teachers to immediately get all the
+            # related qualifications, since this will do one query per teacher.
             qs = Department.objects.prefetch_related("teachers")
             depts = "".join(
                 "%s department: %s\n"
@@ -1138,6 +1195,14 @@ class GenericRelationTests(TestCase):
         Comment.objects.create(comment="awesome", content_object_uuid=article)
         qs = Comment.objects.prefetch_related("content_object_uuid")
         self.assertEqual([c.content_object_uuid for c in qs], [article])
+
+    def test_prefetch_GFK_uses_prepped_primary_key(self):
+        article = ArticleCustomUUID.objects.create(name="Blanche")
+        Comment.objects.create(comment="Enchantment", content_object_uuid=article)
+        obj = Comment.objects.prefetch_related("content_object_uuid").get(
+            comment="Enchantment"
+        )
+        self.assertEqual(obj.content_object_uuid, article)
 
     def test_prefetch_GFK_fk_pk(self):
         book = Book.objects.create(title="Poems")
@@ -1254,6 +1319,20 @@ class GenericRelationTests(TestCase):
                 ],
             )
 
+    def test_reverse_generic_relation(self):
+        # Create two distinct bookmarks to ensure the bookmark and
+        # tagged item models primary are offset.
+        first_bookmark = Bookmark.objects.create()
+        second_bookmark = Bookmark.objects.create()
+        TaggedItem.objects.create(
+            content_object=first_bookmark, favorite=second_bookmark
+        )
+        with self.assertNumQueries(2):
+            obj = TaggedItem.objects.prefetch_related("favorite_bookmarks").get()
+        with self.assertNumQueries(0):
+            prefetched_bookmarks = obj.favorite_bookmarks.all()
+            self.assertQuerySetEqual(prefetched_bookmarks, [second_bookmark])
+
 
 class MultiTableInheritanceTest(TestCase):
     @classmethod
@@ -1319,9 +1398,9 @@ class MultiTableInheritanceTest(TestCase):
                 for a in Author.objects.prefetch_related("authorwithage")
             ]
 
-        # Regression for #18090: the prefetching query must include an IN clause.
-        # Note that on Oracle the table name is upper case in the generated SQL,
-        # thus the .lower() call.
+        # Regression for #18090: the prefetching query must include an IN
+        # clause. Note that on Oracle the table name is upper case in the
+        # generated SQL, thus the .lower() call.
         self.assertIn("authorwithage", connection.queries[-1]["sql"].lower())
         self.assertIn(" IN ", connection.queries[-1]["sql"])
 
@@ -1415,8 +1494,9 @@ class LookupOrderingTest(TestCase):
 
     def test_order(self):
         with self.assertNumQueries(4):
-            # The following two queries must be done in the same order as written,
-            # otherwise 'primary_house' will cause non-prefetched lookups
+            # The following two queries must be done in the same order as
+            # written, otherwise 'primary_house' will cause non-prefetched
+            # lookups
             qs = Person.objects.prefetch_related(
                 "houses__rooms", "primary_house__occupants"
             )
@@ -1432,7 +1512,8 @@ class NullableTest(TestCase):
 
     def test_traverse_nullable(self):
         # Because we use select_related() for 'boss', it doesn't need to be
-        # prefetched, but we can still traverse it although it contains some nulls
+        # prefetched, but we can still traverse it although it contains some
+        # nulls
         with self.assertNumQueries(2):
             qs = Employee.objects.select_related("boss").prefetch_related("boss__serfs")
             co_serfs = [
@@ -1739,8 +1820,8 @@ class DirectPrefetchedObjectCacheReuseTests(TestCase):
 
     def test_detect_is_fetched(self):
         """
-        Nested prefetch_related() shouldn't trigger duplicate queries for the same
-        lookup.
+        Nested prefetch_related() shouldn't trigger duplicate queries for the
+        same lookup.
         """
         with self.assertNumQueries(3):
             books = Book.objects.filter(title__in=["book1", "book2"]).prefetch_related(
@@ -2010,3 +2091,184 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
             with self.subTest(book=book):
                 self.assertEqual(len(book.authors_sliced), 1)
                 self.assertIn(book.authors_sliced[0], list(book.authors.all()))
+
+
+class PrefetchRelatedMTICacheTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.book = Book.objects.create(title="Book1")
+        cls.related1 = Author.objects.create(name="related1", first_book=cls.book)
+        cls.related2 = Author.objects.create(name="related2", first_book=cls.book)
+        cls.related3 = Author.objects.create(name="related3", first_book=cls.book)
+        cls.related4 = Author.objects.create(name="related4", first_book=cls.book)
+
+        cls.child = AuthorWithAgeChild.objects.create(
+            name="child",
+            age=31,
+            first_book=cls.book,
+        )
+        cls.m2m_child = AuthorWithAgeChild.objects.create(
+            name="m2m_child",
+            age=31,
+            first_book=cls.book,
+        )
+        cls.m2m_child.favorite_authors.set([cls.related1, cls.related2, cls.related3])
+
+    def test_parent_fk_available_in_child(self):
+        qs = (
+            Author.objects.select_related("authorwithage")
+            .prefetch_related("first_book")
+            .filter(pk=self.child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].authorwithage.first_book, self.book)
+
+    def test_grandparent_fk_available_in_child(self):
+        qs = (
+            Author.objects.select_related(
+                "authorwithage", "authorwithage__authorwithagechild"
+            )
+            .prefetch_related("first_book")
+            .filter(pk=self.child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertEqual(
+                results[0].authorwithage.authorwithagechild.first_book, self.book
+            )
+
+    def test_parent_m2m_available_in_child(self):
+        qs = (
+            Author.objects.select_related("authorwithage")
+            .prefetch_related("favorite_authors")
+            .filter(pk=self.m2m_child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertQuerySetEqual(
+                results[0].authorwithage.favorite_authors.all(),
+                [self.related1, self.related2, self.related3],
+            )
+
+    def test_grandparent_m2m_available_in_child(self):
+        qs = (
+            Author.objects.select_related(
+                "authorwithage", "authorwithage__authorwithagechild"
+            )
+            .prefetch_related("favorite_authors")
+            .filter(pk=self.m2m_child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertQuerySetEqual(
+                set(results[0].authorwithage.authorwithagechild.favorite_authors.all()),
+                {self.related1, self.related2, self.related3},
+            )
+
+    def test_add_clears_prefetched_objects_in_parent(self):
+        gp = (
+            Author.objects.select_related("authorwithage")
+            .prefetch_related("favorite_authors")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            {self.related1, self.related2, self.related3},
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            {self.related1, self.related2, self.related3},
+        )
+        gp.authorwithage.favorite_authors.add(self.related4)
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            {self.related1, self.related2, self.related3, self.related4},
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            {self.related1, self.related2, self.related3, self.related4},
+        )
+
+    def test_add_clears_prefetched_objects_in_grandparent(self):
+        gp = (
+            Author.objects.select_related(
+                "authorwithage", "authorwithage__authorwithagechild"
+            )
+            .prefetch_related("favorite_authors")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.authorwithagechild.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        gp.authorwithage.authorwithagechild.favorite_authors.add(self.related4)
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.authorwithagechild.favorite_authors.all(),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+
+    def test_remove_clears_prefetched_objects_in_parent(self):
+        gp = (
+            Author.objects.select_related("authorwithage")
+            .prefetch_related("favorite_authors")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        gp.authorwithage.favorite_authors.clear()
+        self.assertSequenceEqual(gp.favorite_authors.all(), [])
+        self.assertSequenceEqual(gp.authorwithage.favorite_authors.all(), [])
+
+    def test_remove_clears_prefetched_objects_in_grandparent(self):
+        gp = (
+            Author.objects.select_related(
+                "authorwithage", "authorwithage__authorwithagechild"
+            )
+            .prefetch_related("favorite_authors")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertCountEqual(
+            gp.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        self.assertCountEqual(
+            gp.authorwithage.authorwithagechild.favorite_authors.all(),
+            [self.related1, self.related2, self.related3],
+        )
+        gp.authorwithage.favorite_authors.clear()
+        self.assertSequenceEqual(gp.favorite_authors.all(), [])
+        self.assertSequenceEqual(gp.authorwithage.favorite_authors.all(), [])
+        self.assertSequenceEqual(
+            gp.authorwithage.authorwithagechild.favorite_authors.all(), []
+        )

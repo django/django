@@ -97,7 +97,8 @@ The following mixins are used to construct Django's editing views:
 
 .. class:: django.views.generic.edit.ModelFormMixin
 
-    A form mixin that works on ``ModelForms``, rather than a standalone form.
+    A form mixin that provides facilities for working with a ``ModelForm``,
+    rather than a standalone form.
 
     Since this is a subclass of
     :class:`~django.views.generic.detail.SingleObjectMixin`, instances of this

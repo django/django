@@ -1,5 +1,6 @@
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Company, Employee, JSONFieldModel
 
@@ -33,6 +34,12 @@ class ValuesExpressionsTests(TestCase):
             Company.objects.values(salary=F("ceo__salary")),
             [{"salary": 10}, {"salary": 20}, {"salary": 30}],
         )
+
+    def test_values_expression_containing_percent_sign_deprecation_warns_once(self):
+        msg = "Using percent signs in a column alias is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as cm:
+            Company.objects.values(**{"alias%": F("id")})
+        self.assertEqual(len(cm.warnings), 1)
 
     def test_values_expression_alias_sql_injection(self):
         crafted_alias = """injected_name" from "expressions_company"; --"""

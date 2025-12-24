@@ -373,7 +373,8 @@ class Tests(TestCase):
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
-            # Check the level on the psycopg connection, not the Django wrapper.
+            # Check the level on the psycopg connection, not the Django
+            # wrapper.
             self.assertEqual(
                 new_connection.connection.isolation_level,
                 IsolationLevel.SERIALIZABLE,

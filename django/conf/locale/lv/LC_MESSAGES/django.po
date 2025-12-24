@@ -2,7 +2,7 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -506,7 +506,7 @@ msgstr "Ierobežojums “%(name)s” ir pārkāpts."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr "Vērtība %(value)r ir nederīga izvēle."
+msgstr "Vērtība %(value)r nav derīga izvēle."
 
 msgid "This field cannot be null."
 msgstr "Šis lauks nevar būt tukšs, null."
@@ -705,8 +705,8 @@ msgid "Value must be valid JSON."
 msgstr "Vērtībai ir jābūt derīgam JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s instance ar %(field)s %(value)r neeksistē."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s instance ar %(field)s %(value)r nav derīga izvēle."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Ārējā atslēga (tipu nosaka lauks uz kuru attiecas)"
@@ -1212,7 +1212,7 @@ msgid "Forbidden"
 msgstr "Aizliegts"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF pārbaude neizdevās. Pieprasījums pārtrauks."
+msgstr "CSRF pārbaude neizdevās. Pieprasījums pārtraukts."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "

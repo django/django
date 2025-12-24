@@ -7,8 +7,8 @@ Database Functions
 
 The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
-Functions are also :doc:`expressions <expressions>`, so they can be used and
-combined with other expressions like :ref:`aggregate functions
+Functions are also :doc:`expressions </ref/models/expressions>`, so they can be
+used and combined with other expressions like :ref:`aggregate functions
 <aggregation-functions>`.
 
 We'll be using the following model in examples of each function::
@@ -168,9 +168,9 @@ and ``comment.modified``.
 
 .. class:: Least(*expressions, **extra)
 
-Accepts a list of at least two field names or expressions and returns the
-least value. Each argument must be of a similar type, so mixing text and numbers
-will result in a database error.
+Accepts a list of at least two field names or expressions and returns the least
+value. Each argument must be of a similar type, so mixing text and numbers will
+result in a database error.
 
 .. warning::
 
@@ -355,7 +355,7 @@ that deal with date-parts can be used with ``DateField``:
 
 .. code-block:: pycon
 
-    >>> from datetime import datetime, timezone
+    >>> from datetime import UTC, datetime
     >>> from django.db.models.functions import (
     ...     ExtractDay,
     ...     ExtractMonth,
@@ -366,8 +366,8 @@ that deal with date-parts can be used with ``DateField``:
     ...     ExtractIsoYear,
     ...     ExtractYear,
     ... )
-    >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
-    >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
+    >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=UTC)
+    >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=UTC)
     >>> Experiment.objects.create(
     ...     start_datetime=start_2015,
     ...     start_date=start_2015.date(),
@@ -424,7 +424,7 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
 
 .. code-block:: pycon
 
-    >>> from datetime import datetime, timezone
+    >>> from datetime import UTC, datetime
     >>> from django.db.models.functions import (
     ...     ExtractDay,
     ...     ExtractHour,
@@ -438,8 +438,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     ...     ExtractIsoYear,
     ...     ExtractYear,
     ... )
-    >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
-    >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
+    >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=UTC)
+    >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=UTC)
     >>> Experiment.objects.create(
     ...     start_datetime=start_2015,
     ...     start_date=start_2015.date(),
@@ -565,8 +565,8 @@ value. If ``output_field`` is omitted, it will default to the ``output_field``
 of ``expression``. A ``tzinfo`` subclass, usually provided by :mod:`zoneinfo`,
 can be passed to truncate a value in a specific timezone.
 
-Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
-return:
+Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in
+``kind``\s return:
 
 * "year": 2015-01-01 00:00:00+00:00
 * "quarter": 2015-04-01 00:00:00+00:00
@@ -664,12 +664,12 @@ that deal with date-parts can be used with ``DateField``:
 
 .. code-block:: pycon
 
-    >>> from datetime import datetime, timezone
+    >>> from datetime import UTC, datetime
     >>> from django.db.models import Count
     >>> from django.db.models.functions import TruncMonth, TruncYear
-    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
-    >>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
-    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
+    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)
+    >>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=UTC)
+    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=UTC)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
     >>> Experiment.objects.create(start_datetime=start2, start_date=start2.date())
     >>> Experiment.objects.create(start_datetime=start3, start_date=start3.date())
@@ -744,7 +744,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from datetime import date, datetime, timezone
+    >>> from datetime import UTC, date, datetime
     >>> from django.db.models import Count
     >>> from django.db.models.functions import (
     ...     TruncDate,
@@ -754,7 +754,7 @@ Usage example:
     ...     TruncSecond,
     ... )
     >>> import zoneinfo
-    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
+    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
     >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")
     >>> Experiment.objects.annotate(
@@ -767,8 +767,8 @@ Usage example:
     {'date': datetime.date(2014, 6, 15),
      'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
      'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
-     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=timezone.utc),
-     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=timezone.utc)
+     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=UTC),
+     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=UTC)
     }
 
 ``TimeField`` truncation
@@ -799,12 +799,12 @@ that deal with time-parts can be used with ``TimeField``:
 
 .. code-block:: pycon
 
-    >>> from datetime import datetime, timezone
+    >>> from datetime import UTC, datetime
     >>> from django.db.models import Count, TimeField
     >>> from django.db.models.functions import TruncHour
-    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
-    >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
-    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
+    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)
+    >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=UTC)
+    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=UTC)
     >>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())
     >>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())
     >>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())
@@ -1823,7 +1823,8 @@ Usage example:
 
 Returns a substring of length ``length`` from the field or expression starting
 at position ``pos``. The position is 1-indexed, so the position must be greater
-than 0. If ``length`` is ``None``, then the rest of the string will be returned.
+than 0. If ``length`` is ``None``, then the rest of the string will be
+returned.
 
 Usage example:
 

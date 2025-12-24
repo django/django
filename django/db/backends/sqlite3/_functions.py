@@ -80,6 +80,7 @@ def register(connection):
     connection.create_aggregate("STDDEV_SAMP", 1, StdDevSamp)
     connection.create_aggregate("VAR_POP", 1, VarPop)
     connection.create_aggregate("VAR_SAMP", 1, VarSamp)
+    connection.create_aggregate("ANY_VALUE", 1, AnyValue)
     # Some math functions are enabled by default in SQLite 3.35+.
     sql = "select sqlite_compileoption_used('ENABLE_MATH_FUNCTIONS')"
     if not connection.execute(sql).fetchone()[0]:
@@ -513,3 +514,8 @@ class VarPop(ListAggregate):
 
 class VarSamp(ListAggregate):
     finalize = statistics.variance
+
+
+class AnyValue(ListAggregate):
+    def finalize(self):
+        return self[0]

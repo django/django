@@ -16,7 +16,8 @@ from .models import Author, Book, Car, Page, Person
 class BaseSignalSetup:
     def setUp(self):
         # Save up the number of connected signals so that we can check at the
-        # end that all the signals we register get properly unregistered (#9989)
+        # end that all the signals we register get properly unregistered
+        # (#9989)
         self.pre_signals = (
             len(signals.pre_save.receivers),
             len(signals.post_save.receivers),
@@ -88,7 +89,8 @@ class SignalTests(BaseSignalSetup, TestCase):
             )
             data[:] = []
 
-            # Calling an internal method purely so that we can trigger a "raw" save.
+            # Calling an internal method purely so that we can trigger a "raw"
+            # save.
             p1.save_base(raw=True)
             self.assertEqual(
                 data,
@@ -341,7 +343,8 @@ class SignalTests(BaseSignalSetup, TestCase):
             )
             data[:] = []
 
-            # Assigning and removing to/from m2m shouldn't generate an m2m signal.
+            # Assigning and removing to/from m2m shouldn't generate an m2m
+            # signal.
             b1.authors.set([a1])
             self.assertEqual(data, [])
             b1.authors.set([])

@@ -14,6 +14,7 @@
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # Juyoung Lim, 2024
+# Lee Dogeon <dev.moreal@gmail.com>, 2025
 # LEE Hwanyong <hwan@ajou.ac.kr>, 2023
 # Seho Noh <iam@sehonoh.kr>, 2018
 # Seacbyul Lee <femizkim@gmail.com>, 2017
@@ -27,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:05+0000\n"
-"Last-Translator: Youngkwang Yang, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Lee Dogeon <dev.moreal@gmail.com>, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,8 +50,8 @@ msgstr "%(count)d개의 %(items)s 을/를 성공적으로 삭제하였습니다.
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s를 삭제할 수 없습니다."
 
-msgid "Are you sure?"
-msgstr "확실합니까?"
+msgid "Delete multiple objects"
+msgstr "여러 개의 오브젝트 삭제"
 
 msgid "Administration"
 msgstr "관리"
@@ -199,7 +200,7 @@ msgstr ""
 "는 \"Command\" 키를 눌러주세요."
 
 msgid "Select this object for an action - {}"
-msgstr "작업에 대한 객체를 선택합니다."
+msgstr "작업에 대한 객체를 선택합니다. - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -282,6 +283,9 @@ msgstr[0] "총 %(total_count)s개가 선택되었습니다."
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 중 아무것도 선택되지 않았습니다."
+
+msgid "Delete"
+msgstr "삭제"
 
 #, python-format
 msgid "Change history: %s"
@@ -366,6 +370,15 @@ msgstr "사용자 위치"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s 애플리케이션의 모델"
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "추가"
 
@@ -375,15 +388,11 @@ msgstr "보기"
 msgid "You don’t have permission to view or edit anything."
 msgstr "독자는 뷰 및 수정 권한이 없습니다."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"첫 번째로, 사용자명과 비밀번호를 입력하세요. 그 후, 독자는 더 많은 사용자 옵"
-"션을 수정할 수 있습니다. "
 
-msgid "Enter a username and password."
-msgstr "사용자 이름과 비밀번호를 입력하세요."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "비밀번호 변경"
@@ -403,12 +412,14 @@ msgid ""
 "This action will <strong>enable</strong> password-based authentication for "
 "this user."
 msgstr ""
+"이 작업은 이 사용자에 대해 비밀번호 기반 인증을 <strong>활성화</strong>합니"
+"다."
 
 msgid "Disable password-based authentication"
-msgstr ""
+msgstr "비밀번호 기반 인증 비활성화"
 
 msgid "Enable password-based authentication"
-msgstr ""
+msgstr "비밀번호 기반 인증 활성화"
 
 msgid "Skip to main content"
 msgstr "메인 콘텐츠로 이동"
@@ -466,9 +477,6 @@ msgstr "테마 토글 (현재 테마: 밝음)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "테마 토글 (현재 테마: 어두움)"
 
-msgid "Delete"
-msgstr "삭제"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -503,9 +511,6 @@ msgstr "네, 확신합니다. "
 
 msgid "No, take me back"
 msgstr "아뇨, 돌려주세요."
-
-msgid "Delete multiple objects"
-msgstr "여러 개의 오브젝트 삭제"
 
 #, python-format
 msgid ""
@@ -580,8 +585,8 @@ msgstr ""
 "%(username)s 로 인증되어 있지만, 이 페이지에 접근 가능한 권한이 없습니다. 다"
 "른 계정으로 로그인하시겠습니까?"
 
-msgid "Forgotten your password or username?"
-msgstr "아이디 또는 비밀번호를 분실하였습니까?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "토글 메뉴"
@@ -743,8 +748,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "다음 페이지에서 새 비밀번호를 선택하세요."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "사용자명:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "사이트를 이용해 주셔서 고맙습니다."

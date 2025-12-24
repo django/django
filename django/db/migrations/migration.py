@@ -128,7 +128,7 @@ class Migration:
                         self.app_label, schema_editor, old_state, project_state
                     )
             else:
-                # Normal behaviour
+                # Normal behavior
                 operation.database_forwards(
                     self.app_label, schema_editor, old_state, project_state
                 )
@@ -189,7 +189,7 @@ class Migration:
                         self.app_label, schema_editor, from_state, to_state
                     )
             else:
-                # Normal behaviour
+                # Normal behavior
                 operation.database_backwards(
                     self.app_label, schema_editor, from_state, to_state
                 )

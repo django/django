@@ -1,6 +1,6 @@
 """
- This module is for the miscellaneous GEOS routines, particularly the
- ones that return the area, distance, and length.
+This module is for the miscellaneous GEOS routines, particularly the
+ones that return the area, distance, and length.
 """
 
 from ctypes import POINTER, c_double, c_int

@@ -3,7 +3,7 @@
 # Translators:
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Igor Melnyk, 2014-2015
-# Illia Volochii <illia.volochii@gmail.com>, 2021,2023
+# Illia Volochii <illia.volochii@gmail.com>, 2021,2023,2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -16,10 +16,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021,2023\n"
-"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021,2023,2025\n"
+"Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,12 +43,22 @@ msgstr "Важливі дати"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Надіслано суперечливі дані форми. Спробуйте ще раз."
+
 msgid "Password changed successfully."
 msgstr "Пароль успішно змінено."
+
+msgid "Password-based authentication was disabled."
+msgstr "Автентифікацію на основі пароля вимкнено."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Змінити пароль: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Встановити пароль: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Аутентифікація та авторизація"
@@ -59,11 +69,17 @@ msgstr "пароль"
 msgid "last login"
 msgstr "останній вхід"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Невірний формат пароля або невідомий алгоритм хешування."
+
 msgid "No password set."
 msgstr "Пароль не встановлено."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Невірний формат пароля або невідомий алгоритм хешування."
+msgid "Reset password"
+msgstr "Скинути пароль"
+
+msgid "Set password"
+msgstr "Встановити пароль"
 
 msgid "The two password fields didn’t match."
 msgstr "Паролі не збігаються"
@@ -78,12 +94,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Введіть той же пароль, що і раніше, для підтвердження."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Паролі не зберігаються у відкритому вигляді, тому немає можливості "
-"переглянути пароль цього користувача, але ви можете змінити пароль за "
-"допомогою <a href=\"{}\">цієї форми</a>."
+"Чи зможе користувач здійснити автентифікацію за допомогою пароля. Якщо "
+"вимкнено, все ще може існувати можливість автентифікації іншими шляхами, як-"
+"от Single Sign-On чи LDAP."
+
+msgid "Password-based authentication"
+msgstr "Автентифікація на основі пароля"
+
+msgid "Enabled"
+msgstr "Увімкнено"
+
+msgid "Disabled"
+msgstr "Вимкнено"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Необроблені паролі не зберігаються, тому немає можливості побачити пароль "
+"користувача."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Увімкніть автентифікацію на основі пароля для цього користувача, встановивши "
+"пароль."
 
 #, python-format
 msgid ""
@@ -111,9 +149,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Старий пароль"
-
-msgid "Password (again)"
-msgstr "Пароль (ще раз)"
 
 msgid "algorithm"
 msgstr "алгоритм"
@@ -238,28 +273,25 @@ msgid "users"
 msgstr "користувачі"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символ"
+"Пароль занадто короткий. Він має складатися щонайменше з %d символу."
 msgstr[1] ""
-"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символи"
+"Пароль занадто короткий. Він має складатися щонайменше з %d символів."
 msgstr[2] ""
-"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символів"
+"Пароль занадто короткий. Він має складатися щонайменше з %d символів."
 msgstr[3] ""
-"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символів"
+"Пароль занадто короткий. Він має складатися щонайменше з %d символів."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Ваш пароль повинен містити як мінімум %(min_length)d символ"
-msgstr[1] "Ваш пароль повинен містити як мінімум %(min_length)d символи"
-msgstr[2] "Ваш пароль повинен містити як мінімум %(min_length)d символів"
-msgstr[3] "Ваш пароль повинен містити як мінімум %(min_length)d символів"
+msgstr[0] "Пароль має складатися щонайменше з %(min_length)d символу."
+msgstr[1] "Пароль має складатися щонайменше з %(min_length)d символів."
+msgstr[2] "Пароль має складатися щонайменше з %(min_length)d символів."
+msgstr[3] "Пароль має складатися щонайменше з %(min_length)d символів."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -269,7 +301,7 @@ msgid "Your password can’t be too similar to your other personal information."
 msgstr "Пароль не може бути надто схожим на іншу особисту інформацію."
 
 msgid "This password is too common."
-msgstr "Пароль надто відомий."
+msgstr "Пароль занадто поширений."
 
 msgid "Your password can’t be a commonly used password."
 msgstr "Пароль не може бути одним із дуже поширених."

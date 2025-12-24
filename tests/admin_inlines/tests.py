@@ -19,6 +19,7 @@ from .models import (
     Child,
     ChildModel1,
     ChildModel2,
+    ExtraTerrestrial,
     Fashionista,
     FootNote,
     Holder,
@@ -240,7 +241,10 @@ class TestInline(TestDataMixin, TestCase):
         )
 
     def test_no_parent_callable_lookup(self):
-        """Admin inline `readonly_field` shouldn't invoke parent ModelAdmin callable"""
+        """
+        Admin inline `readonly_field` shouldn't invoke parent ModelAdmin
+        callable
+        """
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse("admin:admin_inlines_novel_add"))
@@ -323,7 +327,9 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(response, "Label from ModelForm.Meta")
 
     def test_inline_hidden_field_no_column(self):
-        """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
+        """
+        #18263 -- Make sure hidden fields don't get a column in tabular inlines
+        """
         parent = SomeParentModel.objects.create(name="a")
         SomeChildModel.objects.create(name="b", position="0", parent=parent)
         SomeChildModel.objects.create(name="c", position="1", parent=parent)
@@ -1231,7 +1237,8 @@ class TestInlinePermissions(TestCase):
         )
         self.user.user_permissions.add(permission)
         response = self.client.get(self.holder_change_url)
-        # Change permission on inner2s, so we can change existing but not add new
+        # Change permission on inner2s, so we can change existing but not add
+        # new
         self.assertContains(
             response,
             '<h2 id="inner2_set-heading" class="inline-heading">Inner2s</h2>',
@@ -1453,12 +1460,13 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         response = self.client.get(self.change_url)
         self.assertContains(
             response,
-            '<a href="/admin/admin_inlines/poll/" class="closelink">Close</a>',
+            '<a role="button" href="/admin/admin_inlines/poll/" class="closelink">'
+            "Close</a>",
             html=True,
         )
         delete_link = (
-            '<a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete'
-            "</a>"
+            '<a role="button" href="/admin/admin_inlines/poll/%s/delete/" '
+            'class="deletelink">Delete</a>'
         )
         self.assertNotContains(response, delete_link % self.poll.id, html=True)
         self.assertNotContains(
@@ -2493,3 +2501,60 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+        # The table does not overflow the content section.
+        content = self.selenium.find_element(By.ID, "content-main")
+        tabular_wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.tabular.inline-related div.wrapper"
+        )
+        self.assertGreater(
+            tabular_wrapper.find_element(By.TAG_NAME, "table").size["width"],
+            tabular_wrapper.size["width"],
+        )
+        self.assertLessEqual(tabular_wrapper.size["width"], content.size["width"])
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_delete_layout(self):
+        from selenium.webdriver.common.by import By
+
+        user = User.objects.create_user("testing", password="password", is_staff=True)
+        et_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ExtraTerrestrial),
+        )
+        s_permission = Permission.objects.filter(
+            codename__in=["view_sighting", "add_sighting"],
+            content_type=ContentType.objects.get_for_model(Sighting),
+        )
+        user.user_permissions.add(*et_permission, *s_permission)
+        self.admin_login(username="testing", password="password")
+        cf = ExtraTerrestrial.objects.create(name="test")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(cf.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module thead tr th"
+        )
+        self.assertHTMLEqual(headers[-1].get_attribute("outerHTML"), "<th></th>")
+        delete = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "fieldset.module tbody tr.dynamic-sighting_set:not(.original) td.delete",
+        )
+        self.assertIn(
+            '<a role="button" class="inline-deletelink" href="#">',
+            delete.get_attribute("innerHTML"),
+        )
+        self.take_screenshot("loaded")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_object_with_show_change_link(self):
+        from selenium.webdriver.common.by import By
+
+        et = ExtraTerrestrial.objects.create(name="test")
+        Sighting.objects.create(et=et, place="Desert")
+        self.admin_login(username="super", password="secret")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(et.pk,))
+        self.selenium.get(self.live_server_url + url)
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original p"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertIn("Desert", object_str.text)
+        self.take_screenshot("tabular")

@@ -3,7 +3,7 @@ from unittest import skipUnless
 from django.core import checks
 from django.db import connection, models
 from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from django.test.utils import isolate_apps, modify_settings
 
 
 @isolate_apps("invalid_models_tests")
@@ -87,6 +87,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
         )
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
+    @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
     def test_postgres_ci_fields_deprecated(self):
         from django.contrib.postgres.fields import (
             ArrayField,

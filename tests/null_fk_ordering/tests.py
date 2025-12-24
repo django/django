@@ -20,9 +20,9 @@ class NullFkOrderingTests(TestCase):
             author=author_2, title="This article written by Bob Smith"
         )
 
-        # We can't compare results directly (since different databases sort NULLs to
-        # different ends of the ordering), but we can check that all results are
-        # returned.
+        # We can't compare results directly (since different databases sort
+        # NULLs to different ends of the ordering), but we can check that all
+        # results are returned.
         self.assertEqual(len(list(Article.objects.all())), 3)
 
         s = SystemInfo.objects.create(system_name="System Info")
@@ -36,8 +36,8 @@ class NullFkOrderingTests(TestCase):
         Comment.objects.create(comment_text="Another first comment")
         Comment.objects.create(post=p2, comment_text="Another second comment")
 
-        # We have to test this carefully. Some databases sort NULL values before
-        # everything else, some sort them afterward. So we extract the ordered list
-        # and check the length. Before the fix, this list was too short (some values
-        # were omitted).
+        # We have to test this carefully. Some databases sort NULL values
+        # before everything else, some sort them afterward. So we extract the
+        # ordered list and check the length. Before the fix, this list was too
+        # short (some values were omitted).
         self.assertEqual(len(list(Comment.objects.all())), 4)

@@ -189,7 +189,7 @@ class Command(BaseCommand):
             file=self.stdout,
         )
         docs_version = get_docs_version()
-        if os.environ.get("HIDE_PRODUCTION_WARNING") != "true":
+        if os.environ.get("DJANGO_RUNSERVER_HIDE_WARNING") != "true":
             self.stdout.write(
                 self.style.WARNING(
                     "WARNING: This is a development server. Do not use it in a "

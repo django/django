@@ -509,7 +509,8 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
             codename="change_person", content_type=person_content_type
         )
         staff_user.user_permissions.add(view_company, change_person)
-        response_for_person = self.client.get(person_url)
+        with captured_stderr():
+            response_for_person = self.client.get(person_url)
         response_for_company = self.client.get(company_url)
         # View or change permission grants access.
         self.assertEqual(response_for_person.status_code, 200)

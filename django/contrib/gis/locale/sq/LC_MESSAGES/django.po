@@ -2,14 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011,2015
+# Besnik Bleta <besnik@programeshqip.org>, 2025
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2015,2019\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -22,11 +23,13 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr "Fusha GIS bazë."
+msgstr "Fushat GIS bazë."
 
 msgid ""
 "The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Fusha bazë Gjeometri — e përshoqëron me llojin Gjeometri me Specifikime "
+"OpenGIS."
 
 msgid "Point"
 msgstr "Pikë"

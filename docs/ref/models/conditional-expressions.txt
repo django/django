@@ -6,9 +6,9 @@ Conditional Expressions
 
 Conditional expressions let you use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic within filters, annotations, aggregations, and updates. A
-conditional expression evaluates a series of conditions for each row of a
-table and returns the matching result expression. Conditional expressions can
-also be combined and nested like other :doc:`expressions <expressions>`.
+conditional expression evaluates a series of conditions for each row of a table
+and returns the matching result expression. Conditional expressions can also be
+combined and nested like other :doc:`expressions </ref/models/expressions>`.
 
 The conditional expression classes
 ==================================

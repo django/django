@@ -1,10 +1,10 @@
 """Tests related to django.db.backends that haven't been organized."""
 
 import datetime
+import logging
 import threading
 import unittest
 import warnings
-from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -57,8 +57,8 @@ class DateQuotingTest(TestCase):
 
     def test_django_date_extract(self):
         """
-        Test the custom ``django_date_extract method``, in particular against fields
-        which clash with strings passed to it (e.g. 'day') (#12818).
+        Test the custom ``django_date_extract method``, in particular against
+        fields which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
         SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -73,23 +73,24 @@ class LastExecutedQueryTest(TestCase):
         last_executed_query should not raise an exception even if no previous
         query has been run.
         """
+        suffix = connection.features.bare_select_suffix
         with connection.cursor() as cursor:
+            if connection.vendor == "oracle":
+                cursor.statement = None
+            # No previous query has been run.
             connection.ops.last_executed_query(cursor, "", ())
+            # Previous query crashed.
+            connection.ops.last_executed_query(cursor, "SELECT %s" + suffix, (1,))
 
     def test_debug_sql(self):
-        qs = Reporter.objects.filter(first_name="test")
-        ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
-            list(qs)
-        # Queries are formatted with DatabaseOperations.format_debug_sql().
-        format_debug_sql.assert_called()
+        list(Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
 
     def test_query_encoding(self):
         """last_executed_query() returns a string."""
-        data = RawData.objects.filter(raw_data=b"\x00\x46  \xFE").extra(
+        data = RawData.objects.filter(raw_data=b"\x00\x46  \xfe").extra(
             select={"föö": 1}
         )
         sql, params = data.query.sql_with_params()
@@ -233,7 +234,10 @@ class LongNameTest(TransactionTestCase):
 @skipUnlessDBFeature("supports_sequence_reset")
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
-        "Sequence names are correct when resetting generic relations (Ref #13941)"
+        """
+        Sequence names are correct when resetting generic relations (Ref
+        #13941)
+        """
         # Create an object with a manually specified PK
         Post.objects.create(id=10, name="1st post", text="hello world")
 
@@ -571,23 +575,39 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
-    @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
-    def test_queries_logger(self, mocked_logger):
-        sql = "SELECT 1" + connection.features.bare_select_suffix
-        sql = connection.ops.format_debug_sql(sql)
-        with connection.cursor() as cursor:
+    def test_queries_logger(self):
+        sql = "select 1" + connection.features.bare_select_suffix
+        with (
+            connection.cursor() as cursor,
+            self.assertLogs("django.db.backends", "DEBUG") as handler,
+        ):
             cursor.execute(sql)
-        params, kwargs = mocked_logger.debug.call_args
-        self.assertIn("; alias=%s", params[0])
-        self.assertEqual(params[2], sql)
-        self.assertIsNone(params[3])
-        self.assertEqual(params[4], connection.alias)
-        self.assertEqual(
-            list(kwargs["extra"]),
-            ["duration", "sql", "params", "alias"],
+        self.assertGreaterEqual(
+            records_len := len(handler.records),
+            1,
+            f"Wrong number of calls for {handler=} in (expected at least 1, got "
+            f"{records_len}).",
         )
-        self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
+        record = handler.records[-1]
+        # Log raw message, effective level and args are correct.
+        self.assertEqual(record.msg, "(%.3f) %s; args=%s; alias=%s")
+        self.assertEqual(record.levelno, logging.DEBUG)
+        self.assertEqual(len(record.args), 4)
+        duration, logged_sql, params, alias = record.args
+        # Duration is hard to test without mocking time, expect under 1 second.
+        self.assertIsInstance(duration, float)
+        self.assertLess(duration, 1)
+        self.assertEqual(duration, record.duration)
+        # SQL is correct and not formatted.
+        self.assertEqual(logged_sql, sql)
+        self.assertNotEqual(logged_sql, connection.ops.format_debug_sql(sql))
+        self.assertEqual(logged_sql, record.sql)
+        # Params is None and alias is connection.alias.
+        self.assertIsNone(params)
+        self.assertIsNone(record.params)
+        self.assertEqual(alias, connection.alias)
+        self.assertEqual(alias, record.alias)
 
     def test_queries_bare_where(self):
         sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
@@ -720,7 +740,8 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_check_constraints(self):
         """
-        Constraint checks should raise an IntegrityError when bad data is in the DB.
+        Constraint checks should raise an IntegrityError when bad data is in
+        the DB.
         """
         with transaction.atomic():
             # Create an Article.

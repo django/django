@@ -11,8 +11,9 @@ used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
 For each page (response) that Django sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
 headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.http.ConditionalGetMiddleware`
-middleware to set the ``ETag`` header.
+or you can rely on the
+:class:`~django.middleware.http.ConditionalGetMiddleware` middleware to set the
+``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
 such as either :rfc:`If-Modified-Since <9110#section-13.1.3>` or
@@ -22,7 +23,7 @@ last modification time it was sent, or either :rfc:`If-Match
 containing the last ``ETag`` it was sent. If the current version of the page
 matches the ``ETag`` sent by the client, or if the resource has not been
 modified, a 304 status code can be sent back, instead of a full response,
-telling the client that nothing has changed.  Depending on the header, if the
+telling the client that nothing has changed. Depending on the header, if the
 page has been modified or does not match the ``ETag`` sent by the client, a 412
 status code (Precondition Failed) may be returned.
 

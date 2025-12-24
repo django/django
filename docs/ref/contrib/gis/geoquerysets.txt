@@ -13,7 +13,7 @@ The spatial lookups in this section are available for :class:`GeometryField`
 and :class:`RasterField`.
 
 For an introduction, see the :ref:`spatial lookups introduction
-<spatial-lookups-intro>`.  For an overview of what lookups are
+<spatial-lookups-intro>`. For an overview of what lookups are
 compatible with a particular spatial backend, refer to the
 :ref:`spatial lookup compatibility table <spatial-lookup-compatibility>`.
 
@@ -27,7 +27,8 @@ converted to a geometry where necessary using the `ST_Polygon
 <https://postgis.net/docs/RT_ST_Polygon.html>`_ function. See also the
 :ref:`introduction to raster lookups <spatial-lookup-raster>`.
 
-The database operators used by the lookups can be divided into three categories:
+The database operators used by the lookups can be divided into three
+categories:
 
 - Native raster support ``N``: the operator accepts rasters natively on both
   sides of the lookup, and raster input can be mixed with geometry inputs.
@@ -65,8 +66,9 @@ Spatial lookups with rasters are only supported for PostGIS backends
 ``bbcontains``
 --------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Contain.html>`__,
-MariaDB, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Contain.html>`__, MariaDB, MySQL,
+SpatiaLite, PGRaster (Native)
 
 Tests if the geometry or raster field's bounding box completely contains the
 lookup geometry's bounding box.
@@ -113,8 +115,9 @@ SpatiaLite  ``MbrOverlaps(poly, geom)``
 ``contained``
 -------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Contained.html>`__,
-MariaDB, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Contained.html>`__, MariaDB, MySQL,
+SpatiaLite, PGRaster (Native)
 
 Tests if the geometry field's bounding box is completely contained by the
 lookup geometry's bounding box.
@@ -161,8 +164,8 @@ SpatiaLite  ``Contains(poly, geom)``
 ``contains_properly``
 ---------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_ContainsProperly.html>`__,
-PGRaster (Bilateral)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_ContainsProperly.html>`__, PGRaster (Bilateral)
 
 Returns true if the lookup geometry intersects the interior of the
 geometry field, but not the boundary (or exterior).
@@ -183,7 +186,7 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 -------------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_CoveredBy.html>`__,
-Oracle, MariaDB 11.7+, MySQL, PGRaster (Bilateral), SpatiaLite
+Oracle, MariaDB, MySQL, PGRaster (Bilateral), SpatiaLite
 
 Tests if no point in the geometry field is outside the lookup geometry.
 [#fncovers]_
@@ -204,7 +207,11 @@ SpatiaLite  ``CoveredBy(poly, geom)``
 
 .. versionchanged:: 5.2
 
-    MySQL and MariaDB 11.7+ support was added.
+    MySQL support was added.
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
 
 .. fieldlookup:: covers
 
@@ -391,9 +398,35 @@ MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ===================================  ================================================================
 
-.. versionchanged:: 5.2
+.. versionchanged:: 6.0
 
-    MariaDB 11.7+ support was added.
+    MariaDB 12.0.1+ support was added.
+
+.. fieldlookup:: geom_type
+
+``geom_type``
+-------------
+
+.. versionadded:: 6.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle 23c+, MariaDB, MySQL, SpatiaLite
+
+Returns the geometry type of the geometry field.
+
+Example::
+
+    Zipcode.objects.filter(poly__geom_type="POLYGON")
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``GeometryType(geom)``
+MariaDB     ``ST_GeometryType(geom)``
+MySQL       ``ST_GeometryType(geom)``
+Oracle      ``SDO_GEOMETRY.GET_GTYPE(geom)``
+SpatiaLite  ``GeometryType(geom)``
+==========  ==========================
 
 .. fieldlookup:: overlaps
 
@@ -423,19 +456,20 @@ SpatiaLite  ``Overlaps(poly, geom)``
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Relate.html>`__,
 MariaDB, Oracle, SpatiaLite, PGRaster (Conversion)
 
-Tests if the geometry field is spatially related to the lookup geometry by
-the values given in the given pattern.  This lookup requires a tuple parameter,
-``(geom, pattern)``; the form of ``pattern`` will depend on the spatial backend:
+Tests if the geometry field is spatially related to the lookup geometry by the
+values given in the given pattern. This lookup requires a tuple parameter,
+``(geom, pattern)``; the form of ``pattern`` will depend on the spatial
+backend:
 
 MariaDB, PostGIS, and SpatiaLite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On these spatial backends the intersection pattern is a string comprising
-nine characters, which  define intersections between  the interior, boundary,
-and exterior of the geometry field and the lookup geometry.
-The intersection pattern matrix may only use the following characters:
-``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
-a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
+On these spatial backends the intersection pattern is a string comprising nine
+characters, which  define intersections between  the interior, boundary, and
+exterior of the geometry field and the lookup geometry. The intersection
+pattern matrix may only use the following characters: ``1``, ``2``, ``T``,
+``F``, or ``*``. This lookup type allows users to "fine tune" a specific
+geometric relationship consistent with the DE-9IM model. [#fnde9im]_
 
 Geometry example::
 
@@ -473,7 +507,7 @@ Oracle
 Here the relation pattern is comprised of at least one of the nine relation
 strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``,
 ``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
-``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean
+``ANYINTERACT``. Multiple strings may be combined with the logical Boolean
 operator OR, for example, ``'inside+touch'``. [#fnsdorelate]_  The relation
 strings are case-insensitive.
 
@@ -582,11 +616,11 @@ PostGIS equivalent:
 ``overlaps_left``
 -----------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overleft.html>`__,
-PGRaster (Bilateral)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overleft.html>`__, PGRaster (Bilateral)
 
-Tests if the geometry field's bounding box overlaps or is to the left of the lookup
-geometry's bounding box.
+Tests if the geometry field's bounding box overlaps or is to the left of the
+lookup geometry's bounding box.
 
 Example::
 
@@ -604,11 +638,11 @@ PostGIS equivalent:
 ``overlaps_right``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overright.html>`__,
-PGRaster (Bilateral)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overright.html>`__, PGRaster (Bilateral)
 
-Tests if the geometry field's bounding box overlaps or is to the right of the lookup
-geometry's bounding box.
+Tests if the geometry field's bounding box overlaps or is to the right of the
+lookup geometry's bounding box.
 
 Example::
 
@@ -625,8 +659,8 @@ PostGIS equivalent:
 ``overlaps_above``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overabove.html>`__,
-PGRaster (Conversion)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overabove.html>`__, PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is above the lookup
 geometry's bounding box.
@@ -646,8 +680,8 @@ PostGIS equivalent:
 ``overlaps_below``
 ------------------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overbelow.html>`__,
-PGRaster (Conversion)
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_Geometry_Overbelow.html>`__, PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is below the lookup
 geometry's bounding box.
@@ -864,7 +898,7 @@ use these aggregate functions, see :doc:`the topic guide on aggregation
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``tolerance``          This keyword is for Oracle only.  It is for the
+``tolerance``          This keyword is for Oracle only. It is for the
                        tolerance value used by the ``SDOAGGRTYPE``
                        procedure; the  `Oracle documentation`__ has more
                        details.
@@ -888,15 +922,15 @@ Example:
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
 MariaDB, MySQL, SpatiaLite
 
-Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
-column. This is analogous to a simplified version of the :class:`Union`
-aggregate, except it can be several orders of magnitude faster than performing
-a union because it rolls up geometries into a collection or multi object, not
-caring about dissolving boundaries.
+Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the
+geometry column. This is analogous to a simplified version of the
+:class:`Union` aggregate, except it can be several orders of magnitude faster
+than performing a union because it rolls up geometries into a collection or
+multi object, not caring about dissolving boundaries.
 
-.. versionchanged:: 5.2
+.. versionchanged:: 6.0
 
-    MariaDB 11.7+ support was added.
+    MariaDB 12.0.1+ support was added.
 
 ``Extent``
 ~~~~~~~~~~
@@ -925,8 +959,8 @@ Example:
 *Availability*: `PostGIS <https://postgis.net/docs/ST_3DExtent.html>`__
 
 Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a 6-tuple,
-comprising the lower left coordinate and upper right coordinate (each with x, y,
-and z coordinates).
+comprising the lower left coordinate and upper right coordinate (each with x,
+y, and z coordinates).
 
 Example:
 

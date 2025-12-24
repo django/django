@@ -179,7 +179,8 @@ class ModelInstanceCreationTests(TestCase):
 
         # You can use 'in' to test for membership...
         self.assertIn(a, Article.objects.all())
-        # ... but there will often be more efficient ways if that is all you need:
+        # ... but there will often be more efficient ways if that is all you
+        # need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 
     def test_save_primary_with_default(self):
@@ -785,7 +786,8 @@ class ManagerTest(SimpleTestCase):
 
         It's particularly useful to prevent accidentally leaking new methods
         into `Manager`. New `QuerySet` methods that should also be copied onto
-        `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
+        `Manager` will need to be added to
+        `ManagerTest.QUERYSET_PROXY_METHODS`.
         """
         self.assertEqual(
             sorted(BaseManager._get_queryset_methods(models.QuerySet)),

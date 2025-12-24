@@ -38,6 +38,8 @@ For example:
     >>> article = Article.objects.get(pk=1)
     >>> form = ArticleForm(instance=article)
 
+.. _model-form-field-types:
+
 Field types
 -----------
 
@@ -237,14 +239,18 @@ There are two main steps involved in validating a ``ModelForm``:
 2. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
-when calling :meth:`~django.forms.Form.is_valid()` or accessing the
+when calling :meth:`~django.forms.Form.is_valid` or accessing the
 :attr:`~django.forms.Form.errors` attribute and explicitly when calling
 ``full_clean()``, although you will typically not use the latter method in
 practice.
 
-``Model`` validation (:meth:`Model.full_clean()
-<django.db.models.Model.full_clean()>`) is triggered from within the form
-validation step, right after the form's ``clean()`` method is called.
+``Model`` validation is triggered from within the form validation step right
+after the form's ``clean()`` method is called. First, the model's
+:meth:`~django.db.models.Model.full_clean` is called with
+``validate_unique=False`` and ``validate_constraints=False``, then the model's
+:meth:`~django.db.models.Model.validate_unique` and
+:meth:`~django.db.models.Model.validate_constraints` methods are called in
+order.
 
 .. warning::
 
@@ -267,10 +273,10 @@ attribute that gives its methods access to that specific model instance.
 
 .. warning::
 
-    The ``ModelForm.clean()`` method sets a flag that makes the :ref:`model
+    The ``ModelForm.clean()`` method sets flags that make the :ref:`model
     validation <validating-objects>` step validate the uniqueness of model
     fields that are marked as ``unique``, ``unique_together`` or
-    ``unique_for_date|month|year``.
+    ``unique_for_date|month|year``, as well as constraints.
 
     If you would like to override the ``clean()`` method and maintain this
     validation, you must call the parent class's ``clean()`` method.
@@ -284,9 +290,9 @@ If you have excluded any model fields, validation will not be run on those
 fields. See the :doc:`form validation </ref/forms/validation>` documentation
 for more on how field cleaning and validation work.
 
-The model's ``clean()`` method will be called before any uniqueness checks are
-made. See :ref:`Validating objects <validating-objects>` for more information
-on the model's ``clean()`` hook.
+The model's ``clean()`` method will be called before any uniqueness or
+constraint checks are made. See :ref:`Validating objects <validating-objects>`
+for more information on the model's ``clean()`` hook.
 
 .. _considerations-regarding-model-errormessages:
 
@@ -307,7 +313,8 @@ the form level.
 
 You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
-to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
+to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta``
+class::
 
     from django.core.exceptions import NON_FIELD_ERRORS
     from django.forms import ModelForm
@@ -406,7 +413,7 @@ you've manually saved the instance produced by the form, you can invoke
 
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a ``save()`` on a form, all data -- including many-to-many data --
-is saved without the need for any additional method calls.  For example:
+is saved without the need for any additional method calls. For example:
 
 .. code-block:: pycon
 
@@ -436,9 +443,10 @@ fields, especially when new fields are added to a model. Depending on how the
 form is rendered, the problem may not even be visible on the web page.
 
 The alternative approach would be to include all fields automatically, or
-remove only some. This fundamental approach is known to be much less secure
-and has led to serious exploits on major websites (e.g. `GitHub
-<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`_).
+remove only some. This fundamental approach is known to be much less secure and
+has led to serious exploits on major websites (e.g. `GitHub
+<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`__
+).
 
 There are, however, two shortcuts available for cases where you can guarantee
 these security concerns do not apply to you:
@@ -468,13 +476,13 @@ these security concerns do not apply to you:
    ``birth_date``, this will result in the fields ``name`` and ``birth_date``
    being present on the form.
 
-If either of these are used, the order the fields appear in the form will be the
-order the fields are defined in the model, with ``ManyToManyField`` instances
-appearing last.
+If either of these are used, the order the fields appear in the form will be
+the order the fields are defined in the model, with ``ManyToManyField``
+instances appearing last.
 
-In addition, Django applies the following rule: if you set ``editable=False`` on
-the model field, *any* form created from the model via ``ModelForm`` will not
-include that field.
+In addition, Django applies the following rule: if you set ``editable=False``
+on the model field, *any* form created from the model via ``ModelForm`` will
+not include that field.
 
 .. note::
 
@@ -486,7 +494,7 @@ include that field.
     Django will prevent any attempt to save an incomplete model, so if
     the model does not allow the missing fields to be empty, and does
     not provide a default value for the missing fields, any attempt to
-    ``save()`` a ``ModelForm`` with missing fields will fail.  To
+    ``save()`` a ``ModelForm`` with missing fields will fail. To
     avoid this failure, you must instantiate your model with initial
     values for the missing, but required fields::
 
@@ -542,11 +550,12 @@ The ``widgets`` dictionary accepts either widget instances (e.g.,
 dictionary is ignored for a model field with a non-empty ``choices`` attribute.
 In this case, you must override the form field to use a different widget.
 
-Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
-attributes of the inner ``Meta`` class if you want to further customize a field.
+Similarly, you can specify the ``labels``, ``help_texts`` and
+``error_messages`` attributes of the inner ``Meta`` class if you want to
+further customize a field.
 
-For example if you wanted to customize the wording of all user facing strings for
-the ``name`` field::
+For example if you wanted to customize the wording of all user facing strings
+for the ``name`` field::
 
     from django.utils.translation import gettext_lazy as _
 
@@ -629,14 +638,14 @@ the field declaratively and setting its ``validators`` parameter::
     ``ModelForm`` is a regular ``Form`` which can automatically generate
     certain fields. The fields that are automatically generated depend on
     the content of the ``Meta`` class and on which fields have already been
-    defined declaratively. Basically, ``ModelForm`` will **only** generate fields
-    that are **missing** from the form, or in other words, fields that weren't
-    defined declaratively.
+    defined declaratively. Basically, ``ModelForm`` will **only** generate
+    fields that are **missing** from the form, or in other words, fields that
+    weren't defined declaratively.
 
     Fields defined declaratively are left as-is, therefore any customizations
-    made to ``Meta`` attributes such as ``widgets``, ``labels``, ``help_texts``,
-    or ``error_messages`` are ignored; these only apply to fields that are
-    generated automatically.
+    made to ``Meta`` attributes such as ``widgets``, ``labels``,
+    ``help_texts``, or ``error_messages`` are ignored; these only apply to
+    fields that are generated automatically.
 
     Similarly, fields defined declaratively do not draw their attributes like
     ``max_length`` or ``required`` from the corresponding model. If you want to
@@ -673,8 +682,10 @@ the field declaratively and setting its ``validators`` parameter::
     contents of the corresponding model field. When they are not compatible,
     you will get a ``ValueError`` as no implicit conversion takes place.
 
-    See the :doc:`form field documentation </ref/forms/fields>` for more information
-    on fields and their arguments.
+    See the :doc:`form field documentation </ref/forms/fields>` for more
+    information on fields and their arguments.
+
+.. _modelforms-enabling-localization-of-fields:
 
 Enabling localization of fields
 -------------------------------
@@ -696,10 +707,10 @@ will be localized.
 Form inheritance
 ----------------
 
-As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
-them. This is useful if you need to declare extra fields or extra methods on a
-parent class for use in a number of forms derived from models. For example,
-using the previous ``ArticleForm`` class:
+As with basic forms, you can extend and reuse ``ModelForm`` classes by
+inheriting them. This is useful if you need to declare extra fields or extra
+methods on a parent class for use in a number of forms derived from models.
+For example, using the previous ``ArticleForm`` class:
 
 .. code-block:: pycon
 
@@ -735,12 +746,12 @@ There are a couple of things to note, however.
   because these classes rely on different metaclasses and a class can only have
   one metaclass.
 
-* It's possible to declaratively remove a ``Field`` inherited from a parent class by
-  setting the name to be ``None`` on the subclass.
+* It's possible to declaratively remove a ``Field`` inherited from a parent
+  class by setting the name to be ``None`` on the subclass.
 
   You can only use this technique to opt out from a field defined declaratively
-  by a parent class; it won't prevent the ``ModelForm`` metaclass from generating
-  a default field. To opt-out from default fields, see
+  by a parent class; it won't prevent the ``ModelForm`` metaclass from
+  generating a default field. To opt-out from default fields, see
   :ref:`modelforms-selecting-fields`.
 
 Providing initial values
@@ -979,7 +990,7 @@ value (``instances``, in the above example).
 When fields are missing from the form (for example because they have been
 excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
-``ModelForms``, in `Selecting the fields to use`_.
+model forms, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances:
 
@@ -1100,10 +1111,10 @@ above, in :ref:`saving-objects-in-the-formset`.)
 Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
-Just like with ``ModelForms``, by default the ``clean()`` method of a
+Just like with a ``ModelForm``, by default the ``clean()`` method of a
 ``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
-``unique_for_date|month|year``).  If you want to override the ``clean()`` method
+``unique_for_date|month|year``). If you want to override the ``clean()`` method
 on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
@@ -1275,7 +1286,8 @@ a particular author, you could do this:
 
 .. seealso::
 
-    :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
+    :ref:`Manually rendered can_delete and can_order
+    <manually-rendered-can-delete-and-can-order>`.
 
 Overriding methods on an ``InlineFormSet``
 ------------------------------------------

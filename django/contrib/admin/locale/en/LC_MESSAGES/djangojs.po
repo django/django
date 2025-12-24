@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,72 +13,68 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:38
+#: contrib/admin/static/admin/js/SelectFilter2.js:45
 #, javascript-format
 msgid "Available %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:44
+#: contrib/admin/static/admin/js/SelectFilter2.js:49
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:60
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:65
-#: contrib/admin/static/admin/js/SelectFilter2.js:110
+#: contrib/admin/static/admin/js/SelectFilter2.js:66
+#: contrib/admin/static/admin/js/SelectFilter2.js:123
 msgid "Filter"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
-msgid "Choose all"
-msgstr ""
-
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
+#: contrib/admin/static/admin/js/SelectFilter2.js:73
 #, javascript-format
-msgid "Click to choose all %s at once."
+msgid "Choose all %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-msgid "Choose"
+#: contrib/admin/static/admin/js/SelectFilter2.js:84
+#, javascript-format
+msgid "Choose selected %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:77
-msgid "Remove"
+#: contrib/admin/static/admin/js/SelectFilter2.js:91
+#, javascript-format
+msgid "Remove selected %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:83
+#: contrib/admin/static/admin/js/SelectFilter2.js:102
 #, javascript-format
 msgid "Chosen %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:89
+#: contrib/admin/static/admin/js/SelectFilter2.js:106
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:105
+#: contrib/admin/static/admin/js/SelectFilter2.js:118
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:120
-msgid "Remove all"
+#: contrib/admin/static/admin/js/SelectFilter2.js:139
+msgid "(click to clear)"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:120
+#: contrib/admin/static/admin/js/SelectFilter2.js:143
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
+msgid "Remove all %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:211
+#: contrib/admin/static/admin/js/SelectFilter2.js:236
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"

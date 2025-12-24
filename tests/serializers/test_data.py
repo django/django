@@ -241,8 +241,8 @@ def inherited_compare(testcase, pk, klass, data):
         testcase.assertEqual(value, getattr(instance, key))
 
 
-# Define some test helpers. Each has a pair of functions: one to create objects and one
-# to make assertions against objects of a particular type.
+# Define some test helpers. Each has a pair of functions: one to create objects
+# and one to make assertions against objects of a particular type.
 TestHelper = namedtuple("TestHelper", ["create_object", "compare_object"])
 data_obj = TestHelper(data_create, data_compare)
 generic_obj = TestHelper(generic_create, generic_compare)
@@ -257,7 +257,7 @@ uuid_obj = uuid.uuid4()
 
 test_data = [
     # Format: (test helper, PK value, Model Class, data)
-    (data_obj, 1, BinaryData, memoryview(b"\x05\xFD\x00")),
+    (data_obj, 1, BinaryData, memoryview(b"\x05\xfd\x00")),
     (data_obj, 5, BooleanData, True),
     (data_obj, 6, BooleanData, False),
     (data_obj, 7, BooleanData, None),

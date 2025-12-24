@@ -29,8 +29,8 @@ More details about how the caching works:
   of the response's "Cache-Control" header, falling back to the
   CACHE_MIDDLEWARE_SECONDS setting if the section was not found.
 
-* This middleware expects that a HEAD request is answered with the same response
-  headers exactly like the corresponding GET request.
+* This middleware expects that a HEAD request is answered with the same
+  response headers exactly like the corresponding GET request.
 
 * When a hit occurs, a shallow copy of the original response object is returned
   from process_request.
@@ -100,8 +100,17 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         ):
             return response
 
-        # Don't cache a response with 'Cache-Control: private'
-        if "private" in response.get("Cache-Control", ()):
+        # Don't cache responses when the Cache-Control header is set to
+        # private, no-cache, or no-store.
+        cache_control = response.get("Cache-Control", ())
+        if any(
+            directive in cache_control
+            for directive in (
+                "private",
+                "no-cache",
+                "no-store",
+            )
+        ):
             return response
 
         # Page timeout takes precedence over the "max-age" and the default
@@ -163,7 +172,8 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
         response = self.cache.get(cache_key)
-        # if it wasn't found and we are looking for a HEAD, try looking just for that
+        # if it wasn't found and we are looking for a HEAD, try looking just
+        # for that
         if response is None and request.method == "HEAD":
             cache_key = get_cache_key(
                 request, self.key_prefix, "HEAD", cache=self.cache

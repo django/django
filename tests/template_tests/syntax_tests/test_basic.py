@@ -1,7 +1,8 @@
-from django.template.base import TemplateSyntaxError
+from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase
+from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
 
@@ -402,3 +403,29 @@ class BlockContextTests(SimpleTestCase):
             "<BlockContext: blocks=defaultdict(<class 'list'>, "
             "{'content': [<Block Node: content. Contents: []>]})>",
         )
+
+
+class TemplateNameInExceptionTests(SimpleTestCase):
+    template_error_msg = (
+        "Invalid block tag on line 1: 'endfor'. Did you forget to register or "
+        "load this tag?"
+    )
+
+    def test_template_name_in_error_message(self):
+        msg = f"Template: test.html, {self.template_error_msg}"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Template("{% endfor %}", origin=Origin("test.html"))
+
+    def test_template_name_not_in_debug_view(self):
+        try:
+            Template("{% endfor %}", origin=Origin("test.html"))
+        except TemplateSyntaxError as e:
+            reporter = ExceptionReporter(None, e.__class__, e, None)
+            traceback_data = reporter.get_traceback_data()
+            self.assertEqual(traceback_data["exception_value"], self.template_error_msg)
+
+    def test_unknown_source_template(self):
+        try:
+            Template("{% endfor %}")
+        except TemplateSyntaxError as e:
+            self.assertEqual(str(e), self.template_error_msg)

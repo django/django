@@ -5,7 +5,7 @@
 # András Veres-Szentkirályi, 2016-2021,2023
 # Attila Nagy <>, 2012
 # Balázs Meskó <meskobalazs@mailbox.org>, 2024
-# Balázs R, 2023
+# Balázs R, 2023,2025
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-12 06:49+0000\n"
-"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -354,6 +354,9 @@ msgstr "Az oldal nem tartalmaz találatokat"
 msgid "Enter a valid value."
 msgstr "Adjon meg egy érvényes értéket."
 
+msgid "Enter a valid domain name."
+msgstr "Adjon meg egy érvényes domain nevet."
+
 msgid "Enter a valid URL."
 msgstr "Adjon meg egy érvényes URL-t."
 
@@ -377,14 +380,18 @@ msgstr ""
 "Kérjük adjon meg egy érvényes \"domain-darabkát\", amely csak betűkből, "
 "számokból, aláhúzásból és kötőjelből áll."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Írjon be egy érvényes IPv4 címet."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Adjon meg egy érvényes %(protocol)s címet."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Írjon be egy érvényes IPv6 címet."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Írjon be egy érvényes IPv4 vagy IPv6 címet."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 vagy IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Csak számokat adjon meg, vesszővel elválasztva."
@@ -698,8 +705,8 @@ msgid "Value must be valid JSON."
 msgstr "Az érték érvényes JSON kell legyen."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s példány %(value)r %(field)s értékkel nem létezik."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Idegen kulcs (típusa a kapcsolódó mezőtől függ)"

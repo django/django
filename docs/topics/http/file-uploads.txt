@@ -67,8 +67,9 @@ described in :ref:`binding-uploaded-files`. This would look something like:
             form = UploadFileForm()
         return render(request, "upload.html", {"form": form})
 
-Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
-into the form's constructor; this is how file data gets bound into a form.
+Notice that we have to pass :attr:`request.FILES
+<django.http.HttpRequest.FILES>` into the form's constructor; this is how file
+data gets bound into a form.
 
 Here's a common way you might handle an uploaded file::
 
@@ -259,8 +260,8 @@ involves only a read from memory and a write to disk and thus is very fast.
 However, if an uploaded file is too large, Django will write the uploaded file
 to a temporary file stored in your system's temporary directory. On a Unix-like
 platform this means you can expect Django to generate a file called something
-like ``/tmp/tmpzfp6I6.upload``. If an upload is large enough, you can watch this
-file grow in size as Django streams the data onto disk.
+like ``/tmp/tmpzfp6I6.upload``. If an upload is large enough, you can watch
+this file grow in size as Django streams the data onto disk.
 
 These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are "reasonable defaults"
 which can be customized as described in the next section.
@@ -283,8 +284,8 @@ handlers given by :setting:`FILE_UPLOAD_HANDLERS`, but you can modify the list
 as you would any other list.
 
 For instance, suppose you've written a ``ProgressBarUploadHandler`` that
-provides feedback on upload progress to some sort of AJAX widget. You'd add this
-handler to your upload handlers like this::
+provides feedback on upload progress to some sort of AJAX widget. You'd add
+this handler to your upload handlers like this::
 
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
 
@@ -313,9 +314,9 @@ list::
     :class:`~django.middleware.csrf.CsrfViewMiddleware` which is enabled by
     default. This means you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on your view to allow you
-    to change the upload handlers.  You will then need to use
+    to change the upload handlers. You will then need to use
     :func:`~django.views.decorators.csrf.csrf_protect` on the function that
-    actually processes the request.  Note that this means that the handlers may
+    actually processes the request. Note that this means that the handlers may
     start receiving the file upload before the CSRF checks have been done.
     Example code::
 

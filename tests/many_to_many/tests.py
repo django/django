@@ -73,7 +73,8 @@ class ManyToManyTests(TestCase):
             with transaction.atomic():
                 a6.publications.add(a5)
 
-        # Add a Publication directly via publications.add by using keyword arguments.
+        # Add a Publication directly via publications.add by using keyword
+        # arguments.
         p5 = a6.publications.create(title="Highlights for Adults")
         self.assertSequenceEqual(
             a6.publications.all(),
@@ -256,8 +257,8 @@ class ManyToManyTests(TestCase):
             [self.a1, self.a3, self.a2, self.a4],
         )
 
-        # Excluding a related item works as you would expect, too (although the SQL
-        # involved is a little complex).
+        # Excluding a related item works as you would expect, too (although the
+        # SQL involved is a little complex).
         self.assertSequenceEqual(
             Article.objects.exclude(publications=self.p2),
             [self.a1],
@@ -324,7 +325,8 @@ class ManyToManyTests(TestCase):
         )
 
     def test_bulk_delete(self):
-        # Bulk delete some Publications - references to deleted publications should go
+        # Bulk delete some Publications - references to deleted publications
+        # should go
         Publication.objects.filter(title__startswith="Science").delete()
         self.assertSequenceEqual(
             Publication.objects.all(),

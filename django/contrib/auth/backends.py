@@ -254,7 +254,7 @@ class RemoteUserBackend(ModelBackend):
     is handling authentication outside of Django.
 
     By default, the ``authenticate`` method creates ``User`` objects for
-    usernames that don't already exist in the database.  Subclasses can disable
+    usernames that don't already exist in the database. Subclasses can disable
     this behavior by setting the ``create_unknown_user`` attribute to
     ``False``.
     """
@@ -318,7 +318,7 @@ class RemoteUserBackend(ModelBackend):
     def clean_username(self, username):
         """
         Perform any cleaning on the "username" prior to using it to get or
-        create the user object.  Return the cleaned username.
+        create the user object. Return the cleaned username.
 
         By default, return the username unchanged.
         """

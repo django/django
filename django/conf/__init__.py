@@ -120,8 +120,9 @@ class LazySettings(LazyObject):
         try:
             val = getattr(_wrapped, name)
         except AttributeError:
-            # Special case for EMAIL_* settings. To avoid breaking existing third-party
-            # apps accessing the current Django settings. RemovedInDjango70Warning.
+            # Special case for EMAIL_* settings. To avoid breaking existing
+            # third-party apps accessing the current Django settings.
+            # RemovedInDjango70Warning.
             if name == "EMAIL_BACKEND":
                 return self.EMAIL_PROVIDERS["default"]["BACKEND"]
             if name in DEPRECATED_EMAIL_SETTINGS:
@@ -136,7 +137,8 @@ class LazySettings(LazyObject):
             raise
 
         # Special case some settings which require further modification.
-        # This is done here for performance reasons so the modified value is cached.
+        # This is done here for performance reasons so the modified value is
+        # cached.
         if name in {"MEDIA_URL", "STATIC_URL"} and val is not None:
             val = self._add_script_prefix(val)
         elif name == "SECRET_KEY" and not val:
@@ -208,7 +210,8 @@ class LazySettings(LazyObject):
 
 class Settings:
     def __init__(self, settings_module):
-        # update this dict from global settings (but only for ALL_CAPS settings)
+        # update this dict from global settings (but only for ALL_CAPS
+        # settings)
         for setting in dir(global_settings):
             if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))

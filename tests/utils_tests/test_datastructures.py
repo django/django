@@ -9,6 +9,7 @@ import pickle
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
+    DeferredSubDict,
     DictWrapper,
     ImmutableList,
     MultiValueDict,
@@ -367,3 +368,42 @@ class CaseInsensitiveMappingTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             self.dict1["New Key"] = 1
         self.assertEqual(len(self.dict1), 2)
+
+
+class DeferredSubDictTests(SimpleTestCase):
+    def test_basic(self):
+        parent = {
+            "settings": {"theme": "dark", "language": "en"},
+            "config": {"enabled": True, "timeout": 30},
+        }
+        sub = DeferredSubDict(parent, "settings")
+        self.assertEqual(sub["theme"], "dark")
+        self.assertEqual(sub["language"], "en")
+        with self.assertRaises(KeyError):
+            sub["enabled"]
+
+    def test_reflects_changes_in_parent(self):
+        parent = {"settings": {"theme": "dark"}}
+        sub = DeferredSubDict(parent, "settings")
+        parent["settings"]["theme"] = "light"
+        self.assertEqual(sub["theme"], "light")
+        parent["settings"]["mode"] = "tight"
+        self.assertEqual(sub["mode"], "tight")
+
+    def test_missing_deferred_key_raises_keyerror(self):
+        parent = {"settings": {"theme": "dark"}}
+        sub = DeferredSubDict(parent, "nonexistent")
+        with self.assertRaises(KeyError):
+            sub["anything"]
+
+    def test_missing_child_key_raises_keyerror(self):
+        parent = {"settings": {"theme": "dark"}}
+        sub = DeferredSubDict(parent, "settings")
+        with self.assertRaises(KeyError):
+            sub["nonexistent"]
+
+    def test_child_not_a_dict_raises_typeerror(self):
+        parent = {"bad": "not_a_dict"}
+        sub = DeferredSubDict(parent, "bad")
+        with self.assertRaises(TypeError):
+            sub["any_key"]

@@ -44,8 +44,8 @@ Save this as a file by using standard Unix output redirection:
 
     $ python manage.py inspectdb > models.py
 
-This feature is meant as a shortcut, not as definitive model generation. See the
-:djadmin:`documentation of inspectdb <inspectdb>` for more information.
+This feature is meant as a shortcut, not as definitive model generation. See
+the :djadmin:`documentation of inspectdb <inspectdb>` for more information.
 
 Once you've cleaned up your models, name the file ``models.py`` and put it in
 the Python package that holds your app. Then add the app to your

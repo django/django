@@ -62,7 +62,7 @@ def _load_all_namespaces(resolver, parents=()):
     """
     url_patterns = getattr(resolver, "url_patterns", [])
     namespaces = [
-        ":".join(parents + (url.namespace,))
+        ":".join([*parents, url.namespace])
         for url in url_patterns
         if getattr(url, "namespace", None) is not None
     ]

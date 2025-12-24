@@ -8,7 +8,7 @@ def add_srs_entry(
     """
     Take a GDAL SpatialReference system and add its information to the
     `spatial_ref_sys` table of the spatial backend. Doing this enables
-    database-level spatial transformations for the backend.  Thus, this utility
+    database-level spatial transformations for the backend. Thus, this utility
     is useful for adding spatial reference systems not included by default with
     the backend:
 

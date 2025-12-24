@@ -46,7 +46,9 @@ class TemplateCommand(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("name", help="Name of the application or project.")
         parser.add_argument(
-            "directory", nargs="?", help="Optional destination directory"
+            "directory",
+            nargs="?",
+            help="Optional destination directory, this will be created if needed.",
         )
         parser.add_argument(
             "--template", help="The path or URL to load the template from."
@@ -105,10 +107,10 @@ class TemplateCommand(BaseCommand):
             if app_or_project == "app":
                 self.validate_name(os.path.basename(top_dir), "directory")
             if not os.path.exists(top_dir):
-                raise CommandError(
-                    "Destination directory '%s' does not "
-                    "exist, please create it first." % top_dir
-                )
+                try:
+                    os.makedirs(top_dir)
+                except OSError as e:
+                    raise CommandError(e)
 
         # Find formatters, which are external executables, before input
         # from the templates can sneak into the path.

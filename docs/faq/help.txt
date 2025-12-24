@@ -21,7 +21,6 @@ Then, please post it in one of the following channels:
 
 * The Django Forum section `"Using Django"`_. This is for web-based
   discussions.
-* The |django-users| mailing list. This is for email-based discussions.
 * The `Django Discord server`_ for chat-based discussions.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users/6
@@ -32,22 +31,6 @@ summary, being friendly and patient, considerate, respectful, and careful in
 your choice of words.
 
 .. _Django Code of Conduct: https://www.djangoproject.com/conduct/
-
-.. _message-does-not-appear-on-django-users:
-
-Why hasn't my message appeared on *django-users*?
-=================================================
-
-|django-users| has a lot of subscribers. This is good for the community, as
-it means many people are available to contribute answers to questions.
-Unfortunately, it also means that |django-users| is an attractive target for
-spammers.
-
-In order to combat the spam problem, when you join the |django-users| mailing
-list, we manually moderate the first message you send to the list. This means
-that spammers get caught, but it also means that your first question to the
-list might take a little longer to get answered. We apologize for any
-inconvenience that this policy may cause.
 
 Nobody answered my question! What should I do?
 ==============================================
@@ -62,12 +45,6 @@ everybody that can help is busy.
 
 You can also try asking on a different channel. But please don't post your
 question in all three channels in quick succession.
-
-You might notice we have a second mailing list, called |django-developers|.
-This list is for discussion of the development of Django itself. Please don't
-email support questions to this mailing list. Asking a tech support question
-there is considered impolite, and you will likely be directed to ask on
-|django-users|.
 
 I think I've found a bug! What should I do?
 ===========================================

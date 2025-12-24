@@ -587,7 +587,8 @@ solution is to use ``db_manager()``, like this::
 
     User.objects.db_manager("new_users").create_user(...)
 
-``db_manager()`` returns a copy of the manager bound to the database you specify.
+``db_manager()`` returns a copy of the manager bound to the database you
+specify.
 
 Using ``get_queryset()`` with multiple databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

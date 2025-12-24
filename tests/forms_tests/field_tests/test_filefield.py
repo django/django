@@ -105,8 +105,8 @@ class FileFieldTest(SimpleTestCase):
         # A file was not uploaded, but there is initial data
         self.assertFalse(f.has_changed("resume.txt", None))
 
-        # A file was uploaded and there is initial data (file identity is not dealt
-        # with here)
+        # A file was uploaded and there is initial data (file identity is not
+        # dealt with here)
         self.assertTrue(
             f.has_changed(
                 "resume.txt", {"filename": "resume.txt", "content": "My resume"}

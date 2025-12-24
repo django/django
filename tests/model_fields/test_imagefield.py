@@ -71,7 +71,7 @@ class ImageFieldTestMixin(SerializeMixin):
         (if defined) the image field is caching to.
 
         Note, this method will check for dimension fields named by adding
-        "_width" or "_height" to the name of the ImageField.  So, the
+        "_width" or "_height" to the name of the ImageField. So, the
         models used in these tests must have their fields named
         accordingly.
 
@@ -294,7 +294,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         # Test dimensions after fetching from database.
         p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.check_dimensions(p, 4, 8)
@@ -442,7 +442,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # Test dimensions after fetching from database.
         p = self.PersonModel.objects.get(name="Joe")
         # Bug 11084: Dimensions should not get recalculated if file is
-        # coming from the database.  We test this by checking if the file
+        # coming from the database. We test this by checking if the file
         # was opened.
         self.assertIs(p.mugshot.was_opened, False)
         self.assertIs(p.headshot.was_opened, False)

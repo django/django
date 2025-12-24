@@ -4,7 +4,7 @@
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
-# Turmunkh Batkhuyag, 2023
+# Turmunkh Batkhuyag, 2023-2024
 # Zorig, 2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019,2021,2023
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 07:05+0000\n"
-"Last-Translator: Turmunkh Batkhuyag, 2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Turmunkh Batkhuyag, 2023-2024\n"
 "Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -35,8 +35,8 @@ msgstr "%(items)s ээс   %(count)d-ийг амжилттай устгалаа.
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s устгаж чадахгүй."
 
-msgid "Are you sure?"
-msgstr "Итгэлтэй байна уу?"
+msgid "Delete multiple objects"
+msgstr "Олон обектууд устгах"
 
 msgid "Administration"
 msgstr "Удирдлага"
@@ -208,11 +208,6 @@ msgstr ""
 "боломжтой."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-" {name} \"{obj}\" амжилттай нэмэгдлээ. Та доор дахин шинэчлэх боломжтой."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -270,6 +265,9 @@ msgstr[1] "Бүгд %(total_count)s сонгогдсон"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s оос 0 сонгосон"
+
+msgid "Delete"
+msgstr "Устгах"
 
 #, python-format
 msgid "Change history: %s"
@@ -354,6 +352,15 @@ msgstr "Талхны үүрмэг"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s хэрэглүүр дэх моделууд."
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Нэмэх"
 
@@ -363,18 +370,17 @@ msgstr "Харах"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Та ямар ч харах эсвэл засах эрхгүй байна."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Эхлээд, хэрэглэгчийн нэр болон нууц үгээ оруулна уу. Дараа нь, та бусад "
-"хэрэглэгчийн сонголтуудыг засварлах боломжтой болно."
 
-msgid "Enter a username and password."
-msgstr "Хэрэглэгчийн нэр ба нууц үгээ оруулна."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Нууц үг өөрчлөх"
+
+msgid "Set password"
+msgstr "Нууг үг оноох"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -384,6 +390,17 @@ msgstr[1] "Та доорх алдаануудыг засна уу."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong>.хэрэглэгчид шинэ нууц үг оруулна уу."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Үндсэн агуулга руу шилжих"
@@ -441,9 +458,6 @@ msgstr "Загварыг сэлгэх (одоогийн загвар: өдрий
 msgid "Toggle theme (current theme: dark)"
 msgstr "Загварыг сэлгэх (одоогийн горим: шөнийн)"
 
-msgid "Delete"
-msgstr "Устгах"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -477,9 +491,6 @@ msgstr "Тийм, би итгэлтэй."
 
 msgid "No, take me back"
 msgstr "Үгүй, намайг буцаа"
-
-msgid "Delete multiple objects"
-msgstr "Олон обектууд устгах"
 
 #, python-format
 msgid ""
@@ -554,8 +565,8 @@ msgstr ""
 "Та  %(username)s нэрээр нэвтэрсэн байна гэвч энэ хуудасхуу хандах эрх "
 "байхгүй байна. Та өөр эрхээр логин хийх үү?"
 
-msgid "Forgotten your password or username?"
-msgstr "Таны мартсан нууц үг эсвэл нэрвтэр нэр?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Жолоодлого солбих"
@@ -719,8 +730,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Дараах хуудас руу орон шинэ нууц үг сонгоно уу:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Та хэрэглэгчийн нэрээ мартсан бол:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"

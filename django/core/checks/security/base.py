@@ -141,6 +141,11 @@ E024 = Error(
 
 W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
 
+E026 = Error(
+    "The Content Security Policy setting '%s' must be a dictionary (got %r instead).",
+    id="security.E026",
+)
+
 
 def _security_middleware():
     return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE
@@ -261,7 +266,8 @@ def check_referrer_policy(app_configs, **kwargs):
     if _security_middleware():
         if settings.SECURE_REFERRER_POLICY is None:
             return [W022]
-        # Support a comma-separated string or iterable of values to allow fallback.
+        # Support a comma-separated string or iterable of values to allow
+        # fallback.
         if isinstance(settings.SECURE_REFERRER_POLICY, str):
             values = {v.strip() for v in settings.SECURE_REFERRER_POLICY.split(",")}
         else:
@@ -281,3 +287,19 @@ def check_cross_origin_opener_policy(app_configs, **kwargs):
     ):
         return [E024]
     return []
+
+
+@register(Tags.security)
+def check_csp_settings(app_configs, **kwargs):
+    """
+    Validate that CSP settings are properly configured when enabled.
+
+    Ensures both SECURE_CSP and SECURE_CSP_REPORT_ONLY are dictionaries.
+    """
+    # CSP settings must be a dictionary or None.
+    return [
+        Error(E026.msg % (name, value), id=E026.id)
+        for name in ("SECURE_CSP", "SECURE_CSP_REPORT_ONLY")
+        if (value := getattr(settings, name, None)) is not None
+        and not isinstance(value, dict)
+    ]

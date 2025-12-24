@@ -4,14 +4,31 @@ import re
 from decimal import Decimal
 
 from django.contrib.gis.db.models import GeometryField, PolygonField, functions
-from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon, fromstr
+from django.contrib.gis.geos import (
+    GEOSGeometry,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+    fromstr,
+)
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
+from .models import (
+    City,
+    Country,
+    CountryWebMercator,
+    Feature,
+    ManyPointModel,
+    State,
+    Track,
+)
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -190,10 +207,11 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_assvg(self):
         with self.assertRaises(TypeError):
             City.objects.annotate(svg=functions.AsSVG("point", precision="foo"))
-        # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
+        # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city
+        # WHERE name = 'Pueblo';
         svg1 = 'cx="-104.609252" cy="-38.255001"'
-        # Even though relative, only one point so it's practically the same except for
-        # the 'c' letter prefix on the x,y values.
+        # Even though relative, only one point so it's practically the same
+        # except for the 'c' letter prefix on the x,y values.
         svg2 = svg1.replace("c", "")
         self.assertEqual(
             svg1,
@@ -445,7 +463,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_Area_function")
     def test_area_with_regular_aggregate(self):
-        # Create projected country objects, for this test to work on all backends.
+        # Create projected country objects, for this test to work on all
+        # backends.
         for c in Country.objects.all():
             CountryWebMercator.objects.create(
                 name=c.name, mpoly=c.mpoly.transform(3857, clone=True)
@@ -559,7 +578,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # Exact value depends on database and version.
         self.assertTrue(20 <= ptown.size <= 105)
 
-    @skipUnlessDBFeature("has_NumGeom_function")
+    @skipUnlessDBFeature("has_NumGeometries_function")
     def test_num_geom(self):
         # Both 'countries' only have two geometries.
         for c in Country.objects.annotate(num_geom=functions.NumGeometries("mpoly")):
@@ -576,7 +595,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertEqual(1, city.num_geom)
 
-    @skipUnlessDBFeature("has_NumPoint_function")
+    @skipUnlessDBFeature("has_NumPoints_function")
     def test_num_points(self):
         coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
         Track.objects.create(name="Foo", line=LineString(coords))
@@ -612,6 +631,41 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         coords.reverse()
         self.assertEqual(tuple(coords), track.reverse_geom.coords)
 
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate(self):
+        angle = math.pi
+        tests = [
+            {"angle": angle},
+            {"angle": angle, "origin": Point(0, 0)},
+            {"angle": angle, "origin": Point(1, 1)},
+        ]
+        for params in tests:
+            with self.subTest(params=params):
+                qs = Country.objects.annotate(
+                    rotated=functions.Rotate("mpoly", **params)
+                )
+                for country in qs:
+                    for p1, p2 in zip(country.mpoly, country.rotated):
+                        for r1, r2 in zip(p1, p2):
+                            for c1, c2 in zip(r1.coords, r2.coords):
+                                origin = params.get("origin")
+                                if origin is None:
+                                    origin = Point(0, 0)
+                                self.assertAlmostEqual(-c1[0] + 2 * origin.x, c2[0], 5)
+                                self.assertAlmostEqual(-c1[1] + 2 * origin.y, c2[1], 5)
+
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate_invalid_params(self):
+        angle = math.pi
+        bad_params_tests = [
+            {"angle": angle, "origin": 0},
+            {"angle": angle, "origin": [0, 0]},
+        ]
+        msg = "origin argument must be a Point"
+        for params in bad_params_tests:
+            with self.subTest(params=params), self.assertRaisesMessage(TypeError, msg):
+                functions.Rotate("mpoly", **params)
+
     @skipUnlessDBFeature("has_Scale_function")
     def test_scale(self):
         xfac, yfac = 2, 3
@@ -631,7 +685,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_SnapToGrid_function")
     def test_snap_to_grid(self):
-        # Let's try and break snap_to_grid() with bad combinations of arguments.
+        # Let's try and break snap_to_grid() with bad combinations of
+        # arguments.
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
                 Country.objects.annotate(snap=functions.SnapToGrid("mpoly", *bad_args))
@@ -639,8 +694,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             with self.assertRaises(TypeError):
                 Country.objects.annotate(snap=functions.SnapToGrid("mpoly", *bad_args))
 
-        # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
-        # from the world borders dataset he provides.
+        # Boundary for San Marino, courtesy of Bjorn Sandvik of
+        # thematicmapping.org from the world borders dataset he provides.
         wkt = (
             "MULTIPOLYGON(((12.41580 43.95795,12.45055 43.97972,12.45389 43.98167,"
             "12.46250 43.98472,12.47167 43.98694,12.49278 43.98917,"
@@ -685,7 +740,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         )
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23))
+        # SELECT AsText(
+        #     ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23))
         # FROM "geoapp_country"
         # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr(
@@ -763,9 +819,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         )
 
         if connection.ops.oracle:
-            # Should be able to execute the queries; however, they won't be the same
-            # as GEOS (because Oracle doesn't use GEOS internally like PostGIS or
-            # SpatiaLite).
+            # Should be able to execute the queries; however, they won't be the
+            # same as GEOS (because Oracle doesn't use GEOS internally like
+            # PostGIS or SpatiaLite).
             return
         for c in qs:
             self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
@@ -845,3 +901,48 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             City.objects.annotate(union=functions.GeoFunc(1, "point")).get(
                 name="Dallas"
             )
+
+    @skipUnlessDBFeature("has_GeometryType_function")
+    def test_geometry_type(self):
+        Feature.objects.bulk_create(
+            [
+                Feature(name="Point", geom=Point(0, 0)),
+                Feature(name="LineString", geom=LineString((0, 0), (1, 1))),
+                Feature(name="Polygon", geom=Polygon(((0, 0), (1, 0), (1, 1), (0, 0)))),
+                Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1))),
+                Feature(
+                    name="MultiLineString",
+                    geom=MultiLineString(
+                        LineString((0, 0), (1, 1)), LineString((1, 1), (2, 2))
+                    ),
+                ),
+                Feature(
+                    name="MultiPolygon",
+                    geom=MultiPolygon(
+                        Polygon(((0, 0), (1, 0), (1, 1), (0, 0))),
+                        Polygon(((1, 1), (2, 1), (2, 2), (1, 1))),
+                    ),
+                ),
+            ]
+        )
+
+        expected_results = {
+            ("POINT", Point),
+            ("LINESTRING", LineString),
+            ("POLYGON", Polygon),
+            ("MULTIPOINT", MultiPoint),
+            ("MULTILINESTRING", MultiLineString),
+            ("MULTIPOLYGON", MultiPolygon),
+        }
+
+        for geom_type, geom_class in expected_results:
+            with self.subTest(geom_type=geom_type):
+                obj = (
+                    Feature.objects.annotate(
+                        geometry_type=functions.GeometryType("geom")
+                    )
+                    .filter(geom__geom_type=geom_type)
+                    .get()
+                )
+                self.assertIsInstance(obj.geom, geom_class)
+                self.assertEqual(obj.geometry_type, geom_type)

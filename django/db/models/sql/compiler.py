@@ -22,7 +22,6 @@ from django.db.models.sql.constants import (
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
-from django.db.models.sql.where import AND
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -53,10 +52,11 @@ class SQLCompiler:
         # they would return an empty result set.
         self.elide_empty = elide_empty
         self.quote_cache = {"*": "*"}
-        # The select, klass_info, and annotations are needed by QuerySet.iterator()
-        # these are set as a side-effect of executing the query. Note that we calculate
-        # separately a list of extra select columns needed for grammatical correctness
-        # of the query, but these columns are not included in self.select.
+        # The select, klass_info, and annotations are needed by
+        # QuerySet.iterator() these are set as a side-effect of executing the
+        # query. Note that we calculate separately a list of extra select
+        # columns needed for grammatical correctness of the query, but these
+        # columns are not included in self.select.
         self.select = None
         self.annotation_col_map = None
         self.klass_info = None
@@ -257,17 +257,8 @@ class SQLCompiler:
             # self.query.select is a special case. These columns never go to
             # any model.
             cols = self.query.select
-        if cols:
-            klass_info = {
-                "model": self.query.model,
-                "select_fields": list(
-                    range(
-                        len(self.query.extra_select),
-                        len(self.query.extra_select) + len(cols),
-                    )
-                ),
-            }
         selected = []
+        select_fields = None
         if self.query.selected is None:
             selected = [
                 *(
@@ -277,18 +268,28 @@ class SQLCompiler:
                 *((None, col) for col in cols),
                 *self.query.annotation_select.items(),
             ]
+            select_fields = list(
+                range(
+                    len(self.query.extra_select),
+                    len(self.query.extra_select) + len(cols),
+                )
+            )
         else:
-            for alias, expression in self.query.selected.items():
+            select_fields = []
+            for index, (alias, expression) in enumerate(self.query.selected.items()):
                 # Reference to an annotation.
                 if isinstance(expression, str):
                     expression = self.query.annotations[expression]
                 # Reference to a column.
                 elif isinstance(expression, int):
+                    select_fields.append(index)
                     expression = cols[expression]
                 # ColPairs cannot be aliased.
                 if isinstance(expression, ColPairs):
                     alias = None
                 selected.append((alias, expression))
+        if select_fields:
+            klass_info = {"model": self.query.model, "select_fields": select_fields}
 
         for select_idx, (alias, expression) in enumerate(selected):
             if alias:
@@ -946,9 +947,9 @@ class SQLCompiler:
                 # If the query is used as a subquery, the extra selects would
                 # result in more columns than the left-hand side expression is
                 # expecting. This can happen when a subquery uses a combination
-                # of order_by() and distinct(), forcing the ordering expressions
-                # to be selected as well. Wrap the query in another subquery
-                # to exclude extraneous selects.
+                # of order_by() and distinct(), forcing the ordering
+                # expressions to be selected as well. Wrap the query in another
+                # subquery to exclude extraneous selects.
                 sub_selects = []
                 sub_params = []
                 for index, (select, _, alias) in enumerate(self.select, start=1):
@@ -1453,7 +1454,7 @@ class SQLCompiler:
                     field = klass_info["field"]
                     if klass_info["reverse"]:
                         field = field.remote_field
-                    path = parent_path + [field.name]
+                    path = [*parent_path, field.name]
                     yield LOOKUP_SEP.join(path)
                 queue.extend(
                     (path, klass_info)
@@ -1661,19 +1662,6 @@ class SQLCompiler:
             return list(result)
         return result
 
-    def as_subquery_condition(self, alias, columns, compiler):
-        qn = compiler.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
-        query = self.query.clone()
-
-        for index, select_col in enumerate(query.select):
-            lhs_sql, lhs_params = self.compile(select_col)
-            rhs = "%s.%s" % (qn(alias), qn2(columns[index]))
-            query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
-
-        sql, params = query.as_sql(compiler, self.connection)
-        return "EXISTS %s" % sql, params
-
     def explain_query(self):
         result = list(self.execute_sql())
         # Some backends return 1 item tuples with strings, and others return
@@ -1810,23 +1798,65 @@ class SQLInsertCompiler(SQLCompiler):
             on_conflict=self.query.on_conflict,
         )
         result = ["%s %s" % (insert_statement, qn(opts.db_table))]
-        fields = self.query.fields or [opts.pk]
-        result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
 
-        if self.query.fields:
-            value_rows = [
-                [
-                    self.prepare_value(field, self.pre_save_val(field, obj))
-                    for field in fields
+        if fields := list(self.query.fields):
+            from django.db.models.expressions import DatabaseDefault
+
+            supports_default_keyword_in_bulk_insert = (
+                self.connection.features.supports_default_keyword_in_bulk_insert
+            )
+            value_cols = []
+            for field in list(fields):
+                field_prepare = partial(self.prepare_value, field)
+                field_pre_save = partial(self.pre_save_val, field)
+                field_values = [
+                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
                 ]
-                for obj in self.query.objs
-            ]
+
+                if not field.has_db_default():
+                    value_cols.append(field_values)
+                    continue
+
+                # If all values are DEFAULT don't include the field and its
+                # values in the query as they are redundant and could prevent
+                # optimizations. This cannot be done if we're dealing with the
+                # last field as INSERT statements require at least one.
+                if len(fields) > 1 and all(
+                    isinstance(value, DatabaseDefault) for value in field_values
+                ):
+                    fields.remove(field)
+                    continue
+
+                if supports_default_keyword_in_bulk_insert:
+                    value_cols.append(field_values)
+                    continue
+
+                # If the field cannot be excluded from the INSERT for the
+                # reasons listed above and the backend doesn't support the
+                # DEFAULT keyword each values must be expanded into their
+                # underlying expressions.
+                prepared_db_default = field_prepare(field.db_default)
+                field_values = [
+                    (
+                        prepared_db_default
+                        if isinstance(value, DatabaseDefault)
+                        else value
+                    )
+                    for value in field_values
+                ]
+                value_cols.append(field_values)
+            value_rows = list(zip(*value_cols))
+            result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
         else:
-            # An empty object.
+            # No fields were specified but an INSERT statement must include at
+            # least one column. This can only happen when the model's primary
+            # key is composed of a single auto-field so default to including it
+            # as a placeholder to generate a valid INSERT statement.
             value_rows = [
                 [self.connection.ops.pk_default_value()] for _ in self.query.objs
             ]
             fields = [None]
+            result.append("(%s)" % qn(opts.pk.column))
 
         # Currently the backends just accept values when generating bulk
         # queries and generate their own placeholders. Doing that isn't
@@ -1860,7 +1890,7 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(on_conflict_suffix_sql)
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
-            r_sql, self.returning_params = self.connection.ops.return_insert_columns(
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
                 self.returning_fields
             )
             if r_sql:
@@ -1877,7 +1907,7 @@ class SQLInsertCompiler(SQLCompiler):
             if on_conflict_suffix_sql:
                 result.append(on_conflict_suffix_sql)
             return [
-                (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
+                (" ".join([*result, "VALUES (%s)" % ", ".join(p)]), vals)
                 for p, vals in zip(placeholder_rows, param_rows)
             ]
 
@@ -1895,20 +1925,16 @@ class SQLInsertCompiler(SQLCompiler):
                 cursor.execute(sql, params)
             if not self.returning_fields:
                 return []
+            obj_len = len(self.query.objs)
             if (
                 self.connection.features.can_return_rows_from_bulk_insert
-                and len(self.query.objs) > 1
+                and obj_len > 1
+            ) or (
+                self.connection.features.can_return_columns_from_insert and obj_len == 1
             ):
-                rows = self.connection.ops.fetch_returned_insert_rows(cursor)
-                cols = [field.get_col(opts.db_table) for field in self.returning_fields]
-            elif self.connection.features.can_return_columns_from_insert:
-                assert len(self.query.objs) == 1
-                rows = [
-                    self.connection.ops.fetch_returned_insert_columns(
-                        cursor,
-                        self.returning_params,
-                    )
-                ]
+                rows = self.connection.ops.fetch_returned_rows(
+                    cursor, self.returning_params
+                )
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             elif returning_fields and isinstance(
                 returning_field := returning_fields[0], AutoField
@@ -2019,6 +2045,11 @@ class SQLUpdateCompiler(SQLCompiler):
                         "Window expressions are not allowed in this query "
                         "(%s=%r)." % (field.name, val)
                     )
+                if isinstance(val, ColPairs):
+                    raise FieldError(
+                        "Composite primary keys expressions are not allowed "
+                        "in this query (%s=F('pk'))." % field.name
+                    )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
                     val = val.prepare_database_save(field)
@@ -2073,8 +2104,8 @@ class SQLUpdateCompiler(SQLCompiler):
             # If the result_type is NO_RESULTS then the aux_row_count is None.
             aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
             if is_empty and aux_row_count:
-                # Returns the row count for any related updates as the number of
-                # rows updated.
+                # Returns the row count for any related updates as the number
+                # of rows updated.
                 row_count = aux_row_count
                 is_empty = False
         return row_count

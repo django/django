@@ -137,7 +137,8 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
             self.client.get("/dates/books/")
-        # same as above + 1 query to test if books exist + 1 query to count them
+        # same as above + 1 query to test if books exist + 1 query to count
+        # them
         with self.assertNumQueries(4):
             self.client.get("/dates/books/paginated/")
 
@@ -156,9 +157,7 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_archive_view(self):
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/")
         self.assertEqual(res.status_code, 200)
@@ -244,7 +243,8 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context["date_list"]), [])
         self.assertEqual(list(res.context["book_list"]), [])
 
-        # Since allow_empty=True, next/prev are allowed to be empty years (#7164)
+        # Since allow_empty=True, next/prev are allowed to be empty years
+        # (#7164)
         self.assertEqual(res.context["next_year"], datetime.date(2000, 1, 1))
         self.assertEqual(res.context["previous_year"], datetime.date(1998, 1, 1))
 
@@ -345,9 +345,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_year_view(self):
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/2008/")
         self.assertEqual(res.status_code, 200)
@@ -413,7 +411,8 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context["book_list"]), [])
         self.assertEqual(res.context["month"], datetime.date(2000, 1, 1))
 
-        # Since allow_empty=True, next/prev are allowed to be empty months (#7164)
+        # Since allow_empty=True, next/prev are allowed to be empty months
+        # (#7164)
         self.assertEqual(res.context["next_month"], datetime.date(2000, 2, 1))
         self.assertEqual(res.context["previous_month"], datetime.date(1999, 12, 1))
 
@@ -488,7 +487,8 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get("/dates/books/2010/nov/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["previous_month"], datetime.date(2010, 10, 1))
-        # The bug does not occur here because a Book with pubdate of Sep 1 exists
+        # The bug does not occur here because a Book with pubdate of Sep 1
+        # exists
         res = self.client.get("/dates/books/2010/oct/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["previous_month"], datetime.date(2010, 9, 1))
@@ -520,19 +520,13 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_month_view(self):
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 2, 1, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 2, 1, 12, 0, tzinfo=datetime.UTC)
         )
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 6, 3, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 6, 3, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/2008/apr/")
         self.assertEqual(res.status_code, 200)
@@ -588,7 +582,8 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertIsNone(res.context["next_week"])
 
     def test_week_view_allow_future(self):
-        # January 7th always falls in week 1, given Python's definition of week numbers
+        # January 7th always falls in week 1, given Python's definition of week
+        # numbers
         future = datetime.date(datetime.date.today().year + 1, 1, 7)
         future_sunday = future - datetime.timedelta(days=(future.weekday() + 1) % 7)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
@@ -673,9 +668,7 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_week_view(self):
         BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/2008/week/13/")
         self.assertEqual(res.status_code, 200)
@@ -708,7 +701,8 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context["book_list"]), [])
         self.assertEqual(res.context["day"], datetime.date(2000, 1, 1))
 
-        # Since it's allow empty, next/prev are allowed to be empty months (#7164)
+        # Since it's allow empty, next/prev are allowed to be empty months
+        # (#7164)
         self.assertEqual(res.context["next_day"], datetime.date(2000, 1, 2))
         self.assertEqual(res.context["previous_day"], datetime.date(1999, 12, 31))
 
@@ -805,25 +799,19 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_day_view(self):
         bs = BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 200)
         # 2008-04-02T00:00:00+03:00 (beginning of day) >
         # 2008-04-01T22:00:00+00:00 (book signing event date).
-        bs.event_date = datetime.datetime(
-            2008, 4, 1, 22, 0, tzinfo=datetime.timezone.utc
-        )
+        bs.event_date = datetime.datetime(2008, 4, 1, 22, 0, tzinfo=datetime.UTC)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 200)
         # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00
         # (book signing event date).
-        bs.event_date = datetime.datetime(
-            2008, 4, 2, 22, 0, tzinfo=datetime.timezone.utc
-        )
+        bs.event_date = datetime.datetime(2008, 4, 2, 22, 0, tzinfo=datetime.UTC)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 404)
@@ -914,25 +902,19 @@ class DateDetailViewTests(TestDataMixin, TestCase):
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Nairobi")
     def test_aware_datetime_date_detail(self):
         bs = BookSigning.objects.create(
-            event_date=datetime.datetime(
-                2008, 4, 2, 12, 0, tzinfo=datetime.timezone.utc
-            )
+            event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=datetime.UTC)
         )
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)
         self.assertEqual(res.status_code, 200)
         # 2008-04-02T00:00:00+03:00 (beginning of day) >
         # 2008-04-01T22:00:00+00:00 (book signing event date).
-        bs.event_date = datetime.datetime(
-            2008, 4, 1, 22, 0, tzinfo=datetime.timezone.utc
-        )
+        bs.event_date = datetime.datetime(2008, 4, 1, 22, 0, tzinfo=datetime.UTC)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)
         self.assertEqual(res.status_code, 200)
         # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00
         # (book signing event date).
-        bs.event_date = datetime.datetime(
-            2008, 4, 2, 22, 0, tzinfo=datetime.timezone.utc
-        )
+        bs.event_date = datetime.datetime(2008, 4, 2, 22, 0, tzinfo=datetime.UTC)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)
         self.assertEqual(res.status_code, 404)

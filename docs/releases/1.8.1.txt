@@ -51,9 +51,10 @@ Bugfixes
   ``django.conf.urls.url()`` which is deprecated in Django 1.8
   (:ticket:`24635`).
 
-* Fixed queries where an expression was referenced in ``order_by()``, but wasn't
-  part of the select clause. An example query is
-  ``qs.annotate(foo=F('field')).values('pk').order_by('foo'))`` (:ticket:`24615`).
+* Fixed queries where an expression was referenced in ``order_by()``, but
+  wasn't part of the select clause. An example query is
+  ``qs.annotate(foo=F('field')).values('pk').order_by('foo'))``
+  (:ticket:`24615`).
 
 * Fixed a database table name quoting regression (:ticket:`24605`).
 

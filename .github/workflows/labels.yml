@@ -13,13 +13,15 @@ permissions:
 
 jobs:
   no_ticket:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
     name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: "Check title and manage labels"
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = context.payload.pull_request.title;

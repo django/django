@@ -8,8 +8,8 @@ How do I get started?
 #. `Download the code`_.
 #. Install Django (read the :doc:`installation guide </intro/install>`).
 #. Walk through the :doc:`tutorial </intro/tutorial01>`.
-#. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
-   run into trouble.
+#. Check out the rest of the :doc:`documentation </index>`, and
+   `ask questions`_ if you run into trouble.
 
 .. _`Download the code`: https://www.djangoproject.com/download/
 .. _ask questions: https://www.djangoproject.com/community/
@@ -58,7 +58,10 @@ Django version Python versions
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
-supported. You can find the latest micro version for each series on the `Python
+supported. Python versions that have reached end-of-life are no longer
+maintained by the Python project and therefore should not be used with Django.
+
+You can find the latest supported micro version for each series on the `Python
 download page <https://www.python.org/downloads/>`_.
 
 We will support a Python version up to and including the first Django LTS

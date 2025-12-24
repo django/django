@@ -122,7 +122,8 @@ tests earlier, but it's never too late to get started.
 Sometimes it's difficult to figure out where to get started with writing tests.
 If you have written several thousand lines of Python, choosing something to
 test might not be easy. In such a case, it's fruitful to write your first test
-the next time you make a change, either when you add a new feature or fix a bug.
+the next time you make a change, either when you add a new feature or fix a
+bug.
 
 So let's do that right away.
 
@@ -135,9 +136,10 @@ We identify a bug
 -----------------
 
 Fortunately, there's a little bug in the ``polls`` application for us to fix
-right away: the ``Question.was_published_recently()`` method returns ``True`` if
-the ``Question`` was published within the last day (which is correct) but also if
-the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
+right away: the ``Question.was_published_recently()`` method returns ``True``
+if the ``Question`` was published within the last day (which is correct) but
+also if the ``Question``’s ``pub_date`` field is in the future (which certainly
+isn't).
 
 Confirm the bug by using the :djadmin:`shell` to check the method on a question
 whose date lies in the future:
@@ -191,9 +193,9 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
-Here we have created a :class:`django.test.TestCase` subclass with a method that
-creates a ``Question`` instance with a ``pub_date`` in the future. We then check
-the output of ``was_published_recently()`` - which *ought* to be False.
+Here we have created a :class:`django.test.TestCase` subclass with a method
+that creates a ``Question`` instance with a ``pub_date`` in the future. We then
+check the output of ``was_published_recently()`` - which *ought* to be False.
 
 Running tests
 -------------
@@ -242,8 +244,8 @@ What happened is this:
 
 * it looked for test methods - ones whose names begin with ``test``
 
-* in ``test_was_published_recently_with_future_question`` it created a ``Question``
-  instance whose ``pub_date`` field is 30 days in the future
+* in ``test_was_published_recently_with_future_question`` it created a
+  ``Question`` instance whose ``pub_date`` field is 30 days in the future
 
 * ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
@@ -255,10 +257,10 @@ occurred.
 Fixing the bug
 --------------
 
-We already know what the problem is: ``Question.was_published_recently()`` should
-return ``False`` if its ``pub_date`` is in the future. Amend the method in
-``models.py``, so that it will only return ``True`` if the date is also in the
-past:
+We already know what the problem is: ``Question.was_published_recently()``
+should return ``False`` if its ``pub_date`` is in the future. Amend the method
+in ``models.py``, so that it will only return ``True`` if the date is also in
+the past:
 
 .. code-block:: python
     :caption: ``polls/models.py``
@@ -292,8 +294,8 @@ More comprehensive tests
 ------------------------
 
 While we're here, we can further pin down the ``was_published_recently()``
-method; in fact, it would be positively embarrassing if in fixing one bug we had
-introduced another.
+method; in fact, it would be positively embarrassing if in fixing one bug we
+had introduced another.
 
 Add two more test methods to the same class, to test the behavior of the method
 more comprehensively:
@@ -320,8 +322,9 @@ more comprehensively:
         recent_question = Question(pub_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
 
-And now we have three tests that confirm that ``Question.was_published_recently()``
-returns sensible values for past, recent, and future questions.
+And now we have three tests that confirm that
+``Question.was_published_recently()`` returns sensible values for past, recent,
+and future questions.
 
 Again, ``polls`` is a minimal application, but however complex it grows in the
 future and whatever other code it interacts with, we now have some guarantee
@@ -352,7 +355,7 @@ The Django test client
 ----------------------
 
 Django provides a test :class:`~django.test.Client` to simulate a user
-interacting with the code at the view level.  We can use it in ``tests.py``
+interacting with the code at the view level. We can use it in ``tests.py``
 or even in the :djadmin:`shell`.
 
 We will start again with the :djadmin:`shell`, where we need to do a couple of
@@ -461,11 +464,11 @@ Testing our new view
 --------------------
 
 Now you can satisfy yourself that this behaves as expected by firing up
-``runserver``, loading the site in your browser, creating ``Questions`` with
-dates in the past and future, and checking that only those that have been
-published are listed. You don't want to have to do that *every single time you
-make any change that might affect this* - so let's also create a test, based on
-our :djadmin:`shell` session above.
+``runserver``, loading the site in your browser, creating a few ``Question``
+entries with dates in the past and future, and checking that only those that
+have been published are listed. You don't want to have to do that *every single
+time you make any change that might affect this* - so let's also create a test,
+based on our :djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 
@@ -557,8 +560,8 @@ repetition out of the process of creating questions.
 "No polls are available." and verifies the ``latest_question_list`` is empty.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerySetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.TransactionTestCase.assertQuerySetEqual`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
@@ -626,14 +629,14 @@ create a new test class for that view. It'll be very similar to what we have
 just created; in fact there will be a lot of repetition.
 
 We could also improve our application in other ways, adding tests along the
-way. For example, it's silly that ``Questions`` can be published on the site
-that have no ``Choices``. So, our views could check for this, and exclude such
-``Questions``. Our tests would create a ``Question`` without ``Choices`` and
-then test that it's not published, as well as create a similar ``Question``
-*with* ``Choices``, and test that it *is* published.
+way. For example, it's pointless that a ``Question`` with no related ``Choice``
+can be published on the site. So, our views could check for this, and exclude
+such ``Question`` objects. Our tests would create a ``Question`` without a
+``Choice``, and then test that it's not published, as well as create a similar
+``Question`` *with* at least one ``Choice``, and test that it *is* published.
 
-Perhaps logged-in admin users should be allowed to see unpublished
-``Questions``, but not ordinary visitors. Again: whatever needs to be added to
+Perhaps logged-in admin users should be allowed to see unpublished ``Question``
+entries, but not ordinary visitors. Again: whatever needs to be added to
 the software to accomplish this should be accompanied by a test, whether you
 write the test first and then make the code pass the test, or work out the
 logic in your code first and then write a test to prove it.
@@ -644,18 +647,19 @@ code is suffering from test bloat, which brings us to:
 When testing, more is better
 ============================
 
-It might seem that our tests are growing out of control. At this rate there will
-soon be more code in our tests than in our application, and the repetition
+It might seem that our tests are growing out of control. At this rate there
+will soon be more code in our tests than in our application, and the repetition
 is unaesthetic, compared to the elegant conciseness of the rest of our code.
 
 **It doesn't matter**. Let them grow. For the most part, you can write a test
 once and then forget about it. It will continue performing its useful function
 as you continue to develop your program.
 
-Sometimes tests will need to be updated. Suppose that we amend our views so that
-only ``Questions`` with ``Choices`` are published. In that case, many of our
-existing tests will fail - *telling us exactly which tests need to be amended to
-bring them up to date*, so to that extent tests help look after themselves.
+Sometimes tests will need to be updated. Suppose that we amend our views so
+that only ``Question`` entries with associated ``Choice`` instances are
+published. In that case, many of our existing tests will fail - *telling us
+exactly which tests need to be amended to bring them up to date*, so to that
+extent tests help look after themselves.
 
 At worst, as you continue developing, you might find that you have some tests
 that are now redundant. Even that's not a problem; in testing redundancy is

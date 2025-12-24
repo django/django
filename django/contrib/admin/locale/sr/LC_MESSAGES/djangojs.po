@@ -2,16 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2021,2023
+# Igor Jerosimić, 2021,2023,2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Igor Jerosimić, 2021,2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2021,2023,2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -27,11 +27,10 @@ msgstr "Доступни %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Ово је листа доступних „%s“. Можете изабрати елементе тако што ћете их "
-"изабрати у листи и кликнути на „Изабери“."
+"Изаберите %s тако што ћете их означити, а затим кликните дугме са стрелицом "
+"\"Изабери\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +39,17 @@ msgstr "Филтрирајте листу доступних елемената 
 msgid "Filter"
 msgstr "Филтер"
 
-msgid "Choose all"
-msgstr "Изабери све"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Изабери све %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Изаберите све „%s“ одједном."
+msgid "Choose selected %s"
+msgstr "Изабери одабрани %s"
 
-msgid "Choose"
-msgstr "Изабери"
-
-msgid "Remove"
-msgstr "Уклони"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Уклони изабране %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,22 +57,21 @@ msgstr "Изабрано „%s“"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Ово је листа изабраних „%s“. Можете уклонити елементе тако што ћете их "
-"изабрати у листи и кликнути на „Уклони“."
+"Уклоните %s тако што ћете их означити, а затим кликните дугме са стрелицом "
+"\"Уклони\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Унесите ово поље да бисте филтрирали листу изабраних %s."
 
-msgid "Remove all"
-msgstr "Уклони све"
+msgid "(click to clear)"
+msgstr "(кликни да обришеш)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Уклоните све изабране „%s“ одједном."
+msgid "Remove all %s"
+msgstr "Уклони све %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -322,9 +319,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Покажи"
-
-msgid "Hide"
-msgstr "Сакриј"

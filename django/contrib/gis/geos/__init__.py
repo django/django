@@ -1,5 +1,5 @@
 """
-The GeoDjango GEOS module.  Please consult the GeoDjango documentation
+The GeoDjango GEOS module. Please consult the GeoDjango documentation
 for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 """
 

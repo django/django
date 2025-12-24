@@ -8,7 +8,8 @@ Django Utils
 This document covers all stable modules in ``django.utils``. Most of the
 modules in ``django.utils`` are designed for internal use and only the
 following parts can be considered stable and thus backwards compatible as per
-the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
+the :ref:`internal release deprecation policy
+<internal-release-deprecation-policy>`.
 
 ``django.utils.cache``
 ======================
@@ -282,7 +283,7 @@ The functions defined in this module share the following properties:
     :class:`~pathlib.Path`.
 
     This method will encode certain characters that would normally be
-    recognized as special characters for URIs.  Note that this method does not
+    recognized as special characters for URIs. Note that this method does not
     encode the ' character, as it is a valid character within URIs. See
     ``encodeURIComponent()`` JavaScript function for more details.
 
@@ -297,7 +298,8 @@ The functions defined in this module share the following properties:
 ==============================
 
 .. module:: django.utils.feedgenerator
-   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
+   :synopsis: Syndication feed generation library -- used for generating RSS,
+       etc.
 
 Sample usage:
 
@@ -322,14 +324,16 @@ Sample usage:
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
-For definitions of the different versions of RSS, see:
-https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+For definitions of the different versions of RSS, see `The myth of RSS
+compatibility
+<https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss>`__.
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See `How to make a good ID in Atom
+    <https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id>`__.
 
 ``Stylesheet``
 --------------
@@ -348,7 +352,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         An optional string containing the MIME type of the stylesheet. If not
         specified, Django will attempt to guess it by using Python's
-        :py:func:`mimetypes.guess_type()`. Use ``mimetype=None`` if you don't
+        :func:`mimetypes.guess_type`. Use ``mimetype=None`` if you don't
         want your stylesheet to have a MIME type specified.
 
     .. attribute:: media
@@ -367,8 +371,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, stylesheets=None, **kwargs)
 
-        Initialize the feed with the given dictionary of metadata, which applies
-        to the entire feed.
+        Initialize the feed with the given dictionary of metadata, which
+        applies to the entire feed.
 
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
@@ -387,7 +391,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         Adds an item to the feed. All args are expected to be strings except
         ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
-        objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
+        objects, and ``enclosures``, which is a list of ``Enclosure``
+        instances.
 
     .. method:: num_items()
 
@@ -518,7 +523,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         if person.friends:
             ...
 
-    The cached value can be treated like an ordinary attribute of the instance::
+    The cached value can be treated like an ordinary attribute of the
+    instance::
 
         # clear it, requiring re-computation next time it's called
         person.__dict__.pop("friends", None)
@@ -526,7 +532,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
 
-    Because of the way the :py:ref:`descriptor protocol
+    Because of the way the :ref:`descriptor protocol
     <descriptor-invocation>` works, using ``del`` (or ``delattr``) on a
     ``cached_property`` that hasn't been accessed raises ``AttributeError``.
 
@@ -554,7 +560,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: classproperty(method=None)
 
-    Similar to :py:func:`@classmethod <classmethod>`, the ``@classproperty``
+    Similar to :func:`@classmethod <classmethod>`, the ``@classproperty``
     decorator converts the result of a method with a single ``cls`` argument
     into a property that can be accessed directly from the class.
 
@@ -695,8 +701,8 @@ escaping HTML.
     :func:`conditional_escape`.
 
     ``args_generator`` should be an iterator that yields arguments to pass to
-    :func:`format_html`, either sequences of positional arguments or mappings of
-    keyword arguments.
+    :func:`format_html`, either sequences of positional arguments or mappings
+    of keyword arguments.
 
     For example, tuples can be used for positional arguments::
 
@@ -741,7 +747,7 @@ escaping HTML.
     is anything contained within ``<>``.
 
     Absolutely NO guarantee is provided about the resulting string being
-    HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
+    HTML safe. So NEVER mark safe the result of a ``strip_tags`` call without
     escaping it first, for example with :func:`~django.utils.html.escape`.
 
     For example::
@@ -837,7 +843,8 @@ Functions for working with Python modules.
 ===========================
 
 .. module:: django.utils.safestring
-   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
+   :synopsis: Functions and classes for working with strings that can be
+       displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
 displayed safely without further escaping in HTML. Marking something as a "safe
@@ -977,10 +984,10 @@ appropriate entities.
 .. function:: override(timezone)
 
     This is a Python context manager that sets the :ref:`current time zone
-    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    <default-current-time-zone>` on entry with :func:`activate`, and restores
     the previously active time zone on exit. If the ``timezone`` argument is
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
-    on entry with :func:`deactivate()` instead.
+    on entry with :func:`deactivate` instead.
 
     ``override`` is also usable as a function decorator.
 
@@ -1133,8 +1140,8 @@ For a complete discussion on the usage of the following see the
 .. function:: get_language()
 
     Returns the currently selected language code. Returns ``None`` if
-    translations are temporarily deactivated (by :func:`deactivate_all()` or
-    when ``None`` is passed to :func:`override()`).
+    translations are temporarily deactivated (by :func:`deactivate_all` or
+    when ``None`` is passed to :func:`override`).
 
 .. function:: get_language_bidi()
 
@@ -1166,8 +1173,8 @@ For a complete discussion on the usage of the following see the
     ``strict`` is ``True``, or if there is no generic variant and ``strict``
     is ``False``.
 
-    If ``strict`` is ``False`` (the default), a country-specific variant may
-    be returned when neither the language code nor its generic variant is found.
+    If ``strict`` is ``False`` (the default), a country-specific variant may be
+    returned when neither the language code nor its generic variant is found.
     For example, if only ``'es-co'`` is in :setting:`LANGUAGES`, that's
     returned for ``lang_code``\s like ``'es'`` and ``'es-ar'``. Those matches
     aren't returned if ``strict=True``.

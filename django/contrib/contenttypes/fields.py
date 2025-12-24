@@ -55,11 +55,15 @@ class GenericForeignKey(FieldCacheMixin, Field):
         attname, column = super().get_attname_column()
         return attname, None
 
+    @cached_property
+    def ct_field_attname(self):
+        return self.model._meta.get_field(self.ct_field).attname
+
     def get_filter_kwargs_for_object(self, obj):
         """See corresponding method on Field"""
         return {
             self.fk_field: getattr(obj, self.fk_field),
-            self.ct_field: getattr(obj, self.ct_field),
+            self.ct_field_attname: getattr(obj, self.ct_field_attname),
         }
 
     def get_forward_related_filter(self, obj):
@@ -195,8 +199,9 @@ class GenericForeignKey(FieldCacheMixin, Field):
                 ct = self.get_content_type(id=ct_id, using=instance._state.db)
                 ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
 
-        # For doing the join in Python, we have to match both the FK val and the
-        # content type, so we use a callable that returns a (fk, class) pair.
+        # For doing the join in Python, we have to match both the FK val and
+        # the content type, so we use a callable that returns a (fk, class)
+        # pair.
         def gfk_key(obj):
             ct_id = getattr(obj, ct_attname)
             if ct_id is None:
@@ -205,14 +210,11 @@ class GenericForeignKey(FieldCacheMixin, Field):
                 model = self.get_content_type(
                     id=ct_id, using=obj._state.db
                 ).model_class()
-                return (
-                    model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
-                    model,
-                )
+                return str(getattr(obj, self.fk_field)), model
 
         return (
             ret_val,
-            lambda obj: (obj.pk, obj.__class__),
+            lambda obj: (obj._meta.pk.value_to_string(obj), obj.__class__),
             gfk_key,
             True,
             self.name,
@@ -388,6 +390,20 @@ class GenericRelation(ForeignObject):
                 self.model._meta.pk,
             )
         ]
+
+    def get_local_related_value(self, instance):
+        return self.get_instance_value_for_fields(instance, self.foreign_related_fields)
+
+    def get_foreign_related_value(self, instance):
+        # We (possibly) need to convert object IDs to the type of the
+        # instances' PK in order to match up instances during prefetching.
+        return tuple(
+            foreign_field.to_python(val)
+            for foreign_field, val in zip(
+                self.foreign_related_fields,
+                self.get_instance_value_for_fields(instance, self.local_related_fields),
+            )
+        )
 
     def _get_path_info_with_parent(self, filtered_relation):
         """

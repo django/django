@@ -3,16 +3,16 @@
 # Translators:
 # 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2019,2023
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2019,2023,2025
 # אורי רודברג <uri@speedy.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
-"2012-2015,2017,2019,2023\n"
+"2012-2015,2017,2019,2023,2025\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +34,22 @@ msgstr "תאריכים חשובים"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "נשלחו נתונים סותרים בטופס. נא לנסות שוב."
+
 msgid "Password changed successfully."
 msgstr "הסיסמה שונתה בהצלחה."
+
+msgid "Password-based authentication was disabled."
+msgstr "אימות מבוסס סיסמה הושבת."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "שינוי סיסמה: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "קביעת סיסמה: %s"
 
 msgid "Authentication and Authorization"
 msgstr "אימות והרשאות"
@@ -50,11 +60,17 @@ msgstr "סיסמה"
 msgid "last login"
 msgstr "כניסה אחרונה"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
+
 msgid "No password set."
 msgstr "לא נקבעה סיסמה."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
+msgid "Reset password"
+msgstr "איפוס סיסמה"
+
+msgid "Set password"
+msgstr "קביעת סיסמה"
 
 msgid "The two password fields didn’t match."
 msgstr "שני שדות הסיסמה אינם זהים."
@@ -69,11 +85,31 @@ msgid "Enter the same password as before, for verification."
 msgstr "יש להזין את אותה סיסמה כמו קודם, לאימות."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, אבל ניתן "
-"לשנות את הסיסמה בעזרת <a href=\"{}\">טופס זה</a>."
+"האם המשתמש יוכל לבצע אימות באמצעות סיסמה או לא. אם האפשרות מושבתת, ייתכן "
+"שעדיין ניתן יהיה לבצע אימות באמצעות מנגנונים אחרים, כגון Single Sign-On או "
+"LDAP."
+
+msgid "Password-based authentication"
+msgstr "אימות מבוסס סיסמה"
+
+msgid "Enabled"
+msgstr "מופעל"
+
+msgid "Disabled"
+msgstr "מושבת"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"סיסמאות אינן נשמרות בצורתן המקורית, לכן אין אפשרות לראות את סיסמת המשתמש."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "אפשר אימות מבוסס סיסמה עבור משתמש זה על ידי הגדרת סיסמה."
 
 #, python-format
 msgid ""
@@ -100,9 +136,6 @@ msgstr "סיסמתך הישנה הוזנה בצורה שגויה. נא להזי�
 
 msgid "Old password"
 msgstr "סיסמה ישנה"
-
-msgid "Password (again)"
-msgstr "סיסמה (שוב)"
 
 msgid "algorithm"
 msgstr "אלגוריתם"
@@ -226,16 +259,12 @@ msgid "users"
 msgstr "משתמשים"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות תו %(min_length)d."
-msgstr[1] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
-msgstr[2] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
-msgstr[3] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -243,7 +272,6 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "הסיסמה שלך חייבת להכיל לפחות תו %(min_length)d."
 msgstr[1] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
 msgstr[2] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
-msgstr[3] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

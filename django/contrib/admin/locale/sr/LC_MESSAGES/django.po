@@ -2,16 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2019,2021,2023-2024
+# Igor Jerosimić, 2019,2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -31,10 +31,10 @@ msgstr "Успешно обрисано: %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "Несуспело брисање %(name)s"
+msgstr "Неуспело брисање %(name)s"
 
-msgid "Are you sure?"
-msgstr "Да ли сте сигурни?"
+msgid "Delete multiple objects"
+msgstr "Брисање више објеката"
 
 msgid "Administration"
 msgstr "Администрација"
@@ -267,6 +267,9 @@ msgstr[2] "Свих %(total_count)s изабраних"
 msgid "0 of %(cnt)s selected"
 msgstr "0 од %(cnt)s изабрано"
 
+msgid "Delete"
+msgstr "Обриши"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Историјат измена: %s"
@@ -350,6 +353,15 @@ msgstr "Мрвице"
 msgid "Models in the %(name)s application"
 msgstr "Модели у апликацији %(name)s"
 
+msgid "Model name"
+msgstr "Име модела"
+
+msgid "Add link"
+msgstr "Додај везу"
+
+msgid "Change or view list link"
+msgstr "Промени или погледај везу листе"
+
 msgid "Add"
 msgstr "Додај"
 
@@ -359,15 +371,12 @@ msgstr "Преглед"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Немате дозволе да погледате или измените било шта."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Прво унесите корисничко име и лозинку. Потом ћете моћи да мењате још "
-"корисничких подешавања."
+"Након што направите корисника, моћи ћете да измените више корисничких опција."
 
-msgid "Enter a username and password."
-msgstr "Унесите корисничко име и лозинку"
+msgid "Error:"
+msgstr "Грешка:"
 
 msgid "Change password"
 msgstr "Промена лозинке"
@@ -454,9 +463,6 @@ msgstr "Укључи/искључи тему (тренутна тема: све�
 msgid "Toggle theme (current theme: dark)"
 msgstr "Укључи/искључи тему (тренутна тема: тамна)"
 
-msgid "Delete"
-msgstr "Обриши"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -491,9 +497,6 @@ msgstr "Да, сигуран сам"
 
 msgid "No, take me back"
 msgstr "Не, хоћу назад"
-
-msgid "Delete multiple objects"
-msgstr "Брисање више објеката"
 
 #, python-format
 msgid ""
@@ -568,8 +571,8 @@ msgstr ""
 "Пријављени сте као %(username)s, али немате овлашћења да приступите овој "
 "страни. Да ли желите да се пријавите под неким другим налогом?"
 
-msgid "Forgotten your password or username?"
-msgstr "Заборавили сте лозинку или корисничко име?"
+msgid "Forgotten your login credentials?"
+msgstr "Заборавили сте своје акредитиве за пријаву?"
 
 msgid "Toggle navigation"
 msgstr "Укључи/искључи мени"
@@ -735,8 +738,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Идите на следећу страницу и поставите нову лозинку."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Ваше корисничко име, уколико сте заборавили:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "У случају да сте заборавили, ви сте:"
 
 msgid "Thanks for using our site!"
 msgstr "Хвала што користите наш сајт!"

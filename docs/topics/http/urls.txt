@@ -34,8 +34,8 @@ How Django processes a request
 When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-#. Django determines the root URLconf module to use. Ordinarily,
-   this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
+#. Django determines the root URLconf module to use. Ordinarily, this is the
+   value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
    attribute (set by middleware), its value will be used in place of the
    :setting:`ROOT_URLCONF` setting.
@@ -86,8 +86,8 @@ Notes:
 * To capture a value from the URL, use angle brackets.
 
 * Captured values can optionally include a converter type. For example, use
-  ``<int:name>`` to capture an integer parameter. If a converter isn't included,
-  any string, excluding a ``/`` character, is matched.
+  ``<int:name>`` to capture an integer parameter. If a converter isn't
+  included, any string, excluding a ``/`` character, is matched.
 
 * There's no need to add a leading slash, because every URL has that. For
   example, it's ``articles``, not ``/articles``.
@@ -107,8 +107,8 @@ Example requests:
 * ``/articles/2003`` would not match any of these patterns, because each
   pattern requires that the URL end with a slash.
 
-* ``/articles/2003/03/building-a-django-site/`` would match the final
-  pattern. Django would call the function
+* ``/articles/2003/03/building-a-django-site/`` would match the final pattern.
+  Django would call the function
   ``views.article_detail(request, year=2003, month=3, slug="building-a-django-site")``.
 
 Path converters
@@ -116,8 +116,8 @@ Path converters
 
 The following path converters are available by default:
 
-* ``str`` - Matches any non-empty string, excluding the path separator, ``'/'``.
-  This is the default if a converter isn't included in the expression.
+* ``str`` - Matches any non-empty string, excluding the path separator,
+  ``'/'``. This is the default if a converter isn't included in the expression.
 
 * ``int`` - Matches zero or any positive integer. Returns an ``int``.
 
@@ -139,7 +139,8 @@ The following path converters are available by default:
 Registering custom path converters
 ==================================
 
-For more complex matching requirements, you can define your own path converters.
+For more complex matching requirements, you can define your own path
+converters.
 
 A converter is a class that includes the following:
 
@@ -260,9 +261,9 @@ positional arguments: ``page-2/`` and ``2``. The second pattern for
 ``page_number`` set to 2. The outer argument in this case is a non-capturing
 argument ``(?:...)``.
 
-The ``blog_articles`` view needs the outermost captured argument to be reversed,
-``page-2/`` or no arguments in this case, while ``comments`` can be reversed
-with either no arguments or a value for ``page_number``.
+The ``blog_articles`` view needs the outermost captured argument to be
+reversed, ``page-2/`` or no arguments in this case, while ``comments`` can be
+reversed with either no arguments or a value for ``page_number``.
 
 Nested captured arguments create a strong coupling between the view arguments
 and the URL as illustrated by ``blog_articles``: the view receives part of the
@@ -283,8 +284,8 @@ does not include GET or POST parameters, or the domain name.
 For example, in a request to ``https://www.example.com/myapp/``, the URLconf
 will look for ``myapp/``.
 
-In a request to ``https://www.example.com/myapp/?page=3``, the URLconf will look
-for ``myapp/``.
+In a request to ``https://www.example.com/myapp/?page=3``, the URLconf will
+look for ``myapp/``.
 
 The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
@@ -377,7 +378,7 @@ itself. It includes a number of other URLconfs::
         # ... snip ...
     ]
 
-Whenever Django encounters :func:`~django.urls.include()`, it chops off
+Whenever Django encounters :func:`~django.urls.include`, it chops off
 whatever part of the URL matched up to that point and sends the remaining
 string to the included URLconf for further processing.
 
@@ -551,15 +552,16 @@ every view in the included URLconf accepts the extra options you're passing.
 Reverse resolution of URLs
 ==========================
 
-A common need when working on a Django project is the possibility to obtain URLs
-in their final forms either for embedding in generated content (views and assets
-URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
-the server side (redirections, etc.)
+A common need when working on a Django project is the possibility to obtain
+URLs in their final forms either for embedding in generated content (views and
+assets URLs, URLs shown to the user, etc.) or for handling of the navigation
+flow on the server side (redirections, etc.)
 
-It is strongly desirable to avoid hard-coding these URLs (a laborious,
+It is strongly desirable to avoid hardcoding these URLs (a laborious,
 non-scalable and error-prone strategy). Equally dangerous is devising ad-hoc
 mechanisms to generate URLs that are parallel to the design described by the
-URLconf, which can result in the production of URLs that become stale over time.
+URLconf, which can result in the production of URLs that become stale over
+time.
 
 In other words, what's needed is a DRY mechanism. Among other advantages it
 would allow evolution of the URL design without having to go over all the
@@ -575,8 +577,8 @@ the URL design. You feed it with your URLconf and then it can be used in both
 directions:
 
 * Starting with a URL requested by the user/browser, it calls the right Django
-  view providing any arguments it might need with their values as extracted from
-  the URL.
+  view providing any arguments it might need with their values as extracted
+  from the URL.
 
 * Starting with the identification of the corresponding Django view plus the
   values of arguments that would be passed to it, obtain the associated URL.
@@ -643,8 +645,8 @@ change the entry in the URLconf.
 
 In some scenarios where views are of a generic nature, a many-to-one
 relationship might exist between URLs and views. For these cases the view name
-isn't a good enough identifier for it when comes the time of reversing
-URLs. Read the next section to know about the solution Django provides for this.
+isn't a good enough identifier for it when comes the time of reversing URLs.
+Read the next section to know about the solution Django provides for this.
 
 .. _naming-url-patterns:
 
@@ -658,7 +660,7 @@ characters you like. You are not restricted to valid Python names.
 When naming URL patterns, choose names that are unlikely to clash with other
 applications' choice of names. If you call your URL pattern ``comment``
 and another application does the same thing, the URL that
-:func:`~django.urls.reverse()` finds depends on whichever pattern is last in
+:func:`~django.urls.reverse` finds depends on whichever pattern is last in
 your project's ``urlpatterns`` list.
 
 Putting a prefix on your URL names, perhaps derived from the application
@@ -670,12 +672,12 @@ want to override a view. For example, a common use case is to override the
 :class:`~django.contrib.auth.views.LoginView`. Parts of Django and most
 third-party apps assume that this view has a URL pattern with the name
 ``login``. If you have a custom login view and give its URL the name ``login``,
-:func:`~django.urls.reverse()` will find your custom view as long as it's in
+:func:`~django.urls.reverse` will find your custom view as long as it's in
 ``urlpatterns`` after ``django.contrib.auth.urls`` is included (if that's
 included at all).
 
 You may also use the same name for multiple URL patterns if they differ in
-their arguments. In addition to the URL name, :func:`~django.urls.reverse()`
+their arguments. In addition to the URL name, :func:`~django.urls.reverse`
 matches the number of arguments and the names of the keyword arguments. Path
 converters can also raise ``ValueError`` to indicate no match, see
 :ref:`registering-custom-path-converters` for details.
@@ -699,7 +701,7 @@ way to tell these named URLs apart.
 Django applications that make proper use of URL namespacing can be deployed
 more than once for a particular site. For example :mod:`django.contrib.admin`
 has an :class:`~django.contrib.admin.AdminSite` class which allows you to
-:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.  In a
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`. In a
 later example, we'll discuss the idea of deploying the polls application from
 the tutorial in two different locations so we can serve the same functionality
 to two different audiences (authors and publishers).
@@ -726,8 +728,8 @@ index page of the admin application is referenced using ``'admin:index'``. This
 indicates a namespace of ``'admin'``, and a named URL of ``'index'``.
 
 Namespaces can also be nested. The named URL ``'sports:polls:index'`` would
-look for a pattern named ``'index'`` in the namespace ``'polls'`` that is itself
-defined within the top-level namespace ``'sports'``.
+look for a pattern named ``'index'`` in the namespace ``'polls'`` that is
+itself defined within the top-level namespace ``'sports'``.
 
 .. _topics-http-reversing-url-namespaces:
 
@@ -743,7 +745,7 @@ the fully qualified name into parts and then tries the following lookup:
 
 #. If there is a current application defined, Django finds and returns the URL
    resolver for that instance. The current application can be specified with
-   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   the ``current_app`` argument to the :func:`~django.urls.reverse`
    function.
 
    The :ttag:`url` template tag uses the namespace of the currently resolved
@@ -771,11 +773,11 @@ resolved into a URL in the namespace that has been found.
 Example
 ~~~~~~~
 
-To show this resolution strategy in action, consider an example of two instances
-of the ``polls`` application from the tutorial: one called ``'author-polls'``
-and one called ``'publisher-polls'``. Assume we have enhanced that application
-so that it takes the instance namespace into consideration when creating and
-displaying polls.
+To show this resolution strategy in action, consider an example of two
+instances of the ``polls`` application from the tutorial: one called
+``'author-polls'`` and one called ``'publisher-polls'``. Assume we have
+enhanced that application so that it takes the instance namespace into
+consideration when creating and displaying polls.
 
 .. code-block:: python
     :caption: ``urls.py``
@@ -803,10 +805,10 @@ displaying polls.
 
 Using this setup, the following lookups are possible:
 
-* If one of the instances is current - say, if we were rendering the detail page
-  in the instance ``'author-polls'`` - ``'polls:index'`` will resolve to the
-  index page of the ``'author-polls'`` instance; i.e. both of the following will
-  result in ``"/author-polls/"``.
+* If one of the instances is current - say, if we were rendering the detail
+  page in the instance ``'author-polls'`` - ``'polls:index'`` will resolve to
+  the index page of the ``'author-polls'`` instance; i.e. both of the following
+  will result in ``"/author-polls/"``.
 
   In the method of a class-based view::
 
@@ -825,8 +827,8 @@ Using this setup, the following lookups are possible:
   registered will be used. This would be ``'publisher-polls'`` since it's
   declared last in the ``urlpatterns``.
 
-* ``'author-polls:index'`` will always resolve to the index page of the instance
-  ``'author-polls'`` (and likewise for ``'publisher-polls'``) .
+* ``'author-polls:index'`` will always resolve to the index page of the
+  instance ``'author-polls'`` (and likewise for ``'publisher-polls'``).
 
 If there were also a default instance - i.e., an instance named ``'polls'`` -
 the only change from above would be in the case where there is no current
@@ -869,7 +871,8 @@ not the list of ``urlpatterns`` itself.
         path("polls/", include("polls.urls")),
     ]
 
-The URLs defined in ``polls.urls`` will have an application namespace ``polls``.
+The URLs defined in ``polls.urls`` will have an application namespace
+``polls``.
 
 Secondly, you can include an object that contains embedded namespace data. If
 you ``include()`` a list of :func:`~django.urls.path` or
