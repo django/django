@@ -480,6 +480,18 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             "(F(datespan), '-|-')] name='exclude_overlapping' "
             "violation_error_code='overlapping_must_be_excluded'>",
         )
+        constraint = ExclusionConstraint(
+            name="exclude_equal_hash",
+            index_type="hash",
+            expressions=[(F("room"), RangeOperators.EQUAL)],
+            violation_error_code="room_must_be_unique",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type='hash' expressions=["
+            "(F(room), '=')] name='exclude_equal_hash' "
+            "violation_error_code='room_must_be_unique'>",
+        )
 
     def test_eq(self):
         constraint_1 = ExclusionConstraint(
@@ -563,6 +575,12 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             violation_error_code="custom_code",
             violation_error_message="other custom error",
         )
+        constraint_13 = ExclusionConstraint(
+            name="exclude_equal_hash",
+            index_type="hash",
+            expressions=[(F("room"), RangeOperators.EQUAL)],
+            violation_error_code="room_must_be_unique",
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
@@ -577,8 +595,10 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertNotEqual(constraint_1, object())
         self.assertNotEqual(constraint_10, constraint_11)
         self.assertNotEqual(constraint_11, constraint_12)
+        self.assertNotEqual(constraint_12, constraint_13)
         self.assertEqual(constraint_10, constraint_10)
         self.assertEqual(constraint_12, constraint_12)
+        self.assertEqual(constraint_13, constraint_13)
 
     def test_deconstruct(self):
         constraint = ExclusionConstraint(
@@ -1235,6 +1255,22 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(Room, constraint)
         self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
+
+    def test_hash_uniqueness(self):
+        constraint_name = "exclusion_equal_room_hash"
+        self.assertNotIn(constraint_name, self.get_constraints(Room._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            index_type="hash",
+            expressions=[(F("number"), RangeOperators.EQUAL)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Room, constraint)
+        self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
+        Room.objects.create(number=101)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Room.objects.create(number=101)
+        Room.objects.create(number=102)
 
     @isolate_apps("postgres_tests")
     def test_table_create(self):
