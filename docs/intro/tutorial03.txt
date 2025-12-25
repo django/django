@@ -57,8 +57,10 @@ patterns* than that.
 A URL pattern is the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
-To get from a URL to a view, Django uses what are known as 'URLconfs'. A
-URLconf maps URL patterns to views.
+To get from a URL to a view, Django uses what are known as URLconfs. A URLconf
+is a Python module that contains a list of URL patterns, each associated with
+a specific view function. When Django receives a request, it checks these
+patterns in order and calls the first view that matches the requested URL.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
 refer to :doc:`/topics/http/urls` for more information.
