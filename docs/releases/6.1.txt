@@ -135,6 +135,9 @@ Minor features
   :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
   installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
+  supports the Hash index type.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
