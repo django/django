@@ -124,6 +124,9 @@ Cache
   <database-caching>` on a percentage of writes as an optimization. The
   default is 10%, and may be configured using the ``CULL_PROBABILITY`` option.
 
+* instances of ``BaseCache`` and it's Subclasses now have ``alias``
+  as an attribute.
+
 CSP
 ~~~
 
@@ -385,3 +388,7 @@ Miscellaneous
   :setting:`TIME_ZONE` changes. Pass the ``tzinfo`` argument explicitly to
   suppress this warning. In Django 2029, the current timezone will be captured
   automatically when ``tzinfo`` is omitted.
+
+* Cache backends that don't have ``alias`` or ``**kwargs`` as parameter are
+  deprecated. Custom cache backends must accept and forward an ``alias``
+  argument (or variable ``**kwargs``) to the ``BaseCache`` constructor.

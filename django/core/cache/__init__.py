@@ -13,6 +13,8 @@ object.
 See docs/topics/cache.txt for information on the public API.
 """
 
+import warnings
+
 from django.core import signals
 from django.core.cache.backends.base import (
     BaseCache,
@@ -21,6 +23,8 @@ from django.core.cache.backends.base import (
     InvalidCacheKey,
 )
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
+from django.utils.deprecation import RemovedInDjango2029Warning, django_file_prefixes
+from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -50,7 +54,18 @@ class CacheHandler(BaseConnectionHandler):
             raise InvalidCacheBackendError(
                 "Could not find backend '%s': %s" % (backend, e)
             ) from e
-        return backend_cls(location, params)
+        # RemovedInDjango2029Warning
+        if not (
+            func_supports_parameter(backend_cls.__init__, "alias")
+            or func_accepts_kwargs(backend_cls.__init__)
+        ):
+            warnings.warn(
+                "Cache backends must pass the 'alias' arg to BaseCache.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+            return backend_cls(location, params)
+        return backend_cls(location, params, alias=alias)
 
 
 caches = CacheHandler()

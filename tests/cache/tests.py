@@ -63,6 +63,9 @@ from django.utils.cache import (
     patch_cache_control,
     patch_vary_headers,
 )
+from django.utils.deprecation import (
+    RemovedInDjango2029Warning,
+)
 from django.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
@@ -85,6 +88,11 @@ class Unpicklable:
 
 def empty_response(request):
     return HttpResponse()
+
+
+class DeprecatedNoAliasCache(BaseCache):
+    def __init__(self, server, param):
+        super().__init__(param)
 
 
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
@@ -121,6 +129,9 @@ def retry(retries=3, delay=1):
 class DummyCacheTests(SimpleTestCase):
     # The Dummy cache backend doesn't really behave like a test backend,
     # so it has its own test case.
+    def test_backend_has_access_to_alias(self):
+        self.assertTrue(hasattr(cache, "alias"))
+        self.assertEqual(cache.alias, "default")
 
     def test_simple(self):
         "Dummy cache backend ignores cache set calls"
@@ -296,6 +307,7 @@ def custom_key_func(key, key_prefix, version):
 
 _caches_setting_base = {
     "default": {},
+    "alias": {},
     "prefix": {"KEY_PREFIX": "cacheprefix{}".format(os.getpid())},
     "v2": {"VERSION": 2},
     "custom_key": {"KEY_FUNCTION": custom_key_func},
@@ -333,6 +345,15 @@ class BaseCacheTests:
 
     def tearDown(self):
         cache.clear()
+
+    def test_backend_has_access_to_alias(self):
+        self.assertTrue(hasattr(cache, "alias"))
+        self.assertEqual(cache.alias, "default")
+
+    def test_alias_available_in_non_default_backends(self):
+        alias_backend = caches["alias"]
+        self.assertTrue(hasattr(alias_backend, "alias"))
+        self.assertEqual(alias_backend.alias, "alias")
 
     def test_simple(self):
         # Simple cache set/get works
@@ -3484,3 +3505,20 @@ class CacheHandlerTest(SimpleTestCase):
         # .all() initializes all caches.
         self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
         self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))
+
+    def test_cache_handler_deprecation_warning_for_backends_with_no_alias(self):
+        test_cache = CacheHandler(
+            {
+                "default": {
+                    "BACKEND": "cache.tests.DeprecatedNoAliasCache",
+                }
+            }
+        )
+        msg = "Cache backends must pass the 'alias' arg to BaseCache."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            test_cache["default"]
+
+    def test_backends_with_no_alias_deprecation_warning(self):
+        msg = "Cache subclasses must pass 'alias' to BaseCache."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            BaseCache({"test_param": "test_value"})

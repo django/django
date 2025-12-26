@@ -28,6 +28,9 @@ details on these changes.
   the current timezone in migrations when the ``tzinfo`` argument is omitted
   and :setting:`USE_TZ` is ``True``.
 
+* Cache backends that don't have ``alias`` or ``**kwargs`` as parameter are
+  deprecated.
+
 .. _deprecation-removed-in-2028:
 
 2028
