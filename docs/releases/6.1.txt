@@ -178,7 +178,9 @@ Cache
 CSP
 ~~~
 
-* ...
+* The CSP policy builder now validates that directive names and values do not
+  contain semicolons or newlines, raising :exc:`ValueError` with a helpful
+  message if invalid characters are detected.
 
 CSRF
 ~~~~

@@ -135,6 +135,53 @@ class CSPBuildPolicyTest(SimpleTestCase):
         policy = {"default-src": []}
         self.assertPolicyEqual(build_policy(policy), "")
 
+    def test_invalid_directive_with_semicolon(self):
+        """
+        Test that directive names containing semicolons raise ValueError.
+        """
+        policy = {"script-src; report-uri https://evil.com": [CSP.SELF]}
+        msg = (
+            "Invalid CSP directive name 'script-src; report-uri https://evil.com'. "
+            "Directive names cannot contain semicolons or newlines."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            build_policy(policy)
+
+    def test_invalid_directive_with_newline(self):
+        """
+        Test that directive names containing newlines raise ValueError.
+        """
+        policy = {"script-src\r\nX-Evil": [CSP.SELF]}
+        msg = (
+            "Invalid CSP directive name 'script-src\\r\\nX-Evil'. "
+            "Directive names cannot contain semicolons or newlines."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            build_policy(policy)
+
+    def test_invalid_value_with_semicolon(self):
+        """
+        Test that values containing semicolons raise ValueError.
+        """
+        policy = {"script-src": ["https://good.com; report-uri https://evil.com"]}
+        msg = (
+            "Invalid CSP value 'https://good.com; report-uri https://evil.com' "
+            "for directive 'script-src'. Values cannot contain semicolons. "
+            "Use separate list items for multiple values."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            build_policy(policy)
+
+    def test_valid_policy_with_multiple_values(self):
+        """
+        Test that multiple values should be passed as separate list items.
+        """
+        policy = {"script-src": [CSP.SELF, "https://example.com", "https://cdn.com"]}
+        self.assertPolicyEqual(
+            build_policy(policy),
+            "script-src 'self' https://example.com https://cdn.com",
+        )
+
 
 class LazyNonceTests(SimpleTestCase):
     def test_generates_on_usage(self):
