@@ -50,7 +50,7 @@ class CacheHandler(BaseConnectionHandler):
             raise InvalidCacheBackendError(
                 "Could not find backend '%s': %s" % (backend, e)
             ) from e
-        return backend_cls(location, params)
+        return backend_cls(location, params, alias=alias)
 
 
 caches = CacheHandler()
