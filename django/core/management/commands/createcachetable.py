@@ -47,15 +47,15 @@ class Command(BaseCommand):
         if tablenames:
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
-                self.create_table(db, tablename, dry_run)
+                self.create_table(db, tablename, dry_run, None)
         else:
             for cache_alias in settings.CACHES:
                 cache = caches[cache_alias]
                 if isinstance(cache, BaseDatabaseCache):
-                    self.create_table(db, cache._table, dry_run)
+                    self.create_table(db, cache._table, dry_run, cache_alias)
 
-    def create_table(self, database, tablename, dry_run):
-        cache = BaseDatabaseCache(tablename, {})
+    def create_table(self, database, tablename, dry_run, cache_alias):
+        cache = BaseDatabaseCache(tablename, {}, alias=cache_alias)
         if not router.allow_migrate_model(database, cache.cache_model_class):
             return
         connection = connections[database]
