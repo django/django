@@ -330,6 +330,10 @@ class BaseCacheTests:
     def tearDown(self):
         cache.clear()
 
+    def test_backend_has_access_to_alias(self):
+        self.assertTrue(hasattr(cache, "alias"))
+        self.assertEqual(cache.alias, "default")
+
     def test_simple(self):
         # Simple cache set/get works
         cache.set("key", "value")
