@@ -973,11 +973,11 @@ class ChangeListTests(TestCase):
         )
         self.assertTrue(pagination_output.endswith("</nav>"))
         self.assertInHTML(
-            '<li><a role="button" href="" aria-current="page">1</a></li>',
+            '<li><a href="" aria-current="page">1</a></li>',
             pagination_output,
         )
         self.assertInHTML(
-            '<li><a role="button" href="?p=2">2</a></li>',
+            '<li><a href="?p=2">2</a></li>',
             pagination_output,
         )
         self.assertEqual(pagination_output.count('aria-current="page"'), 1)
