@@ -5,8 +5,9 @@ Performing raw SQL queries
 .. currentmodule:: django.db.models
 
 Django gives you three ways of performing raw SQL queries: you can embed raw
-SQL fragments into ORM queries using :class:`~django.db.models.expressions.RawSQL`
-(see :ref:`raw-sql-fragments`), use :meth:`Manager.raw` to `perform raw queries and return model instances`__,
+SQL fragments into ORM queries using
+:class:`~django.db.models.expressions.RawSQL` (see :ref:`raw-sql-fragments`),
+use :meth:`Manager.raw` to `perform raw queries and return model instances`__,
 or avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
@@ -44,14 +45,16 @@ __ `executing custom SQL directly`_
 Raw SQL fragments
 =================
 
-In some cases, you may need to embed raw SQL fragments directly into ORM queries,
-such as in :meth:`QuerySet.annotate` or :meth:`QuerySet.filter` calls.
+In some cases, you may need to embed raw SQL fragments directly into ORM
+queries, such as in :meth:`django.db.models.query.QuerySet.annotate` or
+:meth:`django.db.models.query.QuerySet.filter` calls.
 
-Django provides two tools for this: :ref:`Func() expressions <func-expressions>`
-and :class:`~django.db.models.expressions.RawSQL`. :ref:`Func() expressions
-<func-expressions>` are useful for calling standard SQL functions across
-backends, while :class:`~django.db.models.expressions.RawSQL` provides more
-flexibility for database-specific or complex expressions.
+Django provides two tools for this: :ref:`Func() expressions
+<func-expressions>` and :class:`~django.db.models.expressions.RawSQL`.
+:ref:`Func() expressions <func-expressions>` are useful for calling standard
+SQL functions across backends, while
+:class:`~django.db.models.expressions.RawSQL` provides more flexibility for
+database-specific or complex expressions.
 
 For example::
 
