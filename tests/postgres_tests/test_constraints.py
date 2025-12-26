@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib.postgres.indexes import OpClass
 from django.core.checks import Error
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, transaction
+from django.db import IntegrityError, connection, transaction, NotSupportedError
 from django.db.models import (
     CASCADE,
     CharField,
@@ -27,7 +27,14 @@ from django.test.utils import isolate_apps
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
-from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scene
+from .models import (
+    HotelReservation,
+    IntegerArrayModel,
+    RangesModel,
+    Room,
+    Scene,
+    StatTestModel,
+)
 
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
@@ -1303,3 +1310,46 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         msg = "Constraint “ints_equal” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(RangesModel, RangesModel())
+
+    def test_covering_hash_index_not_supported(self):
+        constraint_name = "covering_hash_index_not_supported"
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[("int1", RangeOperators.EQUAL)],
+            index_type="hash",
+            include=["int2"],
+        )
+        msg = "Covering exclusion constraints using an Hash index are not supported."
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                editor.add_constraint(StatTestModel, constraint)
+
+    def test_composite_hash_index_not_supported(self):
+        constraint_name = "composite_hash_index_not_supported"
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[
+                ("int1", RangeOperators.EQUAL),
+                ("int2", RangeOperators.EQUAL),
+            ],
+            index_type="hash",
+        )
+        msg = "Composite exclusion constraints using an Hash index are not supported."
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                editor.add_constraint(StatTestModel, constraint)
+
+    def test_non_equal_hash_index_not_supported(self):
+        constraint_name = "none_equal_hash_index_not_supported"
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[("int1", RangeOperators.NOT_EQUAL)],
+            index_type="hash",
+        )
+        msg = (
+            "Exclusion constraints using an Hash index only "
+            "supports the EQUAL operator."
+        )
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                editor.add_constraint(StatTestModel, constraint)
