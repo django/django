@@ -4,9 +4,10 @@ Performing raw SQL queries
 
 .. currentmodule:: django.db.models
 
-Django gives you two ways of performing raw SQL queries: you can use
-:meth:`Manager.raw` to `perform raw queries and return model instances`__, or
-you can avoid the model layer entirely and `execute custom SQL directly`__.
+Django gives you three ways of performing raw SQL queries: you can embed raw
+SQL fragments into ORM queries using :class:`~django.db.models.expressions.RawSQL`
+(see :ref:`raw-sql-fragments`), use :meth:`Manager.raw` to `perform raw queries and return model instances`__,
+or avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
@@ -28,11 +29,44 @@ __ `executing custom SQL directly`_
 
 .. warning::
 
+    **Do not use string formatting on raw SQL or quote placeholders in your
+    SQL strings!**
+
     You should be very careful whenever you write raw SQL. Every time you use
-    it, you should properly escape any parameters that the user can control
-    by using ``params`` in order to protect against SQL injection attacks.
-    Please read more about :ref:`SQL injection protection
-    <sql-injection-protection>`.
+    it, you must properly escape any parameters that the user can control by
+    using ``params`` in order to protect against SQL injection attacks. Do not
+    use string interpolation or quote placeholders, as this leaves you
+    vulnerable to SQL injection. Please read more about
+    :ref:`SQL injection protection <sql-injection-protection>`.
+
+.. _raw-sql-fragments:
+
+Raw SQL fragments
+=================
+
+In some cases, you may need to embed raw SQL fragments directly into ORM queries,
+such as in :meth:`QuerySet.annotate` or :meth:`QuerySet.filter` calls.
+
+Django provides two tools for this: :ref:`Func() expressions <func-expressions>`
+and :class:`~django.db.models.expressions.RawSQL`. :ref:`Func() expressions
+<func-expressions>` are useful for calling standard SQL functions across
+backends, while :class:`~django.db.models.expressions.RawSQL` provides more
+flexibility for database-specific or complex expressions.
+
+For example::
+
+    from django.db.models.expressions import RawSQL
+
+    Entry.objects.annotate(
+        val=RawSQL("SELECT col FROM sometable WHERE othercol = %s", (param,))
+    )
+
+The second argument to ``RawSQL`` is a list or tuple of parameters that will be
+safely bound to the query, similar to the ``params`` argument to
+:meth:`Manager.raw`. Use ``%s`` placeholders in the SQL string for parameters.
+
+For full documentation, see the :doc:`RawSQL reference
+</ref/models/expressions>`.
 
 .. _executing-raw-queries:
 
@@ -213,8 +247,9 @@ of people with their ages calculated by the database:
     Jane is 42.
     ...
 
-You can often avoid using raw SQL to compute annotations by instead using a
-:ref:`Func() expression <func-expressions>`.
+You can often avoid using raw SQL to compute annotations by using either
+:ref:`Func() expressions <func-expressions>` or
+:class:`~django.db.models.expressions.RawSQL` (see :ref:`raw-sql-fragments`).
 
 __ https://www.postgresql.org/docs/current/functions-datetime.html
 
@@ -239,35 +274,6 @@ replaced with parameters from the ``params`` argument.
 
    Dictionary params are not supported with the SQLite backend; with
    this backend, you must pass parameters as a list.
-
-.. warning::
-
-    **Do not use string formatting on raw queries or quote placeholders in your
-    SQL strings!**
-
-    It's tempting to write the above query as:
-
-    .. code-block:: pycon
-
-        >>> query = "SELECT * FROM myapp_person WHERE last_name = %s" % lname
-        >>> Person.objects.raw(query)
-
-    You might also think you should write your query like this (with quotes
-    around ``%s``):
-
-    .. code-block:: pycon
-
-        >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
-
-    **Don't make either of these mistakes.**
-
-    As discussed in :ref:`sql-injection-protection`, using the ``params``
-    argument and leaving the placeholders unquoted protects you from `SQL
-    injection attacks`__, a common exploit where attackers inject arbitrary
-    SQL into your database. If you use string interpolation or quote the
-    placeholder, you're at risk for SQL injection.
-
-__ https://en.wikipedia.org/wiki/SQL_injection
 
 .. _executing-custom-sql:
 
