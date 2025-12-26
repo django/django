@@ -13,6 +13,8 @@ object.
 See docs/topics/cache.txt for information on the public API.
 """
 
+import warnings
+
 from django.core import signals
 from django.core.cache.backends.base import (
     BaseCache,
@@ -21,16 +23,19 @@ from django.core.cache.backends.base import (
     InvalidCacheKey,
 )
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
+from django.utils.deprecation import RemovedInDjango2029Warning
+from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.module_loading import import_string
+from django.utils.warnings import django_file_prefixes
 
 __all__ = [
+    "DEFAULT_CACHE_ALIAS",
+    "BaseCache",
+    "CacheKeyWarning",
+    "InvalidCacheBackendError",
+    "InvalidCacheKey",
     "cache",
     "caches",
-    "DEFAULT_CACHE_ALIAS",
-    "InvalidCacheBackendError",
-    "CacheKeyWarning",
-    "BaseCache",
-    "InvalidCacheKey",
 ]
 
 DEFAULT_CACHE_ALIAS = "default"
@@ -50,7 +55,19 @@ class CacheHandler(BaseConnectionHandler):
             raise InvalidCacheBackendError(
                 "Could not find backend '%s': %s" % (backend, e)
             ) from e
-        return backend_cls(location, params)
+        # RemovedInDjango2029Warning
+        if not (
+            func_supports_parameter(backend_cls.__init__, "alias")
+            or func_accepts_kwargs(backend_cls.__init__)
+        ):
+            warnings.warn(
+                f"Cache backend {backend_cls.__name__} "
+                "must accept an 'alias' parameter",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+            return backend_cls(location, params)
+        return backend_cls(location, params, alias=alias)
 
 
 caches = CacheHandler()
