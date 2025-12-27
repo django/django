@@ -1472,12 +1472,81 @@ the custom ``max_age`` from the
 precedence, and the header values will be merged correctly.)
 
 Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
-Here are some more examples:
 
-* ``no_transform=True``
-* ``must_revalidate=True``
-* ``stale_while_revalidate=num_seconds``
-* ``no_cache=True``
+Parameter name transformation
+------------------------------
+
+The ``cache_control()`` decorator and ``patch_cache_control()`` function accept
+keyword arguments that are converted to ``Cache-Control`` header directives.
+Python parameter names are transformed by replacing underscores with hyphens.
+
+Common parameter transformations:
+
+===========================  ============================
+Python Parameter             Cache-Control Header
+===========================  ============================
+``max_age``                  ``max-age``
+``s_maxage``                 ``s-maxage``
+``no_cache``                 ``no-cache``
+``no_store``                 ``no-store``
+``no_transform``             ``no-transform``
+``must_revalidate``          ``must-revalidate``
+``proxy_revalidate``         ``proxy-revalidate``
+``public``                   ``public``
+``private``                  ``private``
+===========================  ============================
+
+Examples
+--------
+
+Set a response to be cached for one hour::
+
+    from django.utils.cache import patch_cache_control
+    from django.shortcuts import render
+
+    response = render(request, "template.html")
+    patch_cache_control(response, max_age=3600)
+    # Cache-Control: max-age=3600
+
+Prevent caching of sensitive data::
+
+    from django.utils.cache import patch_cache_control
+    from django.http import HttpResponse
+
+    response = HttpResponse(user_data)
+    patch_cache_control(response, no_store=True, private=True)
+    # Cache-Control: no-store, private
+
+Set different cache times for browser vs CDN::
+
+    from django.utils.cache import patch_cache_control
+    from django.shortcuts import render
+
+    response = render(request, "article.html")
+    patch_cache_control(response, max_age=300, s_maxage=3600)
+    # Cache-Control: max-age=300, s-maxage=3600
+    # Browsers cache for 5 minutes, CDNs for 1 hour
+
+
+Require revalidation before serving stale content::
+
+    from django.utils.cache import patch_cache_control
+    from django.shortcuts import render
+
+    response = render(request, "dashboard.html")
+    patch_cache_control(response, max_age=600, must_revalidate=True)
+    # Cache-Control: max-age=600, must-revalidate
+
+Allow serving stale content while revalidating::
+
+    from django.utils.cache import patch_cache_control
+    from django.shortcuts import render
+
+    response = render(request, "news.html")
+    patch_cache_control(response, max_age=3600, stale_while_revalidate=86400)
+    # Cache-Control: max-age=3600, stale-while-revalidate=86400
+
+
 
 The full list of known directives can be found in the `IANA registry`_
 (note that not all of them apply to responses).
