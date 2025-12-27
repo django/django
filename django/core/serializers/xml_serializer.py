@@ -10,7 +10,7 @@ from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
@@ -315,7 +315,10 @@ class Deserializer(base.Deserializer):
                 if field_node.getElementsByTagName("None"):
                     value = None
                 else:
-                    value = field.to_python(getInnerText(field_node).strip())
+                    if natural_nodes := field_node.getElementsByTagName("natural"):
+                        value = field.to_python(getInnerText(natural_nodes[0]).strip())
+                    else:
+                        value = field.to_python(getInnerText(field_node).strip())
                     # Load value since JSONField.to_python() outputs strings.
                     if field.get_internal_type() == "JSONField":
                         value = json.loads(value, cls=field.decoder)
@@ -411,6 +414,8 @@ class Deserializer(base.Deserializer):
         try:
             for c in node.getElementsByTagName("object"):
                 values.append(m2m_convert(c))
+        except SuspiciousOperation:
+            raise
         except Exception as e:
             if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
                 return base.DEFER_FIELD
@@ -439,17 +444,15 @@ class Deserializer(base.Deserializer):
             )
 
 
+def check_element_type(element):
+    if element.childNodes:
+        raise SuspiciousOperation
+    return element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+
+
 def getInnerText(node):
-    """Get the inner text of a DOM node and any children one level deep."""
-    # inspired by
-    # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     return "".join(
-        [
-            element.data
-            for child in node.childNodes
-            for element in (child, *child.childNodes)
-            if element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
-        ]
+        [child.data for child in node.childNodes if check_element_type(child)]
     )
 
 
