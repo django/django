@@ -1,7 +1,7 @@
 from types import NoneType
 
 from django.core.exceptions import ValidationError
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, NotSupportedError
 from django.db.backends.ddl_references import Expressions, Statement, Table
 from django.db.models import BaseConstraint, Deferrable, F, Q
 from django.db.models.expressions import Exists, ExpressionList
@@ -9,6 +9,7 @@ from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql import Query
 
+from .fields import RangeOperators
 from .utils import CheckPostgresInstalledMixin
 
 __all__ = ["ExclusionConstraint"]
@@ -36,7 +37,7 @@ class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
         violation_error_code=None,
         violation_error_message=None,
     ):
-        if index_type and index_type.lower() not in {"gist", "spgist"}:
+        if index_type and index_type.lower() not in {"gist", "spgist", "hash"}:
             raise ValueError(
                 "Exclusion constraints only support GiST or SP-GiST indexes."
             )
@@ -118,6 +119,7 @@ class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
         )
 
     def create_sql(self, model, schema_editor):
+        self.check_supported(schema_editor)
         return Statement(
             "ALTER TABLE %(table)s ADD %(constraint)s",
             table=Table(model._meta.db_table, schema_editor.quote_name),
@@ -130,6 +132,28 @@ class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
             model,
             schema_editor.quote_name(self.name),
         )
+
+    def check_supported(self, schema_editor):
+        if self.include and self.index_type.lower() == "hash":
+            raise NotSupportedError(
+                "Covering exclusion constraints using an Hash index "
+                "are not supported."
+            )
+
+        if len(self.expressions) > 1 and self.index_type.lower() == "hash":
+            raise NotSupportedError(
+                "Composite exclusion constraints using an Hash index "
+                "are not supported."
+            )
+
+        if (
+            self.index_type.lower() == "hash"
+            and self.expressions[0][1] != RangeOperators.EQUAL
+        ):
+            raise NotSupportedError(
+                "Exclusion constraints using an Hash index only "
+                "supports the EQUAL operator."
+            )
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
