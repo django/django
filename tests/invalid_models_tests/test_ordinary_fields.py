@@ -620,7 +620,7 @@ class DecimalFieldTests(TestCase):
                     id="fields.E132",
                 ),
             ]
-        self.assertEqual(field.check(), expected)
+        self.assertEqual(field.check(databases=self.databases), expected)
 
     def test_both_attributes_omitted_required_db_features(self):
         class Model(models.Model):
@@ -639,7 +639,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "DecimalField’s max_digits and decimal_places must both "
@@ -657,7 +657,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "DecimalField’s max_digits and decimal_places must both "
@@ -674,7 +674,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "'decimal_places' must be a non-negative integer.",
@@ -695,7 +695,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "'decimal_places' must be a non-negative integer.",
@@ -731,7 +731,7 @@ class DecimalFieldTests(TestCase):
             field = models.DecimalField(max_digits=10, decimal_places=10)
 
         field = Model._meta.get_field("field")
-        self.assertEqual(field.check(), [])
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps("invalid_models_tests")

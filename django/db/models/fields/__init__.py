@@ -1715,10 +1715,11 @@ class DecimalField(Field):
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
+        databases = kwargs.get("databases") or []
 
         digits_errors = [
-            *self._check_decimal_places(),
-            *self._check_max_digits(),
+            *self._check_decimal_places(databases),
+            *self._check_max_digits(databases),
         ]
         if not digits_errors:
             errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
@@ -1726,29 +1727,34 @@ class DecimalField(Field):
             errors.extend(digits_errors)
         return errors
 
-    def _check_decimal_places(self):
+    def _check_decimal_places(self, databases):
         if self.decimal_places is None:
-            if (
-                not connection.features.supports_no_precision_decimalfield
-                and "supports_no_precision_decimalfield"
-                not in self.model._meta.required_db_features
-            ):
-                return [
-                    checks.Error(
-                        "DecimalFields must define a 'decimal_places' attribute.",
-                        obj=self,
-                        id="fields.E130",
-                    )
-                ]
-            elif self.max_digits is not None:
-                return [
-                    checks.Error(
-                        "DecimalField’s max_digits and decimal_places must both "
-                        "be defined or both omitted.",
-                        obj=self,
-                        id="fields.E135",
-                    ),
-                ]
+            for db in databases:
+                if not router.allow_migrate_model(db, self.model):
+                    continue
+                connection = connections[db]
+
+                if (
+                    not connection.features.supports_no_precision_decimalfield
+                    and "supports_no_precision_decimalfield"
+                    not in self.model._meta.required_db_features
+                ):
+                    return [
+                        checks.Error(
+                            "DecimalFields must define a 'decimal_places' attribute.",
+                            obj=self,
+                            id="fields.E130",
+                        )
+                    ]
+                elif self.max_digits is not None:
+                    return [
+                        checks.Error(
+                            "DecimalField’s max_digits and decimal_places must both "
+                            "be defined or both omitted.",
+                            obj=self,
+                            id="fields.E135",
+                        ),
+                    ]
         else:
             try:
                 decimal_places = int(self.decimal_places)
@@ -1764,29 +1770,34 @@ class DecimalField(Field):
                 ]
         return []
 
-    def _check_max_digits(self):
+    def _check_max_digits(self, databases):
         if self.max_digits is None:
-            if (
-                not connection.features.supports_no_precision_decimalfield
-                and "supports_no_precision_decimalfield"
-                not in self.model._meta.required_db_features
-            ):
-                return [
-                    checks.Error(
-                        "DecimalFields must define a 'max_digits' attribute.",
-                        obj=self,
-                        id="fields.E132",
-                    )
-                ]
-            elif self.decimal_places is not None:
-                return [
-                    checks.Error(
-                        "DecimalField’s max_digits and decimal_places must both "
-                        "be defined or both omitted.",
-                        obj=self,
-                        id="fields.E135",
-                    ),
-                ]
+            for db in databases:
+                if not router.allow_migrate_model(db, self.model):
+                    continue
+                connection = connections[db]
+
+                if (
+                    not connection.features.supports_no_precision_decimalfield
+                    and "supports_no_precision_decimalfield"
+                    not in self.model._meta.required_db_features
+                ):
+                    return [
+                        checks.Error(
+                            "DecimalFields must define a 'max_digits' attribute.",
+                            obj=self,
+                            id="fields.E132",
+                        )
+                    ]
+                elif self.decimal_places is not None:
+                    return [
+                        checks.Error(
+                            "DecimalField’s max_digits and decimal_places must both "
+                            "be defined or both omitted.",
+                            obj=self,
+                            id="fields.E135",
+                        ),
+                    ]
         else:
             try:
                 max_digits = int(self.max_digits)
