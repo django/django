@@ -1,10 +1,12 @@
 import pickle
+import warnings
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.utils.choices import CallableChoiceIterator
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazy
 
 from .models import (
@@ -146,6 +148,37 @@ class BasicFieldTests(SimpleTestCase):
             rank = field
 
         self.assertEqual(field_hash, hash(field))
+
+    def test_get_placeholder_deprecation(self):
+        msg = (
+            "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
+            "Define model_fields.tests.BasicFieldTests."
+            "test_get_placeholder_deprecation.<locals>.SomeField.get_placeholder_sql "
+            "to return both SQL and parameters instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+
+            class SomeField(models.Field):
+                def get_placeholder(self, value, compiler, connection):
+                    return "%s"
+
+    def test_get_placeholder_sql_shim(self):
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+
+            class SomeField(models.Field):
+                def get_placeholder(self, value, compiler, connection):
+                    return "(1 + %s)"
+
+        compiler = Bar.objects.all().query.get_compiler(connection=connection)
+        self.assertEqual(
+            SomeField().get_placeholder_sql(2, compiler, connection),
+            ("(1 + %s)", (2,)),
+        )
+        self.assertEqual(
+            SomeField().get_placeholder_sql(models.Value(2), compiler, connection),
+            ("(1 + %s)", [2]),
+        )
 
 
 class ChoicesTests(SimpleTestCase):

@@ -59,6 +59,9 @@ details on these changes.
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   will raise ``TypeError``.
 
+* The ``Field.get_placeholder_sql`` shim over the deprecated
+  ``get_placeholder`` method will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
