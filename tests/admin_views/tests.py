@@ -11,7 +11,7 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
-from django.contrib.admin.options import TO_FIELD_VAR
+from django.contrib.admin.options import SOURCE_MODEL_VAR, TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
@@ -467,6 +467,69 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         }
         response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
         self.assertContains(response, "title with a new\\nline")
+
+    def test_popup_add_POST_with_valid_source_model(self):
+        """
+        Popup add with a valid source_model returns a successful response.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        # Should return a valid popup response
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        # Should not have error messages
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 0)
+
+    def test_popup_add_POST_with_optgroups(self):
+        """
+        Popup add with source_model containing optgroup choices includes
+        the optgroup in the response.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(
+            reverse("admin11:admin_views_article_add"), post_data
+        )
+        self.assertEqual(response.status_code, 200)
+        # Check that optgroup is in the response (HTML encoded)
+        self.assertContains(response, "&quot;optgroup&quot;: &quot;Published&quot;")
+
+    def test_popup_add_POST_with_invalid_source_model(self):
+        """
+        Popup add with an invalid source_model (non-existent app/model)
+        shows an error message instead of crashing.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.nonexistent",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        # Should return a valid popup response, not crash
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        # Error message should be present
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn("admin_views.nonexistent", str(messages[0]))
+        self.assertIn("could not be found", str(messages[0]))
 
     def test_basic_edit_POST(self):
         """

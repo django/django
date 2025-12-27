@@ -1,6 +1,9 @@
+from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm, AdminPasswordChangeForm
 from django.contrib.admin.helpers import ActionForm
 from django.core.exceptions import ValidationError
+
+from .models import Section
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):
@@ -23,3 +26,17 @@ class CustomAdminPasswordChangeForm(AdminPasswordChangeForm):
 class MediaActionForm(ActionForm):
     class Media:
         js = ["path/to/media.js"]
+
+
+class SectionFormWithOptgroups(forms.ModelForm):
+    articles = forms.ChoiceField(
+        choices=[
+            ("Published", [("1", "Test Article")]),
+            ("Draft", [("2", "Other Article")]),
+        ],
+        required=False,
+    )
+
+    class Meta:
+        model = Section
+        fields = ["name", "articles"]
