@@ -358,6 +358,9 @@ Custom serialization formats
 In addition to the default formats, you can create a custom serialization
 format.
 
+Custom serializers must set ``internal_use_only = False`` to be usable with
+management commands such as :djadmin:`dumpdata`
+
 For example, let’s consider a csv serializer and deserializer. First, define a
 ``Serializer`` and a ``Deserializer`` class. These can override existing
 serialization format classes:
@@ -373,6 +376,8 @@ serialization format classes:
 
 
     class Serializer(serializers.python.Serializer):
+        internal_use_only = False
+
         def get_dump_object(self, obj):
             dumped_object = super().get_dump_object(obj)
             row = [dumped_object["model"], str(dumped_object["pk"])]
