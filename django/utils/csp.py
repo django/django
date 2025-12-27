@@ -81,10 +81,46 @@ def generate_nonce():
     return secrets.token_urlsafe(16)
 
 
+def _validate_csp_directive(directive):
+    """Validate that a CSP directive name has no invalid characters."""
+    invalid_chars = {";", "\r", "\n"}
+    if any(char in directive for char in invalid_chars):
+        raise ValueError(
+            f"Invalid CSP directive name {directive!r}. "
+            "Directive names cannot contain semicolons or newlines."
+        )
+
+
+def _validate_csp_value(value, directive):
+    """Validate that a CSP value doesn't contain invalid characters."""
+    if ";" in str(value):
+        raise ValueError(
+            f"Invalid CSP value {value!r} for directive {directive!r}. "
+            "Values cannot contain semicolons. Use separate list items for "
+            "multiple values."
+        )
+
+
 def build_policy(config, nonce=None):
+    """
+    Build a Content Security Policy string from a configuration dictionary.
+
+    Args:
+        config: A dictionary mapping directive names to their values.
+        nonce: Optional nonce string to replace CSP.NONCE placeholders.
+
+    Returns:
+        A properly formatted CSP policy string.
+
+    Raises:
+        ValueError: If directive names or values contain invalid characters
+            (semicolons or newlines).
+    """
     policy = []
 
     for directive, values in config.items():
+        _validate_csp_directive(directive)
+
         if values in (None, False):
             continue
 
@@ -97,6 +133,11 @@ def build_policy(config, nonce=None):
                 values = sorted(values)
             elif not isinstance(values, list | tuple):
                 values = [values]
+
+            # Validate all values before processing.
+            for value in values:
+                if value != CSP.NONCE:  # Skip validation for the sentinel.
+                    _validate_csp_value(value, directive)
 
             # Replace the nonce sentinel with the actual nonce values, if the
             # sentinel is found and a nonce is provided. Otherwise, remove it.
