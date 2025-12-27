@@ -2,6 +2,7 @@ import datetime
 import decimal
 import json
 import re
+from unittest import mock
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
@@ -11,7 +12,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
+from .models import Article, Author, Category, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -273,6 +274,46 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         expected = "(serializers.m2mdata:pk=1) field_value was 'None'"
         with self.assertRaisesMessage(DeserializationError, expected):
             next(serializers.deserialize("json", test_string, ignore=False))
+
+    def test_m2m_natural_key_ordering(self):
+        """
+        M2M relations with natural keys are serialized in a deterministic order
+        (by PK) when the model does not have a default ordering.
+        """
+        author = Author.objects.create(name="Jane Doe")
+        a1 = Article.objects.create(
+            headline="Test Article",
+            pub_date=datetime.datetime(2025, 1, 1),
+            author=author,
+        )
+        c1 = Category.objects.create(name="z_last")
+        c2 = Category.objects.create(name="a_first")
+        a1.categories.add(c1, c2)
+
+        def fake_natural_key(self):
+            return (self.name,)
+
+        s = serializers.json.Serializer()
+        with (
+            mock.patch.object(Category, "natural_key", fake_natural_key, create=True),
+            mock.patch.object(Category._meta, "ordering", []),
+            mock.patch.object(
+                models.QuerySet,
+                "order_by",
+                side_effect=models.QuerySet.order_by,
+                autospec=True,
+            ) as mock_order_by,
+        ):
+
+            output = s.serialize([a1], use_natural_foreign_keys=True)
+            data = json.loads(output)
+            m2m_data = data[0]["fields"]["categories"]
+            self.assertEqual(m2m_data, [list(c1.natural_key()), list(c2.natural_key())])
+            calls = [call.args for call in mock_order_by.call_args_list]
+            self.assertTrue(
+                any("pk" in args for args in calls),
+                "QuerySet.order_by('pk') was not called.",
+            )
 
 
 class JsonSerializerTransactionTestCase(
