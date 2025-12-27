@@ -236,6 +236,19 @@ class BaseModelAdminChecks:
                     id="admin.E038",
                 )
             try:
+                if isinstance(field.remote_field.model, str):
+                    return [
+                        checks.Error(
+                            'An admin for model "%s" has to be registered '
+                            "to be referenced by %s.autocomplete_fields."
+                            % (
+                                field.remote_field.model,
+                                type(obj).__name__,
+                            ),
+                            obj=obj.__class__,
+                            id="admin.E039",
+                        )
+                    ]
                 related_admin = obj.admin_site.get_model_admin(field.remote_field.model)
             except NotRegistered:
                 return [
