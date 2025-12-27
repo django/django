@@ -59,6 +59,9 @@ details on these changes.
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   will raise ``TypeError``.
 
+* The setting ``TEMPLATE_TAGS_MULTILINE`` will be removed, making multiline
+  template tags mandatory.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

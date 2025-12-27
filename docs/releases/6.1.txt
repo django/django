@@ -86,6 +86,35 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+
+Multi-line template tags and variables
+--------------------------------------
+
+Template tags are now multi-line by default. You can get the old behavior
+by setting :setting:`TEMPLATE_TAGS_MULTILINE` to ``False``. This option
+will be removed in Django 7.0.
+
+With this new behavior you can now do this:
+
+.. code-block:: html+django
+
+    {%
+        load
+            static
+            i18n
+    %}
+
+    {{
+        some_variable
+        | filter1
+        | filter2
+    }}
+
+    {#
+        comment
+    #}
+
+
 Minor features
 --------------
 
@@ -423,6 +452,11 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The non-multiline template syntax is deprecated. Set
+  ``TEMPLATE_TAGS_MULTILINE=False`` in ``settings.py`` to opt out of the new
+  behavior. This setting will be removed in 7.0.
+
 
 Features removed in 6.1
 =======================
