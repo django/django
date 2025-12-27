@@ -11,6 +11,7 @@ from django.db.models import CompositePrimaryKey, UniqueConstraint
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
+    sql_delete_table_cascade = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
         "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s DEFERRABLE INITIALLY "
@@ -280,7 +281,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model, handle_autom2m=True, *, cascade=False):
         if handle_autom2m:
-            super().delete_model(model)
+            super().delete_model(model, cascade=False)
         else:
             # Delete the table (and only that)
             self.execute(
