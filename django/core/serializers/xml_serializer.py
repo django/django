@@ -177,7 +177,15 @@ class Serializer(base.Serializer):
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
-                    return attr.iterator(chunk_size)
+                    query_set = attr.all()
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
+                    return query_set.iterator(chunk_size)
 
             else:
 
@@ -186,6 +194,13 @@ class Serializer(base.Serializer):
 
                 def queryset_iterator(obj, field):
                     query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
                     chunk_size = 2000 if query_set._prefetch_related_lookups else None
                     return query_set.iterator(chunk_size=chunk_size)
 
