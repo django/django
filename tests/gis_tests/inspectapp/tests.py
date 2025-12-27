@@ -14,6 +14,7 @@ from ..test_data import TEST_DATA
 from .models import AllOGRFields
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):
         """
