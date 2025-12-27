@@ -1,0 +1,52 @@
+name: Check migrations
+
+on:
+  pull_request:
+    paths:
+      - 'tests/**/models.py'
+      - 'tests/**/migrations/**'
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check-migrations:
+    name: Check test migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+
+      - name: Create virtual environment
+        run: |
+          python -m venv .venv
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: |
+          # Filter out dependencies that require complex C compilation and are not needed for migration checks
+          grep -vE "pylibmc|pywatchman" tests/requirements/py3.txt > tests/requirements/py3-pinned.txt
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install -r tests/requirements/py3-pinned.txt -e .
+      
+      - name: Check for missing migrations
+        working-directory: ./tests
+        run: |
+           python ../scripts/check_migrations.py
