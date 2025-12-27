@@ -3,8 +3,7 @@ XML serializer.
 """
 
 import json
-from contextlib import contextmanager
-from xml.dom import minidom, pulldom
+from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
@@ -14,25 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
-
-
-@contextmanager
-def fast_cache_clearing():
-    """Workaround for performance issues in minidom document checks.
-
-    Speeds up repeated DOM operations by skipping unnecessary full traversal
-    of the DOM tree.
-    """
-    module_helper_was_lambda = False
-    if original_fn := getattr(minidom, "_in_document", None):
-        module_helper_was_lambda = original_fn.__name__ == "<lambda>"
-        if not module_helper_was_lambda:
-            minidom._in_document = lambda node: bool(node.ownerDocument)
-    try:
-        yield
-    finally:
-        if original_fn and not module_helper_was_lambda:
-            minidom._in_document = original_fn
 
 
 class Serializer(base.Serializer):
@@ -73,7 +53,7 @@ class Serializer(base.Serializer):
 
         self.indent(1)
         attrs = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not self._resolve_natural_key(obj):
+        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
             obj_pk = obj.pk
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
@@ -128,16 +108,16 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.attname)
         if related_att is not None:
-            if self.use_natural_foreign_keys and (
-                natural_key_value := self._resolve_fk_natural_key(obj, field)
+            if self.use_natural_foreign_keys and hasattr(
+                field.remote_field.model, "natural_key"
             ):
+                related = getattr(obj, field.name)
+                # If related object has a natural key, use it
+                related = related.natural_key()
                 # Iterable natural keys are rolled out as subelements
-                for key_value in natural_key_value:
+                for key_value in related:
                     self.xml.startElement("natural", {})
-                    if key_value is None:
-                        self.xml.addQuickElement("None")
-                    else:
-                        self.xml.characters(str(key_value))
+                    self.xml.characters(str(key_value))
                     self.xml.endElement("natural")
             else:
                 self.xml.characters(str(related_att))
@@ -153,45 +133,44 @@ class Serializer(base.Serializer):
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and self._model_supports_natural_key(
-                field.remote_field.model
-            ):
-                # If the objects in the m2m have a natural key, use it
-                def handle_m2m(value):
-                    if natural := self._resolve_natural_key(value):
-                        # Iterable natural keys are rolled out as subelements
-                        self.xml.startElement("object", {})
-                        for key_value in natural:
-                            self.xml.startElement("natural", {})
-                            if key_value is None:
-                                self.xml.addQuickElement("None")
-                            else:
-                                self.xml.characters(str(key_value))
-                            self.xml.endElement("natural")
-                        self.xml.endElement("object")
-                    else:
-                        self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
-                def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name)
-                    chunk_size = (
-                        2000 if getattr(attr, "prefetch_cache_name", None) else None
-                    )
-                    return attr.iterator(chunk_size)
+            if self.use_natural_foreign_keys and hasattr(
+                field.remote_field.model, "natural_key"
+            ):
+                # If the objects in the m2m have a natural key, use it.
+                def handle_m2m(value):
+                    natural = value.natural_key()
+                    # Iterable natural keys are rolled out as subelements.
+                    self.xml.startElement("object", {})
+                    for key_value in natural:
+                        self.xml.startElement("natural", {})
+                        self.xml.characters(str(key_value))
+                        self.xml.endElement("natural")
+                    self.xml.endElement("object")
+
+                def get_default_queryset():
+                    manager = getattr(obj, field.name)
+                    qs = manager.all()
+                    model = field.remote_field.model
+
+                    if not qs.ordered:
+                        qs = qs.order_by(model._meta.pk.name)
+                    return qs
 
             else:
 
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
-                def queryset_iterator(obj, field):
-                    query_set = getattr(obj, field.name).select_related(None).only("pk")
-                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
-                    return query_set.iterator(chunk_size=chunk_size)
+                def get_default_queryset():
+                    manager = getattr(obj, field.name)
+                    # Match Python serializer behavior:
+                    # Avoid selecting unnecessary columns like meta_data_id.
+                    return manager.select_related(None).only("pk")
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
-                queryset_iterator(obj, field),
+                get_default_queryset(),
             )
             for relobj in m2m_iter:
                 handle_m2m(relobj)
@@ -235,8 +214,7 @@ class Deserializer(base.Deserializer):
     def __next__(self):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
-                with fast_cache_clearing():
-                    self.event_stream.expandNode(node)
+                self.event_stream.expandNode(node)
                 return self._handle_object(node)
         raise StopIteration
 
@@ -285,11 +263,7 @@ class Deserializer(base.Deserializer):
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
                         [
-                            (
-                                None
-                                if nat_node.getElementsByTagName("None")
-                                else getInnerText(nat_node).strip()
-                            )
+                            getInnerText(nat_node).strip()
                             for nat_node in obj_node.getElementsByTagName("natural")
                         ]
                         for obj_node in field_node.getElementsByTagName("object")
@@ -302,11 +276,7 @@ class Deserializer(base.Deserializer):
                 value = self._handle_fk_field_node(field_node, field)
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
-                        (
-                            None
-                            if k.getElementsByTagName("None")
-                            else getInnerText(k).strip()
-                        )
+                        getInnerText(k).strip()
                         for k in field_node.getElementsByTagName("natural")
                     ]
                 else:
@@ -331,21 +301,16 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ForeignKey
         """
         # Check if there is a child node named 'None', returning None if so.
-        natural_keys = node.getElementsByTagName("natural")
-        if node.getElementsByTagName("None") and not natural_keys:
+        if node.getElementsByTagName("None"):
             return None
         else:
             model = field.remote_field.model
             if hasattr(model._default_manager, "get_by_natural_key"):
-                if natural_keys:
+                keys = node.getElementsByTagName("natural")
+                if keys:
                     # If there are 'natural' subelements, it must be a natural
                     # key
-                    field_value = []
-                    for k in natural_keys:
-                        if k.getElementsByTagName("None"):
-                            field_value.append(None)
-                        else:
-                            field_value.append(getInnerText(k).strip())
+                    field_value = [getInnerText(k).strip() for k in keys]
                     try:
                         obj = model._default_manager.db_manager(
                             self.db
@@ -386,12 +351,7 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural
                     # key
-                    field_value = []
-                    for k in keys:
-                        if k.getElementsByTagName("None"):
-                            field_value.append(None)
-                        else:
-                            field_value.append(getInnerText(k).strip())
+                    field_value = [getInnerText(k).strip() for k in keys]
                     obj_pk = (
                         default_manager.db_manager(self.db)
                         .get_by_natural_key(*field_value)
@@ -440,17 +400,21 @@ class Deserializer(base.Deserializer):
 
 
 def getInnerText(node):
-    """Get the inner text of a DOM node and any children one level deep."""
+    """Get all the inner text of a DOM node (recursively)."""
     # inspired by
     # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
-    return "".join(
-        [
-            element.data
-            for child in node.childNodes
-            for element in (child, *child.childNodes)
-            if element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
-        ]
-    )
+    inner_text = []
+    for child in node.childNodes:
+        if (
+            child.nodeType == child.TEXT_NODE
+            or child.nodeType == child.CDATA_SECTION_NODE
+        ):
+            inner_text.append(child.data)
+        elif child.nodeType == child.ELEMENT_NODE:
+            inner_text.extend(getInnerText(child))
+        else:
+            pass
+    return "".join(inner_text)
 
 
 # Below code based on Christian Heimes' defusedxml
