@@ -1179,6 +1179,26 @@ class MigrateTests(MigrationTestBase):
                 "sqlmigrate", "migrations", "0001", skip_checks=False, no_color=False
             )
 
+    @skipUnlessDBFeature("can_create_inline_fk")
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.cross_app_fk.app_a",
+            "migrations.migrations_test_apps.cross_app_fk.app_b",
+        ],
+    )
+    def test_sqlmigrate_cross_app_fk_alter_pk(self):
+        call_command("migrate", "app_a", "0001", verbosity=0)
+        call_command("migrate", "app_b", "0001", verbosity=0)
+
+        try:
+            out = io.StringIO()
+            call_command("sqlmigrate", "app_a", "0002", stdout=out, no_color=True)
+            output = out.getvalue().lower()
+            self.assertIn("app_b_othermodel", output)
+        finally:
+            call_command("migrate", "app_b", "zero", verbosity=0)
+            call_command("migrate", "app_a", "zero", verbosity=0)
+
     @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",
