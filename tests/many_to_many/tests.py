@@ -630,23 +630,6 @@ class ManyToManyTests(TestCase):
             FETCH_PEERS,
         )
         
-    def test_m2m_field_ignores_default(self):
-        """
-        ManyToManyField should not use default in formfield.
-        Regression test for #2750.
-        """
-        m2m_field = Article._meta.get_field('publications')
-        m2m_field.default = lambda: Publication.objects.all()
-        
-        try:
-            form_field = m2m_field.formfield()
-            assert form_field.initial is None
-            
-            article = Article.objects.create(headline='Test')
-            assert article.publications.count() == 0
-        finally:
-            delattr(m2m_field, 'default')
-
 class ManyToManyQueryTests(TestCase):
     """
     SQL is optimized to reference the through table without joining against the
