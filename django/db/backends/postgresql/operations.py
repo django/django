@@ -12,6 +12,7 @@ from django.db.backends.postgresql.psycopg_any import (
     mogrify,
 )
 from django.db.backends.utils import split_tzname_delta
+from django.db.models import CompositePrimaryKey
 from django.db.models.constants import OnConflict
 from django.db.models.functions import Cast
 from django.utils.regex_helper import _lazy_re_compile
@@ -403,3 +404,16 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def bulk_batch_size(self, fields, objs):
+        if self.connection.features.max_query_params is None or not fields:
+            return len(objs)
+        return self.connection.features.max_query_params // len(
+            [
+                f
+                for field in fields
+                for f in (
+                    field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                )
+            ]
+        )
