@@ -18,6 +18,7 @@ from django.utils.http import (
     parse_header_parameters,
     parse_http_date,
     quote_etag,
+    split_header_words,
     url_has_allowed_host_and_scheme,
     urlencode,
     urlsafe_base64_decode,
@@ -577,3 +578,56 @@ class ContentDispositionHeaderTests(unittest.TestCase):
                 self.assertEqual(
                     content_disposition_header(is_attachment, filename), expected
                 )
+
+
+class SplitHeaderWordsTests(SimpleTestCase):
+    def test_simple_split(self):
+        """Simple comma-separated values are split correctly."""
+        result = split_header_words("a, b, c")
+        self.assertEqual(result, ["a", " b", " c"])
+
+    def test_no_commas(self):
+        """Single value without commas returns a list with one item."""
+        result = split_header_words("text/plain")
+        self.assertEqual(result, ["text/plain"])
+
+    def test_empty_string(self):
+        """Empty string returns an empty list."""
+        result = split_header_words("")
+        self.assertEqual(result, [])
+
+    def test_quoted_comma(self):
+        """Commas inside quoted strings are preserved."""
+        result = split_header_words('text/plain; param="a,b", application/json')
+        self.assertEqual(result, ['text/plain; param="a,b"', " application/json"])
+
+    def test_multiple_quoted_commas(self):
+        """Multiple commas inside quoted strings are preserved."""
+        result = split_header_words('text/plain; a="1,2,3"; b="x,y"')
+        self.assertEqual(result, ['text/plain; a="1,2,3"; b="x,y"'])
+
+    def test_escaped_quotes(self):
+        """Escaped quotes inside quoted strings don't affect parsing."""
+        result = split_header_words(r'text/plain; p="a\"b", application/json')
+        self.assertEqual(result, [r'text/plain; p="a\"b"', " application/json"])
+
+    def test_custom_separator(self):
+        """Custom separator can be specified."""
+        result = split_header_words("a; b; c", separator=";")
+        self.assertEqual(result, ["a", " b", " c"])
+
+    def test_complex_accept_header(self):
+        """
+        Complex Accept header with quality values and quoted params
+        is correctly split.
+        """
+        header = 'text/html; q=0.9, text/plain; format="a,b"; q=0.8, */*; q=0.1'
+        result = split_header_words(header)
+        self.assertEqual(
+            result,
+            [
+                "text/html; q=0.9",
+                ' text/plain; format="a,b"; q=0.8',
+                " */*; q=0.1",
+            ],
+        )
