@@ -243,7 +243,7 @@ class OperationTestBase(MigrationTestBase):
             with connection.constraint_checks_disabled():
                 for table_name in table_names:
                     editor.execute(
-                        editor.sql_delete_table
+                        editor.sql_delete_table_cascade
                         % {
                             "table": editor.quote_name(table_name),
                         }
