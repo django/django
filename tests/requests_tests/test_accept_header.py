@@ -407,3 +407,33 @@ class AcceptHeaderTests(TestCase):
         self.assertEqual(
             request.get_preferred_type(["text/plain", "image/jpeg"]), "image/jpeg"
         )
+
+    def test_comma_in_quoted_parameter(self):
+        """
+        Commas inside quoted parameter values should not be treated as
+        separators. RFC 7231 Section 5.3.2 allows parameters with quoted
+        strings that may contain commas.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = 'text/plain; param="a,b", application/json'
+
+        self.assertEqual(len(request.accepted_types), 2)
+        self.assertEqual(request.accepted_types[0].main_type, "text")
+        self.assertEqual(request.accepted_types[0].sub_type, "plain")
+        self.assertEqual(request.accepted_types[0].params.get("param"), "a,b")
+        self.assertEqual(request.accepted_types[1].main_type, "application")
+        self.assertEqual(request.accepted_types[1].sub_type, "json")
+
+    def test_multiple_commas_in_quoted_parameters(self):
+        """
+        Multiple commas in quoted parameters should all be preserved.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = 'text/plain; a="1,2,3"; b="x,y"'
+
+        self.assertEqual(len(request.accepted_types), 1)
+        media_type = request.accepted_types[0]
+        self.assertEqual(media_type.main_type, "text")
+        self.assertEqual(media_type.sub_type, "plain")
+        self.assertEqual(media_type.params.get("a"), "1,2,3")
+        self.assertEqual(media_type.params.get("b"), "x,y")

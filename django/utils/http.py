@@ -316,6 +316,41 @@ def escape_leading_slashes(url):
     return url
 
 
+def split_header_words(s, separator=","):
+    """
+    Split a header string on the given separator, respecting quoted strings.
+
+    This correctly handles separators that appear inside quoted parameter
+    values. For example, splitting 'text/plain; param="a,b", application/json'
+    on ',' would return ['text/plain; param="a,b"', 'application/json'].
+    """
+    result = []
+    current = []
+    in_quote = False
+    i = 0
+
+    while i < len(s):
+        char = s[i]
+        if char == '"':
+            # Check if this quote is escaped
+            if i > 0 and s[i - 1] == "\\":
+                current.append(char)
+            else:
+                in_quote = not in_quote
+                current.append(char)
+        elif char == separator and not in_quote:
+            result.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+        i += 1
+
+    if current:
+        result.append("".join(current))
+
+    return result
+
+
 def _parseparam(s):
     while s[:1] == ";":
         s = s[1:]
