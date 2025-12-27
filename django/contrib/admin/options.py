@@ -254,6 +254,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         (return None in that case).
         """
         try:
+            if isinstance(db_field.remote_field.model, str):
+                return None
             related_admin = self.admin_site.get_model_admin(db_field.remote_field.model)
         except NotRegistered:
             return None
