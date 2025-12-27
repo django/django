@@ -281,7 +281,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model, handle_autom2m=True, *, cascade=False):
         if handle_autom2m:
-            super().delete_model(model, cascade=False)
+            super().delete_model(model, cascade=cascade)
         else:
             # Delete the table (and only that)
             self.execute(
