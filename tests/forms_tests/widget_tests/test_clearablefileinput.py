@@ -246,19 +246,18 @@ class ClearableFileInputTest(WidgetTest):
             )
 
         form = TestForm()
-        self.assertIs(self.widget.use_fieldset, True)
+        self.assertIs(self.widget.use_fieldset, False)
         self.assertHTMLEqual(
-            "<div><fieldset><legend>Field:</legend>"
-            '<input id="id_field" name="field" type="file" required></fieldset></div>'
-            "<div><fieldset><legend>With file:</legend>Currently: "
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" type="file" required></div>'
+            '<div><label for="id_with_file">With file:</label>Currently: '
             '<a href="something">something</a><br>Change:<input type="file" '
-            'name="with_file" id="id_with_file"></fieldset></div>'
-            "<div><fieldset><legend>Clearable file:</legend>"
+            'name="with_file" id="id_with_file"></div>'
+            '<div><label for="id_clearable_file">Clearable file:</label>'
             'Currently: <a href="something">something</a><input '
             'type="checkbox" name="clearable_file-clear" id="clearable_file-clear_id">'
             '<label for="clearable_file-clear_id">Clear</label><br>Change:'
-            '<input type="file" name="clearable_file" id="id_clearable_file">'
-            "</fieldset></div>",
+            '<input type="file" name="clearable_file" id="id_clearable_file"></div>',
             form.render(),
         )
 

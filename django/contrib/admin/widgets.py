@@ -122,6 +122,7 @@ class AdminRadioSelect(forms.RadioSelect):
 
 class AdminFileWidget(forms.ClearableFileInput):
     template_name = "admin/widgets/clearable_file_input.html"
+    use_fieldset = True
 
 
 def url_params_from_lookup_dict(lookups):
