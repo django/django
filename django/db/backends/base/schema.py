@@ -1722,12 +1722,15 @@ class BaseDatabaseSchemaEditor:
             and (self.quote_name(old_field.column) != self.quote_name(new_field.column))
         ):
             return True
-        if (
-            old_field.many_to_many
-            and new_field.many_to_many
-            and old_field.name != new_field.name
-        ):
-            return True
+        if old_field.many_to_many and new_field.many_to_many:
+            if (
+                old_field.remote_field.through._meta.db_table
+                == new_field.remote_field.through._meta.db_table
+            ):
+                old_kwargs.pop("db_table", None)
+                new_kwargs.pop("db_table", None)
+            else:
+                return True
         return (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 
     def _field_should_be_indexed(self, model, field):
