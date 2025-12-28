@@ -437,3 +437,18 @@ class AcceptHeaderTests(TestCase):
         self.assertEqual(media_type.sub_type, "plain")
         self.assertEqual(media_type.params.get("a"), "1,2,3")
         self.assertEqual(media_type.params.get("b"), "x,y")
+
+    def test_escaped_backslash_before_quote_in_accept_header(self):
+        """A quote preceded by an escaped backslash pair should still
+        terminate the quoted string and not split the Accept header.
+        """
+        request = HttpRequest()
+        # header contains an escaped-backslash pair before the closing quote
+        request.META["HTTP_ACCEPT"] = 'text/plain; p="a\\\\", application/json'
+
+        self.assertEqual(len(request.accepted_types), 2)
+        self.assertEqual(request.accepted_types[0].main_type, "text")
+        self.assertEqual(request.accepted_types[0].sub_type, "plain")
+        self.assertEqual(request.accepted_types[0].params.get("p"), "a\\")
+        self.assertEqual(request.accepted_types[1].main_type, "application")
+        self.assertEqual(request.accepted_types[1].sub_type, "json")
