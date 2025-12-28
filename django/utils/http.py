@@ -332,8 +332,17 @@ def split_header_words(s, separator=","):
     while i < len(s):
         char = s[i]
         if char == '"':
-            # Check if this quote is escaped
-            if i > 0 and s[i - 1] == "\\":
+            # Count consecutive backslashes immediately before this quote.
+            # An odd count means the quote is escaped; an even count means
+            # it's a real quote delimiter. This handles cases like
+            # "...\\\"..." where the backslash itself may be escaped.
+            bs_count = 0
+            j = i - 1
+            while j >= 0 and s[j] == "\\":
+                bs_count += 1
+                j -= 1
+            if bs_count % 2:
+                # Escaped quote, treat as a literal character.
                 current.append(char)
             else:
                 in_quote = not in_quote

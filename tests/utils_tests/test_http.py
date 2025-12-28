@@ -631,3 +631,19 @@ class SplitHeaderWordsTests(SimpleTestCase):
                 " */*; q=0.1",
             ],
         )
+
+    def test_escaped_backslash_before_quote(self):
+        """A quote preceded by an escaped backslash pair should still
+        terminate the quoted string (i.e. two backslashes mean the quote
+        is not escaped). Ensure we split the header into two parts.
+        """
+        header = 'text/plain; p="a\\\\", application/json'
+        result = split_header_words(header)
+        self.assertEqual(len(result), 2)
+        # The first token should include the closing quote
+        self.assertTrue(result[0].strip().endswith('"'))
+        # And MediaType should parse the parameter value as a single backslash
+        from django.http.request import MediaType
+
+        media_type = MediaType(result[0])
+        self.assertEqual(media_type.params.get("p"), "a\\")
