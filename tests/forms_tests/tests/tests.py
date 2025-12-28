@@ -139,7 +139,7 @@ class ModelFormCallableModelDefault(TestCase):
             </select>
             </p>
             """,
-    )
+        )
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"

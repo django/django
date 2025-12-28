@@ -629,7 +629,8 @@ class ManyToManyTests(TestCase):
             a._state.fetch_mode,
             FETCH_PEERS,
         )
-        
+
+
 class ManyToManyQueryTests(TestCase):
     """
     SQL is optimized to reference the through table without joining against the
