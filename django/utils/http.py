@@ -324,6 +324,12 @@ def split_header_words(s, separator=","):
     values. For example, splitting 'text/plain; param="a,b", application/json'
     on ',' would return ['text/plain; param="a,b"', 'application/json'].
     """
+    # Defensive checks: empty input and separator validation.
+    if not s:
+        return []
+    if not separator or len(separator) != 1:
+        raise ValueError("separator must be a single character")
+
     result = []
     current = []
     in_quote = False
