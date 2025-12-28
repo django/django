@@ -127,68 +127,32 @@ class CharFieldTests(TestCase):
         self.assertEqual(field.check(), expected)
 
     def test_negative_max_length(self):
-        class Model(models.Model):
-            field = models.CharField(max_length=-1)
+        msg = "'max_length' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'max_length' must be a positive integer.",
-                    obj=field,
-                    id="fields.E121",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.CharField(max_length=-1)
 
     def test_bad_max_length_value(self):
-        class Model(models.Model):
-            field = models.CharField(max_length="bad")
+        msg = "'max_length' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'max_length' must be a positive integer.",
-                    obj=field,
-                    id="fields.E121",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.CharField(max_length="bad")
 
     def test_str_max_length_value(self):
-        class Model(models.Model):
-            field = models.CharField(max_length="20")
+        msg = "'max_length' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'max_length' must be a positive integer.",
-                    obj=field,
-                    id="fields.E121",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.CharField(max_length="20")
 
     def test_str_max_length_type(self):
-        class Model(models.Model):
-            field = models.CharField(max_length=True)
+        msg = "'max_length' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'max_length' must be a positive integer.",
-                    obj=field,
-                    id="fields.E121",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.CharField(max_length=True)
 
     def test_non_iterable_choices(self):
         class Model(models.Model):
@@ -669,46 +633,18 @@ class DecimalFieldTests(TestCase):
         )
 
     def test_negative_max_digits_and_decimal_places(self):
-        class Model(models.Model):
-            field = models.DecimalField(max_digits=-1, decimal_places=-1)
+        msg = "'max_digits' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'decimal_places' must be a non-negative integer.",
-                    obj=field,
-                    id="fields.E131",
-                ),
-                Error(
-                    "'max_digits' must be a positive integer.",
-                    obj=field,
-                    id="fields.E133",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.DecimalField(max_digits=-1, decimal_places=-1)
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
-        class Model(models.Model):
-            field = models.DecimalField(max_digits="bad", decimal_places="bad")
+        msg = "'max_digits' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "'decimal_places' must be a non-negative integer.",
-                    obj=field,
-                    id="fields.E131",
-                ),
-                Error(
-                    "'max_digits' must be a positive integer.",
-                    obj=field,
-                    id="fields.E133",
-                ),
-            ],
-        )
+            class Model(models.Model):
+                field = models.DecimalField(max_digits="bad", decimal_places="bad")
 
     def test_decimal_places_greater_than_max_digits(self):
         class Model(models.Model):
@@ -1437,27 +1373,16 @@ class GeneratedFieldTests(TestCase):
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_output_field_check_error(self):
-        class Model(models.Model):
-            value = models.DecimalField(max_digits=5, decimal_places=2)
-            field = models.GeneratedField(
-                expression=models.F("value") * 2,
-                output_field=models.DecimalField(max_digits=-1, decimal_places=-1),
-                db_persist=True,
-            )
+        msg = "'max_digits' must be a positive integer."
+        with self.assertRaisesMessage(ValueError, msg):
 
-        expected_errors = [
-            Error(
-                "GeneratedField.output_field has errors:"
-                "\n    'decimal_places' must be a non-negative integer. (fields.E131)"
-                "\n    'max_digits' must be a positive integer. (fields.E133)",
-                obj=Model._meta.get_field("field"),
-                id="fields.E223",
-            ),
-        ]
-        self.assertEqual(
-            Model._meta.get_field("field").check(databases={"default"}),
-            expected_errors,
-        )
+            class Model(models.Model):
+                value = models.DecimalField(max_digits=5, decimal_places=2)
+                field = models.GeneratedField(
+                    expression=models.F("value") * 2,
+                    output_field=models.DecimalField(max_digits=-1, decimal_places=-1),
+                    db_persist=True,
+                )
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_output_field_charfield_unlimited_error(self):
