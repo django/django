@@ -318,6 +318,7 @@ class SaveLoadTests(TestCase):
 class GeoLookupTest(TestCase):
     fixtures = ["initial"]
 
+    @skipUnlessGISLookup("disjoint")
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
         ptown = City.objects.get(name="Pueblo")
@@ -327,22 +328,22 @@ class GeoLookupTest(TestCase):
         self.assertEqual(1, qs2.count())
         self.assertEqual("Kansas", qs2[0].name)
 
-    def test_contains_contained_lookups(self):
-        "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
+    @skipUnlessGISLookup("contained")
+    def test_contained(self):
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name="Texas")
 
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because 'contained' only checks on the
         #  _bounding box_ of the Geometries.
-        if connection.features.supports_contained_lookup:
-            qs = City.objects.filter(point__contained=texas.mpoly)
-            self.assertEqual(3, qs.count())
-            cities = ["Houston", "Dallas", "Oklahoma City"]
-            for c in qs:
-                self.assertIn(c.name, cities)
+        qs = City.objects.filter(point__contained=texas.mpoly)
+        self.assertEqual(3, qs.count())
+        cities = ["Houston", "Dallas", "Oklahoma City"]
+        for c in qs:
+            self.assertIn(c.name, cities)
 
-        # Pulling out some cities.
+    @skipUnlessGISLookup("contains")
+    def test_contains(self):
         houston = City.objects.get(name="Houston")
         wellington = City.objects.get(name="Wellington")
         pueblo = City.objects.get(name="Pueblo")
@@ -371,13 +372,15 @@ class GeoLookupTest(TestCase):
             len(Country.objects.filter(mpoly__contains=okcity.point.wkt)), 0
         )  # Query w/WKT
 
+    @skipUnlessGISLookup("bbcontains")
+    def test_bbcontains(self):
         # OK City is contained w/in bounding box of Texas.
-        if connection.features.supports_bbcontains_lookup:
-            qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
-            self.assertEqual(1, len(qs))
-            self.assertEqual("Texas", qs[0].name)
+        okcity = City.objects.get(name="Oklahoma City")
+        qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
+        self.assertEqual(1, len(qs))
+        self.assertEqual("Texas", qs[0].name)
 
-    @skipUnlessDBFeature("supports_crosses_lookup")
+    @skipUnlessGISLookup("crosses")
     def test_crosses_lookup(self):
         Track.objects.create(name="Line1", line=LineString([(-95, 29), (-60, 0)]))
         self.assertEqual(
@@ -470,6 +473,7 @@ class GeoLookupTest(TestCase):
             lambda b: b.name,
         )
 
+    @skipUnlessGISLookup("same_as", "equals")
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr("POINT (-95.363151 29.763374)", srid=4326)
@@ -658,6 +662,7 @@ class GeoLookupTest(TestCase):
             )
         )
 
+    @skipUnlessDBFeature("has_Union_function")
     def test_gis_lookups_with_complex_expressions(self):
         multiple_arg_lookups = {
             "dwithin",
@@ -671,6 +676,7 @@ class GeoLookupTest(TestCase):
                     **{"point__" + lookup: functions.Union("point", "point")}
                 ).exists()
 
+    @skipUnlessGISLookup("within")
     def test_subquery_annotation(self):
         multifields = MultiFields.objects.create(
             city=City.objects.create(point=Point(1, 1)),
@@ -825,6 +831,7 @@ class GeoQuerySetTest(TestCase):
                 Union("point", tolerance="0.05))), (((1"),
             )
 
+    @skipUnlessGISLookup("within")
     def test_within_subquery(self):
         """
         Using a queryset inside a geo lookup is working (using a subquery)
