@@ -40,7 +40,7 @@ from django.db.models.fields.json import (
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Lower
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -54,6 +54,7 @@ from django.utils.deprecation import RemovedInDjango70Warning
 from .models import (
     CustomJSONDecoder,
     CustomSerializationJSONModel,
+    Foo,
     JSONModel,
     JSONNullDefaultModel,
     NullableJSONModel,
@@ -1073,6 +1074,24 @@ class TestQuerying(TestCase):
                     NullableJSONModel.objects.filter(**{lookup: value}),
                     expected,
                 )
+
+    def test_key_in_with_values_list_subquery(self):
+        obj = NullableJSONModel.objects.create(value={"foo": "val28872"})
+        foo = Foo.objects.create(a="val28872", d=1)
+        subquery = Foo.objects.filter(pk=foo.pk).values_list("a", flat=True)
+        result = NullableJSONModel.objects.filter(value__foo__in=subquery)
+        self.assertSequenceEqual(list(result), [obj])
+
+    def test_key_in_with_annotated_values_list_subquery(self):
+        obj = NullableJSONModel.objects.create(value={"foo": "val28872"})
+        foo = Foo.objects.create(a="VAL28872", d=1)
+        subquery = (
+            Foo.objects.filter(pk=foo.pk)
+            .annotate(lower_a=Lower("a"))
+            .values_list("lower_a", flat=True)
+        )
+        result = NullableJSONModel.objects.filter(value__foo__in=subquery)
+        self.assertSequenceEqual(list(result), [obj])
 
     def test_key_values(self):
         qs = NullableJSONModel.objects.filter(value__h=True)
