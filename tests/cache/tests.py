@@ -1986,6 +1986,40 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
+    def test_redis_cache_adds_version_info(self):
+        """Test that RedisCacheClient adds Django version info."""
+        from django.core.cache.backends.redis import (
+            get_django_version,
+            get_redis_py_version,
+        )
+
+        pool = cache._cache._get_connection_pool(write=False)
+        conn_kwargs = pool.connection_kwargs
+
+        django_ver = get_django_version()
+        expected_lib_name = f"redis-py(django_v{django_ver})"
+        self.assertEqual(conn_kwargs.get("lib_name"), expected_lib_name)
+        self.assertEqual(conn_kwargs.get("lib_version"), get_redis_py_version())
+
+    @override_settings(
+        CACHES=caches_setting_for_tests(
+            base=RedisCache_params,
+            exclude=redis_excluded_caches,
+            OPTIONS={
+                "lib_name": "MyCustomApp",
+                "lib_version": "1.2.3",
+            },
+        )
+    )
+    def test_redis_cache_respects_custom_version_info(self):
+        """Test that custom lib_name and lib_version are not overridden."""
+        pool = cache._cache._get_connection_pool(write=False)
+        conn_kwargs = pool.connection_kwargs
+
+        # Check that custom values were preserved
+        self.assertEqual(conn_kwargs.get("lib_name"), "MyCustomApp")
+        self.assertEqual(conn_kwargs.get("lib_version"), "1.2.3")
+
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):

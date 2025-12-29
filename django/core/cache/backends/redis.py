@@ -9,6 +9,68 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 
+def get_django_version():
+    """Get the Django version string.
+
+    Returns:
+        Django version in the format 'major.minor.patch'
+        or 'unknown' if not available.
+    """
+    try:
+        from django import __version__
+
+        return __version__
+    except (ImportError, AttributeError):
+        return "unknown"
+
+
+def get_redis_py_version():
+    """Get the redis-py version string.
+
+    Returns:
+        redis-py version in the format 'major.minor.patch'
+        or 'unknown' if not available.
+    """
+    try:
+        from importlib.metadata import version
+
+        return version("redis")
+    except Exception:
+        return "unknown"
+
+
+def add_redis_version_info(kwargs):
+    """Add version identification for redis-py client.
+
+    This function adds library identification to Redis connection kwargs,
+    allowing Redis operators to see which library is using the connection.
+
+    Follows the format: lib_name='redis-py(django_v6.1)'
+    and lib_version='<redis-py version>'.
+
+    Only sets lib_name and lib_version if not already provided by user,
+    ensuring user-provided values are never overridden.
+
+    Args:
+        kwargs: Dictionary of keyword arguments to pass to Redis client.
+                Will be modified in-place to add 'lib_name' and 'lib_version'
+                if they are not already present.
+
+    Example:
+        >>> kwargs = {}
+        >>> add_redis_version_info(kwargs)
+        >>> kwargs['lib_name']
+        'redis-py(django_v6.1)'
+        >>> kwargs['lib_version']
+        '5.0.8'
+    """
+    if "lib_name" not in kwargs:
+        django_ver = get_django_version()
+        kwargs["lib_name"] = f"redis-py(django_v{django_ver})"
+    if "lib_version" not in kwargs:
+        kwargs["lib_version"] = get_redis_py_version()
+
+
 class RedisSerializer:
     def __init__(self, protocol=None):
         self.protocol = pickle.HIGHEST_PROTOCOL if protocol is None else protocol
@@ -58,6 +120,9 @@ class RedisCacheClient:
         if isinstance(parser_class, str):
             parser_class = import_string(parser_class)
         parser_class = parser_class or self._lib.connection.DefaultParser
+
+        # Add version identification for redis-py client
+        add_redis_version_info(options)
 
         self._pool_options = {"parser_class": parser_class, **options}
 
