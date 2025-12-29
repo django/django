@@ -45,14 +45,19 @@ DEPRECATED_EMAIL_SETTINGS = {
 def warn_about_deprecated_email_setting(deprecated_setting):
     assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
     if deprecated_setting == "EMAIL_BACKEND":
-        replacement = "EMAIL_PROVIDERS['default']['BACKEND']"
+        replacement = "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND']"
     elif deprecated_setting == "EMAIL_HOST_USER":
-        replacement = "EMAIL_PROVIDERS['default']['OPTIONS']['username']"
+        replacement = (
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']['username']"
+        )
     elif deprecated_setting == "EMAIL_HOST_PASSWORD":
-        replacement = "EMAIL_PROVIDERS['default']['OPTIONS']['password']"
+        replacement = (
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']['password']"
+        )
     else:
         replacement = (
-            f"EMAIL_PROVIDERS['default']['OPTIONS']['{deprecated_setting[6:].lower()}']"
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']"
+            f"['{deprecated_setting[6:].lower()}']"
         )
     warnings.warn(
         f"{deprecated_setting} is deprecated. Use {replacement} instead.",
@@ -124,7 +129,12 @@ class LazySettings(LazyObject):
             # third-party apps accessing the current Django settings.
             # RemovedInDjango70Warning.
             if name == "EMAIL_BACKEND":
-                return self.EMAIL_PROVIDERS["default"]["BACKEND"]
+                warnings.warn(
+                    "EMAIL_BACKEND is deprecated. Use "
+                    "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+                    RemovedInDjango70Warning,
+                )
+                return self.EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]["BACKEND"]
             if name in DEPRECATED_EMAIL_SETTINGS:
                 backend = import_string(getattr(self, "EMAIL_BACKEND"))(
                     provider="default"

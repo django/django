@@ -1,6 +1,7 @@
 from django.core import mail
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 
 @override_settings(
@@ -12,12 +13,20 @@ class SendTestEmailManagementCommand(SimpleTestCase):
     Test the sending of a test email using the `sendtestemail` command.
     """
 
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        )
+
     def test_single_receiver(self):
         """
         The mail is sent with the correct subject and recipient.
         """
         recipient = "joe@example.com"
-        call_command("sendtestemail", recipient)
+        with self.assertDeprecatedBackend():
+            call_command("sendtestemail", recipient)
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
         self.assertEqual(mail_message.subject[0:15], "Test email from")
@@ -28,7 +37,8 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         The mail may be sent with multiple recipients.
         """
         recipients = ["joe@example.com", "jane@example.com"]
-        call_command("sendtestemail", recipients[0], recipients[1])
+        with self.assertDeprecatedBackend():
+            call_command("sendtestemail", recipients[0], recipients[1])
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
         self.assertEqual(mail_message.subject[0:15], "Test email from")
@@ -57,7 +67,8 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         The mail should be sent to the email addresses specified in
         settings.MANAGERS.
         """
-        call_command("sendtestemail", "--managers")
+        with self.assertDeprecatedBackend():
+            call_command("sendtestemail", "--managers")
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
         self.assertEqual(
@@ -73,7 +84,8 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         The mail should be sent to the email addresses specified in
         settings.ADMIN.
         """
-        call_command("sendtestemail", "--admins")
+        with self.assertDeprecatedBackend():
+            call_command("sendtestemail", "--admins")
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
         self.assertEqual(
@@ -89,7 +101,8 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         The mail should be sent to the email addresses specified in both
         settings.MANAGERS and settings.ADMINS.
         """
-        call_command("sendtestemail", "--managers", "--admins")
+        with self.assertDeprecatedBackend():
+            call_command("sendtestemail", "--managers", "--admins")
         self.assertEqual(len(mail.outbox), 2)
         manager_mail = mail.outbox[0]
         self.assertEqual(

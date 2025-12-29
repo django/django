@@ -185,6 +185,13 @@ class MailTestsMixin:
                 "First string doesn't end with the second.",
             )
 
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        )
+
     def get_raw_attachments(self, django_message):
         """
         Return a list of the raw attachment parts in the MIME message generated
@@ -1282,7 +1289,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         """
         Make sure that dummy backends returns correct number of sent messages
         """
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         email = EmailMessage(to=["to@example.com"])
         self.assertEqual(backend.send_messages([email, email, email]), 3)
 
@@ -1291,7 +1299,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         Make sure that get_connection() accepts arbitrary keyword that might be
         used with custom backends.
         """
-        c = mail.get_connection(fail_silently=True, foo="bar")
+        with self.assertDeprecatedBackend():
+            c = mail.get_connection(fail_silently=True, foo="bar")
         self.assertTrue(c.fail_silently)
 
     def test_custom_backend(self):
@@ -1304,10 +1313,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        self.assertIsInstance(
-            mail.get_connection("django.core.mail.backends.smtp.EmailBackend"),
-            smtp.EmailBackend,
-        )
+        with self.assertDeprecatedBackend():
+            self.assertIsInstance(
+                mail.get_connection("django.core.mail.backends.smtp.EmailBackend"),
+                smtp.EmailBackend,
+            )
         self.assertIsInstance(
             mail.get_connection("django.core.mail.backends.locmem.EmailBackend"),
             locmem.EmailBackend,
@@ -1334,7 +1344,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             mail.get_connection(
                 "django.core.mail.backends.filebased.EmailBackend", file_path=object()
             )
-        self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
+        with self.assertDeprecatedBackend():
+            self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
         EMAIL_PROVIDERS={
@@ -1869,7 +1880,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         EmailMessage class docs: "… is initialized with the following
         parameters (in the given order, if positional arguments are used)."
         """
-        connection = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         email = EmailMessage(
             # (If you need to insert/remove/reorder any params here,
             # that indicates a breaking change to documented behavior.)
@@ -1910,8 +1922,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         """
         # This is meant to verify EmailMessage.__init__() doesn't apply any
         # special processing that would be missing for properties set later.
-        original_connection = mail.get_connection(username="original")
-        new_connection = mail.get_connection(username="new")
+        with self.assertDeprecatedBackend():
+            original_connection = mail.get_connection(username="original")
+        with self.assertDeprecatedBackend():
+            new_connection = mail.get_connection(username="new")
         email = EmailMessage(
             "original subject",
             "original body\n",
@@ -2043,6 +2057,13 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             f"Passing positional argument(s) {params} to {name}() is deprecated.",
         )
 
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        )
+
     def test_get_connection(self):
         with self.assertDeprecatedIn70("'fail_silently'", "get_connection"):
             mail.get_connection(
@@ -2052,6 +2073,8 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_send_mail(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'fail_silently', 'auth_user', 'auth_password', 'connection', "
             "'html_message'",
@@ -2066,11 +2089,13 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 True,
                 "username",
                 "password",
-                mail.get_connection(),
+                connection,
                 "html message",
             )
 
     def test_send_mass_mail(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'fail_silently', 'auth_user', 'auth_password', 'connection'",
             "send_mass_mail",
@@ -2081,10 +2106,12 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 True,
                 "username",
                 "password",
-                mail.get_connection(),
+                connection,
             )
 
     def test_mail_admins(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'fail_silently', 'connection', 'html_message'", "mail_admins"
         ):
@@ -2093,11 +2120,13 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 "message",
                 # Deprecated positional args:
                 True,
-                mail.get_connection(),
+                connection,
                 "html message",
             )
 
     def test_mail_managers(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'fail_silently', 'connection', 'html_message'", "mail_managers"
         ):
@@ -2106,11 +2135,13 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 "message",
                 # Deprecated positional args:
                 True,
-                mail.get_connection(),
+                connection,
                 "html message",
             )
 
     def test_email_message_init(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'bcc', 'connection', 'attachments', 'headers', 'cc', 'reply_to'",
             "EmailMessage",
@@ -2122,7 +2153,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 ["to@example.com"],
                 # Deprecated positional args:
                 ["bcc@example.com"],
-                mail.get_connection(),
+                connection,
                 [EmailAttachment("file.txt", "attachment\n", "text/plain")],
                 {"X-Header": "custom header"},
                 ["cc@example.com"],
@@ -2130,6 +2161,8 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_email_multi_alternatives_init(self):
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         with self.assertDeprecatedIn70(
             "'bcc', 'connection', 'attachments', 'headers', 'alternatives', 'cc', "
             "'reply_to'",
@@ -2142,7 +2175,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 ["to@example.com"],
                 # Deprecated positional args:
                 ["bcc@example.com"],
-                mail.get_connection(),
+                connection,
                 [EmailAttachment("file.txt", "attachment\n", "text/plain")],
                 {"X-Header": "custom header"},
                 [EmailAlternative("html body", "text/html")],
@@ -2223,18 +2256,33 @@ class PythonGlobalState(SimpleTestCase):
     }
 )
 class ConsumingDeprecatedEmailSettingsTests(SimpleTestCase):
-    def test_third_party_app_consuming_deprecated_configuration(self):
-        self.assertEqual(
-            settings.EMAIL_BACKEND,
-            "django.core.mail.backends.smtp.EmailBackend",
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
         )
-        self.assertEqual(settings.EMAIL_HOST, "smtp.example.com")
-        self.assertEqual(settings.EMAIL_PORT, 487)
-        self.assertEqual(settings.EMAIL_HOST_USER, "noreply")
-        self.assertEqual(settings.EMAIL_HOST_PASSWORD, "secret")
-        self.assertTrue(settings.EMAIL_USE_TLS)
-        self.assertFalse(settings.EMAIL_USE_SSL)
-        self.assertEqual(settings.EMAIL_TIMEOUT, 42)
+
+    def test_third_party_app_consuming_deprecated_configuration(self):
+        with self.assertDeprecatedBackend():
+            self.assertEqual(
+                settings.EMAIL_BACKEND,
+                "django.core.mail.backends.smtp.EmailBackend",
+            )
+        with self.assertDeprecatedBackend():
+            self.assertEqual(settings.EMAIL_HOST, "smtp.example.com")
+        with self.assertDeprecatedBackend():
+            self.assertEqual(settings.EMAIL_PORT, 487)
+        with self.assertDeprecatedBackend():
+            self.assertEqual(settings.EMAIL_HOST_USER, "noreply")
+        with self.assertDeprecatedBackend():
+            self.assertEqual(settings.EMAIL_HOST_PASSWORD, "secret")
+        with self.assertDeprecatedBackend():
+            self.assertTrue(settings.EMAIL_USE_TLS)
+        with self.assertDeprecatedBackend():
+            self.assertFalse(settings.EMAIL_USE_SSL)
+        with self.assertDeprecatedBackend():
+            self.assertEqual(settings.EMAIL_TIMEOUT, 42)
 
     def test_backend_configuration_mismatch(self):
         with self.assertRaisesMessage(
@@ -2303,12 +2351,15 @@ class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
             path2 = path2[2:] if re.match(r"^[A-Z]:", path2) else path2
         self.assertEqual(os.path.normpath(path1), os.path.normpath(path2))
 
-    def test_deprecated_host_configuration(self):
-        with self.assertWarnsMessage(
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
             RemovedInDjango70Warning,
-            "EMAIL_BACKEND is deprecated. "
-            "Use EMAIL_PROVIDERS['default']['BACKEND'] instead.",
-        ):
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        )
+
+    def test_deprecated_host_configuration(self):
+        with self.assertDeprecatedBackend():
             with self.settings(
                 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
                 EMAIL_HOST="smtp.example.com",
@@ -2449,6 +2500,13 @@ class BaseEmailBackendTests(MailTestsMixin):
         )
         super().setUpClass()
 
+    def assertDeprecatedBackend(self):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        )
+
     def get_mailbox_content(self):
         raise NotImplementedError(
             "subclasses of BaseEmailBackendTests must provide a get_mailbox_content() "
@@ -2474,7 +2532,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         email = EmailMessage(
             "Subject", "Content\n", "from@example.com", ["to@example.com"]
         )
-        num_sent = mail.get_connection().send_messages([email])
+        with self.assertDeprecatedBackend():
+            num_sent = mail.get_connection().send_messages([email])
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], "Subject")
@@ -2489,7 +2548,9 @@ class BaseEmailBackendTests(MailTestsMixin):
             "from@example.com",
             ["to@example.com"],
         )
-        num_sent = mail.get_connection().send_messages([email])
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
+        num_sent = connection.send_messages([email])
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], "Chère maman")
@@ -2517,7 +2578,8 @@ class BaseEmailBackendTests(MailTestsMixin):
                 self.assertGreater(len(body.encode()), 998)
 
                 email = EmailMessage(body=body, to=["to@example.com"])
-                email.send()
+                with self.assertDeprecatedBackend():
+                    email.send()
                 message = self.get_the_message()
                 self.assertMessageHasHeaders(
                     message,
@@ -2535,7 +2597,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         emails_lists = ([email1, email2], iter((email1, email2)))
         for emails_list in emails_lists:
             with self.subTest(emails_list=repr(emails_list)):
-                num_sent = mail.get_connection().send_messages(emails_list)
+                with self.assertDeprecatedBackend():
+                    num_sent = mail.get_connection().send_messages(emails_list)
                 self.assertEqual(num_sent, 2)
                 messages = self.get_mailbox_content()
                 self.assertEqual(len(messages), 2)
@@ -2548,7 +2611,8 @@ class BaseEmailBackendTests(MailTestsMixin):
             from_email='"Firstname Sürname" <from@example.com>',
             to=["to@example.com"],
         )
-        email.send()
+        with self.assertDeprecatedBackend():
+            email.send()
         message = self.get_the_message()
         self.assertEqual(message["from"], "Firstname Sürname <from@example.com>")
 
@@ -2557,7 +2621,10 @@ class BaseEmailBackendTests(MailTestsMixin):
         Test send_mail without the html_message
         regression test for adding html_message parameter to send_mail()
         """
-        send_mail("Subject", "Content\n", "sender@example.com", ["nobody@example.com"])
+        with self.assertDeprecatedBackend():
+            send_mail(
+                "Subject", "Content\n", "sender@example.com", ["nobody@example.com"]
+            )
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "Subject")
@@ -2568,13 +2635,14 @@ class BaseEmailBackendTests(MailTestsMixin):
 
     def test_html_send_mail(self):
         """Test html_message argument to send_mail"""
-        send_mail(
-            "Subject",
-            "Content\n",
-            "sender@example.com",
-            ["nobody@example.com"],
-            html_message="HTML Content\n",
-        )
+        with self.assertDeprecatedBackend():
+            send_mail(
+                "Subject",
+                "Content\n",
+                "sender@example.com",
+                ["nobody@example.com"],
+                html_message="HTML Content\n",
+            )
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "Subject")
@@ -2606,7 +2674,8 @@ class BaseEmailBackendTests(MailTestsMixin):
                     self.subTest(setting=setting, value=value),
                     self.settings(**{setting: value}),
                 ):
-                    mail_func("subject", "content")
+                    with self.assertDeprecatedBackend():
+                        mail_func("subject", "content")
                     message = self.get_the_message()
                     expected_to = ", ".join([str(address) for address in value])
                     self.assertEqual(message.get_all("to"), [expected_to])
@@ -2614,7 +2683,8 @@ class BaseEmailBackendTests(MailTestsMixin):
     @override_settings(MANAGERS=["nobody@example.com"])
     def test_html_mail_managers(self):
         """Test html_message argument to mail_managers"""
-        mail_managers("Subject", "Content\n", html_message="HTML Content\n")
+        with self.assertDeprecatedBackend():
+            mail_managers("Subject", "Content\n", html_message="HTML Content\n")
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "[Django] Subject")
@@ -2629,7 +2699,8 @@ class BaseEmailBackendTests(MailTestsMixin):
     @override_settings(ADMINS=["nobody@example.com"])
     def test_html_mail_admins(self):
         """Test html_message argument to mail_admins"""
-        mail_admins("Subject", "Content\n", html_message="HTML Content\n")
+        with self.assertDeprecatedBackend():
+            mail_admins("Subject", "Content\n", html_message="HTML Content\n")
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "[Django] Subject")
@@ -2652,7 +2723,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         for mail_func in [mail_managers, mail_admins]:
             with self.subTest(mail_func=mail_func):
-                mail_func(gettext_lazy("Subject"), "Content")
+                with self.assertDeprecatedBackend():
+                    mail_func(gettext_lazy("Subject"), "Content")
                 message = self.get_the_message()
                 self.assertEqual(message.get("subject"), "[Django] Subject")
                 self.flush_mailbox()
@@ -2736,7 +2808,9 @@ class BaseEmailBackendTests(MailTestsMixin):
             ["to@example.com"],
             cc=["cc@example.com"],
         )
-        mail.get_connection().send_messages([email])
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
+        connection.send_messages([email])
         message = self.get_the_message()
         self.assertMessageHasHeaders(
             message,
@@ -2756,7 +2830,9 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         Regression test for #14301
         """
-        self.assertTrue(send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]))
+        with self.assertDeprecatedBackend():
+            num_sent = send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"])
+        self.assertTrue(num_sent)
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
         self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
@@ -2765,7 +2841,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         m = EmailMessage(
             from_email="from@öäü.com", to=["to@öäü.com"], cc=["cc@öäü.com"]
         )
-        m.send()
+        with self.assertDeprecatedBackend():
+            m.send()
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
         self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
@@ -2775,7 +2852,9 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         Regression test for #15042
         """
-        self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
+        with self.assertDeprecatedBackend():
+            num_sent = send_mail("Subject", "Content", "tester", ["django"])
+        self.assertTrue(num_sent)
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "tester")
         self.assertEqual(message.get("to"), "django")
@@ -2785,7 +2864,9 @@ class BaseEmailBackendTests(MailTestsMixin):
         Email sending should support lazy email addresses (#24416).
         """
         _ = gettext_lazy
-        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("django")]))
+        with self.assertDeprecatedBackend():
+            num_sent = send_mail("Subject", "Content", _("tester"), [_("django")])
+        self.assertTrue(num_sent)
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "tester")
         self.assertEqual(message.get("to"), "django")
@@ -2799,7 +2880,8 @@ class BaseEmailBackendTests(MailTestsMixin):
             reply_to=[_("reply")],
         )
         self.assertEqual(m.recipients(), ["to1", "to2", "cc1", "cc2", "bcc"])
-        m.send()
+        with self.assertDeprecatedBackend():
+            m.send()
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "tester")
         self.assertEqual(message.get("to"), "to1, to2")
@@ -2810,7 +2892,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         Connection can be closed (even when not explicitly opened)
         """
-        conn = mail.get_connection(username="", password="")
+        with self.assertDeprecatedBackend():
+            conn = mail.get_connection(username="", password="")
         conn.close()
 
     def test_use_as_contextmanager(self):
@@ -2819,7 +2902,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         opened = [False]
         closed = [False]
-        conn = mail.get_connection(username="", password="")
+        with self.assertDeprecatedBackend():
+            conn = mail.get_connection(username="", password="")
 
         def open():
             opened[0] = True
@@ -2854,9 +2938,11 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         """
         Make sure that the locmen backend populates the outbox.
         """
-        connection = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         self.assertIsInstance(connection, locmem.EmailBackend)
-        connection2 = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            connection2 = mail.get_connection()
         email = EmailMessage(to=["to@example.com"])
         connection.send_messages([email])
         connection2.send_messages([email])
@@ -2865,16 +2951,21 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def test_validate_multiline_headers(self):
         # Ticket #18861 - Validate emails when using the locmem backend
         with self.assertRaises(ValueError):
-            send_mail(
-                "Subject\nMultiline", "Content", "from@example.com", ["to@example.com"]
-            )
+            with self.assertDeprecatedBackend():
+                send_mail(
+                    "Subject\nMultiline",
+                    "Content",
+                    "from@example.com",
+                    ["to@example.com"],
+                )
 
     def test_outbox_not_mutated_after_send(self):
         email = EmailMessage(
             subject="correct subject",
             to=["to@example.com"],
         )
-        email.send()
+        with self.assertDeprecatedBackend():
+            email.send()
         email.subject = "other subject"
         email.to.append("other@example.com")
         self.assertEqual(mail.outbox[0].subject, "correct subject")
@@ -2923,7 +3014,8 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
             ["to@example.com"],
             headers={"From": "from@example.com"},
         )
-        connection = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
         connection.send_messages([msg])
 
         self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
@@ -2934,14 +3026,16 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(message.get("from"), "from@example.com")
         self.assertEqual(message.get("to"), "to@example.com")
 
-        connection2 = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            connection2 = mail.get_connection()
         connection2.send_messages([msg])
         self.assertEqual(len(os.listdir(self.tmp_dir)), 2)
 
         connection.send_messages([msg])
         self.assertEqual(len(os.listdir(self.tmp_dir)), 2)
 
-        msg.connection = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            msg.connection = mail.get_connection()
         self.assertTrue(connection.open())
         msg.send()
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
@@ -2962,7 +3056,8 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
                 ImproperlyConfigured,
                 '"file_path" not specified in EMAIL_PROVIDERS["default"]["OPTIONS"]',
             ):
-                mail.get_connection()
+                with self.assertDeprecatedBackend():
+                    mail.get_connection()
 
 
 class FileBackendPathLibTests(FileBackendTests):
@@ -3122,17 +3217,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     )
     def test_email_authentication_options(self):
         with self.subTest("use settings"):
-            backend = mail.get_connection()
+            with self.assertDeprecatedBackend():
+                backend = mail.get_connection()
             self.assertEqual(backend.username, "not empty username")
             self.assertEqual(backend.password, "not empty password")
 
         with self.subTest("override settings"):
-            backend = mail.get_connection(username="username", password="password")
+            with self.assertDeprecatedBackend():
+                backend = mail.get_connection(username="username", password="password")
             self.assertEqual(backend.username, "username")
             self.assertEqual(backend.password, "password")
 
         with self.subTest("disabled authentication"):
-            backend = mail.get_connection(username="", password="")
+            with self.assertDeprecatedBackend():
+                backend = mail.get_connection(username="", password="")
             self.assertEqual(backend.username, "")
             self.assertEqual(backend.password, "")
 
@@ -3141,11 +3239,12 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         Opening the backend with non empty username/password tries
         to authenticate against the SMTP server.
         """
-        backend = mail.get_connection(
-            **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-            username="not empty username",
-            password="not empty password",
-        )
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(
+                **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                username="not empty username",
+                password="not empty password",
+            )
         with self.assertRaisesMessage(
             SMTPException, "SMTP AUTH extension not supported by server."
         ):
@@ -3156,23 +3255,26 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         """
         open() returns whether it opened a connection.
         """
-        backend = mail.get_connection(username="", password="")
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(username="", password="")
         self.assertIsNone(backend.connection)
         opened = backend.open()
         backend.close()
         self.assertIs(opened, True)
 
     def test_reopen_connection(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         # Simulate an already open connection.
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
     def test_email_tls_use_settings(self):
-        backend = mail.get_connection(
-            **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-            use_tls=True,
-        )
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(
+                **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                use_tls=True,
+            )
         self.assertTrue(backend.use_tls)
 
     @override_settings(
@@ -3186,11 +3288,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_tls_override_settings(self):
-        backend = mail.get_connection(use_tls=False)
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(use_tls=False)
         self.assertFalse(backend.use_tls)
 
     def test_email_tls_default_disabled(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertFalse(backend.use_tls)
 
     def test_ssl_tls_mutually_exclusive(self):
@@ -3199,7 +3303,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             "one of those settings to True."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            mail.get_connection(use_ssl=True, use_tls=True)
+            with self.assertDeprecatedBackend():
+                mail.get_connection(use_ssl=True, use_tls=True)
 
     @override_settings(
         EMAIL_PROVIDERS={
@@ -3212,7 +3317,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_use_settings(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertTrue(backend.use_ssl)
 
     @override_settings(
@@ -3226,11 +3332,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_override_settings(self):
-        backend = mail.get_connection(use_ssl=False)
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(use_ssl=False)
         self.assertFalse(backend.use_ssl)
 
     def test_email_ssl_default_disabled(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertFalse(backend.use_ssl)
 
     @override_settings(
@@ -3244,7 +3352,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_certfile_use_settings(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertEqual(backend.ssl_certfile, "foo")
 
     @override_settings(
@@ -3258,11 +3367,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_certfile_override_settings(self):
-        backend = mail.get_connection(ssl_certfile="bar")
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(ssl_certfile="bar")
         self.assertEqual(backend.ssl_certfile, "bar")
 
     def test_email_ssl_certfile_default_disabled(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertIsNone(backend.ssl_certfile)
 
     @override_settings(
@@ -3276,7 +3387,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_keyfile_use_settings(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertEqual(backend.ssl_keyfile, "foo")
 
     @override_settings(
@@ -3290,11 +3402,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_keyfile_override_settings(self):
-        backend = mail.get_connection(ssl_keyfile="bar")
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(ssl_keyfile="bar")
         self.assertEqual(backend.ssl_keyfile, "bar")
 
     def test_email_ssl_keyfile_default_disabled(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         self.assertIsNone(backend.ssl_keyfile)
 
     @override_settings(
@@ -3308,12 +3422,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_tls_attempts_starttls(self):
-        backend = mail.get_connection(
-            **dict(
-                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-                port=self.smtp_controller.port,
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(
+                **dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    port=self.smtp_controller.port,
+                )
             )
-        )
         self.assertTrue(backend.use_tls)
         with self.assertRaisesMessage(
             SMTPException, "STARTTLS extension not supported by server."
@@ -3332,12 +3447,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_ssl_attempts_ssl_connection(self):
-        backend = mail.get_connection(
-            **dict(
-                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-                port=self.smtp_controller.port,
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(
+                **dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    port=self.smtp_controller.port,
+                )
             )
-        )
         self.assertTrue(backend.use_ssl)
         with self.assertRaises(SSLError):
             with backend:
@@ -3345,7 +3461,10 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_connection_timeout_default(self):
         """The connection's timeout value is None by default."""
-        connection = mail.get_connection("django.core.mail.backends.smtp.EmailBackend")
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection(
+                "django.core.mail.backends.smtp.EmailBackend"
+            )
         self.assertIsNone(connection.timeout)
 
     @override_settings(
@@ -3357,10 +3476,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     )
     def test_connection_timeout_custom(self):
         """We use a custom backend with a custom timeout parameter."""
-        myemailbackend = mail.get_connection(
-            host=self.smtp_controller.hostname,
-            port=self.smtp_controller.port,
-        )
+        with self.assertDeprecatedBackend():
+            myemailbackend = mail.get_connection(
+                host=self.smtp_controller.hostname,
+                port=self.smtp_controller.port,
+            )
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
@@ -3377,7 +3497,10 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_timeout_override_settings(self):
-        backend = mail.get_connection(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection(
+                **settings.EMAIL_PROVIDERS["default"]["OPTIONS"]
+            )
         self.assertEqual(backend.timeout, 10)
 
     @override_settings(
@@ -3399,7 +3522,9 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         }
     )
     def test_email_alternative_provider(self):
-        self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
+        with self.assertDeprecatedBackend():
+            connection = mail.get_connection()
+        self.assertIsInstance(connection, locmem.EmailBackend)
         connection = mail.get_connection(provider="alternative")
         self.assertEqual(connection.host, "smtp.example.com")
         self.assertEqual(connection.port, 587)
@@ -3425,7 +3550,9 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             email = EmailMessage(
                 "Subject", "Content", "from@example.com", ["to@example.com"]
             )
-            mail.get_connection().send_messages([email])
+            with self.assertDeprecatedBackend():
+                connection = mail.get_connection()
+            connection.send_messages([email])
 
             # Find the actual message
             msg = None
@@ -3451,7 +3578,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         send_messages() shouldn't try to send messages if open() raises an
         exception after initializing the connection.
         """
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         # Simulate connection initialization success and a subsequent
         # connection exception.
         backend.connection = mock.Mock(spec=object())
@@ -3460,13 +3588,15 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.send_messages([email]), 0)
 
     def test_send_messages_empty_list(self):
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         backend.connection = mock.Mock(spec=object())
         self.assertEqual(backend.send_messages([]), 0)
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         backend.connection = mock.Mock(spec=object())
         email = EmailMessage("Subject", "Content", "from@example.com", to=[])
         sent = backend.send_messages([email])
@@ -3478,7 +3608,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         EmailMessage.all_recipients() (which is distinct from message header
         fields).
         """
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         backend.connection = mock.Mock()
         for email_address in (
             # Invalid address with two @ signs.
@@ -3517,7 +3648,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 "To": "Discussão Django <django@discussão.example.org>",
             },
         )
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         backend.send_messages([email])
         envelope = self.get_smtp_envelopes()[0]
         self.assertEqual(envelope["mail_from"], "lists@xn--discusso-xza.example.org")
@@ -3542,7 +3674,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             cc=['"ශ්‍රී" <cc@xn--nxasmm1c.example.com>'],
             bcc=['"نامه‌ای." <bcc@xn--mgba3gch31f060k.example.com>'],
         )
-        backend = mail.get_connection()
+        with self.assertDeprecatedBackend():
+            backend = mail.get_connection()
         backend.send_messages([email])
         envelope = self.get_smtp_envelopes()[0]
         self.assertEqual(envelope["mail_from"], "from@xn--fa-hia.example.com")
@@ -3560,7 +3693,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         The SMTP EmailBackend does not currently support non-ASCII local-parts.
         (That would require using the RFC 6532 SMTPUTF8 extension.) #35713.
         """
-        backend = smtp.EmailBackend()
+        with self.assertDeprecatedBackend():
+            backend = smtp.EmailBackend()
         backend.connection = mock.Mock(spec=object())
         email = EmailMessage(to=["nø@example.dk"])
         with self.assertRaisesMessage(
@@ -3572,7 +3706,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_prep_address_without_force_ascii(self):
         # A subclass implementing SMTPUTF8 could use
         # prep_address(force_ascii=False).
-        backend = smtp.EmailBackend()
+        with self.assertDeprecatedBackend():
+            backend = smtp.EmailBackend()
         for case in ["åh@example.dk", "oh@åh.example.dk", "åh@åh.example.dk"]:
             with self.subTest(case=case):
                 self.assertEqual(backend.prep_address(case, force_ascii=False), case)
@@ -3583,7 +3718,12 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.backend = mail.get_connection()
+        with cls().assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. Use "
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+        ):
+            cls.backend = mail.get_connection()
         cls.smtp_controller.stop()
 
     @classmethod
