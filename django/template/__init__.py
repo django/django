@@ -74,3 +74,4 @@ from . import autoreload  # NOQA isort:skip
 
 
 __all__ += ("Template", "Context", "RequestContext")
+__all__ += ("Library",)
