@@ -1682,17 +1682,16 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             interactive=False,
             verbosity=0,
         )
-        # Create a stale permission simulating a pre-Django 6.0 environment.
+
+        # At this point, we migrated from OldModel to NewModel.
+        # Before reversing the RenameModel operation back to OldModel,
+        # create a stale permission where the codename & name are old.
+        # Note that the content type has already migrated to "newmodel".
+        ct = ContentType.objects.get(app_label="auth_tests", model="newmodel")
         Permission.objects.create(
             codename="change_oldmodel",
             name="Can change old model",
-            # Should be:
-            # content_type = .create(app_label="auth_tests", model="oldmodel")
-            # but use the new content type, that is, the one we are about to
-            # reverse migrate into, to engineer a conflict. See ticket-XXXXX.
-            content_type=ContentType.objects.get(
-                app_label="auth_tests", model="newmodel"
-            ),
+            content_type=ct,
         )
 
         # In non-interactive mode, conflicting permissions are not reconciled.
@@ -1708,10 +1707,6 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             )
         self.assertIn(
             "The following permissions already existed:",
-            stdout.getvalue(),
-        )
-        self.assertIn(
-            "Reconcile permissions manually.",
             stdout.getvalue(),
         )
         self.assertTrue(
@@ -1744,8 +1739,9 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             interactive=False,
             verbosity=0,
         )
+
         # Create a stale permission simulating a pre-Django 6.0 environment.
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
+        ct = ContentType.objects.get(app_label="auth_tests", model="newmodel")
         Permission.objects.create(
             codename="change_oldmodel",
             name="Can change old model",

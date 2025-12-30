@@ -142,6 +142,7 @@ def rename_permissions_after_model_rename(
         for migration, backward in (plan or [])
         for op in migration.operations
         if isinstance(op, migrations.RenameModel)
+        and migration.app_label == app_config.label
     ]
 
     if not renames:
