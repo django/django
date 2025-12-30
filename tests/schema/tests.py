@@ -412,7 +412,7 @@ class SchemaTests(TransactionTestCase):
             ]
         )
 
-    @skipUnlessDBFeature("can_create_inline_fk")
+    @skipUnlessDBFeature("can_create_inline_fk", "supports_on_delete_db_cascade")
     def test_inline_fk_db_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -602,7 +602,11 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field2, new_field, strict=True)
         self.assertForeignKeyNotExists(Author, "tag_id", "schema_tag")
 
-    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "supports_foreign_keys",
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+    )
     def test_fk_alter_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
