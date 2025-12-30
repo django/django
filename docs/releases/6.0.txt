@@ -177,6 +177,8 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,000,000 to 1,200,000.
 
+* Permission names are now updated when models are renamed.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
