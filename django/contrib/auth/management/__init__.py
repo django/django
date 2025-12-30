@@ -121,12 +121,6 @@ def rename_permissions_after_model_rename(
     if not app_config.models_module:
         return
 
-    # This handler is connected to the global post_migrate signal, which is
-    # emitted for *all* apps — including test configurations where
-    # django.contrib.auth is NOT installed.
-    # Therefore, we must guard against 'auth' not being present, otherwise
-    # apps.get_model("auth", "Permission") will raise LookupError and break
-    # unrelated test suites (especially under parallel test execution).
     try:
         Permission = apps.get_model("auth", "Permission")
     except LookupError:
@@ -134,11 +128,9 @@ def rename_permissions_after_model_rename(
     if not router.allow_migrate_model(using, Permission):
         return
 
-    db = using or router.db_for_write(Permission)
-
     app_label = app_config.label
 
-    # Collect (from_model, to_model) pairs
+    # Collect (from_model, to_model) pairs.
     renames = [
         (op.new_name, op.old_name) if backward else (op.old_name, op.new_name)
         for migration, backward in (plan or [])
@@ -150,10 +142,10 @@ def rename_permissions_after_model_rename(
         return
 
     for old_name, new_name in renames:
-        old_suffix = f"_{old_name.lower()}"
-        new_suffix = f"_{new_name.lower()}"
+        old_suffix = "_" + old_name.lower()
+        new_suffix = "_" + new_name.lower()
 
-        perms = Permission.objects.using(db).filter(
+        perms = Permission.objects.using(using).filter(
             content_type__app_label=app_label,
             codename__endswith=old_suffix,
         )
@@ -173,19 +165,18 @@ def rename_permissions_after_model_rename(
                 perm.name = new_name_str
 
                 try:
-                    with transaction.atomic(using=db):
-                        perm.save(update_fields={"codename", "name"}, using=db)
+                    perm.save(update_fields={"codename", "name"}, using=using)
                 except IntegrityError:
                     # IntegrityError is most likely caused by duplicate
                     # permissions created in pre-Django 6.0 projects before
                     # permission renames were handled.
-                    with transaction.atomic(using=db):
-                        Permission.objects.using(db).filter(
-                            content_type=perm.content_type,
+                    with transaction.atomic(using=using):
+                        Permission.objects.using(using).filter(
+                            content_type=perm.content_type_id,
                             codename=new_codename,
                         ).exclude(pk=perm.pk).delete()
 
-                        perm.save(update_fields={"codename", "name"}, using=db)
+                        perm.save(update_fields={"codename", "name"}, using=using)
 
     for from_name, to_name in renames:
         if verbosity >= 2:

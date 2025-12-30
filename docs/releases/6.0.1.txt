@@ -12,3 +12,9 @@ Bugfixes
 * Fixed a regression in Django 6.0 where :ttag:`querystring` mishandled
   multi-value :class:`~django.http.QueryDict` keys, both by only preserving the
   last value and by incorrectly handling ``None`` values (:ticket:`36783`).
+
+* Fixed a bug in Django 6.0 in the renaming of permissions to match renamed
+  models where conflicts were skipped silently. Conflicts encountered (e.g.
+  when migrating backward in an environment with pre-Django 6.0 permissions
+  that did not get renamed) are now resolved by preserving the permissions
+  attached to the model being renamed (:ticket:`36793`).

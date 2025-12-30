@@ -17,13 +17,12 @@ class AuthConfig(AppConfig):
 
     def ready(self):
         post_migrate.connect(
-            rename_permissions_after_model_rename,
-            dispatch_uid="django.contrib.auth.management.rename_permissions",
-        )
-
-        post_migrate.connect(
             create_permissions,
             dispatch_uid="django.contrib.auth.management.create_permissions",
+        )
+        post_migrate.connect(
+            rename_permissions_after_model_rename,
+            dispatch_uid="django.contrib.auth.management.rename_permissions",
         )
 
         last_login_field = getattr(get_user_model(), "last_login", None)

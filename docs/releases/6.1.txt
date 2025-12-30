@@ -106,9 +106,6 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,200,000 to 1,500,000.
 
-* Fixed permission handling for renamed models during migrations. Duplicate
-  permissions created by pre-Django 6.0 versions are now safely resolved.
-
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
