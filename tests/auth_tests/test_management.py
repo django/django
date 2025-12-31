@@ -22,6 +22,7 @@ from django.core.management.base import CommandError
 from django.db import migrations, models
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
+from django.test.utils import captured_stdout
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -1571,16 +1572,12 @@ class PermissionRenameOperationsTests(TransactionTestCase):
                     self.assertEqual(next_operation.new_model, operation.new_name)
 
     def test_permission_rename(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        actions = ["add", "change", "delete", "view"]
-        for action in actions:
-            Permission.objects.create(
-                codename=f"{action}_oldmodel",
-                name=f"Can {action} old model",
-                content_type=ct,
-            )
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
 
-        call_command("migrate", "auth_tests", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+        actions = ContentType._meta.default_permissions
         for action in actions:
             self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_oldmodel").exists()
@@ -1589,10 +1586,11 @@ class PermissionRenameOperationsTests(TransactionTestCase):
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
             )
 
+        # Reverse the migration.
         call_command(
             "migrate",
             "auth_tests",
-            "zero",
+            "0001",
             database="default",
             interactive=False,
             verbosity=0,
@@ -1606,19 +1604,29 @@ class PermissionRenameOperationsTests(TransactionTestCase):
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
             )
 
+        # Unmigrate everything.
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
     def test_permission_rename_other_db(self):
-        ct = ContentType.objects.using("default").create(
-            app_label="auth_tests", model="oldmodel"
-        )
-        permission = Permission.objects.using("default").create(
-            codename="add_oldmodel",
-            name="Can add old model",
-            content_type=ct,
-        )
+        # Create initial content type and permissions for OldModel on two dbs.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        call_command("migrate", "auth_tests", "0001", verbosity=0, database="other")
+
         # RenamePermission respects the database.
-        call_command("migrate", "auth_tests", verbosity=0, database="other")
-        permission.refresh_from_db()
-        self.assertEqual(permission.codename, "add_oldmodel")
+        call_command("migrate", "auth_tests", "0002", verbosity=0, database="other")
+        self.assertFalse(
+            Permission.objects.using("default").filter(codename="add_newmodel").exists()
+        )
+        self.assertTrue(
+            Permission.objects.using("default").filter(codename="add_oldmodel").exists()
+        )
         self.assertFalse(
             Permission.objects.using("other").filter(codename="add_oldmodel").exists()
         )
@@ -1679,25 +1687,50 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             ).exists()
         )
 
-    def test_rename_permission_conflict(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        Permission.objects.create(
-            codename="change_newmodel",
-            name="Can change new model",
-            content_type=ct,
-        )
-        Permission.objects.create(
-            codename="change_oldmodel",
-            name="Can change old model",
-            content_type=ct,
-        )
-
+    def test_rename_permission_conflict_not_resolved(self):
         call_command(
             "migrate",
             "auth_tests",
             database="default",
             interactive=False,
             verbosity=0,
+        )
+
+        # At this point, we migrated from OldModel to NewModel.
+        # Before reversing the RenameModel operation back to OldModel,
+        # create a stale permission where the codename & name are old.
+        # Note that the content type has already migrated to "newmodel".
+        ct = ContentType.objects.get(app_label="auth_tests", model="newmodel")
+        Permission.objects.create(
+            codename="change_oldmodel",
+            name="Can change old model",
+            content_type=ct,
+        )
+
+        # In non-interactive mode, conflicting permissions are not reconciled.
+        # Both permissions remain.
+        with captured_stdout() as stdout:
+            call_command(
+                "migrate",
+                "auth_tests",
+                "0001",
+                database="default",
+                interactive=False,
+                verbosity=0,
+            )
+        # Assert over the exact output to catch duplicative output if signals
+        # sent from other apps are not short-circuited.
+        self.assertEqual(
+            "\nWARNING:\nWhen renaming permissions for model:\n"
+            "    'NewModel'\nto:\n"
+            "    'OldModel',\n"
+            "the target permission:\n"
+            "    oldmodel | Can change old model\n"
+            "already existed. Any user & group permissions for:\n"
+            "    oldmodel | Can change new model\n"
+            "were not transferred.\n"
+            "Manually reconcile the permissions to reflect your model rename.\n\n",
+            stdout.getvalue(),
         )
         self.assertTrue(
             Permission.objects.filter(

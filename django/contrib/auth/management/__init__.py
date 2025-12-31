@@ -1,16 +1,18 @@
 """
-Creates permissions for all installed apps that need permissions.
+Creates permissions for all installed apps that need permissions, and renames
+them on model renames.
 """
 
 import getpass
+import textwrap
 import unicodedata
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.utils import IntegrityError
+from django.core.management.color import color_style
+from django.db import DEFAULT_DB_ALIAS, migrations, router
 from django.utils.text import camel_case_to_spaces
 
 
@@ -111,47 +113,75 @@ def create_permissions(
 
 
 class RenamePermission(migrations.RunPython):
-    def __init__(self, app_label, old_model, new_model):
+    def __init__(self, app_label, old_model, new_model, backward, using):
         self.app_label = app_label
         self.old_model = old_model
         self.new_model = new_model
-        super(RenamePermission, self).__init__(
-            self.rename_forward, self.rename_backward
-        )
+        self.backward = backward
+        self.using = using
+        super().__init__(self._rename, self._rename)
 
-    def _rename(self, apps, schema_editor, old_model, new_model):
-        ContentType = apps.get_model("contenttypes", "ContentType")
+    def _rename(self, apps, schema_editor):
+        if self.backward:
+            from_model, to_model = self.new_model, self.old_model
+            model_class = apps.get_model(self.app_label, from_model)
+        else:
+            from_model, to_model = self.old_model, self.new_model
+            model_class = apps.get_model(self.app_label, to_model)
+
         # Use the live Permission model instead of the frozen one, since frozen
         # models do not retain foreign key constraints.
         from django.contrib.auth.models import Permission
 
-        db = schema_editor.connection.alias
-        ctypes = ContentType.objects.using(db).filter(
-            app_label=self.app_label, model__icontains=old_model.lower()
+        perms = Permission.objects.using(self.using).filter(
+            content_type__app_label=self.app_label,
+            codename__in=[
+                action + "_" + from_model.lower()
+                for action in model_class._meta.default_permissions
+            ],
         )
-        for permission in Permission.objects.using(db).filter(
-            content_type_id__in=ctypes.values("id")
-        ):
-            prefix = permission.codename.split("_")[0]
-            default_verbose_name = camel_case_to_spaces(new_model)
+        for permission in perms:
+            action = permission.codename.split("_")[0]
+            new_codename = action + "_" + to_model.lower()
+            if self.backward:
+                # We don't have the target model class, so approximate.
+                # TODO: might be able to get this if we adjust the order of
+                # injected operations when migrating backwards.
+                verbose_name_raw = camel_case_to_spaces(from_model)
+            else:
+                verbose_name_raw = model_class._meta.verbose_name_raw
+            new_name = f"Can {action} {verbose_name_raw}"
 
-            new_codename = f"{prefix}_{new_model.lower()}"
-            new_name = f"Can {prefix} {default_verbose_name}"
-
-            if permission.codename != new_codename or permission.name != new_name:
-                permission.codename = new_codename
-                permission.name = new_name
+            if permission.codename != new_codename or permission.name != new_codename:
                 try:
-                    with transaction.atomic(using=db):
-                        permission.save(update_fields={"name", "codename"})
-                except IntegrityError:
-                    pass
-
-    def rename_forward(self, apps, schema_editor):
-        self._rename(apps, schema_editor, self.old_model, self.new_model)
-
-    def rename_backward(self, apps, schema_editor):
-        self._rename(apps, schema_editor, self.new_model, self.old_model)
+                    new_perm = Permission.objects.using(self.using).get(
+                        content_type_id=permission.content_type_id,
+                        codename=new_codename,
+                    )
+                except Permission.DoesNotExist:
+                    permission.codename = new_codename
+                    permission.name = new_name
+                    permission.save(
+                        using=self.using, update_fields={"codename", "name"}
+                    )
+                else:
+                    style = color_style()
+                    msg = textwrap.dedent(
+                        f"""
+                        WARNING:
+                        When renaming permissions for model:
+                            '{from_model}'
+                        to:
+                            '{to_model}',
+                        the target permission:
+                            {new_perm}
+                        already existed. Any user & group permissions for:
+                            {permission}
+                        were not transferred.
+                        Manually reconcile the permissions to reflect your model rename.
+                    """
+                    )
+                    print(style.WARNING(msg))
 
 
 def rename_permissions(
@@ -177,11 +207,16 @@ def rename_permissions(
     for migration, backward in plan:
         inserts = []
         for index, operation in enumerate(migration.operations):
-            if isinstance(operation, migrations.RenameModel):
+            if (
+                isinstance(operation, migrations.RenameModel)
+                and migration.app_label == kwargs.get("sender").label
+            ):
                 operation = RenamePermission(
                     migration.app_label,
                     operation.old_name,
                     operation.new_name,
+                    backward,
+                    using,
                 )
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):
