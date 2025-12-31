@@ -42,3 +42,6 @@ Bugfixes
 * Fixed a regression in Django 6.0 where the :attr:`.Widget.use_fieldset`
   attribute of :class:`~django.forms.ClearableFileInput` was flipped
   from ``False`` to ``True`` (:ticket:`36829`).
+
+* Fixed several bugs in Django 6.0 relating to the automatic renaming of
+  permissions when renaming models (:ticket:`36793`).
