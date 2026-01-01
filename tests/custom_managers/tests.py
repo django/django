@@ -669,6 +669,34 @@ class CustomManagerTests(TestCase):
         self.assertTrue(issubclass(objects_published, models.QuerySet))
         self.assertFalse(issubclass(objects_published_title_a, objects_published))
 
+    def test_queryset_initial_filter_with_mixin(self):
+        class CustomQuerySet(models.QuerySet):
+            pass
+
+        class Mixin:
+            pass
+
+        class ChainCustomQuerySetWithMixin(
+            Mixin, CustomQuerySet.filter(published=True)
+        ):
+            pass
+
+        objects_published = ChainCustomQuerySetWithMixin.filter(author__startswith="A")
+        objects_published_title_a = objects_published.filter(title__istartswith="A")
+        self.assertEqual(
+            objects_published._initial_filter,
+            models.Q(published=True) & models.Q(author__startswith="A"),
+        )
+        self.assertTrue(issubclass(objects_published, models.QuerySet))
+        self.assertEqual(
+            objects_published_title_a._initial_filter,
+            models.Q(published=True)
+            & models.Q(author__startswith="A")
+            & models.Q(title__istartswith="A"),
+        )
+        self.assertTrue(issubclass(objects_published, models.QuerySet))
+        self.assertFalse(issubclass(objects_published_title_a, objects_published))
+
 
 class TestCars(TestCase):
     def test_managers(self):
