@@ -29,7 +29,12 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q, class_or_instance_method
+from django.db.models.query_utils import (
+    PROHIBITED_FILTER_KWARGS,
+    FilteredRelation,
+    Q,
+    class_or_instance_method,
+)
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -1652,11 +1657,13 @@ class QuerySet(AltersData):
             raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         initial_filter = Q(*args, **kwargs)
         # Chain initial filters.
+        base_class = cls
         if cls._initial_filter is not None:
             initial_filter = cls._initial_filter & initial_filter
-            base_class = cls.__bases__[0]
-        else:
-            base_class = cls
+            for base in cls.__bases__:
+                if issubclass(base, QuerySet):
+                    base_class = base
+                    break
 
         initial_filter_id = id(initial_filter)
         name = f"{base_class.__name__}WithFilter{initial_filter_id}"
