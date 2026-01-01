@@ -213,7 +213,8 @@ requests a page, Django runs through each path, in order, and stops at the
 first one that matches the requested URL. (If none of them matches, Django
 calls a special-case 404 view.) This is blazingly fast, because the paths are
 compiled into regular expressions at load time.
-
+This sequential matching order makes it important to place more specific URL
+patterns before more general ones.
 Once one of the URL patterns matches, Django calls the given view, which is a
 Python function. Each view gets passed a request object -- which contains
 request metadata -- and the values captured in the pattern.
