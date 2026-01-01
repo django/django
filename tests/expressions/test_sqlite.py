@@ -10,11 +10,14 @@ from django.test import TestCase
 class SQLiteDecimalExpressionsTests(TestCase):
     # Ensures the test only runs on SQLite.
     @skipUnless(connection.vendor == "sqlite", "SQLite-only test")
-    def test_literal_value_decimal_not_cast(self):
+    def test_literal_value_decimal_cast_to_real(self):
         expr = Value(Decimal("3.0"), output_field=DecimalField())
 
+        # We must use compiler.compile() so that Django looks for 'as_sqlite'
         compiler = connection.ops.compiler("SQLCompiler")(Query(None), connection, None)
-        sql, params = expr.resolve_expression(Query(None)).as_sql(compiler, connection)
+        sql, params = compiler.compile(expr.resolve_expression(Query(None)))
 
-        self.assertNotIn("CAST(", sql)
+        # Verify that the SQL is generated with CAST(... AS REAL)
+        self.assertIn("CAST(", sql)
+        self.assertIn("AS REAL)", sql)
         self.assertNotIn("AS NUMERIC", sql)

@@ -20,15 +20,21 @@ from django.utils.hashable import make_hashable
 
 
 class SQLiteNumericMixin:
+    """
+    Some expressions with output_field=DecimalField() must be cast to
+    numeric to be properly filtered.
+    """
+
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
-
-        if not (isinstance(self, Value) and isinstance(self.value, Decimal)):
-            try:
-                if self.output_field.get_internal_type() == "DecimalField":
+        try:
+            if self.output_field.get_internal_type() == "DecimalField":
+                if isinstance(self, Value) and isinstance(self.value, Decimal):
+                    sql = "(CAST(%s AS REAL))" % sql
+                else:
                     sql = "(CAST(%s AS NUMERIC))" % sql
-            except FieldError:
-                pass
+        except FieldError:
+            pass
         return sql, params
 
 
@@ -423,7 +429,7 @@ class BaseExpression:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                expr.replace_expressions(replacements) if expr else None
+                None if expr is None else expr.replace_expressions(replacements)
                 for expr in source_expressions
             ]
         )
