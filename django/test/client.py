@@ -850,22 +850,24 @@ class ClientMixin:
 
     def force_login(self, user, backend=None):
         if backend is None:
-            backend = self._get_backend()
+            backend = self._get_backend(user=user)
         user.backend = backend
         self._login(user, backend)
 
     async def aforce_login(self, user, backend=None):
         if backend is None:
-            backend = self._get_backend()
+            backend = await sync_to_async(self._get_backend)(user=user)
         user.backend = backend
         await self._alogin(user, backend)
 
-    def _get_backend(self):
+    def _get_backend(self, user=None):
         from django.contrib.auth import load_backend
 
         for backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
             if hasattr(backend, "get_user"):
+                if user and not backend.get_user(user.pk):
+                    continue
                 return backend_path
 
     def _login(self, user, backend=None):
