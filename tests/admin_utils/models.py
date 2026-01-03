@@ -47,6 +47,7 @@ class Cascade(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey("self", models.CASCADE, null=True)
 
+    @admin.display(ordering="num")
     def __str__(self):
         return str(self.num)
 
