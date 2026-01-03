@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.db import migrations, models
 from django.test import TransactionTestCase, override_settings
+from unittest.mock import patch
 
 
 @override_settings(
@@ -154,13 +155,16 @@ class ContentTypeOperationsTests(TransactionTestCase):
     def test_content_type_rename_conflict(self):
         ContentType.objects.create(app_label="contenttypes_tests", model="foo")
         ContentType.objects.create(app_label="contenttypes_tests", model="renamedfoo")
-        call_command(
-            "migrate",
-            "contenttypes_tests",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
+
+        with self.assertWarns(RuntimeWarning):
+            call_command(
+                "migrate",
+                "contenttypes_tests",
+                database="default",
+                interactive=False,
+                verbosity=0,
+            )
+
         self.assertTrue(
             ContentType.objects.filter(
                 app_label="contenttypes_tests", model="foo"
@@ -171,14 +175,17 @@ class ContentTypeOperationsTests(TransactionTestCase):
                 app_label="contenttypes_tests", model="renamedfoo"
             ).exists()
         )
-        call_command(
-            "migrate",
-            "contenttypes_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
+
+        with self.assertWarns(RuntimeWarning):
+            call_command(
+                "migrate",
+                "contenttypes_tests",
+                "zero",
+                database="default",
+                interactive=False,
+                verbosity=0,
+            )
+
         self.assertTrue(
             ContentType.objects.filter(
                 app_label="contenttypes_tests", model="foo"
@@ -189,3 +196,137 @@ class ContentTypeOperationsTests(TransactionTestCase):
                 app_label="contenttypes_tests", model="renamedfoo"
             ).exists()
         )
+
+    def test_rename_contenttype_ignores_integrity_error_on_save(self):
+        from django.db import IntegrityError
+
+        class DummyContentType:
+            DoesNotExist = type("DoesNotExist", (Exception,), {})
+
+            def __init__(self):
+                self.model = "foo"
+
+        class DummyManager:
+            def __init__(self, instance):
+                self._instance = instance
+
+            def db_manager(self, db):
+                return self
+
+            def get_by_natural_key(self, app_label, model):
+                return self._instance
+
+            def clear_cache(self):
+                pass
+            def filter(self, **kwargs):
+                return self
+
+            def update(self, **kwargs):
+                from django.db import IntegrityError
+
+                raise IntegrityError
+
+        class FakeApps:
+            def __init__(self, instance):
+                self._instance = instance
+
+            def get_model(self, app_label, name):
+                DummyContentType.objects = DummyManager(self._instance)
+                return DummyContentType
+
+        class DummySchemaEditor:
+            connection = type("C", (), {"alias": "default"})()
+
+        instance = DummyContentType()
+
+        def _save(using=None, update_fields=None):
+            raise IntegrityError
+
+        instance.save = _save
+
+        op = contenttypes_management.RenameContentType(
+            "contenttypes_tests", "foo", "bar"
+        )
+
+        with patch(
+            "django.contrib.contenttypes.management.router.allow_migrate_model",
+            return_value=True,
+        ):
+            with self.assertWarnsMessage(RuntimeWarning, "Could not rename ContentType"):
+                op._rename(FakeApps(instance), DummySchemaEditor(), "foo", "bar")
+            self.assertEqual(instance.model, "foo")
+
+    def test_rename_contenttype_warns_on_integrity_error(self):
+        from django.db import IntegrityError
+
+        class DummyContentType:
+            DoesNotExist = type("DoesNotExist", (Exception,), {})
+
+            def __init__(self):
+                self.model = "oldmodel"
+
+        class DummyManager:
+            def __init__(self, instance):
+                self._instance = instance
+
+            def db_manager(self, db):
+                return self
+
+            def get_by_natural_key(self, app_label, model):
+                return self._instance
+
+            def clear_cache(self):
+                pass
+
+                def filter(self, **kwargs):
+                    return self
+
+                def update(self, **kwargs):
+                    # Simulate IntegrityError when attempting to update.
+                    raise IntegrityError
+
+        class FakeApps:
+            def __init__(self, instance):
+                self._instance = instance
+
+            def get_model(self, app_label, name):
+                DummyContentType.objects = DummyManager(self._instance)
+                return DummyContentType
+
+        class DummySchemaEditor:
+            connection = type("C", (), {"alias": "default"})()
+
+        instance = DummyContentType()
+
+        def _save(using=None, update_fields=None):
+            raise IntegrityError
+
+        instance.save = _save
+
+        op = contenttypes_management.RenameContentType(
+            "contenttypes_tests", "oldmodel", "newmodel"
+        )
+
+        class FakeState:
+            def __init__(self, apps):
+                self.apps = apps
+
+            def clear_delayed_apps_cache(self):
+                pass
+
+        with patch(
+            "django.contrib.contenttypes.management.router.allow_migrate",
+            return_value=True,
+        ), patch(
+            "django.contrib.contenttypes.management.router.allow_migrate_model",
+            return_value=True,
+        ):
+            from_state = FakeState(FakeApps(instance))
+            with self.assertWarnsMessage(RuntimeWarning, "Could not rename ContentType"):
+                op.database_forwards(
+                    "contenttypes_tests",
+                    DummySchemaEditor(),
+                    from_state,
+                    None,
+                )
+            self.assertEqual(instance.model, "oldmodel")

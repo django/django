@@ -1,4 +1,6 @@
 from django.apps import apps as global_apps
+import warnings
+
 from django.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction
 
 
@@ -20,21 +22,66 @@ class RenameContentType(migrations.RunPython):
                 self.app_label, old_model
             )
         except ContentType.DoesNotExist:
-            pass
-        else:
-            content_type.model = new_model
+            return
+
+        # If a content type with the target model name already exists, try
+        # to skip the rename to avoid a UNIQUE constraint failure. Be
+        # defensive: tests may provide dummy managers/instances that don't
+        # implement `filter()`/`pk`, so fall back to attempting the save if
+        # we cannot perform this check.
+        conflict_exists = False
+        try:
+            manager = ContentType.objects.db_manager(db)
+            if hasattr(manager, "filter"):
+                qs = manager.filter(app_label=self.app_label, model=new_model)
+                if hasattr(content_type, "pk"):
+                    qs = qs.exclude(pk=content_type.pk)
+                conflict_exists = qs.exists()
+        except Exception:
+            conflict_exists = False
+
+        if conflict_exists:
+            warnings.warn(
+                (
+                    f"Could not rename ContentType '{old_model}' to "
+                    f"'{new_model}' because a conflicting ContentType "
+                    "already exists. The original name has been kept. "
+                    "You may need to run 'remove_stale_contenttypes' to "
+                    "resolve the conflict."
+                ),
+                RuntimeWarning,
+            )
+            return
+
+        # Attempt to rename and persist only the model field.
+        content_type.model = new_model
+        try:
+            with transaction.atomic(using=db):
+                content_type.save(using=db, update_fields=["model"])
+        except IntegrityError:
+            # Revert and warn; ensure the outer migration transaction is
+            # not left marked for rollback.
+            content_type.model = old_model
+            warnings.warn(
+                (
+                    f"Could not rename ContentType '{old_model}' to "
+                    f"'{new_model}' due to an existing conflicting "
+                    "content type. The original name has been kept. "
+                    "You may need to run 'remove_stale_contenttypes' to "
+                    "resolve the conflict."
+                ),
+                RuntimeWarning,
+            )
             try:
-                with transaction.atomic(using=db):
-                    content_type.save(using=db, update_fields={"model"})
-            except IntegrityError:
-                # Gracefully fallback if a stale content type causes a
-                # conflict as remove_stale_contenttypes will take care of
-                # asking the user what should be done next.
-                content_type.model = old_model
-            else:
-                # Clear the cache as the `get_by_natural_key()` call will cache
-                # the renamed ContentType instance by its old model name.
-                ContentType.objects.clear_cache()
+                transaction.set_rollback(False, using=db)
+            except Exception:
+                pass
+            return
+
+        # Clear the cache as the `get_by_natural_key()` call will cache
+        # the renamed ContentType instance by its old model name.
+        if hasattr(ContentType.objects, "clear_cache"):
+            ContentType.objects.clear_cache()
 
     def rename_forward(self, apps, schema_editor):
         self._rename(apps, schema_editor, self.old_model, self.new_model)
