@@ -225,9 +225,14 @@ class RelatedFieldListFilter(FieldListFilter):
         self.lookup_kwarg = "%s__%s__exact" % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
         self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val_isnull = get_last_value_from_parameters(
-            params, self.lookup_kwarg_isnull
-        )
+        isnull_value = get_last_value_from_parameters(params, self.lookup_kwarg_isnull)
+        if isnull_value is not None:
+            if isnull_value.lower() in ("false", "0"):
+                self.lookup_val_isnull = False
+            else:
+                self.lookup_val_isnull = True
+        else:
+            self.lookup_val_isnull = None
         super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, "verbose_name"):
