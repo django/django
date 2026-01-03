@@ -1,6 +1,6 @@
-from django.apps import apps as global_apps
 import warnings
 
+from django.apps import apps as global_apps
 from django.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction
 
 

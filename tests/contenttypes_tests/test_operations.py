@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.apps.registry import apps
 from django.conf import settings
 from django.contrib.contenttypes import management as contenttypes_management
@@ -5,7 +7,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.db import migrations, models
 from django.test import TransactionTestCase, override_settings
-from unittest.mock import patch
 
 
 @override_settings(
@@ -218,6 +219,7 @@ class ContentTypeOperationsTests(TransactionTestCase):
 
             def clear_cache(self):
                 pass
+
             def filter(self, **kwargs):
                 return self
 
@@ -252,7 +254,9 @@ class ContentTypeOperationsTests(TransactionTestCase):
             "django.contrib.contenttypes.management.router.allow_migrate_model",
             return_value=True,
         ):
-            with self.assertWarnsMessage(RuntimeWarning, "Could not rename ContentType"):
+            with self.assertWarnsMessage(
+                RuntimeWarning, "Could not rename ContentType"
+            ):
                 op._rename(FakeApps(instance), DummySchemaEditor(), "foo", "bar")
             self.assertEqual(instance.model, "foo")
 
@@ -314,15 +318,20 @@ class ContentTypeOperationsTests(TransactionTestCase):
             def clear_delayed_apps_cache(self):
                 pass
 
-        with patch(
-            "django.contrib.contenttypes.management.router.allow_migrate",
-            return_value=True,
-        ), patch(
-            "django.contrib.contenttypes.management.router.allow_migrate_model",
-            return_value=True,
+        with (
+            patch(
+                "django.contrib.contenttypes.management.router.allow_migrate",
+                return_value=True,
+            ),
+            patch(
+                "django.contrib.contenttypes.management.router.allow_migrate_model",
+                return_value=True,
+            ),
         ):
             from_state = FakeState(FakeApps(instance))
-            with self.assertWarnsMessage(RuntimeWarning, "Could not rename ContentType"):
+            with self.assertWarnsMessage(
+                RuntimeWarning, "Could not rename ContentType"
+            ):
                 op.database_forwards(
                     "contenttypes_tests",
                     DummySchemaEditor(),
