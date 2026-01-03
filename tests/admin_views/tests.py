@@ -799,6 +799,21 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "Results of sorting on Model method are out of order.",
         )
 
+    def test_change_list_sorting_model_str(self):
+        """Ensure we can sort on a Model.__str__ list_display field."""
+
+        class ArticleStrAdmin(admin.ModelAdmin):
+            list_display = ["__str__"]
+
+        model_admin = ArticleStrAdmin(Article, site)
+        request = RequestFactory().get("/?o=1")
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertEqual(cl.get_ordering_field("__str__"), "title")
+        self.assertQuerySetEqual(
+            cl.get_queryset(request), Article.objects.order_by("title", "-pk")
+        )
+
     def test_change_list_sorting_model_admin(self):
         """
         Ensure we can sort on a list_display field that is a ModelAdmin method

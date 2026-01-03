@@ -445,6 +445,12 @@ class UtilsTests(SimpleTestCase):
             "property short description",
         )
 
+    def test_label_for_field_str_admin_order_field(self):
+        _, attr = label_for_field("__str__", Cascade, return_attr=True)
+        self.assertIs(attr, Cascade.__str__)
+        self.assertTrue(hasattr(attr, "admin_order_field"))
+        self.assertEqual(attr.admin_order_field, "num")
+
     def test_help_text_for_field(self):
         tests = [
             ("article", ""),

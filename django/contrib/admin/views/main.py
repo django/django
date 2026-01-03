@@ -359,7 +359,7 @@ class ChangeList:
             # that allows sorting.
             if callable(field_name):
                 attr = field_name
-            elif hasattr(self.model_admin, field_name):
+            elif hasattr(self.model_admin, field_name) and field_name != "__str__":
                 attr = getattr(self.model_admin, field_name)
             else:
                 try:

@@ -47,6 +47,7 @@ class Article(models.Model):
         Section, models.SET_NULL, null=True, blank=True, related_name="+"
     )
 
+    @admin.display(ordering="title")
     def __str__(self):
         return self.title
 
