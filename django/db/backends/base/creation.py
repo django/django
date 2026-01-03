@@ -22,6 +22,12 @@ class BaseDatabaseCreation:
     destruction of the test database.
     """
 
+    # If this backend's destroy_test_db() closes the database connection, this
+    # attribute must be set to the name of the connection closing method (e.g.
+    # "close" on Oracle, "close_pool" on MongoDB) to avoid failures in some
+    # backends tests.
+    destroy_test_db_connection_close_method = None
+
     def __init__(self, connection):
         self.connection = connection
 
