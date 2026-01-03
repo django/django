@@ -13,9 +13,9 @@
   "errors": [
     {"wkt": "GEOMETR##!@#%#............a32515", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
     {"wkt": "Foo.Bar", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
-    {"wkt": "POINT (5, 23)", "bad": true, "hex": false, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKTReader_read_r\"."},
+    {"wkt": "POINT (5, 23)", "bad": true, "hex": false, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKTReader_read_r\". ParseException: Expected number but encountered ','"},
     {"wkt": "AAABBBDDDAAD##@#1113511111-098111111111111111533333333333333", "bad": true, "hex": true, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
-    {"wkt": "FFFFFFFFFFFFFFFFF1355555555555555555565111", "bad": true, "hex": true, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKBReader_readHEX_r\"."},
+    {"wkt": "FFFFFFFFFFFFFFFFF1355555555555555555565111", "bad": true, "hex": true, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKBReader_readHEX_r\". ParseException: Unknown WKB type 535"},
     {"wkt": "", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."}
   ],
   "wkt_out": [
