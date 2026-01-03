@@ -7,7 +7,7 @@ from importlib import import_module
 from pathlib import Path
 
 from django.conf import settings
-from django.db import connection, connections
+from django.db import connection, connections, migrations
 from django.db.migrations.exceptions import (
     AmbiguityError,
     InconsistentMigrationHistory,
@@ -718,6 +718,54 @@ class LoaderTests(TestCase):
             )
         except subprocess.CalledProcessError as err:
             self.fail(err.stderr)
+
+    def test_dependency_link_created_for_squashed_mixed_state(self):
+        """
+        Regression test for #36166.
+        If a migration depends on a squashed migration, and the original
+        replaced migrations are ALSO present in the graph (mixed state),
+        the loader must add a dependency link from the new migration to the
+        original replaced migrations.
+        """
+
+        m1 = migrations.Migration("0001_initial", "app")
+        m2 = migrations.Migration("0002_bar", "app")
+        m2.dependencies = [("app", "0001_initial")]
+        m_squashed = migrations.Migration("0001_squashed", "app")
+        m_squashed.replaces = [("app", "0001_initial"), ("app", "0002_bar")]
+        m3 = migrations.Migration("0003_new", "app")
+        m3.dependencies = [("app", "0001_squashed")]
+        loader = MigrationLoader(connection=None, load=False)
+        loader.load_disk = lambda: None
+        loader.replace_migrations = False
+        loader.disk_migrations = {
+            ("app", "0001_initial"): m1,
+            ("app", "0002_bar"): m2,
+            ("app", "0001_squashed"): m_squashed,
+            ("app", "0003_new"): m3,
+        }
+
+        loader.build_graph()
+        graph = loader.graph
+        node_0003 = ("app", "0003_new")
+        self.assertIn(node_0003, graph.node_map)
+
+        # CRITICAL ASSERTION:
+        # Node 0003 must depend on 0002_bar (the last replacement).
+        parent_nodes = graph.node_map[node_0003].parents
+        parent_keys = {p.key for p in parent_nodes}
+
+        self.assertIn(
+            ("app", "0002_bar"),
+            parent_keys,
+            "Failed: 0003_new should depend on original 0002_bar in mixed state.",
+        )
+
+        self.assertIn(
+            ("app", "0001_squashed"),
+            parent_keys,
+            "Failed: 0003_new should still depend on the squashed migration.",
+        )
 
 
 class PycLoaderTests(MigrationTestBase):
