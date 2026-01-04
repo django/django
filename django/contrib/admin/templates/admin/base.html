@@ -6,11 +6,22 @@
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 {% block dark-mode-vars %}
   <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
-  <script src="{% static "admin/js/theme.js" %}"></script>
+  <script src="{% static "admin/js/theme.js" %}" 
+  {% if csp_nonce %}
+    nonce="{{ csp_nonce }}"
+  {% endif %}
+  ></script>
 {% endblock %}
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
-  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
+  <script
+  src="{% static 'admin/js/nav_sidebar.js' %}"
+  defer
+  {% if csp_nonce %}
+    nonce="{{ csp_nonce }}"
+  {% endif %}
+></script>
+
 {% endif %}
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}

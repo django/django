@@ -3,7 +3,10 @@
 
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
+<script src="{% url 'admin:jsi18n' %}"
+{% if csp_nonce %}
+    nonce="{{ csp_nonce }}"
+  {% endif %}></script>
 {{ media }}
 {% endblock %}
 
@@ -67,6 +70,9 @@
 {% block admin_change_form_document_ready %}
     <script id="django-admin-form-add-constants"
             src="{% static 'admin/js/change_form.js' %}"
+            {% if csp_nonce %}
+    nonce="{{ csp_nonce }}"
+  {% endif %}
             {% if adminform and add %}
                 data-model-name="{{ opts.model_name }}"
             {% endif %}
