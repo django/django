@@ -235,6 +235,9 @@ Tests
   :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
   permission-only backends.
 
+* The Oracle database backend now supports running tests in parallel with the
+  :option:`test --parallel` option.
+
 URLs
 ~~~~
 
