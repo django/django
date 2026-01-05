@@ -13,7 +13,11 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError, MultiPartParser
+from django.http.multipartparser import (
+    MAX_TOTAL_HEADER_SIZE,
+    MultiPartParser,
+    MultiPartParserError,
+)
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
@@ -1113,7 +1117,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request_copy.session, {})
 
     def test_custom_multipart_parser_class(self):
-       
+
         class CustomMultiPartParser(MultiPartParser):
             def parse(self):
                 post, files = super().parse()
@@ -1126,13 +1130,15 @@ class RequestsTests(SimpleTestCase):
             multipart_parser_class = CustomMultiPartParser
 
         payload = FakePayload(
-            "\r\n".join([
-                "--boundary",
-                'Content-Disposition: form-data; name="name"',
-                "",
-                "value",
-                "--boundary--",
-            ])
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
         )
         request = CustomWSGIRequest(
             {
