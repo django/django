@@ -187,7 +187,7 @@ class TaskResult:
     # Time the task was last attempted to be run.
     last_attempted_at: Optional[datetime]
 
-    args: list  # Arguments to pass to the task function.
+    args: list[Any]  # Arguments to pass to the task function.
     kwargs: Dict[str, Any]  # Keyword arguments to pass to the task function.
     backend: str
     errors: list[TaskError]  # Errors raised when running the task.
