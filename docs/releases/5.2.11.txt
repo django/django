@@ -1,0 +1,12 @@
+===========================
+Django 5.2.11 release notes
+===========================
+
+*Expected February 3, 2026*
+
+Django 5.2.11 fixes several bugs in 5.2.10.
+
+Bugfixes
+========
+
+* ...
