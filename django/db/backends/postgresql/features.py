@@ -184,7 +184,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_virtual_generated_columns = property(
         operator.attrgetter("is_postgresql_18")
     )
-
-    # PostgreSQL's LEFT() function accepts negative lengths for right-side
-    # trimming (e.g. LEFT(field, -3) behaves like field[:-3]).
-    supports_negative_indexing = True

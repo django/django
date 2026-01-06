@@ -162,17 +162,8 @@ class Left(Func):
         length: the number of characters to return from the start of the string
         """
         if not hasattr(length, "resolve_expression"):
-            if length == 0:
-                raise ValueError("'length' must be greater than 0")
-            # Negative lengths are supported by PostgreSQL (behaves like
-            # Python slicing, e.g. LEFT(field, -3) returns all but last 3
-            # characters). For other backends, negative lengths are invalid.
-            if length < 0:
-                from django.db import connection
-
-                if connection.vendor != "postgresql":
-                    raise ValueError("'length' must be greater than 0")
-
+            if length < 1:
+                raise ValueError("'length' must be greater than 0.")
         super().__init__(expression, length, **extra)
 
     def get_substr(self):
