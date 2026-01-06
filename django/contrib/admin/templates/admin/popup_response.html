@@ -1,13 +1,12 @@
 {% load i18n static %}<!DOCTYPE html>
+{% load admin_tags %}
 <html>
   <head><title>{% translate 'Popup closing…' %}</title></head>
   <body>
     <script id="django-admin-popup-response-constants"
             src="{% static "admin/js/popup_response.js" %}"
             data-popup-response="{{ popup_response_data }}"
-            {% if csp_nonce %}
-    nonce="{{ csp_nonce }}"
-  {% endif %}>
+            {% csp_nonce_attr %}>
     </script>
   </body>
 </html>

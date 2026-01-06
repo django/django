@@ -1,13 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load i18n l10n admin_urls static %}
+{% load admin_tags %}
 
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
     <script src="{% static 'admin/js/cancel.js' %}" async
-    {% if csp_nonce %}
-    nonce="{{ csp_nonce }}"
-  {% endif %}
+    {% csp_nonce_attr %}
   ></script>
 {% endblock %}
 

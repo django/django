@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_list %}
+{% load admin_tags %}
 
 {% block title %}{% if cl.formset and cl.formset.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrastyle %}
@@ -10,9 +11,7 @@
   {% endif %}
   {% if cl.formset or action_form %}
     <script src="{% url 'admin:jsi18n' %}"
-    {% if csp_nonce %}
-    nonce="{{ csp_nonce }}"
-  {% endif %}></script>
+    {% csp_nonce_attr %}></script>
   {% endif %}
   {{ media.css }}
   {% if not actions_on_top and not actions_on_bottom %}
@@ -26,9 +25,7 @@
 {{ block.super }}
 {{ media.js }}
 <script src="{% static 'admin/js/filters.js' %}" defer
-{% if csp_nonce %}
-    nonce="{{ csp_nonce }}"
-  {% endif %}></script>
+{% csp_nonce_attr %}></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
