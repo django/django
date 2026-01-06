@@ -1633,7 +1633,7 @@ class ManageRunserver(SimpleTestCase):
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
             f"https://docs.djangoproject.com/en/{docs_version}/howto/"
-            "deployment/",
+            "deployment/\n",
             self.output.getvalue(),
         )
 
@@ -1652,7 +1652,7 @@ class ManageRunserver(SimpleTestCase):
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
             f"https://docs.djangoproject.com/en/{docs_version}/howto/"
-            "deployment/",
+            "deployment/\n",
             self.output.getvalue(),
         )
 
@@ -1671,8 +1671,33 @@ class ManageRunserver(SimpleTestCase):
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
             f"https://docs.djangoproject.com/en/{docs_version}/howto/"
-            "deployment/",
+            "deployment/\n",
             self.output.getvalue(),
+        )
+
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "anything-but-true"})
+    def test_wsgi_warning_line(self):
+        self.cmd.addr = "127.0.0.1"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("14437")
+
+        output = self.output.getvalue()
+        docs_version = get_docs_version()
+
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead.\n"
+            "For more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/\n",
+            output,
+        )
+
+        self.assertIn(
+            "NOTE: This development server is running in WSGI (sync) mode only.\n"
+            "Async-only views and middleware will not run correctly unless they are "
+            "also compatible with sync execution.\n",
+            output,
         )
 
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")

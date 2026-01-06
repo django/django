@@ -196,6 +196,11 @@ class Command(BaseCommand):
                     "production setting. Use a production WSGI or ASGI server "
                     "instead.\nFor more information on production servers see: "
                     f"https://docs.djangoproject.com/en/{docs_version}/howto/"
-                    "deployment/"
+                    "deployment/\n"
+                    "NOTE: This development server is running in WSGI (sync) "
+                    "mode only.\n"
+                    "Async-only views and middleware will not run "
+                    "correctly unless they are also compatible with sync "
+                    "execution.\n"
                 )
             )
