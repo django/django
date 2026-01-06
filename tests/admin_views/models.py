@@ -764,7 +764,7 @@ class FoodDelivery(models.Model):
 
 
 class CoverLetter(models.Model):
-    author = models.CharField(max_length=30)
+    author = models.CharField(max_length=30, blank=True)
     date_written = models.DateField(null=True, blank=True)
 
     def __str__(self):
