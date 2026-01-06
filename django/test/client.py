@@ -435,7 +435,7 @@ class RequestFactory:
         "Construct a generic request object."
         response = WSGIRequest(self._base_environ(**request))
         response.resolver_match = type(
-            "RersolverMatch",
+            "ResolverMatch",
             (object,),
             {"app_name": "name", "url_name": "", "_func_path": "", "tried": []},
         )()
