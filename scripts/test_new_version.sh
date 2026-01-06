@@ -25,7 +25,7 @@ django-admin startproject test_one
 cd test_one
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 0
 
 deactivate
 cd ..
@@ -40,7 +40,7 @@ django-admin startproject test_one
 cd test_one
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 0
 
 deactivate
 cd ..
