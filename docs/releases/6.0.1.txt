@@ -2,7 +2,7 @@
 Django 6.0.1 release notes
 ==========================
 
-*Expected January 6, 2026*
+*January 6, 2026*
 
 Django 6.0.1 fixes one data loss bug in Django 5.2 and several bugs in 6.0.
 
@@ -42,3 +42,10 @@ Bugfixes
 * Fixed a regression in Django 6.0 where the :attr:`.Widget.use_fieldset`
   attribute of :class:`~django.forms.ClearableFileInput` was flipped
   from ``False`` to ``True`` (:ticket:`36829`).
+
+* Reverted an undocumented optimization in Django 6.0 that modified permission
+  :attr:`~django.contrib.auth.models.Permission.name` and
+  :attr:`~django.contrib.auth.models.Permission.codename` values when renaming
+  models via a migration. This change could affect unrelated
+  :class:`~django.contrib.auth.models.Permission` objects (:ticket:`36843`) and
+  did not report conflicts (:ticket:`36793`).

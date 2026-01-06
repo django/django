@@ -2,7 +2,7 @@
 Django 5.2.10 release notes
 ===========================
 
-*Expected January 6, 2026*
+*January 6, 2026*
 
 Django 5.2.10 fixes a data loss bug in Django 5.2 and one bug related to
 support for Python 3.14.
