@@ -1,0 +1,186 @@
+[33mcommit 7f206a139608fab2f61f333ca3c379a4e94f6fbf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mticket_36839[m[33m, [m[1;31morigin/ticket_36839[m[33m)[m
+Author: Moksha Choksi <choksimoksha92@gmail.com>
+Date:   Sun Jan 4 01:53:40 2026 +0530
+
+    Remove accidentally committed virtual environment
+
+[1mdiff --git a/venv/bin/Activate.ps1 b/venv/bin/Activate.ps1[m
+[1mdeleted file mode 100644[m
+[1mindex b49d77ba44..0000000000[m
+[1m--- a/venv/bin/Activate.ps1[m
+[1m+++ /dev/null[m
+[36m@@ -1,247 +0,0 @@[m
+[31m-<#[m
+[31m-.Synopsis[m
+[31m-Activate a Python virtual environment for the current PowerShell session.[m
+[31m-[m
+[31m-.Description[m
+[31m-Pushes the python executable for a virtual environment to the front of the[m
+[31m-$Env:PATH environment variable and sets the prompt to signify that you are[m
+[31m-in a Python virtual environment. Makes use of the command line switches as[m
+[31m-well as the `pyvenv.cfg` file values present in the virtual environment.[m
+[31m-[m
+[31m-.Parameter VenvDir[m
+[31m-Path to the directory that contains the virtual environment to activate. The[m
+[31m-default value for this is the parent of the directory that the Activate.ps1[m
+[31m-script is located within.[m
+[31m-[m
+[31m-.Parameter Prompt[m
+[31m-The prompt prefix to display when this virtual environment is activated. By[m
+[31m-default, this prompt is the name of the virtual environment folder (VenvDir)[m
+[31m-surrounded by parentheses and followed by a single space (ie. '(.venv) ').[m
+[31m-[m
+[31m-.Example[m
+[31m-Activate.ps1[m
+[31m-Activates the Python virtual environment that contains the Activate.ps1 script.[m
+[31m-[m
+[31m-.Example[m
+[31m-Activate.ps1 -Verbose[m
+[31m-Activates the Python virtual environment that contains the Activate.ps1 script,[m
+[31m-and shows extra information about the activation as it executes.[m
+[31m-[m
+[31m-.Example[m
+[31m-Activate.ps1 -VenvDir C:\Users\MyUser\Common\.venv[m
+[31m-Activates the Python virtual environment located in the specified location.[m
+[31m-[m
+[31m-.Example[m
+[31m-Activate.ps1 -Prompt "MyPython"[m
+[31m-Activates the Python virtual environment that contains the Activate.ps1 script,[m
+[31m-and prefixes the current prompt with the specified string (surrounded in[m
+[31m-parentheses) while the virtual environment is active.[m
+[31m-[m
+[31m-.Notes[m
+[31m-On Windows, it may be required to enable this Activate.ps1 script by setting the[m
+[31m-execution policy for the user. You can do this by issuing the following PowerShell[m
+[31m-command:[m
+[31m-[m
+[31m-PS C:\> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser[m
+[31m-[m
+[31m-For more information on Execution Policies: [m
+[31m-https://go.microsoft.com/fwlink/?LinkID=135170[m
+[31m-[m
+[31m-#>[m
+[31m-Param([m
+[31m-    [Parameter(Mandatory = $false)][m
+[31m-    [String][m
+[31m-    $VenvDir,[m
+[31m-    [Parameter(Mandatory = $false)][m
+[31m-    [String][m
+[31m-    $Prompt[m
+[31m-)[m
+[31m-[m
+[31m-<# Function declarations --------------------------------------------------- #>[m
+[31m-[m
+[31m-<#[m
+[31m-.Synopsis[m
+[31m-Remove all shell session elements added by the Activate script, including the[m
+[31m-addition of the virtual environment's Python executable from the beginning of[m
+[31m-the PATH variable.[m
+[31m-[m
+[31m-.Parameter NonDestructive[m
+[31m-If present, do not remove this function from the global namespace for the[m
+[31m-session.[m
+[31m-[m
+[31m-#>[m
+[31m-function global:deactivate ([switch]$NonDestructive) {[m
+[31m-    # Revert to original values[m
+[31m-[m
+[31m-    # The prior prompt:[m
+[31m-    if (Test-Path -Path Function:_OLD_VIRTUAL_PROMPT) {[m
+[31m-        Copy-Item -Path Function:_OLD_VIRTUAL_PROMPT -Destination Function:prompt[m
+[31m-        Remove-Item -Path Function:_OLD_VIRTUAL_PROMPT[m
+[31m-    }[m
+[31m-[m
+[31m-    # The prior PYTHONHOME:[m
+[31m-    if (Test-Path -Path Env:_OLD_VIRTUAL_PYTHONHOME) {[m
+[31m-        Copy-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME -Destination Env:PYTHONHOME[m
+[31m-        Remove-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME[m
+[31m-    }[m
+[31m-[m
+[31m-    # The prior PATH:[m
+[31m-    if (Test-Path -Path Env:_OLD_VIRTUAL_PATH) {[m
+[31m-        Copy-Item -Path Env:_OLD_VIRTUAL_PATH -Destination Env:PATH[m
+[31m-        Remove-Item -Path Env:_OLD_VIRTUAL_PATH[m
+[31m-    }[m
+[31m-[m
+[31m-    # Just remove the VIRTUAL_ENV altogether:[m
+[31m-    if (Test-Path -Path Env:VIRTUAL_ENV) {[m
+[31m-        Remove-Item -Path env:VIRTUAL_ENV[m
+[31m-    }[m
+[31m-[m
+[31m-    # Just remove VIRTUAL_ENV_PROMPT altogether.[m
+[31m-    if (Test-Path -Path Env:VIRTUAL_ENV_PROMPT) {[m
+[31m-        Remove-Item -Path env:VIRTUAL_ENV_PROMPT[m
+[31m-    }[m
+[31m-[m
+[31m-    # Just remove the _PYTHON_VENV_PROMPT_PREFIX altogether:[m
+[31m-    if (Get-Variable -Name "_PYTHON_VENV_PROMPT_PREFIX" -ErrorAction SilentlyContinue) {[m
+[31m-        Remove-Variable -Name _PYTHON_VENV_PROMPT_PREFIX -Scope Global -Force[m
+[31m-    }[m
+[31m-[m
+[31m-    # Leave deactivate function in the global namespace if requested:[m
+[31m-    if (-not $NonDestructive) {[m
+[31m-        Remove-Item -Path function:deactivate[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-<#[m
+[31m-.Description[m
+[31m-Get-PyVenvConfig parses the values from the pyvenv.cfg file located in the[m
+[31m-given folder, and returns them in a map.[m
+[31m-[m
+[31m-For each line in the pyvenv.cfg file, if that line can be parsed into exactly[m
+[31m-two strings separated by `=` (with any amount of whitespace surrounding the =)[m
+[31m-then it is considered a `key = value` line. The left hand string is the key,[m
+[31m-the right hand is the value.[m
+[31m-[m
+[31m-If the value starts with a `'` or a `"` then the first and last character is[m
+[31m-stripped from the value before being captured.[m
+[31m-[m
+[31m-.Parameter ConfigDir[m
+[31m-Path to the directory that contains the `pyvenv.cfg` file.[m
+[31m-#>[m
+[31m-function Get-PyVenvConfig([m
+[31m-    [String][m
+[31m-    $ConfigDir[m
+[31m-) {[m
+[31m-    Write-Verbose "Given ConfigDir=$ConfigDir, obtain values in pyvenv.cfg"[m
+[31m-[m
+[31m-    # Ensure the file exists, and issue a warning if it doesn't (but still allow the function to continue).[m
+[31m-    $pyvenvConfigPath = Join-Path -Resolve -Path $ConfigDir -ChildPath 'pyvenv.cfg' -ErrorAction Continue[m
+[31m-[m
+[31m-    # An empty map will be returned if no config file is found.[m
+[31m-    $pyvenvConfig = @{ }[m
+[31m-[m
+[31m-    if ($pyvenvConfigPath) {[m
+[31m-[m
+[31m-        Write-Verbose "File exists, parse `key = value` lines"[m
+[31m-        $pyvenvConfigContent = Get-Content -Path $pyvenvConfigPath[m
+[31m-[m
+[31m-        $pyvenvConfigContent | ForEach-Object {[m
+[31m-            $keyval = $PSItem -split "\s*=\s*", 2[m
+[31m-            if ($keyval[0] -and $keyval[1]) {[m
+[31m-                $val = $keyval[1][m
+[31m-[m
+[31m-                # Remove extraneous quotations around a string value.[m
+[31m-                if ("'""".Contains($val.Substring(0, 1))) {[m
+[31m-                    $val = $val.Substring(1, $val.Length - 2)[m
+[31m-                }[m
+[31m-[m
+[31m-                $pyvenvConfig[$keyval[0]] = $val[m
+[31m-                Write-Verbose "Adding Key: '$($keyval[0])'='$val'"[m
+[31m-            }[m
+[31m-        }[m
+[31m-    }[m
+[31m-    return $pyvenvConfig[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-<# Begin Activate script --------------------------------------------------- #>[m
+[31m-[m
+[31m-# Determine the containing directory of this script[m
+[31m-$VenvExecPath = Split-Path -Parent $MyInvocation.MyCommand.Definition[m
+[31m-$VenvExecDir = Get-Item -Path $VenvExecPath[m
+[31m-[m
+[31m-Write-Verbose "Activation script is located in path: '$VenvExecPath'"[m
+[31m-Write-Verbose "VenvExecDir Fullname: '$($VenvE
