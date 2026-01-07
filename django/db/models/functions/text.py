@@ -176,7 +176,15 @@ class Left(Func):
         super().__init__(expression, length, **extra)
 
     def get_substr(self):
-        return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
+        expression = self.source_expressions[0]
+        length = self.source_expressions[1]
+
+        # Handle negative lengths by converting to LENGTH(string) + length
+        if isinstance(length, Value) and length.value < 0:
+            adjusted_length = Length(expression) + length
+            return Substr(expression, Value(1), adjusted_length)
+
+        return Substr(expression, Value(1), length)
 
     def as_oracle(self, compiler, connection, **extra_context):
         return self.get_substr().as_oracle(compiler, connection, **extra_context)
