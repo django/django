@@ -234,7 +234,10 @@ class WhereNode(tree.Node):
             return replacement
         clone = self.create(connector=self.connector, negated=self.negated)
         for child in self.children:
-            clone.children.append(child.replace_expressions(replacements))
+            if hasattr(child, "replace_expressions"):
+                clone.children.append(child.replace_expressions(replacements))
+            else:
+                clone.children.append(child)
         return clone
 
     def get_refs(self):

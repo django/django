@@ -308,27 +308,6 @@ def generate_cte_sql(connection, query, as_sql):
     if not query._with_ctes:
         return as_sql()
 
-    ctes = []
-    params = []
-    for cte in query._with_ctes:
-        if django.VERSION > (4, 2):
-            _ignore_with_col_aliases(cte.query)
-
-        alias = query.alias_map.get(cte.name)
-        should_elide_empty = not isinstance(alias, QJoin) or alias.join_type != LOUTER
-
-        compiler = cte.query.get_compiler(connection=connection, elide_empty=should_elide_empty)
-        qn = compiler.quote_name_unless_alias
-        try:
-            cte_sql, cte_params = compiler.as_sql()
-        except EmptyResultSet:
-            # Ensure base compiler attributes are still populated.
-            as_sql()
-            raise
-        template = get_cte_query_template(cte)
-        ctes.append(template.format(name=qn(cte.name), query=cte_sql))
-        params.extend(cte_params)
-
     explain_attribute = "explain_info"
     explain_info = getattr(query, explain_attribute, None)
     explain_format = getattr(explain_info, "format", None)
@@ -343,14 +322,40 @@ def generate_cte_sql(connection, query, as_sql):
         # Ensure EXPLAIN stays outside the WITH clause.
         setattr(query, explain_attribute, None)
 
-    if ctes:
-        # Always use WITH RECURSIVE.
-        sql.extend(["WITH RECURSIVE", ", ".join(ctes)])
     base_sql, base_params = as_sql()
 
     if explain_query_or_info:
         setattr(query, explain_attribute, explain_query_or_info)
 
+    ctes = []
+    params = []
+    for cte in query._with_ctes:
+        if django.VERSION > (4, 2):
+            _ignore_with_col_aliases(cte.query)
+
+        alias = query.alias_map.get(cte.name)
+        should_elide_empty = not isinstance(alias, QJoin) or alias.join_type != LOUTER
+
+        compiler = cte.query.get_compiler(connection=connection, elide_empty=should_elide_empty)
+        qn = compiler.quote_name_unless_alias
+        ignore_cte_name = getattr(cte.query, "_ignore_cte_name", None)
+        if getattr(cte.query, "_cte_name", None):
+            cte.query._ignore_cte_name = True
+        try:
+            cte_sql, cte_params = compiler.as_sql()
+        finally:
+            if getattr(cte.query, "_cte_name", None):
+                if ignore_cte_name is None:
+                    delattr(cte.query, "_ignore_cte_name")
+                else:
+                    cte.query._ignore_cte_name = ignore_cte_name
+        template = get_cte_query_template(cte)
+        ctes.append(template.format(name=qn(cte.name), query=cte_sql))
+        params.extend(cte_params)
+
+    if ctes:
+        # Always use WITH RECURSIVE.
+        sql.extend(["WITH RECURSIVE", ", ".join(ctes)])
     sql.append(base_sql)
     params.extend(base_params)
     return " ".join(sql), tuple(params)

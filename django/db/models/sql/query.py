@@ -197,15 +197,60 @@ class _CTEAutoTransformer:
             return
         if getattr(subquery, "is_empty", None) and subquery.is_empty():
             return
-        cte = CTE(_queryset_from_query(subquery), name=self.name_generator())
+        if getattr(subquery, "is_sliced", False):
+            return
+        cte_name = getattr(subquery, "_cte_name", None)
+        if cte_name is None:
+            cte_name = self.name_generator()
+        cte = CTE(_queryset_from_query(subquery), name=cte_name)
         self.collector.add(cte)
-        self.replacements[expr] = _clone_subquery_expression(
-            expr, cte.name, subquery
-        )
+        self.replacements[expr] = _clone_subquery_expression(expr, cte.name, subquery)
+
+    def add_cte_for_query(self, query):
+        if _has_outer_refs(query):
+            return
+        if getattr(query, "is_empty", None) and query.is_empty():
+            return
+        if query.is_sliced:
+            return
+        cte_name = getattr(query, "_auto_cte_name", None)
+        cte = self.collector.seen.get(cte_name)
+        created = False
+        if cte is None:
+            if cte_name is None or cte_name in self.collector.seen:
+                cte_name = self.name_generator()
+                query._auto_cte_name = cte_name
+            cte = CTE(_queryset_from_query(query), name=cte_name)
+            created = True
+        if created:
+            self.collector.add(cte)
+        replacement = _clone_subquery_expression(query, cte.name, query)
+        replacement._auto_cte_skip = True
+        replacement._auto_cte = cte
+        replacement._db = getattr(query, "_db", None)
+        self.replacements[query] = replacement
 
     def inspect_expression(self, expr, *, allow_query=False):
+        from django.db.models.fields.tuple_lookups import TupleLookupMixin
+
+        if (
+            isinstance(expr, Lookup)
+            and isinstance(getattr(expr, "lhs", None), ColPairs)
+            and getattr(expr, "lookup_name", None) == "in"
+            and isinstance(getattr(expr, "rhs", None), (Query, Subquery))
+        ):
+            self.inspect_expression(expr.lhs, allow_query=allow_query)
+            return
+        if isinstance(expr, TupleLookupMixin):
+            self.inspect_expression(expr.lhs, allow_query=allow_query)
+            return
         if allow_query and isinstance(expr, Query) and expr.subquery:
-            self.add_cte_for_expression(expr, expr)
+            if getattr(expr, "_auto_cte_skip", False):
+                cte = getattr(expr, "_auto_cte", None)
+                if cte is not None:
+                    self.collector.add(cte)
+                return
+            self.add_cte_for_query(expr)
             return
         if isinstance(expr, Subquery):
             self.add_cte_for_expression(expr, expr.query)
@@ -216,23 +261,23 @@ class _CTEAutoTransformer:
             if child is not None:
                 self.inspect_expression(child, allow_query=allow_query)
 
-    def inspect_node(self, node):
+    def inspect_node(self, node, *, allow_query=False):
         if node is None:
             return
         if isinstance(node, WhereNode):
             for child in node.children:
-                self.inspect_node(child)
+                self.inspect_node(child, allow_query=allow_query)
             return
         if isinstance(node, (list, tuple)):
             for child in node:
-                self.inspect_node(child)
+                self.inspect_node(child, allow_query=allow_query)
             return
-        self.inspect_expression(node, allow_query=False)
+        self.inspect_expression(node, allow_query=allow_query)
 
 
-def _queryset_from_query(query):
+def _queryset_from_query(query, *, clone_query=True):
     qs = query.model._default_manager.all()
-    qs.query = query.clone()
+    qs.query = query.clone() if clone_query else query
     return qs
 
 
@@ -251,9 +296,32 @@ def _clone_subquery_expression(expr, cte_name, query):
 
 def _has_outer_refs(query):
     try:
-        return bool(query.get_external_cols())
+        if query.get_external_cols():
+            return True
     except Exception:
         return True
+    for expr in chain(query.annotations.values(), query.where.children):
+        if _contains_outer_ref(expr):
+            return True
+    return False
+
+
+def _contains_outer_ref(expr):
+    if expr is None:
+        return False
+    if isinstance(expr, (OuterRef, ResolvedOuterRef)):
+        return True
+    if isinstance(expr, Node):
+        return any(_contains_outer_ref(child) for child in expr.children)
+    if hasattr(expr, "get_source_expressions"):
+        return any(
+            _contains_outer_ref(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    if isinstance(expr, (list, tuple)):
+        return any(_contains_outer_ref(child) for child in expr)
+    return False
 
 
 def _cte_select_columns(query, compiler):
@@ -268,11 +336,10 @@ def _cte_select_columns(query, compiler):
         columns = []
         cols = list(query.select)
         for alias, expression in query.selected.items():
-            if isinstance(expression, str):
-                columns.append(alias)
-            elif isinstance(expression, int):
-                if 0 <= expression < len(cols):
-                    columns.extend(columns_from_expr(cols[expression]))
+            if isinstance(expression, int) and 0 <= expression < len(cols):
+                expr_columns = columns_from_expr(cols[expression])
+                if len(expr_columns) > 1:
+                    columns.extend(expr_columns)
                 else:
                     columns.append(alias)
             else:
@@ -567,12 +634,17 @@ class Query(BaseExpression):
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
         obj._filtered_relations = self._filtered_relations.copy()
+        obj._auto_cte_processed = False
         # Clear the cached_property, if it exists.
         obj.__dict__.pop("base_table", None)
         return obj
 
     def _auto_cte_query(self, name_generator=None, collector=None, clone_query=True):
-        if self._auto_cte_processed and collector is None:
+        if (
+            self._auto_cte_processed
+            and collector is None
+            and getattr(self, "_with_ctes", ())
+        ):
             return self
         clone = self.clone() if clone_query else self
         clone._auto_cte_processed = True
@@ -600,7 +672,7 @@ class Query(BaseExpression):
         transformer = _CTEAutoTransformer(clone, name_generator, collector)
         for annotation in clone.annotations.values():
             transformer.inspect_expression(annotation, allow_query=True)
-        transformer.inspect_node(clone.where)
+        transformer.inspect_node(clone.where, allow_query=True)
 
         if transformer.replacements:
             clone.annotations = {
@@ -1499,8 +1571,15 @@ class Query(BaseExpression):
             return [wrapper or self]
         return external_cols
 
+    def replace_expressions(self, replacements):
+        if not replacements:
+            return self
+        return replacements.get(self, self)
+
     def as_sql(self, compiler, connection):
-        if cte_name := getattr(self, "_cte_name", None):
+        if not getattr(self, "_ignore_cte_name", False) and (
+            cte_name := getattr(self, "_cte_name", None)
+        ):
             qn = compiler.quote_name_unless_alias
             columns = _cte_select_columns(self, compiler)
             select_list = (
