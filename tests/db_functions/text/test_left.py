@@ -1,7 +1,6 @@
 from django.db.models import IntegerField, Value
 from django.db.models.functions import Left, Lower
-from django.test import TestCase
-from django.test import skipUnlessDBFeature, skipIfDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from ..models import Author
 
@@ -37,9 +36,7 @@ class LeftTests(TestCase):
 
     @skipUnlessDBFeature("supports_negative_indexing")
     def test_left_negative_length(self):
-        authors = Author.objects.annotate(
-            name_part=Left("name", -5)
-        )
+        authors = Author.objects.annotate(name_part=Left("name", -5))
         self.assertQuerySetEqual(
             authors.order_by("name"),
             ["John ", "Rh"],
