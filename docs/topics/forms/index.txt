@@ -802,10 +802,8 @@ Useful attributes on ``{{ field }}`` include:
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``.
 
-.. seealso::
-
-    For a complete list of attributes and methods, see
-    :class:`~django.forms.BoundField`.
+For a complete list of attributes and methods, see the reference guide for
+:class:`~django.forms.BoundField`.
 
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
