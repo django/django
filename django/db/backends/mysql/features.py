@@ -244,3 +244,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (11, 7)
         return False
+
+    supports_negative_indexing = True
