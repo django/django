@@ -235,6 +235,53 @@ used to alter routing behavior.
 Using routers
 -------------
 
+Database selection for related-object access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you retrieve an object using a specific database alias, Django records the
+database that the instance came from on ``instance._state.db``. This value is
+used for any related-object lookups.
+
+For example::
+
+    book = Book.objects.using("replica").first()
+    book.publisher  # Uses the 'replica' database
+
+By default, Django will continue to use the same database alias for related
+lookups. This “stickiness” ensures that queries remain consistent with the
+origin of the instance.
+
+When using database routers, Django provides a ``hints`` dictionary to the
+router’s ``db_for_read()`` and ``db_for_write()`` methods. For related-object
+access, the ``hints`` include the current instance::
+
+    hints = {"instance": book}
+
+Routers can use this hint to preserve Django’s default behavior. For example::
+
+    class Router:
+        def db_for_read(self, model, instance=None, **hints):
+            if instance is not None:
+                # Use the same database where the instance was loaded from.
+                return instance._state.db or "default"
+            return "default"
+
+If a router ignores the ``instance`` hint and always returns a fixed alias
+(such as ``'default'``), Django’s default behavior is overridden::
+
+    class BrokenRouter:
+        def db_for_read(self, model, **hints):
+            return "default"
+
+In this case, related-object lookups will always be routed to ``'default'``,
+even if the instance was loaded using a different database alias. This can lead
+to errors such as missing tables or missing related rows in multi-schema setups
+(e.g., when a model exists only in certain databases).
+
+To ensure correct routing in multi-database applications, routers should take
+the ``instance`` hint into account and preserve ``instance._state.db`` during
+related-object access.
+
 Database routers are installed using the :setting:`DATABASE_ROUTERS`
 setting. This setting defines a list of class names, each specifying a
 router that should be used by the base router
