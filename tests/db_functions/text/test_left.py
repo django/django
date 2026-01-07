@@ -39,7 +39,7 @@ class LeftTests(TestCase):
         authors = Author.objects.annotate(name_part=Left("name", -5))
         self.assertQuerySetEqual(
             authors.order_by("name"),
-            ["John ", "Rh"],
+            ["John ", "R"],
             lambda a: a.name_part,
         )
 
