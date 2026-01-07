@@ -3,7 +3,7 @@
 
     <object pk="1" model="fixtures.person">
         <field type="CharField" name="name">
-            <natural>Django <em>pony</em></natural>
+            Django <em>pony</em>
         </field>
     </object>
 

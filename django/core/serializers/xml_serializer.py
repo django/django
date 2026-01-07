@@ -439,17 +439,13 @@ class Deserializer(base.Deserializer):
             )
 
 
+def check_element_type(element):
+    return element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+
+
 def getInnerText(node):
-    """Get the inner text of a DOM node and any children one level deep."""
-    # inspired by
-    # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     return "".join(
-        [
-            element.data
-            for child in node.childNodes
-            for element in (child, *child.childNodes)
-            if element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
-        ]
+        [child.data for child in node.childNodes if check_element_type(child)]
     )
 
 
