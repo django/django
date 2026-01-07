@@ -5,7 +5,7 @@ from django.test import (
     TransactionTestCase,
     override_settings,
 )
-from django.test.testcases import skipUnlessDBFeature
+from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 
@@ -141,6 +141,7 @@ class TestDefaultPK(SimpleTestCase):
         self.assertIsInstance(Model._meta.pk, models.UUIDAutoField)
 
 
+@skipIfDBFeature("requires_literal_defaults")
 @skipUnlessDBFeature("supports_uuid4_function")
 @override_settings(DEFAULT_AUTO_FIELD="django.db.models.UUIDAutoField")
 @isolate_apps("model_options")
