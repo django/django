@@ -174,7 +174,7 @@ class Left(Func):
         expression = self.source_expressions[0]
         length = self.source_expressions[1]
 
-        # Handle negative lengths by converting to LENGTH(string) + length + 1
+        # Handle negative lengths by converting to LENGTH(string) + length
         if isinstance(length, Value) and length.value < 0:
             adjusted_length = Length(expression) + length
             return Substr(expression, Value(1), adjusted_length)
@@ -186,6 +186,9 @@ class Left(Func):
 
     def as_sqlite(self, compiler, connection, **extra_context):
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return self.get_substr().as_mysql(compiler, connection, **extra_context)
 
 
 class Length(Transform):
