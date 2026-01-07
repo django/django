@@ -1,7 +1,7 @@
 from django.forms import *  # NOQA
 
 from .fields import LineStringField  # NOQA
-from .fields import (
+from .fields import (  # NOQA
     GeometryCollectionField,
     GeometryField,
     MultiLineStringField,

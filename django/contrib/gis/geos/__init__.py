@@ -4,7 +4,7 @@ for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 """
 
 from .collections import MultiPoint  # NOQA
-from .collections import (
+from .collections import (  # NOQA
     GeometryCollection,
     MultiLineString,
     MultiPolygon,
