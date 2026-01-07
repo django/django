@@ -358,6 +358,10 @@ class BaseDatabaseFeatures:
     # Does the backend support negative JSON array indexing?
     supports_json_negative_indexing = True
 
+    # Does the backend support negative indexing in text functions like
+    # LEFT(field, -N) (PostgreSQL supports this)?
+    supports_negative_indexing = False
+
     # Does the backend support column collations?
     supports_collation_on_charfield = True
     supports_collation_on_textfield = True
