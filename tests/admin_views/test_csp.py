@@ -88,7 +88,7 @@ class AdminCSPNonceTests(TestCase):
         self.assert_no_nonce(response)
 
     # ------------------------------------------------------------------
-    # 3. CSP enabled WITH nonces
+    # 2. CSP enabled WITH nonces
     # ------------------------------------------------------------------
 
     @override_settings(
@@ -107,7 +107,7 @@ class AdminCSPNonceTests(TestCase):
         self.assert_has_nonce(response)
 
     # ------------------------------------------------------------------
-    # 4. CSP enabled WITH nonces + strict-dynamic
+    # 3. CSP enabled WITH nonces + strict-dynamic
     # ------------------------------------------------------------------
 
     @override_settings(
