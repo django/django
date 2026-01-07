@@ -297,6 +297,40 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
         )
 
+    def test_technical_500_dark_mode_css(self):
+        """Test that dark mode CSS is present in technical_500.html."""
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/")
+        # Check that dark mode media query is present
+        self.assertContains(
+            response,
+            "@media (prefers-color-scheme: dark)",
+            status_code=500,
+        )
+        # Check for dark mode color values
+        self.assertContains(response, "background-color:#222222", status_code=500)
+        self.assertContains(response, "color:#E0E0E0", status_code=500)
+        self.assertContains(response, "background-color:#4A2626", status_code=500)
+        self.assertContains(response, "color:#CC6666", status_code=500)
+        self.assertContains(response, "background:#383838", status_code=500)
+
+    def test_technical_404_dark_mode_css(self):
+        """Test that dark mode CSS is present in technical_404.html."""
+        response = self.client.get("/technical404/")
+        # Check that dark mode media query is present
+        self.assertContains(
+            response,
+            "@media (prefers-color-scheme: dark)",
+            status_code=404,
+        )
+        # Check for dark mode color values
+        self.assertContains(response, "background:#222222", status_code=404)
+        self.assertContains(response, "color:#E0E0E0", status_code=404)
+        self.assertContains(
+            response, "border-bottom:1px solid #383838", status_code=404
+        )
+        self.assertContains(response, "color:#CC6666", status_code=404)
+
     def test_non_l10ned_numeric_ids(self):
         """
         Numeric IDs and fancy traceback context blocks line numbers shouldn't

@@ -21,6 +21,20 @@
     #summary { background: #ffc; }
     #explanation { background:#eee; border-bottom: 0px none; }
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
+    @media (prefers-color-scheme: dark) {
+      body { background:#222222; color:#E0E0E0; }
+      body > :where(header, main, footer) { border-bottom:1px solid #383838; }
+      th { color:#AAAAAA; }
+      td { color:#E0E0E0; }
+      #info { background:#222222; }
+      #summary { background: #222222; border-bottom:1px solid #383838; }
+      #summary h1 { color:#CC6666; }
+      #explanation { background:#222222; border-bottom: 0px none; }
+      pre.exception_value { color: #E0E0E0; }
+      h1 { color:#E0E0E0; }
+      h1 small { color:#AAAAAA; }
+      code { color:#E0E0E0; }
+    }
   </style>
 </head>
 <body>

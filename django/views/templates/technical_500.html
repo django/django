@@ -66,6 +66,73 @@
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5rem; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
+    @media (prefers-color-scheme: dark) {
+      body { background-color:#222222; color:#E0E0E0; }
+      body > :where(header, main, footer) { border-bottom:1px solid #383838; }
+      table { border:1px solid #383838; background:#222222; }
+      thead th { background:#383838; border:1px solid #383838; color:#E0E0E0; }
+      tbody th { color:#AAAAAA; }
+      tbody td { color:#E0E0E0; }
+      table.source td { border-bottom:1px solid #383838; }
+      ul.traceback { color: #E0E0E0; }
+      ul.traceback li.cause { color:#E0E0E0; }
+      ul.traceback li.frame { color:#AAAAAA; }
+      ul.traceback li.user { background-color:#383838; color:#E0E0E0; }
+      div.context { background:#222222; }
+      div.context ol { background:#222222; }
+      div.context ol li { color:#E0E0E0; background:#222222; }
+      div.context ol li pre { color:#E0E0E0; background:#222222; }
+      div.context ol.pre-context li { color:#AAAAAA; background:#222222; }
+      div.context ol.pre-context li pre { color:#AAAAAA; background:#222222; }
+      div.context ol.post-context li { color:#AAAAAA; background:#222222; }
+      div.context ol.post-context li pre { color:#AAAAAA; background:#222222; }
+      div.context ol.context-line li { color:#CC6666; background-color:#4A2626; padding: 3px 2px; }
+      div.context ol.context-line li pre { color:#CC6666; background-color:#4A2626; }
+      div.context ol.context-line li span { color:#CC6666; }
+      .user div.context ol.context-line li { background-color:#4A2626; color:#CC6666; }
+      .user div.context ol.context-line li pre { background-color:#4A2626; color:#CC6666; }
+      .user div.context ol.context-line li span { color:#CC6666; }
+      .user div.context ol li { color:#AAAAAA; background:#222222; }
+      .user div.context ol li pre { color:#AAAAAA; background:#222222; }
+      div.commands a, summary.commands { color:#A38FEE; text-decoration:none; }
+      div.commands a:hover, summary.commands:hover { color:#B8A8F0; }
+      .user div.commands a { color: #A38FEE; }
+      #summary { background: #222222; border-bottom:1px solid #383838; }
+      #summary h1 { color:#CC6666; }
+      #summary h2 { color:#AAAAAA; }
+      #explanation { background:#222222; }
+      #template, #template-not-exist { background:#222222; }
+      #unicode-hint { background:#222222; }
+      #traceback { background:#383838; }
+      #requestinfo { background:#222222; }
+      .error { background: #4A2626; }
+      .error th, .error td { color:#CC6666; }
+      .specific { color:#CC6666; font-weight:bold; }
+      span.commands a:link { color:#A38FEE; }
+      span.commands a:link:hover { color:#B8A8F0; }
+      pre.exception_value { color: #E0E0E0; }
+      code { color:#E0E0E0; background:#222222; }
+      pre { color:#E0E0E0; background:#222222; }
+      .fname { color:#E0E0E0; }
+      ul.traceback code.fname { color:#E0E0E0; }
+      h2, h3, h4 { color:#E0E0E0; }
+      h1 { color:#CC6666; }
+      #summary h1 { color:#CC6666; }
+      table.source { background:#222222; }
+      table.source th { color:#AAAAAA; background:#222222; }
+      table.source td { background:#222222; color:#E0E0E0; }
+      table.source td pre { background:#222222; color:#E0E0E0; }
+      table.vars { background:#222222; }
+      table.vars td { background:#222222; color:#E0E0E0; }
+      table.vars td.code { background:#222222; }
+      table.vars td.code pre { background:#222222; color:#E0E0E0; }
+      table.req { background:#222222; }
+      table.req td { background:#222222; color:#E0E0E0; }
+      table.req td.code { background:#222222; }
+      table.req td.code pre { background:#222222; color:#E0E0E0; }
+      table.req td code { background:#222222; color:#E0E0E0; }
+      table td.code pre { background:#222222; color:#E0E0E0; }
+    }
   </style>
   {% if not is_email %}
   <script>
