@@ -129,6 +129,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "SmallIntegerField": "smallint",
         "TextField": "text",
         "TimeField": "time",
+        "UUIDAutoField": "uuid",
         "UUIDField": "uuid",
     }
     data_type_check_constraints = {
