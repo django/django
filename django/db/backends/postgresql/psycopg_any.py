@@ -75,11 +75,10 @@ except ImportError:
     from enum import IntEnum
 
     from psycopg2 import errors, extensions, sql  # NOQA
-    from psycopg2.extras import (  # NOQA
+    from psycopg2.extras import DateTimeTZRange  # NOQA
+    from psycopg2.extras import (  # Inet,
         DateRange,
         DateTimeRange,
-        DateTimeTZRange,
-        Inet,
         Json,
         NumericRange,
         Range,

@@ -1,0 +1,143 @@
+Metadata-Version: 2.4
+Name: sqlparse
+Version: 0.5.5
+Summary: A non-validating SQL parser.
+Project-URL: Home, https://github.com/andialbrecht/sqlparse
+Project-URL: Documentation, https://sqlparse.readthedocs.io/
+Project-URL: Release Notes, https://sqlparse.readthedocs.io/en/latest/changes.html
+Project-URL: Source, https://github.com/andialbrecht/sqlparse
+Project-URL: Tracker, https://github.com/andialbrecht/sqlparse/issues
+Author-email: Andi Albrecht <albrecht.andi@gmail.com>
+License-File: AUTHORS
+License-File: LICENSE
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Database
+Classifier: Topic :: Software Development
+Requires-Python: >=3.8
+Provides-Extra: dev
+Requires-Dist: build; extra == 'dev'
+Provides-Extra: doc
+Requires-Dist: sphinx; extra == 'doc'
+Description-Content-Type: text/x-rst
+
+python-sqlparse - Parse SQL statements
+======================================
+
+|buildstatus|_
+|coverage|_
+|docs|_
+|packageversion|_
+
+.. docincludebegin
+
+sqlparse is a non-validating SQL parser for Python.
+It provides support for parsing, splitting and formatting SQL statements.
+
+The module is compatible with Python 3.8+ and released under the terms of the
+`New BSD license <https://opensource.org/licenses/BSD-3-Clause>`_.
+
+Visit the project page at https://github.com/andialbrecht/sqlparse for
+further information about this project.
+
+
+Quick Start
+-----------
+
+.. code-block:: sh
+
+   $ pip install sqlparse
+
+.. code-block:: python
+
+   >>> import sqlparse
+
+   >>> # Split a string containing two SQL statements:
+   >>> raw = 'select * from foo; select * from bar;'
+   >>> statements = sqlparse.split(raw)
+   >>> statements
+   ['select * from foo;', 'select * from bar;']
+
+   >>> # Format the first statement and print it out:
+   >>> first = statements[0]
+   >>> print(sqlparse.format(first, reindent=True, keyword_case='upper'))
+   SELECT *
+   FROM foo;
+
+   >>> # Parsing a SQL statement:
+   >>> parsed = sqlparse.parse('select * from foo')[0]
+   >>> parsed.tokens
+   [<DML 'select' at 0x7f22c5e15368>, <Whitespace ' ' at 0x7f22c5e153b0>, <Wildcard '*' … ]
+   >>>
+
+Pre-commit Hook
+---------------
+
+sqlparse can be used as a `pre-commit <https://pre-commit.com/>`_ hook
+to automatically format SQL files before committing:
+
+.. code-block:: yaml
+
+   repos:
+     - repo: https://github.com/andialbrecht/sqlparse
+       rev: 0.5.4  # Use the latest version
+       hooks:
+         - id: sqlformat
+           # Optional: Add more formatting options
+           # IMPORTANT: --in-place is required, already included by default
+           args: [--in-place, --reindent, --keywords, upper]
+
+Then install the hook:
+
+.. code-block:: sh
+
+   $ pre-commit install
+
+Your SQL files will now be automatically formatted on each commit.
+
+**Note**: The hook uses ``--in-place --reindent`` by default. If you override
+the ``args``, you **must** include ``--in-place`` for the hook to work.
+
+Links
+-----
+
+Project page
+   https://github.com/andialbrecht/sqlparse
+
+Bug tracker
+   https://github.com/andialbrecht/sqlparse/issues
+
+Documentation
+   https://sqlparse.readthedocs.io/
+
+Online Demo
+   https://sqlformat.org/
+
+
+sqlparse is licensed under the BSD license.
+
+Parts of the code are based on pygments written by Georg Brandl and others.
+pygments-Homepage: http://pygments.org/
+
+.. |buildstatus| image:: https://github.com/andialbrecht/sqlparse/actions/workflows/python-app.yml/badge.svg
+.. _buildstatus: https://github.com/andialbrecht/sqlparse/actions/workflows/python-app.yml
+.. |coverage| image:: https://codecov.io/gh/andialbrecht/sqlparse/branch/master/graph/badge.svg
+.. _coverage: https://codecov.io/gh/andialbrecht/sqlparse
+.. |docs| image:: https://readthedocs.org/projects/sqlparse/badge/?version=latest
+.. _docs: https://sqlparse.readthedocs.io/en/latest/?badge=latest
+.. |packageversion| image:: https://img.shields.io/pypi/v/sqlparse?color=%2334D058&label=pypi%20package
+.. _packageversion: https://pypi.org/project/sqlparse

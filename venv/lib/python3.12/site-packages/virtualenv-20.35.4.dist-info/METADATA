@@ -1,0 +1,84 @@
+Metadata-Version: 2.4
+Name: virtualenv
+Version: 20.35.4
+Summary: Virtual Python Environment builder
+Project-URL: Documentation, https://virtualenv.pypa.io
+Project-URL: Homepage, https://github.com/pypa/virtualenv
+Project-URL: Source, https://github.com/pypa/virtualenv
+Project-URL: Tracker, https://github.com/pypa/virtualenv/issues
+Maintainer-email: Bernat Gabor <gaborjbernat@gmail.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: environments,isolated,virtual
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Requires-Dist: distlib<1,>=0.3.7
+Requires-Dist: filelock<4,>=3.12.2
+Requires-Dist: importlib-metadata>=6.6; python_version < '3.8'
+Requires-Dist: platformdirs<5,>=3.9.1
+Requires-Dist: typing-extensions>=4.13.2; python_version < '3.11'
+Provides-Extra: docs
+Requires-Dist: furo>=2023.7.26; extra == 'docs'
+Requires-Dist: proselint>=0.13; extra == 'docs'
+Requires-Dist: sphinx!=7.3,>=7.1.2; extra == 'docs'
+Requires-Dist: sphinx-argparse>=0.4; extra == 'docs'
+Requires-Dist: sphinxcontrib-towncrier>=0.2.1a0; extra == 'docs'
+Requires-Dist: towncrier>=23.6; extra == 'docs'
+Provides-Extra: test
+Requires-Dist: covdefaults>=2.3; extra == 'test'
+Requires-Dist: coverage-enable-subprocess>=1; extra == 'test'
+Requires-Dist: coverage>=7.2.7; extra == 'test'
+Requires-Dist: flaky>=3.7; extra == 'test'
+Requires-Dist: packaging>=23.1; extra == 'test'
+Requires-Dist: pytest-env>=0.8.2; extra == 'test'
+Requires-Dist: pytest-freezer>=0.4.8; (platform_python_implementation == 'PyPy' or platform_python_implementation == 'GraalVM' or (platform_python_implementation == 'CPython' and sys_platform == 'win32' and python_version >= '3.13')) and extra == 'test'
+Requires-Dist: pytest-mock>=3.11.1; extra == 'test'
+Requires-Dist: pytest-randomly>=3.12; extra == 'test'
+Requires-Dist: pytest-timeout>=2.1; extra == 'test'
+Requires-Dist: pytest>=7.4; extra == 'test'
+Requires-Dist: setuptools>=68; extra == 'test'
+Requires-Dist: time-machine>=2.10; (platform_python_implementation == 'CPython') and extra == 'test'
+Description-Content-Type: text/markdown
+
+# virtualenv
+
+[![PyPI](https://img.shields.io/pypi/v/virtualenv?style=flat-square)](https://pypi.org/project/virtualenv)
+[![PyPI - Implementation](https://img.shields.io/pypi/implementation/virtualenv?style=flat-square)](https://pypi.org/project/virtualenv)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/virtualenv?style=flat-square)](https://pypi.org/project/virtualenv)
+[![Documentation](https://readthedocs.org/projects/virtualenv/badge/?version=latest&style=flat-square)](http://virtualenv.pypa.io)
+[![Discord](https://img.shields.io/discord/803025117553754132)](https://discord.gg/pypa)
+[![Downloads](https://static.pepy.tech/badge/virtualenv/month)](https://pepy.tech/project/virtualenv)
+[![PyPI - License](https://img.shields.io/pypi/l/virtualenv?style=flat-square)](https://opensource.org/licenses/MIT)
+[![check](https://github.com/pypa/virtualenv/actions/workflows/check.yaml/badge.svg)](https://github.com/pypa/virtualenv/actions/workflows/check.yaml)
+
+A tool for creating isolated `virtual` python environments.
+
+- [Installation](https://virtualenv.pypa.io/en/latest/installation.html)
+- [Documentation](https://virtualenv.pypa.io)
+- [Changelog](https://virtualenv.pypa.io/en/latest/changelog.html)
+- [Issues](https://github.com/pypa/virtualenv/issues)
+- [PyPI](https://pypi.org/project/virtualenv)
+- [Github](https://github.com/pypa/virtualenv)
+
+## Code of Conduct
+
+Everyone interacting in the virtualenv project's codebases, issue trackers, chat rooms, and mailing lists is expected to
+follow the [PSF Code of Conduct](https://github.com/pypa/.github/blob/main/CODE_OF_CONDUCT.md).

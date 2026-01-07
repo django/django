@@ -1,0 +1,76 @@
+Metadata-Version: 2.4
+Name: pytokens
+Version: 0.3.0
+Summary: A Fast, spec compliant Python 3.14+ tokenizer that runs on older Pythons.
+Home-page: https://github.com/tusharsadhwani/pytokens
+Author: Tushar Sadhwani
+Author-email: tushar.sadhwani000@gmail.com
+License: MIT
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Typing :: Typed
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: build; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: setuptools; extra == "dev"
+Requires-Dist: tox; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Requires-Dist: wheel; extra == "dev"
+Dynamic: license-file
+
+# pytokens
+
+A Fast, spec compliant Python 3.14+ tokenizer that runs on older Pythons.
+
+## Installation
+
+```bash
+pip install pytokens
+```
+
+## Usage
+
+```bash
+python -m pytokens path/to/file.py
+```
+
+## Local Development / Testing
+
+- Create and activate a virtual environment
+- Run `pip install -r requirements-dev.txt` to do an editable install
+- Run `pytest` to run tests
+
+## Type Checking
+
+Run `mypy .`
+
+## Create and upload a package to PyPI
+
+Make sure to bump the version in `setup.cfg`.
+
+Then run the following commands:
+
+```bash
+rm -rf dist
+python -m build
+```
+
+Then upload it to PyPI using [twine](https://twine.readthedocs.io/en/latest/#installation):
+
+```bash
+twine upload dist/*
+```

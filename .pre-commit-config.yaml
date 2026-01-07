@@ -20,6 +20,7 @@ repos:
     rev: 7.3.0
     hooks:
       - id: flake8
+        exclude: venv/|__init__\.py$
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.36.0
     hooks:

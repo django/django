@@ -188,7 +188,7 @@ class Left(Func):
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
     def as_sql(self, compiler, connection, **extra_context):
-        return self.get_substr().as_mysql(compiler, connection, **extra_context)
+        return self.get_substr().as_sql(compiler, connection, **extra_context)
 
 
 class Length(Transform):

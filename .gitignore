@@ -17,3 +17,5 @@ tests/.coverage*
 build/
 tests/report/
 tests/screenshots/
+
+venv/

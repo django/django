@@ -4,9 +4,9 @@ prototype handles the interaction between the GEOS library and Python
 via ctypes.
 """
 
-from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
+from django.contrib.gis.geos.prototypes.coordseq import cs_clone  # NOQA
+from django.contrib.gis.geos.prototypes.coordseq import (
     create_cs,
-    cs_clone,
     cs_getdims,
     cs_getordinate,
     cs_getsize,
@@ -20,8 +20,8 @@ from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
     cs_setz,
     get_cs,
 )
-from django.contrib.gis.geos.prototypes.geom import (  # NOQA
-    create_collection,
+from django.contrib.gis.geos.prototypes.geom import create_collection  # NOQA
+from django.contrib.gis.geos.prototypes.geom import (
     create_empty_polygon,
     create_linearring,
     create_linestring,
@@ -44,8 +44,8 @@ from django.contrib.gis.geos.prototypes.geom import (  # NOQA
     get_num_geoms,
 )
 from django.contrib.gis.geos.prototypes.misc import *  # NOQA
-from django.contrib.gis.geos.prototypes.predicates import (  # NOQA
-    geos_contains,
+from django.contrib.gis.geos.prototypes.predicates import geos_contains  # NOQA
+from django.contrib.gis.geos.prototypes.predicates import (
     geos_covers,
     geos_crosses,
     geos_disjoint,
