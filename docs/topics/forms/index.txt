@@ -856,3 +856,7 @@ This covers the basics, but forms can do a whole lot more:
     :doc:`The Forms Reference </ref/forms/index>`
         Covers the full API reference, including form fields, form widgets,
         and form and field validation.
+
+    :pypi:`django-formtools`
+        Provides additional form utilities, such as form previews and wizards
+        (`documentation <https://django-formtools.readthedocs.io/>`_).
