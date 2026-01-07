@@ -169,6 +169,7 @@ class Left(Func):
             # characters). For other backends, negative lengths are invalid.
             if length < 0:
                 from django.db import connection
+
                 if connection.vendor != "postgresql":
                     raise ValueError("'length' must be greater than 0")
 
