@@ -237,3 +237,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_stored_generated_columns(self):
         return self.connection.oracle_version >= (23, 7)
+
+    supports_negative_indexing = True

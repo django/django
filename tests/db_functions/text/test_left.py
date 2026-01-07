@@ -39,7 +39,7 @@ class LeftTests(TestCase):
         authors = Author.objects.annotate(name_part=Left("name", -5))
         self.assertQuerySetEqual(
             authors.order_by("name"),
-            ["John ", "Rh"],
+            ["John ", "R"],
             lambda a: a.name_part,
         )
 
@@ -49,7 +49,7 @@ class LeftTests(TestCase):
         # test_left_negative_length, but clearer in test output).
         authors = Author.objects.annotate(name_part=Left("name", -5))
         self.assertQuerySetEqual(
-            authors.order_by("name"), ["John ", "Rh"], lambda a: a.name_part
+            authors.order_by("name"), ["John ", "R"], lambda a: a.name_part
         )
 
     @skipIfDBFeature("supports_negative_indexing")

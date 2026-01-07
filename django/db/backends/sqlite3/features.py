@@ -172,3 +172,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
     has_json_object_function = property(operator.attrgetter("supports_json_field"))
+    supports_negative_indexing = True

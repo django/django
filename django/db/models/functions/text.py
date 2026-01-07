@@ -164,14 +164,9 @@ class Left(Func):
         if not hasattr(length, "resolve_expression"):
             if length == 0:
                 raise ValueError("'length' must be greater than 0")
-            # Negative lengths are supported by PostgreSQL (behaves like
-            # Python slicing, e.g. LEFT(field, -3) returns all but last 3
-            # characters). For other backends, negative lengths are invalid.
-            if length < 0:
-                from django.db import connection
-
-                if connection.vendor != "postgresql":
-                    raise ValueError("'length' must be greater than 0")
+            # Negative lengths are now supported on all backends.
+            # PostgreSQL handles them natively. For other backends,
+            # they are converted via get_substr().
 
         super().__init__(expression, length, **extra)
 
@@ -179,7 +174,7 @@ class Left(Func):
         expression = self.source_expressions[0]
         length = self.source_expressions[1]
 
-        # Handle negative lengths by converting to LENGTH(string) + length
+        # Handle negative lengths by converting to LENGTH(string) + length + 1
         if isinstance(length, Value) and length.value < 0:
             adjusted_length = Length(expression) + length
             return Substr(expression, Value(1), adjusted_length)
