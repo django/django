@@ -1,5 +1,6 @@
 import pickle
 from functools import wraps
+from unittest.mock import patch
 
 from django.db import IntegrityError, connections, transaction
 from django.test import TestCase, skipUnlessDBFeature
@@ -168,3 +169,35 @@ class SetupTestDataIsolationTests(TestCase):
         self.assertEqual(self.car.name, "Volkswagen Beetle")
         self.car.name = "Volkswagen Coccinelle"
         self.car.save()
+
+
+class SetupTestDataExceptionTest(TestCase):
+    def test_cleanup_on_setup_exception_without_transactions(self):
+        with patch.object(
+            connections["default"].features, "supports_transactions", False
+        ):
+
+            class FailingSetupTestCase(TestCase):
+                @classmethod
+                def setUpTestData(cls):
+                    Car.objects.create(name="Should be cleaned up")
+                    raise ValueError("Simulated exception in setUpTestData")
+
+                def test_dummy(self):
+                    pass
+
+            test_instance = FailingSetupTestCase("test_dummy")
+
+            initial_count = Car.objects.count()
+
+            with self.assertRaises(ValueError):
+                test_instance._pre_setup()
+
+            final_count = Car.objects.count()
+
+            self.assertEqual(
+                initial_count,
+                final_count,
+                "Data was not cleaned up after setUpTestData exception. "
+                f"Cars before: {initial_count}, after: {final_count}",
+            )
