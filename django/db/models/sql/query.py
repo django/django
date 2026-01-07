@@ -44,7 +44,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.cte import CTE
-from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
@@ -273,6 +273,281 @@ class _CTEAutoTransformer:
                 self.inspect_node(child, allow_query=allow_query)
             return
         self.inspect_expression(node, allow_query=allow_query)
+
+
+def _annotation_refs_in_expression(expr, annotation_names):
+    if expr is None:
+        return set()
+    if isinstance(expr, F):
+        return {expr.name} if expr.name in annotation_names else set()
+    if isinstance(expr, Ref):
+        return {expr.refs} if expr.refs in annotation_names else set()
+    refs = set()
+    if isinstance(expr, (list, tuple)):
+        for child in expr:
+            refs.update(_annotation_refs_in_expression(child, annotation_names))
+        return refs
+    if hasattr(expr, "get_source_expressions"):
+        for child in expr.get_source_expressions():
+            refs.update(_annotation_refs_in_expression(child, annotation_names))
+    return refs
+
+
+def _annotation_is_simple(expr):
+    from django.db.models.expressions import CombinedExpression, Func
+    from django.db.models.lookups import Transform
+
+    allowed = (F, Value, Func, CombinedExpression, Col, ColPairs)
+    if isinstance(expr, Transform):
+        return False
+    if isinstance(expr, allowed):
+        pass
+    elif hasattr(expr, "get_source_expressions"):
+        return all(
+            _annotation_is_simple(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    else:
+        return False
+    if hasattr(expr, "get_source_expressions"):
+        return all(
+            _annotation_is_simple(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    return True
+
+
+def _annotation_dependency_levels(annotations, annotation_deps=None):
+    annotation_order = list(annotations)
+    deps = {}
+    for name, expr in annotations.items():
+        if annotation_deps is not None and name in annotation_deps:
+            refs = set(annotation_deps[name])
+        else:
+            refs = set()
+            if hasattr(expr, "get_refs"):
+                refs = set(expr.get_refs())
+        deps[name] = {ref for ref in refs if ref in annotations}
+    remaining = set(annotation_order)
+    resolved = set()
+    levels = []
+    while remaining:
+        ready = [
+            name
+            for name in annotation_order
+            if name in remaining and deps[name].issubset(resolved)
+        ]
+        if not ready:
+            break
+        levels.append(ready)
+        resolved.update(ready)
+        remaining.difference_update(ready)
+    return levels, deps
+
+
+def _node_refs_annotations(node, annotation_names):
+    if node is None or not annotation_names:
+        return False
+    if isinstance(node, NothingNode):
+        return False
+    if hasattr(node, "get_refs"):
+        try:
+            return bool(annotation_names.intersection(node.get_refs()))
+        except Exception:
+            return False
+    if isinstance(node, Node):
+        return any(_node_refs_annotations(child, annotation_names) for child in node.children)
+    if isinstance(node, (list, tuple)):
+        return any(_node_refs_annotations(child, annotation_names) for child in node)
+    return False
+
+
+def _node_refs_annotation_exprs(node, annotation_exprs):
+    if node is None or not annotation_exprs:
+        return False
+    if node in annotation_exprs:
+        return True
+    if isinstance(node, NothingNode):
+        return False
+    if isinstance(node, Node):
+        return any(_node_refs_annotation_exprs(child, annotation_exprs) for child in node.children)
+    if isinstance(node, (list, tuple)):
+        return any(_node_refs_annotation_exprs(child, annotation_exprs) for child in node)
+    if hasattr(node, "get_source_expressions"):
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs)
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    return False
+
+
+def _where_has_annotation_transform(node, annotation_exprs):
+    from django.db.models.lookups import Transform
+
+    if node is None or not annotation_exprs:
+        return False
+    if isinstance(node, Transform):
+        return any(
+            child in annotation_exprs
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    if isinstance(node, Node):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs)
+            for child in node.children
+        )
+    if isinstance(node, (list, tuple)):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs) for child in node
+        )
+    if hasattr(node, "get_source_expressions"):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs)
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    return False
+
+
+def _split_where_by_annotation_refs(node, annotation_names, annotation_exprs=None):
+    if node is None:
+        return None, None, True
+    if annotation_exprs:
+        if not _node_refs_annotation_exprs(node, annotation_exprs):
+            return None, node, True
+    elif not _node_refs_annotations(node, annotation_names):
+        return None, node, True
+    if isinstance(node, NothingNode):
+        return None, node, True
+    if isinstance(node, WhereNode):
+        if node.negated or node.connector in (OR, XOR):
+            return None, node, False
+        annotation_children = []
+        other_children = []
+        for child in node.children:
+            annotation_child, other_child, ok = _split_where_by_annotation_refs(
+                child, annotation_names, annotation_exprs
+            )
+            if not ok:
+                return None, node, False
+            if annotation_child is not None:
+                annotation_children.append(annotation_child)
+            if other_child is not None:
+                other_children.append(other_child)
+        annotation_node = (
+            WhereNode(annotation_children, connector=node.connector)
+            if annotation_children
+            else None
+        )
+        other_node = (
+            WhereNode(other_children, connector=node.connector) if other_children else None
+        )
+        return annotation_node, other_node, True
+    return node, None, True
+
+
+def _auto_cte_annotation_reuse(query, name_generator, collector):
+    if getattr(query, "_auto_cte_annotation_skip", False):
+        return query
+    if (
+        query.model is None
+        or query.__class__ is not Query
+        or query.combinator
+        or query.is_sliced
+        or query.group_by is not None
+        or query.selected is not None
+        or not query.annotations
+    ):
+        return query
+    levels, deps = _annotation_dependency_levels(
+        query.annotations, getattr(query, "_annotation_deps", None)
+    )
+    if not levels:
+        return query
+    if not any(deps.values()):
+        return query
+    refs_in_where = set(getattr(query, "_annotation_filter_refs", ()))
+    referenced = set().union(*deps.values(), refs_in_where)
+    referenced = {name for name in referenced if name in query.annotations}
+    if not referenced:
+        return query
+    last_materialized_index = max(
+        (idx for idx, level in enumerate(levels) if any(name in referenced for name in level)),
+        default=-1,
+    )
+    if last_materialized_index < 0:
+        return query
+    materialized_names = set().union(*levels[: last_materialized_index + 1])
+    annotation_exprs = {query.annotations[name] for name in materialized_names}
+    annotation_where, base_where, ok = _split_where_by_annotation_refs(
+        query.where, set(query.annotations), annotation_exprs
+    )
+    if not ok:
+        return query
+    base_alias = query.get_initial_alias()
+    source_annotations = getattr(query, "_annotation_unresolved", query.annotations)
+    move_annotation_where = (
+        annotation_where is not None
+        and base_where is None
+        and len(query.alias_map) == 1
+        and all(
+            _annotation_is_simple(source_annotations.get(name, query.annotations[name]))
+            for name in materialized_names
+        )
+        and not _where_has_annotation_transform(query.where, annotation_exprs)
+    )
+    if not move_annotation_where:
+        annotation_where = None
+        base_where = query.where
+    base_query = query.clone()
+    base_query.where = base_where or WhereNode()
+    base_query.annotations = {}
+    if base_query.annotation_select_mask is not None:
+        base_query.set_annotation_mask(set())
+    if base_query.selected:
+        base_query.selected = {
+            key: value
+            for key, value in base_query.selected.items()
+            if not isinstance(value, str) or value not in query.annotations
+        }
+    base_query._annotation_select_cache = None
+    base_query.order_by = ()
+    base_query.extra_order_by = ()
+    base_query.default_ordering = False
+    current_query = base_query
+    cte_created = False
+    for idx, level in enumerate(levels):
+        for name in level:
+            annotation_expr = source_annotations.get(name, query.annotations[name])
+            current_query.add_annotation(annotation_expr, name)
+        if idx <= last_materialized_index and not cte_created:
+            cte_query = current_query.clone()
+            cte_query._with_ctes = ()
+            cte_query._auto_cte_annotation_skip = True
+            cte_query._auto_cte_processed = True
+            cte = CTE(_queryset_from_query(cte_query, clone_query=False), name=name_generator())
+            collector.add(cte)
+            current_query = cte.queryset().query
+            cte_created = True
+    if annotation_where is not None:
+        annotation_where.relabel_aliases(
+            {base_alias: current_query.get_initial_alias()}
+        )
+        replacements = {
+            query.annotations[name]: current_query.annotations[name]
+            for name in materialized_names
+            if name in current_query.annotations
+        }
+        annotation_where = annotation_where.replace_expressions(replacements)
+    current_query.where = annotation_where or WhereNode()
+    current_query.order_by = query.order_by
+    current_query.extra_order_by = query.extra_order_by
+    current_query.default_ordering = query.default_ordering
+    return current_query
 
 
 def _queryset_from_query(query, *, clone_query=True):
@@ -668,6 +943,8 @@ class Query(BaseExpression):
                 combined_processed._with_ctes = ()
                 combined_queries.append(combined_processed)
             clone.combined_queries = tuple(combined_queries)
+
+        clone = _auto_cte_annotation_reuse(clone, name_generator, collector)
 
         transformer = _CTEAutoTransformer(clone, name_generator, collector)
         for annotation in clone.annotations.values():
@@ -1506,6 +1783,19 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
+        if not hasattr(self, "_annotation_unresolved"):
+            self._annotation_unresolved = {}
+        if hasattr(annotation, "copy"):
+            self._annotation_unresolved[alias] = annotation.copy()
+        else:
+            self._annotation_unresolved[alias] = annotation
+        deps = _annotation_refs_in_expression(annotation, set(self.annotations))
+        if deps:
+            if not hasattr(self, "_annotation_deps"):
+                self._annotation_deps = {}
+            self._annotation_deps[alias] = deps
+        elif hasattr(self, "_annotation_deps") and alias in self._annotation_deps:
+            self._annotation_deps.pop(alias, None)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
@@ -1636,6 +1926,9 @@ class Query(BaseExpression):
                 lookup_splitted, self.annotations
             )
             if annotation:
+                if not hasattr(self, "_annotation_filter_refs"):
+                    self._annotation_filter_refs = set()
+                self._annotation_filter_refs.add(annotation)
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
