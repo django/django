@@ -58,6 +58,7 @@ from django.db.models.query import (
     prefetch_related_objects,
 )
 from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.sql.cte import CTE, with_cte
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
@@ -127,6 +128,7 @@ __all__ += [
     "DEFERRED",
     "Model",
     "FilteredRelation",
+    "CTE",
     "ForeignKey",
     "ForeignObject",
     "OneToOneField",
@@ -135,4 +137,5 @@ __all__ += [
     "ManyToOneRel",
     "ManyToManyRel",
     "OneToOneRel",
+    "with_cte",
 ]
