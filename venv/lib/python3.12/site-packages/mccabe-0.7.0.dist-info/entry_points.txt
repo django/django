@@ -1,3 +1,0 @@
-[flake8.extension]
-C90 = mccabe:McCabeChecker
-
