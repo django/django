@@ -10,16 +10,6 @@ Model field reference
 This document contains all the API references of :class:`Field` including the
 `field options`_ and `field types`_ Django offers.
 
-.. seealso::
-
-    If the built-in fields don't do the trick, you can try
-    :pypi:`django-localflavor` (`documentation
-    <https://django-localflavor.readthedocs.io/>`_), which contains assorted
-    pieces of code that are useful for particular countries and cultures.
-
-    Also, you can easily :doc:`write your own custom model fields
-    </howto/custom-model-fields>`.
-
 .. note::
 
     Fields are defined in :mod:`django.db.models.fields`, but for convenience
