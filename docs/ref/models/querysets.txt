@@ -1994,7 +1994,7 @@ them:
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
 ``select_for_update()``. However, MariaDB only supports the ``nowait``
-argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
+argument, MariaDB also supports the ``skip_locked`` argument, and MySQL
 supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
 argument is only supported on PostgreSQL.
 
