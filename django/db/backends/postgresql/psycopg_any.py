@@ -76,7 +76,8 @@ except ImportError:
 
     from psycopg2 import errors, extensions, sql  # NOQA
     from psycopg2.extras import DateTimeTZRange  # NOQA
-    from psycopg2.extras import (  # Inet,
+    from psycopg2.extras import Inet  # NOQA
+    from psycopg2.extras import (
         DateRange,
         DateTimeRange,
         Json,
