@@ -23,6 +23,12 @@ msgstr ""
 msgid "Humanize"
 msgstr "Humanisation"
 
+#. Translators: Ordinal format when value is 1.
+#: contrib/humanize/templatetags/humanize.py:37
+msgctxt "ordinal is 1"
+msgid "{}st"
+msgstr "{}<sup>er</sup>"
+
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
@@ -36,7 +42,7 @@ msgstr "{}<sup>e</sup>"
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
 msgctxt "ordinal 1"
 msgid "{}st"
-msgstr "{}<sup>er</sup>"
+msgstr "{}<sup>e</sup>"
 
 #. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
 msgctxt "ordinal 2"
