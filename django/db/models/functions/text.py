@@ -294,8 +294,23 @@ class Reverse(Transform):
         return sql, params * 3
 
 
-class Right(Left):
+class Right(Func):  # Change from Left to Func
     function = "RIGHT"
+    arity = 2
+    output_field = CharField()
+
+    def __init__(self, expression, length, **extra):
+        """
+        expression: the name of a field, or an expression returning a string
+        length: the number of characters to return from the end of the string
+        """
+        if not hasattr(length, "resolve_expression"):
+            if length == 0:
+                raise ValueError("'length' must be greater than 0")
+            if length < 0:
+                raise ValueError("'length' must be greater than 0")
+        
+        super().__init__(expression, length, **extra)
 
     def get_substr(self):
         return Substr(
@@ -304,6 +319,14 @@ class Right(Left):
             self.source_expressions[1],
         )
 
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.get_substr().as_oracle(compiler, connection, **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return self.get_substr().as_sqlite(compiler, connection, **extra_context)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        return self.get_substr().as_sql(compiler, connection, **extra_context)
 
 class RPad(LPad):
     function = "RPAD"
