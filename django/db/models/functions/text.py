@@ -294,7 +294,7 @@ class Reverse(Transform):
         return sql, params * 3
 
 
-class Right(Func):  # Change from Left to Func
+class Right(Func):
     function = "RIGHT"
     arity = 2
     output_field = CharField()
@@ -309,7 +309,7 @@ class Right(Func):  # Change from Left to Func
                 raise ValueError("'length' must be greater than 0")
             if length < 0:
                 raise ValueError("'length' must be greater than 0")
-        
+
         super().__init__(expression, length, **extra)
 
     def get_substr(self):
@@ -326,7 +326,9 @@ class Right(Func):  # Change from Left to Func
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
     def as_sql(self, compiler, connection, **extra_context):
-        return self.get_substr().as_sql(compiler, connection, **extra_context)
+        # PostgreSQL and MySQL have native RIGHT() function
+        return super().as_sql(compiler, connection, **extra_context)
+    
 
 class RPad(LPad):
     function = "RPAD"
