@@ -9,7 +9,7 @@ valid_drivers = (
     "MapInfo File",
     "S57",
     "DGN",
-    "Memory",
+    "Memory" if GDAL_VERSION <= (3, 10) else "MEM",
     "CSV",
     "GML",
     "KML",
