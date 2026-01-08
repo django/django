@@ -3528,13 +3528,7 @@ class NullInExcludeTest(TestCase):
         # into subquery above
         self.assertIs(inner_qs._result_cache, None)
 
-    @unittest.expectedFailure
     def test_col_not_in_list_containing_null(self):
-        """
-        The following case is not handled properly because
-        SQL's COL NOT IN (list containing null) handling is too weird to
-        abstract away.
-        """
         self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=[None]), ["i1"], attrgetter("name")
         )
