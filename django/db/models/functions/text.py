@@ -328,7 +328,7 @@ class Right(Func):
     def as_sql(self, compiler, connection, **extra_context):
         # PostgreSQL and MySQL have native RIGHT() function
         return super().as_sql(compiler, connection, **extra_context)
-    
+
 
 class RPad(LPad):
     function = "RPAD"
