@@ -167,20 +167,26 @@ def run_formatters(written_files, black_path=(sentinel := object()), stderr=sys.
     """
     Run the black formatter on the specified files.
     """
+    explicit_black_path = black_path is not sentinel
+
     if black_path is sentinel:
         black_path = shutil.which("black")
 
-    if not black_path:
-        stderr.write("Formatters failed to launch\n")
-        stderr.write("Black executable not found\n")
+    # Only skip silently if black was NOT explicitly requested
+    if not black_path and not explicit_black_path:
         return
+
+    # REMOVE THIS:
+    # if not written_files:
+    #     return
 
     try:
         subprocess.run(
             [black_path, "--fast", "--", *written_files],
-            capture_output=True,
-            check=False,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
-    except OSError:
+    except (OSError, subprocess.CalledProcessError):
         stderr.write("Formatters failed to launch\n")
         traceback.print_exc(file=stderr)
