@@ -4,7 +4,8 @@ Django 6.0.1 release notes
 
 *January 6, 2026*
 
-Django 6.0.1 fixes one data loss bug in Django 5.2 and several bugs in 6.0.
+Django 6.0.1 fixes one data loss bug introduced in Django 5.2 as well as
+several other bugs in Django 6.0.
 
 Bugfixes
 ========
