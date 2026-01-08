@@ -1,4 +1,5 @@
 """macOS."""
+
 from __future__ import annotations
 
 import os.path
@@ -18,7 +19,9 @@ class MacOS(PlatformDirsABC):
     @property
     def user_data_dir(self) -> str:
         """:return: data directory tied to the user, e.g. ``~/Library/Application Support/$appname/$version``"""
-        return self._append_app_name_and_version(os.path.expanduser("~/Library/Application Support"))  # noqa: PTH111
+        return self._append_app_name_and_version(
+            os.path.expanduser("~/Library/Application Support")
+        )  # noqa: PTH111
 
     @property
     def site_data_dir(self) -> str:
@@ -38,7 +41,9 @@ class MacOS(PlatformDirsABC):
     @property
     def user_cache_dir(self) -> str:
         """:return: cache directory tied to the user, e.g. ``~/Library/Caches/$appname/$version``"""
-        return self._append_app_name_and_version(os.path.expanduser("~/Library/Caches"))  # noqa: PTH111
+        return self._append_app_name_and_version(
+            os.path.expanduser("~/Library/Caches")
+        )  # noqa: PTH111
 
     @property
     def site_cache_dir(self) -> str:
@@ -53,7 +58,9 @@ class MacOS(PlatformDirsABC):
     @property
     def user_log_dir(self) -> str:
         """:return: log directory tied to the user, e.g. ``~/Library/Logs/$appname/$version``"""
-        return self._append_app_name_and_version(os.path.expanduser("~/Library/Logs"))  # noqa: PTH111
+        return self._append_app_name_and_version(
+            os.path.expanduser("~/Library/Logs")
+        )  # noqa: PTH111
 
     @property
     def user_documents_dir(self) -> str:
@@ -83,7 +90,9 @@ class MacOS(PlatformDirsABC):
     @property
     def user_runtime_dir(self) -> str:
         """:return: runtime directory tied to the user, e.g. ``~/Library/Caches/TemporaryItems/$appname/$version``"""
-        return self._append_app_name_and_version(os.path.expanduser("~/Library/Caches/TemporaryItems"))  # noqa: PTH111
+        return self._append_app_name_and_version(
+            os.path.expanduser("~/Library/Caches/TemporaryItems")
+        )  # noqa: PTH111
 
 
 __all__ = [

@@ -1,5 +1,4 @@
-"""Prepares a distribution for installation
-"""
+"""Prepares a distribution for installation"""
 
 # The following comment should be removed at some point in the future.
 # mypy: strict-optional=False

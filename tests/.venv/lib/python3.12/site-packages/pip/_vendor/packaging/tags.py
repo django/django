@@ -36,7 +36,7 @@ INTERPRETER_SHORT_NAMES: Dict[str, str] = {
 }
 
 
-_32_BIT_INTERPRETER = sys.maxsize <= 2 ** 32
+_32_BIT_INTERPRETER = sys.maxsize <= 2**32
 
 
 class Tag:

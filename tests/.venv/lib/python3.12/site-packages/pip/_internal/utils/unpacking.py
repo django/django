@@ -1,5 +1,4 @@
-"""Utilities related archives.
-"""
+"""Utilities related archives."""
 
 import logging
 import os

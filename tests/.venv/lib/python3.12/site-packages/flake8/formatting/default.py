@@ -1,4 +1,5 @@
 """Default formatting class for Flake8."""
+
 from __future__ import annotations
 
 from flake8.formatting import base

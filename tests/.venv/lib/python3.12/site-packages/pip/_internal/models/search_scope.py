@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class SearchScope:
-
     """
     Encapsulates the locations that pip is configured to search.
     """

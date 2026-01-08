@@ -767,6 +767,7 @@ def should_bypass_proxies(url, no_proxy):
 
     :rtype: bool
     """
+
     # Prioritize lowercase environment variables over uppercase
     # to keep a consistent behaviour with other http projects (curl, wget).
     def get_proxy(key):

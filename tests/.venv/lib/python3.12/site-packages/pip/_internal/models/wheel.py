@@ -1,6 +1,7 @@
 """Represents a wheel file and provides access to the various parts of the
 name that have meaning.
 """
+
 import re
 from typing import Dict, Iterable, List
 

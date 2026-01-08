@@ -49,23 +49,23 @@ class pyparsing_test:
             self._save_context["default_whitespace"] = ParserElement.DEFAULT_WHITE_CHARS
             self._save_context["default_keyword_chars"] = Keyword.DEFAULT_KEYWORD_CHARS
 
-            self._save_context[
-                "literal_string_class"
-            ] = ParserElement._literalStringClass
+            self._save_context["literal_string_class"] = (
+                ParserElement._literalStringClass
+            )
 
             self._save_context["verbose_stacktrace"] = ParserElement.verbose_stacktrace
 
             self._save_context["packrat_enabled"] = ParserElement._packratEnabled
             if ParserElement._packratEnabled:
-                self._save_context[
-                    "packrat_cache_size"
-                ] = ParserElement.packrat_cache.size
+                self._save_context["packrat_cache_size"] = (
+                    ParserElement.packrat_cache.size
+                )
             else:
                 self._save_context["packrat_cache_size"] = None
             self._save_context["packrat_parse"] = ParserElement._parse
-            self._save_context[
-                "recursion_enabled"
-            ] = ParserElement._left_recursion_enabled
+            self._save_context["recursion_enabled"] = (
+                ParserElement._left_recursion_enabled
+            )
 
             self._save_context["__diag__"] = {
                 name: getattr(__diag__, name) for name in __diag__._all_names

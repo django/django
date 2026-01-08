@@ -403,7 +403,7 @@ class Layout:
             self._render_map = render_map
             layout_lines: List[List[Segment]] = [[] for _ in range(height)]
             _islice = islice
-            for (region, lines) in render_map.values():
+            for region, lines in render_map.values():
                 _x, y, _layout_width, layout_height = region
                 for row, line in zip(
                     _islice(layout_lines, y, y + layout_height), lines

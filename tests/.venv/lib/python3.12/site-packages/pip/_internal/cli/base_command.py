@@ -172,7 +172,7 @@ class Command(CommandContextMixIn):
                 options.cache_dir = None
 
         def intercepts_unhandled_exc(
-            run_func: Callable[..., int]
+            run_func: Callable[..., int],
         ) -> Callable[..., int]:
             @functools.wraps(run_func)
             def exc_logging_wrapper(*args: Any) -> int:

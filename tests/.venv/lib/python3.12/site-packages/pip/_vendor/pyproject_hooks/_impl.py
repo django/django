@@ -11,23 +11,25 @@ from ._in_process import _in_proc_script_path
 
 
 def write_json(obj, path, **kwargs):
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, **kwargs)
 
 
 def read_json(path):
-    with open(path, encoding='utf-8') as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
 class BackendUnavailable(Exception):
     """Will be raised if the backend cannot be imported in the hook process."""
+
     def __init__(self, traceback):
         self.traceback = traceback
 
 
 class BackendInvalid(Exception):
     """Will be raised if the backend is invalid."""
+
     def __init__(self, backend_name, backend_path, message):
         super().__init__(message)
         self.backend_name = backend_name
@@ -36,6 +38,7 @@ class BackendInvalid(Exception):
 
 class HookMissing(Exception):
     """Will be raised on missing hooks (if a fallback can't be used)."""
+
     def __init__(self, hook_name):
         super().__init__(hook_name)
         self.hook_name = hook_name
@@ -43,6 +46,7 @@ class HookMissing(Exception):
 
 class UnsupportedOperation(Exception):
     """May be raised by build_sdist if the backend indicates that it can't."""
+
     def __init__(self, traceback):
         self.traceback = traceback
 
@@ -96,16 +100,15 @@ def norm_and_check(source_tree, requested):
 
 
 class BuildBackendHookCaller:
-    """A wrapper to call the build backend hooks for a source directory.
-    """
+    """A wrapper to call the build backend hooks for a source directory."""
 
     def __init__(
-            self,
-            source_dir,
-            build_backend,
-            backend_path=None,
-            runner=None,
-            python_executable=None,
+        self,
+        source_dir,
+        build_backend,
+        backend_path=None,
+        runner=None,
+        python_executable=None,
     ):
         """
         :param source_dir: The source directory to invoke the build backend for
@@ -121,9 +124,7 @@ class BuildBackendHookCaller:
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
         if backend_path:
-            backend_path = [
-                norm_and_check(self.source_dir, p) for p in backend_path
-            ]
+            backend_path = [norm_and_check(self.source_dir, p) for p in backend_path]
         self.backend_path = backend_path
         self._subprocess_runner = runner
         if not python_executable:
@@ -150,7 +151,7 @@ class BuildBackendHookCaller:
 
     def _supported_features(self):
         """Return the list of optional features supported by the backend."""
-        return self._call_hook('_supported_features', {})
+        return self._call_hook("_supported_features", {})
 
     def get_requires_for_build_wheel(self, config_settings=None):
         """Get additional dependencies required for building a wheel.
@@ -163,13 +164,13 @@ class BuildBackendHookCaller:
             If the build backend does not defined a hook with this name, an
             empty list will be returned.
         """
-        return self._call_hook('get_requires_for_build_wheel', {
-            'config_settings': config_settings
-        })
+        return self._call_hook(
+            "get_requires_for_build_wheel", {"config_settings": config_settings}
+        )
 
     def prepare_metadata_for_build_wheel(
-            self, metadata_directory, config_settings=None,
-            _allow_fallback=True):
+        self, metadata_directory, config_settings=None, _allow_fallback=True
+    ):
         """Prepare a ``*.dist-info`` folder with metadata for this project.
 
         :returns: Name of the newly created subfolder within
@@ -183,15 +184,18 @@ class BuildBackendHookCaller:
             wheel via the ``build_wheel`` hook and the dist-info extracted from
             that will be returned.
         """
-        return self._call_hook('prepare_metadata_for_build_wheel', {
-            'metadata_directory': abspath(metadata_directory),
-            'config_settings': config_settings,
-            '_allow_fallback': _allow_fallback,
-        })
+        return self._call_hook(
+            "prepare_metadata_for_build_wheel",
+            {
+                "metadata_directory": abspath(metadata_directory),
+                "config_settings": config_settings,
+                "_allow_fallback": _allow_fallback,
+            },
+        )
 
     def build_wheel(
-            self, wheel_directory, config_settings=None,
-            metadata_directory=None):
+        self, wheel_directory, config_settings=None, metadata_directory=None
+    ):
         """Build a wheel from this project.
 
         :returns:
@@ -206,11 +210,14 @@ class BuildBackendHookCaller:
         """
         if metadata_directory is not None:
             metadata_directory = abspath(metadata_directory)
-        return self._call_hook('build_wheel', {
-            'wheel_directory': abspath(wheel_directory),
-            'config_settings': config_settings,
-            'metadata_directory': metadata_directory,
-        })
+        return self._call_hook(
+            "build_wheel",
+            {
+                "wheel_directory": abspath(wheel_directory),
+                "config_settings": config_settings,
+                "metadata_directory": metadata_directory,
+            },
+        )
 
     def get_requires_for_build_editable(self, config_settings=None):
         """Get additional dependencies required for building an editable wheel.
@@ -223,13 +230,13 @@ class BuildBackendHookCaller:
             If the build backend does not defined a hook with this name, an
             empty list will be returned.
         """
-        return self._call_hook('get_requires_for_build_editable', {
-            'config_settings': config_settings
-        })
+        return self._call_hook(
+            "get_requires_for_build_editable", {"config_settings": config_settings}
+        )
 
     def prepare_metadata_for_build_editable(
-            self, metadata_directory, config_settings=None,
-            _allow_fallback=True):
+        self, metadata_directory, config_settings=None, _allow_fallback=True
+    ):
         """Prepare a ``*.dist-info`` folder with metadata for this project.
 
         :returns: Name of the newly created subfolder within
@@ -243,15 +250,18 @@ class BuildBackendHookCaller:
             wheel via the ``build_editable`` hook and the dist-info
             extracted from that will be returned.
         """
-        return self._call_hook('prepare_metadata_for_build_editable', {
-            'metadata_directory': abspath(metadata_directory),
-            'config_settings': config_settings,
-            '_allow_fallback': _allow_fallback,
-        })
+        return self._call_hook(
+            "prepare_metadata_for_build_editable",
+            {
+                "metadata_directory": abspath(metadata_directory),
+                "config_settings": config_settings,
+                "_allow_fallback": _allow_fallback,
+            },
+        )
 
     def build_editable(
-            self, wheel_directory, config_settings=None,
-            metadata_directory=None):
+        self, wheel_directory, config_settings=None, metadata_directory=None
+    ):
         """Build an editable wheel from this project.
 
         :returns:
@@ -267,11 +277,14 @@ class BuildBackendHookCaller:
         """
         if metadata_directory is not None:
             metadata_directory = abspath(metadata_directory)
-        return self._call_hook('build_editable', {
-            'wheel_directory': abspath(wheel_directory),
-            'config_settings': config_settings,
-            'metadata_directory': metadata_directory,
-        })
+        return self._call_hook(
+            "build_editable",
+            {
+                "wheel_directory": abspath(wheel_directory),
+                "config_settings": config_settings,
+                "metadata_directory": metadata_directory,
+            },
+        )
 
     def get_requires_for_build_sdist(self, config_settings=None):
         """Get additional dependencies required for building an sdist.
@@ -279,9 +292,9 @@ class BuildBackendHookCaller:
         :returns: A list of :pep:`dependency specifiers <508>`.
         :rtype: list[str]
         """
-        return self._call_hook('get_requires_for_build_sdist', {
-            'config_settings': config_settings
-        })
+        return self._call_hook(
+            "get_requires_for_build_sdist", {"config_settings": config_settings}
+        )
 
     def build_sdist(self, sdist_directory, config_settings=None):
         """Build an sdist from this project.
@@ -289,21 +302,24 @@ class BuildBackendHookCaller:
         :returns:
             The name of the newly created sdist within ``wheel_directory``.
         """
-        return self._call_hook('build_sdist', {
-            'sdist_directory': abspath(sdist_directory),
-            'config_settings': config_settings,
-        })
+        return self._call_hook(
+            "build_sdist",
+            {
+                "sdist_directory": abspath(sdist_directory),
+                "config_settings": config_settings,
+            },
+        )
 
     def _call_hook(self, hook_name, kwargs):
-        extra_environ = {'PEP517_BUILD_BACKEND': self.build_backend}
+        extra_environ = {"PEP517_BUILD_BACKEND": self.build_backend}
 
         if self.backend_path:
             backend_path = os.pathsep.join(self.backend_path)
-            extra_environ['PEP517_BACKEND_PATH'] = backend_path
+            extra_environ["PEP517_BACKEND_PATH"] = backend_path
 
         with tempfile.TemporaryDirectory() as td:
-            hook_input = {'kwargs': kwargs}
-            write_json(hook_input, pjoin(td, 'input.json'), indent=2)
+            hook_input = {"kwargs": kwargs}
+            write_json(hook_input, pjoin(td, "input.json"), indent=2)
 
             # Run the hook in a subprocess
             with _in_proc_script_path() as script:
@@ -311,20 +327,20 @@ class BuildBackendHookCaller:
                 self._subprocess_runner(
                     [python, abspath(str(script)), hook_name, td],
                     cwd=self.source_dir,
-                    extra_environ=extra_environ
+                    extra_environ=extra_environ,
                 )
 
-            data = read_json(pjoin(td, 'output.json'))
-            if data.get('unsupported'):
-                raise UnsupportedOperation(data.get('traceback', ''))
-            if data.get('no_backend'):
-                raise BackendUnavailable(data.get('traceback', ''))
-            if data.get('backend_invalid'):
+            data = read_json(pjoin(td, "output.json"))
+            if data.get("unsupported"):
+                raise UnsupportedOperation(data.get("traceback", ""))
+            if data.get("no_backend"):
+                raise BackendUnavailable(data.get("traceback", ""))
+            if data.get("backend_invalid"):
                 raise BackendInvalid(
                     backend_name=self.build_backend,
                     backend_path=self.backend_path,
-                    message=data.get('backend_error', '')
+                    message=data.get("backend_error", ""),
                 )
-            if data.get('hook_missing'):
-                raise HookMissing(data.get('missing_hook_name') or hook_name)
-            return data['return_val']
+            if data.get("hook_missing"):
+                raise HookMissing(data.get("missing_hook_name") or hook_name)
+            return data["return_val"]

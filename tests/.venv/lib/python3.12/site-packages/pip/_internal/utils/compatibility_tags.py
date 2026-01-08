@@ -1,5 +1,4 @@
-"""Generate and work with PEP 425 Compatibility Tags.
-"""
+"""Generate and work with PEP 425 Compatibility Tags."""
 
 import re
 from typing import List, Optional, Tuple

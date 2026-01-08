@@ -7,6 +7,7 @@ CoreFoundation messing about and memory management. The concerns in this module
 are almost entirely about trying to avoid memory leaks and providing
 appropriate and useful assistance to the higher-level code.
 """
+
 import base64
 import ctypes
 import itertools
@@ -138,8 +139,8 @@ def _assert_no_error(error, exception_class=None):
     output = _cf_string_to_unicode(cf_error_string)
     CoreFoundation.CFRelease(cf_error_string)
 
-    if output is None or output == u"":
-        output = u"OSStatus %s" % error
+    if output is None or output == "":
+        output = "OSStatus %s" % error
 
     if exception_class is None:
         exception_class = ssl.SSLError

@@ -1,5 +1,4 @@
-"""Build Environment used for isolation during sdist building
-"""
+"""Build Environment used for isolation during sdist building"""
 
 import logging
 import os

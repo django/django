@@ -69,8 +69,7 @@ class Criterion(object):
 
     def __repr__(self):
         requirements = ", ".join(
-            "({!r}, via={!r})".format(req, parent)
-            for req, parent in self.information
+            "({!r}, via={!r})".format(req, parent) for req, parent in self.information
         )
         return "Criterion({})".format(requirements)
 
@@ -317,16 +316,14 @@ class Resolution(object):
                 except (IndexError, KeyError):
                     raise ResolutionImpossible(causes)
                 current_dependencies = {
-                    self._p.identify(d)
-                    for d in self._p.get_dependencies(candidate)
+                    self._p.identify(d) for d in self._p.get_dependencies(candidate)
                 }
                 incompatible_state = not current_dependencies.isdisjoint(
                     incompatible_deps
                 )
 
             incompatibilities_from_broken = [
-                (k, list(v.incompatibilities))
-                for k, v in broken_state.criteria.items()
+                (k, list(v.incompatibilities)) for k, v in broken_state.criteria.items()
             ]
 
             # Also mark the newly known incompatibility.
@@ -418,9 +415,7 @@ class Resolution(object):
                 return self.state
 
             # keep track of satisfied names to calculate diff after pinning
-            satisfied_names = set(self.state.criteria.keys()) - set(
-                unsatisfied_names
-            )
+            satisfied_names = set(self.state.criteria.keys()) - set(unsatisfied_names)
 
             # Choose the most preferred unpinned criterion to try.
             name = min(unsatisfied_names, key=self._get_preference)

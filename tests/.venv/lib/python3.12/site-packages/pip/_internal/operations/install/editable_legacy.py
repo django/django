@@ -1,5 +1,5 @@
-"""Legacy editable installation process, i.e. `setup.py develop`.
-"""
+"""Legacy editable installation process, i.e. `setup.py develop`."""
+
 import logging
 from typing import Optional, Sequence
 

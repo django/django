@@ -285,7 +285,7 @@ class LegacySpecifier(_IndividualSpecifier):
 
 
 def _require_version_compare(
-    fn: Callable[["Specifier", ParsedVersion, str], bool]
+    fn: Callable[["Specifier", ParsedVersion, str], bool],
 ) -> Callable[["Specifier", ParsedVersion, str], bool]:
     @functools.wraps(fn)
     def wrapped(self: "Specifier", prospective: ParsedVersion, spec: str) -> bool:

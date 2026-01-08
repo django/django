@@ -194,9 +194,11 @@ def render(
                         if handler_name:
                             meta_params = (
                                 handler_name,
-                                meta_params
-                                if isinstance(meta_params, tuple)
-                                else (meta_params,),
+                                (
+                                    meta_params
+                                    if isinstance(meta_params, tuple)
+                                    else (meta_params,)
+                                ),
                             )
 
                     else:

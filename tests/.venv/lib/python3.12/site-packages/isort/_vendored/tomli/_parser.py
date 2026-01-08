@@ -1,7 +1,17 @@
 import string
 import warnings
 from types import MappingProxyType
-from typing import IO, Any, Callable, Dict, FrozenSet, Iterable, NamedTuple, Optional, Tuple
+from typing import (
+    IO,
+    Any,
+    Callable,
+    Dict,
+    FrozenSet,
+    Iterable,
+    NamedTuple,
+    Optional,
+    Tuple,
+)
 
 from ._re import (
     RE_DATETIME,
@@ -122,7 +132,9 @@ def loads(s: str, *, parse_float: ParseFloat = float) -> Dict[str, Any]:  # noqa
         except IndexError:
             break
         if char != "\n":
-            raise suffixed_err(src, pos, "Expected newline or end of document after a statement")
+            raise suffixed_err(
+                src, pos, "Expected newline or end of document after a statement"
+            )
         pos += 1
 
     return out.data.dict
@@ -266,7 +278,9 @@ def skip_comment(src: str, pos: Pos) -> Pos:
     except IndexError:
         char = None
     if char == "#":
-        return skip_until(src, pos + 1, "\n", error_on=ILLEGAL_COMMENT_CHARS, error_on_eof=False)
+        return skip_until(
+            src, pos + 1, "\n", error_on=ILLEGAL_COMMENT_CHARS, error_on_eof=False
+        )
     return pos
 
 
@@ -318,13 +332,17 @@ def create_list_rule(src: str, pos: Pos, out: Output) -> Tuple[Pos, Key]:
     return pos + 2, key
 
 
-def key_value_rule(src: str, pos: Pos, out: Output, header: Key, parse_float: ParseFloat) -> Pos:
+def key_value_rule(
+    src: str, pos: Pos, out: Output, header: Key, parse_float: ParseFloat
+) -> Pos:
     pos, key, value = parse_key_value_pair(src, pos, parse_float)
     key_parent, key_stem = key[:-1], key[-1]
     abs_key_parent = header + key_parent
 
     if out.flags.is_(abs_key_parent, Flags.FROZEN):
-        raise suffixed_err(src, pos, f"Can not mutate immutable namespace {abs_key_parent}")
+        raise suffixed_err(
+            src, pos, f"Can not mutate immutable namespace {abs_key_parent}"
+        )
     # Containers in the relative path can't be opened with the table syntax after this
     out.flags.set_for_relative_key(header, key, Flags.EXPLICIT_NEST)
     try:
@@ -340,7 +358,9 @@ def key_value_rule(src: str, pos: Pos, out: Output, header: Key, parse_float: Pa
     return pos
 
 
-def parse_key_value_pair(src: str, pos: Pos, parse_float: ParseFloat) -> Tuple[Pos, Key, Any]:
+def parse_key_value_pair(
+    src: str, pos: Pos, parse_float: ParseFloat
+) -> Tuple[Pos, Key, Any]:
     pos, key = parse_key(src, pos)
     try:
         char: Optional[str] = src[pos]
@@ -498,7 +518,9 @@ def parse_hex_char(src: str, pos: Pos, hex_len: int) -> Tuple[Pos, str]:
 def parse_literal_str(src: str, pos: Pos) -> Tuple[Pos, str]:
     pos += 1  # Skip starting apostrophe
     start_pos = pos
-    pos = skip_until(src, pos, "'", error_on=ILLEGAL_LITERAL_STR_CHARS, error_on_eof=True)
+    pos = skip_until(
+        src, pos, "'", error_on=ILLEGAL_LITERAL_STR_CHARS, error_on_eof=True
+    )
     return pos + 1, src[start_pos:pos]  # Skip ending apostrophe
 
 
@@ -565,7 +587,9 @@ def parse_basic_str(src: str, pos: Pos, *, multiline: bool) -> Tuple[Pos, str]:
         pos += 1
 
 
-def parse_value(src: str, pos: Pos, parse_float: ParseFloat) -> Tuple[Pos, Any]:  # noqa: C901
+def parse_value(
+    src: str, pos: Pos, parse_float: ParseFloat
+) -> Tuple[Pos, Any]:  # noqa: C901
     try:
         char: Optional[str] = src[pos]
     except IndexError:

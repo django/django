@@ -1,4 +1,5 @@
 """The base class and interface for all formatting plugins."""
+
 from __future__ import annotations
 
 import argparse

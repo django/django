@@ -64,7 +64,8 @@ def before_sleep_log(
 
         logger.log(
             log_level,
-            f"Retrying {fn_name} " f"in {retry_state.next_action.sleep} seconds as it {verb} {value}.",
+            f"Retrying {fn_name} "
+            f"in {retry_state.next_action.sleep} seconds as it {verb} {value}.",
             exc_info=local_exc_info,
         )
 

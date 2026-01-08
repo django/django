@@ -17,8 +17,10 @@ import os
 if "_PIP_STANDALONE_CERT" not in os.environ:
     from pip._vendor.certifi import where
 else:
+
     def where():
         return os.environ["_PIP_STANDALONE_CERT"]
+
 
 if __name__ == "__main__":
     print(where())

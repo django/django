@@ -2,6 +2,7 @@
 
 See: https://github.com/pre-commit/pre-commit/blob/cb40e96/pre_commit/color.py
 """
+
 from __future__ import annotations
 
 import sys

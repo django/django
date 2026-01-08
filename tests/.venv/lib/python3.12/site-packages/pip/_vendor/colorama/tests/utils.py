@@ -9,9 +9,11 @@ class StreamTTY(StringIO):
     def isatty(self):
         return True
 
+
 class StreamNonTTY(StringIO):
     def isatty(self):
         return False
+
 
 @contextmanager
 def osname(name):
@@ -19,6 +21,7 @@ def osname(name):
     os.name = name
     yield
     os.name = orig
+
 
 @contextmanager
 def replace_by(stream):
@@ -30,6 +33,7 @@ def replace_by(stream):
     sys.stdout = orig_stdout
     sys.stderr = orig_stderr
 
+
 @contextmanager
 def replace_original_by(stream):
     orig_stdout = sys.__stdout__
@@ -39,6 +43,7 @@ def replace_original_by(stream):
     yield
     sys.__stdout__ = orig_stdout
     sys.__stderr__ = orig_stderr
+
 
 @contextmanager
 def pycharm():

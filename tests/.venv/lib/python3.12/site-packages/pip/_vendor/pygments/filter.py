@@ -1,11 +1,11 @@
 """
-    pygments.filter
-    ~~~~~~~~~~~~~~~
+pygments.filter
+~~~~~~~~~~~~~~~
 
-    Module that implements the default filter.
+Module that implements the default filter.
 
-    :copyright: Copyright 2006-2023 by the Pygments team, see AUTHORS.
-    :license: BSD, see LICENSE for details.
+:copyright: Copyright 2006-2023 by the Pygments team, see AUTHORS.
+:license: BSD, see LICENSE for details.
 """
 
 
@@ -15,8 +15,10 @@ def apply_filters(stream, filters, lexer=None):
     a stream. If lexer is given it's forwarded to the
     filter, otherwise the filter receives `None`.
     """
+
     def _apply(filter_, stream):
         yield from filter_.filter(lexer, stream)
+
     for filter_ in filters:
         stream = _apply(filter_, stream)
     return stream
@@ -31,11 +33,15 @@ def simplefilter(f):
             for ttype, value in stream:
                 yield ttype, value.lower()
     """
-    return type(f.__name__, (FunctionFilter,), {
-        '__module__': getattr(f, '__module__'),
-        '__doc__': f.__doc__,
-        'function': f,
-    })
+    return type(
+        f.__name__,
+        (FunctionFilter,),
+        {
+            "__module__": getattr(f, "__module__"),
+            "__doc__": f.__doc__,
+            "function": f,
+        },
+    )
 
 
 class Filter:
@@ -58,12 +64,12 @@ class FunctionFilter(Filter):
     automatically creates subclasses of this class for
     functions passed to it.
     """
+
     function = None
 
     def __init__(self, **options):
-        if not hasattr(self, 'function'):
-            raise TypeError('%r used without bound function' %
-                            self.__class__.__name__)
+        if not hasattr(self, "function"):
+            raise TypeError("%r used without bound function" % self.__class__.__name__)
         Filter.__init__(self, **options)
 
     def filter(self, lexer, stream):

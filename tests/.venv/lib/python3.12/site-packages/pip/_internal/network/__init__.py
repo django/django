@@ -1,2 +1,1 @@
-"""Contains purely network-related utilities.
-"""
+"""Contains purely network-related utilities."""

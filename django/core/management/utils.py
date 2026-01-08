@@ -170,7 +170,7 @@ def run_formatters(written_files, black_path=(sentinel := object()), stderr=sys.
     # Use a sentinel rather than None, as which() returns None when not found.
     if black_path is sentinel:
         black_path = shutil.which("black")
-    if black_path:
+    if black_path and os.path.isfile(black_path):
         try:
             subprocess.run(
                 [black_path, "--fast", "--", *written_files],

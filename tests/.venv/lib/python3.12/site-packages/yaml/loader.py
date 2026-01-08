@@ -1,5 +1,4 @@
-
-__all__ = ['BaseLoader', 'FullLoader', 'SafeLoader', 'Loader', 'UnsafeLoader']
+__all__ = ["BaseLoader", "FullLoader", "SafeLoader", "Loader", "UnsafeLoader"]
 
 from .reader import *
 from .scanner import *
@@ -7,6 +6,7 @@ from .parser import *
 from .composer import *
 from .constructor import *
 from .resolver import *
+
 
 class BaseLoader(Reader, Scanner, Parser, Composer, BaseConstructor, BaseResolver):
 
@@ -18,6 +18,7 @@ class BaseLoader(Reader, Scanner, Parser, Composer, BaseConstructor, BaseResolve
         BaseConstructor.__init__(self)
         BaseResolver.__init__(self)
 
+
 class FullLoader(Reader, Scanner, Parser, Composer, FullConstructor, Resolver):
 
     def __init__(self, stream):
@@ -27,6 +28,7 @@ class FullLoader(Reader, Scanner, Parser, Composer, FullConstructor, Resolver):
         Composer.__init__(self)
         FullConstructor.__init__(self)
         Resolver.__init__(self)
+
 
 class SafeLoader(Reader, Scanner, Parser, Composer, SafeConstructor, Resolver):
 
@@ -38,6 +40,7 @@ class SafeLoader(Reader, Scanner, Parser, Composer, SafeConstructor, Resolver):
         SafeConstructor.__init__(self)
         Resolver.__init__(self)
 
+
 class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
 
     def __init__(self, stream):
@@ -47,6 +50,7 @@ class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
         Composer.__init__(self)
         Constructor.__init__(self)
         Resolver.__init__(self)
+
 
 # UnsafeLoader is the same as Loader (which is and was always unsafe on
 # untrusted input). Use of either Loader or UnsafeLoader should be rare, since

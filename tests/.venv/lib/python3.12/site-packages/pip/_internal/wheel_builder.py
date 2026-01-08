@@ -1,5 +1,4 @@
-"""Orchestrator for building wheels from InstallRequirements.
-"""
+"""Orchestrator for building wheels from InstallRequirements."""
 
 import logging
 import os.path

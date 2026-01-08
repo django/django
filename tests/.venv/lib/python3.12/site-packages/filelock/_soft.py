@@ -28,7 +28,9 @@ class SoftFileLock(BaseFileLock):
         except OSError as exception:  # re-raise unless expected exception
             if not (
                 exception.errno == EEXIST  # lock already exist
-                or (exception.errno == EACCES and sys.platform == "win32")  # has no access to this lock
+                or (
+                    exception.errno == EACCES and sys.platform == "win32"
+                )  # has no access to this lock
             ):  # pragma: win32 no cover
                 raise
         else:

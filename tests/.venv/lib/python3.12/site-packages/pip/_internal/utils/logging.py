@@ -212,7 +212,6 @@ class MaxLevelFilter(Filter):
 
 
 class ExcludeLoggerFilter(Filter):
-
     """
     A logging Filter that excludes records from a logger (or its children).
     """

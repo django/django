@@ -1,5 +1,4 @@
-"""Support functions for working with wheel files.
-"""
+"""Support functions for working with wheel files."""
 
 import logging
 from email.message import Message

@@ -5,6 +5,7 @@ requests.sessions
 This module provides a Session object to manage and persist settings across
 requests (cookies, auth, proxies).
 """
+
 import os
 import sys
 import time
@@ -326,7 +327,7 @@ class SessionRedirectMixin:
 
         # urllib3 handles proxy authorization for us in the standard adapter.
         # Avoid appending this to TLS tunneled requests where it may be leaked.
-        if not scheme.startswith('https') and username and password:
+        if not scheme.startswith("https") and username and password:
             headers["Proxy-Authorization"] = _basic_auth_str(username, password)
 
         return new_proxies
@@ -759,7 +760,7 @@ class Session(SessionRedirectMixin):
             # Set environment's proxies.
             no_proxy = proxies.get("no_proxy") if proxies is not None else None
             env_proxies = get_environ_proxies(url, no_proxy=no_proxy)
-            for (k, v) in env_proxies.items():
+            for k, v in env_proxies.items():
                 proxies.setdefault(k, v)
 
             # Look for requests environment configuration
@@ -785,7 +786,7 @@ class Session(SessionRedirectMixin):
 
         :rtype: requests.adapters.BaseAdapter
         """
-        for (prefix, adapter) in self.adapters.items():
+        for prefix, adapter in self.adapters.items():
 
             if url.lower().startswith(prefix.lower()):
                 return adapter

@@ -362,7 +362,7 @@ if __name__ == "__main__":  # pragma: no cover
                 table.add_column("Destination Currency")
                 table.add_column("Exchange Rate")
 
-                for ((source, dest), exchange_rate) in exchange_rate_dict.items():
+                for (source, dest), exchange_rate in exchange_rate_dict.items():
                     table.add_row(
                         source,
                         dest,

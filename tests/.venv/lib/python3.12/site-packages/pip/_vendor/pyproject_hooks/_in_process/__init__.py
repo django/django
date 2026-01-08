@@ -11,8 +11,11 @@ try:
 except AttributeError:
     # Python 3.8 compatibility
     def _in_proc_script_path():
-        return resources.path(__package__, '_in_process.py')
+        return resources.path(__package__, "_in_process.py")
+
 else:
+
     def _in_proc_script_path():
         return resources.as_file(
-            resources.files(__package__).joinpath('_in_process.py'))
+            resources.files(__package__).joinpath("_in_process.py")
+        )

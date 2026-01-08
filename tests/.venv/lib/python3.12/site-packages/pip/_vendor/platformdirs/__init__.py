@@ -2,6 +2,7 @@
 Utilities for determining application-specific dirs. See <https://github.com/platformdirs/platformdirs> for details and
 usage.
 """
+
 from __future__ import annotations
 
 import os

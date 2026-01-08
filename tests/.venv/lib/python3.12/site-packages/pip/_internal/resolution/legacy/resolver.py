@@ -246,9 +246,9 @@ class Resolver(BaseResolver):
             return [install_req], None
 
         try:
-            existing_req: Optional[
-                InstallRequirement
-            ] = requirement_set.get_requirement(install_req.name)
+            existing_req: Optional[InstallRequirement] = (
+                requirement_set.get_requirement(install_req.name)
+            )
         except KeyError:
             existing_req = None
 

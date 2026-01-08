@@ -1,5 +1,4 @@
-"""A single place for constructing and exposing the main parser
-"""
+"""A single place for constructing and exposing the main parser"""
 
 import os
 import subprocess

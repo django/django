@@ -1,5 +1,4 @@
-"""Cache Management
-"""
+"""Cache Management"""
 
 import hashlib
 import json

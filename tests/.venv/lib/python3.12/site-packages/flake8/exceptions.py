@@ -1,4 +1,5 @@
 """Exception classes for all of Flake8."""
+
 from __future__ import annotations
 
 

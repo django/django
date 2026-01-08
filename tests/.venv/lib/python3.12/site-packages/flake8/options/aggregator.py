@@ -3,6 +3,7 @@
 This holds the logic that uses the collected and merged config files and
 applies the user-specified command-line configuration on top of it.
 """
+
 from __future__ import annotations
 
 import argparse

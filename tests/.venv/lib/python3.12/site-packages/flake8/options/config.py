@@ -1,4 +1,5 @@
 """Config handling logic for Flake8."""
+
 from __future__ import annotations
 
 import configparser

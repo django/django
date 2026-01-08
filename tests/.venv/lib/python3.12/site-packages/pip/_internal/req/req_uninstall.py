@@ -38,7 +38,7 @@ def _script_names(
 
 
 def _unique(
-    fn: Callable[..., Generator[Any, None, None]]
+    fn: Callable[..., Generator[Any, None, None]],
 ) -> Callable[..., Generator[Any, None, None]]:
     @functools.wraps(fn)
     def unique(*args: Any, **kw: Any) -> Generator[Any, None, None]:

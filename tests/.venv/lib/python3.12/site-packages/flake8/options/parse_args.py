@@ -1,4 +1,5 @@
 """Procedure for parsing args, config, loading plugins."""
+
 from __future__ import annotations
 
 import argparse

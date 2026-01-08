@@ -71,9 +71,9 @@ class UniversalDetector:
     """
 
     MINIMUM_THRESHOLD = 0.20
-    HIGH_BYTE_DETECTOR = re.compile(b"[\x80-\xFF]")
+    HIGH_BYTE_DETECTOR = re.compile(b"[\x80-\xff]")
     ESC_DETECTOR = re.compile(b"(\033|~{)")
-    WIN_BYTE_DETECTOR = re.compile(b"[\x80-\x9F]")
+    WIN_BYTE_DETECTOR = re.compile(b"[\x80-\x9f]")
     ISO_WIN_MAP = {
         "iso-8859-1": "Windows-1252",
         "iso-8859-2": "Windows-1250",
@@ -188,7 +188,7 @@ class UniversalDetector:
                 # FF FE 00 00  UTF-32, little-endian BOM
                 # 00 00 FE FF  UTF-32, big-endian BOM
                 self.result = {"encoding": "UTF-32", "confidence": 1.0, "language": ""}
-            elif byte_str.startswith(b"\xFE\xFF\x00\x00"):
+            elif byte_str.startswith(b"\xfe\xff\x00\x00"):
                 # FE FF 00 00  UCS-4, unusual octet order BOM (3412)
                 self.result = {
                     # TODO: This encoding is not supported by Python. Should remove?
@@ -196,7 +196,7 @@ class UniversalDetector:
                     "confidence": 1.0,
                     "language": "",
                 }
-            elif byte_str.startswith(b"\x00\x00\xFF\xFE"):
+            elif byte_str.startswith(b"\x00\x00\xff\xfe"):
                 # 00 00 FF FE  UCS-4, unusual octet order BOM (2143)
                 self.result = {
                     # TODO: This encoding is not supported by Python. Should remove?

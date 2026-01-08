@@ -102,7 +102,7 @@ class SOCKSConnection(HTTPConnection):
                 proxy_password=self._socks_options["password"],
                 proxy_rdns=self._socks_options["rdns"],
                 timeout=self.timeout,
-                **extra_kw
+                **extra_kw,
             )
 
         except SocketTimeout:
@@ -174,7 +174,7 @@ class SOCKSProxyManager(PoolManager):
         password=None,
         num_pools=10,
         headers=None,
-        **connection_pool_kw
+        **connection_pool_kw,
     ):
         parsed = parse_url(proxy_url)
 

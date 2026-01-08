@@ -33,7 +33,7 @@ from typing import Optional, Union
 from .enums import LanguageFilter, ProbingState
 
 INTERNATIONAL_WORDS_PATTERN = re.compile(
-    b"[a-zA-Z]*[\x80-\xFF]+[a-zA-Z]*[^a-zA-Z\x80-\xFF]?"
+    b"[a-zA-Z]*[\x80-\xff]+[a-zA-Z]*[^a-zA-Z\x80-\xff]?"
 )
 
 
@@ -70,7 +70,7 @@ class CharSetProber:
 
     @staticmethod
     def filter_high_byte_only(buf: Union[bytes, bytearray]) -> bytes:
-        buf = re.sub(b"([\x00-\x7F])+", b" ", buf)
+        buf = re.sub(b"([\x00-\x7f])+", b" ", buf)
         return buf
 
     @staticmethod
@@ -78,8 +78,8 @@ class CharSetProber:
         """
         We define three types of bytes:
         alphabet: english alphabets [a-zA-Z]
-        international: international characters [\x80-\xFF]
-        marker: everything else [^a-zA-Z\x80-\xFF]
+        international: international characters [\x80-\xff]
+        marker: everything else [^a-zA-Z\x80-\xff]
         The input buffer can be thought to contain a series of words delimited
         by markers. This function works to filter all words that contain at
         least one international character. All contiguous sequences of markers

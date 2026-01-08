@@ -163,7 +163,6 @@ class MovedAttribute(_LazyDescr):
 
 
 class _SixMetaPathImporter(object):
-
     """
     A meta path importer to import six.moves and its submodules.
 
@@ -241,7 +240,6 @@ _importer = _SixMetaPathImporter(__name__)
 
 
 class _MovedItems(_LazyModule):
-
     """Lazy loading of moved objects"""
 
     __path__ = []  # mark as package
@@ -350,7 +348,6 @@ _importer._add_module(moves, "moves")
 
 
 class Module_six_moves_urllib_parse(_LazyModule):
-
     """Lazy loading of moved objects in six.moves.urllib_parse"""
 
 
@@ -397,7 +394,6 @@ _importer._add_module(
 
 
 class Module_six_moves_urllib_error(_LazyModule):
-
     """Lazy loading of moved objects in six.moves.urllib_error"""
 
 
@@ -420,7 +416,6 @@ _importer._add_module(
 
 
 class Module_six_moves_urllib_request(_LazyModule):
-
     """Lazy loading of moved objects in six.moves.urllib_request"""
 
 
@@ -475,7 +470,6 @@ _importer._add_module(
 
 
 class Module_six_moves_urllib_response(_LazyModule):
-
     """Lazy loading of moved objects in six.moves.urllib_response"""
 
 
@@ -499,7 +493,6 @@ _importer._add_module(
 
 
 class Module_six_moves_urllib_robotparser(_LazyModule):
-
     """Lazy loading of moved objects in six.moves.urllib_robotparser"""
 
 
@@ -522,7 +515,6 @@ _importer._add_module(
 
 
 class Module_six_moves_urllib(types.ModuleType):
-
     """Create a six.moves.urllib namespace that resembles the Python 3 namespace"""
 
     __path__ = []  # mark as package
@@ -784,7 +776,7 @@ else:
             del frame
         elif _locs_ is None:
             _locs_ = _globs_
-        exec ("""exec _code_ in _globs_, _locs_""")
+        exec("""exec _code_ in _globs_, _locs_""")
 
     exec_(
         """def reraise(tp, value, tb=None):
@@ -928,6 +920,7 @@ else:
 
 def with_metaclass(meta, *bases):
     """Create a base class with a metaclass."""
+
     # This requires a bit of explanation: the basic idea is to make a dummy
     # metaclass for one level of class instantiation that replaces itself with
     # the actual metaclass.

@@ -148,9 +148,11 @@ class Columns(JupyterMixin):
         ]
         if self.equal:
             _renderables = [
-                None
-                if renderable is None
-                else Constrain(renderable, renderable_widths[0])
+                (
+                    None
+                    if renderable is None
+                    else Constrain(renderable, renderable_widths[0])
+                )
                 for renderable in _renderables
             ]
         if self.align:

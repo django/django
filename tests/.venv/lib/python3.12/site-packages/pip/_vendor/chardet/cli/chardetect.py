@@ -12,7 +12,6 @@ If no paths are provided, it takes its input from stdin.
 
 """
 
-
 import argparse
 import sys
 from typing import Iterable, List, Optional

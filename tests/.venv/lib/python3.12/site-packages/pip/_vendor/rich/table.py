@@ -685,7 +685,7 @@ class Table(JupyterMixin):
                     getattr(renderable, "vertical", None) or column.vertical,
                 )
         else:
-            for (style, renderable) in raw_cells:
+            for style, renderable in raw_cells:
                 yield _Cell(
                     style,
                     renderable,

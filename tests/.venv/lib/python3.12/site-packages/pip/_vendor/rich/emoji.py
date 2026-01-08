@@ -27,7 +27,7 @@ class NoEmoji(Exception):
 class Emoji(JupyterMixin):
     __slots__ = ["name", "style", "_char", "variant"]
 
-    VARIANTS = {"text": "\uFE0E", "emoji": "\uFE0F"}
+    VARIANTS = {"text": "\ufe0e", "emoji": "\ufe0f"}
 
     def __init__(
         self,
@@ -87,7 +87,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console(record=True)
 
     columns = Columns(
-        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200D" not in name),
+        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200d" not in name),
         column_first=True,
     )
 

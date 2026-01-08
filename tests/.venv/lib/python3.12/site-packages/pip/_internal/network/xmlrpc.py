@@ -1,5 +1,4 @@
-"""xmlrpclib.Transport implementation
-"""
+"""xmlrpclib.Transport implementation"""
 
 import logging
 import urllib.parse

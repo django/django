@@ -66,7 +66,6 @@ def _create_truststore_ssl_context() -> Optional["SSLContext"]:
 
 
 class SessionCommandMixin(CommandContextMixIn):
-
     """
     A class mixin for command classes needing _build_session().
     """
@@ -154,7 +153,6 @@ class SessionCommandMixin(CommandContextMixIn):
 
 
 class IndexGroupCommand(Command, SessionCommandMixin):
-
     """
     Abstract base class for commands with the index_group options.
 
@@ -438,9 +436,11 @@ class RequirementCommand(IndexGroupCommand):
                     isolated=options.isolated_mode,
                     use_pep517=options.use_pep517,
                     user_supplied=True,
-                    config_settings=parsed_req.options.get("config_settings")
-                    if parsed_req.options
-                    else None,
+                    config_settings=(
+                        parsed_req.options.get("config_settings")
+                        if parsed_req.options
+                        else None
+                    ),
                 )
                 requirements.append(req_to_add)
 

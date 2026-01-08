@@ -1,5 +1,4 @@
-"""Support for installing and building the "wheel" binary package format.
-"""
+"""Support for installing and building the "wheel" binary package format."""
 
 import collections
 import compileall

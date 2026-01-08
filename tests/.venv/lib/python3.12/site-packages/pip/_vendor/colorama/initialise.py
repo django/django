@@ -30,14 +30,14 @@ def _wipe_internal_state_for_tests():
 
 
 def reset_all():
-    if AnsiToWin32 is not None:    # Issue #74: objects might become None at exit
+    if AnsiToWin32 is not None:  # Issue #74: objects might become None at exit
         AnsiToWin32(orig_stdout).reset_all()
 
 
 def init(autoreset=False, convert=None, strip=None, wrap=True):
 
     if not wrap and any([autoreset, convert, strip]):
-        raise ValueError('wrap=False conflicts with any other arg=True')
+        raise ValueError("wrap=False conflicts with any other arg=True")
 
     global wrapped_stdout, wrapped_stderr
     global orig_stdout, orig_stderr
@@ -48,13 +48,15 @@ def init(autoreset=False, convert=None, strip=None, wrap=True):
     if sys.stdout is None:
         wrapped_stdout = None
     else:
-        sys.stdout = wrapped_stdout = \
-            wrap_stream(orig_stdout, convert, strip, autoreset, wrap)
+        sys.stdout = wrapped_stdout = wrap_stream(
+            orig_stdout, convert, strip, autoreset, wrap
+        )
     if sys.stderr is None:
         wrapped_stderr = None
     else:
-        sys.stderr = wrapped_stderr = \
-            wrap_stream(orig_stderr, convert, strip, autoreset, wrap)
+        sys.stderr = wrapped_stderr = wrap_stream(
+            orig_stderr, convert, strip, autoreset, wrap
+        )
 
     global atexit_done
     if not atexit_done:
@@ -92,6 +94,7 @@ def just_fix_windows_console():
 
     fixed_windows_console = True
 
+
 @contextlib.contextmanager
 def colorama_text(*args, **kwargs):
     init(*args, **kwargs)
@@ -110,8 +113,7 @@ def reinit():
 
 def wrap_stream(stream, convert, strip, autoreset, wrap):
     if wrap:
-        wrapper = AnsiToWin32(stream,
-            convert=convert, strip=strip, autoreset=autoreset)
+        wrapper = AnsiToWin32(stream, convert=convert, strip=strip, autoreset=autoreset)
         if wrapper.should_wrap():
             stream = wrapper.stream
     return stream

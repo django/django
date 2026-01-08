@@ -4,7 +4,13 @@ from time import process_time
 
 from pip._vendor.rich import box
 from pip._vendor.rich.color import Color
-from pip._vendor.rich.console import Console, ConsoleOptions, Group, RenderableType, RenderResult
+from pip._vendor.rich.console import (
+    Console,
+    ConsoleOptions,
+    Group,
+    RenderableType,
+    RenderResult,
+)
 from pip._vendor.rich.markdown import Markdown
 from pip._vendor.rich.measure import Measurement
 from pip._vendor.rich.pretty import Pretty

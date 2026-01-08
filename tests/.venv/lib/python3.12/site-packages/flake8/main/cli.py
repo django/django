@@ -1,4 +1,5 @@
 """Command-line implementation of flake8."""
+
 from __future__ import annotations
 
 import sys

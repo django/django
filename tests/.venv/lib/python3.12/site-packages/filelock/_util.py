@@ -23,7 +23,9 @@ def raise_on_not_writable_file(filename: str) -> None:
     except OSError:
         return  # swallow does not exist or other errors
 
-    if file_stat.st_mtime != 0:  # if os.stat returns but modification is zero that's an invalid os.stat - ignore it
+    if (
+        file_stat.st_mtime != 0
+    ):  # if os.stat returns but modification is zero that's an invalid os.stat - ignore it
         if not (file_stat.st_mode & stat.S_IWUSR):
             raise PermissionError(EACCES, "Permission denied", filename)
 

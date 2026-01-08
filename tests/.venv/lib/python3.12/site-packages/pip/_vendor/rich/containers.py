@@ -76,12 +76,10 @@ class Lines:
         return iter(self._lines)
 
     @overload
-    def __getitem__(self, index: int) -> "Text":
-        ...
+    def __getitem__(self, index: int) -> "Text": ...
 
     @overload
-    def __getitem__(self, index: slice) -> List["Text"]:
-        ...
+    def __getitem__(self, index: slice) -> List["Text"]: ...
 
     def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
         return self._lines[index]

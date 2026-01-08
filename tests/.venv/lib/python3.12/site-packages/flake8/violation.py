@@ -1,4 +1,5 @@
 """Contains the Violation error class used internally."""
+
 from __future__ import annotations
 
 import functools
@@ -63,7 +64,5 @@ class Violation(NamedTuple):
             )
             return True
 
-        LOG.debug(
-            "%r is not ignored inline with ``# noqa: %s``", self, codes_str
-        )
+        LOG.debug("%r is not ignored inline with ``# noqa: %s``", self, codes_str)
         return False

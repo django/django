@@ -1,2 +1,1 @@
-"""For modules related to installing packages.
-"""
+"""For modules related to installing packages."""

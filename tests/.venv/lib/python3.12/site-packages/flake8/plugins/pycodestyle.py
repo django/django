@@ -1,4 +1,5 @@
 """Generated using ./bin/gen-pycodestyle-plugin."""
+
 # fmt: off
 from __future__ import annotations
 

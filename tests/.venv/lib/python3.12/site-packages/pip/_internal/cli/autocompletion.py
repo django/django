@@ -1,5 +1,4 @@
-"""Logic that powers autocompletion installed by ``pip completion``.
-"""
+"""Logic that powers autocompletion installed by ``pip completion``."""
 
 import optparse
 import os

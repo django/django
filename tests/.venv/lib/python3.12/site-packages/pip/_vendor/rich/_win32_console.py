@@ -2,6 +2,7 @@
 
 The API that this module wraps is documented at https://docs.microsoft.com/en-us/windows/console/console-functions
 """
+
 import ctypes
 import sys
 from typing import Any

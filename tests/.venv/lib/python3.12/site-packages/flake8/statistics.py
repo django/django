@@ -1,4 +1,5 @@
 """Statistic collection logic for Flake8."""
+
 from __future__ import annotations
 
 from collections.abc import Generator

@@ -41,7 +41,7 @@ def format_header_param_rfc2231(name, value):
         value = value.decode("utf-8")
 
     if not any(ch in value for ch in '"\\\r\n'):
-        result = u'%s="%s"' % (name, value)
+        result = '%s="%s"' % (name, value)
         try:
             result.encode("ascii")
         except (UnicodeEncodeError, UnicodeDecodeError):
@@ -64,15 +64,15 @@ def format_header_param_rfc2231(name, value):
 
 
 _HTML5_REPLACEMENTS = {
-    u"\u0022": u"%22",
+    "\u0022": "%22",
     # Replace "\" with "\\".
-    u"\u005C": u"\u005C\u005C",
+    "\u005c": "\u005c\u005c",
 }
 
 # All control characters from 0x00 to 0x1F *except* 0x1B.
 _HTML5_REPLACEMENTS.update(
     {
-        six.unichr(cc): u"%{:02X}".format(cc)
+        six.unichr(cc): "%{:02X}".format(cc)
         for cc in range(0x00, 0x1F + 1)
         if cc not in (0x1B,)
     }
@@ -116,7 +116,7 @@ def format_header_param_html5(name, value):
 
     value = _replace_multiple(value, _HTML5_REPLACEMENTS)
 
-    return u'%s="%s"' % (name, value)
+    return '%s="%s"' % (name, value)
 
 
 # For backwards-compatibility.
@@ -225,7 +225,7 @@ class RequestField(object):
             if value is not None:
                 parts.append(self._render_part(name, value))
 
-        return u"; ".join(parts)
+        return "; ".join(parts)
 
     def render_headers(self):
         """
@@ -236,15 +236,15 @@ class RequestField(object):
         sort_keys = ["Content-Disposition", "Content-Type", "Content-Location"]
         for sort_key in sort_keys:
             if self.headers.get(sort_key, False):
-                lines.append(u"%s: %s" % (sort_key, self.headers[sort_key]))
+                lines.append("%s: %s" % (sort_key, self.headers[sort_key]))
 
         for header_name, header_value in self.headers.items():
             if header_name not in sort_keys:
                 if header_value:
-                    lines.append(u"%s: %s" % (header_name, header_value))
+                    lines.append("%s: %s" % (header_name, header_value))
 
-        lines.append(u"\r\n")
-        return u"\r\n".join(lines)
+        lines.append("\r\n")
+        return "\r\n".join(lines)
 
     def make_multipart(
         self, content_disposition=None, content_type=None, content_location=None
@@ -261,12 +261,12 @@ class RequestField(object):
             The 'Content-Location' of the request body.
 
         """
-        self.headers["Content-Disposition"] = content_disposition or u"form-data"
-        self.headers["Content-Disposition"] += u"; ".join(
+        self.headers["Content-Disposition"] = content_disposition or "form-data"
+        self.headers["Content-Disposition"] += "; ".join(
             [
-                u"",
+                "",
                 self._render_parts(
-                    ((u"name", self._name), (u"filename", self._filename))
+                    (("name", self._name), ("filename", self._filename))
                 ),
             ]
         )

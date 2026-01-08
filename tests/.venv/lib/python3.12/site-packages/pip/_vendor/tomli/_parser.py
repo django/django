@@ -41,11 +41,11 @@ BASIC_STR_ESCAPE_REPLACEMENTS = MappingProxyType(
     {
         "\\b": "\u0008",  # backspace
         "\\t": "\u0009",  # tab
-        "\\n": "\u000A",  # linefeed
-        "\\f": "\u000C",  # form feed
-        "\\r": "\u000D",  # carriage return
+        "\\n": "\u000a",  # linefeed
+        "\\f": "\u000c",  # form feed
+        "\\r": "\u000d",  # carriage return
         '\\"': "\u0022",  # quote
-        "\\\\": "\u005C",  # backslash
+        "\\\\": "\u005c",  # backslash
     }
 )
 

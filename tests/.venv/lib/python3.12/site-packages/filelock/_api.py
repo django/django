@@ -71,7 +71,9 @@ class FileLockContext:
     lock_file_fd: int | None = None
 
     #: The lock counter is used for implementing the nested locking mechanism.
-    lock_counter: int = 0  # When the lock is acquired is increased and the lock is only released, when this value is 0
+    lock_counter: int = (
+        0  # When the lock is acquired is increased and the lock is only released, when this value is 0
+    )
 
 
 class ThreadLocalFileContext(FileLockContext, local):
@@ -111,7 +113,10 @@ class FileLockMeta(ABCMeta):
                 # parameters do not match; raise error
                 msg = "Singleton lock instances cannot be initialized with differing arguments"
                 msg += "\nNon-matching arguments: "
-                for param_name, (passed_param, set_param) in non_matching_params.items():
+                for param_name, (
+                    passed_param,
+                    set_param,
+                ) in non_matching_params.items():
                     msg += f"\n\t{param_name} (existing lock has {set_param} but {passed_param} was passed)"
                 raise ValueError(msg)
 
@@ -129,7 +134,9 @@ class FileLockMeta(ABCMeta):
         }
 
         present_params = inspect.signature(cls.__init__).parameters  # type: ignore[misc]
-        init_params = {key: value for key, value in all_params.items() if key in present_params}
+        init_params = {
+            key: value for key, value in all_params.items() if key in present_params
+        }
 
         instance = super().__call__(lock_file, **init_params)
 
@@ -186,7 +193,9 @@ class BaseFileLock(contextlib.ContextDecorator, metaclass=FileLockMeta):
             "mode": mode,
             "blocking": blocking,
         }
-        self._context: FileLockContext = (ThreadLocalFileContext if thread_local else FileLockContext)(**kwargs)
+        self._context: FileLockContext = (
+            ThreadLocalFileContext if thread_local else FileLockContext
+        )(**kwargs)
 
     def is_thread_local(self) -> bool:
         """:return: a flag indicating if this lock is thread local or not"""
@@ -328,16 +337,24 @@ class BaseFileLock(contextlib.ContextDecorator, metaclass=FileLockMeta):
         try:
             while True:
                 if not self.is_locked:
-                    _LOGGER.debug("Attempting to acquire lock %s on %s", lock_id, lock_filename)
+                    _LOGGER.debug(
+                        "Attempting to acquire lock %s on %s", lock_id, lock_filename
+                    )
                     self._acquire()
                 if self.is_locked:
                     _LOGGER.debug("Lock %s acquired on %s", lock_id, lock_filename)
                     break
                 if blocking is False:
-                    _LOGGER.debug("Failed to immediately acquire lock %s on %s", lock_id, lock_filename)
+                    _LOGGER.debug(
+                        "Failed to immediately acquire lock %s on %s",
+                        lock_id,
+                        lock_filename,
+                    )
                     raise Timeout(lock_filename)  # noqa: TRY301
                 if 0 <= timeout < time.perf_counter() - start_time:
-                    _LOGGER.debug("Timeout on acquiring lock %s on %s", lock_id, lock_filename)
+                    _LOGGER.debug(
+                        "Timeout on acquiring lock %s on %s", lock_id, lock_filename
+                    )
                     raise Timeout(lock_filename)  # noqa: TRY301
                 msg = "Lock %s not acquired on %s, waiting %s seconds ..."
                 _LOGGER.debug(msg, lock_id, lock_filename, poll_interval)
@@ -361,7 +378,9 @@ class BaseFileLock(contextlib.ContextDecorator, metaclass=FileLockMeta):
             if self._context.lock_counter == 0 or force:
                 lock_id, lock_filename = id(self), self.lock_file
 
-                _LOGGER.debug("Attempting to release lock %s on %s", lock_id, lock_filename)
+                _LOGGER.debug(
+                    "Attempting to release lock %s on %s", lock_id, lock_filename
+                )
                 self._release()
                 self._context.lock_counter = 0
                 _LOGGER.debug("Lock %s released on %s", lock_id, lock_filename)

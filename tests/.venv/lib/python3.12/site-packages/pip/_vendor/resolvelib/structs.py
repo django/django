@@ -132,9 +132,7 @@ class _FactoryIterableView(object):
     __nonzero__ = __bool__  # XXX: Python 2.
 
     def __iter__(self):
-        iterable = (
-            self._factory() if self._iterable is None else self._iterable
-        )
+        iterable = self._factory() if self._iterable is None else self._iterable
         self._iterable, current = itertools.tee(iterable)
         return current
 

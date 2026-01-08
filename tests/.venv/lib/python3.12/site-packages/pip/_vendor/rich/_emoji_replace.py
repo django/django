@@ -16,7 +16,7 @@ def _emoji_replace(
 ) -> str:
     """Replace emoji code in text."""
     get_emoji = EMOJI.__getitem__
-    variants = {"text": "\uFE0E", "emoji": "\uFE0F"}
+    variants = {"text": "\ufe0e", "emoji": "\ufe0f"}
     get_variant = variants.get
     default_variant_code = variants.get(default_variant, "") if default_variant else ""
 

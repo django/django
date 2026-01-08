@@ -21,14 +21,14 @@ from .util import cached_property, get_cache_base, Cache
 logger = logging.getLogger(__name__)
 
 
-cache = None    # created when needed
+cache = None  # created when needed
 
 
 class ResourceCache(Cache):
     def __init__(self, base=None):
         if base is None:
             # Use native string to avoid issues on 2.x: see Python #20140.
-            base = os.path.join(get_cache_base(), str('resource-cache'))
+            base = os.path.join(get_cache_base(), str("resource-cache"))
         super(ResourceCache, self).__init__(base)
 
     def is_stale(self, resource, path):
@@ -63,7 +63,7 @@ class ResourceCache(Cache):
                 stale = self.is_stale(resource, path)
             if stale:
                 # write the bytes of the resource to the cache location
-                with open(result, 'wb') as f:
+                with open(result, "wb") as f:
                     f.write(resource.bytes)
         return result
 
@@ -80,7 +80,8 @@ class Resource(ResourceBase):
     not normally instantiated by user code, but rather by a
     :class:`ResourceFinder` which manages the resource.
     """
-    is_container = False        # Backwards compatibility
+
+    is_container = False  # Backwards compatibility
 
     def as_stream(self):
         """
@@ -108,7 +109,7 @@ class Resource(ResourceBase):
 
 
 class ResourceContainer(ResourceBase):
-    is_container = True     # Backwards compatibility
+    is_container = True  # Backwards compatibility
 
     @cached_property
     def resources(self):
@@ -120,15 +121,15 @@ class ResourceFinder(object):
     Resource finder for file system resources.
     """
 
-    if sys.platform.startswith('java'):
-        skipped_extensions = ('.pyc', '.pyo', '.class')
+    if sys.platform.startswith("java"):
+        skipped_extensions = (".pyc", ".pyo", ".class")
     else:
-        skipped_extensions = ('.pyc', '.pyo')
+        skipped_extensions = (".pyc", ".pyo")
 
     def __init__(self, module):
         self.module = module
-        self.loader = getattr(module, '__loader__', None)
-        self.base = os.path.dirname(getattr(module, '__file__', ''))
+        self.loader = getattr(module, "__loader__", None)
+        self.base = os.path.dirname(getattr(module, "__file__", ""))
 
     def _adjust_path(self, path):
         return os.path.realpath(path)
@@ -136,10 +137,10 @@ class ResourceFinder(object):
     def _make_path(self, resource_name):
         # Issue #50: need to preserve type of path on Python 2.x
         # like os.path._get_sep
-        if isinstance(resource_name, bytes):    # should only happen on 2.x
-            sep = b'/'
+        if isinstance(resource_name, bytes):  # should only happen on 2.x
+            sep = b"/"
         else:
-            sep = '/'
+            sep = "/"
         parts = resource_name.split(sep)
         parts.insert(0, self.base)
         result = os.path.join(*parts)
@@ -164,10 +165,10 @@ class ResourceFinder(object):
         return result
 
     def get_stream(self, resource):
-        return open(resource.path, 'rb')
+        return open(resource.path, "rb")
 
     def get_bytes(self, resource):
-        with open(resource.path, 'rb') as f:
+        with open(resource.path, "rb") as f:
             return f.read()
 
     def get_size(self, resource):
@@ -175,8 +176,8 @@ class ResourceFinder(object):
 
     def get_resources(self, resource):
         def allowed(f):
-            return (f != '__pycache__' and not
-                    f.endswith(self.skipped_extensions))
+            return f != "__pycache__" and not f.endswith(self.skipped_extensions)
+
         return set([f for f in os.listdir(resource.path) if allowed(f)])
 
     def is_container(self, resource):
@@ -197,7 +198,7 @@ class ResourceFinder(object):
                         if not rname:
                             new_name = name
                         else:
-                            new_name = '/'.join([rname, name])
+                            new_name = "/".join([rname, name])
                         child = self.find(new_name)
                         if child.is_container:
                             todo.append(child)
@@ -209,12 +210,13 @@ class ZipResourceFinder(ResourceFinder):
     """
     Resource finder for resources in .zip files.
     """
+
     def __init__(self, module):
         super(ZipResourceFinder, self).__init__(module)
         archive = self.loader.archive
         self.prefix_len = 1 + len(archive)
         # PyPy doesn't have a _files attr on zipimporter, and you can't set one
-        if hasattr(self.loader, '_files'):
+        if hasattr(self.loader, "_files"):
             self._files = self.loader._files
         else:
             self._files = zipimport._zip_directory_cache[archive]
@@ -224,7 +226,7 @@ class ZipResourceFinder(ResourceFinder):
         return path
 
     def _find(self, path):
-        path = path[self.prefix_len:]
+        path = path[self.prefix_len :]
         if path in self._files:
             result = True
         else:
@@ -236,14 +238,14 @@ class ZipResourceFinder(ResourceFinder):
             except IndexError:
                 result = False
         if not result:
-            logger.debug('_find failed: %r %r', path, self.loader.prefix)
+            logger.debug("_find failed: %r %r", path, self.loader.prefix)
         else:
-            logger.debug('_find worked: %r %r', path, self.loader.prefix)
+            logger.debug("_find worked: %r %r", path, self.loader.prefix)
         return result
 
     def get_cache_info(self, resource):
         prefix = self.loader.archive
-        path = resource.path[1 + len(prefix):]
+        path = resource.path[1 + len(prefix) :]
         return prefix, path
 
     def get_bytes(self, resource):
@@ -253,11 +255,11 @@ class ZipResourceFinder(ResourceFinder):
         return io.BytesIO(self.get_bytes(resource))
 
     def get_size(self, resource):
-        path = resource.path[self.prefix_len:]
+        path = resource.path[self.prefix_len :]
         return self._files[path][3]
 
     def get_resources(self, resource):
-        path = resource.path[self.prefix_len:]
+        path = resource.path[self.prefix_len :]
         if path and path[-1] != os.sep:
             path += os.sep
         plen = len(path)
@@ -267,12 +269,12 @@ class ZipResourceFinder(ResourceFinder):
             if not self.index[i].startswith(path):
                 break
             s = self.index[i][plen:]
-            result.add(s.split(os.sep, 1)[0])   # only immediate children
+            result.add(s.split(os.sep, 1)[0])  # only immediate children
             i += 1
         return result
 
     def _is_directory(self, path):
-        path = path[self.prefix_len:]
+        path = path[self.prefix_len :]
         if path and path[-1] != os.sep:
             path += os.sep
         i = bisect.bisect(self.index, path)
@@ -285,7 +287,7 @@ class ZipResourceFinder(ResourceFinder):
 
 _finder_registry = {
     type(None): ResourceFinder,
-    zipimport.zipimporter: ZipResourceFinder
+    zipimport.zipimporter: ZipResourceFinder,
 }
 
 try:
@@ -322,20 +324,21 @@ def finder(package):
         if package not in sys.modules:
             __import__(package)
         module = sys.modules[package]
-        path = getattr(module, '__path__', None)
+        path = getattr(module, "__path__", None)
         if path is None:
-            raise DistlibException('You cannot get a finder for a module, '
-                                   'only for a package')
-        loader = getattr(module, '__loader__', None)
+            raise DistlibException(
+                "You cannot get a finder for a module, " "only for a package"
+            )
+        loader = getattr(module, "__loader__", None)
         finder_maker = _finder_registry.get(type(loader))
         if finder_maker is None:
-            raise DistlibException('Unable to locate finder for %r' % package)
+            raise DistlibException("Unable to locate finder for %r" % package)
         result = finder_maker(module)
         _finder_cache[package] = result
     return result
 
 
-_dummy_module = types.ModuleType(str('__dummy__'))
+_dummy_module = types.ModuleType(str("__dummy__"))
 
 
 def finder_for_path(path):
@@ -352,7 +355,7 @@ def finder_for_path(path):
     finder = _finder_registry.get(type(loader))
     if finder:
         module = _dummy_module
-        module.__file__ = os.path.join(path, '')
+        module.__file__ = os.path.join(path, "")
         module.__loader__ = loader
         result = finder(module)
     return result

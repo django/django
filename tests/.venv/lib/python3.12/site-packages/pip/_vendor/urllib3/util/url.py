@@ -148,23 +148,23 @@ class Url(namedtuple("Url", url_attrs)):
             'http://username:password@host.com:80/path?query#fragment'
         """
         scheme, auth, host, port, path, query, fragment = self
-        url = u""
+        url = ""
 
         # We use "is not None" we want things to happen with empty strings (or 0 port)
         if scheme is not None:
-            url += scheme + u"://"
+            url += scheme + "://"
         if auth is not None:
-            url += auth + u"@"
+            url += auth + "@"
         if host is not None:
             url += host
         if port is not None:
-            url += u":" + str(port)
+            url += ":" + str(port)
         if path is not None:
             url += path
         if query is not None:
-            url += u"?" + query
+            url += "?" + query
         if fragment is not None:
-            url += u"#" + fragment
+            url += "#" + fragment
 
         return url
 
@@ -315,7 +315,7 @@ def _idna_encode(name):
             return idna.encode(name.lower(), strict=True, std3_rules=True)
         except idna.IDNAError:
             six.raise_from(
-                LocationParseError(u"Name '%s' is not a valid IDNA label" % name), None
+                LocationParseError("Name '%s' is not a valid IDNA label" % name), None
             )
     return name.lower().encode("ascii")
 
