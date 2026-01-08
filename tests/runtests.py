@@ -44,6 +44,12 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango70Warning)
+# Ignore this message as the test suite uses the default
+warnings.filterwarnings(
+    "ignore",
+    message="Multiline tags in templates will become the default in Django 7.0",
+    category=RemovedInDjango70Warning,
+)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)

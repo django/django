@@ -56,8 +56,9 @@ import re
 import warnings
 from enum import Enum
 
+from django.conf import settings
 from django.template.context import BaseContext
-from django.utils.deprecation import django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import lazy_annotations
@@ -89,7 +90,10 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})", re.DOTALL)
+
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -404,6 +408,9 @@ class Token:
 
 
 class Lexer:
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    _has_warned_for_multiline = False
+
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -415,6 +422,22 @@ class Lexer:
             self.verbatim,
         )
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # and remove TEMPLATE_TAGS_MULTILINE from settings.py-tpl
+    @property
+    def tag_re(self):
+        multiline = getattr(settings, "TEMPLATE_TAGS_MULTILINE", True)
+        if not multiline and not Lexer._has_warned_for_multiline:
+            warnings.warn(
+                "Multiline tags in templates will become the default in Django 7.0. "
+                "Opt in to the new behavior by setting TEMPLATE_TAGS_MULTILINE=True "
+                "in settings.",
+                RemovedInDjango70Warning,
+            )
+            Lexer._has_warned_for_multiline = True
+
+        return tag_re if multiline else tag_re_legacy
+
     def tokenize(self):
         """
         Return a list of tokens from a given template_string.
@@ -422,7 +445,9 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for token_string in tag_re.split(self.template_string):
+        # RemovedInDjango70Warning: When the deprecation ends, replace
+        # all usages of self.tag_re with just tag_re
+        for token_string in self.tag_re.split(self.template_string):
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -467,7 +492,9 @@ class Lexer:
 class DebugLexer(Lexer):
     def _tag_re_split_positions(self):
         last = 0
-        for match in tag_re.finditer(self.template_string):
+        # RemovedInDjango70Warning: When the deprecation ends, replace
+        # all usages of self.tag_re with just tag_re
+        for match in self.tag_re.finditer(self.template_string):
             start, end = match.span()
             yield last, start
             yield start, end
