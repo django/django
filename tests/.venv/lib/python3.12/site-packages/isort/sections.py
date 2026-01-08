@@ -1,0 +1,8 @@
+"""Defines all sections isort uses by default"""
+
+FUTURE: str = "FUTURE"
+STDLIB: str = "STDLIB"
+THIRDPARTY: str = "THIRDPARTY"
+FIRSTPARTY: str = "FIRSTPARTY"
+LOCALFOLDER: str = "LOCALFOLDER"
+DEFAULT: tuple[str, ...] = (FUTURE, STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER)
