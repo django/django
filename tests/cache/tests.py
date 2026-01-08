@@ -3107,3 +3107,49 @@ class CacheHandlerTest(SimpleTestCase):
         # .all() initializes all caches.
         self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
         self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))
+
+
+@override_settings(
+    CACHES={
+        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+        "other": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "other",
+        },
+    },
+)
+class DuplicateCacheKey(TestCase):
+    @mock.patch("time.sleep")
+    def test_cache_page_conflict(self, mock_sleep):
+        """cache_page isn't causing duplicates with middlewares"""
+
+        @cache_page(3000, cache="other")
+        def test_view(request):
+            time.sleep(1)
+            return HttpResponse(b"Hello, world")
+
+        request = RequestFactory().get("/view/")
+        cache_key = (
+            "views.decorators.cache.cache_page..GET."
+            "5b30bdb36b35025daf3570b18c3bb916.d41d8cd98f00b204e9800998ecf8427e.en"
+        )
+
+        self.assertFalse(caches["default"].has_key(cache_key))
+        self.assertFalse(caches["other"].has_key(cache_key))
+
+        UpdateCacheMiddleware(test_view)(request)
+        self.assertTrue(caches["other"].has_key(cache_key))
+        self.assertFalse(caches["default"].has_key(cache_key))
+        mock_sleep.assert_called_once()
+        mock_sleep.reset_mock()
+
+        CacheMiddleware(test_view)(request)
+        self.assertTrue(caches["other"].has_key(cache_key))
+        self.assertFalse(caches["default"].has_key(cache_key))
+        mock_sleep.assert_not_called()
+
+        response = test_view(request)
+        self.assertEqual(response.content, b"Hello, world")
+        self.assertTrue(caches["other"].has_key(cache_key))
+        self.assertFalse(caches["default"].has_key(cache_key))
+        mock_sleep.assert_not_called()
