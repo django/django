@@ -1,5 +1,5 @@
 [flake8]
-exclude = build,.git,.tox,./tests/.env
+exclude = build,.git,.tox,./tests/.env,./tests/.venv
 extend-ignore = E203
 max-line-length = 88
 max-doc-length = 79
