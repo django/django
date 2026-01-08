@@ -4,6 +4,7 @@ import email.policy
 import smtplib
 import ssl
 import threading
+from email.errors import HeaderParseError
 from email.headerregistry import Address, AddressHeader
 
 from django.conf import settings
@@ -159,24 +160,18 @@ class EmailBackend(BaseEmailBackend):
         return True
 
     def prep_address(self, address, force_ascii=True):
-        """
-        Return the addr-spec portion of an email address. Raises ValueError for
-        invalid addresses, including CR/NL injection.
-
-        If force_ascii is True, apply IDNA encoding to non-ASCII domains, and
-        raise ValueError for non-ASCII local-parts (which can't be encoded).
-        Otherwise, leave Unicode characters unencoded (e.g., for sending with
-        SMTPUTF8).
-        """
         address = force_str(address)
-        parsed = AddressHeader.value_parser(address)
+        try:
+            parsed = AddressHeader.value_parser(address)
+        except (HeaderParseError, IndexError) as exc:
+            raise ValueError(f"Invalid address {address!r}") from exc
+
         defects = set(str(defect) for defect in parsed.all_defects)
-        # Django allows local mailboxes like "From: webmaster" (#15042).
         defects.discard("addr-spec local part with no domain")
+
         if not force_ascii:
-            # Non-ASCII local-part is valid with SMTPUTF8. Remove once
-            # https://github.com/python/cpython/issues/81074 is fixed.
             defects.discard("local-part contains non-ASCII characters)")
+
         if defects:
             raise ValueError(f"Invalid address {address!r}: {'; '.join(defects)}")
 
@@ -186,8 +181,6 @@ class EmailBackend(BaseEmailBackend):
 
         mailbox = mailboxes[0]
         if force_ascii and mailbox.domain and not mailbox.domain.isascii():
-            # Re-compose an addr-spec with the IDNA encoded domain.
             domain = punycode(mailbox.domain)
             return str(Address(username=mailbox.local_part, domain=domain))
-        else:
-            return mailbox.addr_spec
+        return mailbox.addr_spec
