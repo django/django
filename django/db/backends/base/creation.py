@@ -361,24 +361,43 @@ class BaseDatabaseCreation:
         # Only load unittest if we're actually testing.
         from unittest import expectedFailure, skip
 
+        def get_test(module_or_class, class_or_method, test_name):
+            try:
+                test_case = import_string(module_or_class)
+            except ImportError:
+                # If import_string couldn't chop the rightmost term
+                # and getattr() it from the remainder, it's likely that
+                # the rightmost term was a submodule, and the remainder
+                # is a module that hasn't been imported yet.
+                # Import the test_method by importing test_name.
+                test_method = import_string(test_name)
+                test_case = sys.modules.get(test_method.__module__)
+            else:
+                test_method = getattr(test_case, class_or_method)
+            return test_case, test_method
+
         for test_name in self.connection.features.django_test_expected_failures:
-            test_case_name, _, test_method_name = test_name.rpartition(".")
+            module_or_class_name, _, class_or_method_name = test_name.rpartition(".")
             test_app = test_name.split(".")[0]
             # Importing a test app that isn't installed raises RuntimeError.
             if test_app in settings.INSTALLED_APPS:
-                test_case = import_string(test_case_name)
-                test_method = getattr(test_case, test_method_name)
-                setattr(test_case, test_method_name, expectedFailure(test_method))
+                test_case, test_method = get_test(
+                    module_or_class_name, class_or_method_name, test_name
+                )
+                setattr(test_case, class_or_method_name, expectedFailure(test_method))
         for reason, tests in self.connection.features.django_test_skips.items():
             for test_name in tests:
-                test_case_name, _, test_method_name = test_name.rpartition(".")
+                module_or_class_name, _, class_or_method_name = test_name.rpartition(
+                    "."
+                )
                 test_app = test_name.split(".")[0]
                 # Importing a test app that isn't installed raises
                 # RuntimeError.
                 if test_app in settings.INSTALLED_APPS:
-                    test_case = import_string(test_case_name)
-                    test_method = getattr(test_case, test_method_name)
-                    setattr(test_case, test_method_name, skip(reason)(test_method))
+                    test_case, test_method = get_test(
+                        module_or_class_name, class_or_method_name, test_name
+                    )
+                    setattr(test_case, class_or_method_name, skip(reason)(test_method))
 
     def sql_table_creation_suffix(self):
         """
