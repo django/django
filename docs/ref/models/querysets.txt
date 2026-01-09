@@ -170,6 +170,18 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: totally_ordered
+
+        .. versionadded:: 6.1
+
+        Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a ``GROUP BY`` clause, the model's default
+        ordering is ignored. Ordering specified via ``.extra(order_by=...)``
+        is also ignored.
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.

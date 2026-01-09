@@ -287,6 +287,10 @@ Models
 * :class:`~django.db.models.StringAgg` now supports ``distinct=True`` on SQLite
   when using the default delimiter ``Value(",")`` only.
 
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
