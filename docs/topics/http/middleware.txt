@@ -75,6 +75,12 @@ Middleware can either support only synchronous Python (the default), only
 asynchronous Python, or both. See :ref:`async-middleware` for details of how to
 advertise what you support, and know what kind of request you are getting.
 
+.. admonition:: Asynchronous middleware in development
+    Django’s built-in ``runserver`` development server runs only in synchronous
+    (WSGI) mode. This means that async-only middleware will not run when using
+    ``runserver``. To exercise async middleware during development, use an ASGI
+    server such as Daphne or Uvicorn instead.
+
 Middleware can live anywhere on your Python path.
 
 ``__init__(get_response)``
