@@ -1,6 +1,7 @@
 import copy
 import datetime
 import os
+import sys
 from unittest import mock
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
@@ -333,6 +334,10 @@ class TestMarkTests(SimpleTestCase):
                 "backends.base.test_creation.skip_test_function",
             },
         }
+        # Emulate the scenario where the parent module for
+        # backends.base.test_creation has not been imported yet.
+        popped_module = sys.modules.pop("backends.base")
+        self.addCleanup(sys.modules.__setitem__, "backends.base", popped_module)
         creation.mark_expected_failures_and_skips()
         self.assertIs(
             expected_failure_test_function.__unittest_expecting_failure__,
