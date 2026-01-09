@@ -162,18 +162,33 @@ class Left(Func):
         length: the number of characters to return from the start of the string
         """
         if not hasattr(length, "resolve_expression"):
-            if length < 1:
-                raise ValueError("'length' must be greater than 0.")
+            if length == 0:
+                raise ValueError("'length' must be greater than 0")
+            # Negative lengths are now supported on all backends.
+            # PostgreSQL handles them natively. For other backends,
+            # they are converted via get_substr().
+
         super().__init__(expression, length, **extra)
 
     def get_substr(self):
-        return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
+        expression = self.source_expressions[0]
+        length = self.source_expressions[1]
+
+        # Handle negative lengths by converting to LENGTH(string) + length
+        if isinstance(length, Value) and length.value < 0:
+            adjusted_length = Length(expression) + length
+            return Substr(expression, Value(1), adjusted_length)
+
+        return Substr(expression, Value(1), length)
 
     def as_oracle(self, compiler, connection, **extra_context):
         return self.get_substr().as_oracle(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        return self.get_substr().as_sql(compiler, connection, **extra_context)
 
 
 class Length(Transform):
