@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 # ---------------------------------------------------------------------
-# Reusable middleware stacks (important for admin!)
+# Reusable middleware stacks (important for admin)
 # ---------------------------------------------------------------------
 
 BASE_MIDDLEWARE = [
@@ -55,8 +55,8 @@ class AdminCSPNonceTests(TestCase):
     """
     Regression tests for CSP nonce behavior in Django admin templates.
 
-    We intentionally test ONLY whether the nonce appears in HTML.
-    CSP headers are tested elsewhere in Django.
+    Only the presence of the nonce in rendered HTML is tested.
+    CSP header behavior is tested elsewhere in Django.
     """
 
     def get_admin_index(self):
@@ -77,7 +77,7 @@ class AdminCSPNonceTests(TestCase):
         )
 
     # ------------------------------------------------------------------
-    # 1. CSP middleware NOT enabled
+    # 1. CSP middleware not enabled
     # ------------------------------------------------------------------
 
     def test_admin_without_csp_middleware(self):
@@ -88,7 +88,7 @@ class AdminCSPNonceTests(TestCase):
         self.assert_no_nonce(response)
 
     # ------------------------------------------------------------------
-    # 2. CSP enabled WITH nonces
+    # 2. CSP enabled with nonces
     # ------------------------------------------------------------------
 
     @override_settings(
@@ -107,7 +107,7 @@ class AdminCSPNonceTests(TestCase):
         self.assert_has_nonce(response)
 
     # ------------------------------------------------------------------
-    # 3. CSP enabled WITH nonces + strict-dynamic
+    # 3. CSP enabled with nonces and strict-dynamic
     # ------------------------------------------------------------------
 
     @override_settings(
