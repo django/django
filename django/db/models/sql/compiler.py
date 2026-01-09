@@ -1690,7 +1690,7 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
-    def field_as_sql(self, field, get_placeholder, val):
+    def field_as_sql(self, field, get_placeholder_sql, val):
         """
         Take a field and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Check for raw values,
@@ -1702,13 +1702,13 @@ class SQLInsertCompiler(SQLCompiler):
         if field is None:
             # A field value of None means the value is raw.
             sql, params = val, []
+        elif get_placeholder_sql is not None:
+            # Some fields (e.g. geo fields) need special munging before
+            # they can be inserted.
+            sql, params = get_placeholder_sql(val, self, self.connection)
         elif hasattr(val, "as_sql"):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
-        elif get_placeholder is not None:
-            # Some fields (e.g. geo fields) need special munging before
-            # they can be inserted.
-            sql, params = get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
             sql, params = "%s", [val]
@@ -1777,11 +1777,15 @@ class SQLInsertCompiler(SQLCompiler):
 
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
-        get_placeholders = [getattr(field, "get_placeholder", None) for field in fields]
+        get_placeholder_sqls = [
+            getattr(field, "get_placeholder_sql", None) for field in fields
+        ]
         rows_of_fields_as_sql = (
             (
-                self.field_as_sql(field, get_placeholder, value)
-                for field, get_placeholder, value in zip(fields, get_placeholders, row)
+                self.field_as_sql(field, get_placeholder_sql, value)
+                for field, get_placeholder_sql, value in zip(
+                    fields, get_placeholder_sqls, row
+                )
             )
             for row in value_rows
         )
@@ -2078,21 +2082,20 @@ class SQLUpdateCompiler(SQLCompiler):
                     )
             val = field.get_db_prep_save(val, connection=self.connection)
 
-            # Getting the placeholder for the field.
-            if hasattr(field, "get_placeholder"):
-                placeholder = field.get_placeholder(val, self, self.connection)
-            else:
-                placeholder = "%s"
-            name = field.column
-            if hasattr(val, "as_sql"):
-                sql, params = self.compile(val)
-                values.append("%s = %s" % (qn(name), placeholder % sql))
+            quoted_name = qn(field.column)
+            if (
+                get_placeholder_sql := getattr(field, "get_placeholder_sql", None)
+            ) is not None:
+                sql, params = get_placeholder_sql(val, self, self.connection)
+                values.append(f"{quoted_name} = {sql}")
                 update_params.extend(params)
-            elif val is not None:
-                values.append("%s = %s" % (qn(name), placeholder))
-                update_params.append(val)
+            elif hasattr(val, "as_sql"):
+                sql, params = self.compile(val)
+                values.append(f"{quoted_name} = {sql}")
+                update_params.extend(params)
             else:
-                values.append("%s = NULL" % qn(name))
+                values.append(f"{quoted_name} = %s")
+                update_params.append(val)
         table = self.query.base_table
         result = [
             "UPDATE %s SET" % qn(table),

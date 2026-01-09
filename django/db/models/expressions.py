@@ -1173,8 +1173,12 @@ class Value(SQLiteNumericMixin, Expression):
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
-            if hasattr(output_field, "get_placeholder"):
-                return output_field.get_placeholder(val, compiler, connection), [val]
+            if (
+                get_placeholder_sql := getattr(
+                    output_field, "get_placeholder_sql", None
+                )
+            ) is not None:
+                return get_placeholder_sql(val, compiler, connection)
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we

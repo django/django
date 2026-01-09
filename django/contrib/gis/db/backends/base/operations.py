@@ -115,7 +115,7 @@ class BaseSpatialOperations:
             "Distance operations not available on this spatial backend."
         )
 
-    def get_geom_placeholder(self, f, value, compiler):
+    def get_geom_placeholder_sql(self, f, value, compiler):
         """
         Return the placeholder for the given geometry field with the given
         value. Depending on the spatial backend, the placeholder may contain a
@@ -123,28 +123,26 @@ class BaseSpatialOperations:
         backend.
         """
 
-        def transform_value(value, field):
+        def must_transform_value(value, field):
             return value is not None and value.srid != field.srid
 
         if hasattr(value, "as_sql"):
-            return (
-                "%s(%%s, %s)" % (self.spatial_function_name("Transform"), f.srid)
-                if transform_value(value.output_field, f)
-                else "%s"
-            )
-        if transform_value(value, f):
-            # Add Transform() to the SQL placeholder.
-            return "%s(%s(%%s,%s), %s)" % (
-                self.spatial_function_name("Transform"),
-                self.from_text,
-                value.srid,
-                f.srid,
-            )
+            sql, params = compiler.compile(value)
+            if must_transform_value(value.output_field, f):
+                transform_func = self.spatial_function_name("Transform")
+                sql = f"{transform_func}({sql}, %s)"
+                params = (*params, f.srid)
+            return sql, params
+        elif must_transform_value(value, f):
+            transform_func = self.spatial_function_name("Transform")
+            sql = f"{transform_func}({self.from_text}(%s, %s), %s)"
+            params = (value, value.srid, f.srid)
+            return sql, params
         elif self.connection.features.has_spatialrefsys_table:
-            return "%s(%%s,%s)" % (self.from_text, f.srid)
+            return f"{self.from_text}(%s, %s)", (value, f.srid)
         else:
             # For backwards compatibility on MySQL (#27464).
-            return "%s(%%s)" % self.from_text
+            return f"{self.from_text}(%s)", (value,)
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):

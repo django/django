@@ -30,6 +30,7 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
@@ -180,6 +181,30 @@ class Field(RegisterLookupMixin):
         }
 
     description = property(_description)
+
+    def __init_subclass__(cls, **kwargs):
+        # Allow for both `get_placeholder` and `get_placeholder_sql` to
+        # be declared to ease the deprecation process for third-party apps.
+        if (
+            get_placeholder := getattr(cls, "get_placeholder", None)
+        ) is not None and not hasattr(cls, "get_placeholder_sql"):
+            warnings.warn(
+                "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
+                f"Define {cls.__module__}.{cls.__qualname__}.get_placeholder_sql "
+                "to return both SQL and parameters instead.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+
+            def get_placeholder_sql(self, value, compiler, connection):
+                placeholder = get_placeholder(self, value, compiler, connection)
+                if hasattr(value, "as_sql"):
+                    sql, params = compiler.compile(value)
+                    return placeholder % sql, params
+                return placeholder, (value,)
+
+            setattr(cls, "get_placeholder_sql", get_placeholder_sql)
+        return super().__init_subclass__(**kwargs)
 
     def __init__(
         self,
@@ -2735,8 +2760,8 @@ class BinaryField(Field):
     def get_internal_type(self):
         return "BinaryField"
 
-    def get_placeholder(self, value, compiler, connection):
-        return connection.ops.binary_placeholder_sql(value)
+    def get_placeholder_sql(self, value, compiler, connection):
+        return connection.ops.binary_placeholder_sql(value, compiler)
 
     def get_default(self):
         if self.has_default() and not callable(self.default):
