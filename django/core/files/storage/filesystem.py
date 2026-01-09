@@ -139,7 +139,10 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                 break
 
         if self.file_permissions_mode is not None:
-            os.chmod(full_path, self.file_permissions_mode)
+            try:
+                os.chmod(full_path, self.file_permissions_mode)
+            except FileNotFoundError:
+                pass
 
         # Ensure the saved path is always relative to the storage root.
         name = os.path.relpath(full_path, self.location)
