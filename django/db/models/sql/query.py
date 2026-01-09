@@ -453,13 +453,20 @@ def _split_where_by_annotation_refs(node, annotation_names, annotation_exprs=Non
 def _auto_cte_annotation_reuse(query, name_generator, collector):
     if getattr(query, "_auto_cte_annotation_skip", False):
         return query
+    original_selected = query.selected
+    if original_selected is not None:
+        if any(
+            not isinstance(value, (int, str))
+            for value in original_selected.values()
+        ):
+            return query
     if (
         query.model is None
         or query.__class__ is not Query
         or query.combinator
+        or query.subquery
         or query.is_sliced
         or query.group_by is not None
-        or query.selected is not None
         or not query.annotations
     ):
         return query
@@ -519,6 +526,13 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     base_query.extra_order_by = ()
     base_query.default_ordering = False
     current_query = base_query
+    auto_cte_selected = None
+    if original_selected is not None:
+        auto_cte_selected = {
+            alias: value if isinstance(value, str) else alias
+            for alias, value in original_selected.items()
+        }
+        auto_cte_selected_deferred = set(query.annotations)
     cte_created = False
     for idx, level in enumerate(levels):
         for name in level:
@@ -529,6 +543,19 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
             cte_query._with_ctes = ()
             cte_query._auto_cte_annotation_skip = True
             cte_query._auto_cte_processed = True
+            if auto_cte_selected is not None:
+                selected_for_cte = dict(base_query.selected or {})
+                for name in materialized_names:
+                    if name not in cte_query.annotations:
+                        annotation_expr = source_annotations.get(
+                            name, query.annotations[name]
+                        )
+                        cte_query.add_annotation(annotation_expr, name)
+                    selected_for_cte[name] = cte_query.annotations[name]
+                cte_query.selected = selected_for_cte
+                cte_query._annotation_select_cache = None
+                cte_query._auto_cte_selected = auto_cte_selected
+                cte_query._auto_cte_selected_deferred = auto_cte_selected_deferred
             cte = CTE(_queryset_from_query(cte_query, clone_query=False), name=name_generator())
             collector.add(cte)
             current_query = cte.queryset().query
@@ -937,6 +964,7 @@ class Query(BaseExpression):
         if clone.combined_queries:
             combined_queries = []
             for combined_query in clone.combined_queries:
+                combined_query._auto_cte_annotation_skip = True
                 combined_processed = combined_query._auto_cte_query(
                     name_generator=name_generator, collector=collector
                 )

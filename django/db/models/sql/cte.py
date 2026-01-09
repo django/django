@@ -127,8 +127,16 @@ class CTE:
                 query.add_annotation(col, alias)
         query.annotation_select_mask = cte_query.annotation_select_mask
 
-        if selected := getattr(cte_query, "selected", None):
+        selected = getattr(cte_query, "_auto_cte_selected", None)
+        if selected is None:
+            selected = getattr(cte_query, "selected", None)
+        if selected:
+            selected_deferred = getattr(
+                cte_query, "_auto_cte_selected_deferred", set()
+            )
             for alias in selected:
+                if alias in selected_deferred:
+                    continue
                 if alias not in cte_query.annotations:
                     output_field = cte_query.resolve_ref(alias).output_field
                     col = CTEColumnRef(alias, self.name, output_field)
