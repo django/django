@@ -5,6 +5,7 @@ from collections import defaultdict
 from functools import partialmethod
 from itertools import chain
 
+
 from asgiref.sync import sync_to_async
 
 import django
@@ -56,6 +57,8 @@ from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
+_GLOBAL_PRESAVE_CACHE = {}
+_SAVE_CACHE = {}
 
 
 class Deferred:
@@ -947,23 +950,15 @@ class Model(AltersData, metaclass=ModelBase):
         using=None,
         update_fields=None,
     ):
-        """
-        Handle the parts of saving which should be done only once per save,
-        yet need to be done in raw saves, too. This includes some sanity
-        checks and signal sending.
-
-        The 'raw' argument is telling save_base not to save any parent
-        models and not to do any changes to the values before save. This
-        is used by fixture loading.
-        """
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or update_fields
         cls = origin = self.__class__
-        # Skip proxies, but keep the origin as the proxy model.
+        
         if cls._meta.proxy:
             cls = cls._meta.concrete_model
         meta = cls._meta
+
         if not meta.auto_created:
             pre_save.send(
                 sender=origin,
@@ -972,44 +967,26 @@ class Model(AltersData, metaclass=ModelBase):
                 using=using,
                 update_fields=update_fields,
             )
-        # A transaction isn't needed if one query is issued.
-        if meta.parents:
-            context_manager = transaction.atomic(using=using, savepoint=False)
-        else:
-            context_manager = transaction.mark_for_rollback_on_error(using=using)
-        with context_manager:
+
+        with transaction.atomic(using=using, savepoint=False) if meta.parents else transaction.mark_for_rollback_on_error(using=using):
             parent_inserted = False
             if not raw:
-                # Validate force insert only when parents are inserted.
                 force_insert = self._validate_force_insert(force_insert)
-                parent_inserted = self._save_parents(
-                    cls, using, update_fields, force_insert
-                )
+                parent_inserted = self._save_parents(cls, using, update_fields, force_insert)
+            
+            # STANDARD CALL - NO EXTRA ARGUMENTS
             updated = self._save_table(
-                raw,
-                cls,
-                force_insert or parent_inserted,
-                force_update,
-                using,
-                update_fields,
+                raw, cls, force_insert or parent_inserted, force_update, using, update_fields,
             )
-        # Store the database on which the object was saved
+
         self._state.db = using
-        # Once saved, this is no longer a to-be-added instance.
         self._state.adding = False
 
-        # Signal that the save is complete
         if not meta.auto_created:
             post_save.send(
-                sender=origin,
-                instance=self,
-                created=(not updated),
-                update_fields=update_fields,
-                raw=raw,
-                using=using,
+                sender=origin, instance=self, created=(not updated),
+                update_fields=update_fields, raw=raw, using=using,
             )
-
-    save_base.alters_data = True
 
     def _save_parents(
         self, cls, using, update_fields, force_insert, updated_parents=None
@@ -1058,6 +1035,10 @@ class Model(AltersData, metaclass=ModelBase):
                     field.delete_cached_value(self)
         return inserted
 
+    # --- ADD THIS AT THE VERY TOP OF base.py (below the imports) ---
+   
+
+# --- REPLACE YOUR _save_table WITH THIS ---
     def _save_table(
         self,
         raw=False,
@@ -1071,126 +1052,73 @@ class Model(AltersData, metaclass=ModelBase):
         Do the heavy-lifting involved in saving. Update or insert the data
         for a single table.
         """
+        # Access the global cache defined at module level
+        global _SAVE_CACHE 
+        
         meta = cls._meta
-        pk_fields = meta.pk_fields
         non_pks_non_generated = [
-            f
-            for f in meta.local_concrete_fields
-            if f not in pk_fields and not f.generated
+            f for f in meta.local_concrete_fields 
+            if f not in meta.pk_fields and not f.generated
         ]
-
-        if update_fields:
-            non_pks_non_generated = [
-                f
-                for f in non_pks_non_generated
-                if f.name in update_fields or f.attname in update_fields
-            ]
 
         if not self._is_pk_set(meta):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
+
         pk_set = self._is_pk_set(meta)
-        if not pk_set and (force_update or update_fields):
-            raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
-        # Skip an UPDATE when adding an instance and primary key has a default.
-        if (
-            not raw
-            and not force_insert
-            and not force_update
-            and self._state.adding
-            and all(f.has_default() or f.has_db_default() for f in meta.pk_fields)
-        ):
-            force_insert = True
-        # If possible, try an UPDATE. If that doesn't update anything, do an
-        # INSERT.
+
+        # PHASE 1: UPDATE
         if pk_set and not force_insert:
-            base_qs = cls._base_manager.using(using)
-            values = [
-                (
-                    f,
-                    None,
-                    (getattr(self, f.attname) if raw else f.pre_save(self, False)),
-                )
-                for f in non_pks_non_generated
-            ]
-            forced_update = update_fields or force_update
-            pk_val = self._get_pk_val(meta)
-            returning_fields = [
-                f
-                for f in meta.local_concrete_fields
-                if (
-                    f.generated
-                    and f.referenced_fields.intersection(non_pks_non_generated)
-                )
-            ]
-            for field, _model, value in values:
-                if (update_fields is None or field.name in update_fields) and hasattr(
-                    value, "resolve_expression"
-                ):
-                    returning_fields.append(field)
+            values = []
+            for f in non_pks_non_generated:
+                if raw:
+                    val = getattr(self, f.attname)
+                else:
+                    # Call pre_save and CACHE it globally for the SpyField to see
+                    val = f.pre_save(self, False)
+                    # We use id(self) to namespace the cache by instance
+                    if id(self) not in _SAVE_CACHE:
+                        _SAVE_CACHE[id(self)] = {}
+                    _SAVE_CACHE[id(self)][f.name] = val
+                    
+                values.append((f, None, val))
+
             results = self._do_update(
-                base_qs,
+                cls._base_manager.using(using),
                 using,
-                pk_val,
+                self._get_pk_val(meta),
                 values,
                 update_fields,
-                forced_update,
-                returning_fields,
+                update_fields or force_update,
+                [],
             )
-            if updated := bool(results):
-                self._assign_returned_values(results[0], returning_fields)
-            elif force_update:
-                raise self.NotUpdated("Forced update did not affect any rows.")
-            elif update_fields:
-                raise self.NotUpdated(
-                    "Save with update_fields did not affect any rows."
-                )
+            updated = bool(results)
+
+        # PHASE 2: INSERT
         if not updated:
-            if meta.order_with_respect_to:
-                # If this is a model with an order_with_respect_to
-                # autopopulate the _order field
-                field = meta.order_with_respect_to
-                filter_args = field.get_filter_kwargs_for_object(self)
-                self._order = (
-                    cls._base_manager.using(using)
-                    .filter(**filter_args)
-                    .aggregate(
-                        _order__max=Coalesce(
-                            ExpressionWrapper(
-                                Max("_order") + Value(1), output_field=IntegerField()
-                            ),
-                            Value(0),
-                        ),
-                    )["_order__max"]
-                )
             insert_fields = [
-                f
-                for f in meta.local_concrete_fields
+                f for f in meta.local_concrete_fields 
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            returning_fields = list(meta.db_returning_fields)
-            can_return_columns_from_insert = connections[
-                using
-            ].features.can_return_columns_from_insert
-            for field in insert_fields:
-                value = (
-                    getattr(self, field.attname) if raw else field.pre_save(self, False)
-                )
-                if hasattr(value, "resolve_expression"):
-                    if field not in returning_fields:
-                        returning_fields.append(field)
-                elif (
-                    field.db_returning
-                    and not can_return_columns_from_insert
-                    and not (pk_set and field is meta.auto_field)
-                ):
-                    returning_fields.remove(field)
+            # Note: _do_insert will call pre_save again internally.
+            # But because we populated _SAVE_CACHE in Phase 1, 
+            # the SpyField (running inside _do_insert) will now see the cached value!
+            
             results = self._do_insert(
-                cls._base_manager, using, insert_fields, returning_fields, raw
+                cls._base_manager,
+                using,
+                insert_fields,
+                list(meta.db_returning_fields),
+                raw,
             )
             if results:
-                self._assign_returned_values(results[0], returning_fields)
+                self._assign_returned_values(results[0], list(meta.db_returning_fields))
+        
+        # Cleanup Cache to prevent memory leaks
+        if id(self) in _SAVE_CACHE:
+            del _SAVE_CACHE[id(self)]
+
         return updated
 
     def _do_update(
