@@ -148,7 +148,7 @@ class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
         if isinstance(other, self.__class__):
             return (
                 self.name == other.name
-                and self.index_type == other.index_type
+                and self.index_type.lower() == other.index_type.lower()
                 and self.expressions == other.expressions
                 and self.condition == other.condition
                 and self.deferrable == other.deferrable

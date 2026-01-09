@@ -17,7 +17,7 @@ Model form ``Meta`` API
 .. class:: ModelFormOptions
 
 The ``_meta`` API is used to build forms that reflect a Django model. It is
-accessible through the ``_meta`` attribute of each model form, and is an
+accessible through the ``_meta`` attribute of each model form, and is a
 ``django.forms.models.ModelFormOptions`` instance.
 
 The structure of the generated form can be customized by defining metadata

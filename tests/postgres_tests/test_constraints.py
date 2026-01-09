@@ -535,6 +535,24 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ],
             include=["cancelled"],
         )
+        constraint_8 = ExclusionConstraint(
+            index_type="gist",
+            name="exclude_overlapping",
+            expressions=[
+                ("datespan", RangeOperators.OVERLAPS),
+                ("room", RangeOperators.EQUAL),
+            ],
+            include=["cancelled"],
+        )
+        constraint_9 = ExclusionConstraint(
+            index_type="GIST",
+            name="exclude_overlapping",
+            expressions=[
+                ("datespan", RangeOperators.OVERLAPS),
+                ("room", RangeOperators.EQUAL),
+            ],
+            include=["cancelled"],
+        )
         constraint_10 = ExclusionConstraint(
             name="exclude_overlapping",
             expressions=[
@@ -572,6 +590,8 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
         self.assertNotEqual(constraint_2, constraint_7)
+        self.assertEqual(constraint_7, constraint_8)
+        self.assertEqual(constraint_7, constraint_9)
         self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_5, constraint_6)
         self.assertNotEqual(constraint_1, object())
