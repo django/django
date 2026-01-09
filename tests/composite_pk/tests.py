@@ -17,7 +17,7 @@ from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
-from .models import Comment, Post, Tenant, TimeStamped, User
+from .models import Comment, Post, Tenant, TimeStamped, Token, User
 
 
 class CommentForm(forms.ModelForm):
@@ -281,6 +281,16 @@ class CompositePKTests(TestCase):
             FieldError, "Unknown field(s) (pk) specified for Comment"
         ):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
+
+    def test_totally_ordered(self):
+        """
+        QuerySet.totally_ordered returns True when ordering by all fields of a
+        composite primary key and False when ordering by a subset.
+        """
+        qs_ordered = Token.objects.order_by("tenant_id", "id")
+        self.assertIs(qs_ordered.totally_ordered, True)
+        qs_partial = Token.objects.order_by("tenant_id")
+        self.assertIs(qs_partial.totally_ordered, False)
 
 
 class CompositePKFixturesTests(TestCase):
