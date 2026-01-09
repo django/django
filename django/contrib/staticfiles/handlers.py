@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urlparse
 from urllib.request import url2pathname
 
@@ -35,7 +36,12 @@ class StaticFilesHandlerMixin:
         Check if the path should be handled. Ignore the path if:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
+        * the path contains a special character (':' or '|') on Windows systems
         """
+
+        if os.name == "nt" and (":" in path or "|" in path):
+            return False
+
         return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
