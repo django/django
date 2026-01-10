@@ -60,6 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_virtual_generated_columns = True
 
     supports_json_negative_indexing = False
+    supports_json_absent_on_null = False
 
     @cached_property
     def minimum_database_version(self):
@@ -102,6 +103,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "test_update_ordered_by_inline_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
+            },
+            "MySQL does not correctly support ORDER BY in JSON_ARRAYAGG.": {
+                "aggregation.tests.JSONArrayAggTests.test_order_by",
             },
         }
         if not self.connection.mysql_is_mariadb:
