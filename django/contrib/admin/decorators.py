@@ -1,4 +1,11 @@
-def action(function=None, *, permissions=None, description=None):
+def action(
+    function=None,
+    *,
+    permissions=None,
+    description=None,
+    description_plural=None,
+    show_on_change_form=False,
+):
     """
     Conveniently add attributes to an action function::
 
@@ -23,6 +30,13 @@ def action(function=None, *, permissions=None, description=None):
             func.allowed_permissions = permissions
         if description is not None:
             func.short_description = description
+        if description_plural is not None:
+            func.plural_description = description_plural
+        elif description is not None:
+            func.plural_description = description
+
+        func.show_on_change_form = show_on_change_form
+
         return func
 
     if function is None:
