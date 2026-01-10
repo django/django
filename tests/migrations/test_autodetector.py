@@ -8,12 +8,14 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
 from django.db import connection, migrations, models
+from django.db.migrations import operations
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.functions import Concat, Lower, Upper
+from django.db.models import F, Value
+from django.db.models.functions import Cast, Concat, Lower, Upper
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_lru_cache
 
@@ -1217,6 +1219,103 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(
             changes["testapp"][0].dependencies, [("otherapp", "0001_initial")]
+        )
+
+    def test_generatedfield_fk_inline_with_multiple_initials(self):
+        """
+        When two apps are created together and one app's model has a
+        GeneratedField depending on a FK to the other app, and the apps'
+        initial migrations are split into multiple 000x_initial files,
+        the FK must still be created inline with the GeneratedField in
+        the CreateModel operation (not split into AddField).
+        """
+        # Add a GeneratedField on Book that depends on the FK to Author.
+        book_with_generated = ModelState(
+            app_label="otherapp",
+            name="Book",
+            fields=[
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),  # Just some random field
+                (
+                    "ref",
+                    # The actual field that causes the issue because
+                    # it references FK author_id
+                    models.GeneratedField(
+                        expression=Concat(
+                            Cast(F("author_id"), output_field=models.TextField()),
+                            Value("-REF"),
+                        ),
+                        output_field=models.CharField(max_length=64),
+                        db_persist=True,
+                    ),
+                ),
+            ],
+        )
+
+        before = self.make_project_state([])
+        after = self.make_project_state(
+            [
+                # testapp.Author with FK to otherapp.Book
+                self.author_with_book,
+                # otherapp.Book with FK to testapp.Author + GeneratedField
+                book_with_generated,
+                # otherapp.Attribution (M2M through)
+                self.attribution,
+            ]
+        )
+
+        autodetector = MigrationAutodetector(
+            before,
+            after,
+            MigrationQuestioner({"ask_initial": True}),
+        )
+        changes = autodetector._detect_changes()
+        graph = MigrationGraph()
+        changes = autodetector.arrange_for_graph(changes, graph)
+
+        # otherapp must have multiple initial migrations in this setup.
+        self.assertIn("otherapp", changes)
+        migrations_otherapp = changes["otherapp"]
+        self.assertGreaterEqual(
+            len(migrations_otherapp),
+            2,
+            msg="Expected otherapp to have multiple initial migrations.",
+        )
+
+        # Find the migration that creates Book.
+        create_book = None
+        for migration in migrations_otherapp:
+            for op in migration.operations:
+                if isinstance(op, operations.CreateModel) and op.name == "Book":
+                    create_book = op
+                    break
+            if create_book is not None:
+                break
+
+        self.assertIsNotNone(
+            create_book,
+            "No CreateModel operation for otherapp.Book found in generated migrations.",
+        )
+
+        field_names = dict(create_book.fields).keys()
+
+        # FK and GeneratedField must both be inline in CreateModel.
+        self.assertIn("author", field_names)
+        self.assertIn("ref", field_names)
+
+        # There must NOT be any AddField(Book, "author")
+        # in *any* otherapp migration.
+        self.assertFalse(
+            any(
+                isinstance(op, operations.AddField)
+                and op.model_name == "Book"
+                and op.name == "author"
+                for migration in migrations_otherapp
+                for op in migration.operations
+            ),
+            "ForeignKey referenced by a GeneratedField was split into AddField "
+            "across multiple initial migrations.",
         )
 
     def test_trim_apps(self):
