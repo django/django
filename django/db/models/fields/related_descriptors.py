@@ -172,14 +172,17 @@ class ForwardManyToOneDescriptor:
         ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
-        if querysets and len(querysets) != 1:
-            raise ValueError(
-                "querysets argument of get_prefetch_querysets() should have a length "
-                "of 1."
-            )
-        queryset = (
-            querysets[0] if querysets else self.get_queryset(instance=instances[0])
-        )
+        _cloning_disabled = False
+        if querysets:
+            if len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0]
+        else:
+            _cloning_disabled = True
+            queryset = self.get_queryset(instance=instances[0])._disable_cloning()
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -203,6 +206,9 @@ class ForwardManyToOneDescriptor:
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
+        # Restore subsequent cloning operations.
+        if _cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -466,14 +472,17 @@ class ReverseOneToOneDescriptor:
         ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
-        if querysets and len(querysets) != 1:
-            raise ValueError(
-                "querysets argument of get_prefetch_querysets() should have a length "
-                "of 1."
-            )
-        queryset = (
-            querysets[0] if querysets else self.get_queryset(instance=instances[0])
-        )
+        _cloning_disabled = False
+        if querysets:
+            if len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0]
+        else:
+            _cloning_disabled = True
+            queryset = self.get_queryset(instance=instances[0])._disable_cloning()
 
         rel_obj_attr = self.related.field.get_local_related_value
         instance_attr = self.related.field.get_foreign_related_value
@@ -483,6 +492,9 @@ class ReverseOneToOneDescriptor:
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
+        # Restore subsequent cloning operations.
+        if _cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -798,12 +810,18 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_querysets(self, instances, querysets=None):
-            if querysets and len(querysets) != 1:
-                raise ValueError(
-                    "querysets argument of get_prefetch_querysets() should have a "
-                    "length of 1."
-                )
-            queryset = querysets[0] if querysets else super().get_queryset()
+            _cloning_disabled = False
+            if querysets:
+                if len(querysets) != 1:
+                    raise ValueError(
+                        "querysets argument of get_prefetch_querysets() should have a "
+                        "length of 1."
+                    )
+                queryset = querysets[0]
+            else:
+                _cloning_disabled = True
+                queryset = super().get_queryset()._disable_cloning()
+
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
 
@@ -811,6 +829,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
             instance_attr = self.field.get_foreign_related_value
             instances_dict = {instance_attr(inst): inst for inst in instances}
             queryset = _filter_prefetch_queryset(queryset, self.field.name, instances)
+            # Restore subsequent cloning operations.
+            if _cloning_disabled:
+                queryset._enable_cloning()
 
             # Since we just bypassed this class' get_queryset(), we must manage
             # the reverse relation manually.
@@ -1176,12 +1197,18 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_querysets(self, instances, querysets=None):
-            if querysets and len(querysets) != 1:
-                raise ValueError(
-                    "querysets argument of get_prefetch_querysets() should have a "
-                    "length of 1."
-                )
-            queryset = querysets[0] if querysets else super().get_queryset()
+            _cloning_disabled = False
+            if querysets:
+                if len(querysets) != 1:
+                    raise ValueError(
+                        "querysets argument of get_prefetch_querysets() should have a "
+                        "length of 1."
+                    )
+                queryset = querysets[0]
+            else:
+                _cloning_disabled = True
+                queryset = super().get_queryset()._disable_cloning()
+
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
@@ -1207,6 +1234,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     for f in fk.local_related_fields
                 }
             )
+            # Restore subsequent cloning operations.
+            if _cloning_disabled:
+                queryset._enable_cloning()
+
             return (
                 queryset,
                 lambda result: tuple(
