@@ -959,6 +959,14 @@ class BaseDatabaseSchemaEditor:
         strict=False,
     ):
         """Perform a "physical" (non-ManyToMany) field update."""
+
+        # [FIX START] Define the model to use for introspection.
+        # If collecting SQL and the table was renamed, we must look at the old model.
+        introspection_model = model
+        if self.collect_sql and old_field.model._meta.db_table != model._meta.db_table:
+            introspection_model = old_field.model
+        # [FIX END]
+
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if (
@@ -971,8 +979,9 @@ class BaseDatabaseSchemaEditor:
                 ignore={"db_comment"},
             )
         ):
+            # [FIX] Use introspection_model instead of model
             fk_names = self._constraint_names(
-                model, [old_field.column], foreign_key=True
+                introspection_model, [old_field.column], foreign_key=True
             )
             if strict and len(fk_names) != 1:
                 raise ValueError(
@@ -994,8 +1003,9 @@ class BaseDatabaseSchemaEditor:
             meta_constraint_names = {
                 constraint.name for constraint in model._meta.constraints
             }
+            # [FIX] Use introspection_model instead of model
             constraint_names = self._constraint_names(
-                model,
+                introspection_model,
                 [old_field.column],
                 unique=True,
                 primary_key=False,
@@ -1028,8 +1038,20 @@ class BaseDatabaseSchemaEditor:
             # '_meta.related_field' also contains M2M reverse fields, these
             # will be filtered out
             for _old_rel, new_rel in _related_non_m2m_objects(old_field, new_field):
+                # [FIX START] Handle self-referencing renames here too
+                rel_introspection_model = new_rel.related_model
+                if (
+                    self.collect_sql
+                    and _old_rel.related_model._meta.db_table
+                    != new_rel.related_model._meta.db_table
+                ):
+                    rel_introspection_model = _old_rel.related_model
+                # [FIX END]
+
                 rel_fk_names = self._constraint_names(
-                    new_rel.related_model, [new_rel.field.column], foreign_key=True
+                    rel_introspection_model,
+                    [new_rel.field.column],
+                    foreign_key=True,
                 )
                 for fk_name in rel_fk_names:
                     self.execute(self._delete_fk_sql(new_rel.related_model, fk_name))
@@ -1053,8 +1075,10 @@ class BaseDatabaseSchemaEditor:
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
+
+            # [FIX] Use introspection_model instead of model
             index_names = self._constraint_names(
-                model,
+                introspection_model,
                 [old_field.column],
                 index=True,
                 type_=Index.suffix,
@@ -1072,8 +1096,9 @@ class BaseDatabaseSchemaEditor:
             meta_constraint_names = {
                 constraint.name for constraint in model._meta.constraints
             }
+            # [FIX] Use introspection_model instead of model
             constraint_names = self._constraint_names(
-                model,
+                introspection_model,
                 [old_field.column],
                 check=True,
                 exclude=meta_constraint_names,
