@@ -2906,7 +2906,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             else:
                 manager = getattr(obj, to_attr)
                 if leaf and lookup.queryset is not None:
-                    qs = manager._apply_rel_filters(lookup.queryset)
+                    qs = manager._apply_rel_filters(lookup.queryset._chain())
                 else:
                     qs = manager.get_queryset()
                 qs._result_cache = vals
