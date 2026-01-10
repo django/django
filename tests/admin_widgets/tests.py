@@ -1284,7 +1284,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def assertButtonsDisabled(
         self,
-        mode,
         field_name,
         choose_btn_disabled=False,
         remove_btn_disabled=False,
@@ -1297,15 +1296,10 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         remove_all_button = "#id_%s_remove_all" % field_name
         self.assertEqual(self.is_disabled(choose_button), choose_btn_disabled)
         self.assertEqual(self.is_disabled(remove_button), remove_btn_disabled)
-        if mode == "horizontal":
-            self.assertEqual(
-                self.is_disabled(choose_all_button), choose_all_btn_disabled
-            )
-            self.assertEqual(
-                self.is_disabled(remove_all_button), remove_all_btn_disabled
-            )
+        self.assertEqual(self.is_disabled(choose_all_button), choose_all_btn_disabled)
+        self.assertEqual(self.is_disabled(remove_all_button), remove_all_btn_disabled)
 
-    def execute_basic_operations(self, mode, field_name):
+    def execute_basic_operations(self, field_name):
         from selenium.webdriver.common.by import By
 
         original_url = self.selenium.current_url
@@ -1331,7 +1325,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.assertSelectOptions(to_box, [str(self.lisa.id), str(self.peter.id)])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1340,16 +1333,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
 
         # Click 'Choose all' --------------------------------------------------
-        if mode == "horizontal":
-            self.selenium.find_element(By.ID, choose_all_button).click()
-        elif mode == "vertical":
-            # There 's no 'Choose all' button in vertical mode, so individually
-            # select all options and click 'Choose'.
-            for option in self.selenium.find_elements(
-                By.CSS_SELECTOR, from_box + " > option"
-            ):
-                option.click()
-            self.selenium.find_element(By.ID, choose_button).click()
+        self.selenium.find_element(By.ID, choose_all_button).click()
         self.assertSelectOptions(from_box, [])
         self.assertSelectOptions(
             to_box,
@@ -1365,7 +1349,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1374,16 +1357,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
 
         # Click 'Remove all' --------------------------------------------------
-        if mode == "horizontal":
-            self.selenium.find_element(By.ID, remove_all_button).click()
-        elif mode == "vertical":
-            # There 's no 'Remove all' button in vertical mode, so individually
-            # select all options and click 'Remove'.
-            for option in self.selenium.find_elements(
-                By.CSS_SELECTOR, to_box + " > option"
-            ):
-                option.click()
-            self.selenium.find_element(By.ID, remove_button).click()
+        self.selenium.find_element(By.ID, remove_all_button).click()
         self.assertSelectOptions(
             from_box,
             [
@@ -1399,7 +1373,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.assertSelectOptions(to_box, [])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1423,7 +1396,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.bob.id))
         self.select_option(from_box, str(self.john.id))
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=False,
             remove_btn_disabled=True,
@@ -1432,7 +1404,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.selenium.find_element(By.ID, choose_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1472,7 +1443,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(to_box, str(self.lisa.id))
         self.select_option(to_box, str(self.bob.id))
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=False,
@@ -1481,7 +1451,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         self.selenium.find_element(By.ID, remove_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1572,8 +1541,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
             self.wait_page_ready()
             self.trigger_resize()
-            self.execute_basic_operations("vertical", "students")
-            self.execute_basic_operations("horizontal", "alumni")
+            self.execute_basic_operations("students")
+            self.execute_basic_operations("alumni")
 
             # Save, everything should be stored properly stored in the
             # database.
