@@ -337,6 +337,10 @@ def generate_cte_sql(connection, query, as_sql):
 
     ctes = []
     params = []
+    cte_entries = []
+    quoted_names = {
+        cte.name: connection.ops.quote_name(cte.name) for cte in query._with_ctes
+    }
     for cte in query._with_ctes:
         if django.VERSION > (4, 2):
             _ignore_with_col_aliases(cte.query)
@@ -357,8 +361,30 @@ def generate_cte_sql(connection, query, as_sql):
                     delattr(cte.query, "_ignore_cte_name")
                 else:
                     cte.query._ignore_cte_name = ignore_cte_name
+        cte_entries.append((cte, qn(cte.name), cte_sql, cte_params))
+
+    used = {
+        name for name, quoted in quoted_names.items() if quoted in base_sql
+    }
+    queue = list(used)
+    sql_by_name = {cte.name: cte_sql for cte, _, cte_sql, _ in cte_entries}
+    while queue:
+        name = queue.pop()
+        cte_sql = sql_by_name.get(name)
+        if cte_sql is None:
+            continue
+        for other_name, quoted in quoted_names.items():
+            if other_name == name:
+                continue
+            if quoted in cte_sql and other_name not in used:
+                used.add(other_name)
+                queue.append(other_name)
+
+    for cte, cte_name_sql, cte_sql, cte_params in cte_entries:
+        if cte.name not in used:
+            continue
         template = get_cte_query_template(cte)
-        ctes.append(template.format(name=qn(cte.name), query=cte_sql))
+        ctes.append(template.format(name=cte_name_sql, query=cte_sql))
         params.extend(cte_params)
 
     if ctes:
