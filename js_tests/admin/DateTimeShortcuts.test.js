@@ -37,9 +37,10 @@ QUnit.test('time zone offset warning - single field', function(assert) {
     const timeField = $('<input id="id_updated_at" type="text" name="updated_at" class="vTimeField">');
     $('#qunit-fixture').append(timeField);
     $('body').attr('data-admin-utc-offset', new Date().getTimezoneOffset() * -60 + 3600);
+    $('body').attr('data-admin-server-timezone', 'EST');
     DateTimeShortcuts.init();
     $('body').attr('data-admin-utc-offset', savedOffset);
-    assert.equal($('.timezonewarning').text(), 'Note: You are 1 hour behind server time.');
+    assert.equal($('.timezonewarning').text(), 'Note: Enter times in the EST timezone. (You are 1 hour behind)');
     assert.equal($('.timezonewarning').attr("id"), "id_updated_at_timezone_warning_helptext");
 });
 
