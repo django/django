@@ -22,7 +22,6 @@ PY313 = sys.version_info >= (3, 13)
 PY314 = sys.version_info >= (3, 14)
 PY315 = sys.version_info >= (3, 15)
 
-
 def get_version(version=None):
     """Return a PEP 440-compliant version number from VERSION."""
     version = get_complete_version(version)
@@ -86,23 +85,29 @@ def get_git_changeset():
     """
     # Repository may not be found if __file__ is undefined, e.g. in a frozen
     # module.
+
     if "__file__" not in globals():
         return None
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    git_log = subprocess.run(
-        "git log --pretty=format:%ct --quiet -1 HEAD",
-        capture_output=True,
-        shell=True,
-        cwd=repo_dir,
-        text=True,
-    )
-    timestamp = git_log.stdout
-    tz = datetime.UTC
     try:
-        timestamp = datetime.datetime.fromtimestamp(int(timestamp), tz=tz)
-    except ValueError:
+        timestamp = subprocess.check_output(
+            ["git", "log", "--pretty=format:%ct", "--quiet", "-1", "HEAD"],
+            cwd=repo_dir,
+            
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
         return None
-    return timestamp.strftime("%Y%m%d%H%M%S")
+    if not timestamp:
+        return None
+
+    try:
+        dt = datetime.datetime.fromtimestamp(int(timestamp), tz=datetime.UTC)
+    except (ValueError, OSError):
+        return None
+
+    return dt.strftime("%Y%m%d%H%M%S")
 
 
 version_component_re = _lazy_re_compile(r"(\d+|[a-z]+|\.)")

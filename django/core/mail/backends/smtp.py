@@ -11,7 +11,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import force_str, punycode
 from django.utils.functional import cached_property
-
+from email.errors import HeaderParseError
 
 class EmailBackend(BaseEmailBackend):
     """
@@ -169,7 +169,12 @@ class EmailBackend(BaseEmailBackend):
         SMTPUTF8).
         """
         address = force_str(address)
-        parsed = AddressHeader.value_parser(address)
+
+        try:
+            parsed = AddressHeader.value_parser(address)
+        except (HeaderParseError, IndexError, ValueError):
+            raise ValueError(f"Invalid address {address!r}")
+
         defects = set(str(defect) for defect in parsed.all_defects)
         # Django allows local mailboxes like "From: webmaster" (#15042).
         defects.discard("addr-spec local part with no domain")
@@ -186,7 +191,6 @@ class EmailBackend(BaseEmailBackend):
 
         mailbox = mailboxes[0]
         if force_ascii and mailbox.domain and not mailbox.domain.isascii():
-            # Re-compose an addr-spec with the IDNA encoded domain.
             domain = punycode(mailbox.domain)
             return str(Address(username=mailbox.local_part, domain=domain))
         else:

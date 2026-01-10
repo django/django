@@ -298,11 +298,14 @@ class Right(Left):
     function = "RIGHT"
 
     def get_substr(self):
-        return Substr(
-            self.source_expressions[0],
-            self.source_expressions[1] * Value(-1),
-            self.source_expressions[1],
-        )
+        from django.db.models.functions import Length
+        
+        expression = self.source_expressions[0]
+        length = self.source_expressions[1]
+
+        # Convert RIGHT(x, n) → SUBSTR(x, LENGTH(x) - n + 1, n)
+        start = Length(expression) - length + Value(1)
+        return Substr(expression, start, length)
 
 
 class RPad(LPad):
