@@ -460,12 +460,14 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
             for value in original_selected.values()
         ):
             return query
+    original_annotation_select_mask = query.annotation_select_mask
+    if original_annotation_select_mask is not None:
+        original_annotation_select = set(query.annotation_select)
     if (
         query.model is None
         or query.__class__ is not Query
         or query.combinator
         or query.subquery
-        or query.is_sliced
         or query.group_by is not None
         or not query.annotations
     ):
@@ -510,7 +512,12 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     if not move_annotation_where:
         annotation_where = None
         base_where = query.where
+    is_sliced = query.is_sliced
+    original_low_mark = query.low_mark
+    original_high_mark = query.high_mark
     base_query = query.clone()
+    if is_sliced:
+        base_query.clear_limits()
     base_query.where = base_where or WhereNode()
     base_query.annotations = {}
     if base_query.annotation_select_mask is not None:
@@ -574,6 +581,11 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     current_query.order_by = query.order_by
     current_query.extra_order_by = query.extra_order_by
     current_query.default_ordering = query.default_ordering
+    if original_annotation_select_mask is not None:
+        current_query.set_annotation_mask(original_annotation_select)
+    if is_sliced:
+        current_query.low_mark = original_low_mark
+        current_query.high_mark = original_high_mark
     return current_query
 
 
