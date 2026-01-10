@@ -321,7 +321,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The Oracle database backend now supports running tests in parallel with the
+  ``--parallel`` option.
 
 URLs
 ~~~~
