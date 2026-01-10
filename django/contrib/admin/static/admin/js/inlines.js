@@ -198,7 +198,7 @@
     /* Setup plugin defaults */
     $.fn.formset.defaults = {
         prefix: "form", // The form prefix for your django formset
-        addText: "add another", // Text for the add link
+        addText: "add", // Text for the add link
         deleteText: "remove", // Text for the delete link
         addCssClass: "add-row", // CSS class applied to the add link
         deleteCssClass: "delete-row", // CSS class applied to the delete link
