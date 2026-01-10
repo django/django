@@ -738,12 +738,13 @@ def create_reverse_many_to_one_manager(superclass, rel):
             empty_strings_as_null = connections[
                 db
             ].features.interprets_empty_strings_as_nulls
-            queryset._add_hints(instance=self.instance)
-            if self._db:
-                queryset = queryset.using(self._db)
-            queryset._fetch_mode = self.instance._state.fetch_mode
-            queryset._defer_next_filter = True
-            queryset = queryset.filter(**self.core_filters)
+            with queryset._avoid_cloning():
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                queryset._fetch_mode = self.instance._state.fetch_mode
+                queryset._defer_next_filter = True
+                queryset = queryset.filter(**self.core_filters)
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
                 if val is None or (val == "" and empty_strings_as_null):
@@ -1140,12 +1141,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            queryset._add_hints(instance=self.instance)
-            if self._db:
-                queryset = queryset.using(self._db)
-            queryset._fetch_mode = self.instance._state.fetch_mode
-            queryset._defer_next_filter = True
-            return queryset._next_is_sticky().filter(**self.core_filters)
+            with queryset._avoid_cloning():
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                queryset._fetch_mode = self.instance._state.fetch_mode
+                queryset._defer_next_filter = True
+                return queryset._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_cache(self):
             # Walk up the ancestor-chain (if cached) to try and find a prefetch
