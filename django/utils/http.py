@@ -41,6 +41,12 @@ RFC3986_SUBDELIMS = "!$&'()*+,;="
 MAX_URL_LENGTH = 2048
 MAX_URL_REDIRECT_LENGTH = 16384
 
+# Quoted strings can contain horizontal tabs, space characters, and
+# characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
+# can still be expressed but must be escaped with their own `\`.
+# https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
+_quotable_chars_re = _lazy_re_compile(r"^[\t \x21-\x7e]*$")
+
 
 def urlencode(query, doseq=False):
     """
@@ -379,12 +385,7 @@ def content_disposition_header(as_attachment, filename):
             is_ascii = True
         except UnicodeEncodeError:
             is_ascii = False
-        # Quoted strings can contain horizontal tabs, space characters, and
-        # characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
-        # can still be expressed but must be escaped with their own `\`.
-        # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
-        quotable_characters = r"^[\t \x21-\x7e]*$"
-        if is_ascii and re.match(quotable_characters, filename):
+        if is_ascii and _quotable_chars_re.match(filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")
             )
