@@ -7,15 +7,7 @@ from django.conf import settings
 from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import (
-    AutoField,
-    CompositePrimaryKey,
-    Exists,
-    ExpressionWrapper,
-    Lookup,
-)
-from django.db.models.expressions import RawSQL
-from django.db.models.sql.where import WhereNode
+from django.db.models import AutoField, CompositePrimaryKey
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
@@ -718,21 +710,6 @@ END;
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)
-
-    def conditional_expression_supported_in_where_clause(self, expression):
-        """
-        Oracle supports only EXISTS(...) or filters in the WHERE clause, others
-        must be compared with True.
-        """
-        if isinstance(expression, (Exists, Lookup, WhereNode)):
-            return True
-        if isinstance(expression, ExpressionWrapper) and expression.conditional:
-            return self.conditional_expression_supported_in_where_clause(
-                expression.expression
-            )
-        if isinstance(expression, RawSQL) and expression.conditional:
-            return True
-        return False
 
     def format_json_path_numeric_index(self, num):
         if num < 0:
