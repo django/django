@@ -37,7 +37,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -1155,9 +1155,19 @@ class QuerySet(AltersData):
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
+        # RemovedInDjango70Warning: replace with:
+        # if self.ordered or not self.query.default_ordering:
         if self.ordered:
             queryset = self
         else:
+            if not self.query.default_ordering:
+                warnings.warn(
+                    "Calling first() after order_by() with no arguments will stop "
+                    "adding implicit 'pk' ordering in Django 7.0. Pass a field name "
+                    "to order_by() instead.",
+                    category=RemovedInDjango70Warning,
+                    skip_file_prefixes=django_file_prefixes(),
+                )
             self._check_ordering_first_last_queryset_aggregation(method="first")
             queryset = self.order_by("pk")
         for obj in queryset[:1]:
@@ -1168,9 +1178,19 @@ class QuerySet(AltersData):
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
+        # RemovedInDjango70Warning: replace with:
+        # if self.ordered or not self.query.default_ordering:
         if self.ordered:
             queryset = self.reverse()
         else:
+            if not self.query.default_ordering:
+                warnings.warn(
+                    "Calling last() after order_by() with no arguments will stop "
+                    "adding implicit '-pk' ordering in Django 7.0. Pass a field name "
+                    "to order_by() instead.",
+                    category=RemovedInDjango70Warning,
+                    skip_file_prefixes=django_file_prefixes(),
+                )
             self._check_ordering_first_last_queryset_aggregation(method="last")
             queryset = self.order_by("-pk")
         for obj in queryset[:1]:
