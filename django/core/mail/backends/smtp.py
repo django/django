@@ -4,6 +4,7 @@ import email.policy
 import smtplib
 import ssl
 import threading
+from email.errors import HeaderParseError
 from email.headerregistry import Address, AddressHeader
 
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import force_str, punycode
 from django.utils.functional import cached_property
-from email.errors import HeaderParseError
+
 
 class EmailBackend(BaseEmailBackend):
     """

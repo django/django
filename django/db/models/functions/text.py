@@ -299,7 +299,7 @@ class Right(Left):
 
     def get_substr(self):
         from django.db.models.functions import Length
-        
+
         expression = self.source_expressions[0]
         length = self.source_expressions[1]
 
