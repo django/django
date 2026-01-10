@@ -22,6 +22,7 @@ PY313 = sys.version_info >= (3, 13)
 PY314 = sys.version_info >= (3, 14)
 PY315 = sys.version_info >= (3, 15)
 
+
 def get_version(version=None):
     """Return a PEP 440-compliant version number from VERSION."""
     version = get_complete_version(version)
@@ -93,7 +94,6 @@ def get_git_changeset():
         timestamp = subprocess.check_output(
             ["git", "log", "--pretty=format:%ct", "--quiet", "-1", "HEAD"],
             cwd=repo_dir,
-            
             stderr=subprocess.DEVNULL,
             text=True,
         ).strip()
