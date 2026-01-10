@@ -2280,6 +2280,17 @@ class ComparisonTests(TestCase):
             [item_ab],
         )
 
+    @skipUnlessDBFeature("interprets_empty_strings_as_nulls")
+    def test_empty_string_iexact_lookup(self):
+        obj = NullableName.objects.create(name=None)
+        obj1 = NullableName.objects.create(name="")
+        cases = [{"name__exact": ""}, {"name__iexact": ""}]
+        for lookup in cases:
+            with self.subTest(lookup):
+                self.assertSequenceEqual(
+                    NullableName.objects.filter(**lookup), [obj, obj1]
+                )
+
 
 class ExistsSql(TestCase):
     def test_exists(self):
