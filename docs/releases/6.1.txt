@@ -303,6 +303,10 @@ Serialization
   ``()``. This ensures primary keys are serialized when using
   :option:`dumpdata --natural-primary`.
 
+* The XML deserializer now raises
+  :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
+  unexpected nested tags.
+
 Signals
 ~~~~~~~
 
