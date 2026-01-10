@@ -967,10 +967,12 @@ class ChangeListTests(TestCase):
                 '<nav class="paginator" aria-labelledby="pagination">'
             )
         )
+        # --- FIXED LINE BELOW ---
         self.assertInHTML(
-            '<h2 id="pagination" class="visually-hidden">Pagination swallows</h2>',
+            '<h2 id="pagination" class="visually-hidden">Pagination</h2>',
             pagination_output,
         )
+        # ------------------------
         self.assertTrue(pagination_output.endswith("</nav>"))
         self.assertInHTML(
             '<li><a role="button" href="" aria-current="page">1</a></li>',
@@ -982,7 +984,6 @@ class ChangeListTests(TestCase):
         )
         self.assertEqual(pagination_output.count('aria-current="page"'), 1)
         self.assertEqual(pagination_output.count('href=""'), 1)
-
     def test_computed_list_display_localization(self):
         """
         Regression test for #13196: output of functions should be  localized
