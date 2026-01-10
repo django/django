@@ -615,7 +615,25 @@ class KeyTransformIsNull(lookups.IsNull):
 
 
 class KeyTransformIn(JSONIn):
-    pass
+    def as_postgresql(self, compiler, connection):
+        rhs = getattr(self.rhs, "query", self.rhs)
+        if getattr(rhs, "has_select_fields", False):
+            lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+            rhs_sql, rhs_params = rhs.get_compiler(connection=connection).as_sql()
+            num_cols = len(rhs.select) + len(rhs.annotation_select)
+            cols_list, jsonb_list = [], []
+            for i in range(num_cols):
+                col = "c%d" % i
+                cols_list.append(col)
+                jsonb_list.append("to_jsonb(%s)" % col)
+            cols = ", ".join(cols_list)
+            jsonb_cols = ", ".join(jsonb_list)
+            return (
+                "%s IN (SELECT %s FROM (%s) subquery(%s))"
+                % (lhs_sql, jsonb_cols, rhs_sql, cols),
+                (*lhs_params, *rhs_params),
+            )
+        return self.as_sql(compiler, connection)
 
 
 class KeyTransformExact(JSONExact):
