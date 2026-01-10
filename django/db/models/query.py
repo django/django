@@ -847,7 +847,13 @@ class QuerySet(AltersData):
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
             if objs_without_pk:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
+                fields = [
+                    f
+                    for f in fields
+                    if not (
+                        isinstance(f, AutoField) or getattr(f, "db_returning", False)
+                    )
+                ]
                 returned_columns = self._batched_insert(
                     objs_without_pk,
                     fields,
