@@ -2048,6 +2048,22 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [jane])
 
+    def test_relatedfieldlistfilter_isnull_false(self):
+        """
+        Ticket #30149: ?field__isnull=False should
+        filter for non-null values.
+        Previously, the string 'False' was interpreted as True,
+        returning null values instead.
+        """
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get("/", {"author__isnull": "False"})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertCountEqual(
+            list(queryset), [self.django_book, self.bio_book, self.djangonaut_book]
+        )
+
 
 class FacetsMixinTests(SimpleTestCase):
     def test_get_facet_counts(self):
