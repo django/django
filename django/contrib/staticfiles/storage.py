@@ -2,6 +2,8 @@ import json
 import os
 import posixpath
 import re
+import textwrap
+from graphlib import CycleError, TopologicalSorter
 from hashlib import md5
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
@@ -11,6 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.jslex import extract_css_urls, find_import_export_strings
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -44,83 +47,20 @@ class StaticFilesStorage(FileSystemStorage):
         return super().path(name)
 
 
+class ProcessingException(Exception):
+    def __init__(self, e, file_name):
+        self.file_name = file_name
+        self.original_exception = e
+        super().__init__(e.args[0] if len(e.args) else "")
+
+
 class HashedFilesMixin:
-    default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     support_js_module_import_aggregation = False
-    _js_module_import_aggregation_patterns = (
-        "*.js",
-        (
-            (
-                (
-                    r"""(?P<matched>import"""
-                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
-                    r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
-                ),
-                """import%(import)s from "%(url)s";""",
-            ),
-            (
-                (
-                    r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
-                    r"""\s*from\s*["'](?P<url>[./].*?)["']\s*;)"""
-                ),
-                """export%(exports)s from "%(url)s";""",
-            ),
-            (
-                r"""(?P<matched>import\s*['"](?P<url>[./].*?)["']\s*;)""",
-                """import"%(url)s";""",
-            ),
-            (
-                r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
-                """import("%(url)s")""",
-            ),
-        ),
-    )
-    patterns = (
-        (
-            "*.css",
-            (
-                r"""(?P<matched>url\((?P<quote>['"]{0,1})"""
-                r"""\s*(?P<url>.*?)(?P=quote)\))""",
-                (
-                    r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
-                    """@import url("%(url)s")""",
-                ),
-                (
-                    (
-                        r"(?m)^(?P<matched>/\*#[ \t]"
-                        r"(?-i:sourceMappingURL)=(?P<url>.*)[ \t]*\*/)$"
-                    ),
-                    "/*# sourceMappingURL=%(url)s */",
-                ),
-            ),
-        ),
-        (
-            "*.js",
-            (
-                (
-                    r"(?m)^(?P<matched>//# (?-i:sourceMappingURL)=(?P<url>.*))$",
-                    "//# sourceMappingURL=%(url)s",
-                ),
-            ),
-        ),
-    )
-    keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
-        if self.support_js_module_import_aggregation:
-            self.patterns += (self._js_module_import_aggregation_patterns,)
         super().__init__(*args, **kwargs)
-        self._patterns = {}
         self.hashed_files = {}
-        for extension, patterns in self.patterns:
-            for pattern in patterns:
-                if isinstance(pattern, (tuple, list)):
-                    pattern, template = pattern
-                else:
-                    template = self.default_template
-                compiled = re.compile(pattern, re.IGNORECASE)
-                self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
         """
@@ -204,214 +144,533 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
-        """
-        Return the custom URL converter for the given file name.
-        """
-        if template is None:
-            template = self.default_template
-
-        def converter(matchobj):
-            """
-            Convert the matched URL to a normalized and hashed URL.
-
-            This requires figuring out which files the matched URL resolves
-            to and calling the url() method of the storage.
-            """
-            matches = matchobj.groupdict()
-            matched = matches["matched"]
-            url = matches["url"]
-
-            # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r"^[a-z]+:", url) or url.startswith("//"):
-                return matched
-
-            # Ignore absolute URLs that don't point to a static file (dynamic
-            # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith("/") and not url.startswith(settings.STATIC_URL):
-                return matched
-
-            # Strip off the fragment so a path-like fragment won't interfere.
-            url_path, fragment = urldefrag(url)
-
-            # Ignore URLs without a path
-            if not url_path:
-                return matched
-
-            if url_path.startswith("/"):
-                # Otherwise the condition above would have returned
-                # prematurely.
-                assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path.removeprefix(settings.STATIC_URL)
-            else:
-                # We're using the posixpath module to mix paths and URLs
-                # conveniently.
-                source_name = name if os.sep == "/" else name.replace(os.sep, "/")
-                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
-
-            # Determine the hashed name of the target file with the storage
-            # backend.
-            hashed_url = self._url(
-                self._stored_name,
-                unquote(target_name),
-                force=True,
-                hashed_files=hashed_files,
-            )
-
-            transformed_url = "/".join(
-                url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
-            )
-
-            # Restore the fragment that was stripped off earlier.
-            if fragment:
-                transformed_url += ("?#" if "?#" in url else "#") + fragment
-
-            # Return the hashed version to the file
-            matches["url"] = unquote(transformed_url)
-            return template % matches
-
-        return converter
-
     def post_process(self, paths, dry_run=False, **options):
         """
         Post process the given dictionary of files (called from collectstatic).
 
-        Processing is actually two separate operations:
-
-        1. renaming files to include a hash of their content for cache-busting,
-           and copying those files to the target storage.
-        2. adjusting files which contain references to other files so they
-           refer to the cache-busting filenames.
-
-        If either of these are performed on a file, then that file is
-        considered post-processed.
+        Uses a dependency graph to minimize the number of passes required.
         """
         # don't even dare to process the files if we're in dry run mode
         if dry_run:
             return
+        try:
+            # Process files using the dependency graph
+            yield from self._post_process(paths)
+        except ProcessingException as exc:
+            # django's collectstatic management command is written to expect
+            # the exception to be returned in this format
+            yield exc.file_name, None, exc.original_exception
 
-        # where to store the new paths
+    def _post_process(self, paths):
+        """
+        Process static files using a unified dependency graph approach.
+        """
         hashed_files = {}
 
-        # build a list of adjustable files
-        adjustable_paths = [
-            path for path in paths if matches_patterns(path, self._patterns)
-        ]
+        substitutions_dict = self._find_substitutions(paths)
+        linear_deps, circular_deps = self._topological_sort(paths, substitutions_dict)
+        # First process the linear dependencies
+        for name in linear_deps:
+            name, hashed_name, processed = self._process_file(
+                name, paths[name], hashed_files, substitutions_dict.get(name, [])
+            )
+            hashed_files[self.hash_key(self.clean_name(name))] = hashed_name
+            yield name, hashed_name, processed
 
-        # Adjustable files to yield at end, keyed by the original path.
-        processed_adjustable_paths = {}
-
-        # Do a single pass first. Post-process all files once, yielding not
-        # adjustable files and exceptions, and collecting adjustable files.
-        for name, hashed_name, processed, _ in self._post_process(
-            paths, adjustable_paths, hashed_files
-        ):
-            if name not in adjustable_paths or isinstance(processed, Exception):
-                yield name, hashed_name, processed
-            else:
-                processed_adjustable_paths[name] = (name, hashed_name, processed)
-
-        paths = {path: paths[path] for path in adjustable_paths}
-        unresolved_paths = []
-        for i in range(self.max_post_process_passes):
-            unresolved_paths = []
-            for name, hashed_name, processed, subst in self._post_process(
-                paths, adjustable_paths, hashed_files
-            ):
-                # Overwrite since hashed_name may be newer.
-                processed_adjustable_paths[name] = (name, hashed_name, processed)
-                if subst:
-                    unresolved_paths.append(name)
-
-            if not unresolved_paths:
-                break
-
-        if unresolved_paths:
-            problem_paths = ", ".join(sorted(unresolved_paths))
-            yield problem_paths, None, RuntimeError("Max post-process passes exceeded.")
+        # Handle circular dependencies
+        if circular_deps:
+            circular_hashes = self._process_circular_dependencies(
+                circular_deps, paths, substitutions_dict, hashed_files
+            )
+            for name, hashed_name in circular_hashes:
+                hashed_files[self.hash_key(self.clean_name(name))] = hashed_name
+                yield name, hashed_name, True
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)
 
-        # Yield adjustable files with final, hashed name.
-        yield from processed_adjustable_paths.values()
+    @property
+    def url_finders(self):
+        """
+        Mapping of glob patterns to URL extraction functions.
 
-    def _post_process(self, paths, adjustable_paths, hashed_files):
-        # Sort the files by directory level
+        Each function receives (name, content) and returns a list of
+        (url, position) tuples.
+        """
+        return {
+            "*.css": [self._process_css_urls, self._process_sourcemap],
+            "*.js": [self._process_js_modules, self._process_sourcemap],
+        }
+
+    def _get_url_finders(self, name):
+        """Return list of URL finder functions for the given file name."""
+        finders = []
+        for pattern, pattern_finders in self.url_finders.items():
+            if matches_patterns(name, [pattern]):
+                finders.extend(pattern_finders)
+        return finders
+
+    def _find_substitutions(self, paths):
+        """
+        Return a dictionary mapping file names that need substitutions to a
+        list of file names that need substituting along with the position in
+        the file.
+        """
+        substitutions_dict = {}
+        for name in paths:
+            finders = self._get_url_finders(name)
+            if not finders:
+                continue
+            storage, path = paths[name]
+            with storage.open(path) as original_file:
+                try:
+                    content = original_file.read().decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise ProcessingException(exc, path)
+
+                url_positions = []
+                for finder in finders:
+                    url_positions.extend(finder(name, content))
+                substitutions_dict[name] = url_positions
+        return substitutions_dict
+
+    def _topological_sort(self, paths, substitutions_dict):
+        """
+        Examines all the files that need substitutions and returns the list of
+        files sorted in an order that is safe to process linearly, e.g
+        image.png is hashed before styles.css needs to replace it with
+        image.hash.png in a url().
+        Any circular dependencies found will be returned as a separate list.
+        """
+
+        graph_sorter = TopologicalSorter()
+        adjustable_paths = substitutions_dict.keys()
+        non_adjustable = set(paths.keys()) - set(adjustable_paths)
+
+        # build the graph based on the substitutions_dict
+        for name, url_positions in substitutions_dict.items():
+            if url_positions:
+                for url_name, _ in url_positions:
+                    # normalise base.css, /static/base.css, ../base.css, etc
+                    target = self._get_target_name(url_name, name)
+                    graph_sorter.add(name, target)
+            else:
+                non_adjustable.add(name)
+
+        try:
+            graph_sorter.prepare()
+        except CycleError:
+            # Even if there is a CycleError we can still access the linear
+            # nodes using get_ready
+            pass
+        linear_deps = []
+        while graph_sorter.is_active():
+            node_group = graph_sorter.get_ready()
+            linear_deps += [node for node in node_group if node in adjustable_paths]
+            graph_sorter.done(*node_group)
+
         def path_level(name):
             return len(name.split(os.sep))
 
-        for name in sorted(paths, key=path_level, reverse=True):
-            substitutions = True
-            # use the original, local file, not the copied-but-unprocessed
-            # file, which might be somewhere far away, like S3
-            storage, path = paths[name]
-            with storage.open(path) as original_file:
-                cleaned_name = self.clean_name(name)
-                hash_key = self.hash_key(cleaned_name)
+        non_adjustable = sorted(list(non_adjustable), key=path_level, reverse=True)
+        linear_deps = list(non_adjustable) + linear_deps
+        circular_deps = set(adjustable_paths) - set(linear_deps)
 
-                # generate the hash with the original content, even for
-                # adjustable files.
-                if hash_key not in hashed_files:
-                    hashed_name = self.hashed_name(name, original_file)
-                else:
-                    hashed_name = hashed_files[hash_key]
+        return linear_deps, circular_deps
 
-                # then get the original's file content..
+    def _process_js_modules(self, name, content):
+        """Process JavaScript import/export statements."""
+        url_positions = []
+
+        if not self.support_js_module_import_aggregation or not matches_patterns(
+            name, ("*.js",)
+        ):
+            return url_positions
+
+        # simple search rules out most js files quickly
+        complex_adjustments = "import" in content or (
+            "export" in content and "from" in content
+        )
+
+        if not complex_adjustments:
+            return url_positions
+
+        # The simple search still leaves lots of false positives,
+        # like the words important or exports
+        # Match for import export syntax to futher reduce the need
+        # to run the lexer, should cut out 90% of false positives
+        if not self.import_export_pattern.search(content):
+            return url_positions
+
+        try:
+            urls = find_import_export_strings(content)
+        except ValueError as e:
+            message = e.args[0] if len(e.args) else ""
+            message = f"The js file '{name}' could not be processed.\n{message}"
+            raise ProcessingException(ValueError(message), name)
+        for url_name, position in urls:
+            if self._should_adjust_url(url_name):
+                url_positions.append((url_name, position))
+
+        return url_positions
+
+    import_export_pattern = re.compile(
+        # check for import statements
+        r"((^|[;}]|\*/)\s*import\b|"
+        # check for dynamic imports
+        r"import\s\(|"
+        # check for comment in between import and opening bracket
+        r"import\s*/\*.*?\*/\s*\(|"
+        # check for the word export must be followed
+        r"\bexport[\s{/*])",
+        re.MULTILINE,
+    )
+
+    def _process_css_urls(self, name, content):
+        """Process CSS url & import statements."""
+        url_positions = []
+        if not matches_patterns(name, ("*.css",)):
+            return url_positions
+        search_content = content.lower()
+        complex_adjustments = "url(" in search_content or "@import" in search_content
+
+        if not complex_adjustments:
+            return url_positions
+
+        for url_name, position in extract_css_urls(content):
+            if self._should_adjust_url(url_name):
+                url_positions.append((url_name, position))
+        return url_positions
+
+    def _process_sourcemap(self, name, content):
+        url_positions = []
+        if "sourceMappingURL" not in content:
+            return url_positions
+
+        for extension, pattern in self.source_map_patterns.items():
+            if matches_patterns(name, (extension,)):
+                for match in pattern.finditer(content):
+                    url = match.group("url")
+                    if self._should_adjust_url(url):
+                        url_positions.append((url, match.start("url")))
+        return url_positions
+
+    source_map_patterns = {
+        "*.css": re.compile(
+            r"(?m)^/\*#[ \t](?-i:sourceMappingURL)=(?P<url>.*?)[ \t]*\*/$",
+            re.IGNORECASE,
+        ),
+        "*.js": re.compile(
+            r"(?m)^//# (?-i:sourceMappingURL)=(?P<url>.*?)[ \t]*$", re.IGNORECASE
+        ),
+    }
+
+    _data_uri_re = re.compile(r"^[a-z]+:")
+
+    def _should_adjust_url(self, url):
+        """
+        Return whether this is a url that should be adjusted
+        """
+        # Ignore absolute/protocol-relative and data-uri URLs.
+        if self._data_uri_re.match(url) or url.startswith("//"):
+            return False
+
+        # Ignore absolute URLs that don't point to a static file (dynamic
+        # CSS / JS?). Note that STATIC_URL cannot be empty.
+        if url.startswith("/") and not url.startswith(settings.STATIC_URL):
+            return False
+
+        # Strip off the fragment so a path-like fragment won't interfere.
+        url_path, _ = urldefrag(url)
+
+        # Ignore URLs without a path
+        if not url_path:
+            return False
+        return True
+
+    def _adjust_url(self, url, name, hashed_files):
+        """
+        Return the hashed url without affecting fragments
+        """
+        # Strip off the fragment so a path-like fragment won't interfere.
+        url_path, fragment = urldefrag(url)
+
+        # determine the target file name (remove /static if needed)
+        target_name = self._get_base_target_name(url_path, name)
+
+        # Determine the hashed name of the target file.
+        hashed_url = self._url(
+            self._stored_name,
+            unquote(target_name),
+            force=True,
+            hashed_files=hashed_files,
+        )
+
+        transformed_url = "/".join(
+            url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
+        )
+
+        # Restore the fragment that was stripped off earlier.
+        if fragment:
+            transformed_url += ("?#" if "?#" in url else "#") + fragment
+
+        # Ensure we return a string (handle mock objects in tests)
+        return str(transformed_url)
+
+    def _get_target_name(self, url, source_name):
+        """
+        Get the target file name from a URL and source file name
+        """
+        url_path, _ = urldefrag(url)
+        path = posixpath.normpath(self._get_base_target_name(url_path, source_name))
+        if os.sep != "/":
+            path = path.replace("/", os.sep)
+        return path
+
+    def _get_base_target_name(self, url_path, source_name):
+        """
+        Get the target file name from a URL (no fragment) and source file name
+        """
+        # Used by _get_target_name and _adjust_url
+        if url_path.startswith("/"):
+            # Otherwise the condition above would have returned prematurely.
+            assert url_path.startswith(settings.STATIC_URL)
+            target_name = url_path.removeprefix(settings.STATIC_URL)
+        else:
+            # We're using the posixpath module to mix paths and URLs.
+            source_name = (
+                source_name if os.sep == "/" else source_name.replace(os.sep, "/")
+            )
+            target_name = posixpath.join(posixpath.dirname(source_name), url_path)
+        return target_name
+
+    def _process_file(self, name, storage_and_path, hashed_files, url_positions):
+        """
+        Process a single file using the unified graph structure.
+        """
+        storage, path = storage_and_path
+
+        with storage.open(path) as original_file:
+            # Calculate hash of original file
+            if hasattr(original_file, "seek"):
+                original_file.seek(0)
+
+            hashed_name = self.hashed_name(name, original_file)
+            hashed_file_exists = self.exists(hashed_name)
+            processed = False
+
+            # If this is an adjustable file with URL positions,
+            # apply transformations
+            if url_positions:
                 if hasattr(original_file, "seek"):
                     original_file.seek(0)
+                content = original_file.read().decode("utf-8")
 
-                hashed_file_exists = self.exists(hashed_name)
-                processed = False
+                # Apply URL substitutions using stored positions
+                content = self._process_file_content(
+                    name, content, url_positions, hashed_files
+                )
 
-                # ..to apply each replacement pattern to the content
-                if name in adjustable_paths:
-                    old_hashed_name = hashed_name
-                    try:
-                        content = original_file.read().decode("utf-8")
-                    except UnicodeDecodeError as exc:
-                        yield name, None, exc, False
-                    for extension, patterns in self._patterns.items():
-                        if matches_patterns(path, (extension,)):
-                            for pattern, template in patterns:
-                                converter = self.url_converter(
-                                    name, hashed_files, template
-                                )
-                                try:
-                                    content = pattern.sub(converter, content)
-                                except ValueError as exc:
-                                    yield name, None, exc, False
-                    if hashed_file_exists:
-                        self.delete(hashed_name)
-                    # then save the processed result
-                    content_file = ContentFile(content.encode())
-                    if self.keep_intermediate_files:
-                        # Save intermediate file for reference
-                        self._save(hashed_name, content_file)
-                    hashed_name = self.hashed_name(name, content_file)
+                # Create a content file and calculate its hash
+                content_file = ContentFile(content.encode())
+                new_hashed_name = self.hashed_name(name, content_file)
 
-                    if self.exists(hashed_name):
-                        self.delete(hashed_name)
-
-                    saved_name = self._save(hashed_name, content_file)
+                if not self.exists(new_hashed_name):
+                    saved_name = self._save(new_hashed_name, content_file)
                     hashed_name = self.clean_name(saved_name)
-                    # If the file hash stayed the same, this file didn't change
-                    if old_hashed_name == hashed_name:
-                        substitutions = False
-                    processed = True
+                else:
+                    hashed_name = new_hashed_name
 
-                if not processed:
-                    # or handle the case in which neither processing nor
-                    # a change to the original file happened
-                    if not hashed_file_exists:
-                        processed = True
-                        saved_name = self._save(hashed_name, original_file)
-                        hashed_name = self.clean_name(saved_name)
+                processed = True
 
-                # and then set the cache accordingly
-                hashed_files[hash_key] = hashed_name
+            elif not hashed_file_exists:
+                # For non-adjustable files just copy the file
+                if hasattr(original_file, "seek"):
+                    original_file.seek(0)
+                processed = True
+                saved_name = self._save(hashed_name, original_file)
+                hashed_name = self.clean_name(saved_name)
 
-                yield name, hashed_name, processed, substitutions
+            return name, hashed_name, processed
+
+    def _process_file_content(self, name, content, url_positions, hashed_files):
+        """
+        Process file content by substituting URLs.
+        url_positions is a list of (url, position) tuples.
+        """
+        if not url_positions:
+            return content
+
+        result_parts = []
+        last_position = 0
+
+        # Sort by position to ensure correct order
+        sorted_positions = sorted(
+            url_positions,
+            key=lambda x: x[1],
+        )
+
+        for url, pos in sorted_positions:
+            position = pos
+            # Add content before this URL
+            result_parts.append(content[last_position:position])
+
+            try:
+                transformed_url = self._adjust_url(url, name, hashed_files)
+            except ValueError as exc:
+                message = exc.args[0] if len(exc.args) else ""
+                message = f"Error processing the url {url}\n{message}"
+                exc = self._make_helpful_exception(ValueError(message), name)
+                raise ProcessingException(exc, name)
+
+            result_parts.append(transformed_url)
+            last_position = position + len(url)
+
+        # Add remaining content
+        result_parts.append(content[last_position:])
+        return "".join(result_parts)
+
+    def _process_circular_dependencies(
+        self, circular_deps, paths, substitutions_dict, hashed_files
+    ):
+        """
+        Process files with circular dependencies.
+
+        This method breaks the dependency cycle by:
+        1. First replacing all non-circular URLs in each file
+        and generating a hash based on their combined content
+        2. Apply this stable combined hash to each of the files
+        3. Safely updating all the references within the files
+
+        Args:
+            circular_deps: List of files that have circular dependencies
+            paths: Dict mapping file paths to (storage, path) tuples
+            substitutions_dict: Dictionary of url positions
+            hashed_files: Dict of already processed files
+        """
+        circular_hashes = {}
+        processed_files = set()
+
+        # First pass: Replace all non-circular dependency URLs in each file
+        # and generate group hash
+        group_hash, original_contents = self._calculate_combined_hash(
+            circular_deps, paths, substitutions_dict, hashed_files
+        )
+
+        # Second pass: Create hashed filenames using the group hash
+        for name in circular_deps:
+            if name in processed_files:
+                continue
+
+            # Generate a hashed filename based on the group hash
+            filename, ext = os.path.splitext(name)
+            hashed_name = f"{filename}.{group_hash}{ext}"
+
+            # Store the hash for this file
+            hash_key = self.hash_key(self.clean_name(name))
+            circular_hashes[hash_key] = hashed_name
+            processed_files.add(name)
+
+        # Third pass: Process all URLs (including circular ones) and save files
+        for name in circular_deps:
+            content = original_contents[name]
+
+            combined_hashes = {**hashed_files, **circular_hashes}
+            content = self._process_file_content(
+                name, content, substitutions_dict.get(name, []), combined_hashes
+            )
+
+            # Get the hashed name for this file
+            hash_key = self.hash_key(self.clean_name(name))
+            hashed_name = circular_hashes[hash_key]
+
+            # Save the processed content to the hashed filename
+            content_file = ContentFile(content.encode())
+            if self.exists(hashed_name):
+                self.delete(hashed_name)
+            self._save(hashed_name, content_file)
+            yield name, hashed_name
+
+    def _calculate_combined_hash(
+        self, circular_deps, paths, substitutions_dict, hashed_files
+    ):
+        """
+        Return a hash of the combined content from all circular dependencies
+        Replace the non circular URL's before calculating
+
+        Also returns the original content to save opening it twice
+        """
+        original_contents = {}
+        processed_contents = {}
+        for name in circular_deps:
+            storage, path = paths[name]
+            with storage.open(path) as original_file:
+                if hasattr(original_file, "seek"):
+                    original_file.seek(0)
+                content = original_file.read().decode("utf-8")
+
+                original_contents[name] = content
+
+                # Filter URL positions to only non-circular dependencies
+                non_circular_positions = []
+                for url, pos in substitutions_dict.get(name, []):
+                    target = self._get_target_name(url, name)
+                    if target not in circular_deps:
+                        non_circular_positions.append((url, pos))
+                # Replace all non-circular URLs first
+                if non_circular_positions:
+                    content = self._process_file_content(
+                        name, content, non_circular_positions, hashed_files
+                    )
+
+                # Store the processed content for the second pass
+                # We haven't actually saved these changes to disk
+                processed_contents[name] = content
+
+        # Calculate a stable hash for all circular dependencies combined
+        combined_content = "".join(
+            processed_contents[name] for name in sorted(circular_deps)
+        )
+        combined_file = ContentFile(combined_content.encode())
+        group_hash = self.file_hash("_combined", combined_file)
+        return group_hash, original_contents
+
+    def _make_helpful_exception(self, exception, name):
+        """
+        The ValueError for missing files, such as images/fonts in css,
+        sourcemaps, or js files in imports, lack context of the file being
+        processed. Reformat them to be more helpful in revealing the source
+        of the problem.
+        """
+        message = exception.args[0] if len(exception.args) else ""
+        match = self._error_msg_re.search(message)
+        if match:
+            extension = os.path.splitext(name)[1].lstrip(".").upper()
+            message = self._error_msg.format(
+                orig_message=message,
+                filename=name,
+                missing=match.group(2),
+                ext=extension,
+                url=match.group(1),
+            )
+            exception = ValueError(message)
+        return exception
+
+    _error_msg_re = re.compile(
+        r"^Error processing the url (.+)\nThe file '(.+)' could not be found"
+    )
+
+    _error_msg = textwrap.dedent(
+        """\
+        {orig_message}
+
+        The {ext} file '{filename}' references a file which could not be found:
+          {missing}
+
+        Please check the URL references in this {ext} file, particularly any
+        relative paths which might be pointing to the wrong location.
+        """
+    )
 
     def clean_name(self, name):
         return name.replace("\\", "/")
@@ -460,7 +719,6 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = "1.1"  # the manifest format standard
     manifest_name = "staticfiles.json"
     manifest_strict = True
-    keep_intermediate_files = False
 
     def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
