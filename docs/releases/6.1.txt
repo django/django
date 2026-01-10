@@ -126,7 +126,10 @@ Minor features
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* To harden the :class:`~django.contrib.messages.storage.cookie.CookieStorage`
+  against information exposure in templates, the internal ``signer`` attribute
+  is now private. This prevents template authors from accessing
+  the signing key via ``{{ messages.storage.0.signer.key }}``.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
