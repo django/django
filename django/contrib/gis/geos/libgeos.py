@@ -97,7 +97,9 @@ def error_h(fmt, lst):
         err_msg = fmt % lst
     except TypeError:
         err_msg = fmt
-    logger.error("GEOS_ERROR: %s\n", err_msg)
+    from django.contrib.gis.geos.prototypes.threadsafe import thread_context
+
+    thread_context.last_error = err_msg
 
 
 error_h = ERRORFUNC(error_h)
