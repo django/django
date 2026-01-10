@@ -149,14 +149,14 @@ class CompositePKTests(TestCase):
 
     def test_in_bulk_batching(self):
         Comment.objects.all().delete()
-        batching_required = connection.features.max_query_params is not None
-        expected_queries = 2 if batching_required else 1
+        connection.features.__dict__.pop("max_query_params", None)
         with unittest.mock.patch.object(
             type(connection.features), "max_query_params", 10
         ):
             num_requiring_batching = (
                 connection.ops.bulk_batch_size([Comment._meta.pk], []) + 1
             )
+            expected_queries = 2 if num_requiring_batching > 1 else 1
             comments = [
                 Comment(id=i, tenant=self.tenant, user=self.user)
                 for i in range(1, num_requiring_batching + 1)
