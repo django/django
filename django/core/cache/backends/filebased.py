@@ -18,8 +18,8 @@ class FileBasedCache(BaseCache):
     cache_suffix = ".djcache"
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
-    def __init__(self, dir, params):
-        super().__init__(params)
+    def __init__(self, dir, params, **kwargs):
+        super().__init__(params, **kwargs)
         self._dir = os.path.abspath(dir)
         self._createdir()
 
