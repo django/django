@@ -13,7 +13,11 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
+from django.http.multipartparser import (
+    MAX_TOTAL_HEADER_SIZE,
+    MultiPartParser,
+    MultiPartParserError,
+)
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
@@ -1111,6 +1115,44 @@ class RequestsTests(SimpleTestCase):
         request_copy = copy.deepcopy(request)
         request.session["key"] = "value"
         self.assertEqual(request_copy.session, {})
+
+    def test_custom_multipart_parser_class(self):
+
+        class CustomMultiPartParser(MultiPartParser):
+            def parse(self):
+                post, files = super().parse()
+                post._mutable = True
+                post["custom_parser_used"] = "yes"
+                post._mutable = False
+                return post, files
+
+        class CustomWSGIRequest(WSGIRequest):
+            multipart_parser_class = CustomMultiPartParser
+
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = CustomWSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+
+        # This assertion would FAIL without the _multipart_parser_class change
+        # because the hardcoded MultiPartParser would be used instead.
+        self.assertEqual(request.POST.get("custom_parser_used"), "yes")
+        self.assertEqual(request.POST.get("name"), "value")
 
 
 class HostValidationTests(SimpleTestCase):

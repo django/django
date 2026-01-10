@@ -56,6 +56,7 @@ class HttpRequest:
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
     _upload_handlers = []
+    multipart_parser_class = MultiPartParser
 
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
@@ -373,7 +374,9 @@ class HttpRequest:
                 "processed."
             ),
         )
-        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        parser = self.multipart_parser_class(
+            META, post_data, self.upload_handlers, self.encoding
+        )
         return parser.parse()
 
     @property
