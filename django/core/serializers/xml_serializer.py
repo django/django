@@ -173,11 +173,14 @@ class Serializer(base.Serializer):
                         self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
-                    attr = getattr(obj, field.name)
+                    manager = getattr(obj, field.name)
+                    qs = manager.all()
+                    if not qs.ordered:
+                        qs = qs.order_by("pk")
                     chunk_size = (
-                        2000 if getattr(attr, "prefetch_cache_name", None) else None
+                        2000 if getattr(manager, "prefetch_cache_name", None) else None
                     )
-                    return attr.iterator(chunk_size)
+                    return qs.iterator(chunk_size)
 
             else:
 
