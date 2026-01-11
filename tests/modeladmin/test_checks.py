@@ -1724,6 +1724,7 @@ class AutocompleteFieldsTests(CheckTestCase):
             invalid_obj=Admin,
         )
 
+    @isolate_apps("modeladmin")
     def test_autocomplete_e039_unresolved_model(self):
         class UnresolvedForeignKeyModel(models.Model):
             unresolved = models.ForeignKey("missing.Model", models.CASCADE)
