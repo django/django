@@ -240,7 +240,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -285,7 +284,6 @@ class ChangeListTests(TestCase):
         admin.site.empty_value_display = "???"
         m = ChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -310,7 +308,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = EmptyValueChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -341,7 +338,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -370,7 +366,6 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/grandchild/", self.superuser)
         m = GrandChildAdmin(GrandChild, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
