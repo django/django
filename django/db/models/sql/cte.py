@@ -2,6 +2,7 @@ from copy import copy
 import weakref
 
 import django
+from django.db.backends.base.operations import BaseDatabaseOperations
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Col, Expression, Ref
 from django.db.models.query_utils import Q
@@ -329,9 +330,22 @@ def generate_cte_sql(connection, query, as_sql):
     explain_query_or_info = getattr(query, explain_attribute, None)
     sql = []
     if explain_query_or_info:
-        sql.append(
-            connection.ops.explain_query_prefix(explain_format, **explain_options)
-        )
+        try:
+            sql.append(
+                connection.ops.explain_query_prefix(
+                    explain_format, **explain_options
+                )
+            )
+        except ValueError:
+            if (
+                explain_options
+                and set(explain_options) <= {"analyze", "verbose"}
+                and connection.ops.__class__.explain_query_prefix
+                is BaseDatabaseOperations.explain_query_prefix
+            ):
+                sql.append(connection.ops.explain_query_prefix(explain_format))
+            else:
+                raise
         # Ensure EXPLAIN stays outside the WITH clause.
         setattr(query, explain_attribute, None)
 
