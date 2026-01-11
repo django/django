@@ -134,14 +134,19 @@ class CTE:
             selected_deferred = getattr(
                 cte_query, "_auto_cte_selected_deferred", set()
             )
-            for alias in selected:
+            for alias, value in selected.items():
                 if alias in selected_deferred:
                     continue
                 if alias not in cte_query.annotations:
                     output_field = cte_query.resolve_ref(alias).output_field
                     col = CTEColumnRef(alias, self.name, output_field)
-                    query.add_annotation(col, alias)
-            query.selected = {alias: alias for alias in selected}
+                    query.add_annotation(col, alias, select=False)
+            query.selected = {}
+            for alias, value in selected.items():
+                if isinstance(value, str):
+                    query.selected[alias] = value
+                else:
+                    query.selected[alias] = query.annotations.get(alias, value)
 
         qs.query = query
         return qs

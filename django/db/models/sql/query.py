@@ -490,7 +490,11 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     )
     if last_materialized_index < 0:
         return query
-    materialized_names = set().union(*levels[: last_materialized_index + 1])
+    materialized_names = [
+        name
+        for level in levels[: last_materialized_index + 1]
+        for name in level
+    ]
     annotation_exprs = {query.annotations[name] for name in materialized_names}
     annotation_where, base_where, ok = _split_where_by_annotation_refs(
         query.where, set(query.annotations), annotation_exprs
@@ -535,10 +539,7 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     current_query = base_query
     auto_cte_selected = None
     if original_selected is not None:
-        auto_cte_selected = {
-            alias: value if isinstance(value, str) else alias
-            for alias, value in original_selected.items()
-        }
+        auto_cte_selected = dict(original_selected)
         auto_cte_selected_deferred = set(query.annotations)
     cte_created = False
     for idx, level in enumerate(levels):
