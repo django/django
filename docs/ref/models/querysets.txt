@@ -170,6 +170,24 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: totally_ordered
+
+        .. versionadded:: 6.1
+
+        Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
+        sufficient to guarantee a deterministic result. This requires that the
+        ordering includes a field (or set of fields)
+        that is unique and non-nullable.
+
+        For example:
+
+        .. code-block:: pycon
+
+            >>> Author.objects.order_by("name").totally_ordered
+            False
+            >>> Author.objects.order_by("pk").totally_ordered
+            True
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.
