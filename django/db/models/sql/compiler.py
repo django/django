@@ -930,7 +930,8 @@ class SQLCompiler:
                     result.append("HAVING %s" % having)
                     params.extend(h_params)
 
-            if self.query.explain_info:
+            # EXPLAIN for CTE queries is handled in generate_cte_sql()
+            if self.query.explain_info and not self.query._with_ctes:
                 result.insert(
                     0,
                     self.connection.ops.explain_query_prefix(

@@ -961,6 +961,7 @@ class Query(BaseExpression):
         ):
             return self
         clone = self.clone() if clone_query else self
+        explain_info = getattr(clone, "explain_info", None)
         clone._auto_cte_processed = True
 
         if collector is None:
@@ -985,6 +986,8 @@ class Query(BaseExpression):
             clone.combined_queries = tuple(combined_queries)
 
         clone = _auto_cte_annotation_reuse(clone, name_generator, collector)
+        if explain_info is not None:
+            clone.explain_info = explain_info
 
         transformer = _CTEAutoTransformer(clone, name_generator, collector)
         for annotation in clone.annotations.values():

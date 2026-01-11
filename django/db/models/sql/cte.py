@@ -319,7 +319,7 @@ def generate_cte_sql(connection, query, as_sql):
     explain_attribute = "explain_info"
     explain_info = getattr(query, explain_attribute, None)
     explain_format = getattr(explain_info, "format", None)
-    explain_options = getattr(explain_info, "options", {})
+    explain_options = dict(getattr(explain_info, "options", {}))
 
     explain_query_or_info = getattr(query, explain_attribute, None)
     sql = []
@@ -353,6 +353,9 @@ def generate_cte_sql(connection, query, as_sql):
         ignore_cte_name = getattr(cte.query, "_ignore_cte_name", None)
         if getattr(cte.query, "_cte_name", None):
             cte.query._ignore_cte_name = True
+        cte_explain_info = getattr(cte.query, explain_attribute, None)
+        if cte_explain_info is not None:
+            setattr(cte.query, explain_attribute, None)
         try:
             cte_sql, cte_params = compiler.as_sql()
         finally:
@@ -361,6 +364,8 @@ def generate_cte_sql(connection, query, as_sql):
                     delattr(cte.query, "_ignore_cte_name")
                 else:
                     cte.query._ignore_cte_name = ignore_cte_name
+            if cte_explain_info is not None:
+                setattr(cte.query, explain_attribute, cte_explain_info)
         cte_entries.append((cte, qn(cte.name), cte_sql, cte_params))
 
     used = {
