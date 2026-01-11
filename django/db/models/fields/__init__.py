@@ -1032,9 +1032,9 @@ class Field(RegisterLookupMixin):
         if self.has_db_default():
             from django.db.models.expressions import DatabaseDefault
 
-            return lambda: DatabaseDefault(
-                self._db_default_expression, output_field=self
-            )
+            default = DatabaseDefault(self._db_default_expression, output_field=self)
+
+            return lambda: default
 
         if (
             not self.empty_strings_allowed
