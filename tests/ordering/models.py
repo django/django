@@ -80,3 +80,34 @@ class OrderedByExpressionChild(models.Model):
 
 class OrderedByExpressionGrandChild(models.Model):
     parent = models.ForeignKey(OrderedByExpressionChild, models.CASCADE)
+
+
+class OrderingConstraint(models.Model):
+    rank = models.IntegerField(unique=True, null=True)
+    headline = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100, default="slug")
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
+    pub_date = models.DateField(null=True)
+    editor = models.OneToOneField(
+        Author, on_delete=models.CASCADE, related_name="ordering_constraint_editor"
+    )
+    barcode = models.CharField(max_length=30, default="bar")
+
+    class Meta:
+        unique_together = (("headline", "slug"),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["pub_date", "author"],
+                name="unique_pub_date_author",
+            ),
+            models.UniqueConstraint(
+                fields=["rank"],
+                condition=models.Q(rank__gt=0),
+                name="unique_rank_conditional",
+            ),
+            models.UniqueConstraint(
+                fields=["barcode"],
+                condition=models.Q(),
+                name="unique_barcode_empty_condition",
+            ),
+        ]
