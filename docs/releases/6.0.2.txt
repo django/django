@@ -9,4 +9,7 @@ Django 6.0.2 fixes several bugs in 6.0.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a visual regression in Django 6.0 that caused the admin filter sidebar
+  to wrap below the changelist when filter elements contained long text
+  (:ticket:`36850`).
+
