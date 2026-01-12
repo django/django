@@ -7085,6 +7085,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertTrue(show_all.is_displayed())
         self.take_screenshot("pagination")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_changelist_filter_sidebar_width(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_person_changelist")
+        )
+        changelist_filter = self.selenium.find_element(By.ID, "changelist-filter")
+        # Verify the filter width is constrained to max-width (240px).
+        self.assertLessEqual(changelist_filter.rect["width"], 240)
+        self.take_screenshot("filter_sidebar")
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
