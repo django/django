@@ -29,7 +29,7 @@ from django.forms import (
     ValidationError,
     formset_factory,
 )
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import (
@@ -1052,6 +1052,15 @@ class HTMLEqualTests(SimpleTestCase):
             '<p class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</p>',
             html=True,
         )
+
+    def test_streaming_response_called_once(self):
+        response = StreamingHttpResponse(iter("hello world"))
+        self.assertContains(response, "hello")
+
+    def test_streaming_response_called_twice(self):
+        response = StreamingHttpResponse(iter("hello world"))
+        self.assertContains(response, "hello")
+        self.assertContains(response, "world")
 
 
 class InHTMLTests(SimpleTestCase):
