@@ -609,6 +609,15 @@ or may not be the same as the entries in the first filter. We are filtering the
 if each condition needs to match the same related object, then each should be
 contained in a single :meth:`~django.db.models.query.QuerySet.filter` call.
 
+.. warning::
+
+   When filtering across multi-valued relationships, combining conditions in
+   a single ``filter()`` call may produce different results than chaining
+   multiple ``filter()`` calls. A single ``filter()`` applies all conditions
+   to the same related object, while chained filters may apply them to
+   different related objects.
+
+
 .. note::
 
     As the second (more permissive) query chains multiple filters, it performs
