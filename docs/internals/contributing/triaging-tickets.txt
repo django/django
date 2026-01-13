@@ -341,11 +341,21 @@ A ticket can be resolved in a number of ways:
       the reported issue but is potentially still valid. The ticket
       should be reopened when more information is supplied.
 
+* needsnewfeatureprocess
+      Used when a ticket is requesting a new feature. Feature requests
+      should not be started in the ticket tracker, as they
+      :ref:`follow a separate process <requesting-features>` in the
+      `Django Features project`_. If the feature ends up being approved,
+      then the ticket might be moved into "accepted", or a brand new ticket
+      will be created.
+
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
 Again, please do not reopen tickets that have been marked as "wontfix" and
 bring the issue to the `Django Forum`_ instead.
+
+.. _Django Features project: https://github.com/django/new-features
 
 .. _how-can-i-help-with-triaging:
 
