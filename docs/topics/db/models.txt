@@ -764,9 +764,15 @@ Django places some restrictions on model field names:
 #. A field name cannot be ``check``, as this would override the check
    framework's ``Model.check()`` method.
 
-These limitations can be worked around, though, because your field name doesn't
-necessarily have to match your database column name. See the
-:attr:`~Field.db_column` option.
+These limitations can be worked around, because your field name doesn't
+necessarily have to match your database column name. You can use the
+:attr:`~Field.db_column` option to specify a different database column name.
+
+For example::
+
+    class Example(models.Model):
+        readable_name = models.IntegerField(db_column="pass")
+
 
 SQL reserved words, such as ``join``, ``where`` or ``select``, *are* allowed as
 model field names, because Django escapes all database table names and column
