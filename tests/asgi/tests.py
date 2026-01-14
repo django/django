@@ -7,6 +7,7 @@ from asgiref.testing import ApplicationCommunicator
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
+from django.core.handlers.asgi import ASGIRequest
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
 from django.test import (
@@ -192,6 +193,32 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Echo!")
+
+    async def test_meta_not_modified_with_repeat_headers(self):
+        scope = self.async_request_factory._base_scope(path="/", http_version="2.0")
+        scope["headers"] = [(b"foo", b"bar")] * 200_000
+
+        setitem_count = 0
+
+        class InstrumentedDict(dict):
+            def __setitem__(self, *args, **kwargs):
+                nonlocal setitem_count
+                setitem_count += 1
+                super().__setitem__(*args, **kwargs)
+
+        class InstrumentedASGIRequest(ASGIRequest):
+            @property
+            def META(self):
+                return self._meta
+
+            @META.setter
+            def META(self, value):
+                self._meta = InstrumentedDict(**value)
+
+        request = InstrumentedASGIRequest(scope, None)
+
+        self.assertEqual(len(request.headers["foo"].split(",")), 200_000)
+        self.assertLessEqual(setitem_count, 100)
 
     async def test_untouched_request_body_gets_closed(self):
         application = get_asgi_application()

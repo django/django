@@ -2,6 +2,7 @@ import logging
 import sys
 import tempfile
 import traceback
+from collections import defaultdict
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -81,6 +82,7 @@ class ASGIRequest(HttpRequest):
             self.META["SERVER_NAME"] = "unknown"
             self.META["SERVER_PORT"] = "0"
         # Headers go into META.
+        _headers = defaultdict(list)
         for name, value in self.scope.get("headers", []):
             name = name.decode("latin1")
             if name == "content-length":
@@ -92,9 +94,8 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
-                value = self.META[corrected_name] + "," + value
-            self.META[corrected_name] = value
+            _headers[corrected_name].append(value)
+        self.META.update({name: ",".join(value) for name, value in _headers.items()})
         # Pull out request encoding, if provided.
         self._set_content_type_params(self.META)
         # Directly assign the body file to be our stream.
