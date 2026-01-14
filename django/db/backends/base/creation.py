@@ -373,7 +373,12 @@ class BaseDatabaseCreation:
         # Importing a test app that isn't installed raises RuntimeError.
         if test_app in settings.INSTALLED_APPS:
             try:
-                test_frame = import_string(module_or_class_name)
+                # RemovedInDjango70Warning: When the deprecation ends, replace:
+                # test_frame = import_string(module_or_class_name)
+                with warnings.catch_warnings(
+                    action="ignore", category=RemovedInDjango70Warning
+                ):
+                    test_frame = import_string(module_or_class_name)
             except ImportError:
                 # import_string() can raise ImportError if a submodule's parent
                 # module hasn't already been imported during test discovery.

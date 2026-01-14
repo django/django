@@ -250,6 +250,27 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             },
         )
 
+    @override_settings(INSTALLED_APPS=[])
+    def test_get_namespace_no_dependence_on_prior_import(self):
+        # Emulate the scenario where the parent module of an automatic import
+        # has not been coincidentally imported.
+        popped_module = sys.modules.pop("django.db")
+        self.addCleanup(sys.modules.__setitem__, "django.db", popped_module)
+
+        namespace = shell.Command().get_namespace()
+
+        self.assertEqual(
+            namespace.keys(),
+            {
+                "settings",
+                "connection",
+                "reset_queries",
+                "models",
+                "functions",
+                "timezone",
+            },
+        )
+
     @override_settings(
         INSTALLED_APPS=["model_forms", "contenttypes_tests", "forms_tests"]
     )
