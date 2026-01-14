@@ -327,6 +327,11 @@ A ticket can be resolved in a number of ways:
       close a ticket. Always use the forum to get a consensus before reopening
       tickets closed as "wontfix".
 
+* needsnewfeatureprocess
+      Used when the ticket merits a new feature, which will need to get
+      community input and support.
+      See the :ref:`process for suggesting new features <requesting-features>`.
+
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
       tickets, we keep all the discussion in one place, which helps
@@ -344,8 +349,10 @@ A ticket can be resolved in a number of ways:
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
-Again, please do not reopen tickets that have been marked as "wontfix" and
-bring the issue to the `Django Forum`_ instead.
+Again, please do not reopen tickets that have been marked as "wontfix" or
+"needsnewfeatureprocess". For "wontfix" tickets, bring the issue to the
+`Django Forum`_ instead. For "needsnewfeatureprocess" tickets, propose the
+feature through the :ref:`new features process <requesting-features>`.
 
 .. _how-can-i-help-with-triaging:
 
@@ -361,8 +368,8 @@ reset page`_.
 
 Then, you can help out by:
 
-* Closing "Unreviewed" tickets as "invalid", "worksforme", or "duplicate", or
-  "wontfix".
+* Closing "Unreviewed" tickets as "invalid", "worksforme", "duplicate",
+  "wontfix", or "needsnewfeatureprocess".
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
   sparse to be actionable.
