@@ -3,6 +3,7 @@ import logging
 import sys
 import tempfile
 import traceback
+from collections import defaultdict
 from contextlib import aclosing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
@@ -83,6 +84,7 @@ class ASGIRequest(HttpRequest):
             self.META["SERVER_NAME"] = "unknown"
             self.META["SERVER_PORT"] = "0"
         # Headers go into META.
+        _headers = defaultdict(list)
         for name, value in self.scope.get("headers", []):
             name = name.decode("latin1")
             if name == "content-length":
@@ -96,11 +98,10 @@ class ASGIRequest(HttpRequest):
             value = value.decode("latin1")
             if corrected_name == "HTTP_COOKIE":
                 value = value.rstrip("; ")
-                if "HTTP_COOKIE" in self.META:
-                    value = self.META[corrected_name] + "; " + value
-            elif corrected_name in self.META:
-                value = self.META[corrected_name] + "," + value
-            self.META[corrected_name] = value
+            _headers[corrected_name].append(value)
+        if cookie_header := _headers.pop("HTTP_COOKIE", None):
+            self.META["HTTP_COOKIE"] = "; ".join(cookie_header)
+        self.META.update({name: ",".join(value) for name, value in _headers.items()})
         # Pull out request encoding, if provided.
         self._set_content_type_params(self.META)
         # Directly assign the body file to be our stream.
