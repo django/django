@@ -27,6 +27,9 @@ Before reporting a bug on the `ticket tracker
 * Don't reopen issues that have been marked "wontfix" without finding consensus
   to do so on the `Django Forum`_.
 
+* Don't reopen issues that have been marked "needsnewfeatureprocess" without
+  shepherding an issue through the `new feature ideas`_ GitHub project.
+
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
   discussion to the `Django Forum`_.
