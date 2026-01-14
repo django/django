@@ -17,3 +17,15 @@ allowed remote attackers to enumerate users via a timing attack.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2025-14550: Potential denial-of-service vulnerability via repeated headers when using ASGI
+==============================================================================================
+
+When receiving duplicates of a single header, ``ASGIRequest`` allowed a remote
+attacker to cause a potential denial-of-service via a specifically created
+request with multiple duplicate headers. The vulnerability resulted from
+repeated string concatenation while combining repeated headers, which
+produced super-linear computation resulting in service degradation or outage.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.

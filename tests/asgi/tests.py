@@ -211,7 +211,7 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Echo!")
 
-    async def test_create_request_error(self):
+    async def test_request_too_big_request_error(self):
         # Track request_finished signal.
         signal_handler = SignalHandler()
         request_finished.connect(signal_handler)
@@ -241,6 +241,32 @@ class ASGITest(SimpleTestCase):
         self.assertNotEqual(
             signal_handler.calls[0]["thread"], threading.current_thread()
         )
+
+    async def test_meta_not_modified_with_repeat_headers(self):
+        scope = self.async_request_factory._base_scope(path="/", http_version="2.0")
+        scope["headers"] = [(b"foo", b"bar")] * 200_000
+
+        setitem_count = 0
+
+        class InstrumentedDict(dict):
+            def __setitem__(self, *args, **kwargs):
+                nonlocal setitem_count
+                setitem_count += 1
+                super().__setitem__(*args, **kwargs)
+
+        class InstrumentedASGIRequest(ASGIRequest):
+            @property
+            def META(self):
+                return self._meta
+
+            @META.setter
+            def META(self, value):
+                self._meta = InstrumentedDict(**value)
+
+        request = InstrumentedASGIRequest(scope, None)
+
+        self.assertEqual(len(request.headers["foo"].split(",")), 200_000)
+        self.assertLessEqual(setitem_count, 100)
 
     async def test_cancel_post_request_with_sync_processing(self):
         """
