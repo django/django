@@ -321,7 +321,11 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains` (and
+  :meth:`~django.test.SimpleTestCase.assertNotContains`) can now be called
+  multiple times with a :class:`~django.http.StreamingHttpResponse`. Previously
+  it would consume the streaming response's content and would only work
+  correctly on the first call.
 
 URLs
 ~~~~
