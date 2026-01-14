@@ -1,5 +1,7 @@
 from io import IOBase
 
+from asgiref.sync import AsyncSingleThreadContext
+
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
@@ -118,6 +120,9 @@ class WSGIHandler(base.BaseHandler):
         self.load_middleware()
 
     def __call__(self, environ, start_response):
+        async_context = AsyncSingleThreadContext()
+        async_context.__enter__()
+
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
         request = self.request_class(environ)
@@ -131,6 +136,17 @@ class WSGIHandler(base.BaseHandler):
             *(("Set-Cookie", c.OutputString()) for c in response.cookies.values()),
         ]
         start_response(status, response_headers)
+
+        original_close = response.close
+
+        def close():
+            try:
+                original_close()
+            finally:
+                async_context.__exit__(None, None, None)
+
+        response.close = close
+
         if getattr(response, "file_to_stream", None) is not None and environ.get(
             "wsgi.file_wrapper"
         ):
