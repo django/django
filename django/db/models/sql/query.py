@@ -1444,7 +1444,7 @@ class Query(BaseExpression):
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
         if (
-            lookup_name == "exact"
+            lookup_name in ("exact", "iexact")
             and lookup.rhs == ""
             and connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
         ):
