@@ -7,7 +7,9 @@ import sqlparse
 
 from django.conf import settings
 from django.db import NotSupportedError, transaction
-from django.db.models.expressions import Col
+from django.db.models import Exists, ExpressionWrapper, Lookup
+from django.db.models.expressions import Col, RawSQL
+from django.db.models.sql.where import WhereNode
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
@@ -685,10 +687,25 @@ class BaseDatabaseOperations:
 
     def conditional_expression_supported_in_where_clause(self, expression):
         """
-        Return True, if the conditional expression is supported in the WHERE
-        clause.
+        Return True, if the conditional expression is directly supported in the
+        WHERE clause.
         """
-        return True
+        # If the backend supports native boolean field it can accept any
+        # direct conditional expression usage.
+        if self.connection.features.has_native_boolean_field:
+            return True
+        # Most backends support direct EXISTS and lookups usage.
+        if isinstance(expression, (Exists, Lookup, WhereNode)):
+            return True
+        # Nested expression wrappers should be unwrapped.
+        if isinstance(expression, ExpressionWrapper) and expression.conditional:
+            return self.conditional_expression_supported_in_where_clause(
+                expression.expression
+            )
+        # Trust that direct usage of RawSQL can be used by itself.
+        if isinstance(expression, RawSQL) and expression.conditional:
+            return True
+        return False
 
     def combine_expression(self, connector, sub_expressions):
         """
