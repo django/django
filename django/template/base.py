@@ -50,7 +50,6 @@ times with multiple contexts)
 '<html></html>'
 """
 
-import functools
 import inspect
 import logging
 import re
@@ -104,11 +103,11 @@ logger = logging.getLogger("django.template")
 def clear_template_caches():
     """
     Clear all template compilation caches.
-    
+
     This function can be called in production environments to clear cached
     template data, for example after deploying new template code or when
     memory pressure is detected. It's also useful in testing scenarios.
-    
+
     Example usage:
         from django.template.base import clear_template_caches
         clear_template_caches()
@@ -442,20 +441,21 @@ class Lexer:
     def tokenize(self):
         """
         Return a list of tokens from a given template_string.
-        
+
         Uses a cache to avoid re-tokenizing identical template strings,
         which is a common pattern in production where the same templates
         are rendered repeatedly with different contexts.
         """
-        # Use hash of template string for cache key to handle large templates efficiently.
-        # Hash collisions are extremely rare and acceptable here since we're just caching.
+        # Use hash of template string for cache key to handle large
+        # templates efficiently. Hash collisions are extremely rare and
+        # acceptable here since we're just caching.
         cache_key = hash(self.template_string)
-        
+
         # Check cache first for performance boost on repeated renders.
         # Skip cache for verbatim templates since they maintain state.
         if not self.verbatim and cache_key in _tokenize_cache:
             return _tokenize_cache[cache_key]
-        
+
         in_tag = False
         lineno = 1
         result = []
@@ -464,19 +464,19 @@ class Lexer:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
             in_tag = not in_tag
-        
+
         # Cache the result for non-verbatim templates.
         # Verbatim templates may have state, so we don't cache them.
         if not self.verbatim:
             if len(_tokenize_cache) >= 1000:
-                # Simple cache eviction: clear 25% of cache when limit reached.
-                # This pragmatic approach maintains performance while preventing
-                # unbounded growth in production environments.
+                # Simple cache eviction: clear 25% of cache when limit
+                # reached. This pragmatic approach maintains performance
+                # while preventing unbounded growth in production.
                 keys_to_remove = list(_tokenize_cache.keys())[:250]
                 for key in keys_to_remove:
                     del _tokenize_cache[key]
             _tokenize_cache[cache_key] = result
-        
+
         return result
 
     def create_token(self, token_string, position, lineno, in_tag):
@@ -722,24 +722,24 @@ class Parser:
     def compile_filter(self, token):
         """
         Convenient wrapper for FilterExpression with caching optimization.
-        
+
         Since filter expressions are often reused across templates and renders,
         we cache the compiled results. The cache key includes the token and
         available filters to ensure correctness when filters are added/removed.
         """
-        # Create a cache key that includes filter state to maintain correctness.
-        # We use frozenset of filter names to make it hashable.
+        # Create a cache key that includes filter state to maintain
+        # correctness. We use frozenset of filter names to make it hashable.
         try:
             filters_key = frozenset(self.filters.keys())
             cache_key = (token, filters_key)
-            
+
             # Check if we have a cached version of this filter expression.
             if cache_key in _filter_expression_cache:
                 return _filter_expression_cache[cache_key]
-            
+
             # Compile the filter expression.
             filter_expr = FilterExpression(token, self)
-            
+
             # Cache it for future use with bounded cache size.
             if len(_filter_expression_cache) >= 500:
                 # Evict oldest 20% of cache entries when limit is reached.
@@ -747,7 +747,7 @@ class Parser:
                 keys_to_remove = list(_filter_expression_cache.keys())[:100]
                 for key in keys_to_remove:
                     del _filter_expression_cache[key]
-            
+
             _filter_expression_cache[cache_key] = filter_expr
             return filter_expr
         except (TypeError, AttributeError):
