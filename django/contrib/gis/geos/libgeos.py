@@ -92,13 +92,13 @@ ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 
 
 def error_h(fmt, lst):
+    from django.contrib.gis.geos.prototypes.threadsafe import thread_context
+
     fmt, lst = fmt.decode(), lst.decode()
     try:
         err_msg = fmt % lst
     except TypeError:
         err_msg = fmt
-    from django.contrib.gis.geos.prototypes.threadsafe import thread_context
-
     thread_context.last_error = err_msg
 
 
