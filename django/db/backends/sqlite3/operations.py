@@ -29,26 +29,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     # SQLite. Use JSON_TYPE() instead.
     jsonfield_datatype_values = frozenset(["null", "false", "true"])
 
-    def bulk_batch_size(self, fields, objs):
-        """
-        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
-        (reflected in max_query_params).
-        """
-        fields = list(
-            chain.from_iterable(
-                (
-                    field.fields
-                    if isinstance(field, models.CompositePrimaryKey)
-                    else [field]
-                )
-                for field in fields
-            )
-        )
-        if fields:
-            return self.connection.features.max_query_params // len(fields)
-        else:
-            return len(objs)
-
     def check_expression_support(self, expression):
         bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
         bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
