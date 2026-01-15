@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from io import IOBase
 
 from asgiref.sync import AsyncSingleThreadContext
@@ -120,8 +121,8 @@ class WSGIHandler(base.BaseHandler):
         self.load_middleware()
 
     def __call__(self, environ, start_response):
-        async_context = AsyncSingleThreadContext()
-        async_context.__enter__()
+        cleanup_stack = ExitStack()
+        cleanup_stack.enter_context(AsyncSingleThreadContext())
 
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
@@ -139,13 +140,13 @@ class WSGIHandler(base.BaseHandler):
 
         original_close = response.close
 
-        def close():
+        def close_with_cleanup():
             try:
                 original_close()
             finally:
-                async_context.__exit__(None, None, None)
+                cleanup_stack.close()
 
-        response.close = close
+        response.close = close_with_cleanup
 
         if getattr(response, "file_to_stream", None) is not None and environ.get(
             "wsgi.file_wrapper"
