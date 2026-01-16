@@ -736,13 +736,14 @@ class OperationTests(OperationTestBase):
     def test_delete_model_fails_on_incoming_fk(self):
         """
         DeleteModel should fail if a table has incoming foreign keys.
-        This prevents silent loss of FK constraints when using DROP TABLE
-        without CASCADE.
+        This prevents silent loss of FK constraints when using
+        DROP TABLE without CASCADE.
         """
-        # Skip on SQLite - it doesn't enforce FK constraints in test environments
+        # Skip on SQLite - it doesn't enforce FK constraints
+        # in test environments
         if connection.vendor == "sqlite":
             self.skipTest("SQLite doesn't enforce FK constraints by default")
-        
+
         # Create two models: Bob (referenced) and Jane (has FK to Bob)
         project_state = ProjectState()
         bob_operation = migrations.CreateModel(
@@ -765,7 +766,9 @@ class OperationTests(OperationTestBase):
 
         # Create the tables
         with connection.schema_editor() as editor:
-            bob_operation.database_forwards("test_dlfk", editor, project_state, bob_state)
+            bob_operation.database_forwards(
+                "test_dlfk", editor, project_state, bob_state
+            )
             jane_operation.database_forwards("test_dlfk", editor, bob_state, jane_state)
 
         # Attempt to delete Bob (which Jane references)
@@ -782,8 +785,12 @@ class OperationTests(OperationTestBase):
 
         # Cleanup
         with connection.schema_editor() as editor:
-            editor.delete_model(jane_state.apps.get_model("test_dlfk", "Jane"), cascade=True)
-            editor.delete_model(bob_state.apps.get_model("test_dlfk", "Bob"), cascade=True)
+            editor.delete_model(
+                jane_state.apps.get_model("test_dlfk", "Jane"), cascade=True
+            )
+            editor.delete_model(
+                bob_state.apps.get_model("test_dlfk", "Bob"), cascade=True
+            )
 
     def test_delete_proxy_model(self):
         """

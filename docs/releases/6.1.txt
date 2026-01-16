@@ -365,11 +365,11 @@ Migrations
 
       operations = [
           migrations.RemoveField(
-              model_name='jane',
-              name='bob',
+              model_name="jane",
+              name="bob",
           ),
           migrations.DeleteModel(
-              name='Bob',
+              name="Bob",
           ),
       ]
 
