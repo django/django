@@ -11,7 +11,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Book, ChildModel1, ChildModel2
 
@@ -312,7 +312,7 @@ class SimpleIndexesTests(SimpleTestCase):
         )
 
 
-@ignore_warnings(category=RemovedInDjango60Warning)
+@ignore_warnings(category=RemovedInDjango70Warning)
 class IndexesTests(TestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     @override_settings(DEFAULT_TABLESPACE=None)
