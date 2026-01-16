@@ -8,11 +8,15 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     geom_index_ops_nd = "GIST_GEOMETRY_OPS_ND"
     rast_index_template = "ST_ConvexHull(%(expressions)s)"
 
+    # ST_Force2D()/ST_Force3D() only accept geometries, so the column is cast
+    # before being forced. The cast is a no-op for geometry columns.
     sql_alter_column_to_3d = (
-        "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force3D(%(column)s)::%(type)s"
+        "ALTER COLUMN %(column)s TYPE %(type)s "
+        "USING ST_Force3D(%(column)s::geometry)::%(type)s"
     )
     sql_alter_column_to_2d = (
-        "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force2D(%(column)s)::%(type)s"
+        "ALTER COLUMN %(column)s TYPE %(type)s "
+        "USING ST_Force2D(%(column)s::geometry)::%(type)s"
     )
 
     def geo_quote_name(self, name):
@@ -30,14 +34,16 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         return self._create_spatial_index_sql(model, fields[0], **kwargs)
 
     def _alter_column_type_sql(
-        self, table, old_field, new_field, new_type, old_collation, new_collation
+        self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
         """
-        Special case when dimension changed.
+        Special case when the dimension changed. Conversions between geography
+        and geometry are delegated to the PostgreSQL backend, which adds the
+        USING clause required to cast between the two (#23902).
         """
         if not hasattr(old_field, "dim") or not hasattr(new_field, "dim"):
             return super()._alter_column_type_sql(
-                table, old_field, new_field, new_type, old_collation, new_collation
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
 
         if old_field.dim == 2 and new_field.dim == 3:
@@ -45,7 +51,10 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         elif old_field.dim == 3 and new_field.dim == 2:
             sql_alter = self.sql_alter_column_to_2d
         else:
-            sql_alter = self.sql_alter_column_type
+            return super()._alter_column_type_sql(
+                model, old_field, new_field, new_type, old_collation, new_collation
+            )
+
         return (
             (
                 sql_alter
@@ -70,6 +79,16 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         new_db_params,
         strict=False,
     ):
+        old_spatial_index = self._spatial_index_type(old_field)
+        new_spatial_index = self._spatial_index_type(new_field)
+
+        # A no longer applicable index must be dropped before the column type
+        # changes, as PostgreSQL rebuilds indexes as part of ALTER COLUMN TYPE
+        # and fails when the existing operator class doesn't accept the new
+        # type.
+        if old_spatial_index is not None and old_spatial_index != new_spatial_index:
+            self.execute(self._delete_spatial_index_sql(model, old_field))
+
         super()._alter_field(
             model,
             old_field,
@@ -81,16 +100,22 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             strict=strict,
         )
 
-        old_field_spatial_index = (
-            isinstance(old_field, BaseSpatialField) and old_field.spatial_index
-        )
-        new_field_spatial_index = (
-            isinstance(new_field, BaseSpatialField) and new_field.spatial_index
-        )
-        if not old_field_spatial_index and new_field_spatial_index:
+        if new_spatial_index is not None and new_spatial_index != old_spatial_index:
             self.execute(self._create_spatial_index_sql(model, new_field))
-        elif old_field_spatial_index and not new_field_spatial_index:
-            self.execute(self._delete_spatial_index_sql(model, old_field))
+
+    def _spatial_index_type(self, field):
+        """
+        Return a value identifying the spatial index a field requires, or None
+        if it requires none. Alterations that change this value invalidate any
+        existing index, which must then be recreated.
+        """
+        if not isinstance(field, BaseSpatialField) or not field.spatial_index:
+            return None
+        if field.geom_type == "RASTER":
+            return self.rast_index_template
+        if field.dim > 2 and not field.geography:
+            return self.geom_index_ops_nd
+        return self.geom_index_type
 
     def _create_spatial_index_name(self, model, field):
         return self._create_index_name(model._meta.db_table, [field.column], "_id")
