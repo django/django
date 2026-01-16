@@ -2,13 +2,13 @@
 
 #changelist .changelist-form-container {
     display: flex;
-    flex-wrap: wrap;
     align-items: flex-start;
     width: 100%;
 }
 
 #changelist .changelist-form-container > div {
     flex: 1 1 auto;
+    min-width: 0;
 }
 
 #changelist .changelist-form-container:not(:has(#changelist-filter)) > div {
