@@ -85,6 +85,16 @@ class LazySettings(LazyObject):
             self._setup(name)
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
+        if name == "DEFAULT_TABLESPACE":
+            self._show_deprecation_warning(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        elif name == "DEFAULT_INDEX_TABLESPACE":
+            self._show_deprecation_warning(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
 
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
@@ -198,17 +208,7 @@ class Settings:
                 RemovedInDjango70Warning,
             )
 
-        if self.is_overridden("DEFAULT_TABLESPACE"):
-            warnings.warn(
-                DEFAULT_TABLESPACE_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
-            )
 
-        if self.is_overridden("DEFAULT_INDEX_TABLESPACE"):
-            warnings.warn(
-                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
-            )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -258,16 +258,6 @@ class UserSettingsHolder:
         if name == "FORMS_URLFIELD_ASSUME_HTTPS":
             warnings.warn(
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
-            )
-        if name == "DEFAULT_TABLESPACE":
-            warnings.warn(
-                DEFAULT_TABLESPACE_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
-            )
-        if name == "DEFAULT_INDEX_TABLESPACE":
-            warnings.warn(
-                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
                 RemovedInDjango70Warning,
             )
 
