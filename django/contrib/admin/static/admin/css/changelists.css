@@ -9,6 +9,7 @@
 
 #changelist .changelist-form-container > div {
     flex: 1 1 auto;
+    min-width: 0;
 }
 
 #changelist .changelist-form-container:not(:has(#changelist-filter)) > div {
@@ -161,10 +162,13 @@
 
 #changelist-filter {
     flex: 0 0 240px;
+    max-width: 240px;
+    min-width: 240px;
     order: 1;
     background: var(--darkened-bg);
     border-left: none;
     margin: 0 0 0 30px;
+    overflow: hidden;
 }
 
 @media (forced-colors: active) {
@@ -187,6 +191,8 @@
     font-weight: 400;
     padding: 0 15px;
     margin-bottom: 10px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 #changelist-filter details summary > * {
@@ -231,6 +237,7 @@
     display: block;
     color: var(--body-quiet-color);
     word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 #changelist-filter li.selected {
