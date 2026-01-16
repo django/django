@@ -208,8 +208,6 @@ class Settings:
                 RemovedInDjango70Warning,
             )
 
-
-
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
