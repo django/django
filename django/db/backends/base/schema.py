@@ -86,7 +86,8 @@ class BaseDatabaseSchemaEditor:
     sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
     sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
     sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
-    sql_delete_table = "DROP TABLE %(table)s CASCADE"
+    sql_delete_table = "DROP TABLE %(table)s"
+    sql_delete_table_cascade = "DROP TABLE %(table)s CASCADE"
 
     sql_create_column = "ALTER TABLE %(table)s ADD COLUMN %(column)s %(definition)s"
     sql_alter_column = "ALTER TABLE %(table)s %(changes)s"
@@ -542,7 +543,7 @@ class BaseDatabaseSchemaEditor:
             if field.remote_field.through._meta.auto_created:
                 self.create_model(field.remote_field.through)
 
-    def delete_model(self, model):
+    def delete_model(self, model, *, cascade=False):
         """Delete a model from the database."""
         # Handle auto-created intermediary models
         for field in model._meta.local_many_to_many:
@@ -550,8 +551,9 @@ class BaseDatabaseSchemaEditor:
                 self.delete_model(field.remote_field.through)
 
         # Delete the table
+        delete_sql = self.sql_delete_table_cascade if cascade else self.sql_delete_table
         self.execute(
-            self.sql_delete_table
+            delete_sql
             % {
                 "table": self.quote_name(model._meta.db_table),
             }

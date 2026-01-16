@@ -348,11 +348,51 @@ Validators
 Backwards incompatible changes in 6.1
 =====================================
 
+Migrations
+----------
+
+* The :class:`~django.db.migrations.operations.DeleteModel` operation now uses
+  ``DROP TABLE`` without ``CASCADE`` on PostgreSQL, MySQL, and Oracle. This
+  prevents silently dropping foreign key constraints on other tables that
+  reference the deleted model.
+
+  To safely delete a model that is referenced by foreign keys, explicitly
+  remove the referencing foreign key fields first using
+  :class:`~django.db.migrations.operations.RemoveField` before running
+  ``DeleteModel``:
+
+  .. code-block:: python
+
+      operations = [
+          migrations.RemoveField(
+              model_name='jane',
+              name='bob',
+          ),
+          migrations.DeleteModel(
+              name='Bob',
+          ),
+      ]
+
+  If you are writing manual migrations and need the old behavior (drop with
+  cascade), you can call ``schema_editor.delete_model(model, cascade=True)``
+  directly.
+
 Database backend API
 --------------------
 
 This section describes changes that may be needed in third-party database
 backends.
+
+* The ``BaseDatabaseSchemaEditor.delete_model()`` method now accepts an
+  optional keyword-only ``cascade`` parameter. Third-party backends that
+  override this method should update their signatures to accept this parameter.
+  The default value is ``False``, which uses ``sql_delete_table`` (without
+  CASCADE). When ``True``, it uses ``sql_delete_table_cascade``.
+
+* A new ``sql_delete_table_cascade`` attribute has been added to
+  ``BaseDatabaseSchemaEditor``. Third-party backends should define this
+  attribute with the appropriate CASCADE SQL syntax for their database, or set
+  it equal to ``sql_delete_table`` if CASCADE is not supported.
 
 * The ``DatabaseOperations.adapt_durationfield_value()`` hook is added. If the
   database has native support for ``DurationField``, override this method to
