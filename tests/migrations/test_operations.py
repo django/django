@@ -2,7 +2,14 @@ import math
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db import IntegrityError, connection, migrations, models, transaction
+from django.db import (
+    DatabaseError,
+    IntegrityError,
+    connection,
+    migrations,
+    models,
+    transaction,
+)
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
@@ -777,7 +784,9 @@ class OperationTests(OperationTestBase):
         delete_operation.state_forwards("test_dlfk", delete_state)
 
         # This should raise a database error on backends with FK support
-        with self.assertRaises((IntegrityError, Exception)), transaction.atomic():
+        with self.assertRaises(
+            (IntegrityError, DatabaseError)
+        ), transaction.atomic():
             with connection.schema_editor() as editor:
                 delete_operation.database_forwards(
                     "test_dlfk", editor, jane_state, delete_state
