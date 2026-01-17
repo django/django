@@ -159,6 +159,8 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
     def _show_deprecation_warning(self, message, category):
+        if not self.configured:
+            return
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
         # Stack index: -1 this line, -2 the property, -3 the
