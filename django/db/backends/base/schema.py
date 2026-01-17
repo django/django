@@ -1554,8 +1554,6 @@ class BaseDatabaseSchemaEditor:
                 db_tablespace = fields[0].db_tablespace
             elif db_settings.get("DEFAULT_INDEX_TABLESPACE"):
                 db_tablespace = db_settings["DEFAULT_INDEX_TABLESPACE"]
-            elif settings.DEFAULT_INDEX_TABLESPACE:
-                db_tablespace = settings.DEFAULT_INDEX_TABLESPACE
             elif model._meta.db_tablespace:
                 db_tablespace = model._meta.db_tablespace
             elif db_settings.get("DEFAULT_TABLESPACE"):
