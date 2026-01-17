@@ -158,7 +158,7 @@ Alters the managers that are available during migrations.
 Adds a field to a model. ``model_name`` is the model's name, ``name`` is
 the field's name, and ``field`` is an unbound Field instance (the thing
 you would put in the field declaration in ``models.py`` - for example,
-``models.IntegerField(null=True)``.
+``models.IntegerField(null=True)``).
 
 The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),

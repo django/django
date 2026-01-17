@@ -89,7 +89,7 @@ can be chained with other lookup functions. To use it, you need to add
 the `unaccent extension on PostgreSQL`_. The
 :class:`~django.contrib.postgres.operations.UnaccentExtension` migration
 operation is available if you want to perform this activation using
-migrations).
+migrations.
 
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
