@@ -3,6 +3,7 @@ import operator
 from datetime import datetime
 from itertools import chain
 
+from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.ddl_references import (
     Columns,
@@ -301,8 +302,11 @@ class BaseDatabaseSchemaEditor:
         db_tablespace = None
         if model._meta.db_tablespace:
             db_tablespace = model._meta.db_tablespace
-        elif self.connection.settings_dict.get("DEFAULT_TABLESPACE"):
-            db_tablespace = self.connection.settings_dict.get("DEFAULT_TABLESPACE")
+        else:
+            db_settings = settings.DATABASES.get(self.connection.alias, {})
+            db_tablespace = db_settings.get(
+                "DEFAULT_TABLESPACE"
+            ) or self.connection.settings_dict.get("DEFAULT_TABLESPACE")
 
         if db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(db_tablespace)
@@ -369,9 +373,11 @@ class BaseDatabaseSchemaEditor:
         elif field.unique:
             yield "UNIQUE"
         # Optionally add the tablespace if it's an implicitly indexed column.
+        db_settings = settings.DATABASES.get(self.connection.alias, {})
         tablespace = (
             field.db_tablespace
             or model._meta.db_tablespace
+            or db_settings.get("DEFAULT_TABLESPACE")
             or self.connection.settings_dict.get("DEFAULT_TABLESPACE")
         )
         if (
@@ -1547,15 +1553,25 @@ class BaseDatabaseSchemaEditor:
 
     def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
         if db_tablespace is None:
-            db_settings = self.connection.settings_dict
+            from django.conf import settings
+
+            db_settings = settings.DATABASES.get(self.connection.alias, {})
             if len(fields) == 1 and fields[0].db_tablespace:
                 db_tablespace = fields[0].db_tablespace
-            elif db_settings.get("DEFAULT_INDEX_TABLESPACE"):
-                db_tablespace = db_settings["DEFAULT_INDEX_TABLESPACE"]
+            elif db_settings.get(
+                "DEFAULT_INDEX_TABLESPACE"
+            ) or self.connection.settings_dict.get("DEFAULT_INDEX_TABLESPACE"):
+                db_tablespace = db_settings.get(
+                    "DEFAULT_INDEX_TABLESPACE"
+                ) or self.connection.settings_dict.get("DEFAULT_INDEX_TABLESPACE")
             elif model._meta.db_tablespace:
                 db_tablespace = model._meta.db_tablespace
-            elif db_settings.get("DEFAULT_TABLESPACE"):
-                db_tablespace = db_settings["DEFAULT_TABLESPACE"]
+            elif db_settings.get(
+                "DEFAULT_TABLESPACE"
+            ) or self.connection.settings_dict.get("DEFAULT_TABLESPACE"):
+                db_tablespace = db_settings.get(
+                    "DEFAULT_TABLESPACE"
+                ) or self.connection.settings_dict.get("DEFAULT_TABLESPACE")
         if db_tablespace is not None:
             return " " + self.connection.ops.tablespace_sql(db_tablespace)
         return ""
