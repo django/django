@@ -3,7 +3,6 @@ import operator
 from datetime import datetime
 from itertools import chain
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.ddl_references import (
     Columns,
@@ -302,10 +301,9 @@ class BaseDatabaseSchemaEditor:
         db_tablespace = None
         if model._meta.db_tablespace:
             db_tablespace = model._meta.db_tablespace
-        elif settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE"):
-            db_tablespace = settings.DATABASES[self.connection.alias][
-                "DEFAULT_TABLESPACE"
-            ]
+        elif self.connection.settings_dict.get("DEFAULT_TABLESPACE"):
+            db_tablespace = self.connection.settings_dict.get("DEFAULT_TABLESPACE")
+
         if db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(db_tablespace)
             if tablespace_sql:
@@ -374,7 +372,7 @@ class BaseDatabaseSchemaEditor:
         tablespace = (
             field.db_tablespace
             or model._meta.db_tablespace
-            or settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE")
+            or self.connection.settings_dict.get("DEFAULT_TABLESPACE")
         )
         if (
             tablespace
@@ -1549,7 +1547,7 @@ class BaseDatabaseSchemaEditor:
 
     def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
         if db_tablespace is None:
-            db_settings = settings.DATABASES[self.connection.alias]
+            db_settings = self.connection.settings_dict
             if len(fields) == 1 and fields[0].db_tablespace:
                 db_tablespace = fields[0].db_tablespace
             elif db_settings.get("DEFAULT_INDEX_TABLESPACE"):
