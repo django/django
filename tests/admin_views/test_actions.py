@@ -294,7 +294,7 @@ class AdminActionsTest(TestCase):
         self.assertContains(
             response,
             """<label>Action: <select name="action" required>
-<option value="" selected>---------</option>
+<option value="" selected>- Select an option -</option>
 <option value="delete_selected">Delete selected external
 subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>

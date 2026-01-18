@@ -3044,6 +3044,19 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+.. setting:: USE_BLANK_CHOICE_DASH
+
+``USE_BLANK_CHOICE_DASH``
+------------------------------------
+
+.. versionadded:: 6.1
+.. deprecated:: 6.1
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to revert back to the old default
+blank choice label in forms.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -3851,6 +3864,7 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
+* :setting:`USE_BLANK_CHOICE_DASH`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

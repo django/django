@@ -1,3 +1,6 @@
+import textwrap
+
+from django.db.models.utils import get_blank_choice_label
 from django.forms import (
     CharField,
     ChoiceField,
@@ -121,6 +124,41 @@ class FormsI18nTests(SimpleTestCase):
             degree = IntegerField(widget=Select(choices=((1, gettext_lazy("test")),)))
 
         CopyForm()
+
+    def test_blank_choice_label(self):
+        class SomeForm(Form):
+            somechoices = ChoiceField(
+                choices=(
+                    ("0", get_blank_choice_label()),
+                    ("1", "Test 1"),
+                    ("2", "Test 2"),
+                )
+            )
+
+        f = SomeForm()
+
+        self.assertHTMLEqual(
+            f.as_p(),
+            textwrap.dedent("""
+            <p>
+                <label for="id_somechoices">Somechoices:</label>
+                <select name="somechoices" id="id_somechoices">
+                <option value="0">- Select an option -</option>
+                <option value="1">Test 1</option>
+                <option value="2">Test 2</option></select>
+            </p>"""),
+        )
+
+        with translation.override("de"):
+            self.assertHTMLEqual(
+                f.as_p(),
+                textwrap.dedent("""<p><label for="id_somechoices">Somechoices:</label>
+                    <select name="somechoices" id="id_somechoices">
+                    <option value="0">- Wähle eine Option -</option>
+                    <option value="1">Test 1</option>
+                    <option value="2">Test 2</option></select>
+                </p>"""),
+            )
 
 
 @jinja2_tests
