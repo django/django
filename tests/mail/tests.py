@@ -1087,15 +1087,13 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         Attaching a message that uses 8bit content transfer encoding for
         non-ASCII characters should not raise a UnicodeEncodeError (#36119).
         """
-        attachment = dedent(
-            """\
+        attachment = dedent("""\
             Subject: A message using 8bit CTE
             Content-Type: text/plain; charset=utf-8
             Content-Transfer-Encoding: 8bit
 
             ¡8-bit content!
-            """
-        ).encode()
+            """).encode()
         email = EmailMessage()
         email.attach("attachment.eml", attachment, "message/rfc822")
         attachments = self.get_raw_attachments(email)
