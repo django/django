@@ -15,6 +15,7 @@ from io import BytesIO
 
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.db.models.utils import get_blank_choice_label
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -1200,7 +1201,7 @@ class FilePathField(ChoiceField):
         if self.required:
             self.choices = []
         else:
-            self.choices = [("", "---------")]
+            self.choices = [("", get_blank_choice_label())]
 
         if self.match is not None:
             self.match_re = re.compile(self.match)

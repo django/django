@@ -12,7 +12,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import ProhibitNullCharactersValidator
-from django.db.models.utils import AltersData
+from django.db.models.utils import AltersData, get_blank_choice_label
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -1481,7 +1481,7 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset,
         *,
-        empty_label="---------",
+        empty_label="",
         required=True,
         widget=None,
         label=None,
@@ -1508,6 +1508,8 @@ class ModelChoiceField(ChoiceField):
         ):
             self.empty_label = None
         else:
+            if empty_label == "":
+                empty_label = get_blank_choice_label()
             self.empty_label = empty_label
         self.queryset = queryset
         self.limit_choices_to = limit_choices_to  # limit the queryset later.

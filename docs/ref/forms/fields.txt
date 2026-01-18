@@ -1384,7 +1384,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         By default the ``<select>`` widget used by ``ModelChoiceField`` will
         have an empty choice at the top of the list. You can change the text of
-        this label (which is ``"---------"`` by default) with the
+        this label (which is ``"- Select an option -"`` by default) with the
         ``empty_label`` attribute, or you can disable the empty label entirely
         by setting ``empty_label`` to ``None``::
 
@@ -1399,6 +1399,11 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
         default initial value, or a ``widget`` is set to
         :class:`~django.forms.RadioSelect` and the
         :attr:`~ModelChoiceField.blank` argument is ``False``.
+
+    .. versionchanged:: 6.1
+
+        The default empty label was changed from ``"---------"`` to
+        ``"- Select an option -"``.
 
     .. attribute:: to_field_name
 

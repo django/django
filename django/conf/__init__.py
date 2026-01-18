@@ -16,11 +16,18 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
+    "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
+    "your own default blank choice label, override "
+    "django.db.models.fields.BLANK_CHOICE_LABEL in your app's ready() method."
+)
 
 
 class SettingsReference(str):
@@ -226,6 +233,12 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        if name == "USE_BLANK_CHOICE_DASH":
+            warnings.warn(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

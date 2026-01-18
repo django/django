@@ -110,7 +110,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             fk_dropdown.get_attribute("innerHTML"),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{id_value}" selected>{interesting_name}</option>
             """,
         )
@@ -155,7 +155,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             fk_dropdown.get_attribute("innerHTML"),
             f"""
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="{id_value}">{name}</option>
             """,
         )
