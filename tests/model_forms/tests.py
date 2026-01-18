@@ -5,6 +5,7 @@ from decimal import Decimal
 from unittest import mock, skipUnless
 
 from django import forms
+from django.conf import settings
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
     FieldError,
@@ -25,6 +26,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.choices import BlankChoiceIterator
+from django.utils.translation import gettext as _
 from django.utils.version import PY314, PYPY
 
 from .models import (
@@ -343,7 +345,7 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(
             list(form.fields["author"].choices),
             [
-                ("", "---------"),
+                ("", _(settings.BLANK_CHOICE_LABEL)),
                 (writer.pk, "Joe Doe"),
             ],
         )
@@ -1531,7 +1533,7 @@ class ModelFormBasicTests(TestCase):
             <li>Slug: <input type="text" name="slug" maxlength="50" required></li>
             <li>Pub date: <input type="text" name="pub_date" required></li>
             <li>Writer: <select name="writer" required>
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="%s">Bob Woodward</option>
             <option value="%s">Mike Royko</option>
             </select></li>
@@ -1543,7 +1545,7 @@ class ModelFormBasicTests(TestCase):
             <option value="%s">Third test</option>
             </select></li>
             <li>Status: <select name="status">
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="1">Draft</option>
             <option value="2">Pending</option>
             <option value="3">Live</option>
@@ -1585,7 +1587,7 @@ class ModelFormBasicTests(TestCase):
             <li>Pub date:
             <input type="text" name="pub_date" value="1988-01-04" required></li>
             <li>Writer: <select name="writer" required>
-            <option value="">---------</option>
+            <option value="">- Select an option -</option>
             <option value="%s">Bob Woodward</option>
             <option value="%s" selected>Mike Royko</option>
             </select></li>
@@ -1597,7 +1599,7 @@ class ModelFormBasicTests(TestCase):
             <option value="%s">Third test</option>
             </select></li>
             <li>Status: <select name="status">
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="1">Draft</option>
             <option value="2">Pending</option>
             <option value="3">Live</option>
@@ -1653,7 +1655,8 @@ class ModelFormBasicTests(TestCase):
 <option value="%s" selected>Entertainment</option>
 <option value="%s" selected>It&#x27;s a test</option>
 <option value="%s">Third test</option>
-</select></li>""" % (self.c1.pk, self.c2.pk, self.c3.pk),
+</select></li>"""
+            % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_basic_creation(self):
@@ -1731,7 +1734,7 @@ class ModelFormBasicTests(TestCase):
             </div>
             <div>Writer:
                 <select name="writer" required>
-                    <option value="" selected>---------</option>
+                    <option value="" selected>- Select an option -</option>
                     <option value="%s">Bob Woodward</option>
                     <option value="%s">Mike Royko</option>
                 </select>
@@ -1748,7 +1751,7 @@ class ModelFormBasicTests(TestCase):
             </div>
             <div>Status:
                 <select name="status">
-                    <option value="" selected>---------</option>
+                    <option value="" selected>- Select an option -</option>
                     <option value="1">Draft</option><option value="2">Pending</option>
                     <option value="3">Live</option>
                 </select>
@@ -1781,7 +1784,7 @@ class ModelFormBasicTests(TestCase):
             <li>Pub date:
             <input type="text" name="pub_date" value="1988-01-04" required></li>
             <li>Writer: <select name="writer" required>
-            <option value="">---------</option>
+            <option value="">- Select an option -</option>
             <option value="%s">Bob Woodward</option>
             <option value="%s" selected>Mike Royko</option>
             </select></li>
@@ -1793,7 +1796,7 @@ class ModelFormBasicTests(TestCase):
             <option value="%s">Third test</option>
             </select></li>
             <li>Status: <select name="status">
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="1">Draft</option>
             <option value="2">Pending</option>
             <option value="3">Live</option>
@@ -1957,7 +1960,7 @@ class ModelFormBasicTests(TestCase):
             '<li>Slug: <input type="text" name="slug" maxlength="50" required></li>'
             '<li>Pub date: <input type="text" name="pub_date" required></li>'
             '<li>Writer: <select name="writer" required>'
-            '<option value="" selected>---------</option>'
+            '<option value="" selected>- Select an option -</option>'
             '<option value="%s">Bob Woodward</option>'
             '<option value="%s">Mike Royko</option>'
             "</select></li>"
@@ -1969,7 +1972,7 @@ class ModelFormBasicTests(TestCase):
             '<option value="%s">Third test</option>'
             "</select> </li>"
             '<li>Status: <select name="status">'
-            '<option value="" selected>---------</option>'
+            '<option value="" selected>- Select an option -</option>'
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
@@ -1986,7 +1989,7 @@ class ModelFormBasicTests(TestCase):
             '<li>Slug: <input type="text" name="slug" maxlength="50" required></li>'
             '<li>Pub date: <input type="text" name="pub_date" required></li>'
             '<li>Writer: <select name="writer" required>'
-            '<option value="" selected>---------</option>'
+            '<option value="" selected>- Select an option -</option>'
             '<option value="%s">Bob Woodward</option>'
             '<option value="%s">Carl Bernstein</option>'
             '<option value="%s">Mike Royko</option>'
@@ -2000,7 +2003,7 @@ class ModelFormBasicTests(TestCase):
             '<option value="%s">Fourth</option>'
             "</select></li>"
             '<li>Status: <select name="status">'
-            '<option value="" selected>---------</option>'
+            '<option value="" selected>- Select an option -</option>'
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
@@ -2044,7 +2047,8 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(call_count, 0)
         self.assertEqual(
             form.fields["animal"].choices,
-            models.BLANK_CHOICE_DASH + [("LION", "Lion"), ("ZEBRA", "Zebra")],
+            [("", _(settings.BLANK_CHOICE_LABEL))]
+            + [("LION", "Lion"), ("ZEBRA", "Zebra")],
         )
         self.assertEqual(call_count, 1)
 
@@ -2410,7 +2414,7 @@ class ModelOneToOneFieldTests(TestCase):
             """
             <p><label for="id_writer">Writer:</label>
             <select name="writer" id="id_writer" required>
-            <option value="" selected>---------</option>
+            <option value="" selected>- Select an option -</option>
             <option value="%s">Bob Woodward</option>
             <option value="%s">Mike Royko</option>
             </select></p>
@@ -2437,7 +2441,7 @@ class ModelOneToOneFieldTests(TestCase):
             """
             <p><label for="id_writer">Writer:</label>
             <select name="writer" id="id_writer" required>
-            <option value="">---------</option>
+            <option value="">- Select an option -</option>
             <option value="%s" selected>Bob Woodward</option>
             <option value="%s">Mike Royko</option>
             </select></p>
@@ -2727,7 +2731,8 @@ class FileAndImageFieldTests(TestCase):
 
         form = FPForm()
         self.assertEqual(
-            [name for _, name in form["path"].field.choices], ["---------", "models.py"]
+            [name for _, name in form["path"].field.choices],
+            [_(settings.BLANK_CHOICE_LABEL), "models.py"],
         )
 
     @skipUnless(test_images, "Pillow not installed")
@@ -3027,7 +3032,7 @@ class OtherModelFormTests(TestCase):
             self.assertEqual(
                 tuple(field.choices),
                 (
-                    ("", "---------"),
+                    ("", _(settings.BLANK_CHOICE_LABEL)),
                     (multicolor_item.pk, "blue, red"),
                     (red_item.pk, "red"),
                 ),
@@ -3041,14 +3046,19 @@ class OtherModelFormTests(TestCase):
         field = forms.ModelChoiceField(Inventory.objects.all(), to_field_name="barcode")
         self.assertEqual(
             tuple(field.choices),
-            (("", "---------"), (86, "Apple"), (87, "Core"), (22, "Pear")),
+            (
+                ("", _(settings.BLANK_CHOICE_LABEL)),
+                (86, "Apple"),
+                (87, "Core"),
+                (22, "Pear"),
+            ),
         )
 
         form = InventoryForm(instance=core)
         self.assertHTMLEqual(
             str(form["parent"]),
             """<select name="parent" id="id_parent">
-<option value="">---------</option>
+<option value="">- Select an option -</option>
 <option value="86" selected>Apple</option>
 <option value="87">Core</option>
 <option value="22">Pear</option>
@@ -3118,7 +3128,8 @@ class OtherModelFormTests(TestCase):
             <select multiple name="colors" id="id_colors" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
-            """ % {"blue_pk": color.pk},
+            """
+            % {"blue_pk": color.pk},
         )
 
     def test_callable_field_default(self):
@@ -3155,7 +3166,9 @@ class OtherModelFormTests(TestCase):
             <option value="3" selected>Novel</option></select>
             <input id="initial-id_category" name="initial-category" type="hidden"
                 value="3">
-            """.format(today_str),
+            """.format(
+                today_str
+            ),
         )
         empty_data = {
             "title": "",
