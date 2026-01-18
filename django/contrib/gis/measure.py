@@ -35,6 +35,7 @@ Authors: Robert Coup, Justin Bronn, Riccardo Di Virgilio
 Inspired by GeoPy (https://github.com/geopy/geopy)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
 """
+
 from decimal import Decimal
 from functools import total_ordering
 

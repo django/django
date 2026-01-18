@@ -165,16 +165,14 @@ class TransactionalTests(TransactionTestCase):
         # when an INSERT statement is used with a RETURNING clause (see #28859).
         with connection.cursor() as cursor:
             # Create trigger that raises "ORA-1403: no data found".
-            cursor.execute(
-                """
+            cursor.execute("""
                 CREATE OR REPLACE TRIGGER "TRG_NO_DATA_FOUND"
                 AFTER INSERT ON "BACKENDS_SQUARE"
                 FOR EACH ROW
                 BEGIN
                     RAISE NO_DATA_FOUND;
                 END;
-            """
-            )
+            """)
         try:
             with self.assertRaisesMessage(
                 DatabaseError,

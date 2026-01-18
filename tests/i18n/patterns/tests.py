@@ -484,51 +484,43 @@ class URLTagTests(URLTestCaseBase):
     """
 
     def test_strings_only(self):
-        t = Template(
-            """{% load i18n %}
+        t = Template("""{% load i18n %}
             {% language 'nl' %}{% url 'no-prefix-translated' %}{% endlanguage %}
-            {% language 'pt-br' %}{% url 'no-prefix-translated' %}{% endlanguage %}"""
-        )
+            {% language 'pt-br' %}{% url 'no-prefix-translated' %}{% endlanguage %}""")
         self.assertEqual(
             t.render(Context({})).strip().split(), ["/vertaald/", "/traduzidos/"]
         )
 
     def test_context(self):
         ctx = Context({"lang1": "nl", "lang2": "pt-br"})
-        tpl = Template(
-            """{% load i18n %}
+        tpl = Template("""{% load i18n %}
             {% language lang1 %}{% url 'no-prefix-translated' %}{% endlanguage %}
-            {% language lang2 %}{% url 'no-prefix-translated' %}{% endlanguage %}"""
-        )
+            {% language lang2 %}{% url 'no-prefix-translated' %}{% endlanguage %}""")
         self.assertEqual(
             tpl.render(ctx).strip().split(), ["/vertaald/", "/traduzidos/"]
         )
 
     def test_args(self):
-        tpl = Template(
-            """
+        tpl = Template("""
             {% load i18n %}
             {% language 'nl' %}
             {% url 'no-prefix-translated-slug' 'apo' %}{% endlanguage %}
             {% language 'pt-br' %}
             {% url 'no-prefix-translated-slug' 'apo' %}{% endlanguage %}
-            """
-        )
+            """)
         self.assertEqual(
             tpl.render(Context({})).strip().split(),
             ["/vertaald/apo/", "/traduzidos/apo/"],
         )
 
     def test_kwargs(self):
-        tpl = Template(
-            """
+        tpl = Template("""
             {% load i18n %}
             {% language 'nl'  %}
             {% url 'no-prefix-translated-slug' slug='apo' %}{% endlanguage %}
             {% language 'pt-br' %}
             {% url 'no-prefix-translated-slug' slug='apo' %}{% endlanguage %}
-            """
-        )
+            """)
         self.assertEqual(
             tpl.render(Context({})).strip().split(),
             ["/vertaald/apo/", "/traduzidos/apo/"],
