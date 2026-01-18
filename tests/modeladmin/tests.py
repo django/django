@@ -1,6 +1,7 @@
 from datetime import date
 
 from django import forms
+from django.conf import settings
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL,
@@ -21,6 +22,7 @@ from django.db import models
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
+from django.utils.translation import gettext as _
 
 from .models import Band, Concert, Song
 
@@ -636,9 +638,9 @@ class ModelAdminTests(TestCase):
             '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select data-context="available-source" '
             'name="main_band" id="id_main_band" required>'
-            '<option value="" selected>---------</option>'
-            '<option value="%s">The Beatles</option>'
-            '<option value="%s">The Doors</option>'
+            '<option value="" selected>- Select an option -</option>'
+            '<option value="%d">The Beatles</option>'
+            '<option value="%d">The Doors</option>'
             "</select></div>" % (band2.id, self.band.id),
         )
 
@@ -660,8 +662,8 @@ class ModelAdminTests(TestCase):
             '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select data-context="available-source" '
             'name="main_band" id="id_main_band" required>'
-            '<option value="" selected>---------</option>'
-            '<option value="%s">The Doors</option>'
+            '<option value="" selected>- Select an option -</option>'
+            '<option value="%d">The Doors</option>'
             "</select></div>" % self.band.id,
         )
 
@@ -708,30 +710,31 @@ class ModelAdminTests(TestCase):
         # ForeignKey widgets in the admin are wrapped with
         # RelatedFieldWidgetWrapper so they need to be handled properly when
         # type checking. For Select fields, all of the choices lists have a
-        # first entry of dashes.
+        # first entry of a translatable blank choice label.
+        blank_option = ("", _(settings.BLANK_CHOICE_LABEL))
         cma = ModelAdmin(Concert, self.site)
         cmafa = cma.get_form(request)
 
         self.assertEqual(type(cmafa.base_fields["main_band"].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields["main_band"].widget.choices),
-            [("", "---------"), (self.band.id, "The Doors")],
+            [blank_option, (self.band.id, "The Doors")],
         )
 
         self.assertEqual(type(cmafa.base_fields["opening_band"].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields["opening_band"].widget.choices),
-            [("", "---------"), (self.band.id, "The Doors")],
+            [blank_option, (self.band.id, "The Doors")],
         )
         self.assertEqual(type(cmafa.base_fields["day"].widget), Select)
         self.assertEqual(
             list(cmafa.base_fields["day"].widget.choices),
-            [("", "---------"), (1, "Fri"), (2, "Sat")],
+            [blank_option, (1, "Fri"), (2, "Sat")],
         )
         self.assertEqual(type(cmafa.base_fields["transport"].widget), Select)
         self.assertEqual(
             list(cmafa.base_fields["transport"].widget.choices),
-            [("", "---------"), (1, "Plane"), (2, "Train"), (3, "Bus")],
+            [blank_option, (1, "Plane"), (2, "Train"), (3, "Bus")],
         )
 
     def test_foreign_key_as_radio_field(self):
