@@ -7,6 +7,8 @@ from django.http import FileResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 
+from .urls import event_loop_info
+
 
 @override_settings(ROOT_URLCONF="wsgi.urls")
 class WSGITest(SimpleTestCase):
@@ -88,6 +90,33 @@ class WSGITest(SimpleTestCase):
         self.assertEqual(response_data["status"], "200 OK")
         self.assertIsInstance(response, FileWrapper)
         self.assertEqual(response.block_size, FileResponse.block_size)
+
+    def test_async_context_reuse(self):
+        """
+        Multiple calls to async_to_sync within a single request share the
+        same thread and event loop via AsyncSingleThreadContext.
+        """
+        event_loop_info.clear()
+
+        application = get_wsgi_application()
+        environ = self.request_factory._base_environ(PATH_INFO="/async_event_loop_id/")
+
+        def start_response(status, headers):
+            pass
+
+        response = application(environ, start_response)
+        response.close()
+
+        self.assertTrue(
+            event_loop_info["start_thread_id"] == event_loop_info["end_thread_id"]
+            and event_loop_info["view_thread_id"] == event_loop_info["start_thread_id"]
+        )
+        self.assertTrue(
+            event_loop_info["start_event_loop_id"]
+            == event_loop_info["end_event_loop_id"]
+            and event_loop_info["view_event_loop_id"]
+            == event_loop_info["start_event_loop_id"]
+        )
 
 
 class GetInternalWSGIApplicationTest(SimpleTestCase):
