@@ -1649,10 +1649,17 @@ class ManyToManyField(RelatedField):
                     )
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
+
+            def _get_concrete_model(model):
+                if model is None or isinstance(model, str):
+                    return model
+                return model._meta.concrete_model
+
             # Count foreign keys in intermediate model
             if self_referential:
                 seen_self = sum(
-                    from_model == getattr(field.remote_field, "model", None)
+                    _get_concrete_model(from_model)
+                    == _get_concrete_model(getattr(field.remote_field, "model", None))
                     for field in self.remote_field.through._meta.fields
                 )
 
@@ -1675,13 +1682,14 @@ class ManyToManyField(RelatedField):
                     )
 
             else:
-                # Count foreign keys in relationship model
                 seen_from = sum(
-                    from_model == getattr(field.remote_field, "model", None)
+                    _get_concrete_model(from_model)
+                    == _get_concrete_model(getattr(field.remote_field, "model", None))
                     for field in self.remote_field.through._meta.fields
                 )
                 seen_to = sum(
-                    to_model == getattr(field.remote_field, "model", None)
+                    _get_concrete_model(to_model)
+                    == _get_concrete_model(getattr(field.remote_field, "model", None))
                     for field in self.remote_field.through._meta.fields
                 )
 
@@ -1789,19 +1797,20 @@ class ManyToManyField(RelatedField):
                 ):
                     possible_field_names = []
                     for f in through._meta.fields:
-                        if (
-                            hasattr(f, "remote_field")
-                            and getattr(f.remote_field, "model", None) == related_model
-                        ):
+                        if hasattr(f, "remote_field") and _get_concrete_model(
+                            getattr(f.remote_field, "model", None)
+                        ) == _get_concrete_model(related_model):
                             possible_field_names.append(f.name)
+                    related_model_name = (
+                        related_model
+                        if isinstance(related_model, str)
+                        else related_model._meta.object_name
+                    )
                     if possible_field_names:
                         hint = (
                             "Did you mean one of the following foreign keys to '%s': "
                             "%s?"
-                            % (
-                                related_model._meta.object_name,
-                                ", ".join(possible_field_names),
-                            )
+                            % (related_model_name, ", ".join(possible_field_names))
                         )
                     else:
                         hint = None
@@ -1821,21 +1830,18 @@ class ManyToManyField(RelatedField):
                     else:
                         if not (
                             hasattr(field, "remote_field")
-                            and getattr(field.remote_field, "model", None)
-                            == related_model
-                        ):
-                            related_object_name = (
-                                related_model
-                                if isinstance(related_model, str)
-                                else related_model._meta.object_name
+                            and _get_concrete_model(
+                                getattr(field.remote_field, "model", None)
                             )
+                            == _get_concrete_model(related_model)
+                        ):
                             errors.append(
                                 checks.Error(
                                     "'%s.%s' is not a foreign key to '%s'."
                                     % (
                                         through._meta.object_name,
                                         field_name,
-                                        related_object_name,
+                                        related_model_name,
                                     ),
                                     hint=hint,
                                     obj=self,
@@ -2016,7 +2022,8 @@ class ManyToManyField(RelatedField):
         for f in self.remote_field.through._meta.fields:
             if (
                 f.is_relation
-                and f.remote_field.model == related.related_model
+                and f.remote_field.model._meta.concrete_model
+                == related.related_model._meta.concrete_model
                 and (link_field_name is None or link_field_name == f.name)
             ):
                 setattr(self, cache_attr, getattr(f, attr))
@@ -2036,7 +2043,11 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.remote_field.through._meta.fields:
-            if f.is_relation and f.remote_field.model == related.model:
+            if (
+                f.is_relation
+                and f.remote_field.model._meta.concrete_model
+                == related.model._meta.concrete_model
+            ):
                 if link_field_name is None and related.related_model == related.model:
                     # If this is an m2m-intermediate to self,
                     # the first foreign key you find will be
