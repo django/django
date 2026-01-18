@@ -1215,38 +1215,71 @@ class MigrationAutodetector:
             self._generate_removed_field(app_label, model_name, field_name)
 
     def _generate_removed_field(self, app_label, model_name, field_name):
+        old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+        old_field = self.from_state.models[app_label, old_model_name].get_field(
+            field_name
+        )
+        # Include dependencies such as order_with_respect_to, constraints,
+        # and any generated fields that may depend on this field. These
+        # are safely ignored if not present.
+        dependencies = [
+            OperationDependency(
+                app_label,
+                model_name,
+                field_name,
+                OperationDependency.Type.REMOVE_ORDER_WRT,
+            ),
+            OperationDependency(
+                app_label,
+                model_name,
+                field_name,
+                OperationDependency.Type.ALTER_FOO_TOGETHER,
+            ),
+            OperationDependency(
+                app_label,
+                model_name,
+                field_name,
+                OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
+            ),
+            *self._get_generated_field_dependencies_for_removed_field(
+                app_label, model_name, field_name
+            ),
+        ]
+        if old_field.primary_key:
+            # If we're removing a primary key, we must depend on the new
+            # primary key being created/altered first.
+            new_model_state = self.to_state.models[app_label, model_name]
+            for new_field_name, new_field in new_model_state.fields.items():
+                if new_field.primary_key:
+                    if (
+                        new_field_name
+                        in self.from_state.models[app_label, old_model_name].fields
+                    ):
+                        dependencies.append(
+                            OperationDependency(
+                                app_label,
+                                model_name,
+                                new_field_name,
+                                OperationDependency.Type.ALTER,
+                            )
+                        )
+                    else:
+                        dependencies.append(
+                            OperationDependency(
+                                app_label,
+                                model_name,
+                                new_field_name,
+                                OperationDependency.Type.CREATE,
+                            )
+                        )
+                    break
         self.add_operation(
             app_label,
             operations.RemoveField(
                 model_name=model_name,
                 name=field_name,
             ),
-            # Include dependencies such as order_with_respect_to, constraints,
-            # and any generated fields that may depend on this field. These
-            # are safely ignored if not present.
-            dependencies=[
-                OperationDependency(
-                    app_label,
-                    model_name,
-                    field_name,
-                    OperationDependency.Type.REMOVE_ORDER_WRT,
-                ),
-                OperationDependency(
-                    app_label,
-                    model_name,
-                    field_name,
-                    OperationDependency.Type.ALTER_FOO_TOGETHER,
-                ),
-                OperationDependency(
-                    app_label,
-                    model_name,
-                    field_name,
-                    OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
-                ),
-                *self._get_generated_field_dependencies_for_removed_field(
-                    app_label, model_name, field_name
-                ),
-            ],
+            dependencies=dependencies,
         )
 
     def generate_altered_fields(self):
@@ -1270,6 +1303,8 @@ class MigrationAutodetector:
             new_field = self.to_state.models[app_label, model_name].get_field(
                 field_name
             )
+            old_field.set_attributes_from_name(old_field_name)
+            new_field.set_attributes_from_name(field_name)
             dependencies = []
             # Implement any model renames on relations; these are handled by
             # RenameModel so we need to exclude them from the comparison
@@ -1342,7 +1377,11 @@ class MigrationAutodetector:
                 target_changed = (
                     both_m2m and new_field_dec[2]["to"] != old_field_dec[2]["to"]
                 )
-                if (both_m2m or neither_m2m) and not target_changed:
+                if (
+                    (both_m2m or neither_m2m)
+                    and not target_changed
+                    and old_field.concrete == new_field.concrete
+                ):
                     # Either both fields are m2m or neither is
                     preserve_default = True
                     if (

@@ -535,6 +535,7 @@ class ForeignObject(RelatedField):
     one_to_one = False
 
     requires_unique_target = True
+    db_constraint = True
     related_accessor_class = ReverseManyToOneDescriptor
     forward_related_accessor_class = ForwardManyToOneDescriptor
     rel_class = ForeignObjectRel

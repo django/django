@@ -68,9 +68,8 @@ expect to see this in future releases.
 Migrating to a composite primary key
 ====================================
 
-Django doesn't support migrating to, or from, a composite primary key after the
-table is created. It also doesn't support adding or removing fields from the
-composite primary key.
+Django doesn't support adding or removing fields from the composite
+primary key.
 
 If you would like to migrate an existing table from a single primary key to a
 composite primary key, follow your database backend's instructions to do so.

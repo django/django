@@ -5571,24 +5571,131 @@ class AutodetectorTests(BaseAutodetectorTests):
 
         changes = self.get_changes(before, after)
         self.assertNumberMigrations(changes, "app", 1)
-        self.assertOperationTypes(changes, "app", 0, ["RemoveField", "AlterField"])
+        self.assertOperationTypes(changes, "app", 0, ["AlterField", "RemoveField"])
         self.assertOperationAttributes(
             changes,
             "app",
             0,
             0,
-            name="pk",
+            name="id",
             model_name="foo",
+            preserve_default=True,
         )
         self.assertOperationAttributes(
             changes,
             "app",
             0,
             1,
-            name="id",
+            name="pk",
             model_name="foo",
-            preserve_default=True,
         )
+
+    def test_composite_pk_to_foreign_key_ordering(self):
+        before = [
+            ModelState("app", "Order", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "OrderLineItem",
+                [
+                    ("pk", models.CompositePrimaryKey("order_id", "product_id")),
+                    ("order", models.ForeignKey("app.Order", models.CASCADE)),
+                    ("product_id", models.IntegerField()),
+                ],
+            ),
+        ]
+        after = [
+            ModelState("app", "Order", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "OrderLineItem",
+                [
+                    (
+                        "order",
+                        models.ForeignKey(
+                            "app.Order", models.CASCADE, primary_key=True
+                        ),
+                    ),
+                    ("product_id", models.IntegerField()),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "app", 1)
+        # Order: AlterField(order) then RemoveField(pk)
+        self.assertOperationTypes(changes, "app", 0, ["AlterField", "RemoveField"])
+
+    def test_foreign_key_to_composite_pk_ordering(self):
+        before = [
+            ModelState("app", "Order", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "OrderLineItem",
+                [
+                    (
+                        "order",
+                        models.ForeignKey(
+                            "app.Order", models.CASCADE, primary_key=True
+                        ),
+                    ),
+                    ("product_id", models.IntegerField()),
+                ],
+            ),
+        ]
+        after = [
+            ModelState("app", "Order", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "OrderLineItem",
+                [
+                    ("pk", models.CompositePrimaryKey("order_id", "product_id")),
+                    ("order", models.ForeignKey("app.Order", models.CASCADE)),
+                    ("product_id", models.IntegerField()),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "app", 1)
+        # Order: AddField(pk) then AlterField(order)
+        self.assertOperationTypes(changes, "app", 0, ["AddField", "AlterField"])
+
+    def test_foreign_object_to_foreign_key(self):
+        before = [
+            ModelState("app", "Target", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    (
+                        "target",
+                        models.ForeignObject(
+                            "app.Target",
+                            on_delete=models.CASCADE,
+                            from_fields=["id"],
+                            to_fields=["id"],
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        after = [
+            ModelState("app", "Target", [("id", models.AutoField(primary_key=True))]),
+            ModelState(
+                "app",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    (
+                        "target",
+                        models.ForeignKey("app.Target", on_delete=models.CASCADE),
+                    ),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "app", 1)
+        # Should NOT be AlterField. Must be RemoveField and AddField
+        self.assertOperationTypes(changes, "app", 0, ["RemoveField", "AddField"])
 
 
 class MigrationSuggestNameTests(SimpleTestCase):
