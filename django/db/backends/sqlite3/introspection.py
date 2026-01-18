@@ -77,12 +77,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT name, type FROM sqlite_master
             WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
-            ORDER BY name"""
-        )
+            ORDER BY name""")
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):

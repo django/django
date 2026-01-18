@@ -112,9 +112,7 @@ class MultiDBOperationTests(OperationTestBase):
         sql = """
         INSERT INTO {0}_pony (pink, weight) VALUES (1, 3.55);
         INSERT INTO {0}_pony (pink, weight) VALUES (3, 5.0);
-        """.format(
-            app_label
-        )
+        """.format(app_label)
 
         operation = migrations.RunSQL(sql, hints=hints or {})
         # Test the state alteration does nothing

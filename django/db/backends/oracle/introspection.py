@@ -58,8 +58,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT
                 user_tables.table_name,
                 't',
@@ -78,8 +77,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT view_name, 'v', NULL FROM user_views
             UNION ALL
             SELECT mview_name, 'v', NULL FROM user_mviews
-        """
-        )
+        """)
         return [
             TableInfo(self.identifier_converter(row[0]), row[1], row[2])
             for row in cursor.fetchall()
