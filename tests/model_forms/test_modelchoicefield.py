@@ -402,8 +402,7 @@ class ModelChoiceFieldTests(TestCase):
             <div><label>
             <input type="checkbox" name="name" value="%d" data-slug="third-test">Third
             </label></div></div>
-            """
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+            """ % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_choice_value_hash(self):
