@@ -72,6 +72,8 @@ class CTE:
 
     def join(self, model_or_queryset, *filter_q, **filter_kw):
         """Join this CTE to the given model or queryset."""
+        from django.db.models.query import QuerySet
+
         if isinstance(model_or_queryset, QuerySet):
             queryset = model_or_queryset.all()
         else:
@@ -408,7 +410,12 @@ def generate_cte_sql(connection, query, as_sql):
         if cte.name not in used:
             continue
         template = get_cte_query_template(cte)
-        ctes.append(template.format(name=cte_name_sql, query=cte_sql))
+        cte_name = cte_name_sql
+        column_names = getattr(cte, "_column_names", None)
+        if column_names:
+            cols_sql = ", ".join(connection.ops.quote_name(name) for name in column_names)
+            cte_name = f"{cte_name_sql} ({cols_sql})"
+        ctes.append(template.format(name=cte_name, query=cte_sql))
         params.extend(cte_params)
 
     if ctes:
