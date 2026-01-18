@@ -1653,8 +1653,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%d" selected>Entertainment</option>
 <option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
-</select></li>"""
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+</select></li>""" % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_basic_creation(self):
@@ -3119,8 +3118,7 @@ class OtherModelFormTests(TestCase):
             <select multiple name="colors" id="id_colors" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
-            """
-            % {"blue_pk": color.pk},
+            """ % {"blue_pk": color.pk},
         )
 
     def test_callable_field_default(self):
@@ -3157,9 +3155,7 @@ class OtherModelFormTests(TestCase):
             <option value="3" selected>Novel</option></select>
             <input id="initial-id_category" name="initial-category" type="hidden"
                 value="3">
-            """.format(
-                today_str
-            ),
+            """.format(today_str),
         )
         empty_data = {
             "title": "",

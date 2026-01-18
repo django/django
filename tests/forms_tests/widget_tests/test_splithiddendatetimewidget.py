@@ -56,12 +56,10 @@ class SplitHiddenDateTimeWidgetTest(WidgetTest):
             self.widget,
             "date",
             d,
-            html=(
-                """
+            html=("""
             <input type="hidden" name="date_0" value="17.09.2007">
             <input type="hidden" name="date_1" value="12:51:00">
-            """
-            ),
+            """),
         )
 
     def test_constructor_different_attrs(self):

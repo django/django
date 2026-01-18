@@ -3664,7 +3664,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertTrue(f.is_valid())
 
         file1 = SimpleUploadedFile(
-            "我隻氣墊船裝滿晒鱔.txt", "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode()
+            "我隻氣墊船裝滿晒鱔.txt",
+            "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode(),
         )
         f = FileForm(data={}, files={"file1": file1}, auto_id=False)
         self.assertHTMLEqual(

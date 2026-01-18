@@ -101,7 +101,6 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
     from django.contrib.postgres.fields import RangeOperators
     from django.db.models import Deferrable
 
-
     ExclusionConstraint(
         name="exclude_overlapping_deferred",
         expressions=[
