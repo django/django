@@ -51,6 +51,9 @@ class PostGISOperator(SpatialOperator):
 
         # Look for band indices and inject them if provided.
         if lookup.band_lhs is not None and lhs_is_raster:
+            if not isinstance(lookup.band_lhs, int):
+                name = lookup.band_lhs.__class__.__name__
+                raise TypeError(f"Band index must be an integer, but got {name!r}.")
             if not self.func:
                 raise ValueError(
                     "Band indices are not allowed for this operator, it works on bbox "
@@ -62,6 +65,9 @@ class PostGISOperator(SpatialOperator):
             )
 
         if lookup.band_rhs is not None and rhs_is_raster:
+            if not isinstance(lookup.band_rhs, int):
+                name = lookup.band_rhs.__class__.__name__
+                raise TypeError(f"Band index must be an integer, but got {name!r}.")
             if not self.func:
                 raise ValueError(
                     "Band indices are not allowed for this operator, it works on bbox "
