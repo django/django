@@ -186,7 +186,7 @@ All attributes should be considered read-only, unless stated otherwise.
     .. code-block:: pycon
 
         >>> request.headers
-        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...)}
 
         >>> "User-Agent" in request.headers
         True

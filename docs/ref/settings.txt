@@ -3668,7 +3668,7 @@ usage.
     :doc:`staticfiles</ref/contrib/staticfiles>`’s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
-    :setting:`STATICFILES_DIRS`).
+    :setting:`STATICFILES_DIRS`.
 
 .. setting:: STATIC_URL
 
