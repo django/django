@@ -224,7 +224,7 @@
     display: flex;
     height: 30px;
     width: 64px;
-    margin: 0 0 10px 40%;
+    margin: 0 auto 10px auto;
     background-color: #eee;
     border-radius: 10px;
     transform: none;
@@ -584,7 +584,6 @@ ul.timelist, .timelist li {
 .related-widget-wrapper {
     display: flex;
     gap: 0 10px;
-    flex-grow: 1;
     flex-wrap: wrap;
     margin-bottom: 5px;
 }
