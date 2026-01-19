@@ -454,32 +454,6 @@ class JSONArrayAgg(Aggregate):
         sql = f"(CASE WHEN {count_sql} > 0 THEN {sql}{default_sql} END)"
         return sql, count_params + params + default_params
 
-    def as_native(self, compiler, connection, *, returning=None, **extra_context):
-        # Oracle and PostgreSQL 16+ default to removing SQL null values from
-        # the returned array. This adds the NULL ON NULL clause to preserve
-        # the null values in the array as default behaviour Similar to that
-        # of SQLite, also removes the null values from the array when
-        # specified via ABSENT ON NULL.
-        if len(self.get_source_expressions()) == 0:
-            on_null_clause = ""
-        elif self.absent_on_null:
-            on_null_clause = "ABSENT ON NULL"
-        else:
-            on_null_clause = "NULL ON NULL"
-        if returning:
-            extra_context.setdefault(
-                "template",
-                "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
-                f"{on_null_clause} RETURNING {returning}) %(filter)s",
-            )
-        else:
-            extra_context.setdefault(
-                "template",
-                "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
-                f"{on_null_clause}) %(filter)s",
-            )
-        return self.as_sql(compiler, connection, **extra_context)
-
     def as_postgresql(self, compiler, connection, **extra_context):
         if not connection.features.is_postgresql_16:
             sql, params = self.as_sql(
@@ -496,7 +470,7 @@ class JSONArrayAgg(Aggregate):
                 if self.filter:
                     not_null_condition = IsNull(expression, False)
                     copy = self.copy()
-                    copy.filter.source_expressions[0].children += [not_null_condition]
+                    copy.filter.source_expressions[0].add(not_null_condition, "AND")
                     sql, params = copy.as_sql(
                         compiler, connection, function="ARRAY_AGG", **extra_context
                     )
@@ -507,9 +481,29 @@ class JSONArrayAgg(Aggregate):
                     return f"TO_JSONB({sql} {filter_sql})", params
             else:
                 return f"TO_JSONB({sql})", params
-        return self.as_native(compiler, connection, returning="JSONB", **extra_context)
+        # PostgreSQL 16+ defaults to removing SQL null values from the returned
+        # array, adding NULL ON NULL clause preserves the null values
+        # to match SQLite, MySQL default behaviour, the null values are removed
+        # when ABSENT ON NULL is specified.
+        on_null_clause = "ABSENT ON NULL" if self.absent_on_null else "NULL ON NULL"
+        extra_context.setdefault(
+            "template",
+            "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+            f"{on_null_clause} RETURNING JSONB) %(filter)s",
+        )
+        return self.as_sql(compiler, connection, **extra_context)
 
     def as_oracle(self, compiler, connection, **extra_context):
+        # Oracle defaults to removing SQL null values from the returned
+        # array, adding NULL ON NULL clause preserves the null values
+        # to match SQLite, MySQL default behaviour, the null values are
+        # removed when ABSENT ON NULL is specified.
+        on_null_clause = "ABSENT ON NULL" if self.absent_on_null else "NULL ON NULL"
+        extra_context.setdefault(
+            "template",
+            "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+            f"{on_null_clause}) %(filter)s",
+        )
         # Oracle turns DATE columns into ISO 8601 timestamp including T00:00:00
         # suffixed when converting to JSON while other backends only include
         # the date part.
@@ -523,5 +517,5 @@ class JSONArrayAgg(Aggregate):
                     *source_expressions[1:],
                 ]
             )
-            return clone.as_native(compiler, connection, **extra_context)
-        return self.as_native(compiler, connection, **extra_context)
+            return clone.as_sql(compiler, connection, **extra_context)
+        return self.as_sql(compiler, connection, **extra_context)

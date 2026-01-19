@@ -4174,7 +4174,7 @@ by the aggregate.
 ``JSONArrayAgg``
 ~~~~~~~~~~~~~~~~
 
-.. versionadded:: 6.0
+.. versionadded:: 6.1
 
 .. class:: JSONArrayAgg(expression, output_field=None, filter=None, order_by=None, default=None, **extra)
 
