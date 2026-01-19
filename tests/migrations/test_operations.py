@@ -784,9 +784,7 @@ class OperationTests(OperationTestBase):
         delete_operation.state_forwards("test_dlfk", delete_state)
 
         # This should raise a database error on backends with FK support
-        with self.assertRaises(
-            (IntegrityError, DatabaseError)
-        ), transaction.atomic():
+        with self.assertRaises((IntegrityError, DatabaseError)), transaction.atomic():
             with connection.schema_editor() as editor:
                 delete_operation.database_forwards(
                     "test_dlfk", editor, jane_state, delete_state
