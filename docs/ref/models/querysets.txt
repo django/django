@@ -1990,7 +1990,7 @@ them:
 .. code-block:: pycon
 
     >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
-    <QuerySet [<Person: ...)>, ...]>
+    <QuerySet [<Person: ...>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
 ``select_for_update()``. However, MariaDB only supports the ``nowait``
