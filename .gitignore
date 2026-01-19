@@ -17,3 +17,6 @@ tests/.coverage*
 build/
 tests/report/
 tests/screenshots/
+
+# py -m venv %HOMEPATH%\.virtualenvs\djangodev
+djangodev/
