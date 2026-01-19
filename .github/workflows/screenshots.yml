@@ -39,7 +39,7 @@ jobs:
         run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=1
 
       - name: Cache oxipng
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cargo/
           key: ${{ runner.os }}-cargo
@@ -56,7 +56,7 @@ jobs:
           mv tests/screenshots/* "/tmp/screenshots/${{ github.event.pull_request.head.sha }}/"
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: screenshots-${{ github.event.pull_request.head.sha }}
           path: /tmp/screenshots/
