@@ -29,3 +29,15 @@ produced super-linear computation resulting in service degradation or outage.
 
 This issue has severity "moderate" according to the :ref:`Django security
 policy <security-disclosure>`.
+
+CVE-2026-1207: Potential SQL injection via raster lookups on PostGIS
+====================================================================
+
+:ref:`Raster lookups <spatial-lookup-raster>` on GIS fields (only implemented
+on PostGIS) were subject to SQL injection if untrusted data was used as a band
+index.
+
+As a reminder, all untrusted user input should be validated before use.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<security-disclosure>`.
