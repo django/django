@@ -1224,7 +1224,7 @@ class MigrationAutodetector:
         if (
             not field.null
             and not field.has_default()
-            and field.db_default is models.NOT_PROVIDED
+            and not field.has_db_default()
             and not field.many_to_many
             and not (field.blank and field.empty_strings_allowed)
             and not (
