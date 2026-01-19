@@ -18,10 +18,18 @@ When the web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application. In
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute. Django can be configured to make
-use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
-or ``PersistentRemoteUserMiddleware``, and
-:class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
+use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` or
+``PersistentRemoteUserMiddleware``, and :class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
 :mod:`django.contrib.auth`.
+
+.. note::
+
+    **Warning for ASGI deployments:** If you run Django directly with an ASGI
+    server such as `uvicorn` or `daphne` without a trusted front-end proxy,
+    ``RemoteUserMiddleware`` can be exploited. Clients could send arbitrary
+    ``REMOTE_USER`` values in HTTP headers, potentially logging in as any user.
+    Always run behind a trusted upstream that sets or strips the ``REMOTE_USER``
+    header.
 
 Configuration
 =============
@@ -38,6 +46,12 @@ First, you must add the
         "...",
     ]
 
+.. note::
+
+    **ASGI deployment note:** RemoteUserMiddleware requires a trusted upstream
+    server to set ``REMOTE_USER``. Running Django directly with `uvicorn` or
+    `daphne` without such a proxy is unsafe.
+
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
 with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
@@ -51,16 +65,15 @@ With this setup, ``RemoteUserMiddleware`` will detect the username in
 using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
 
 Be aware that this particular setup disables authentication with the default
-``ModelBackend``. This means that if the ``REMOTE_USER`` value is not set
-then the user is unable to log in, even using Django's admin interface.
+``ModelBackend``. This means that if the ``REMOTE_USER`` value is not set then
+the user is unable to log in, even using Django's admin interface.
 Adding ``'django.contrib.auth.backends.ModelBackend'`` to the
 ``AUTHENTICATION_BACKENDS`` list will use ``ModelBackend`` as a fallback
 if ``REMOTE_USER`` is absent, which will solve these issues.
 
-Django's user management, such as the views in ``contrib.admin`` and
-the :djadmin:`createsuperuser` management command, doesn't integrate with
-remote users. These interfaces work with users stored in the database
-regardless of ``AUTHENTICATION_BACKENDS``.
+Django's user management, such as the views in ``contrib.admin`` and the
+:djadmin:`createsuperuser` management command, doesn't integrate with remote users.
+These interfaces work with users stored in the database regardless of ``AUTHENTICATION_BACKENDS``.
 
 .. note::
 
@@ -72,7 +85,7 @@ regardless of ``AUTHENTICATION_BACKENDS``.
     <django.contrib.auth.models.User.is_active>` won't be allowed to
     authenticate. Use
     :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
-    you want to allow them to.
+    you want to allow them.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
@@ -108,10 +121,10 @@ instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
     also check that your web server doesn't allow a spoofed header using
     underscores in place of dashes.
 
-    This warning doesn't apply to ``RemoteUserMiddleware`` in its default
-    configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
-    start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
-    or ASGI server, not directly from an HTTP request header.
+    **Important:** This default warning does not apply if Django is running as
+    a direct ASGI endpoint without a trusted proxy. In such a case, clients
+    could still inject a ``REMOTE_USER`` header and bypass authentication.
+    Always ensure a trusted upstream sets or strips the header.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
