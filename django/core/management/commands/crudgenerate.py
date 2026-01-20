@@ -1,10 +1,3 @@
-
-'''
-This is CRUD generation function for view, edit and delete fuctionality
-Templates needs to be modified after generation
-
-'''
-
 from __future__ import annotations
 
 import os
@@ -25,12 +18,23 @@ def parse_field(spec: str) -> str:
     """Return a Django model field declaration (source) for a single field spec.
 
     Grammar examples:
-      title:str:200
-      body:text
-      published:bool
-      author:fk:auth.User
-      name:str:100:null,blank
-      slug:str:50:unique,default=untitled
+        title:str:200
+        body:text
+        published:bool
+        author:fk:auth.User
+        name:str:100:null,blank
+        slug:str:50:unique,default=untitled
+        price:decimal:10,2:default=0.00
+        rating:float
+        email:email
+        website:url
+        code:slug:50
+        identifier:uuid
+        meta:json
+        started:time
+        duration:duration
+        partner:o2o:app.Model
+        tags:m2m:app.Tag
     """
     m = FIELD_RE.match(spec)
     if not m:
@@ -59,16 +63,50 @@ def parse_field(spec: str) -> str:
         field = "models.TextField("
     elif ftype in ("int", "integer"):
         field = "models.IntegerField("
+    elif ftype == "float":
+        field = "models.FloatField("
+    elif ftype == "decimal":
+        # arg expected as "max_digits,decimal_places" e.g. 10,2
+        if not arg:
+            raise ValueError("decimal requires arg like max_digits,decimal_places")
+        parts = [p.strip() for p in arg.split(",")]
+        if len(parts) != 2 or not all(p.isdigit() for p in parts):
+            raise ValueError("decimal arg must be two integers separated by a comma, e.g. 10,2")
+        max_digits, decimal_places = parts
+        field = f"models.DecimalField(max_digits={max_digits}, decimal_places={decimal_places}"
     elif ftype == "bool":
         field = "models.BooleanField("
     elif ftype == "date":
         field = "models.DateField("
     elif ftype == "datetime":
         field = "models.DateTimeField("
+    elif ftype == "time":
+        field = "models.TimeField("
+    elif ftype == "duration":
+        field = "models.DurationField("
+    elif ftype == "email":
+        field = "models.EmailField("
+    elif ftype == "url":
+        field = "models.URLField("
+    elif ftype == "slug":
+        field = "models.SlugField("
+    elif ftype == "uuid":
+        field = "models.UUIDField("
+    elif ftype == "json":
+        field = "models.JSONField("
     elif ftype == "fk":
         if not arg:
             raise ValueError("fk requires target like app.Model")
         field = f"models.ForeignKey('{arg}', on_delete=models.CASCADE, "
+    elif ftype == "o2o" or ftype == "one_to_one":
+        if not arg:
+            raise ValueError("o2o/one_to_one requires target like app.Model")
+        field = f"models.OneToOneField('{arg}', on_delete=models.CASCADE, "
+    elif ftype == "m2m" or ftype == "many_to_many":
+        if not arg:
+            raise ValueError("m2m/many_to_many requires target like app.Model")
+        # ManyToManyField doesn't take on_delete
+        field = f"models.ManyToManyField('{arg}'"
     else:
         raise ValueError(f"Unknown field type: {ftype}")
 
@@ -386,9 +424,7 @@ class Command(BaseCommand):
     help = "Bind a simple CRUD set for an app and model: python manage.py crud <app> <ModelName> <field:type>... \n" \
               "Or create only templates for an existing app/model with --templates-only" \
               "python manage.py crud myapp Publication title:str:255 body:text --create-base --force\n" \
-              "python manage.py crud myapp Publication --templates-only --create-base --force" \
-              " migrate after the generation to create database tables"  
-                
+              "python manage.py crud myapp Publication --templates-only --create-base --force"
 
     def add_arguments(self, parser):
         parser.add_argument("app")
@@ -527,6 +563,8 @@ class Command(BaseCommand):
                         "      <td>{{ val }}</td>\n"
                         "      {% endfor %}\n"
                         "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__detail' pk %}\">View</a></td>\n"
+                        "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__edit' pk %}\">Edit</a></td>\n"
+                        "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__delete' pk %}\">Delete</a></td>\n"
                         "    </tr>\n"
                         "    {% endfor %}\n"
                         "  </tbody>\n"
@@ -761,7 +799,7 @@ class Command(BaseCommand):
                     "      {% for label, fname in headers %}\n"
                     "      <th>{{ label }}</th>\n"
                     "      {% endfor %}\n"
-                    "      <th>Actions</th>\n"
+                    "      <th colspan=\"3\">Actions</th>\n"
                     "    </tr>\n"
                     "  </thead>\n"
                     "  <tbody>\n"
@@ -771,6 +809,8 @@ class Command(BaseCommand):
                     "      <td>{{ val }}</td>\n"
                     "      {% endfor %}\n"
                     "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__detail' pk %}\">View</a></td>\n"
+                    "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__edit' pk %}\">Edit</a></td>\n" \
+                    "      <td><a href=\"{% url '__APP__:__MODEL_LOWER__delete' pk %}\">Delete</a></td>\n"
                     "    </tr>\n"
                     "    {% endfor %}\n"
                     "  </tbody>\n"
