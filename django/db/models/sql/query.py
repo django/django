@@ -866,6 +866,7 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
             cte_query._with_ctes = ()
             cte_query._auto_cte_annotation_skip = True
             cte_query._auto_cte_processed = True
+            cte_query.select_related = False
             if auto_cte_selected is not None:
                 selected_for_cte = dict(base_query.selected or {})
                 for name in materialized_names:
