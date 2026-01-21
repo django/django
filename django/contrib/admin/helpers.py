@@ -74,6 +74,12 @@ class AdminForm:
             )
 
     @property
+    def has_field_error(self):
+        return any(
+            field.errors() for fieldset in self for line in fieldset for field in line
+        )
+
+    @property
     def errors(self):
         return self.form.errors
 
@@ -378,6 +384,10 @@ class InlineAdminFormSet:
                 model_admin=self.opts,
             )
 
+    @property
+    def has_error(self):
+        return any(form.has_error for form in self) or self.non_form_errors()
+
     def fields(self):
         fk = getattr(self.formset, "fk", None)
         empty_form = self.formset.empty_form
@@ -500,6 +510,16 @@ class InlineAdminForm(AdminForm):
                 model_admin=self.model_admin,
                 **options,
             )
+
+    @property
+    def has_field_error(self):
+        return any(
+            field.errors() for fieldset in self for line in fieldset for field in line
+        )
+
+    @property
+    def has_error(self):
+        return self.has_field_error or self.form.non_field_errors()
 
     def needs_explicit_pk_field(self):
         return (

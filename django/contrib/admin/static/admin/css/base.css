@@ -33,6 +33,14 @@ html[data-theme="light"],
     --border-color: #ccc;
 
     --error-fg: #ba2121;
+    --error-note-section-bg: #fee1e1;
+    --error-note-section-border-color: #f26868;
+    --error-note-info-bg: #fff7eb;
+    --error-note-info-border-color: #f2a950;
+    --error-note-inline-border-color: #ed8936;
+    --error-note-link-border-color: #f56565;
+    --error-note-link-hover-bg: #fafdff;
+    --error-note-link-hover-border-color: #c8d1db;
 
     --message-debug-bg: #efefef;
     --message-debug-icon: url(../img/icon-debug.svg);
@@ -690,13 +698,100 @@ ul.messagelist li.error {
     font-weight: 700;
     display: block;
     padding: 10px 12px;
-    margin: 0 0 10px 0;
+    margin: 2rem 0;
     color: var(--error-fg);
-    border: 1px solid var(--error-fg);
+    border: 2px solid var(--error-fg);
+    border-left: 6px solid var(--error-fg);
     border-radius: 4px;
     background-color: var(--body-bg);
     background-position: 5px 12px;
     overflow-wrap: break-word;
+}
+
+.errornote h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+}
+
+.errornote .group {
+    margin: 20px 0 12px 0;
+    padding: 8px 12px;
+    background: var(--error-note-section-bg);
+    border-radius: 4px;
+    border-left: 4px solid var(--error-note-section-border-color);
+}
+
+.errornote .group h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--error-fg);
+}
+
+.errornote ul.errorlist {
+    padding: 12px;
+    margin: 8px 0;
+    background: transparent;
+}
+
+.errornote h3 > ul.errorlist.nonfield,
+.errornote h3 > ul.errorlist.nonform,
+.errornote div.inline h4 > ul.errorlist.nonfield {
+    background-color: var(--error-note-info-bg);
+    border: 1px solid var(--error-note-info-border-color);
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.errornote .group div.inline {
+    margin: 15px 0 9px 0;
+    padding: 8px 12px;
+    border: 1px solid var(--error-note-inline-border-color);
+    border-left: 4px solid var(--error-note-inline-border-color);
+    border-radius: 4px;
+    background-color: var(--body-bg);
+}
+
+.errornote .group div.inline h4 {
+    font-size: 0.9rem;
+    color: var(--error-fg);
+    margin-bottom: 0;
+}
+
+.errornote ul.errorlist li a {
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--error-note-link-border-color);
+    border-left: 4px solid var(--error-note-link-border-color);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: var(--body-bg);
+}
+
+.errornote ul.errorlist li + li {
+    margin-top: 8px;
+}
+
+.errornote ul.errorlist li a:hover {
+    background-color: var(--error-note-link-hover-bg);
+    border-color: var(--error-note-link-hover-border-color);
+    transform: translateX(2px);
+}
+
+.errornote ul.errorlist li a::after {
+    content: '→';
+    position: absolute;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.errornote ul.errorlist a:hover::after,
+.errornote ul.errorlist a:focus::after {
+    opacity: 1;
 }
 
 ul.errorlist {
