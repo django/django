@@ -126,10 +126,11 @@ class TruncateHTMLParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag not in self.void_elements:
             self.output += f"</{tag}>"
-            try:
-                self.tags.remove(tag)
-            except ValueError:
-                pass
+            # Remove from the stack only if the tag matches the most recently
+            # opened tag (LIFO). This avoids O(n) linear scans for unmatched
+            # end tags if `deque.remove()` would be called.
+            if self.tags and self.tags[0] == tag:
+                self.tags.popleft()
 
     def handle_data(self, data):
         data, output = self.process(data)

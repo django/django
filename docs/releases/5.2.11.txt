@@ -41,3 +41,15 @@ As a reminder, all untrusted user input should be validated before use.
 
 This issue has severity "high" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2026-1285: Potential denial-of-service vulnerability in ``django.utils.text.Truncator`` HTML methods
+========================================================================================================
+
+``django.utils.text.Truncator.chars()`` and ``Truncator.words()`` methods (with
+``html=True``) and the :tfilter:`truncatechars_html` and
+:tfilter:`truncatewords_html` template filters were subject to a potential
+denial-of-service attack via certain inputs with a large number of unmatched
+HTML end tags, which could cause quadratic time complexity during HTML parsing.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
