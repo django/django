@@ -30,6 +30,21 @@ the previous behavior of ``URLField.to_python()``.
 This issue has severity "moderate" according to the :ref:`Django security
 policy <security-disclosure>`.
 
+CVE-2026-25674: Potential incorrect permissions on newly created file system objects
+====================================================================================
+
+Django's file-system storage and file-based cache backends used the process
+``umask`` to control permissions when creating directories. In multi-threaded
+environments, one thread's temporary umask change can affect other threads'
+file and directory creation, resulting in file system objects being created
+with unintended permissions.
+
+Django now applies the requested permissions via :func:`~os.chmod` after
+:func:`~os.mkdir`, removing the dependency on the process-wide umask.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
 Bugfixes
 ========
 
