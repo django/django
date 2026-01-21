@@ -272,15 +272,11 @@ class Truncator(SimpleLazyObject):
             if self_closing or tagname in html4_singlets:
                 pass
             elif closing_tag:
-                # Check for match in open tags list
-                try:
-                    i = open_tags.index(tagname)
-                except ValueError:
-                    pass
-                else:
-                    # SGML: An end tag closes, back to the matching start tag,
-                    # all unclosed intervening start tags with omitted end tags
-                    open_tags = open_tags[i + 1 :]
+                # Remove from the list only if the tag matches the most
+                # recently opened tag (LIFO). This avoids O(n) linear scans
+                # for unmatched end tags if `list.index()` would be called.
+                if open_tags and open_tags[0] == tagname:
+                    open_tags = open_tags[1:]
             else:
                 # Add it to the start of the open tags list
                 open_tags.insert(0, tagname)
