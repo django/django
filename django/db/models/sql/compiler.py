@@ -434,7 +434,7 @@ class SQLCompiler:
                 yield OrderBy(expr, descending=descending), False
                 continue
 
-            if "." in field:
+            if "." in field and field in self.query.extra_order_by:
                 # This came in through an extra(order_by=...) addition. Pass it
                 # on verbatim.
                 table, col = col.split(".", 1)
