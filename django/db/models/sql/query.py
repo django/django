@@ -1622,6 +1622,11 @@ class Query(BaseExpression):
         return target_clause
 
     def add_filtered_relation(self, filtered_relation, alias):
+        if "." in alias:
+            raise ValueError(
+                "FilteredRelation doesn't support aliases with periods "
+                "(got %r)." % alias
+            )
         self.check_alias(alias)
         filtered_relation.alias = alias
         lookups = dict(get_children_from_q(filtered_relation.condition))

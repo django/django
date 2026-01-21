@@ -15,7 +15,6 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Length, Upper
-from django.db.utils import DatabaseError
 from django.test import TestCase
 
 from .models import (
@@ -408,13 +407,19 @@ class OrderingTests(TestCase):
         self.assertNotEqual(qs[0].headline, "Backdated")
 
         relation = FilteredRelation("author")
-        qs2 = Article.objects.annotate(**{crafted: relation}).order_by(crafted)
-        with self.assertRaises(DatabaseError):
+        msg = (
+            "FilteredRelation doesn't support aliases with periods "
+            "(got 'ordering_article.pub_date')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            qs2 = Article.objects.annotate(**{crafted: relation}).order_by(crafted)
             # Before, unlike F(), which causes ordering expressions to be
             # replaced by ordinals like n in ORDER BY n, these were ordered by
             # pub_date instead of author.
             # The Article model orders by -pk, so sorting on author will place
             # first any article by author2 instead of the backdated one.
+            # This assertion is reachable if FilteredRelation.__init__() starts
+            # supporting periods in aliases in the future.
             self.assertNotEqual(qs2[0].headline, "Backdated")
 
     def test_order_by_pk(self):
