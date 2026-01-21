@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 from decimal import Decimal
+from itertools import chain
 
 from django.core.exceptions import FieldError
 from django.db import connection
@@ -2088,13 +2089,18 @@ class AggregateTestCase(TestCase):
         self.assertEqual(len(qs), 6)
 
     def test_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "aggregation_author"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Author.objects.aggregate(**{crafted_alias: Avg("age")})
+        for crafted_alias in [
+            """injected_name" from "aggregation_author"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Author.objects.aggregate(**{crafted_alias: Avg("age")})
 
     def test_exists_extra_where_with_aggregate(self):
         qs = Book.objects.annotate(

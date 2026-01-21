@@ -2,6 +2,7 @@ import datetime
 import pickle
 import sys
 import unittest
+from itertools import chain
 from operator import attrgetter
 from threading import Lock
 
@@ -1941,13 +1942,18 @@ class Queries5Tests(TestCase):
         )
 
     def test_extra_select_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "queries_note"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Note.objects.extra(select={crafted_alias: "1"})
+        for crafted_alias in [
+            """injected_name" from "queries_note"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Note.objects.extra(select={crafted_alias: "1"})
 
     def test_queryset_reuse(self):
         # Using querysets doesn't mutate aliases.

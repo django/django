@@ -55,3 +55,18 @@ denial-of-service attack via certain inputs with a large number of unmatched
 HTML end tags, which could cause quadratic time complexity during HTML parsing.
 
 This issue has severity "moderate" according to the Django security policy.
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
+
+CVE-2026-1287: Potential SQL injection in column aliases via control characters
+===============================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases via
+control characters, using a suitably crafted dictionary, with dictionary
+expansion, as the ``**kwargs`` passed to :meth:`.QuerySet.annotate`,
+:meth:`~.QuerySet.aggregate`, :meth:`~.QuerySet.extra`,
+:meth:`~.QuerySet.values`, :meth:`~.QuerySet.values_list`, and
+:meth:`~.QuerySet.alias`.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<security-disclosure>`.
