@@ -52,12 +52,17 @@ from django.utils.tree import Node
 __all__ = ["Query", "RawQuery"]
 
 # RemovedInDjango70Warning: When the deprecation ends, replace with:
-# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs,
-# hashes, or inline SQL comments are forbidden in column aliases.
-# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|#|--|/\*|\*/")
-# Quotation marks ('"`[]), whitespace characters, semicolons, hashes, or inline
-# SQL comments are forbidden in column aliases.
-FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|#|--|/\*|\*/")
+# Quotation marks ('"`[]), whitespace characters, control characters,
+# semicolons, percent signs, hashes, or inline SQL comments are
+# forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
+#   r"['`\"\]\[;\s\x00-\x1F\x7F-\x9F]|%|#|--|/\*|\*/"
+# )
+# Quotation marks ('"`[]), whitespace characters, control characters,
+# semicolons, hashes, or inline SQL comments are forbidden in column aliases.
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
+    r"['`\"\]\[;\s\x00-\x1F\x7F-\x9F]|#|--|/\*|\*/"
+)
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -1231,9 +1236,9 @@ class Query(BaseExpression):
                 "Column aliases cannot contain whitespace characters, hashes, "
                 # RemovedInDjango70Warning: When the deprecation ends, replace
                 # with:
-                # "quotation marks, semicolons, percent signs, or SQL "
-                # "comments."
-                "quotation marks, semicolons, or SQL comments."
+                # "control characters, quotation marks, semicolons, percent "
+                # "signs, or SQL comments."
+                "control characters, quotation marks, semicolons, or SQL comments."
             )
 
     def add_annotation(self, annotation, alias, select=True):
