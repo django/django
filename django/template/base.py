@@ -50,6 +50,7 @@ times with multiple contexts)
 '<html></html>'
 """
 
+import asyncio
 import inspect
 import logging
 import re
@@ -57,6 +58,7 @@ import warnings
 from enum import Enum
 
 from asgiref.sync import async_to_sync
+
 from django.template.context import BaseContext
 from django.utils.deprecation import django_file_prefixes
 from django.utils.formats import localize
