@@ -672,6 +672,14 @@ class BaseDatabaseSchemaEditor:
             )
             if default_name in constraint_names:
                 constraint_names = [default_name]
+        if len(constraint_names) == 0 and self.collect_sql:
+            constraint_names = [
+                self._create_index_name(
+                    model._meta.db_table,
+                    columns,
+                    suffix="_uniq" if constraint_kwargs.get("unique") else "_idx",
+                )
+            ]
         if len(constraint_names) != 1:
             raise ValueError(
                 "Found wrong number (%s) of constraints for %s(%s)"
@@ -2020,6 +2028,10 @@ class BaseDatabaseSchemaEditor:
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:
+            # Check if table exists before attempting introspection
+            table_names = self.connection.introspection.table_names(cursor)
+            if model._meta.db_table not in table_names:
+                return []
             constraints = self.connection.introspection.get_constraints(
                 cursor, model._meta.db_table
             )

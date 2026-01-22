@@ -1108,6 +1108,17 @@ class MigrateTests(MigrationTestBase):
         self.assertIn("-- create model tribble", output)
 
     @override_settings(
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_migrations_alter_unique_together"
+        }
+    )
+    def test_sqlmigrate_alter_unique_together_change(self):
+        out = io.StringIO()
+        call_command("sqlmigrate", "migrations", "0002", stdout=out)
+        output = out.getvalue()
+        self.assertIn("-- Alter unique_together for company (1 constraint(s))", output)
+
+    @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_operations"}
     )
     def test_sqlmigrate_no_operations(self):
