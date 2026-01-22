@@ -705,7 +705,10 @@ class AsyncRequestFactory(RequestFactory):
         if headers:
             extra.update(HttpHeaders.to_asgi_names(headers))
         s["headers"] += [
-            (key.lower().encode("ascii"), value.encode("latin1"))
+            # Avoid breaking test clients that just want to supply normalized
+            # ASGI names, regardless of the fact that ASGIRequest drops headers
+            # with underscores (CVE-2026-3902).
+            (key.lower().replace("_", "-").encode("ascii"), value.encode("latin1"))
             for key, value in extra.items()
         ]
         # If QUERY_STRING is absent or empty, we want to extract it from the
