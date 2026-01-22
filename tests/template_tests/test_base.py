@@ -67,7 +67,7 @@ class AsyncTemplateTests(SimpleTestCase):
     def test_async_property_resolution(self):
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
 
         class Example:
             def sync_method(self):
@@ -87,7 +87,7 @@ class AsyncTemplateTests(SimpleTestCase):
         """
 
         template = django_engine.from_string(html_string)
-        rendered_html = template.render({'example': Example()})
+        rendered_html = template.render({"example": Example()})
 
         self.assertIn("sync: Synchronous Method Result", rendered_html)
         self.assertIn("async: Asynchronous Method Result", rendered_html)
