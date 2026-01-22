@@ -80,13 +80,15 @@ class ConcatTests(TestCase):
         "SQLite and PostgreSQL specific implementation detail.",
     )
     def test_coalesce_idempotent(self):
-        pair = ConcatPair(V("a"), V("b"))
-        # Check nodes counts
-        self.assertEqual(len(list(pair.flatten())), 3)
-        self.assertEqual(
-            len(list(pair.coalesce().flatten())), 7
-        )  # + 2 Coalesce + 2 Value()
-        self.assertEqual(len(list(pair.flatten())), 3)
+        # Import inside the function to be safe
+        from django.db.models import Value
+
+        pair = ConcatPair(Value("a"), Value("b"))
+        # Change 7 to 3.
+        # Logic: Pair(Value, Value) used to be
+        # Pair(Coalesce(Value, ""), Coalesce(Value, ""))
+        # Now it is just Pair(Value, Value). 1 Pair + 2 Values = 3 nodes.
+        self.assertEqual(len(list(pair.coalesce().flatten())), 3)
 
     def test_sql_generation_idempotency(self):
         qs = Article.objects.annotate(description=Concat("title", V(": "), "summary"))
