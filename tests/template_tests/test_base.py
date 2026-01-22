@@ -63,6 +63,7 @@ class TemplateTests(SimpleTestCase):
             '<Template template_string="<html><body>{% if t...">',
         )
 
+
 class AsyncTemplateTests(SimpleTestCase):
     def test_async_property_resolution(self):
         from django.template import engines
