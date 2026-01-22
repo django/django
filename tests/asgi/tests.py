@@ -280,6 +280,17 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(len(request.headers["foo"].split(",")), 200_000)
         self.assertLessEqual(setitem_count, 100)
 
+    async def test_underscores_in_headers_ignored(self):
+        scope = self.async_request_factory._base_scope(path="/", http_version="2.0")
+        scope["headers"] = [(b"some_header", b"1")]
+        request = ASGIRequest(scope, None)
+        # No form of the header exists anywhere.
+        self.assertNotIn("Some_Header", request.headers)
+        self.assertNotIn("Some-Header", request.headers)
+        self.assertNotIn("SOME_HEADER", request.META)
+        self.assertNotIn("SOME-HEADER", request.META)
+        self.assertNotIn("HTTP_SOME_HEADER", request.META)
+
     async def test_cancel_post_request_with_sync_processing(self):
         """
         The request.body object should be available and readable in view

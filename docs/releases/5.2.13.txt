@@ -6,3 +6,23 @@ Django 5.2.13 release notes
 
 Django 5.2.13 fixes one security issue with severity "moderate" and four
 security issues with severity "low" in 5.2.12.
+
+CVE-2026-3902: ASGI header spoofing via underscore/hyphen conflation
+====================================================================
+
+``ASGIRequest`` normalizes header names following WSGI conventions, mapping
+hyphens to underscores. As a result, even in configurations where reverse
+proxies carefully strip security-sensitive headers named with hyphens, such a
+header could be spoofed by supplying a header named with underscores.
+
+Under WSGI, it is the responsibility of the server or proxy to avoid ambiguous
+mappings. (Django's :djadmin:`runserver` was patched in :cve:`2015-0219`.) But
+under ASGI, there is not the same uniform expectation, even if many proxies
+protect against this under default configuration (including ``nginx`` via
+``underscores_in_headers off;``).
+
+Headers containing underscores are now ignored by ``ASGIRequest``, matching the
+behavior of :pypi:`Daphne <daphne>`, the reference server for ASGI.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
