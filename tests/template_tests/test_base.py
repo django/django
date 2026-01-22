@@ -63,6 +63,35 @@ class TemplateTests(SimpleTestCase):
             '<Template template_string="<html><body>{% if t...">',
         )
 
+class AsyncTemplateTests(SimpleTestCase):
+    def test_async_property_resolution(self):
+        from django.template import engines
+
+        django_engine = engines['django']
+
+        class Example:
+            def sync_method(self):
+                return "Synchronous Method Result"
+
+            async def async_method(self):
+                return "Asynchronous Method Result"
+
+        html_string = """
+        <!DOCTYPE html>
+        <html>
+        <body>
+            <p>sync: {{ example.sync_method }}</p>
+            <p>async: {{ example.async_method }}</p>
+        </body>
+        </html>
+        """
+
+        template = django_engine.from_string(html_string)
+        rendered_html = template.render({'example': Example()})
+
+        self.assertIn("sync: Synchronous Method Result", rendered_html)
+        self.assertIn("async: Asynchronous Method Result", rendered_html)
+
 
 class VariableDoesNotExistTests(SimpleTestCase):
     def test_str(self):
