@@ -87,6 +87,9 @@ class ASGIRequest(HttpRequest):
         _headers = defaultdict(list)
         for name, value in self.scope.get("headers", []):
             name = name.decode("latin1")
+            # Prevent spoofing via ambiguity between underscores and hyphens.
+            if "_" in name:
+                continue
             if name == "content-length":
                 corrected_name = "CONTENT_LENGTH"
             elif name == "content-type":
