@@ -1,3 +1,4 @@
+import gzip
 import json
 import sys
 from unittest.mock import patch
@@ -433,10 +434,9 @@ class TestUtilsText(SimpleTestCase):
         data = [{"key": i} for i in range(10)]
         seq = list(json.JSONEncoder().iterencode(data))
         seq = [s.encode() for s in seq]
-        actual_length = len(b"".join(seq))
-        out = text.compress_sequence(seq)
-        compressed_length = len(b"".join(out))
-        self.assertLess(compressed_length, actual_length)
+        original = b"".join(seq)
+        out = b"".join(text.compress_sequence(seq))
+        self.assertEqual(gzip.decompress(out), original)
 
     def test_format_lazy(self):
         self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))
