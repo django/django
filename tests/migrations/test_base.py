@@ -290,14 +290,13 @@ class OperationTestBase(MigrationTestBase):
     ):
         """Creates a test model state and database table."""
         # Make the "current" state.
-        model_options = {
-            "swappable": "TEST_SWAP_MODEL",
-            "unique_together": [["pink", "weight"]] if unique_together else [],
-        }
+        model_options = {"swappable": "TEST_SWAP_MODEL"}
         if options:
             model_options["permissions"] = [("can_groom", "Can groom")]
         if db_table:
             model_options["db_table"] = db_table
+        if unique_together:
+            model_options["unique_together"] = {("pink", "weight")}
         operations = [
             migrations.CreateModel(
                 "Pony",
