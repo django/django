@@ -1193,6 +1193,18 @@ class CamelCaseAdmin(admin.ModelAdmin):
 
 class CourseAdmin(admin.ModelAdmin):
     radio_fields = {"difficulty": admin.VERTICAL}
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    ("title", "difficulty"),
+                    ("materials", "start_datetime"),
+                    ("categories"),
+                ),
+            },
+        ),
+    )
 
 
 site = admin.AdminSite(name="admin")
