@@ -15,7 +15,6 @@ permissions:
 
 jobs:
   coverage:
-    if: github.repository == 'django/django'
     name: Coverage Tests (Windows)
     runs-on: windows-latest
     timeout-minutes: 60
