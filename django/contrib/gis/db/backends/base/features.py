@@ -32,6 +32,7 @@ class BaseSpatialFeatures:
     # Are empty geometries supported?
     supports_empty_geometries = False
     # Can the function be applied on geodetic coordinate systems?
+    supports_distance_spheroid = True
     supports_distance_geodetic = True
     supports_length_geodetic = True
     supports_perimeter_geodetic = False
