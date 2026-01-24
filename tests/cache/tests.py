@@ -1987,22 +1987,15 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
-    def test_client_lib_name_and_lib_ver(self):
-        """Test that lib-name and lib-ver were successfully applied"""
+    def test_client_lib_name(self):
+        """Test that lib-name was successfully applied"""
         client = cache._cache.get_client()
         client.ping()
 
         client_info = client.client_info()
 
         if "lib-name" in client_info:
-            self.assertEqual(client_info["lib-name"], "django")
-        else:
-            self.skipTest(
-                "Redis version does not support CLIENT SETINFO (requires 7.2+)"
-            )
-
-        if "lib-ver" in client_info:
-            self.assertEqual(client_info["lib-ver"], django.get_version())
+            self.assertEqual(client_info["lib-name"], f"redis-py(django_v{django.get_version()})",)
         else:
             self.skipTest(
                 "Redis version does not support CLIENT SETINFO (requires 7.2+)"

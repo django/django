@@ -34,8 +34,9 @@ class RedisCacheClient:
         class DjangoConnection(lib.Connection):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
-                self.lib_name = "django"
-                self.lib_version = django.get_version()
+                self.lib_name = f"redis-py(django_v{django.get_version()})"
+                if getattr(lib, "DriverInfo", None):
+                    self.driver_info = lib.DriverInfo().add_upstream_driver("django", django.get_version(),)
 
         return DjangoConnection
 
