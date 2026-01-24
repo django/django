@@ -180,7 +180,7 @@ Asynchronous views
 Cache
 ~~~~~
 
-* :class:`~django.core.cache.backends.redis.RedisCache` backend
+* Redis backend
   now includes the current django version at ``lib-name``
   in the driver info of Redis connections.
 
