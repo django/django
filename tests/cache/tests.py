@@ -1995,10 +1995,25 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         client_info = client.client_info()
 
         if "lib-name" in client_info:
+            try:
+                from redis import DriverInfo
+
+                correct_lib_name = (
+                    DriverInfo()
+                    .add_upstream_driver(
+                        "django",
+                        django.get_version(),
+                    )
+                    .formatted_name
+                )
+
+            except ImportError:
+                correct_lib_name = f"redis-py(django_v{django.get_version()})"
             self.assertEqual(
                 client_info["lib-name"],
-                f"redis-py(django_v{django.get_version()})",
+                correct_lib_name,
             )
+
         else:
             self.skipTest(
                 "Redis version does not support CLIENT SETINFO (requires 7.2+)"
