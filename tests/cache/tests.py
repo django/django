@@ -1995,7 +1995,10 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         client_info = client.client_info()
 
         if "lib-name" in client_info:
-            self.assertEqual(client_info["lib-name"], f"redis-py(django_v{django.get_version()})",)
+            self.assertEqual(
+                client_info["lib-name"],
+                f"redis-py(django_v{django.get_version()})",
+            )
         else:
             self.skipTest(
                 "Redis version does not support CLIENT SETINFO (requires 7.2+)"
