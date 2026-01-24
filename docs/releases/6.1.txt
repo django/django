@@ -127,6 +127,9 @@ Minor features
   allow filtering geometries by the number of dimensions on PostGIS and
   SpatiaLite.
 
+* The ``ST_Distance_Sphere`` function is now supported in MySQL for distance
+  calculations on geodetic coordinate systems with point geometries.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

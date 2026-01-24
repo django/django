@@ -27,6 +27,8 @@ class GeographyTest(TestCase):
     @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
         "Testing distance lookup support on non-point geography fields."
+        if connection.vendor == "mysql":
+            self.skipTest("MySQL's ST_Distance_Sphere doesn't support LineStrings.")
         z = Zipcode.objects.get(code="77002")
         cities1 = list(
             City.objects.filter(point__distance_lte=(z.poly, D(mi=500)))
@@ -143,6 +145,8 @@ class GeographyFunctionTests(FuncTestMixin, TestCase):
         """
         Testing Distance() support on non-point geography fields.
         """
+        if connection.vendor == "mysql":
+            self.skipTest("MySQL's ST_Distance_Sphere doesn't support LineStrings.")
         if connection.ops.oracle:
             ref_dists = [0, 4899.68, 8081.30, 9115.15]
         elif connection.ops.spatialite:

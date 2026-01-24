@@ -312,11 +312,14 @@ class DistanceResultMixin:
 class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     geom_param_pos = (0, 1)
     spheroid = None
+    radius = None
 
-    def __init__(self, expr1, expr2, spheroid=None, **extra):
+    def __init__(self, expr1, expr2, spheroid=None, radius=None, **extra):
         expressions = [expr1, expr2]
         if spheroid is not None:
             self.spheroid = self._handle_param(spheroid, "spheroid", bool)
+        if radius is not None:
+            self.radius = self._handle_param(radius, "radius", float)
         super().__init__(*expressions, **extra)
 
     def as_postgresql(self, compiler, connection, **extra_context):
@@ -358,6 +361,26 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
             )
             extra_context["spheroid"] = int(bool(self.spheroid))
         return super().as_sql(compiler, connection, **extra_context)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        clone = self.copy()
+        function = None
+        expr2 = clone.source_expressions[1]
+        expr2_is_point = (
+            getattr(getattr(expr2, "output_field", None), "geom_type", None) == "POINT"
+        )
+        # ST_Distance_Sphere only supports point geometries on geodetic fields
+        if (
+            self.geo_field.geodetic(connection)
+            and self.geo_field.geom_type == "POINT"
+            and expr2_is_point
+        ):
+            function = connection.ops.spatial_function_name("Distance_Sphere")
+            if self.radius is not None:
+                clone.source_expressions.append(Value(self.radius))
+        else:
+            function = connection.ops.spatial_function_name("Distance")
+        return super().as_sql(compiler, connection, function=function, **extra_context)
 
 
 class Envelope(GeomOutputGeoFunc):

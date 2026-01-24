@@ -121,14 +121,21 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         value = value[0]
         if isinstance(value, Distance):
             if f.geodetic(self.connection):
-                raise ValueError(
-                    "Only numeric values of degree units are allowed on "
-                    "geodetic distance queries."
+                if lookup_type == "dwithin":
+                    raise ValueError(
+                        "Only numeric values of degree units are allowed on"
+                        " geodetic distance queries."
+                    )
+                dist_param = value.m
+            else:
+                dist_param = getattr(
+                    value, Distance.unit_attname(f.units_name(self.connection))
                 )
-            dist_param = getattr(
-                value, Distance.unit_attname(f.units_name(self.connection))
-            )
         else:
+            if not isinstance(value, (int, float)):
+                raise TypeError(
+                    "Distance value must be a Distance object or numeric value."
+                )
             dist_param = value
         return [dist_param]
 

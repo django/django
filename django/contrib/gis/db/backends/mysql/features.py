@@ -7,7 +7,7 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     empty_intersection_returns_none = False
     has_spatialrefsys_table = False
     supports_add_srs_entry = False
-    supports_distance_geodetic = False
+    supports_distance_spheroid = False
     supports_length_geodetic = False
     supports_area_geodetic = False
     supports_transform = False
