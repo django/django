@@ -2009,7 +2009,6 @@ class RedisCacheTests(BaseCacheTests, TestCase):
             )
 
 
-
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):
         tmp_dir = super().mkdtemp()
