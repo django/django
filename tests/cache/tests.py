@@ -15,6 +15,7 @@ from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
+import django
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
@@ -1985,6 +1986,28 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["db"], 5)
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
+
+    def test_client_lib_name_and_lib_ver(self):
+        """Test that lib-name and lib-ver were successfully applied"""
+        client = cache._cache.get_client()
+        client.ping()
+
+        client_info = client.client_info()
+
+        if "lib-name" in client_info:
+            self.assertEqual(client_info["lib-name"], "django")
+        else:
+            self.skipTest(
+                "Redis version does not support CLIENT SETINFO (requires 7.2+)"
+            )
+
+        if "lib-ver" in client_info:
+            self.assertEqual(client_info["lib-ver"], django.get_version())
+        else:
+            self.skipTest(
+                "Redis version does not support CLIENT SETINFO (requires 7.2+)"
+            )
+
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
