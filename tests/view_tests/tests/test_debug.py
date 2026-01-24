@@ -1114,12 +1114,13 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<td class="code"><pre>Error in formatting', html)
+        # reprlib gracefully handles objects with failing __repr__ by falling
+        # back to a basic instance representation.
+        self.assertIn("OomOutput instance", html)
 
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
         large = 256 * 1024
-        repr_len = large + len(repr(""))
         try:
 
             class LargeOutput:
@@ -1133,8 +1134,46 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
-        self.assertIn(
-            "&lt;trimmed %d chars out of %d&gt;" % (repr_len - 4096, repr_len), html
+        self.assertIn("A" * 509 + "&lt;trimmed&gt;", html)
+        self.assertNotIn("A" * 1024, html)
+
+    def test_large_collection_values_handling(self):
+        """Large collections should not be fully rendered."""
+        try:
+            large_list = list(range(1024 * 1024))  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, &lt;trimmed&gt;]", html)
+
+    def test_large_total_value_trimmed(self):
+        """The full representation of a value is limited to 4096 chars."""
+        try:
+            large_dict = {i: "A" * 2048 for i in range(10)}  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn("… &lt;trimmed 6254 chars out of 10350&gt;", html)
+
+    def test_huge_int_handling(self):
+        """Ints too large to convert to a string don't break the page."""
+        try:
+            huge_int = 10**5000  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        # reprlib raises ValueError for these ints on Python 3.12.
+        self.assertRegex(
+            html,
+            r'<td>huge_int</td>\s*<td class="code"><pre>'
+            r"(Error in formatting: ValueError: Exceeds the limit"
+            r"|&lt;int instance with roughly 5001 digits)",
         )
 
     def test_encoding_error(self):
