@@ -2,6 +2,7 @@ import functools
 import inspect
 import itertools
 import re
+import reprlib
 import sys
 import types
 import warnings
@@ -10,7 +11,6 @@ from pathlib import Path
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
 from django.urls import URLResolver, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -28,6 +28,21 @@ from django.views.decorators.debug import coroutine_functions_to_sensitive_varia
 DEBUG_ENGINE = Engine(
     debug=True,
     libraries={"i18n": "django.templatetags.i18n"},
+)
+
+# Limit the size of variable representations during generation, avoiding high
+# memory consumption for large variables.
+DEBUG_REPR = reprlib.Repr(
+    maxlevel=3,
+    maxtuple=10,
+    maxlist=10,
+    maxarray=10,
+    maxdict=10,
+    maxset=10,
+    maxfrozenset=10,
+    maxdeque=10,
+    maxstring=200,
+    maxother=200,
 )
 
 
@@ -352,10 +367,10 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
-                    # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
+                    try:
+                        v = DEBUG_REPR.repr(v)
+                    except Exception as e:
+                        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame
