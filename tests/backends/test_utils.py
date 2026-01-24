@@ -138,3 +138,29 @@ class CursorWrapperTests(TransactionTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             with connection.cursor() as cursor:
                 cursor.callproc("test_procedure", [], {"P_I": 1})
+
+    @skipUnlessDBFeature("create_test_procedure_without_params_sql")
+    def test_callproc_debug_logging(self):
+        """Test that callproc() is instrumented in debug mode."""
+        # Create the test procedure
+        with connection.cursor() as cursor:
+            cursor.execute(connection.features.create_test_procedure_without_params_sql)
+        
+        # Clear existing queries
+        connection.queries_log.clear()
+        
+        # Call the procedure with debug mode enabled
+        with self.settings(DEBUG=True):
+            with connection.cursor() as cursor:
+                cursor.callproc("test_procedure")
+        
+        # Verify the call was logged
+        self.assertEqual(len(connection.queries_log), 1)
+        logged_query = connection.queries_log[0]
+        self.assertIn("test_procedure", logged_query["sql"])
+        self.assertIn("time", logged_query)
+        
+        # Clean up
+        with connection.schema_editor() as editor:
+            editor.remove_procedure("test_procedure", [])
+
