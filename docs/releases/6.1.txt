@@ -180,7 +180,9 @@ Asynchronous views
 Cache
 ~~~~~
 
-* :class:`~django.core.cache.backends.redis.RedisCache` backend now includes the current django version at ``lib-name`` in the driver info of redis connections.
+* :class:`~django.core.cache.backends.redis.RedisCache` backend
+  now includes the current django version at ``lib-name``
+  in the driver info of Redis connections.
 
 CSP
 ~~~
