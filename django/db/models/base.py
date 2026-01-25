@@ -1153,7 +1153,9 @@ class Model(AltersData, metaclass=ModelBase):
             ].features.can_return_columns_from_insert
             for field in insert_fields:
                 value = (
-                    getattr(self, field.attname) if raw else field.pre_save(self, False)
+                    getattr(self, field.attname)
+                    if raw
+                    else field.pre_save(self, add=True)
                 )
                 if hasattr(value, "resolve_expression"):
                     if field not in returning_fields:

@@ -261,8 +261,18 @@ class DataModel(models.Model):
 # FileField
 
 
+def upload_to_with_date(instance, filename):
+    return f"{instance.created_at.year}/{filename}"
+
+
 class Document(models.Model):
     myfile = models.FileField(storage=temp_storage, upload_to="unused", unique=True)
+
+
+# See ticket #36847.
+class DocumentWithTimestamp(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    myfile = models.FileField(storage=temp_storage, upload_to=upload_to_with_date)
 
 
 ###############################################################################
