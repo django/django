@@ -13,7 +13,7 @@ from django.db import IntegrityError, models
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
 
-from .models import Document
+from .models import Document, DocumentWithTimestamp
 
 
 class FileFieldTests(TestCase):
@@ -209,3 +209,9 @@ class FileFieldTests(TestCase):
 
         document = MyDocument(myfile="test_file.py")
         self.assertEqual(document.myfile.field.model, MyDocument)
+
+    def test_upload_to_callable_sees_auto_now_add_field_value(self):
+        d = DocumentWithTimestamp(myfile=ContentFile(b"content", name="foo"))
+        d.save()
+        self.assertIsNotNone(d.created_at)
+        self.assertIs(d.myfile.name.startswith(f"{d.created_at.year}/foo"), True)
