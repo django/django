@@ -1238,9 +1238,12 @@ subclass::
     This should be set to a list of field names that will be searched whenever
     somebody submits a search query in that text box.
 
-    These fields should be some kind of text field, such as ``CharField`` or
-    ``TextField``. You can also perform a related lookup on a ``ForeignKey`` or
-    ``ManyToManyField`` with the lookup API "follow" notation::
+    These fields are typically text fields such as ``CharField`` or
+    ``TextField``, but non-text fields like ``IntegerField`` can also be
+    searched when an explicit lookup is specified (see
+    :ref:`searching-non-text-fields` below). You can also perform a related
+    lookup on a ``ForeignKey`` or ``ManyToManyField`` with the lookup API
+    "follow" notation::
 
         search_fields = ["foreign_key__related_fieldname"]
 
@@ -1287,6 +1290,26 @@ subclass::
     @       :lookup:`search`
     None    :lookup:`icontains`
     ======  ====================
+
+    .. _searching-non-text-fields:
+
+    Searching non-text fields
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    While ``search_fields`` is optimized for text fields, non-text fields such
+    as ``IntegerField``, ``DateField``, or ``pk`` can be searched by specifying
+    an explicit lookup::
+
+        search_fields = ["user__id__exact", "age__exact"]
+
+    .. admonition:: Performance consideration
+
+        Searching non-text fields converts field values to strings for
+        comparison, which prevents the database from using indexes on those
+        fields. This may cause slow queries on large tables. For
+        performance-critical searches on non-text fields, consider implementing
+        a custom :meth:`~ModelAdmin.get_search_results` method that performs
+        native type comparisons.
 
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
