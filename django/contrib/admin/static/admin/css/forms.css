@@ -30,7 +30,8 @@ form .form-row p {
     flex-wrap: wrap;
 }
 
-.form-multiline > div {
+.form-multiline > div,
+.form-multiline > fieldset {
     padding-bottom: 10px;
 }
 
