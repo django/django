@@ -430,13 +430,13 @@ Then add the module containing the serializer definitions to your
         "csv": "path.to.custom_csv_serializer",
         "json": "django.core.serializers.json",
     }
+
 .. note::
 
    Custom serializers are marked as internal-use only by default. To make a
    custom serializer available to management commands such as
    :djadmin:`dumpdata`, set ``internal_use_only = False`` on the serializer
    class.
-   
 .. _topics-serialization-natural-keys:
 
 Natural keys
