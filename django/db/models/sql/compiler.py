@@ -44,6 +44,7 @@ class SQLCompiler:
         r"^(.*)\s(?:ASC|DESC).*",
         re.MULTILINE | re.DOTALL,
     )
+    auto_cte_enabled = True
 
     def __init__(self, query, connection, using, elide_empty=True):
         self.query = query
@@ -71,7 +72,10 @@ class SQLCompiler:
         )
 
     def _apply_ctes(self, as_sql):
-        if not getattr(self.query, "_auto_cte_processed", False):
+        if (
+            self.auto_cte_enabled
+            and not getattr(self.query, "_auto_cte_processed", False)
+        ):
             self.query = self.query._auto_cte_query(clone_query=False)
         return generate_cte_sql(self.connection, self.query, as_sql)
 
@@ -1982,6 +1986,8 @@ class SQLInsertCompiler(SQLCompiler):
 
 
 class SQLDeleteCompiler(SQLCompiler):
+    auto_cte_enabled = False
+
     @cached_property
     def single_alias(self):
         # Ensure base table is in aliases.
@@ -2021,7 +2027,10 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of        
         parameters.
         """
-        if not getattr(self.query, "_auto_cte_processed", False):
+        if (
+            self.auto_cte_enabled
+            and not getattr(self.query, "_auto_cte_processed", False)
+        ):
             self.query = self.query._auto_cte_query(clone_query=False)
         if self.single_alias and (
             self.connection.features.delete_can_self_reference_subquery
@@ -2044,6 +2053,7 @@ class SQLDeleteCompiler(SQLCompiler):
 
 
 class SQLUpdateCompiler(SQLCompiler):
+    auto_cte_enabled = False
     returning_fields = None
     returning_params = ()
 
