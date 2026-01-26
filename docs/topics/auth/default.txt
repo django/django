@@ -8,7 +8,7 @@ This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
 implementation of passwords and permissions. For projects where authentication
-needs differ from the default, Django supports extensive :doc:`extension and
+needs different from the default, Django supports extensive :doc:`extension and
 customization </topics/auth/customizing>` of authentication.
 
 Django authentication provides both authentication and authorization together
@@ -24,7 +24,7 @@ are somewhat coupled.
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., :attr:`'superusers'
+exists in Django's authentication frameworks, i.e., :attr:`'superusers'
 <django.contrib.auth.models.User.is_superuser>` or admin :attr:`'staff'
 <django.contrib.auth.models.User.is_staff>` users are just user objects with
 special attributes set, not different classes of user objects.
@@ -169,9 +169,9 @@ code.
 The Django admin site uses permissions as follows:
 
 * Access to view objects is limited to users with the "view" or "change"
-  permission for that type of object.
+  permissions for that type of object.
 * Access to view the "add" form and add an object is limited to users with
-  the "add" permission for that type of object.
+  the "add" permissions for that type of object.
 * Access to view the change list, view the "change" form and change an
   object is limited to users with the "change" permission for that type of
   object.
