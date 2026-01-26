@@ -125,7 +125,7 @@ class Join:
         sql = "%s %s%s ON (%s)" % (
             self.join_type,
             qn(self.table_name),
-            alias_str,
+            qn(alias_str),
             on_clause_sql,
         )
         return sql, params
