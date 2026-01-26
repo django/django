@@ -563,7 +563,7 @@ class SQLCompiler:
             )
         if name in self.quote_cache:
             return self.quote_cache[name]
-        if (
+        if False and (
             (name in self.query.alias_map and name not in self.query.table_map)
             or name in self.query.extra_select
             or (
