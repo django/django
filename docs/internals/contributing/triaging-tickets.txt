@@ -63,7 +63,8 @@ vote of the :ref:`Steering Council <steering-council>`.
 * Bug fixers: anyone can contribute by opening a pull request and working on a
   solution for a ticket.
 
-* Reviewers: anyone can review pull requests and suggest improvements.
+* Reviewers: anyone can :ref:`review pull requests <reviewing-patches>` and
+  suggest improvements.
 
 * Mergers: people with commit access who make the final decision to merge a
   change.
@@ -414,7 +415,7 @@ the ticket database:
 * Please **don't** promote your own tickets to "Ready for checkin". You
   may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
-  review a patch that you submit.
+  :ref:`review a patch <reviewing-patches>` that you submit.
 
 * Please **don't** reverse a decision without posting a message to the
   `Django Forum`_ to find consensus.
@@ -484,3 +485,90 @@ commit where the test fails.
 Now, report your results on the Trac ticket, and please include the regression
 test as an attachment. When someone writes a fix for the bug, they'll already
 have your test as a starting point.
+
+.. _reviewing-patches:
+
+Reviewing patches
+=================
+
+A great way to learn the Django codebase is to help review patches. It allows
+you to focus on a fixed scope of Django with a particular perspective. Plus,
+Django tends to receive more patches than it can review which causes the
+`review queue`_ to build up. Contributors can help Django tremendously by
+reviewing patches.
+
+The `review queue`_ is defined by tickets in Trac_ that are in the "Accepted"
+state with the flag Has patch set and the flags "patch needs improvement",
+"needs tests" and "needs documentation" unset. There is also a set of
+`Pull Requests in GitHub with the no ticket label`_ that can be reviewed.
+
+Code review process
+-------------------
+
+The general process to reviewing a patch for Django is as follows:
+
+1. Pick a patch to review. This can be from the `review queue`_ or the
+   `Pull Requests in GitHub with the no ticket label`_. If you're new, pick a
+   specific component to stick with. Django is a big codebase, so it's best to
+   contribute consistently with a narrow focus and grow it slowly.
+
+2. Pull the branch. See the :ref:`handling-pull-requests`, including the git
+   alias to make checking out other pull requests easier.
+
+3. Check the tests. If the ticket is for a bug, there should be a regression
+   test. Confirm that the test fails if the change is reverted. Check that the
+   tests are adequately covering the code and logic as well.
+
+4. Test in your own Django project. See :ref:`installing-development-version`
+   for how. Explore the user interface and user experience with the change.
+   Does it feel right? Can you break it?
+
+5. Check the documentation. Is the documentation understandable? Does it
+   provide the information the reader needs at that moment? Does it read well?
+   Is it consistent with the documentation before and after it? See
+   :ref:`build-documentation-locally`.
+
+6. Are you happy with the patch? This is fairly subjective, but that's fine.
+   You should ask, does the approach make sense to you and is there another
+   way to do it that's better? Also ask yourself, is the scope of the change
+   appropriate? Does the change :ref:`adhere to the guidelines for
+   contributing <patch-style>`? Are things named appropriately? Renaming
+   things is slow and challenging in Django, so we should try to get it
+   right from the start. Lastly, are there any other general concerns such
+   as things that may worry you or that should be looked into?
+
+7. Submit feedback on GitHub and update flags, "patch needs improvement",
+   "needs tests", and "needs documentation", as needed. If you have given a
+   specific type of code review, please indicate that on the Pull Request.
+
+Types of code reviews
+---------------------
+
+Not everyone is or should give the same type of code review. Having a diverse
+set of opinions and experiences helps Django be better. If you are providing a
+specific review, please indicate that on the Pull Request in GitHub.
+
+* Accessibility review. Does it conform to our :ref:`accessibility-standards`?
+
+* :ref:`Patch style <patch-style>` and contribution process review.
+
+  * Check that types are used.
+
+  * Check tests coverage.
+
+  * Check documentation coverage.
+
+* Usability and developer experience review.
+
+  * Use the change and provide feedback from that experience.
+
+  * Are the APIs and documentation accessible and well explained.
+
+* Domain expertise review. Do you have a personal expertise that is relevant
+  such as databases, HTTP, security, etc.
+
+* Benchmarking and performance review. There are benchmarking tests, but
+  sometimes changes require additional testing.
+
+.. _review queue: https://code.djangoproject.com/query?has_patch=1&needs_better_patch=0&needs_docs=0&needs_tests=0&stage=Accepted&status=!closed&order=changetime&desc=1
+.. _Pull Requests in GitHub with the no ticket label: https://github.com/django/django/pulls?q=is%3Aopen+is%3Apr+label%3A%22no+ticket%22
