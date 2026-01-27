@@ -39,6 +39,14 @@ class Event(models.Model):
     title = models.CharField(max_length=100)
     group = models.ForeignKey(Group, models.CASCADE, limit_choices_to=models.Q())
 
+    objects = models.Manager()
+    objects_title_x = models.QuerySet.filter(title__startswith="X").as_manager()
+    objects_title_x_y = (
+        models.QuerySet.filter(title__startswith="X")
+        .filter(title__endswith="Y")
+        .as_manager()
+    )
+
 
 class Happening(models.Model):
     when = models.DateTimeField(blank=True, default=datetime.datetime.now)
