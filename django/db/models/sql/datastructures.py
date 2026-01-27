@@ -82,7 +82,7 @@ class Join:
         """
         join_conditions = []
         params = []
-        qn = compiler.quote_name_unless_alias
+        qn = compiler.quote_name
         # Add a join condition for each pair of joining columns.
         for lhs, rhs in self.join_fields:
             lhs, rhs = connection.ops.prepare_join_on_clause(
@@ -195,7 +195,7 @@ class BaseTable:
         self.table_alias = alias
 
     def as_sql(self, compiler, connection):
-        qn = compiler.quote_name_unless_alias
+        qn = compiler.quote_name
         alias_str = (
             ""
             if self.table_alias == self.table_name
