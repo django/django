@@ -1480,7 +1480,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # Check the format of the shown object -- shouldn't contain a change
         # link
         self.assertContains(
-            response, '<th class="field-__str__">%s</th>' % o, html=True
+            response,
+            '<th scope="row" id="row-%s" class="field-__str__">%s</th>' % (o.pk, o),
+            html=True,
         )
 
     def test_invalid_appindex_url(self):
@@ -1564,30 +1566,42 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin6:admin_views_article_changelist"))
         for field_name in expected_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="sortable column-%s">' % field_name
+                response,
+                '<th scope="col" id="col-%s" class="sortable column-%s">'
+                % (field_name, field_name),
             )
         for field_name in expected_not_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="column-%s">' % field_name
+                response,
+                '<th scope="col" id="col-%s" class="column-%s">'
+                % (field_name, field_name),
             )
 
     def test_get_sortable_by_columns_subset(self):
         response = self.client.get(reverse("admin6:admin_views_actor_changelist"))
-        self.assertContains(response, '<th scope="col" class="sortable column-age">')
-        self.assertContains(response, '<th scope="col" class="column-name">')
+        self.assertContains(
+            response, '<th scope="col" id="col-age" class="sortable column-age">'
+        )
+        self.assertContains(
+            response, '<th scope="col" id="col-name" class="column-name">'
+        )
 
     def test_sortable_by_no_column(self):
         expected_not_sortable_fields = ("title", "book")
         response = self.client.get(reverse("admin6:admin_views_chapter_changelist"))
         for field_name in expected_not_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="column-%s">' % field_name
+                response,
+                '<th scope="col" id="col-%s" class="column-%s">'
+                % (field_name, field_name),
             )
         self.assertNotContains(response, '<th scope="col" class="sortable column')
 
     def test_get_sortable_by_no_column(self):
         response = self.client.get(reverse("admin6:admin_views_color_changelist"))
-        self.assertContains(response, '<th scope="col" class="column-value">')
+        self.assertContains(
+            response, '<th scope="col" id="col-value" class="column-value">'
+        )
         self.assertNotContains(response, '<th scope="col" class="sortable column')
 
     def test_app_index_context(self):
@@ -4107,9 +4121,13 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         change_url = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=("__fk__",)
         ).replace("__fk__", pk_final_url)
-        should_contain = '<th class="field-__str__"><a href="%s">%s</a></th>' % (
-            change_url,
-            escape(self.pk),
+        should_contain = (
+            '<th scope="row" id="row-%s" class="field-__str__"><a href="%s">%s</a></th>'
+            % (
+                escape(self.pk),
+                change_url,
+                escape(self.pk),
+            )
         )
         self.assertContains(response, should_contain)
 
@@ -4805,12 +4823,14 @@ class AdminViewListEditable(TestCase):
         )
         self.assertContains(
             response,
-            '<th class="field-id"><a href="%s">%d</a></th>' % (link1, story1.id),
+            '<th scope="row" id="row-%d" class="field-id"><a href="%s">%d</a></th>'
+            % (story1.id, link1, story1.id),
             1,
         )
         self.assertContains(
             response,
-            '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id),
+            '<th scope="row" id="row-%d" class="field-id"><a href="%s">%d</a></th>'
+            % (story2.id, link2, story2.id),
             1,
         )
 
@@ -8047,9 +8067,13 @@ class CSSTest(TestCase):
         Cells of the change list table should contain the field name in their
         class attribute.
         """
-        Podcast.objects.create(name="Django Dose", release_date=datetime.date.today())
+        podcast = Podcast.objects.create(
+            name="Django Dose", release_date=datetime.date.today()
+        )
         response = self.client.get(reverse("admin:admin_views_podcast_changelist"))
-        self.assertContains(response, '<th class="field-name">')
+        self.assertContains(
+            response, '<th scope="row" id="row-%s" class="field-name">' % podcast.pk
+        )
         self.assertContains(response, '<td class="field-release_date nowrap">')
         self.assertContains(response, '<td class="action-checkbox">')
 
@@ -9435,3 +9459,51 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(unknown_url)
         # Does not redirect to the admin login.
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class ListEditableAccessibilityTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="admin_editable",
+            email="admin_editable@example.com",
+            password="password",
+        )
+
+        cls.section = Section.objects.create(name="Main Section")
+
+        cls.a1 = Article.objects.create(
+            title="Article One",
+            content="Editable Content 1",
+            date=datetime.date(2003, 2, 11),
+            section=cls.section,
+        )
+        cls.a2 = Article.objects.create(
+            title="Article Two",
+            content="Editable Content 2",
+            date=datetime.date(2026, 3, 27),
+            section=cls.section,
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_aria_labelledby_on_editable_fields(self):
+        """
+        Verify that editable inputs in the changelist have the correct
+        aria-labelledby attributes pointing to the Row Header and
+        Column Header.
+        """
+        url = reverse("admin:admin_views_article_changelist")
+        response = self.client.get(url)
+
+        self.assertContains(response, 'id="col-content"')
+        self.assertContains(response, 'id="col-section"')
+
+        self.assertContains(response, f'id="row-{self.a1.pk}"')
+        self.assertContains(response, f'id="row-{self.a2.pk}"')
+
+        for obj in (self.a1, self.a2):
+            section_aria = f'aria-labelledby="row-{obj.pk} col-section"'
+            self.assertContains(response, section_aria)

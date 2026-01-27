@@ -107,8 +107,9 @@ def result_headers(cl):
                         f'<input type="checkbox" id="action-toggle" '
                         f'aria-label="{aria_label}">'
                     ),
-                    "class_attrib": SafeString(' class="action-checkbox-column"'),
+                    "class_attrib": SafeString('class="action-checkbox-column"'),
                     "sortable": False,
+                    "col_id": f"col-{field_name}",
                 }
                 continue
 
@@ -123,8 +124,9 @@ def result_headers(cl):
             # Not sortable
             yield {
                 "text": text,
-                "class_attrib": format_html(' class="column-{}"', field_name),
+                "class_attrib": format_html('class="column-{}"', field_name),
                 "sortable": False,
+                "col_id": f"col-{field_name}",
             }
             continue
 
@@ -176,8 +178,9 @@ def result_headers(cl):
             "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
             "class_attrib": (
-                format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
+                format_html('class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
+            "col_id": f"col-{field_name}",
         }
 
 
@@ -291,9 +294,20 @@ def items_for_result(cl, result, form):
                     result_repr,
                 )
 
-            yield format_html(
-                "<{}{}>{}</{}>", table_tag, row_class, link_or_text, table_tag
-            )
+            if table_tag == "th":
+                yield format_html(
+                    '<th scope="row" ' 'id="row-{}"{}>' "{}</th>",
+                    result.pk,
+                    row_class,
+                    link_or_text,
+                )
+            else:
+                yield format_html(
+                    "<td{}>{}</td>",
+                    row_class,
+                    link_or_text,
+                )
+
         else:
             # By default the fields come from ModelAdmin.list_editable, but if
             # we pull the fields out of the form instead of list_editable
@@ -307,7 +321,15 @@ def items_for_result(cl, result, form):
                 )
             ):
                 bf = form[field_name]
-                result_repr = mark_safe(str(bf.errors) + str(bf))
+                column_id = f"col-{_coerce_field_name(field_name, field_index)}"
+                row_id = f"row-{result.pk}"
+                widget_html = bf.as_widget(
+                    attrs={
+                        "aria-labelledby": f"{row_id} {column_id}",
+                    }
+                )
+                result_repr = mark_safe(str(bf.errors) + widget_html)
+
             yield format_html("<td{}>{}</td>", row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
         yield format_html("<td>{}</td>", form[cl.model._meta.pk.name])
