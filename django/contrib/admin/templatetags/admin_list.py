@@ -296,7 +296,7 @@ def items_for_result(cl, result, form):
 
             if table_tag == "th":
                 yield format_html(
-                    '<th scope="row" id="row-{}"{}>{}</th>',
+                    '<th scope="row" ' 'id="row-{}"{}>' "{}</th>",
                     result.pk,
                     row_class,
                     link_or_text,

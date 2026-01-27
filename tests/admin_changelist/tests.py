@@ -249,7 +249,8 @@ class ChangeListTests(TestCase):
         row_html = (
             "<tr>"
             '<td class="action-checkbox">'
-            '<input type="checkbox" name="_selected_action" value="%d" class="action-select" '
+            '<input type="checkbox" name="_selected_action" '
+            'value="%d" class="action-select" '
             'aria-label="Select this object for an action - Child object (%d)">'
             "</td>"
             '<th scope="row" id="row-%d" class="field-name">'
@@ -284,7 +285,8 @@ class ChangeListTests(TestCase):
             "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
-            f'class="action-select" aria-label="Select this object for an action - Child object ({new_child.pk})">'
+            f'class="action-select" aria-label="Select '
+            f'this object for an action - Child object ({new_child.pk})">'
             "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">-</a>'
@@ -316,7 +318,8 @@ class ChangeListTests(TestCase):
             "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
-            f'class="action-select" aria-label="Select this object for an action - {new_child}">'
+            f'class="action-select" aria-label="Select '
+            f'this object for an action - {new_child}">'
             "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
@@ -350,7 +353,8 @@ class ChangeListTests(TestCase):
             "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
-            f'class="action-select" aria-label="Select this object for an action - {new_child}">'
+            f'class="action-select" aria-label="Select '
+            f'this object for an action - {new_child}">'
             "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
@@ -386,7 +390,8 @@ class ChangeListTests(TestCase):
         row_html = (
             "<tr>"
             '<td class="action-checkbox">'
-            '<input type="checkbox" name="_selected_action" value="%d" class="action-select" '
+            '<input type="checkbox" name="_selected_action" '
+            'value="%d" class="action-select" '
             'aria-label="Select this object for an action - %s">'
             "</td>"
             '<th scope="row" id="row-%d" class="field-name">'
@@ -400,7 +405,7 @@ class ChangeListTests(TestCase):
             table_output.find(row_html),
             -1,
             "Failed to find expected row element: %s" % table_output,
-        )
+            )
         self.assertInHTML(
             '<input type="checkbox" id="action-toggle" '
             'aria-label="Select all objects on this page for an action">',
@@ -421,18 +426,23 @@ class ChangeListTests(TestCase):
             "admin:admin_changelist_grandchild_change", args=(grandchild.id,)
         )
         row_html = (
-            f"<tr>"
-            f'<td class="action-checkbox">'
-            f'<input type="checkbox" name="_selected_action" value="{grandchild.pk}" '
-            f'class="action-select" aria-label="Select this object for an action - name">'
-            f"</td>"
+            "<tr>"
+            '<td class="action-checkbox">'
+            (
+                f'<input type="checkbox" name="_selected_action" '
+                f'value="{grandchild.pk}" '
+                'class="action-select" '
+                'aria-label="Select this object for an action - name">'
+            )
+            "</td>"
             f'<th scope="row" id="row-{grandchild.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
-            f"</th>"
-            f'<td class="field-parent__name">-</td>'
-            f'<td class="field-parent__parent__name">-</td>'
-            f"</tr>"
-        )
+            "</th>"
+            '<td class="field-parent__name">-</td>'
+            '<td class="field-parent__parent__name">-</td>'
+            "</tr>"
+)
+
         row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
             table_output.find(row_html),
