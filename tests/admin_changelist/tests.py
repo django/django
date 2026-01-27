@@ -405,7 +405,7 @@ class ChangeListTests(TestCase):
             table_output.find(row_html),
             -1,
             "Failed to find expected row element: %s" % table_output,
-            )
+        )
         self.assertInHTML(
             '<input type="checkbox" id="action-toggle" '
             'aria-label="Select all objects on this page for an action">',
