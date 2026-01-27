@@ -194,7 +194,7 @@ class Queries1Tests(TestCase):
         # It is possible to reuse U for the second subquery, no need to use W.
         self.assertNotIn("w0", str(qs4.query).lower())
         # So, 'U0."id"' is referenced in SELECT and WHERE twice.
-        id_col = "%s." % connection.ops.quote_name("u0")
+        id_col = "%s." % connection.ops.quote_name("U0").lower()
         self.assertEqual(str(qs4.query).lower().count(id_col), 4)
 
     def test_ticket1050(self):
