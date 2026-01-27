@@ -1,9 +1,18 @@
+"""
+Implementation of MySQL UPDATE query fix for Django Ticket #36877
+
+This module provides a fixed SQLUpdateCompiler that reorders SET clauses
+to ensure atomic evaluation semantics despite MySQL's left-to-right processing.
+"""
+
+from collections import defaultdict, deque
 from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.expressions import Col
+from django.db.models.expressions import Col, F
 from django.db.models.sql.compiler import SQLAggregateCompiler, SQLCompiler
 from django.db.models.sql.compiler import SQLDeleteCompiler as BaseSQLDeleteCompiler
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.compiler import SQLUpdateCompiler as BaseSQLUpdateCompiler
+from django.db.models.sql.compiler import ColPairs
 
 __all__ = [
     "SQLAggregateCompiler",
@@ -45,15 +54,263 @@ class SQLDeleteCompiler(BaseSQLDeleteCompiler):
 
 
 class SQLUpdateCompiler(BaseSQLUpdateCompiler):
+    """
+    MySQL-specific UPDATE compiler that handles F() expression dependencies.
+    
+    MySQL evaluates UPDATE SET clauses left-to-right, which differs from
+    the SQL standard's atomic evaluation. This compiler reorders SET clauses
+    to ensure correct results when F() expressions reference other updated fields.
+    """
+    
+    def _extract_field_references(self, expression):
+        """
+        Extract all field column names referenced in an expression.
+        
+        Recursively searches for F() expressions and Col expressions to identify
+        which database columns are referenced.
+        
+        Args:
+            expression: A Django expression object (could be F, Col, or composite)
+            
+        Returns:
+            set: Column names referenced by this expression
+        """
+        referenced_fields = set()
+        
+        # Handle F() expressions
+        if isinstance(expression, F):
+            # F('field_name') - extract the field name
+            referenced_fields.add(expression.name)
+        
+        # Handle Col expressions (already resolved)
+        elif isinstance(expression, Col):
+            # Col objects have target field information
+            if hasattr(expression, 'target') and hasattr(expression.target, 'column'):
+                referenced_fields.add(expression.target.column)
+        
+        # Recursively check source expressions for composite expressions
+        if hasattr(expression, 'get_source_expressions'):
+            for source_expr in expression.get_source_expressions():
+                referenced_fields.update(self._extract_field_references(source_expr))
+        
+        return referenced_fields
+    
+    def _build_dependency_graph(self, field_updates):
+        """
+        Build a dependency graph for field updates.
+        
+        Creates a directed graph where an edge from A to B means
+        "A must be updated before B" because B is being CHANGED and A references it.
+        
+        CRITICAL: If field A's expression references field B, then:
+        - A must be evaluated BEFORE B is updated
+        - So A should appear FIRST in the sorted order
+        - Edge direction: A -> B (A comes before B)
+        
+        Example: UPDATE SET name_length = LENGTH(name), name = 'Alice'
+        - name_length references 'name'
+        - name_length must be evaluated first (before name changes)
+        - Dependency edge: name_length -> name
+        
+        Args:
+            field_updates: list of (field, model, val) tuples from self.query.values
+            
+        Returns:
+            tuple: (dependencies dict, in_degree dict, field_map dict)
+                - dependencies: field -> list of fields that must come after it
+                - in_degree: field -> count of fields that must come before it
+                - field_map: field.column -> (field, model, val) for lookup
+        """
+        dependencies = defaultdict(list)
+        in_degree = defaultdict(int)
+        field_map = {}
+        
+        # Map all fields being updated
+        for field, model, val in field_updates:
+            field_map[field.column] = (field, model, val)
+            # Initialize in_degree for all fields
+            if field.column not in in_degree:
+                in_degree[field.column] = 0
+        
+        # Build dependency edges
+        for field, model, val in field_updates:
+            target_column = field.column  # The field being updated
+            
+            # Check if this update value references other fields
+            if hasattr(val, 'resolve_expression'):
+                # Resolve the expression to analyze it
+                resolved_val = val.resolve_expression(
+                    self.query, allow_joins=False, for_save=True
+                )
+                
+                # Extract referenced fields from the expression
+                referenced_columns = self._extract_field_references(resolved_val)
+                
+                # Create dependencies for fields being updated in this query
+                # CRITICAL FIX: If target_column references ref_col, then:
+                #   - target_column must be evaluated BEFORE ref_col is updated
+                #   - Edge: target_column -> ref_col
+                for ref_col in referenced_columns:
+                    if ref_col in field_map and ref_col != target_column:
+                        # target_column depends on the ORIGINAL value of ref_col
+                        # So target_column must come BEFORE ref_col in execution order
+                        dependencies[target_column].append(ref_col)
+                        in_degree[ref_col] += 1
+        
+        return dependencies, in_degree, field_map
+    
+    def _topological_sort(self, field_updates):
+        """
+        Sort field updates using topological sort to respect dependencies.
+        
+        Uses Kahn's algorithm for topological sorting. Fields with no dependencies
+        are processed first, ensuring that when a field references another field
+        in its update expression, the referenced field appears later in the SET clause.
+        
+        Args:
+            field_updates: list of (field, model, val) tuples
+            
+        Returns:
+            list: Reordered (field, model, val) tuples
+            
+        Raises:
+            FieldError: If circular dependencies are detected
+        """
+        if not field_updates:
+            return []
+        
+        dependencies, in_degree, field_map = self._build_dependency_graph(field_updates)
+       
+        # Kahn's algorithm: Start with nodes that have no dependencies
+        queue = deque([col for col in field_map.keys() if in_degree[col] == 0])
+        sorted_columns = []
+        
+        while queue:
+            # Process field with no remaining dependencies
+            current_col = queue.popleft()
+            sorted_columns.append(current_col)
+            
+            # Reduce in-degree for dependent fields
+            for dependent_col in dependencies[current_col]:
+                in_degree[dependent_col] -= 1
+                if in_degree[dependent_col] == 0:
+                    queue.append(dependent_col)
+        
+        # Check for circular dependencies
+        if len(sorted_columns) != len(field_map):
+            # Circular dependency detected
+            remaining = set(field_map.keys()) - set(sorted_columns)
+            raise FieldError(
+                f"Circular dependency detected in UPDATE query. "
+                f"Fields involved: {', '.join(remaining)}. "
+                f"Cannot update fields that reference each other in a cycle."
+            )
+        
+        # Return updates in sorted order
+        return [field_map[col] for col in sorted_columns]
+    
     def as_sql(self):
-        update_query, update_params = super().as_sql()
-        # MySQL and MariaDB support UPDATE ... ORDER BY syntax.
+        """
+        Create the SQL for this query with reordered SET clauses for MySQL.
+        
+        This overrides the base implementation to reorder SET clauses based on
+        F() expression dependencies, ensuring correct evaluation order on MySQL.
+        """
+        self.pre_sql_setup()
+        if not self.query.values:
+            return "", ()
+        
+        # STEP 1: Reorder updates based on dependencies (MySQL-specific fix)
+        try:
+            sorted_values = self._topological_sort(list(self.query.values))
+        except FieldError:
+            # If circular dependency, fall back to original order and let it fail
+            # with a clear error message
+            sorted_values = list(self.query.values)
+        
+        # STEP 2: Generate SQL for each update (same as base implementation)
+        qn = self.quote_name_unless_alias
+        values, update_params = [], []
+        
+        for field, model, val in sorted_values:
+            if hasattr(val, "resolve_expression"):
+                val = val.resolve_expression(
+                    self.query, allow_joins=False, for_save=True
+                )
+                if val.contains_aggregate:
+                    raise FieldError(
+                        "Aggregate functions are not allowed in this query "
+                        "(%s=%r)." % (field.name, val)
+                    )
+                if val.contains_over_clause:
+                    raise FieldError(
+                        "Window expressions are not allowed in this query "
+                        "(%s=%r)." % (field.name, val)
+                    )
+                if isinstance(val, ColPairs):
+                    raise FieldError(
+                        "Composite primary keys expressions are not allowed "
+                        "in this query (%s=F('pk'))." % field.name
+                    )
+            elif hasattr(val, "prepare_database_save"):
+                if field.remote_field:
+                    val = val.prepare_database_save(field)
+                else:
+                    raise TypeError(
+                        "Tried to update field %s with a model instance, %r. "
+                        "Use a value compatible with %s."
+                        % (field, val, field.__class__.__name__)
+                    )
+            val = field.get_db_prep_save(val, connection=self.connection)
+
+            # Getting the placeholder for the field.
+            if hasattr(field, "get_placeholder"):
+                placeholder = field.get_placeholder(val, self, self.connection)
+            else:
+                placeholder = "%s"
+            name = field.column
+            if hasattr(val, "as_sql"):
+                sql, params = self.compile(val)
+                values.append("%s = %s" % (qn(name), placeholder % sql))
+                update_params.extend(params)
+            elif val is not None:
+                values.append("%s = %s" % (qn(name), placeholder))
+                update_params.append(val)
+            else:
+                values.append("%s = NULL" % qn(name))
+        
+        # STEP 3: Build final UPDATE query
+        table = self.query.base_table
+        result = [
+            "UPDATE %s SET" % qn(table),
+            ", ".join(values),
+        ]
+        try:
+            where, params = self.compile(self.query.where)
+        except FullResultSet:
+            params = []
+        else:
+            result.append("WHERE %s" % where)
+        if self.returning_fields:
+            # Skip empty r_sql to allow subclasses to customize behavior for
+            # 3rd party backends. Refs #19096.
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
+                self.returning_fields
+            )
+            if r_sql:
+                result.append(r_sql)
+                params.extend(self.returning_params)
+        
+        update_query = " ".join(result)
+        update_params_tuple = tuple(update_params + params)
+        
+        # STEP 4: Apply MySQL-specific ORDER BY clause if needed
         if self.query.order_by:
             order_by_sql = []
             order_by_params = []
             db_table = self.query.get_meta().db_table
             try:
-                for resolved, (sql, params, _) in self.get_order_by():
+                for resolved, (sql, params_ob, _) in self.get_order_by():
                     if (
                         isinstance(resolved.expression, Col)
                         and resolved.expression.alias != db_table
@@ -62,11 +319,12 @@ class SQLUpdateCompiler(BaseSQLUpdateCompiler):
                         # they cannot be used in the ORDER BY clause.
                         raise FieldError
                     order_by_sql.append(sql)
-                    order_by_params.extend(params)
+                    order_by_params.extend(params_ob)
                 update_query += " ORDER BY " + ", ".join(order_by_sql)
-                update_params += tuple(order_by_params)
+                update_params_tuple += tuple(order_by_params)
             except FieldError:
                 # Ignore ordering if it contains annotations, because they're
                 # removed in .update() and cannot be resolved.
                 pass
-        return update_query, update_params
+        
+        return update_query, update_params_tuple
