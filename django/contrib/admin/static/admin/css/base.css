@@ -824,6 +824,17 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
+/* TITLES */
+
+.titles-and-tools {
+    display: flex;
+    align-content: space-between;
+}
+
+.titles {
+    flex-grow: 1;
+}
+
 /* OBJECT TOOLS */
 
 .object-tools {
