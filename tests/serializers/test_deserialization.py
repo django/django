@@ -144,15 +144,13 @@ class TestDeserializer(SimpleTestCase):
         nested_close = "</nested>" * depth
         leaf = "x" * leaf_text_len
         field_content = f"{nested_open}{leaf}{nested_close}"
-        crafted_xml = textwrap.dedent(
-            f"""
+        crafted_xml = textwrap.dedent(f"""
         <django-objects version="1.0">
             <object model="contenttypes.contenttype" pk="1">
                 <field name="app_label">{field_content}</field>
                 <field name="model">m</field>
             </object>
-        </django-objects>"""
-        )
+        </django-objects>""")
 
         msg = "Unexpected element: 'nested'"
         with self.assertRaisesMessage(SuspiciousOperation, msg):

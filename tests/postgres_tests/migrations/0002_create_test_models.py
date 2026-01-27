@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
                 ("tags", ArrayField(TagField(), blank=True, null=True)),
                 (
                     "json",
-                    ArrayField(models.JSONField(default=dict), default=list),
+                    ArrayField(models.JSONField(default=dict), default=list, null=True),
                 ),
                 ("int_ranges", ArrayField(IntegerRangeField(), null=True, blank=True)),
                 (
@@ -179,7 +179,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    ArrayField(models.FloatField(), size=2, null=True, blank=True),
+                    ArrayField(models.FloatField(), size=3),
                 ),
             ],
             options={

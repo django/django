@@ -28,7 +28,6 @@ import django.core.checks.templates  # NOQA isort:skip
 import django.core.checks.translation  # NOQA isort:skip
 import django.core.checks.urls  # NOQA isort:skip
 
-
 __all__ = [
     "CheckMessage",
     "Debug",

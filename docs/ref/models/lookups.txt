@@ -26,7 +26,7 @@ all Django builtin lookups are derived:
 
 A lookup expression consists of three parts:
 
-* Fields part (e.g.
+* Fields part, e.g.
   ``Book.objects.filter(author__best_friends__first_name...``);
 * Transforms part (may be omitted) (e.g. ``__lower__first3chars__reversed``);
 * A lookup (e.g. ``__icontains``) that, if omitted, defaults to ``__exact``.

@@ -95,6 +95,10 @@ Minor features
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
+* The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
+  preserve :ref:`named groups <field-choices-named-groups>` (e.g.
+  ``choices=[("Group", [("1", "Item")]), ...]``).
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -398,6 +402,12 @@ Dropped support for MySQL < 8.4
 
 Upstream support for MySQL 8.0 ends in April 2026, and MySQL 8.1-8.3 are
 short-term innovation releases. Django 6.1 supports MySQL 8.4 and higher.
+
+Dropped support for MariaDB < 10.11
+-----------------------------------
+
+Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
+short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
 Miscellaneous
 -------------
