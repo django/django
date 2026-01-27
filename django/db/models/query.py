@@ -671,7 +671,7 @@ class QuerySet(AltersData):
     async def aget(self, *args, **kwargs):
         return await sync_to_async(self.get)(*args, **kwargs)
 
-    def create(self, **kwargs):
+    def _prepare_for_create(self, **kwargs):
         """
         Create a new object with the given kwargs, saving it to the database
         and returning the created object.
@@ -687,6 +687,10 @@ class QuerySet(AltersData):
 
         obj = self.model(**kwargs)
         self._for_write = True
+        return obj
+
+    def create(self, **kwargs):
+        obj = self._prepare_for_create(**kwargs)
         obj.save(force_insert=True, using=self.db)
         obj._state.fetch_mode = self._fetch_mode
         return obj
@@ -694,7 +698,10 @@ class QuerySet(AltersData):
     create.alters_data = True
 
     async def acreate(self, **kwargs):
-        return await sync_to_async(self.create)(**kwargs)
+        obj = await sync_to_async(self._prepare_for_create)(**kwargs)
+        await obj.asave(force_insert=True, using=self.db)
+        obj._state.fetch_mode = self._fetch_mode
+        return obj
 
     acreate.alters_data = True
 

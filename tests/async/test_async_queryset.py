@@ -1,6 +1,7 @@
 import json
 import xml.etree.ElementTree
 from datetime import datetime
+from unittest.mock import patch
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -8,7 +9,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import RelatedModel, SimpleModel
+from .models import RelatedModel, SimpleModel, IncrementASaveModel
 
 
 class AsyncQuerySetTest(TestCase):
@@ -92,6 +93,15 @@ class AsyncQuerySetTest(TestCase):
     async def test_acreate(self):
         await SimpleModel.objects.acreate(field=4)
         self.assertEqual(await SimpleModel.objects.acount(), 4)
+
+    async def test_acreate_calls_asave(self):
+        with patch("django.db.models.base.Model.asave") as mock_asave:
+            await SimpleModel.objects.acreate(field=4)
+            mock_asave.assert_called()
+
+    async def test_acreate_runs_increment_logic_from_asave(self):
+        obj = await IncrementASaveModel.objects.acreate(field=4)
+        self.assertEqual(obj.field, 5)
 
     async def test_aget_or_create(self):
         instance, created = await SimpleModel.objects.aget_or_create(field=4)
