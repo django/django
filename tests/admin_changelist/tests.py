@@ -247,18 +247,18 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = (
-            '<tr>'
+            "<tr>"
             '<td class="action-checkbox">'
             '<input type="checkbox" name="_selected_action" value="%d" class="action-select" '
             'aria-label="Select this object for an action - Child object (%d)">'
-            '</td>'
+            "</td>"
             '<th scope="row" id="row-%d" class="field-name">'
             '<a href="%s">name</a>'
-            '</th>'
+            "</th>"
             '<td class="field-parent nowrap">-</td>'
-            '</tr>'
+            "</tr>"
         ) % (new_child.pk, new_child.pk, new_child.pk, link)
-        row_html = row_html.replace('> <', '><')
+        row_html = row_html.replace("> <", "><")
 
         self.assertNotEqual(
             table_output.find(row_html),
@@ -280,18 +280,18 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = (
-            '<tbody>'
-            '<tr>'
+            "<tbody>"
+            "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
             f'class="action-select" aria-label="Select this object for an action - Child object ({new_child.pk})">'
-            '</td>'
+            "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">-</a>'
-            '</th>'
+            "</th>"
             '<td class="field-parent nowrap">-</td>'
-            '</tr>'
-            '</tbody>'
+            "</tr>"
+            "</tbody>"
         )
         self.assertInHTML(row_html, table_output)
 
@@ -313,18 +313,18 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = (
-            '<tr>'
+            "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
             f'class="action-select" aria-label="Select this object for an action - {new_child}">'
-            '</td>'
+            "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
-            '</th>'
+            "</th>"
             '<td class="field-parent nowrap">???</td>'
-            '</tr>'
+            "</tr>"
         )
-        row_html = row_html.replace('> <', '><')
+        row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
@@ -347,19 +347,19 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = (
-            '<tr>'
+            "<tr>"
             '<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{new_child.pk}" '
             f'class="action-select" aria-label="Select this object for an action - {new_child}">'
-            '</td>'
+            "</td>"
             f'<th scope="row" id="row-{new_child.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
-            '</th>'
+            "</th>"
             '<td class="field-age_display">&amp;dagger;</td>'
             '<td class="field-age">-empty-</td>'
-            '</tr>'
+            "</tr>"
         )
-        row_html = row_html.replace('> <', '><')
+        row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
@@ -384,24 +384,18 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = (
-            '<tr>'
+            "<tr>"
             '<td class="action-checkbox">'
             '<input type="checkbox" name="_selected_action" value="%d" class="action-select" '
             'aria-label="Select this object for an action - %s">'
-            '</td>'
+            "</td>"
             '<th scope="row" id="row-%d" class="field-name">'
             '<a href="%s">name</a>'
-            '</th>'
+            "</th>"
             '<td class="field-parent nowrap">%s</td>'
-            '</tr>'
-        ) % (
-            new_child.pk, 
-            new_child,
-            new_child.pk, 
-            link, 
-            new_parent 
-        )
-        row_html = row_html.replace('> <', '><')
+            "</tr>"
+        ) % (new_child.pk, new_child, new_child.pk, link, new_parent)
+        row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
@@ -427,19 +421,19 @@ class ChangeListTests(TestCase):
             "admin:admin_changelist_grandchild_change", args=(grandchild.id,)
         )
         row_html = (
-            f'<tr>'
+            f"<tr>"
             f'<td class="action-checkbox">'
             f'<input type="checkbox" name="_selected_action" value="{grandchild.pk}" '
             f'class="action-select" aria-label="Select this object for an action - name">'
-            f'</td>'
+            f"</td>"
             f'<th scope="row" id="row-{grandchild.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
-            f'</th>'
+            f"</th>"
             f'<td class="field-parent__name">-</td>'
             f'<td class="field-parent__parent__name">-</td>'
-            f'</tr>'
+            f"</tr>"
         )
-        row_html = row_html.replace('> <', '><')
+        row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
             table_output.find(row_html),
             -1,

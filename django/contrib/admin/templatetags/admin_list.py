@@ -180,7 +180,7 @@ def result_headers(cl):
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
-            "col_id": f"col-{field_name}", 
+            "col_id": f"col-{field_name}",
         }
 
 
@@ -296,12 +296,17 @@ def items_for_result(cl, result, form):
 
             if table_tag == "th":
                 yield format_html(
-                    '<th scope="row" id="row-{}"{}>{}</th>', result.pk, row_class, link_or_text,
-                    )
+                    '<th scope="row" id="row-{}"{}>{}</th>',
+                    result.pk,
+                    row_class,
+                    link_or_text,
+                )
             else:
                 yield format_html(
-                    "<td{}>{}</td>", row_class, link_or_text,
-                    )
+                    "<td{}>{}</td>",
+                    row_class,
+                    link_or_text,
+                )
 
         else:
             # By default the fields come from ModelAdmin.list_editable, but if
@@ -318,9 +323,11 @@ def items_for_result(cl, result, form):
                 bf = form[field_name]
                 column_id = f"col-{_coerce_field_name(field_name, field_index)}"
                 row_id = f"row-{result.pk}"
-                widget_html = bf.as_widget(attrs={
-                    "aria-labelledby": f"{row_id} {column_id}",
-                })
+                widget_html = bf.as_widget(
+                    attrs={
+                        "aria-labelledby": f"{row_id} {column_id}",
+                    }
+                )
                 result_repr = mark_safe(str(bf.errors) + widget_html)
 
             yield format_html("<td{}>{}</td>", row_class, result_repr)
