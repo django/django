@@ -9326,7 +9326,8 @@ class ListEditableAccessibilityTests(TestCase):
     def test_aria_labelledby_on_editable_fields(self):
         """
         Verify that editable inputs in the changelist have the correct
-        aria-labelledby attributes pointing to the Row Header and Column Header.
+        aria-labelledby attributes pointing to the Row Header and 
+        Column Header.
         """
         url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(url)
