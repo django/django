@@ -428,12 +428,10 @@ class ChangeListTests(TestCase):
         row_html = (
             "<tr>"
             '<td class="action-checkbox">'
-            (
-                f'<input type="checkbox" name="_selected_action" '
-                f'value="{grandchild.pk}" '
-                'class="action-select" '
-                'aria-label="Select this object for an action - name">'
-            )
+            f'<input type="checkbox" name="_selected_action" '
+            f'value="{grandchild.pk}" '
+            'class="action-select" '
+            'aria-label="Select this object for an action - name">'
             "</td>"
             f'<th scope="row" id="row-{grandchild.pk}" class="field-name">'
             f'<a href="{link}">name</a>'
@@ -441,7 +439,7 @@ class ChangeListTests(TestCase):
             '<td class="field-parent__name">-</td>'
             '<td class="field-parent__parent__name">-</td>'
             "</tr>"
-)
+        )
 
         row_html = row_html.replace("> <", "><")
         self.assertNotEqual(
