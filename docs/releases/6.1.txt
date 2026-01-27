@@ -374,6 +374,12 @@ backends.
 * Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
   if the management command isn't supported.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``object-tools`` block is hoisted out of the ``content`` block on
+  changelist pages.
+
 :mod:`django.contrib.gis`
 -------------------------
 
