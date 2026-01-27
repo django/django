@@ -320,7 +320,6 @@ class CustomArticleAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context={"extra_var": "Hello!"})
 
 
-class ThingAdmin(admin.ModelAdmin):
     list_filter = (
         "color",
         "color__warm",
@@ -328,6 +327,7 @@ class ThingAdmin(admin.ModelAdmin):
         "pub_date",
         "very_long_filter_field",
     )
+
 
 
 
