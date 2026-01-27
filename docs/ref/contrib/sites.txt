@@ -242,6 +242,7 @@ That gives you more flexibility, but it's also more complex.
 It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
 objects as much as possible, to remove unneeded complexity and redundancy.
 
+
 Getting the current domain for full URLs
 ----------------------------------------
 
@@ -419,6 +420,30 @@ To avoid repetitions, add
 :setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
 request object, so you can use ``request.site`` to get the current site.
 
+Site context_processor
+======================
+
+.. versionadded:: 6.0
+
+The current site can be made available in templates through a dedicated
+context processor.
+
+Add the :func:`~django.template.context_processors.csp` context processor
+to your :setting:`TEMPLATES` setting. This makes the current Site object
+available in the Django templates as the ``site`` context variable::
+
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "context_processors": [
+                    # ...
+                    "django.contrib.sites.context_processors.site",
+                ],
+            },
+        },
+    ]
+
 How Django uses the sites framework
 ===================================
 
@@ -440,13 +465,10 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
   checks the current site in retrieving flatpages to display.
 
-* In the :mod:`syndication framework <django.contrib.syndication>`, the
-  templates for ``title`` and ``description`` automatically have access to a
-  variable ``{{ site }}``, which is the
-  :class:`~django.contrib.sites.models.Site` object representing the current
-  site. Also, the hook for providing item URLs will use the ``domain`` from
-  the current :class:`~django.contrib.sites.models.Site` object if you don't
-  specify a fully-qualified domain.
+* In the :mod:`syndication framework <django.contrib.syndication>`, the hook
+  for providing item URLs will use the ``domain`` from the current
+  :class:`~django.contrib.sites.models.Site` object if you don't specify a
+  fully-qualified domain.
 
 * In the :mod:`authentication framework <django.contrib.auth>`,
   :class:`django.contrib.auth.views.LoginView` passes the current
