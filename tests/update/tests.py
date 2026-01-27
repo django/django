@@ -3,7 +3,7 @@ import unittest
 from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
-from django.db.models.functions import Abs, Concat, Lower
+from django.db.models.functions import Abs, Concat, Length, Lower
 from django.test import TestCase
 from django.test.utils import register_lookup
 
@@ -310,6 +310,26 @@ class AdvancedTests(TestCase):
         msg = "Cannot negate non-conditional expressions."
         with self.assertRaisesMessage(TypeError, msg):
             DataPoint.objects.update(is_active=~F("name"))
+
+    def test_update_evaluation_order_with_deps(self):
+        """
+        UPDATE set clauses should respect dependencies between fields.
+        Reference: Ticket #36877.
+        """
+        # Create DataPoint with an initial value
+        # name="Alice", value="20" (value is CharField)
+        d = DataPoint.objects.create(name="Alice", value="20")
+
+        # Update:
+        # name = "Bob"
+        # value = Length('name')  (Should use OLD name "Alice" -> 5)
+        # on buggy MySQL: name="Bob" first, then value=Length("Bob")=3.
+        DataPoint.objects.filter(pk=d.pk).update(name="Bob", value=Length("name"))
+
+        d.refresh_from_db()
+        self.assertEqual(d.name, "Bob")
+        # value is CharField, so compare with string "5"
+        self.assertEqual(d.value, "5")
 
 
 @unittest.skipUnless(
