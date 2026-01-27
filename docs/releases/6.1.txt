@@ -368,10 +368,10 @@ backends.
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
 :mod:`django.contrib.admin`
--------------------------
+---------------------------
 
 * The ``object-tools`` block is hoisted out of the ``content`` block on
-changelist pages.
+  changelist pages.
 
 :mod:`django.contrib.gis`
 -------------------------
