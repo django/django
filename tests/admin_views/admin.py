@@ -321,7 +321,14 @@ class CustomArticleAdmin(admin.ModelAdmin):
 
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ("color", "color__warm", "color__value", "pub_date")
+    list_filter = (
+        "color",
+        "color__warm",
+        "color__value",
+        "pub_date",
+        "very_long_filter_field",
+    )
+
 
 
 class InquisitionAdmin(admin.ModelAdmin):
