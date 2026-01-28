@@ -40,6 +40,7 @@ def cursor_execute(*queries):
     return results
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTestCase(TestCase):
     unique_re = re.compile(r".*unique_together = \((.+),\).*")
 
@@ -519,6 +520,7 @@ class InspectDBTestCase(TestCase):
         )
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTransactionalTests(TransactionTestCase):
     available_apps = ["inspectdb"]
 
