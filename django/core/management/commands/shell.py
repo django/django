@@ -2,6 +2,7 @@ import os
 import select
 import sys
 import traceback
+import warnings
 from collections import defaultdict
 from importlib import import_module
 
@@ -9,6 +10,7 @@ from django.apps import apps
 from django.core.exceptions import AppRegistryNotReady
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.module_loading import import_string as import_dotted_path
 
 
@@ -188,11 +190,22 @@ class Command(BaseCommand):
         auto_imports = defaultdict(list)
         import_errors = []
         for path in path_imports:
-            try:
-                obj = import_dotted_path(path) if "." in path else import_module(path)
-            except ImportError:
-                import_errors.append(path)
-                continue
+            treat_as_module = "." not in path
+            if not treat_as_module:
+                try:
+                    with warnings.catch_warnings(
+                        action="ignore", category=RemovedInDjango70Warning
+                    ):
+                        obj = import_dotted_path(path)
+                except ImportError:
+                    # Might be a submodule, e.g. "django.db.models".
+                    treat_as_module = True
+            if treat_as_module:
+                try:
+                    obj = import_module(path)
+                except ImportError:
+                    import_errors.append(path)
+                    continue
 
             if "." in path:
                 module, name = path.rsplit(".", 1)
