@@ -10,6 +10,12 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
 from django.utils.html import escape
+from django.contrib.admin.sites import AdminSite
+from django.contrib.admin.utils import construct_change_message
+from django.db import models
+from django.forms import ModelForm
+from django.test import TestCase
+
 
 from .models import Article, ArticleProxy, Car, Site
 
@@ -177,16 +183,16 @@ class LogEntryTests(TestCase):
         self.assertEqual(
             json.loads(logentry.change_message),
             [
-                {"changed": {"fields": ["Domain"]}},
-                {"added": {"object": "Added article", "name": "article"}},
+                {"changed": {"fields": ["domain"]}},
+                {"added": {"name": "article", "object": "Added article"}},
                 {
                     "changed": {
-                        "fields": ["Title", "not_a_form_field"],
-                        "object": "Changed Title",
+                        "fields": ["title", "not_a_form_field"],
                         "name": "article",
+                        "object": "Changed Title",
                     }
                 },
-                {"deleted": {"object": "Title second article", "name": "article"}},
+                {"deleted": {"name": "article", "object": "Title second article"}},
             ],
         )
         self.assertEqual(
@@ -453,3 +459,33 @@ class LogEntryTests(TestCase):
         response = self.client.get(reverse("custom_admin:index"))
         self.assertContains(response, exp_str_article)
         self.assertNotContains(response, exp_str_car)
+
+
+class Occupation(models.Model):
+    occupation = models.CharField("occupation", max_length=100)
+
+    class Meta:
+        app_label = "admin_utils"
+
+
+class OccupationForm(ModelForm):
+    class Meta:
+        model = Occupation
+        fields = ["occupation"]
+
+
+class ConstructChangeMessageTranslationTests(TestCase):
+    def test_uses_model_verbose_name_not_form_label(self):
+        obj = Occupation.objects.create(occupation="Engineer")
+        form = OccupationForm(
+            data={"occupation": "Doctor"},
+            instance=obj,
+        )
+        self.assertTrue(form.is_valid())
+
+        message = construct_change_message(form, [], add=False)
+
+        self.assertEqual(
+            message,
+            [{"changed": {"fields": ["occupation"]}}],
+        )

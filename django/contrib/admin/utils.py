@@ -4,6 +4,7 @@ import json
 from collections import defaultdict
 from functools import reduce
 from operator import or_
+from django.utils.text import capfirst
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.templatetags.auth import render_password_as_hash
@@ -605,11 +606,9 @@ def construct_change_message(form, formsets, add):
 
 
 def _get_changed_field_labels_from_form(form, changed_data):
-    changed_field_labels = []
-    for field_name in changed_data:
-        try:
-            verbose_field_name = form.fields[field_name].label or field_name
-        except KeyError:
-            verbose_field_name = field_name
-        changed_field_labels.append(str(verbose_field_name))
-    return changed_field_labels
+    
+    return list(changed_data)
+
+
+
+
