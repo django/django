@@ -27,6 +27,7 @@ from .models import (
     OrderedByExpressionChild,
     OrderedByExpressionGrandChild,
     OrderedByFArticle,
+    OrderingConstraint,
     Reference,
 )
 
@@ -658,3 +659,51 @@ class OrderingTests(TestCase):
             F("num").desc(), "pk"
         )
         self.assertCountEqual(qs, qs.iterator())
+
+
+class TotallyOrderedTests(TestCase):
+    def test_basic_ordering(self):
+        self.assertIs(Author.objects.all().totally_ordered, True)
+        self.assertIs(Author.objects.order_by("name").totally_ordered, False)
+        self.assertIs(
+            OrderingConstraint.objects.order_by("rank").totally_ordered, False
+        )
+        self.assertIs(
+            OrderingConstraint.objects.order_by("rank", "pk").totally_ordered, True
+        )
+
+    def test_composite_constraints(self):
+        self.assertIs(
+            OrderingConstraint.objects.order_by("pub_date", "author").totally_ordered,
+            False,
+        )
+        self.assertIs(
+            OrderingConstraint.objects.order_by("headline", "slug").totally_ordered,
+            True,
+        )
+
+    def test_reverse_ordering(self):
+        self.assertIs(Author.objects.order_by("-pk").totally_ordered, True)
+
+    def test_f_expressions(self):
+        self.assertIs(Author.objects.order_by(F("pk")).totally_ordered, True)
+        self.assertIs(Author.objects.order_by(F("name")).totally_ordered, False)
+
+    def test_one_to_one_relation(self):
+        self.assertIs(
+            OrderingConstraint.objects.order_by("editor").totally_ordered, False
+        )
+        self.assertIs(
+            OrderingConstraint.objects.order_by("editor_id").totally_ordered, True
+        )
+
+    def test_relation_traversal(self):
+        self.assertIs(Article.objects.order_by("author__pk").totally_ordered, False)
+
+    def test_conditional_constraints(self):
+        self.assertIs(
+            OrderingConstraint.objects.order_by("rank").totally_ordered, False
+        )
+        self.assertIs(
+            OrderingConstraint.objects.order_by("barcode").totally_ordered, True
+        )

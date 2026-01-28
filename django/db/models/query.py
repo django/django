@@ -26,7 +26,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
@@ -1972,6 +1972,74 @@ class QuerySet(AltersData):
             return True
         else:
             return False
+
+    @property
+    def totally_ordered(self):
+        """
+        Return True if the QuerySet is ordered and the ordering is sufficient
+        to guarantee a stable sort
+        (i.e. includes a unique field or constraint).
+        """
+        if not self.ordered:
+            return False
+
+        ordering = self.query.order_by
+        if not ordering and self.query.default_ordering:
+            ordering = self.query.get_meta().ordering
+
+        if not ordering:
+            return False
+
+        opts = self.model._meta
+        total_ordering_fields = {"pk"} | {
+            field.attname
+            for field in opts.fields
+            if (field.unique or field.primary_key) and not field.null
+        }
+
+        ordering_fields = set()
+
+        for part in ordering:
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip("-")
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+
+            if field_name:
+                if field_name == "pk":
+                    return True
+
+                try:
+                    field = opts.get_field(field_name)
+                except exceptions.FieldDoesNotExist:
+                    continue
+
+                if field.remote_field and field_name == field.name:
+                    continue
+                if field.attname in total_ordering_fields:
+                    return True
+
+                ordering_fields.add(field.attname)
+
+        constraint_field_names = (
+            *opts.unique_together,
+            *(constraint.fields for constraint in opts.total_unique_constraints),
+        )
+        for field_names in constraint_field_names:
+            try:
+                fields = [opts.get_field(field_name) for field_name in field_names]
+            except exceptions.FieldDoesNotExist:
+                continue
+
+            if any(field.null for field in fields):
+                continue
+            if ordering_fields.issuperset(field.attname for field in fields):
+                return True
+
+        return False
 
     @property
     def db(self):
