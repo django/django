@@ -348,7 +348,6 @@ class ASGIHandler(base.BaseHandler):
                         )
             # Final closing message.
             await send({"type": "http.response.body"})
-
         # Other responses just need chunking.
         else:
             # Yield chunks of response.
