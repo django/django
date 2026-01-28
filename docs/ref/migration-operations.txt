@@ -186,7 +186,7 @@ defaults and always applies them in the Django ORM code.
 ``RemoveField``
 ---------------
 
-.. class:: RemoveField(model_name, name)
+.. class:: RemoveField(model_name, name, default=NOT_PROVIDED)
 
 Removes a field from a model.
 
@@ -194,7 +194,9 @@ Bear in mind that when reversed, this is actually adding a field to a model.
 The operation is reversible (apart from any data loss, which is irreversible)
 if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
-default value, the operation is irreversible.
+default value, it will ask for a default value to populate existing
+rows and make the operation reversible. If the default value is not provided,
+the operation will be irreversible.
 
 .. versionchanged:: 6.0
 
@@ -202,6 +204,10 @@ default value, the operation is irreversible.
     PostgreSQL backends no longer use ``CASCADE`` to delete dependent related
     database objects, such as views. Any dependent objects that are not managed
     by Django may need to be removed manually before running ``RemoveField``.
+
+.. versionchanged:: 6.1
+
+    Support for the ``default`` argument was added.
 
 ``AlterField``
 --------------
