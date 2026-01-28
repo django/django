@@ -376,6 +376,9 @@ backends.
 
 * Support for GDAL 3.1 and 3.2 is removed.
 
+* Added support for ``ST_Distance_Sphere`` in MySQL for distance calculations
+  on geodetic coordinate systems with point geometries.
+
 :mod:`django.contrib.postgres`
 ------------------------------
 
