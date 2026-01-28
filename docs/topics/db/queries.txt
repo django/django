@@ -1721,6 +1721,11 @@ a join with an ``F()`` object, a ``FieldError`` will be raised:
     # This will raise a FieldError
     >>> Entry.objects.update(headline=F("blog__name"))
 
+.. admonition:: MySQL
+
+   MySQL is sensitive to the order in which fields are supplied for update.
+   See the :ref:`MySQL notes <mysql-notes>` for more details.
+
 .. _topics-db-queries-related:
 
 Related objects

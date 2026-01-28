@@ -809,6 +809,29 @@ If you implement custom model fields that inherit from
 :meth:`~django.db.models.Manager.raw`, you should ensure that you perform
 appropriate typecasting.
 
+
+MySQL is sensitive to the order of update operations
+----------------------------------------------------
+
+When updating multiple fields with an ``update()`` query, MySQL updates each
+field sequentially, using any previously updated values for subsequent fields.
+Thus the following queries will have different results, depending on the order
+in which updates are supplied:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import Lower
+    >>> Author.objects.create(name="John", alias="john")
+    >>> Author.objects.update(name="Alice", alias=Lower("name"))
+    >>> print(Author.objects.first().alias)  # alias derived from *new* value of name
+    alice
+    >>> Author.objects.update(alias=Lower("name"), name="Bob")
+    >>> print(Author.objects.first().alias)  # alias derived from *previous* value of name
+    alice
+
+``order_by()`` can be used with update queries to control update order, only on
+MySQL and MariaDB.
+
 .. _sqlite-notes:
 
 SQLite notes
