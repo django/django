@@ -9,7 +9,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import RelatedModel, SimpleModel, IncrementASaveModel
+from .models import IncrementASaveModel, RelatedModel, SimpleModel
 
 
 class AsyncQuerySetTest(TestCase):
