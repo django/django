@@ -15,3 +15,5 @@ Bugfixes
   to wrap below the changelist when filter elements contained long text
   (:ticket:`36850`).
 
+* Fixed a visual regression in Django 6.0 for admin form fields grouped under a
+  ``<fieldset>`` aligned horizontally (:ticket:`36850`).
