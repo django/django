@@ -180,7 +180,9 @@ Asynchronous views
 Cache
 ~~~~~
 
-* ...
+* Redis backend
+  now includes the current django version at ``lib-name``
+  in the driver info of Redis connections.
 
 CSP
 ~~~

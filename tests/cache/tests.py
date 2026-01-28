@@ -15,6 +15,7 @@ from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
+import django
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
@@ -1985,6 +1986,48 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["db"], 5)
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
+
+    def test_client_driver_info(self):
+        """Test that driver info was successfully applied"""
+        client = cache._cache.get_client()
+        client.ping()
+
+        client_info = client.client_info()
+
+        if all(
+            (
+                x in client_info
+                for x in (
+                    "lib-name",
+                    "lib-ver",
+                )
+            )
+        ):
+
+            if getattr(self.lib, "DriverInfo", None):
+                correct_lib_name = (
+                    self.lib.DriverInfo()
+                    .add_upstream_driver(
+                        "django",
+                        django.get_version(),
+                    )
+                    .formatted_name
+                )
+            else:
+                correct_lib_name = f"redis-py(django_v{django.get_version()})"
+            self.assertEqual(
+                client_info["lib-name"],
+                correct_lib_name,
+            )
+            self.assertEqual(
+                client_info["lib-ver"],
+                self.lib.__version__,
+            )
+
+        else:
+            self.skipTest(
+                "Redis version does not support CLIENT SETINFO (requires 7.2+)"
+            )
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
