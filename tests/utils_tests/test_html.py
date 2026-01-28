@@ -100,10 +100,9 @@ class TestUtilsHtml(SimpleTestCase):
             (3, 11): (3, 11, 14),
             (3, 10): (3, 10, 19),
             (3, 9): (3, 9, 24),
+            # Not fixed in 3.8.
+            (3, 8): (3, 8, math.inf),
         }
-        htmlparser_fixed_security = (
-            sys.version_info >= min_fixed_security[sys.version_info[:2]]
-        )
         # Similarly, there was a fix for terminating incomplete entities. See:
         # https://github.com/python/cpython/commit/95296a9d
         min_fixed_incomplete_entities = {
@@ -114,6 +113,7 @@ class TestUtilsHtml(SimpleTestCase):
             (3, 11): (3, 11, math.inf),
             (3, 10): (3, 10, math.inf),
             (3, 9): (3, 9, math.inf),
+            (3, 8): (3, 8, math.inf),
         }
         major_version = sys.version_info[:2]
         htmlparser_fixed_security = sys.version_info >= min_fixed_security.get(
