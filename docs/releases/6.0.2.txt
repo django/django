@@ -15,3 +15,6 @@ Bugfixes
   to wrap below the changelist when filter elements contained long text
   (:ticket:`36850`).
 
+* Fixed a regression in Django 6.0 where ``auto_now_add`` field values were not
+  populated during ``INSERT`` operations, due to incorrect parameters passed to
+  ``field.pre_save()`` (:ticket:`36847`).
