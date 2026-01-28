@@ -266,7 +266,13 @@ class Person(models.Model):
         (2, "Female"),
     )
     name = models.CharField(max_length=100)
-    gender = models.IntegerField(choices=GENDER_CHOICES)
+    gender = models.IntegerField(
+        choices=GENDER_CHOICES,
+        verbose_name=(
+            "very very very very very very very very very "
+            "loooooooooooooooooooooooooooooooooooooooooong name"
+        ),
+    )
     age = models.IntegerField(default=21)
     alive = models.BooleanField(default=True)
 

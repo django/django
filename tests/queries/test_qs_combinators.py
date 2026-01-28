@@ -512,12 +512,7 @@ class QuerySetSetOperationTests(TestCase):
             tags.filter(id=OuterRef(OuterRef("tag_id")))
         )
         qs = Note.objects.filter(
-            Exists(
-                Annotation.objects.filter(
-                    Exists(tags),
-                    notes__in=OuterRef("pk"),
-                )
-            )
+            Exists(Annotation.objects.filter(Exists(tags), notes=OuterRef("pk")))
         )
         self.assertIsNone(qs.first())
         annotation.notes.add(note)

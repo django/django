@@ -1624,7 +1624,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
@@ -1643,7 +1643,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("14437")
         self.assertIn(
-            "Starting development server at http://127.0.0.1:14437/",
+            "Starting WSGI development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
@@ -1662,7 +1662,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()

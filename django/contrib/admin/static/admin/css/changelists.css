@@ -2,7 +2,6 @@
 
 #changelist .changelist-form-container {
     display: flex;
-    flex-wrap: wrap;
     align-items: flex-start;
     width: 100%;
 }
@@ -16,6 +15,7 @@
 }
 
 #changelist .changelist-form-container:has(#changelist-filter) > div {
+    min-width: 0;
     max-width: calc(100% - 270px);
 }
 
