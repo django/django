@@ -1,3 +1,5 @@
+import contextlib
+
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.regex_helper import _lazy_re_compile
@@ -30,7 +32,28 @@ class GZipMiddleware(MiddlewareMixin):
         if not re_accepts_gzip.search(ae):
             return response
 
-        if response.streaming:
+        if response.streaming_acmgr:
+            original_iterator = response.streaming_acmgr_content
+
+            @contextlib.asynccontextmanager
+            async def gzip_acmgr_wrapper():
+                async with original_iterator as v:
+
+                    async def agen():
+                        async for chunk in v:
+                            yield compress_string(
+                                chunk,
+                                max_random_bytes=self.max_random_bytes,
+                            )
+
+                    yield agen()
+
+            response.streaming_acmgr_content = gzip_acmgr_wrapper()
+            # Delete the `Content-Length` header for streaming content, because
+            # we won't know the compressed size until we stream it.
+            del response.headers["Content-Length"]
+
+        elif response.streaming:
             if response.is_async:
                 response.streaming_content = acompress_sequence(
                     response.streaming_content,
