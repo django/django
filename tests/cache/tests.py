@@ -690,16 +690,23 @@ class BaseCacheTests:
             cull_cache = caches[cull_cache_name]
         except InvalidCacheBackendError:
             self.skipTest("Culling isn't implemented.")
-
-        # Create initial cache key entries. This will overflow the cache,
-        # causing a cull.
-        for i in range(1, initial_count):
-            cull_cache.set("cull%d" % i, "value", 1000)
-        count = 0
-        # Count how many keys are left in the cache.
-        for i in range(1, initial_count):
-            if cull_cache.has_key("cull%d" % i):
-                count += 1
+        try:
+            # Turn off cull optimization for DBCache. #32785.
+            if hasattr(cull_cache, "_cull_n"):
+                old_n = cull_cache._cull_n
+                cull_cache._cull_n = 0
+            # Create initial cache key entries. This will overflow the cache,
+            # causing a cull.
+            for i in range(1, initial_count):
+                cull_cache.set("cull%d" % i, "value", 1000)
+            count = 0
+            # Count how many keys are left in the cache.
+            for i in range(1, initial_count):
+                if cull_cache.has_key("cull%d" % i):
+                    count += 1
+        finally:
+            if hasattr(cull_cache, "_cull_n"):
+                cull_cache._cull_n = old_n
         self.assertEqual(count, final_count)
 
     def test_cull(self):
@@ -1307,6 +1314,18 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 self.assertIn(connection.ops.quote_name("expires"), sql)
             if "cache_key" in sql:
                 self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_cull_occurs_every_5_queries(self):
+        old_max_entries = cache._max_entries
+        cache._max_entries = -1
+        try:
+            with mock.patch.object(cache, "_cull") as mocked:
+                for i in range(0, 5):
+                    cache.set(f"key{i}", "foo")
+                mocked.assert_called_once()
+            self.assertEqual(cache._cull_n, 5)
+        finally:
+            cache._max_entries = old_max_entries
 
     def test_delete_cursor_rowcount(self):
         """
