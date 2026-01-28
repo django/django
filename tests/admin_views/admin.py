@@ -319,7 +319,6 @@ class CustomArticleAdmin(admin.ModelAdmin):
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={"extra_var": "Hello!"})
 
-
     list_filter = (
         "color",
         "color__warm",
@@ -327,8 +326,6 @@ class CustomArticleAdmin(admin.ModelAdmin):
         "pub_date",
         "very_long_filter_field",
     )
-
-
 
 
 class InquisitionAdmin(admin.ModelAdmin):

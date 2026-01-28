@@ -170,11 +170,6 @@ class Thing(models.Model):
         default=False,
     )
 
-
-    
-
-
-
     def __str__(self):
         return self.title
 
