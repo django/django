@@ -1987,31 +1987,41 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
-    def test_client_lib_name(self):
-        """Test that lib-name was successfully applied"""
+    def test_client_driver_info(self):
+        """Test that driver info was successfully applied"""
         client = cache._cache.get_client()
         client.ping()
 
         client_info = client.client_info()
 
-        if "lib-name" in client_info:
-            try:
-                from redis import DriverInfo
+        if all(
+            (
+                x in client_info
+                for x in (
+                    "lib-name",
+                    "lib-ver",
+                )
+            )
+        ):
 
+            if getattr(self.lib, "DriverInfo", None):
                 correct_lib_name = (
-                    DriverInfo()
+                    self.lib.DriverInfo()
                     .add_upstream_driver(
                         "django",
                         django.get_version(),
                     )
                     .formatted_name
                 )
-
-            except ImportError:
+            else:
                 correct_lib_name = f"redis-py(django_v{django.get_version()})"
             self.assertEqual(
                 client_info["lib-name"],
                 correct_lib_name,
+            )
+            self.assertEqual(
+                client_info["lib-ver"],
+                self.lib.__version__,
             )
 
         else:
