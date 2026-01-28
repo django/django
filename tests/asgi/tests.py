@@ -706,6 +706,7 @@ class ASGITest(SimpleTestCase):
         # 'last\n' isn't sent.
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
+
     async def test_read_body_thread(self):
         """Write runs on correct thread depending on rollover."""
         handler = ASGIHandler()
