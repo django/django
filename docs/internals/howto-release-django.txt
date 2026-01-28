@@ -63,7 +63,7 @@ permissions.
 
 * A Unix environment with these tools installed (in alphabetical order):
 
-  * bash
+  * bash (at least v4: Note that macOS ships with a much older version.)
   * git
   * GPG
   * make
