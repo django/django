@@ -104,8 +104,9 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The combination of O_CREAT and O_EXCL makes os.open() raises an
-                    # OSError if the file already exists before it's opened.
+                    # The combination of O_CREAT and O_EXCL makes os.open()
+                    # raises an OSError if the file already exists before it's
+                    # opened.
                     open_flags = (
                         os.O_WRONLY
                         | os.O_CREAT

@@ -32,9 +32,9 @@ def div_custom_end(content):
 
 @register.filter
 def noop(value, param=None):
-    """A noop filter that always return its first argument and does nothing with
-    its second (optional) one.
-    Useful for testing out whitespace in filter arguments (see #19882)."""
+    """A noop filter that always return its first argument and does nothing
+    with its second (optional) one. Useful for testing out whitespace in filter
+    arguments (see #19882)."""
     return value
 
 
@@ -266,62 +266,6 @@ def simple_unlimited_args_kwargs_block(content, one, two="hi", *args, **kwargs):
             ", ".join("%s=%s" % (k, v) for (k, v) in kwargs.items()),
         )
     )
-
-
-@register.simple_block_tag(takes_context=True)
-def simple_block_tag_without_context_parameter(arg):
-    """Expected simple_block_tag_without_context_parameter __doc__"""
-    return "Expected result"
-
-
-@register.simple_block_tag
-def simple_tag_without_content_parameter(arg):
-    """Expected simple_tag_without_content_parameter __doc__"""
-    return "Expected result"
-
-
-@register.simple_block_tag(takes_context=True)
-def simple_tag_with_context_without_content_parameter(context, arg):
-    """Expected simple_tag_with_context_without_content_parameter __doc__"""
-    return "Expected result"
-
-
-@register.simple_tag(takes_context=True)
-def simple_tag_without_context_parameter(arg):
-    """Expected simple_tag_without_context_parameter __doc__"""
-    return "Expected result"
-
-
-simple_tag_without_context_parameter.anything = (
-    "Expected simple_tag_without_context_parameter __dict__"
-)
-
-
-@register.simple_block_tag(takes_context=True)
-def simple_tag_takes_context_without_params_block():
-    """Expected simple_tag_takes_context_without_params_block __doc__"""
-    return "Expected result"
-
-
-@register.simple_tag(takes_context=True)
-def simple_tag_takes_context_without_params():
-    """Expected simple_tag_takes_context_without_params __doc__"""
-    return "Expected result"
-
-
-simple_tag_takes_context_without_params.anything = (
-    "Expected simple_tag_takes_context_without_params __dict__"
-)
-
-
-@register.simple_block_tag
-def simple_block_tag_without_content():
-    return "Expected result"
-
-
-@register.simple_block_tag(takes_context=True)
-def simple_block_tag_with_context_without_content():
-    return "Expected result"
 
 
 @register.simple_tag(takes_context=True)

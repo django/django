@@ -664,7 +664,7 @@ class RequestFactory:
         if query_params:
             extra["QUERY_STRING"] = urlencode(query_params, doseq=True)
         r.update(extra)
-        # If QUERY_STRING is absent or empty, we want to extract it from the URL.
+        # If QUERY_STRING is absent or empty, extract it from the URL.
         if not r.get("QUERY_STRING"):
             # WSGI requires latin-1 encoded strings. See get_path_info().
             r["QUERY_STRING"] = parsed.query.encode().decode("iso-8859-1")

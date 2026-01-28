@@ -130,7 +130,8 @@ class MultiUserProxy(UserProxy, AnotherUserProxy):
         proxy = True
 
 
-# We can still use `select_related()` to include related models in our querysets.
+# We can still use `select_related()` to include related models in our
+# querysets.
 
 
 class Country(models.Model):

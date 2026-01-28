@@ -4,13 +4,15 @@ import html
 import json
 import re
 import warnings
+from collections import deque
 from collections.abc import Mapping
 from html.parser import HTMLParser
+from itertools import chain
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
-from django.core.validators import EmailValidator
+from django.core.validators import DomainNameValidator, EmailValidator
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -75,8 +77,11 @@ _js_escapes = {
     ord("\u2029"): "\\u2029",
 }
 
-# Escape every ASCII character with a value less than 32.
-_js_escapes.update((ord("%c" % z), "\\u%04X" % z) for z in range(32))
+# Escape every ASCII character with a value less than 32 (C0), 127(C0),
+# or 128-159(C1).
+_js_escapes.update(
+    (ord("%c" % z), "\\u%04X" % z) for z in chain(range(32), range(0x7F, 0xA0))
+)
 
 
 @keep_lazy(SafeString)
@@ -256,8 +261,8 @@ def smart_urlquote(url):
     netloc = unquote_quote(netloc)
 
     if query:
-        # Separately unquoting key/value, so as to not mix querystring separators
-        # included in query values. See #22267.
+        # Separately unquoting key/value, so as to not mix querystring
+        # separators included in query values. See #22267.
         query_parts = [
             (unquote(q[0]), unquote(q[1]))
             for q in parse_qsl(query, keep_blank_values=True)
@@ -296,7 +301,10 @@ class Urlizer:
 
     simple_url_re = _lazy_re_compile(r"^https?://\[?\w", re.IGNORECASE)
     simple_url_2_re = _lazy_re_compile(
-        r"^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$", re.IGNORECASE
+        rf"^www\.|^(?!http)(?:{DomainNameValidator.hostname_re})"
+        rf"(?:{DomainNameValidator.domain_re})"
+        r"\.(com|edu|gov|int|mil|net|org)($|/.*)$",
+        re.IGNORECASE,
     )
     word_split_re = _lazy_re_compile(r"""([\s<>"']+)""")
 
@@ -352,7 +360,8 @@ class Urlizer:
                 url = smart_urlquote(html.unescape(middle))
             elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
                 unescaped_middle = html.unescape(middle)
-                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
                 # url = smart_urlquote(f"https://{unescaped_middle}")
                 protocol = (
                     "https"
@@ -388,7 +397,7 @@ class Urlizer:
                     attrs=nofollow_attr,
                     url=trimmed,
                 )
-                return mark_safe(f"{lead}{middle}{trail}")
+                return SafeString(f"{lead}{middle}{trail}")
             else:
                 if safe_input:
                     return mark_safe(word)
@@ -425,7 +434,7 @@ class Urlizer:
         # Strip all opening wrapping punctuation.
         middle = word.lstrip(self.wrapping_punctuation_openings)
         lead = word[: len(word) - len(middle)]
-        trail = ""
+        trail = deque()
 
         # Continue trimming until middle remains unchanged.
         trimmed_something = True
@@ -438,7 +447,7 @@ class Urlizer:
                     rstripped = middle.rstrip(closing)
                     if rstripped != middle:
                         strip = counts[closing] - counts[opening]
-                        trail = middle[-strip:]
+                        trail.appendleft(middle[-strip:])
                         middle = middle[:-strip]
                         trimmed_something = True
                         counts[closing] -= strip
@@ -449,7 +458,7 @@ class Urlizer:
             else:
                 rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
             if rstripped != middle:
-                trail = middle[len(rstripped) :] + trail
+                trail.appendleft(middle[len(rstripped) :])
                 middle = rstripped
                 trimmed_something = True
 
@@ -462,16 +471,18 @@ class Urlizer:
                     trail_start = len(rstripped)
                     amount_trailing_semicolons = len(middle) - len(middle.rstrip(";"))
                     if amp > -1 and amount_trailing_semicolons > 1:
-                        # Leave up to most recent semicolon as might be an entity.
+                        # Leave up to most recent semicolon as might be an
+                        # entity.
                         recent_semicolon = middle[trail_start:].index(";")
                         middle_semicolon_index = recent_semicolon + trail_start + 1
-                        trail = middle[middle_semicolon_index:] + trail
+                        trail.appendleft(middle[middle_semicolon_index:])
                         middle = rstripped + middle[trail_start:middle_semicolon_index]
                     else:
-                        trail = middle[trail_start:] + trail
+                        trail.appendleft(middle[trail_start:])
                         middle = rstripped
                     trimmed_something = True
 
+        trail = "".join(trail)
         return lead, middle, trail
 
     @staticmethod

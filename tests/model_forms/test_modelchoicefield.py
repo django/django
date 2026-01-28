@@ -52,9 +52,9 @@ class ModelChoiceFieldTests(TestCase):
         c4 = Category.objects.create(name="Fourth", url="4th")
         self.assertEqual(f.clean(c4.id).name, "Fourth")
 
-        # Delete a Category object *after* the ModelChoiceField has already been
-        # instantiated. This proves clean() checks the database during clean()
-        # rather than caching it at instantiation time.
+        # Delete a Category object *after* the ModelChoiceField has already
+        # been instantiated. This proves clean() checks the database during
+        # clean() rather than caching it at instantiation time.
         Category.objects.get(url="4th").delete()
         msg = (
             "['Select a valid choice. That choice is not one of the available "
@@ -402,8 +402,7 @@ class ModelChoiceFieldTests(TestCase):
             <div><label>
             <input type="checkbox" name="name" value="%d" data-slug="third-test">Third
             </label></div></div>
-            """
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+            """ % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_choice_value_hash(self):

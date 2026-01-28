@@ -19,42 +19,42 @@ API reference
 
 .. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
-The warnings and errors raised by system checks must be instances of
-``CheckMessage``. An instance encapsulates a single reportable error or
-warning. It also provides context and hints applicable to the message, and a
-unique identifier that is used for filtering purposes.
+    The warnings and errors raised by system checks must be instances of
+    ``CheckMessage``. An instance encapsulates a single reportable error or
+    warning. It also provides context and hints applicable to the message, and
+    a unique identifier that is used for filtering purposes.
 
-Constructor arguments are:
+    Constructor arguments are:
 
-``level``
-    The severity of the message. Use one of the predefined values: ``DEBUG``,
-    ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is greater or
-    equal to ``ERROR``, then Django will prevent management commands from
-    executing. Messages with level lower than ``ERROR`` (i.e. warnings) are
-    reported to the console, but can be silenced.
+    ``level``
+       The severity of the message. Use one of the predefined values: ``DEBUG``
+       , ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is
+       greater or equal to ``ERROR``, then Django will prevent management
+       commands from executing. Messages with level lower than ``ERROR``
+       (i.e. warnings) are reported to the console, but can be silenced.
 
-``msg``
-    A short (less than 80 characters) string describing the problem. The string
-    should *not* contain newlines.
+    ``msg``
+       A short (less than 80 characters) string describing the problem. The
+       string should *not* contain newlines.
 
-``hint``
-    A single-line string providing a hint for fixing the problem. If no hint
-    can be provided, or the hint is self-evident from the error message, the
-    hint can be omitted, or a value of ``None`` can be used.
+    ``hint``
+       A single-line string providing a hint for fixing the problem. If no hint
+       can be provided, or the hint is self-evident from the error message, the
+       hint can be omitted, or a value of ``None`` can be used.
 
-``obj``
-    Optional. An object providing context for the message (for example, the
-    model where the problem was discovered). The object should be a model,
-    field, or manager or any other object that defines a ``__str__()`` method.
-    The method is used while reporting all messages and its result precedes the
-    message.
+    ``obj``
+       Optional. An object providing context for the message (for example, the
+       model where the problem was discovered). The object should be a model,
+       field, or manager or any other object that defines a ``__str__()``
+       method. The method is used while reporting all messages and its result
+       precedes the message.
 
-``id``
-    Optional string. A unique identifier for the issue. Identifiers should
-    follow the pattern ``applabel.X001``, where ``X`` is one of the letters
-    ``CEWID``, indicating the message severity (``C`` for criticals, ``E`` for
-    errors and so). The number can be allocated by the application, but should
-    be unique within that application.
+    ``id``
+       Optional string. A unique identifier for the issue. Identifiers should
+       follow the pattern ``applabel.X001``, where ``X`` is one of the letters
+       ``CEWID``, indicating the message severity (``C`` for criticals, ``E``
+       for errors and so). The number can be allocated by the application, but
+       should be unique within that application.
 
 There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the
@@ -79,10 +79,10 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flags potential problems with version upgrades.
 * ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
-  are not run by default because they do more than static code analysis as
-  regular checks do. They are only run by the :djadmin:`migrate` command or if
-  you specify configured database aliases using the ``--database`` option when
-  calling the :djadmin:`check` command.
+  are not run by default because they do more than only static code analysis as
+  most regular checks do. They are only run by the :djadmin:`migrate` command
+  or if you specify configured database aliases using the ``--database`` option
+  when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -167,7 +167,7 @@ Model fields
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
 * **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
-  iterable (e.g. a list or tuple).
+  ordered iterable (e.g. a list or tuple, but not a set).
 * **fields.E005**: ``choices`` must be a mapping of actual values to human
   readable names or an iterable containing ``(actual value, human readable
   name)`` tuples.
@@ -189,11 +189,15 @@ Model fields
 * **fields.E121**: ``max_length`` must be a positive integer.
 * **fields.W122**: ``max_length`` is ignored when used with
   ``<integer field type>``.
-* **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
+* **fields.E130**: ``DecimalField``\s must define a ``decimal_places``
+  attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
 * **fields.E133**: ``max_digits`` must be a positive integer.
-* **fields.E134**: ``max_digits`` must be greater or equal to ``decimal_places``.
+* **fields.E134**: ``max_digits`` must be greater or equal to
+  ``decimal_places``.
+* **fields.E135**: ``DecimalField``’s ``max_digits`` and ``decimal_places``
+  must both be defined or both omitted.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
 * **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if
@@ -217,6 +221,7 @@ Model fields
   ``GeneratedField``\s.
 * **fields.E223**: ``GeneratedField.output_field`` has errors: ...
 * **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
+* **fields.W225**: ``null`` has no effect on ``GeneratedField``.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -297,9 +302,16 @@ Related fields
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
   related model ``<app label>.<model>``.
-* **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
-* **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
-  default value.
+* **fields.E320**: Field specifies ``on_delete=<set null option>``, but cannot
+  be null.
+* **fields.E321**: Field specifies ``on_delete=SET_DEFAULT``, but has no
+  ``default`` value.
+* **fields.E322**: Field specifies ``on_delete=DB_SET_DEFAULT``, but has no
+  ``db_default`` value.
+* **fields.E323**: Field specifies database/Python-level on_delete variant, but
+  referenced model uses python/database-level variant.
+* **fields.E324**: ``<database>`` does not support
+  ``<database delete option>``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
@@ -324,7 +336,8 @@ Related fields
   ``<model>``.
 * **fields.E338**: The intermediary model ``<through model>`` has no field
   ``<field name>``.
-* **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
+* **fields.E339**: ``<model>.<field name>`` is not a foreign key to
+  ``<model>``.
 * **fields.E340**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W340**: ``null`` has no effect on ``ManyToManyField``.
@@ -338,8 +351,8 @@ Related fields
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
 * **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
-* **fields.E347**: Field defines a relation to the ``CompositePrimaryKey`` of
-  model ``<model>`` which is not supported.
+* **fields.E347**: Field defines a relation involving model ``<model>`` which
+  has a ``CompositePrimaryKey`` and such relations are not supported.
 * **fields.E348**: Related name ``<related_name>`` for ``<model>.<field name>``
   clashes with the name of a model manager.
 
@@ -382,7 +395,8 @@ Models
 * **models.E019**: Autogenerated column name too long for M2M field
   ``<M2M field>``. Maximum length is ``<maximum length>`` for database
   ``<alias>``.
-* **models.E020**: The ``<model>.check()`` class method is currently overridden.
+* **models.E020**: The ``<model>.check()`` class method is currently
+  overridden.
 * **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
   together.
 * **models.E022**: ``<function>`` contains a lazy reference to
@@ -425,7 +439,8 @@ Models
 * **models.E042**: ``<field name>`` cannot be included in the composite
   primary key.
 * **models.W042**: Auto-created primary key used when not defining a primary
-  key type, by default ``django.db.models.AutoField``.
+  key type, by default ``django.db.models.AutoField``. *This check appeared in
+  Django 3.2 - 5.2*.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
@@ -433,16 +448,22 @@ Models
   expression and won't be validated during the model ``full_clean()``.
 * **models.W046**: ``<database>`` does not support comments on tables
   (``db_table_comment``).
-* **models.W047**: ``<database>`` does not support unique constraints with
-  nulls distinct.
+* **models.W047**: ``<database>`` does not support
+  ``UniqueConstraint.nulls_distinct``.
 * **models.E048**: ``constraints/indexes/unique_together`` refers to a
   ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
   not supported for that option.
+* **models.E049**: ``constraints/indexes/unique_together`` refers to a
+  ``ForeignObject`` ``<field name>`` with multiple ``from_fields``, which is
+  not supported for that option.
+* **models.E050**: The model cannot have related fields with both
+  database-level and Python-level ``on_delete`` variants.
 
 Management Commands
 -------------------
 
-The following checks verify custom management commands are correctly configured:
+The following checks verify custom management commands are correctly
+configured:
 
 * **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
   the same ``autodetector``.
@@ -489,12 +510,13 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W005**: You have not set the
   :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
   your site is potentially vulnerable to attack via an insecure connection to a
-  subdomain. Only set this to ``True`` if you are certain that all subdomains of
-  your domain should be served exclusively via SSL.
+  subdomain. Only set this to ``True`` if you are certain that all subdomains
+  of your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
   ``'X-Content-Type-Options: nosniff'`` header. You should consider enabling
-  this header to prevent the browser from identifying content types incorrectly.
+  this header to prevent the browser from identifying content types
+  incorrectly.
 * **security.W007**: Your ``SECURE_BROWSER_XSS_FILTER`` setting is not
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
@@ -504,7 +526,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
-  a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
+  a load balancer or reverse-proxy server  to redirect all connections to
+  HTTPS.
 * **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters,
   less than 5 unique characters, or it's prefixed with ``'django-insecure-'``
   indicating that it was generated automatically by Django. Please generate a
@@ -521,18 +544,19 @@ The following checks are run if you use the :option:`check --deploy` option:
   to ``True``. Using a secure-only session cookie makes it more difficult for
   network traffic sniffers to hijack user sessions.
 * **security.W012**: :setting:`SESSION_COOKIE_SECURE` is not set to ``True``.
-  Using a secure-only session cookie makes it more difficult for network traffic
-  sniffers to hijack user sessions.
+  Using a secure-only session cookie makes it more difficult for network
+  traffic sniffers to hijack user sessions.
 * **security.W013**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS`, but you have not set
   :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
-  cookie makes it more difficult for cross-site scripting attacks to hijack user
-  sessions.
+  cookie makes it more difficult for cross-site scripting attacks to hijack
+  user sessions.
 * **security.W014**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE`, but you have not set :setting:`SESSION_COOKIE_HTTPONLY`
-  to ``True``. Using an ``HttpOnly`` session cookie makes it more difficult for
-  cross-site scripting attacks to hijack user sessions.
+  :setting:`MIDDLEWARE`, but you have not set
+  :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
+  cookie makes it more difficult for cross-site scripting attacks to hijack
+  user sessions.
 * **security.W015**: :setting:`SESSION_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` session cookie makes it more difficult for cross-site
   scripting attacks to hijack user sessions.
@@ -585,8 +609,8 @@ Signals
 -------
 
 * **signals.E001**: ``<handler>`` was connected to the ``<signal>`` signal with
-  a lazy reference to the sender ``<app label>.<model>``, but app ``<app label>``
-  isn't installed or doesn't provide model ``<model>``.
+  a lazy reference to the sender ``<app label>.<model>``, but app
+  ``<app label>`` isn't installed or doesn't provide model ``<model>``.
 
 Templates
 ---------
@@ -818,11 +842,11 @@ The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
 registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 
-* **admin.E301**: ``'ct_field'`` references ``<label>``, which is not a field
+* **admin.E301**: ``<model>`` has no ``GenericForeignKey``.
+* **admin.E302**: ``'ct_field'`` references ``<label>``, which is not a field
   on ``<model>``.
-* **admin.E302**: ``'ct_fk_field'`` references ``<label>``, which is not a
+* **admin.E303**: ``'ct_fk_field'`` references ``<label>``, which is not a
   field on ``<model>``.
-* **admin.E303**: ``<model>`` has no ``GenericForeignKey``.
 * **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
   field ``<field name>`` and object ID field ``<field name>``.
 
@@ -871,8 +895,8 @@ The following checks are performed on the default
   unique.
 * **auth.E005**: The permission codenamed ``<codename>`` clashes with a builtin
   permission for model ``<model>``.
-* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for model
-  ``<model>``.
+* **auth.E006**: The permission codenamed ``<codename>`` is duplicated for
+  model ``<model>``.
 * **auth.E007**: The :attr:`verbose_name
   <django.db.models.Options.verbose_name>` of model ``<model>`` must be at most
   244 characters for its builtin permission names
@@ -909,6 +933,8 @@ The following checks are performed when a model contains a
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
 * **contenttypes.E005**: Model names must be at most 100 characters.
+* **contenttypes.E006**: ``<field>`` cannot use the database-level
+  ``on_delete`` variant.
 
 ``postgres``
 ------------

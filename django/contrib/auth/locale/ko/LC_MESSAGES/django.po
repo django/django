@@ -8,6 +8,7 @@
 # Dummy Iam, 2021
 # Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
@@ -23,8 +24,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Lee Dogeon <dev.moreal@gmail.com>, 2025\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"Last-Translator: Jamie Seol, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -274,7 +275,7 @@ msgstr "사용자(들)"
 msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
 "This password is too short. It must contain at least %d characters."
-msgstr[0] ""
+msgstr[0] "이 비밀번호는 너무 짧습니다. 최소 %d자 이상이어야 합니다."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -289,7 +290,7 @@ msgid "Your password can’t be too similar to your other personal information."
 msgstr "다른 개인 정보와 유사한 비밀번호는 사용할 수 없습니다."
 
 msgid "This password is too common."
-msgstr "비밀번호가 너무 일상적인 단어입니다."
+msgstr "너무 흔히 사용되는 비밀번호입니다."
 
 msgid "Your password can’t be a commonly used password."
 msgstr "통상적으로 자주 사용되는 비밀번호는 사용할 수 없습니다."

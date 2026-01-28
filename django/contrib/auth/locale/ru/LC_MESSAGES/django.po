@@ -4,7 +4,7 @@
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Ivan Khomutov <iskhomutov@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 # Влад Мещеряков <victimofamisery@gmail.com>, 2021
 # Bobsans <mr.bobsans@gmail.com>, 2016
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -65,11 +65,11 @@ msgstr "пароль"
 msgid "last login"
 msgstr "последний вход"
 
-msgid "No password set."
-msgstr "Пароль не задан."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Неизвестный формат пароля или алгоритм хеширования."
+
+msgid "No password set."
+msgstr "Пароль не задан."
 
 msgid "Reset password"
 msgstr "Сбросить пароль"
@@ -80,15 +80,6 @@ msgstr "Задать пароль"
 msgid "The two password fields didn’t match."
 msgstr "Введенные пароли не совпадают."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Может ли пользователь аутентифироваться по паролю. Если эта возможность "
-"выключена, пользователь всё ещё может аутентифицироваться иными способами, "
-"например, Single Sing-On или LDAP, если они сконфигурированы и разрешены."
-
 msgid "Password"
 msgstr "Пароль"
 
@@ -97,6 +88,15 @@ msgstr "Подтверждение пароля"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Для подтверждения введите, пожалуйста, пароль ещё раз."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Может ли пользователь аутентифироваться по паролю. Если эта возможность "
+"выключена, пользователь всё ещё может аутентифицироваться иными способами, "
+"например, Single Sing-On или LDAP, если они сконфигурированы и разрешены."
 
 msgid "Password-based authentication"
 msgstr "Аутентификация по паролю"
@@ -269,24 +269,21 @@ msgid "users"
 msgstr "пользователи"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Введённый пароль слишком короткий. Он должен содержать как минимум "
-"%(min_length)d символ."
+"Введённый пароль слишком короткий. Он должен состоять из как минимум %d "
+"символ."
 msgstr[1] ""
-"Введённый пароль слишком короткий. Он должен содержать как минимум "
-"%(min_length)d символа."
+"Введённый пароль слишком короткий. Он должен состоять из как минимум %d "
+"символа."
 msgstr[2] ""
-"Введённый пароль слишком короткий. Он должен содержать как минимум "
-"%(min_length)d символов."
+"Введённый пароль слишком короткий. Он должен состоять из как минимум %d "
+"символов."
 msgstr[3] ""
-"Введённый пароль слишком короткий. Он должен содержать как минимум "
-"%(min_length)d символов."
+"Введённый пароль слишком короткий. Он должен состоять из как минимум %d "
+"символов."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

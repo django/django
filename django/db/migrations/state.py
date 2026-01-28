@@ -73,9 +73,10 @@ def get_related_models_recursive(model):
 
     Relationships are either defined by explicit relational fields, like
     ForeignKey, ManyToManyField or OneToOneField, or by inheriting from another
-    model (a superclass is related to its subclasses, but not vice versa). Note,
-    however, that a model inheriting from a concrete model is also related to
-    its superclass through the implicit *_ptr OneToOneField on the subclass.
+    model (a superclass is related to its subclasses, but not vice versa).
+    Note, however, that a model inheriting from a concrete model is also
+    related to its superclass through the implicit *_ptr OneToOneField on the
+    subclass.
     """
     seen = set()
     queue = _get_related_models(model)
@@ -760,7 +761,7 @@ class ModelState:
                 raise ValueError(
                     'ModelState.fields cannot be bound to a model - "%s" is.' % name
                 )
-            # Sanity-check that relation fields are NOT referring to a model class.
+            # Ensure that relation fields are NOT referring to a model class.
             if field.is_relation and hasattr(field.related_model, "_meta"):
                 raise ValueError(
                     'Model fields in "ModelState.fields" cannot refer to a model class '

@@ -43,6 +43,7 @@ from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
+from django.template.base import PartialTemplate
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -138,10 +139,22 @@ class _AssertTemplateUsedContext:
         self.rendered_templates.append(template)
         self.context.append(copy(context))
 
+    @property
+    def rendered_template_names(self):
+        return [
+            (
+                f"{t.origin.template_name}#{t.name}"
+                if isinstance(t, PartialTemplate)
+                else t.name
+            )
+            for t in self.rendered_templates
+            if t.name is not None
+        ]
+
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            [t.name for t in self.rendered_templates if t.name is not None],
+            self.rendered_template_names,
             self.msg_prefix,
             self.count,
         )
@@ -159,11 +172,8 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        rendered_template_names = [
-            t.name for t in self.rendered_templates if t.name is not None
-        ]
         self.test_case.assertFalse(
-            self.template_name in rendered_template_names,
+            self.template_name in self.rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )
@@ -281,7 +291,8 @@ class SimpleTestCase(unittest.TestCase):
                 # Dynamically created connections are always allowed.
                 and self.alias in connections
             ):
-                # Connection has not yet been established, but the alias is not allowed.
+                # Connection has not yet been established, but the alias is not
+                # allowed.
                 message = cls._disallowed_database_msg % {
                     "test": f"{cls.__module__}.{cls.__qualname__}",
                     "alias": self.alias,
@@ -1231,9 +1242,9 @@ class TransactionTestCase(SimpleTestCase):
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
-                # of these statements is lost, which can affect the operation of
-                # tests (e.g., losing a timezone setting causing objects to be
-                # created with the wrong time). To make sure this doesn't
+                # of these statements is lost, which can affect the operation
+                # of tests (e.g., losing a timezone setting causing objects to
+                # be created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
                 for conn in connections.all(initialized_only=True):
                     conn.close()
@@ -1512,11 +1523,11 @@ class TestCase(TransactionTestCase):
                             try:
                                 callback()
                             except Exception as e:
-                                logger.error(
-                                    f"Error calling {callback.__qualname__} in "
-                                    f"on_commit() (%s).",
+                                name = getattr(callback, "__qualname__", callback)
+                                logger.exception(
+                                    "Error calling %s in on_commit() (%s).",
+                                    name,
                                     e,
-                                    exc_info=True,
                                 )
                         else:
                             callback()
@@ -1783,9 +1794,9 @@ class LiveServerTestCase(TransactionTestCase):
     framework, such as Selenium for example, instead of the built-in dummy
     client.
     It inherits from TransactionTestCase instead of TestCase because the
-    threads don't share the same transactions (unless if using in-memory sqlite)
-    and each thread needs to commit all their transactions so that the other
-    thread can see the changes.
+    threads don't share the same transactions (unless if using in-memory
+    sqlite) and each thread needs to commit all their transactions so that the
+    other thread can see the changes.
     """
 
     host = "localhost"

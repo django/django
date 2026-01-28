@@ -284,8 +284,9 @@ class IfChangedTests(SimpleTestCase):
         )
 
         # Using generator to mimic concurrency.
-        # The generator is not passed to the 'for' loop, because it does a list(values)
-        # instead, call gen.next() in the template to control the generator.
+        # The generator is not passed to the 'for' loop, because it does a
+        # list(values) instead, call gen.next() in the template to control the
+        # generator.
         def gen():
             yield 1
             yield 2

@@ -114,7 +114,8 @@ class LogEntryTests(TestCase):
 
     def test_logentry_change_message_localized_datetime_input(self):
         """
-        Localized date/time inputs shouldn't affect changed form data detection.
+        Localized date/time inputs shouldn't affect changed form data
+        detection.
         """
         post_data = {
             "site": self.site.pk,

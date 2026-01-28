@@ -19,6 +19,7 @@ from django.db import (
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper
+from django.db.models import BigAutoField, Value
 from django.db.models.sql.constants import CURSOR
 from django.test import (
     TestCase,
@@ -57,8 +58,8 @@ class DateQuotingTest(TestCase):
 
     def test_django_date_extract(self):
         """
-        Test the custom ``django_date_extract method``, in particular against fields
-        which clash with strings passed to it (e.g. 'day') (#12818).
+        Test the custom ``django_date_extract method``, in particular against
+        fields which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
         SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -234,7 +235,10 @@ class LongNameTest(TransactionTestCase):
 @skipUnlessDBFeature("supports_sequence_reset")
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
-        "Sequence names are correct when resetting generic relations (Ref #13941)"
+        """
+        Sequence names are correct when resetting generic relations (Ref
+        #13941)
+        """
         # Create an object with a manually specified PK
         Post.objects.create(id=10, name="1st post", text="hello world")
 
@@ -737,7 +741,8 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_check_constraints(self):
         """
-        Constraint checks should raise an IntegrityError when bad data is in the DB.
+        Constraint checks should raise an IntegrityError when bad data is in
+        the DB.
         """
         with transaction.atomic():
             # Create an Article.
@@ -962,7 +967,7 @@ class ThreadTests(TransactionTestCase):
             connection.dec_thread_sharing()
 
 
-class MySQLPKZeroTests(TestCase):
+class MySQLAutoPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
     does not allow zero for autoincrement primary key if the
@@ -971,8 +976,15 @@ class MySQLPKZeroTests(TestCase):
 
     @skipIfDBFeature("allows_auto_pk_0")
     def test_zero_as_autoval(self):
-        with self.assertRaises(ValueError):
+        msg = "The database backend does not accept 0 as a value for AutoField."
+        with self.assertRaisesMessage(ValueError, msg):
             Square.objects.create(id=0, root=0, square=1)
+        with self.assertRaisesMessage(ValueError, msg):
+            Square.objects.create(id=Value(0, BigAutoField()), root=0, square=1)
+
+    @skipIfDBFeature("allows_auto_pk_0")
+    def test_no_error_when_filtering_with_expression(self):
+        self.assertSequenceEqual(Square.objects.filter(id=Value(0, BigAutoField())), ())
 
 
 class DBConstraintTestCase(TestCase):

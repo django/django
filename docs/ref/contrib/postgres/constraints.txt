@@ -73,9 +73,13 @@ creates an exclusion constraint on ``circle`` using ``circle_ops``.
 
 .. attribute:: ExclusionConstraint.index_type
 
-The index type of the constraint. Accepted values are ``GIST`` or ``SPGIST``.
-Matching is case insensitive. If not provided, the default index type is
-``GIST``.
+The index type of the constraint. Accepted values are ``GiST``, ``Hash``, or
+``SPGiST``. Matching is case insensitive. If not provided, the default index
+type is ``GIST``.
+
+.. versionchanged:: 6.1
+
+    Support for exclusion constraints using Hash indexes was added.
 
 ``condition``
 -------------
@@ -100,7 +104,6 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import RangeOperators
     from django.db.models import Deferrable
-
 
     ExclusionConstraint(
         name="exclude_overlapping_deferred",
@@ -130,8 +133,7 @@ used for queries that select only included fields
 (:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
 (:attr:`~ExclusionConstraint.expressions`).
 
-``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
-``include`` for SP-GiST indexes.
+``include`` is supported for GiST and SP-GiST indexes.
 
 ``violation_error_code``
 ------------------------

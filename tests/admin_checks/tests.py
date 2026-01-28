@@ -680,9 +680,9 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_fk_exclusion(self):
         """
-        Regression test for #11709 - when testing for fk excluding (when exclude is
-        given) make sure fk_name is honored or things blow up when there is more
-        than one fk to the parent model.
+        Regression test for #11709 - when testing for fk excluding (when
+        exclude is given) make sure fk_name is honored or things blow up when
+        there is more than one fk to the parent model.
         """
 
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -859,9 +859,9 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_graceful_m2m_fail(self):
         """
-        Regression test for #12203/#12237 - Fail more gracefully when a M2M field that
-        specifies the 'through' option is included in the 'fields' or the 'fieldsets'
-        ModelAdmin options.
+        Regression test for #12203/#12237 - Fail more gracefully when a M2M
+        field that specifies the 'through' option is included in the 'fields'
+        or the 'fieldsets' ModelAdmin options.
         """
 
         class BookAdmin(admin.ModelAdmin):
@@ -946,7 +946,8 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_non_model_first_field(self):
         """
         Regression for ensuring ModelAdmin.field can handle first elem being a
-        non-model field (test fix for UnboundLocalError introduced with r16225).
+        non-model field (test fix for UnboundLocalError introduced with
+        r16225).
         """
 
         class SongForm(forms.ModelForm):

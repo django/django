@@ -36,6 +36,7 @@ if "%1" == "help" (
 	echo.  doctest    to run all doctests embedded in the documentation if enabled
 	echo.  spelling   to check for typos in documentation
 	echo.  black      to apply the black formatting to code blocks in documentation
+	echo.  lint       to check for linting errors in documentation
 	goto end
 )
 
@@ -189,20 +190,48 @@ results in %BUILDDIR%/doctest/output.txt.
 )
 
 if "%1" == "spelling" (
-	%SPHINXBUILD% -b spelling %ALLSPHINXOPTS% %BUILDDIR%/spelling
-	if errorlevel 1 exit /b 1
-	echo.
-	echo.Check finished. Wrong words can be found in %BUILDDIR%/^
-spelling/output.txt.
+	call :run_spelling
 	goto end
 )
 
 if "%1" == "black" (
+	call :run_black
+	goto end
+)
+
+if "%1" == "lint" (
+	call :run_lint
+	goto end
+)
+
+if "%1" == "check" (
+	call :run_lint
+	call :run_black
+	call :run_spelling
+	echo.
+	echo.All checks completed.
+	goto end
+)
+
+:run_spelling
+	%SPHINXBUILD% -b spelling %ALLSPHINXOPTS% %BUILDDIR%/spelling
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Check finished. Wrong words can be found in %BUILDDIR%/spelling/output.txt.
+	exit /b
+
+:run_black
 	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_theme"`) do (
 		blacken-docs --rst-literal-block %%i
 	)
 	echo.
 	echo.Code blocks reformatted
-)
+	exit /b
+
+:run_lint
+	python lint.py
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Documentation lint complete.
 
 :end

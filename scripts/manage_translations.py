@@ -16,7 +16,7 @@
 # operation to the specified language or resource. For example, to get stats
 # for Spanish in contrib.admin, run:
 #
-#  $ python scripts/manage_translations.py lang_stats --language=es --resources=admin
+#  $ python scripts/manage_translations.py lang_stats -l es -r admin
 #
 # Also each command supports a --verbosity option to get progress feedback.
 
@@ -146,7 +146,8 @@ def _get_locale_dirs(resources, include_core=True):
     """
     Return a tuple (contrib name, absolute path) for all locale directories,
     optionally including the django core catalog.
-    If resources list is not None, filter directories matching resources content.
+    If resources list is not None, filter directories matching resources
+    content.
     """
     contrib_dir = os.path.join(os.getcwd(), "django", "contrib")
     dirs = []

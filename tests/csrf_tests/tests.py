@@ -441,7 +441,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
     def test_process_request_csrf_cookie_and_token(self):
         """
-        If both a cookie and a token is present, the middleware lets it through.
+        If both a cookie and a token is present, the middleware lets it
+        through.
         """
         req = self._get_POST_request_with_token()
         mw = CsrfViewMiddleware(post_form_view)
@@ -718,14 +719,16 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
         # >>> urlsplit('//example.com/')
-        # SplitResult(scheme='', netloc='example.com', path='/', query='', fragment='')
+        # SplitResult(scheme='', netloc='example.com', path='/', query='',
+        # fragment='')
         req.META["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing netloc
         # >>> urlsplit('https://')
-        # SplitResult(scheme='https', netloc='', path='', query='', fragment='')
+        # SplitResult(scheme='https', netloc='', path='', query='',
+        # fragment='')
         req.META["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})

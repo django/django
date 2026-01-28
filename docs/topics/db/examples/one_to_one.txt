@@ -139,7 +139,8 @@ Restaurants:
     >>> Place.objects.order_by("name")
     <QuerySet [<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]>
 
-You can query the models using :ref:`lookups across relationships <lookups-that-span-relationships>`:
+You can query the models using :ref:`lookups across relationships
+<lookups-that-span-relationships>`:
 
 .. code-block:: pycon
 

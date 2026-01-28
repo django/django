@@ -1,14 +1,14 @@
-============================================
-Django 6.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 6.0 release notes
+========================
 
-*Expected December 2025*
+*December 3, 2025*
 
 Welcome to Django 6.0!
 
 These release notes cover the :ref:`new features <whats-new-6.0>`, as well as
-some :ref:`backwards incompatible changes <backwards-incompatible-6.0>` you'll
-want to be aware of when upgrading from Django 5.2 or earlier. We've
+some :ref:`backwards incompatible changes <backwards-incompatible-6.0>` you
+should be aware of when upgrading from Django 5.2 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-6.0>`.
 
@@ -18,13 +18,13 @@ project.
 Python compatibility
 ====================
 
-Django 6.0 supports Python 3.12 and 3.13. We **highly recommend** and only
-officially support the latest release of each series.
+Django 6.0 supports Python 3.12, 3.13, and 3.14. We **highly recommend**, and
+only officially support, the latest release of each series.
 
 The Django 5.2.x series is the last to support Python 3.10 and 3.11.
 
-Third-party library support for older version of Django
-=======================================================
+Third-party library support for older versions of Django
+========================================================
 
 Following the release of Django 6.0, we suggest that third-party app authors
 drop support for all versions of Django prior to 5.2. At that time, you should
@@ -72,7 +72,86 @@ The resulting ``Content-Security-Policy`` header would be set to:
 
 To get started, follow the :doc:`CSP how-to guide </howto/csp>`. For in-depth
 guidance, see the :ref:`CSP security overview <security-csp>` and the
-:doc:`reference docs </ref/csp>`.
+:doc:`reference docs </ref/csp>`, which include details about decorators to
+override or disable policies on a per-view basis.
+
+Template Partials
+-----------------
+
+The :ref:`Django Template Language <template-language-intro>` now supports
+:ref:`template partials <template-partials>`, making it easier to encapsulate
+and reuse small named fragments within a template file. The new tags
+:ttag:`{% partialdef %} <partialdef>` and :ttag:`{% partial %} <partial>`
+define a partial and render it, respectively.
+
+Partials can also be referenced using the ``template_name#partial_name`` syntax
+with :func:`~django.template.Engine.get_template`,
+:func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
+template-loading tools, enabling more modular and maintainable templates
+without needing to split components into separate files.
+
+A `migration guide`_ is available if you're updating from the
+:pypi:`django-template-partials` third-party package.
+
+.. _migration guide: https://github.com/carltongibson/django-template-partials/blob/main/Migration.md
+
+Background Tasks
+----------------
+
+Django now includes a built-in Tasks framework for running code outside the
+HTTP request–response cycle. This enables offloading work, such as sending
+emails or processing data, to background workers.
+
+The framework provides task definition, validation, queuing, and result
+handling. Django guarantees consistent behavior for creating and managing
+tasks, while the responsibility for running them continues to belong to
+external worker processes.
+
+Tasks are defined using the :func:`~django.tasks.task` decorator::
+
+    from django.core.mail import send_mail
+    from django.tasks import task
+
+
+    @task
+    def email_users(emails, subject, message):
+        return send_mail(subject, message, None, emails)
+
+Once defined, tasks can be enqueued through a configured backend::
+
+    email_users.enqueue(
+        emails=["user@example.com"],
+        subject="You have a message",
+        message="Hello there!",
+    )
+
+Backends are configured via the :setting:`TASKS` setting. The :ref:`two
+built-in backends <task-available-backends>` included in this release are
+primarily intended for development and testing.
+
+Django handles task creation and queuing, but does not provide a worker
+mechanism to run tasks. Execution must be managed by external infrastructure,
+such as a separate process or service.
+
+See :doc:`/topics/tasks` for an overview and the :doc:`Tasks reference
+</ref/tasks>` for API details.
+
+Adoption of Python's modern email API
+-------------------------------------
+
+Email handling in Django now uses Python's modern email API, introduced in
+Python 3.6. This API, centered around the
+:class:`email.message.EmailMessage` class, offers a cleaner and
+Unicode-friendly interface for composing and sending emails. It replaces use of
+Python's older legacy (``Compat32``) API, which relied on lower-level MIME
+classes (from :mod:`email.mime`) and required more manual handling of
+message structure and encoding.
+
+Notably, the return type of the :meth:`EmailMessage.message()
+<django.core.mail.EmailMessage.message>` method is now an instance of Python's
+:class:`email.message.EmailMessage`. This supports the same API as the
+previous ``SafeMIMEText`` and ``SafeMIMEMultipart`` return types, but is not an
+instance of those now-deprecated classes.
 
 Minor features
 --------------
@@ -83,22 +162,20 @@ Minor features
 * The Font Awesome Free icon set (version 6.7.2) is now used for the admin
   interface icons.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 * The new :attr:`.AdminSite.password_change_form` attribute allows customizing
   the form used in the admin site password change view.
+
+* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
+  icons and CSS styling. Previously, both levels shared the same appearance as
+  ``messages.SUCCESS``. Given that :meth:`.ModelAdmin.message_user` uses
+  ``messages.INFO`` by default, set the level to ``messages.SUCCESS`` to keep
+  the previous icon and styling.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,000,000 to 1,200,000.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,13 +200,19 @@ Minor features
   :class:`GeometryType() <django.contrib.gis.db.models.functions.GeometryType>`
   database function allow filtering geometries by their types.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
+  inline JavaScript in templates. If you have customized any geometry widgets
+  or their templates, you may need to :ref:`update them
+  <geometry-widgets-customization>` to match the new layout.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :class:`Lexeme <django.contrib.postgres.search.Lexeme>` expression
+  for full text search provides fine-grained control over search terms.
+  ``Lexeme`` objects automatically escape their input and support logical
+  combination operators (``&``, ``|``, ``~``), prefix matching, and term
+  weighting.
 
 * Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
   now include system checks to verify that ``django.contrib.postgres`` is an
@@ -143,26 +226,6 @@ Minor features
   parameter. This allows providing database hints to database routers to assist
   them in :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -170,65 +233,26 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
+* The :djadmin:`collectstatic` command now reports only a summary for skipped
+  files (and for deleted files when using ``--clear``) at ``--verbosity`` 1. To
+  see per-file details for either case, set ``--verbosity`` to 2 or higher.
 
 Email
 ~~~~~
 
-* ...
+* The new ``policy`` argument for :meth:`EmailMessage.message()
+  <django.core.mail.EmailMessage.message>` allows specifying the email policy,
+  the set of rules for updating and serializing the representation of the
+  message. Defaults to :data:`email.policy.default`.
 
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-Forms
-~~~~~
-
-* ...
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
+* :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` now
+  accepts a :class:`~email.message.MIMEPart` object from Python's modern email
+  API.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-Logging
-~~~~~~~
-
-* ...
+* Added support and translations for the Haitian Creole language.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -274,12 +298,26 @@ Models
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
 
+* Subqueries returning a :class:`~django.db.models.CompositePrimaryKey` can now
+  be used as the target of lookups other than ``__in``, such as ``__exact``.
+
 * :class:`~django.db.models.JSONField` now supports
   :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
 
 * The new :class:`~django.db.models.AnyValue` aggregate returns an arbitrary
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
+
+* :class:`~django.db.models.GeneratedField`\s and :ref:`fields assigned
+  expressions <avoiding-race-conditions-using-f>` are now refreshed from the
+  database after :meth:`~django.db.models.Model.save` on backends that support
+  the ``RETURNING`` clause (SQLite, PostgreSQL, and Oracle). On backends that
+  don't support it (MySQL and MariaDB), the fields are marked as deferred to
+  trigger a refresh on subsequent accesses.
+
+* Using a :ref:`ForeignObject <cpk-and-relations>` with multiple
+  ``from_fields`` in Model indexes, constraints, or :attr:`unique_together
+  <django.db.models.Options.unique_together>` now emits a system check error.
 
 Pagination
 ~~~~~~~~~~
@@ -292,22 +330,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
+* Multiple ``Cookie`` headers are now supported for HTTP/2 requests when
+  running with ASGI.
 
 Templates
 ~~~~~~~~~
@@ -325,22 +349,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
-
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
+* The :class:`.DiscoverRunner` now supports parallel test execution on systems
+  using the ``forkserver`` :mod:`multiprocessing` start method.
 
 .. _backwards-incompatible-6.0:
 
@@ -353,11 +363,23 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
-  ``serialize_db_to_string()`` instead.
-
 * :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
   PostgreSQL backends no longer use ``CASCADE`` when dropping a column.
+
+* ``DatabaseOperations.return_insert_columns()`` and
+  ``DatabaseOperations.fetch_returned_insert_rows()`` methods are renamed to
+  ``returning_columns()`` and ``fetch_returned_rows()``, respectively, to
+  denote they can be used in the context of ``UPDATE … RETURNING`` statements
+  as well as ``INSERT … RETURNING``.
+
+* The ``DatabaseOperations.fetch_returned_insert_columns()`` method is removed
+  and the ``fetch_returned_rows()`` method replacing
+  ``fetch_returned_insert_rows()`` expects both a ``cursor`` and
+  ``returning_params`` to be provided, just like
+  ``fetch_returned_insert_columns()`` did.
+
+* If the database supports ``UPDATE … RETURNING`` statements, backends can set
+  ``DatabaseFeatures.can_return_rows_from_update=True``.
 
 Dropped support for MariaDB 10.5
 --------------------------------
@@ -375,6 +397,7 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``aiosmtpd`` 1.4.5
 * ``argon2-cffi`` 23.1.0
 * ``bcrypt`` 4.1.1
+* ``docutils`` 0.22
 * ``geoip2`` 4.8.0
 * ``Pillow`` 10.1.0
 * ``mysqlclient`` 2.2.1
@@ -387,30 +410,82 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``sqlparse`` 0.5.0
 * ``tblib`` 3.0.0
 
+Email
+-----
+
+* The undocumented ``mixed_subtype`` and ``alternative_subtype`` properties
+  of :class:`~django.core.mail.EmailMessage` and
+  :class:`~django.core.mail.EmailMultiAlternatives` are no longer supported.
+
+* The undocumented ``encoding`` property of
+  :class:`~django.core.mail.EmailMessage` no longer supports Python legacy
+  :class:`email.charset.Charset` objects.
+
+* As the internal implementations of :class:`~django.core.mail.EmailMessage`
+  and :class:`~django.core.mail.EmailMultiAlternatives` have changed
+  significantly, closely examine any custom subclasses that rely on overriding
+  undocumented, internal underscore methods.
+
+``DEFAULT_AUTO_FIELD`` setting now defaults to ``BigAutoField``
+---------------------------------------------------------------
+
+Since Django 3.2, when the :setting:`DEFAULT_AUTO_FIELD` setting was added,
+the default :djadmin:`startproject` template's ``settings.py`` contained::
+
+    DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+and the default :djadmin:`startapp` template's ``AppConfig`` contained::
+
+    default_auto_field = "django.db.models.BigAutoField"
+
+At that time, the default value of :setting:`DEFAULT_AUTO_FIELD` remained
+:class:`django.db.models.AutoField` for backwards compatibility.
+
+In Django 6.0, :setting:`DEFAULT_AUTO_FIELD` now defaults to
+:class:`django.db.models.BigAutoField` and the aforementioned lines in the
+project and app templates are removed.
+
+Most projects shouldn't be affected, since Django 3.2 has raised the system
+check warning **models.W042** for projects that don't set
+:setting:`DEFAULT_AUTO_FIELD`.
+
+If you haven't dealt with this warning by now, add
+``DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'`` to your project's
+settings, or ``default_auto_field = 'django.db.models.AutoField'`` to an app's
+``AppConfig``, as needed.
+
+Custom ORM expressions should return params as a tuple
+------------------------------------------------------
+
+Prior to Django 6.0, :doc:`custom lookups </howto/custom-lookups>` and
+:ref:`custom expressions <writing-your-own-query-expressions>` implementing the
+``as_sql()`` method (and its supporting methods ``process_lhs()`` and
+``process_rhs()``) were allowed to return a sequence of params in either a list
+or a tuple. To address the interoperability problems that resulted, the second
+return element of the ``as_sql()`` method should now be a tuple::
+
+  def as_sql(self, compiler, connection) -> tuple[str, tuple]: ...
+
+If your custom expressions support multiple versions of Django, you should
+adjust any pre-processing of parameters to be resilient against either tuples
+or lists. For instance, prefer unpacking like this::
+
+  params = (*lhs_params, *rhs_params)
+
 Miscellaneous
 -------------
 
 * The :ref:`JSON <serialization-formats-json>` serializer now writes a newline
   at the end of the output, even without the ``indent`` option set.
 
-* The undocumented ``django.utils.http.parse_header_parameters()`` function is
-  refactored to use Python's :py:class:`email.message.Message` for parsing.
-  Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
-
-* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
-  inline JavaScript in templates. If you have customized any geometry widgets
-  or their templates, you may need to :ref:`update them
-  <geometry-widgets-customization>` to match the new layout.
-
-* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
-  icons and CSS styling in the admin. Previously, these used the same icon and
-  styling as the ``messages.SUCCESS`` level. Since
-  :meth:`.ModelAdmin.message_user` uses the ``messages.INFO`` level by default,
-  set the level to ``messages.SUCCESS`` to retain the previous icon and
-  styling.
-
 * The minimum supported version of ``asgiref`` is increased from 3.8.1 to
   3.9.1.
+
+.. currentmodule:: django.db.models
+
+* :meth:`Field.pre_save` may now be called more than once when saving model
+  instances, so custom implementations should be idempotent and free of side
+  effects.
 
 .. _deprecated-features-6.0:
 
@@ -420,22 +495,18 @@ Features deprecated in 6.0
 Positional arguments in ``django.core.mail`` APIs
 -------------------------------------------------
 
-.. currentmodule:: django.core.mail
-
 :mod:`django.core.mail` APIs now require keyword arguments for less commonly
 used parameters. Using positional arguments for these now emits a deprecation
-warning and will raise a :exc:`TypeError` when the deprecation period ends.
+warning and will raise a :exc:`TypeError` when the deprecation period ends:
 
 * All *optional* parameters (``fail_silently`` and later) must be passed as
-  keyword arguments to :func:`get_connection`,  :func:`mail_admins`,
-  :func:`mail_managers`, :func:`send_mail`, and :func:`send_mass_mail`.
+  keyword arguments to :func:`.get_connection`, :func:`.mail_admins`,
+  :func:`.mail_managers`, :func:`.send_mail`, and :func:`.send_mass_mail`.
 
 * All parameters must be passed as keyword arguments when creating an
-  :class:`EmailMessage` or :class:`EmailMultiAlternatives` instance, except for
-  the first four (``subject``, ``body``, ``from_email``, and ``to``), which may
-  still be passed either as positional or keyword arguments.
-
-.. currentmodule:: None
+  :class:`.EmailMessage` or :class:`.EmailMultiAlternatives` instance, except
+  for the first four (``subject``, ``body``, ``from_email``, and ``to``), which
+  may still be passed either as positional or keyword arguments.
 
 Miscellaneous
 -------------
@@ -447,14 +518,15 @@ Miscellaneous
   available :class:`~django.db.models.StringAgg` class.
 
 * The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
-  ``order_by`` attribute now available on the ``Aggregate`` class.
+  ``order_by`` attribute now available on the
+  :class:`~django.db.models.Aggregate` class.
 
 * The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` will
   change from HTTP to HTTPS in Django 7.0. Set the transitional setting
-  ``URLIZE_ASSUME_HTTPS`` to ``True`` to opt into assuming HTTPS during the
-  Django 6.x release cycle.
+  :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to opt into assuming HTTPS during
+  the Django 6.x release cycle.
 
-* ``URLIZE_ASSUME_HTTPS`` transitional setting is deprecated.
+* The :setting:`URLIZE_ASSUME_HTTPS` transitional setting is deprecated.
 
 * Setting :setting:`ADMINS` or :setting:`MANAGERS` to a list of (name, address)
   tuples is deprecated. Set to a list of email address strings instead. Django
@@ -466,6 +538,23 @@ Miscellaneous
   :class:`django.core.paginator.AsyncPaginator` is deprecated.
 
 * Using a percent sign in a column alias or annotation is deprecated.
+
+* Support for passing Python's legacy email :class:`~email.mime.base.MIMEBase`
+  object to
+  :meth:`EmailMessage.attach() <django.core.mail.EmailMessage.attach>` (or
+  including one in the message's ``attachments`` list) is deprecated. For
+  complex attachments requiring additional headers or parameters, switch to the
+  modern email API's :class:`~email.message.MIMEPart`.
+
+* The ``django.core.mail.BadHeaderError`` exception is deprecated. Python's
+  modern email raises a :exc:`!ValueError` for email headers containing
+  prohibited characters.
+
+* The ``django.core.mail.SafeMIMEText`` and ``SafeMIMEMultipart`` classes are
+  deprecated.
+
+* The undocumented ``django.core.mail.forbid_multi_line_headers()`` and
+  ``django.core.mail.message.sanitize_address()`` functions are deprecated.
 
 Features removed in 6.0
 =======================
@@ -489,12 +578,12 @@ to remove usage of these features.
 * Support for calling ``format_html()`` without passing args or kwargs is
   removed.
 
-* The default scheme for ``forms.URLField`` changed from ``"http"`` to
+* The default scheme for ``forms.URLField`` has changed from ``"http"`` to
   ``"https"``.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is removed.
 
-* The ``django.db.models.sql.datastructures.Join`` no longer fallback to
+* The ``django.db.models.sql.datastructures.Join`` no longer falls back to
   ``get_joining_columns()``.
 
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
@@ -512,8 +601,8 @@ to remove usage of these features.
 * The ``get_prefetch_queryset()`` method of related managers and descriptors is
   removed.
 
-* ``get_prefetcher()`` and ``prefetch_related_objects()`` no longer fallback to
-  ``get_prefetch_queryset()``.
+* ``get_prefetcher()`` and ``prefetch_related_objects()`` no longer fall back
+  to ``get_prefetch_queryset()``.
 
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
@@ -525,7 +614,7 @@ to remove usage of these features.
   methods are removed.
 
 * The undocumented ``django.utils.itercompat.is_iterable()`` function and the
-  ``django.utils.itercompat`` module is removed.
+  ``django.utils.itercompat`` module are removed.
 
 * The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is removed.
 

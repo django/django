@@ -67,8 +67,6 @@ should return a rendered template (as a string) or raise
 
     .. attribute:: bound_field_class
 
-        .. versionadded:: 5.2
-
         The default class used to represent form fields across the project.
 
         Defaults to :class:`.BoundField` class.

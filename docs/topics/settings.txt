@@ -44,7 +44,7 @@ by using an environment variable, :envvar:`DJANGO_SETTINGS_MODULE`.
 
 The value of :envvar:`DJANGO_SETTINGS_MODULE` should be in Python path syntax,
 e.g. ``mysite.settings``. Note that the settings module should be on the
-Python :py:data:`sys.path`.
+Python :data:`sys.path`.
 
 
 The ``django-admin`` utility
@@ -160,7 +160,8 @@ read it. This is especially important in a shared-hosting environment.
 Available settings
 ==================
 
-For a full list of available settings, see the :doc:`settings reference </ref/settings>`.
+For a full list of available settings, see the
+:doc:`settings reference </ref/settings>`.
 
 Creating your own settings
 ==========================
@@ -280,7 +281,7 @@ ORM to fetch some data -- there's one more step you'll need in addition to
 configuring settings.
 
 After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
-``configure()``, you'll need to call :func:`django.setup()` to load your
+``configure()``, you'll need to call :func:`django.setup` to load your
 settings and populate Django's application registry. For example::
 
     import django

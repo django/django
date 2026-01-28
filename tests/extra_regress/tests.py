@@ -307,7 +307,8 @@ class ExtraRegressTests(TestCase):
             [("first", "second")],
         )
 
-        # Extra columns after a non-empty values_list() clause are ignored completely
+        # Extra columns after a non-empty values_list() clause are ignored
+        # completely
         self.assertEqual(
             list(
                 TestObject.objects.values_list("first", "second").extra(

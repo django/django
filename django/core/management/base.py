@@ -15,6 +15,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.version import PY314, PY315
 
 ALL_CHECKS = "__all__"
 
@@ -57,6 +58,11 @@ class CommandParser(ArgumentParser):
     ):
         self.missing_args_message = missing_args_message
         self.called_from_command_line = called_from_command_line
+        if PY314:
+            if not PY315:
+                kwargs.setdefault("suggest_on_error", True)
+            if os.environ.get("DJANGO_COLORS") == "nocolor" or "--no-color" in sys.argv:
+                kwargs.setdefault("color", False)
         super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):

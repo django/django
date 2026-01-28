@@ -62,7 +62,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         start_method = multiprocessing.get_start_method()
         if start_method == "fork":
             return orig_settings_dict
-        if start_method == "spawn":
+        if start_method in {"forkserver", "spawn"}:
             return {
                 **orig_settings_dict,
                 "NAME": f"{self.connection.alias}_{suffix}.sqlite3",
@@ -99,9 +99,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                 self.log("Got an error cloning the test database: %s" % e)
                 sys.exit(2)
         # Forking automatically makes a copy of an in-memory database.
-        # Spawn requires migrating to disk which will be re-opened in
-        # setup_worker_connection.
-        elif multiprocessing.get_start_method() == "spawn":
+        # Forkserver and spawn require migrating to disk which will be
+        # re-opened in setup_worker_connection.
+        elif multiprocessing.get_start_method() in {"forkserver", "spawn"}:
             ondisk_db = sqlite3.connect(target_database_name, uri=True)
             self.connection.connection.backup(ondisk_db)
             ondisk_db.close()
@@ -137,7 +137,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             # Update settings_dict in place.
             self.connection.settings_dict.update(settings_dict)
             self.connection.close()
-        elif start_method == "spawn":
+        elif start_method in {"forkserver", "spawn"}:
             alias = self.connection.alias
             connection_str = (
                 f"file:memorydb_{alias}_{_worker_id}?mode=memory&cache=shared"
@@ -155,5 +155,3 @@ class DatabaseCreation(BaseDatabaseCreation):
             # connection.
             self.connection.connect()
             target_db.close()
-            if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
-                self.mark_expected_failures_and_skips()

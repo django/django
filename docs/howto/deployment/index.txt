@@ -29,8 +29,8 @@ You should also consider how you will handle :doc:`static files
 :doc:`error reporting</howto/error-reporting>`.
 
 Finally, before you deploy your application to production, you should run
-through our :doc:`deployment checklist<checklist>` to ensure that your
-configurations are suitable.
+through our :doc:`deployment checklist </howto/deployment/checklist>` to ensure
+that your configurations are suitable.
 
 .. _WSGI: https://wsgi.readthedocs.io/en/latest/
 .. _ASGI: https://asgi.readthedocs.io/en/latest/

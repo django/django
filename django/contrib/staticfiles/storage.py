@@ -239,15 +239,18 @@ class HashedFilesMixin:
                 return matched
 
             if url_path.startswith("/"):
-                # Otherwise the condition above would have returned prematurely.
+                # Otherwise the condition above would have returned
+                # prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
                 target_name = url_path.removeprefix(settings.STATIC_URL)
             else:
-                # We're using the posixpath module to mix paths and URLs conveniently.
+                # We're using the posixpath module to mix paths and URLs
+                # conveniently.
                 source_name = name if os.sep == "/" else name.replace(os.sep, "/")
                 target_name = posixpath.join(posixpath.dirname(source_name), url_path)
 
-            # Determine the hashed name of the target file with the storage backend.
+            # Determine the hashed name of the target file with the storage
+            # backend.
             hashed_url = self._url(
                 self._stored_name,
                 unquote(target_name),
@@ -280,8 +283,8 @@ class HashedFilesMixin:
         2. adjusting files which contain references to other files so they
            refer to the cache-busting filenames.
 
-        If either of these are performed on a file, then that file is considered
-        post-processed.
+        If either of these are performed on a file, then that file is
+        considered post-processed.
         """
         # don't even dare to process the files if we're in dry run mode
         if dry_run:
@@ -448,7 +451,8 @@ class HashedFilesMixin:
                 # Move on to the next intermediate file.
                 intermediate_name = cache_name
         # If the cache name can't be determined after the max number of passes,
-        # the intermediate files on disk may be corrupt; avoid an infinite loop.
+        # the intermediate files on disk may be corrupt; avoid an infinite
+        # loop.
         raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
 
 

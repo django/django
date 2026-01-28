@@ -147,21 +147,83 @@ class CompositePKTests(TestCase):
         result = Comment.objects.in_bulk([self.comment.pk])
         self.assertEqual(result, {self.comment.pk: self.comment})
 
-    @unittest.mock.patch.object(
-        type(connection.features), "max_query_params", new_callable=lambda: 10
-    )
-    def test_in_bulk_batching(self, mocked_max_query_params):
+    def test_in_bulk_batching(self):
         Comment.objects.all().delete()
-        num_requiring_batching = (connection.features.max_query_params // 2) + 1
-        comments = [
-            Comment(id=i, tenant=self.tenant, user=self.user)
-            for i in range(1, num_requiring_batching + 1)
-        ]
-        Comment.objects.bulk_create(comments)
-        id_list = list(Comment.objects.values_list("pk", flat=True))
-        with self.assertNumQueries(2):
-            comment_dict = Comment.objects.in_bulk(id_list=id_list)
+        num_objects = 10
+        connection.features.__dict__.pop("max_query_params", None)
+        with unittest.mock.patch.object(
+            type(connection.features), "max_query_params", num_objects
+        ):
+            comments = [
+                Comment(id=i, tenant=self.tenant, user=self.user)
+                for i in range(1, num_objects + 1)
+            ]
+            Comment.objects.bulk_create(comments)
+            id_list = list(Comment.objects.values_list("pk", flat=True))
+            with self.assertNumQueries(2):
+                comment_dict = Comment.objects.in_bulk(id_list=id_list)
         self.assertQuerySetEqual(comment_dict, id_list)
+
+    def test_in_bulk_values(self):
+        result = Comment.objects.values().in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {
+                self.comment.pk: {
+                    "tenant_id": self.comment.tenant_id,
+                    "id": self.comment.id,
+                    "user_id": self.comment.user_id,
+                    "text": self.comment.text,
+                    "integer": self.comment.integer,
+                }
+            },
+        )
+
+    def test_in_bulk_values_field(self):
+        result = Comment.objects.values("text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_fields(self):
+        result = Comment.objects.values("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"pk": self.comment.pk, "text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_list(self):
+        result = Comment.objects.values_list("text").in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: (self.comment.text,)})
+
+    def test_in_bulk_values_list_multiple_fields(self):
+        result = Comment.objects.values_list("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.pk, self.comment.text)}
+        )
+
+    def test_in_bulk_values_list_fields_are_pk(self):
+        result = Comment.objects.values_list("tenant", "id").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.tenant_id, self.comment.id)}
+        )
+
+    def test_in_bulk_values_list_flat(self):
+        result = Comment.objects.values_list("text", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.comment.text})
+
+    def test_in_bulk_values_list_flat_pk(self):
+        result = Comment.objects.values_list("pk", flat=True).in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: self.comment.pk})
+
+    def test_in_bulk_values_list_flat_tenant(self):
+        result = Comment.objects.values_list("tenant", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.tenant.id})
 
     def test_iterator(self):
         """

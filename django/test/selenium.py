@@ -29,7 +29,8 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         multiple browsers specs are provided (e.g. --selenium=firefox,chrome).
         """
         test_class = super().__new__(cls, name, bases, attrs)
-        # If the test class is either browser-specific or a test base, return it.
+        # If the test class is either browser-specific or a test base, return
+        # it.
         if test_class.browser or not any(
             name.startswith("test") and callable(value) for name, value in attrs.items()
         ):
@@ -62,7 +63,8 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                 )
                 setattr(module, browser_test_class.__name__, browser_test_class)
             return test_class
-        # If no browsers were specified, skip this class (it'll still be discovered).
+        # If no browsers were specified, skip this class (it'll still be
+        # discovered).
         return unittest.skip("No browsers specified.")(test_class)
 
     @classmethod
@@ -214,8 +216,8 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         if features is not None:
             params["features"] = features
 
-        # Not using .execute_cdp_cmd() as it isn't supported by the remote web driver
-        # when using --selenium-hub.
+        # Not using .execute_cdp_cmd() as it isn't supported by the remote web
+        # driver when using --selenium-hub.
         self.selenium.execute(
             driver_command="executeCdpCommand",
             params={"cmd": "Emulation.setEmulatedMedia", "params": params},
@@ -242,7 +244,9 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         self.selenium.save_screenshot(path)
 
     def get_browser_logs(self, source=None, level="ALL"):
-        """Return Chrome console logs filtered by level and optionally source."""
+        """
+        Return Chrome console logs filtered by level and optionally source.
+        """
         try:
             logs = self.selenium.get_log("browser")
         except AttributeError:

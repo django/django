@@ -39,8 +39,8 @@ class Envelope:
 
     def __init__(self, *args):
         """
-        The initialization function may take an OGREnvelope structure, 4-element
-        tuple or list, or 4 individual arguments.
+        The initialization function may take an OGREnvelope structure,
+        4-element tuple or list, or 4 individual arguments.
         """
 
         if len(args) == 1:
@@ -128,7 +128,7 @@ class Envelope:
                         (args[0][0], args[0][1], args[0][0], args[0][1])
                     )
                 elif len(args[0]) == 4:
-                    (minx, miny, maxx, maxy) = args[0]
+                    minx, miny, maxx, maxy = args[0]
                     if minx < self._envelope.MinX:
                         self._envelope.MinX = minx
                     if miny < self._envelope.MinY:

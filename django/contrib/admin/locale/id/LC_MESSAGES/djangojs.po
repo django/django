@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2024
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2024\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2025\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,7 @@ msgstr "%s yang tersedia"
 msgid ""
 "Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
+"Pilih %s dengan memilih mereka dan kemudian memilih tombol panah \"Choose\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,15 +40,15 @@ msgstr "Filter"
 
 #, javascript-format
 msgid "Choose all %s"
-msgstr ""
+msgstr "Pilih semua %s"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "Pilih terpilih %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Pindahkan terpilih %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -57,17 +58,19 @@ msgstr "%s terpilih"
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
+"Pindahkan%s dengan memilih mereka dan kemudian memilih tombol panah "
+"\"Remove\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Ketik di dalam kotak utnuk menyaring daftar dar %s terpilih."
 
 msgid "(click to clear)"
-msgstr ""
+msgstr "(klik untuk membersihkan)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr ""
+msgstr "Pindahkan semua %s"
 
 #, javascript-format
 msgid "%s selected option not visible"

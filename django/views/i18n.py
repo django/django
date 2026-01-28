@@ -29,9 +29,9 @@ def builtin_template_path(name):
 
 def set_language(request):
     """
-    Redirect to a given URL while setting the chosen language in the session
-    (if enabled) and in a cookie. The URL and the language code need to be
-    specified in the request parameters.
+    Redirect to a given URL while setting the chosen language in the language
+    cookie. The URL and the language code need to be specified in the request
+    parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
@@ -105,7 +105,8 @@ class JavaScriptCatalog(View):
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This
-    might be needed if you deliver your JavaScript source from Django templates.
+    might be needed if you deliver your JavaScript source from Django
+    templates.
     """
 
     domain = "djangojs"
@@ -153,8 +154,8 @@ class JavaScriptCatalog(View):
     @property
     def _plural_string(self):
         """
-        Return the plural string (including nplurals) for this catalog language,
-        or None if no plural string is available.
+        Return the plural string (including nplurals) for this catalog
+        language, or None if no plural string is available.
         """
         if "" in self.translation._catalog:
             for line in self.translation._catalog[""].split("\n"):
@@ -167,7 +168,8 @@ class JavaScriptCatalog(View):
         if plural is not None:
             # This should be a compiled function of a typical plural-form:
             # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :
-            #               n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
+            #               n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)
+            #               ? 1 : 2;
             plural = [
                 el.strip()
                 for el in plural.split(";")

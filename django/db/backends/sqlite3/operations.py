@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import sqlite3
 import uuid
 from functools import lru_cache
 from itertools import chain
@@ -27,31 +28,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     # List of datatypes to that cannot be extracted with JSON_EXTRACT() on
     # SQLite. Use JSON_TYPE() instead.
     jsonfield_datatype_values = frozenset(["null", "false", "true"])
-
-    def bulk_batch_size(self, fields, objs):
-        """
-        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
-        (reflected in max_query_params).
-
-        If there's only a single field to insert, the limit is 500
-        (SQLITE_MAX_COMPOUND_SELECT).
-        """
-        fields = list(
-            chain.from_iterable(
-                (
-                    field.fields
-                    if isinstance(field, models.CompositePrimaryKey)
-                    else [field]
-                )
-                for field in fields
-            )
-        )
-        if len(fields) == 1:
-            return 500
-        elif len(fields) > 1:
-            return self.connection.features.max_query_params // len(fields)
-        else:
-            return len(objs)
 
     def check_expression_support(self, expression):
         bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
@@ -88,13 +64,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
-
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the list of returned data.
-        """
-        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -155,16 +124,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         Only for last_executed_query! Don't use this to execute SQL queries!
         """
-        # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
-        # number of return values, default = 2000). Since Python's sqlite3
-        # module doesn't expose the get_limit() C API, assume the default
-        # limits are in effect and split the work in batches if needed.
-        BATCH_SIZE = 999
-        if len(params) > BATCH_SIZE:
+        connection = self.connection.connection
+        variable_limit = self.connection.features.max_query_params
+        column_limit = connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN)
+        batch_size = min(variable_limit, column_limit)
+
+        if len(params) > batch_size:
             results = ()
-            for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index : index + BATCH_SIZE]
+            for index in range(0, len(params), batch_size):
+                chunk = params[index : index + batch_size]
                 results += self._quote_params_for_last_executed_query(chunk)
             return results
 
@@ -403,20 +371,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         if on_conflict == OnConflict.IGNORE:
             return "INSERT OR IGNORE INTO"
         return super().insert_statement(on_conflict=on_conflict)
-
-    def return_insert_columns(self, fields):
-        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if (

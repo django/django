@@ -23,8 +23,8 @@ Basic examples
 ==============
 
 Django provides base view classes which will suit a wide range of applications.
-All views inherit from the :class:`~django.views.generic.base.View` class, which
-handles linking the view into the URLs, HTTP method dispatching and other
+All views inherit from the :class:`~django.views.generic.base.View` class,
+which handles linking the view into the URLs, HTTP method dispatching and other
 common features. :class:`~django.views.generic.base.RedirectView` provides a
 HTTP redirect, and :class:`~django.views.generic.base.TemplateView` extends the
 base class to make it also render a template.
@@ -84,7 +84,8 @@ method instead, which provides a function-like entry to class-based views::
 
 
 For more information on how to use the built in generic views, consult the next
-topic on :doc:`generic class-based views</topics/class-based-views/generic-display>`.
+topic on
+:doc:`generic class-based views</topics/class-based-views/generic-display>`.
 
 .. _supporting-other-http-methods:
 
@@ -132,7 +133,7 @@ And the view::
 If the view is accessed from a ``GET`` request, an object list is returned in
 the response (using the ``book_list.html`` template). But if the client issues
 a ``HEAD`` request, the response has an empty body and the ``Last-Modified``
-header indicates when the most recent book was published.  Based on this
+header indicates when the most recent book was published. Based on this
 information, the client may or may not download the full object list.
 
 .. _async-class-based-views:

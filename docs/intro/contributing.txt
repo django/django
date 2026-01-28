@@ -32,9 +32,9 @@ don't, `Dive Into Python`_ is a fantastic (and free) online book for beginning
 Python programmers.
 
 Those of you who are unfamiliar with version control systems and Trac will find
-that this tutorial and its links include just enough information to get started.
-However, you'll probably want to read some more about these different tools if
-you plan on contributing to Django regularly.
+that this tutorial and its links include just enough information to get
+started. However, you'll probably want to read some more about these different
+tools if you plan on contributing to Django regularly.
 
 For the most part though, this tutorial tries to explain as much as possible,
 so that it can be of use to the widest audience.
@@ -52,9 +52,9 @@ so that it can be of use to the widest audience.
 What does this tutorial cover?
 ------------------------------
 
-We'll be walking you through contributing to Django for the first time.
-By the end of this tutorial, you should have a basic understanding of both the
-tools and the processes involved. Specifically, we'll be covering the following:
+We'll be walking you through contributing to Django for the first time. By the
+end of this tutorial, you should have a basic understanding of both the tools
+and the processes involved. Specifically, we'll be covering the following:
 
 * Installing Git.
 * Downloading a copy of Django's development version.
@@ -85,7 +85,8 @@ Code of Conduct
 ===============
 
 As a contributor, you can help us keep the Django community open and inclusive.
-Please read and follow our `Code of Conduct <https://www.djangoproject.com/conduct/>`_.
+Please read and follow our `Code of Conduct
+<https://www.djangoproject.com/conduct/>`_.
 
 Installing Git
 ==============
@@ -123,14 +124,16 @@ Download the Django source code repository using the following command:
     all of Django's commit history, which reduces data transfer from  ~250 MB
     to ~70 MB.
 
-Now that you have a local copy of Django, you can install it just like you would
-install any package using ``pip``. The most convenient way to do so is by using
-a *virtual environment*, which is a feature built into Python that allows you
-to keep a separate directory of installed packages for each of your projects so
-that they don't interfere with each other.
+Now that you have a local copy of Django, you can install it just like you
+would install any package using ``pip``. The most convenient way to do so is by
+using a *virtual environment*, which is a feature built into Python that allows
+you to keep a separate directory of installed packages for each of your
+projects so that they don't interfere with each other.
 
 It's a good idea to keep all your virtual environments in one place, for
 example in ``.virtualenvs/`` in your home directory.
+
+.. _intro-contributing-install-local-copy:
 
 Create a new virtual environment by running:
 
@@ -168,42 +171,26 @@ command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
-.. _intro-contributing-install-local-copy:
-
 Go ahead and install the previously cloned copy of Django:
 
 .. console::
 
     $ python -m pip install -e /path/to/your/local/clone/django/
 
-The installed version of Django is now pointing at your local copy by installing
-in editable mode. You will immediately see any changes you make to it, which is
-of great help when writing your first contribution.
-
-Creating projects with a local copy of Django
----------------------------------------------
-
-It may be helpful to test your local changes with a Django project. First you
-have to create a new virtual environment, :ref:`install the previously cloned
-local copy of Django in editable mode <intro-contributing-install-local-copy>`,
-and create a new Django project outside of your local copy of Django. You will
-immediately see any changes you make to Django in your new project, which is
-of great help when writing your first contribution, especially if testing
-any changes to the UI.
-
-You can follow the :doc:`tutorial</intro/tutorial01>` for help in creating a
-Django project.
+The installed version of Django is now pointing at your local copy by
+installing in editable mode. You will immediately see any changes you make to
+it, which is of great help when testing your first contribution.
 
 Running Django's test suite for the first time
 ==============================================
 
 When contributing to Django it's very important that your code changes don't
 introduce bugs into other areas of Django. One way to check that Django still
-works after you make your changes is by running Django's test suite. If all
-the tests still pass, then you can be reasonably sure that your changes
-work and haven't broken other parts of Django. If you've never run Django's test
-suite before, it's a good idea to run it once beforehand to get familiar with
-its output.
+works after you make your changes is by running Django's test suite. If all the
+tests still pass, then you can be reasonably sure that your changes work and
+haven't broken other parts of Django. If you've never run Django's test suite
+before, it's a good idea to run it once beforehand to get familiar with its
+output.
 
 Before running the test suite, enter the Django ``tests/`` directory using the
 ``cd tests`` command, and install test dependencies by running:
@@ -362,8 +349,8 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
     $ ./runtests.py shortcuts
 
-If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error:
+If the tests ran correctly, you should see one failure corresponding to the
+test method we added, with this error:
 
 .. code-block:: pytb
 

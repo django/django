@@ -1,7 +1,6 @@
 from django.conf import settings
+from django.core.checks import Error, Tags, Warning, register
 from django.core.exceptions import ImproperlyConfigured
-
-from .. import Error, Tags, Warning, register
 
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     "same-origin",
@@ -266,7 +265,8 @@ def check_referrer_policy(app_configs, **kwargs):
     if _security_middleware():
         if settings.SECURE_REFERRER_POLICY is None:
             return [W022]
-        # Support a comma-separated string or iterable of values to allow fallback.
+        # Support a comma-separated string or iterable of values to allow
+        # fallback.
         if isinstance(settings.SECURE_REFERRER_POLICY, str):
             values = {v.strip() for v in settings.SECURE_REFERRER_POLICY.split(",")}
         else:

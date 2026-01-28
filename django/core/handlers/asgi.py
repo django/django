@@ -3,7 +3,7 @@ import logging
 import sys
 import tempfile
 import traceback
-from contextlib import aclosing
+from contextlib import aclosing, closing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -94,7 +94,11 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
+            if corrected_name == "HTTP_COOKIE":
+                value = value.rstrip("; ")
+                if "HTTP_COOKIE" in self.META:
+                    value = self.META[corrected_name] + "; " + value
+            elif corrected_name in self.META:
                 value = self.META[corrected_name] + "," + value
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
@@ -170,65 +174,41 @@ class ASGIHandler(base.BaseHandler):
             body_file = await self.read_body(receive)
         except RequestAborted:
             return
-        # Request is complete and can be served.
-        set_script_prefix(get_script_prefix(scope))
-        await signals.request_started.asend(sender=self.__class__, scope=scope)
-        # Get the request and check for basic issues.
-        request, error_response = self.create_request(scope, body_file)
-        if request is None:
-            body_file.close()
-            await self.send_response(error_response, send)
-            await sync_to_async(error_response.close)()
-            return
 
-        async def process_request(request, send):
-            response = await self.run_get_response(request)
-            try:
-                await self.send_response(response, send)
-            except asyncio.CancelledError:
-                # Client disconnected during send_response (ignore exception).
+        with closing(body_file):
+            # Request is complete and can be served.
+            set_script_prefix(get_script_prefix(scope))
+            await signals.request_started.asend(sender=self.__class__, scope=scope)
+            # Get the request and check for basic issues.
+            request, error_response = self.create_request(scope, body_file)
+            if request is None:
+                body_file.close()
+                await self.send_response(error_response, send)
+                await sync_to_async(error_response.close)()
+                return
+
+            class RequestProcessed(Exception):
                 pass
 
-            return response
-
-        # Try to catch a disconnect while getting response.
-        tasks = [
-            # Check the status of these tasks and (optionally) terminate them
-            # in this order. The listen_for_disconnect() task goes first
-            # because it should not raise unexpected errors that would prevent
-            # us from cancelling process_request().
-            asyncio.create_task(self.listen_for_disconnect(receive)),
-            asyncio.create_task(process_request(request, send)),
-        ]
-        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-        # Now wait on both tasks (they may have both finished by now).
-        for task in tasks:
-            if task.done():
+            response = None
+            try:
                 try:
-                    task.result()
-                except RequestAborted:
-                    # Ignore client disconnects.
+                    async with asyncio.TaskGroup() as tg:
+                        tg.create_task(self.listen_for_disconnect(receive))
+                        response = await self.run_get_response(request)
+                        await self.send_response(response, send)
+                        raise RequestProcessed
+                except* (RequestProcessed, RequestAborted):
                     pass
-                except AssertionError:
-                    body_file.close()
-                    raise
+            except BaseExceptionGroup as exception_group:
+                if len(exception_group.exceptions) == 1:
+                    raise exception_group.exceptions[0]
+                raise
+
+            if response is None:
+                await signals.request_finished.asend(sender=self.__class__)
             else:
-                # Allow views to handle cancellation.
-                task.cancel()
-                try:
-                    await task
-                except asyncio.CancelledError:
-                    # Task re-raised the CancelledError as expected.
-                    pass
-
-        try:
-            response = tasks[1].result()
-        except asyncio.CancelledError:
-            await signals.request_finished.asend(sender=self.__class__)
-        else:
-            await sync_to_async(response.close)()
-
-        body_file.close()
+                await sync_to_async(response.close)()
 
     async def listen_for_disconnect(self, receive):
         """Listen for disconnect from the client."""
@@ -331,8 +311,8 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly, to
-            #   allow mapping of a sync iterator.
+            # - Consume via `__aiter__` and not `streaming_content` directly,
+            #   to allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter. See
             #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
             async with aclosing(aiter(response)) as content:
@@ -342,8 +322,9 @@ class ASGIHandler(base.BaseHandler):
                             {
                                 "type": "http.response.body",
                                 "body": chunk,
-                                # Ignore "more" as there may be more parts; instead,
-                                # use an empty final closing message with False.
+                                # Ignore "more" as there may be more parts;
+                                # instead, use an empty final closing message
+                                # with False.
                                 "more_body": True,
                             }
                         )

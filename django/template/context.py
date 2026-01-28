@@ -81,7 +81,10 @@ class BaseContext:
         context[key] = value
 
     def __getitem__(self, key):
-        "Get a variable's value, starting at the current context and going upward"
+        """
+        Get a variable's value, starting at the current context and going
+        upward
+        """
         for d in reversed(self.dicts):
             if key in d:
                 return d[key]
@@ -177,16 +180,17 @@ class RenderContext(BaseContext):
     """
     A stack container for storing Template state.
 
-    RenderContext simplifies the implementation of template Nodes by providing a
-    safe place to store state between invocations of a node's `render` method.
+    RenderContext simplifies the implementation of template Nodes by providing
+    a safe place to store state between invocations of a node's `render`
+    method.
 
     The RenderContext also provides scoping rules that are more sensible for
     'template local' variables. The render context stack is pushed before each
     template is rendered, creating a fresh scope with nothing in it. Name
-    resolution fails if a variable is not found at the top of the RequestContext
-    stack. Thus, variables are local to a specific template and don't affect the
-    rendering of other templates as they would if they were stored in the normal
-    template context.
+    resolution fails if a variable is not found at the top of the
+    RequestContext stack. Thus, variables are local to a specific template and
+    don't affect the rendering of other templates as they would if they were
+    stored in the normal template context.
     """
 
     template = None

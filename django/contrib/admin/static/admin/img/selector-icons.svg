@@ -1,4 +1,4 @@
-<svg width="16" height="192" viewBox="0 0 512 6144" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16" height="128" viewBox="0 0 512 4096" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
   <defs>
     <g id="up">
@@ -33,22 +33,6 @@
       -->
       <path d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM215 127c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-71 71L392 232c13.3 0 24 10.7 24 24s-10.7 24-24 24l-214.1 0 71 71c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L103 273c-9.4-9.4-9.4-24.6 0-33.9L215 127z"/>
     </g>
-    <g id="clearall">
-      <!--
-        Icon Name: circle-chevron-left
-        Icon Family: classic
-        Icon Style: solid
-      -->
-      <path d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"/>
-    </g>
-    <g id="chooseall">
-      <!--
-        Icon Name: circle-chevron-right
-        Icon Family: classic
-        Icon Style: solid
-      -->
-      <path d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM241 377c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l87-87-87-87c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L345 239c9.4 9.4 9.4 24.6 0 33.9L241 377z"/>
-    </g>
   </defs>
   <use xlink:href="#up" x="0" y="0" fill="#666666" />
   <use xlink:href="#up" x="0" y="512" fill="#447e9b" />
@@ -58,8 +42,4 @@
   <use xlink:href="#left" x="0" y="2560" fill="#447e9b" />
   <use xlink:href="#right" x="0" y="3072" fill="#666666" />
   <use xlink:href="#right" x="0" y="3584" fill="#447e9b" />
-  <use xlink:href="#clearall" x="0" y="4096" fill="#666666" />
-  <use xlink:href="#clearall" x="0" y="4608" fill="#447e9b" />
-  <use xlink:href="#chooseall" x="0" y="5120" fill="#666666" />
-  <use xlink:href="#chooseall" x="0" y="5632" fill="#447e9b" />
 </svg>

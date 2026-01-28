@@ -8,6 +8,7 @@
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
+# Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -22,15 +23,15 @@
 # Natalia, 2024
 # Pablo, 2015
 # Salomon Herrera, 2023
-# Uriel Medina <urimeba511@gmail.com>, 2020-2024
+# Uriel Medina <urimeba511@gmail.com>, 2020-2025
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
-"Last-Translator: Alberto MH, 2025\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2025\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -380,7 +381,7 @@ msgid "Add link"
 msgstr "Añadir vínculo"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Cambiar o ver el enlace de la lista"
 
 msgid "Add"
 msgstr "Añadir"
@@ -393,6 +394,7 @@ msgstr "No cuenta con permiso para ver ni editar nada."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
+"Después de haber creado un usuario, podrá editar más opciones del mismo."
 
 msgid "Error:"
 msgstr "Error:"
@@ -594,7 +596,7 @@ msgstr ""
 "esta página. ¿Desea autenticarse con una cuenta diferente?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "¿Olvidó sus credenciales de inicio de sesión?"
 
 msgid "Toggle navigation"
 msgstr "Activar navegación"
@@ -765,7 +767,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor, vaya a la página siguiente y escoja una nueva contraseña."
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Por si lo ha olvidado, usted es:"
 
 msgid "Thanks for using our site!"
 msgstr "¡Gracias por usar nuestro sitio!"

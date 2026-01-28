@@ -910,7 +910,8 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 
-        # Make sure that only actual authors are present in author's list filter
+        # Make sure that only actual authors are present in author's list
+        # filter
         filterspec = changelist.get_filters(request)[0][4]
         expected = [(self.alfred.pk, "alfred"), (self.bob.pk, "bob")]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
@@ -1029,7 +1030,8 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 
-        # Make sure that only actual contributors are present in contrib's list filter
+        # Make sure that only actual contributors are present in contrib's list
+        # filter
         filterspec = changelist.get_filters(request)[0][5]
         expected = [(self.bob.pk, "bob"), (self.lisa.pk, "lisa")]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))

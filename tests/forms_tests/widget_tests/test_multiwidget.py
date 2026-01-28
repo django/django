@@ -273,8 +273,7 @@ class MultiWidgetTest(WidgetTest):
             widget,
             "name",
             "some text,JP,2007-04-25 06:24:00",
-            html=(
-                """
+            html=("""
             <input type="text" name="name_0" value="some text">
             <select multiple name="name_1">
                 <option value="J" selected>John</option>
@@ -284,8 +283,7 @@ class MultiWidgetTest(WidgetTest):
             </select>
             <input type="text" name="name_2_0" value="2007-04-25">
             <input type="text" name="name_2_1" value="06:24:00">
-            """
-            ),
+            """),
         )
 
     def test_no_whitespace_between_widgets(self):

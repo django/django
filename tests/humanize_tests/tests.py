@@ -153,6 +153,9 @@ class HumanizeTests(SimpleTestCase):
             "-1234567.1234567",
             Decimal("1234567.1234567"),
             Decimal("-1234567.1234567"),
+            Decimal("Infinity"),
+            Decimal("-Infinity"),
+            Decimal("NaN"),
             None,
             "１２３４５６７",
             "-１２３４５６７",
@@ -193,6 +196,9 @@ class HumanizeTests(SimpleTestCase):
             "-1,234,567.1234567",
             "1,234,567.1234567",
             "-1,234,567.1234567",
+            "Infinity",
+            "-Infinity",
+            "NaN",
             None,
             "1,234,567",
             "-1,234,567",
@@ -610,8 +616,8 @@ class HumanizeTests(SimpleTestCase):
 
     def test_inflection_for_timedelta(self):
         """
-        Translation of '%d day'/'%d month'/… may differ depending on the context
-        of the string it is inserted in.
+        Translation of '%d day'/'%d month'/… may differ depending on the
+        context of the string it is inserted in.
         """
         test_list = [
             # "%(delta)s ago" translations

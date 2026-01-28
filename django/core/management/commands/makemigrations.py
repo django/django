@@ -139,7 +139,8 @@ class Command(BaseCommand):
         # the loader doesn't try to resolve replaced migrations from DB.
         loader = MigrationLoader(None, ignore_no_migrations=True)
 
-        # Raise an error if any migrations are applied before their dependencies.
+        # Raise an error if any migrations are applied before their
+        # dependencies.
         consistency_check_labels = {config.label for config in apps.get_app_configs()}
         # Non-default databases are only checked if database routers used.
         aliases_to_check = (
@@ -186,7 +187,8 @@ class Command(BaseCommand):
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
-        # If they want to merge and there's nothing to merge, then politely exit
+        # If they want to merge and there's nothing to merge, then politely
+        # exit
         if self.merge and not conflicts:
             self.log("No conflicts detected to merge.")
             return
@@ -505,9 +507,9 @@ class Command(BaseCommand):
                         if self.scriptable:
                             self.stdout.write(writer.path)
                 elif self.verbosity == 3:
-                    # Alternatively, makemigrations --merge --dry-run --verbosity 3
-                    # will log the merge migrations rather than saving the file
-                    # to the disk.
+                    # Alternatively, makemigrations --merge --dry-run
+                    # --verbosity 3 will log the merge migrations rather than
+                    # saving the file to the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
                             "Full merge migrations file '%s':" % writer.filename

@@ -1,0 +1,9 @@
+===========================
+Django 4.2.28 release notes
+===========================
+
+*February 3, 2026*
+
+Django 4.2.28 fixes three security issues with severity "high", two security
+issues with severity "moderate", and one security issue with severity "low" in
+4.2.27.

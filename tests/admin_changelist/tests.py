@@ -143,7 +143,8 @@ class ChangeListTests(TestCase):
     def test_select_related_preserved(self):
         """
         Regression test for #10348: ChangeList.get_queryset() shouldn't
-        overwrite a custom select_related provided by ModelAdmin.get_queryset().
+        overwrite a custom select_related provided by
+        ModelAdmin.get_queryset().
         """
         m = ChildAdmin(Child, custom_site)
         request = self.factory.get("/child/")
@@ -239,7 +240,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -284,7 +284,6 @@ class ChangeListTests(TestCase):
         admin.site.empty_value_display = "???"
         m = ChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -309,7 +308,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = EmptyValueChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -340,7 +338,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -369,7 +366,6 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/grandchild/", self.superuser)
         m = GrandChildAdmin(GrandChild, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -874,7 +870,8 @@ class ChangeListTests(TestCase):
             request = self.factory.get("/", data={SEARCH_VAR: search_term})
             request.user = self.superuser
             with self.subTest(search_term=search_term):
-                # 1 query for filtered result, 1 for filtered count, 1 for total count.
+                # 1 query for filtered result, 1 for filtered count, 1 for
+                # total count.
                 with self.assertNumQueries(3):
                     cl = model_admin.get_changelist_instance(request)
                 self.assertCountEqual(cl.queryset, expected_result)
@@ -1347,7 +1344,9 @@ class ChangeListTests(TestCase):
         self.assertEqual(queryset.count(), 1)
 
     def test_changelist_view_list_editable_changed_objects_uses_filter(self):
-        """list_editable edits use a filtered queryset to limit memory usage."""
+        """
+        list_editable edits use a filtered queryset to limit memory usage.
+        """
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
         Swallow.objects.create(origin="Swallow B", load=2, speed=2)
         data = {
@@ -1367,7 +1366,8 @@ class ChangeListTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("WHERE", context.captured_queries[4]["sql"])
             self.assertIn("IN", context.captured_queries[4]["sql"])
-            # Check only the first few characters since the UUID may have dashes.
+            # Check only the first few characters since the UUID may have
+            # dashes.
             self.assertIn(str(a.pk)[:8], context.captured_queries[4]["sql"])
 
     def test_list_editable_error_title(self):
@@ -1420,7 +1420,8 @@ class ChangeListTests(TestCase):
         check_results_order()
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by -pk as well.
+        # value for that field, make sure everything gets ordered by -pk as
+        # well.
         UnorderedObjectAdmin.ordering = ["bool"]
         check_results_order()
 
@@ -1481,7 +1482,8 @@ class ChangeListTests(TestCase):
         check_results_order(ascending=True)
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by -pk as well.
+        # value for that field, make sure everything gets ordered by -pk as
+        # well.
         OrderedObjectAdmin.ordering = ["bool"]
         check_results_order()
 

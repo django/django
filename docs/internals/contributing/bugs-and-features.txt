@@ -5,7 +5,7 @@ Reporting bugs and requesting features
 .. Important::
 
     Please report security issues **only** to
-    security@djangoproject.com.  This is a private list only open to
+    ``security@djangoproject.com``. This is a private list only open to
     long-time, highly trusted Django developers, and its archives are
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
@@ -26,6 +26,9 @@ Before reporting a bug on the `ticket tracker
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
   to do so on the `Django Forum`_.
+
+* Don't reopen issues that have been marked "needsnewfeatureprocess" without
+  shepherding an issue through the `new feature ideas`_ GitHub project.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
@@ -55,7 +58,7 @@ particular:
   as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
-:doc:`triaging-tickets`.
+:ref:`triage-workflow`.
 
 Reporting user interface bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

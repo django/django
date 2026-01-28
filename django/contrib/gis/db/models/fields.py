@@ -81,8 +81,8 @@ class BaseSpatialField(Field):
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """
-        The initialization function for base spatial fields. Takes the following
-        as keyword arguments:
+        The initialization function for base spatial fields. Takes the
+        following as keyword arguments:
 
         srid:
          The spatial reference system identifier, an OGC standard.
@@ -195,7 +195,8 @@ class BaseSpatialField(Field):
         if isinstance(obj, GEOSGeometry):
             pass
         else:
-            # Check if input is a candidate for conversion to raster or geometry.
+            # Check if input is a candidate for conversion to raster or
+            # geometry.
             is_candidate = isinstance(obj, (bytes, str)) or hasattr(
                 obj, "__geo_interface__"
             )
@@ -395,7 +396,8 @@ class RasterField(BaseSpatialField):
     geography = False
 
     def _check_connection(self, connection):
-        # Make sure raster fields are used only on backends with raster support.
+        # Make sure raster fields are used only on backends with raster
+        # support.
         if (
             not connection.features.gis_enabled
             or not connection.features.supports_raster

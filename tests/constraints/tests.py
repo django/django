@@ -3,7 +3,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
-from django.db.models import F
+from django.db.models import Case, F, When
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
 from django.db.models.functions import Abs, Lower, Sqrt, Upper
 from django.db.transaction import atomic
@@ -1064,6 +1064,23 @@ class UniqueConstraintTests(TestCase):
             UniqueConstraintProduct(updated=updated_date + timedelta(days=1)),
         )
 
+    def test_validate_case_when(self):
+        UniqueConstraintProduct.objects.create(name="p1")
+        constraint = models.UniqueConstraint(
+            Case(When(color__isnull=True, then=F("name"))),
+            name="name_without_color_uniq",
+        )
+        msg = "Constraint “name_without_color_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(name="p1"),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name="p1", color="green"),
+        )
+
     def test_validate_ordered_expression(self):
         constraint = models.UniqueConstraint(
             Lower("name").desc(), name="name_lower_uniq_desc"
@@ -1445,7 +1462,7 @@ class UniqueConstraintTests(TestCase):
     def test_requires_name(self):
         msg = "A unique constraint must be named."
         with self.assertRaisesMessage(ValueError, msg):
-            models.UniqueConstraint(fields=["field"])
+            models.UniqueConstraint(fields=["field"], name="")
 
     def test_database_default(self):
         models.UniqueConstraint(

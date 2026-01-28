@@ -2,15 +2,21 @@
 How to upgrade Django to a newer version
 ========================================
 
-While it can be a complex process at times, upgrading to the latest Django
-version has several benefits:
+Upgrading Django to the latest version offers several benefits:
 
-* New features and improvements are added.
+* New features and improvements become available.
 * Bugs are fixed.
-* Older version of Django will eventually no longer receive security updates.
+* Older versions of Django eventually stop receiving security updates
   (see :ref:`supported-versions-policy`).
-* Upgrading as each new Django release is available makes future upgrades less
-  painful by keeping your code base up to date.
+* Upgrading with each new release helps keep your code base current and makes
+  future upgrades smoother.
+
+.. admonition:: Tools to help with version upgrades
+
+    Django has a vibrant ecosystem. There are automated upgrade helpers
+    highlighted on the `Community Ecosystem
+    <https://www.djangoproject.com/community/ecosystem/#upgrade-utilities>`__
+    page.
 
 Here are some things to consider to help make your upgrade process as smooth as
 possible.
@@ -91,7 +97,8 @@ Once you're ready, it is time to :doc:`install the new Django version
 is a major upgrade, you might want to set up a new environment with all the
 dependencies first.
 
-If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
+If you installed Django with pip_, you can use the ``--upgrade`` or ``-U``
+flag:
 
 .. console::
 
@@ -127,6 +134,6 @@ If you are using caching provided by Django, you should consider clearing your
 cache after upgrading. Otherwise you may run into problems, for example, if you
 are caching pickled objects as these objects are not guaranteed to be
 pickle-compatible across Django versions. A past instance of incompatibility
-was caching pickled :class:`~django.http.HttpResponse` objects, either
-directly or indirectly via the :func:`~django.views.decorators.cache.cache_page`
+was caching pickled :class:`~django.http.HttpResponse` objects, either directly
+or indirectly via the :func:`~django.views.decorators.cache.cache_page`
 decorator.

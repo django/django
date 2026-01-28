@@ -160,8 +160,8 @@ class MigrationWriter:
             "\n".join(sorted(dependencies)) + "\n" if dependencies else ""
         )
 
-        # Format imports nicely, swapping imports of functions from migration files
-        # for comments
+        # Format imports nicely, swapping imports of functions from migration
+        # files for comments
         migration_imports = set()
         for line in list(imports):
             if re.match(r"^import (.*)\.\d+[^\s]*$", line):

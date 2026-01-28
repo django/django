@@ -57,15 +57,12 @@ class Command(BaseCommand):
         )
 
         if interactive:
-            confirm = input(
-                """You have requested a flush of the database.
+            confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
 and return each table to an empty state.
 Are you sure you want to do this?
 
-    Type 'yes' to continue, or 'no' to cancel: """
-                % connection.settings_dict["NAME"]
-            )
+    Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict["NAME"])
         else:
             confirm = "yes"
 
@@ -86,8 +83,9 @@ Are you sure you want to do this?
             # Empty sql_list may signify an empty database and post_migrate
             # would then crash.
             if sql_list and not inhibit_post_migrate:
-                # Emit the post migrate signal. This allows individual applications to
-                # respond as if the database had been migrated from scratch.
+                # Emit the post migrate signal. This allows individual
+                # applications to respond as if the database had been migrated
+                # from scratch.
                 emit_post_migrate_signal(verbosity, interactive, database)
         else:
             self.stdout.write("Flush cancelled.")

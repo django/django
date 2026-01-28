@@ -181,8 +181,8 @@ class PickleabilityTestCase(TestCase):
 
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
-        #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()
-        caused subsequent QuerySet pickling to fail.
+        #24831 -- Cached properties on ManyToOneRel created in
+        QuerySet.delete() caused subsequent QuerySet pickling to fail.
         """
         g = Group.objects.create(name="foo")
         m2m = M2MModel.objects.create()
@@ -350,6 +350,29 @@ class PickleabilityTestCase(TestCase):
         event = MyEvent.objects.create(title="test event", group=group)
         event.edition_set.create()
         self.assert_pickles(event.edition_set.order_by("event"))
+
+    def test_fetch_mode_fetch_one(self):
+        restored = pickle.loads(pickle.dumps(self.happening))
+        self.assertIs(restored._state.fetch_mode, models.FETCH_ONE)
+
+    def test_fetch_mode_fetch_peers(self):
+        Happening.objects.create()
+        objs = list(Happening.objects.fetch_mode(models.FETCH_PEERS))
+        self.assertEqual(objs[0]._state.fetch_mode, models.FETCH_PEERS)
+        self.assertEqual(len(objs[0]._state.peers), 2)
+
+        restored = pickle.loads(pickle.dumps(objs))
+
+        self.assertIs(restored[0]._state.fetch_mode, models.FETCH_PEERS)
+        # Peers not restored because weak references are not picklable.
+        self.assertEqual(restored[0]._state.peers, ())
+
+    def test_fetch_mode_raise(self):
+        objs = list(Happening.objects.fetch_mode(models.RAISE))
+        self.assertEqual(objs[0]._state.fetch_mode, models.RAISE)
+
+        restored = pickle.loads(pickle.dumps(objs))
+        self.assertIs(restored[0]._state.fetch_mode, models.RAISE)
 
 
 class InLookupTests(TestCase):

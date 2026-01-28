@@ -132,7 +132,7 @@ Related objects reference
             >>> e = Entry.objects.get(id=234)
             >>> b.entry_set.remove(e)  # Disassociates Entry e from Blog b.
 
-        Similar to :meth:`add()`, ``e.save()`` is called in the example above
+        Similar to :meth:`add`, ``e.save()`` is called in the example above
         to perform the update. Using ``remove()`` with a many-to-many
         relationship, however, will delete the relationships using
         :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which

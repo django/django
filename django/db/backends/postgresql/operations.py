@@ -155,13 +155,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return f"SELECT * FROM {placeholder_rows}"
         return super().bulk_insert_sql(fields, placeholder_rows)
 
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the tuple of returned data.
-        """
-        return cursor.fetchall()
-
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = "%s"
         # Cast text lookups to text to allow things like filter(x__contains=4)
@@ -221,8 +214,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ["%s;" % " ".join(sql_parts)]
 
     def sequence_reset_by_name_sql(self, style, sequences):
-        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
-        # to reset sequence indices
+        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL
+        # statements to reset sequence indices
         sql = []
         for sequence_info in sequences:
             table_name = sequence_info["table"]
@@ -309,11 +302,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                 try:
                     return self.compose_sql(sql, params)
                 except errors.DataError:
-                    return None
+                    return super().last_executed_query(cursor, sql, params)
             else:
                 if cursor._query and cursor._query.query is not None:
                     return cursor._query.query.decode()
-                return None
+                return super().last_executed_query(cursor, sql, params)
 
     else:
 
@@ -322,20 +315,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # The query attribute is a Psycopg extension to the DB API 2.0.
             if cursor.query is not None:
                 return cursor.query.decode()
-            return None
-
-    def return_insert_columns(self, fields):
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
+            return super().last_executed_query(cursor, sql, params)
 
     if is_psycopg3:
 
@@ -348,6 +328,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
     def adapt_datetimefield_value(self, value):
+        return value
+
+    def adapt_durationfield_value(self, value):
         return value
 
     def adapt_timefield_value(self, value):

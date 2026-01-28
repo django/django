@@ -18,7 +18,12 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.decorators.common import no_append_slash
 
-from .forms import MediaActionForm
+from .forms import (
+    MediaActionForm,
+    SectionFormWithDynamicOptgroups,
+    SectionFormWithObjectOptgroups,
+    SectionFormWithOptgroups,
+)
 from .models import (
     Actor,
     AdminOrderedAdminMethod,
@@ -47,6 +52,7 @@ from .models import (
     Color2,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -431,6 +437,8 @@ class PodcastAdmin(admin.ModelAdmin):
     list_display = ("name", "release_date")
     list_editable = ("release_date",)
     date_hierarchy = "release_date"
+    list_filter = ("name",)
+    search_fields = ("name",)
     ordering = ("name",)
 
 
@@ -1188,6 +1196,10 @@ class CamelCaseAdmin(admin.ModelAdmin):
     filter_horizontal = ["m2m"]
 
 
+class CourseAdmin(admin.ModelAdmin):
+    radio_fields = {"difficulty": admin.VERTICAL}
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1264,8 +1276,8 @@ site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
-# We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
-# That way we cover all four cases:
+# We intentionally register Promo and ChapterXtra1 but not Chapter nor
+# ChapterXtra2. That way we cover all four cases:
 #     related ForeignKey object registered in admin
 #     related ForeignKey object not registered in admin
 #     related OneToOne object registered in admin
@@ -1278,6 +1290,7 @@ site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
 site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
+site.register(Course, CourseAdmin)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)
@@ -1337,6 +1350,32 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+
+
+# Admin for testing optgroup in popup response
+class SectionAdminWithOptgroups(admin.ModelAdmin):
+    form = SectionFormWithOptgroups
+
+
+class SectionAdminWithObjectOptgroups(admin.ModelAdmin):
+    form = SectionFormWithObjectOptgroups
+
+
+class SectionAdminWithDynamicOptgroups(admin.ModelAdmin):
+    form = SectionFormWithDynamicOptgroups
+
+
+site11 = admin.AdminSite(name="admin11")
+site11.register(Article, ArticleAdmin2)
+site11.register(Section, SectionAdminWithOptgroups)
+
+site12 = admin.AdminSite(name="admin12")
+site12.register(Article, ArticleAdmin2)
+site12.register(Section, SectionAdminWithObjectOptgroups)
+
+site13 = admin.AdminSite(name="admin13")
+site13.register(Article, ArticleAdmin2)
+site13.register(Section, SectionAdminWithDynamicOptgroups)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 site7.register(
     Pizza,

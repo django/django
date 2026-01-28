@@ -67,37 +67,40 @@ class File(FileProxyMixin):
         Return ``True`` if you can expect multiple chunks.
 
         NB: If a particular file representation is in memory, subclasses should
-        always return ``False`` -- there's no good reason to read from memory in
-        chunks.
+        always return ``False`` -- there's no good reason to read from memory
+        in chunks.
         """
         return self.size > (chunk_size or self.DEFAULT_CHUNK_SIZE)
 
     def __iter__(self):
         # Iterate over this file-like object by newlines
-        buffer_ = None
+        buffer_ = []
         for chunk in self.chunks():
             for line in chunk.splitlines(True):
                 if buffer_:
-                    if endswith_cr(buffer_) and not equals_lf(line):
+                    if endswith_cr(buffer_[-1]) and not equals_lf(line):
                         # Line split after a \r newline; yield buffer_.
-                        yield buffer_
+                        yield type(buffer_[0])().join(buffer_)
                         # Continue with line.
+                        buffer_ = []
                     else:
                         # Line either split without a newline (line
                         # continues after buffer_) or with \r\n
                         # newline (line == b'\n').
-                        line = buffer_ + line
-                    # buffer_ handled, clear it.
-                    buffer_ = None
+                        buffer_.append(line)
 
-                # If this is the end of a \n or \r\n line, yield.
-                if endswith_lf(line):
-                    yield line
-                else:
-                    buffer_ = line
+                if not buffer_:
+                    # If this is the end of a \n or \r\n line, yield.
+                    if endswith_lf(line):
+                        yield line
+                    else:
+                        buffer_.append(line)
+                elif endswith_lf(line):
+                    yield type(buffer_[0])().join(buffer_)
+                    buffer_ = []
 
-        if buffer_ is not None:
-            yield buffer_
+        if buffer_:
+            yield type(buffer_[0])().join(buffer_)
 
     def __enter__(self):
         return self

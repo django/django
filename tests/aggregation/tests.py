@@ -1321,9 +1321,10 @@ class AggregateTestCase(TestCase):
 
             def as_sql(self, compiler, connection, **extra_context):
                 copy = self.copy()
-                # Most database backends do not support compiling multiple arguments on
-                # the Max aggregate, and that isn't what is being tested here anyway. To
-                # avoid errors, the extra argument is just dropped.
+                # Most database backends do not support compiling multiple
+                # arguments on the Max aggregate, and that isn't what is being
+                # tested here anyway. To avoid errors, the extra argument is
+                # just dropped.
                 copy.set_source_expressions(
                     copy.get_source_expressions()[0:1] + [None, None]
                 )
@@ -2243,8 +2244,8 @@ class AggregateTestCase(TestCase):
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "aggregation_author"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, quotation "
+            "marks, semicolons, or SQL comments."
         )
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.aggregate(**{crafted_alias: Avg("age")})

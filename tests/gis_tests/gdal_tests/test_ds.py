@@ -264,8 +264,8 @@ class DataSourceTest(SimpleTestCase):
 
                     # Making sure the fields match to an appropriate OFT type.
                     for k, v in source.fields.items():
-                        # Making sure we get the proper OGR Field instance, using
-                        # a string value index for the feature.
+                        # Making sure we get the proper OGR Field instance,
+                        # using a string value index for the feature.
                         self.assertIsInstance(feat[k], v)
                     self.assertIsInstance(feat.fields[0], str)
 

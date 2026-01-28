@@ -13,7 +13,7 @@ The ``File`` class
 .. class:: File(file_object, name=None)
 
     The :class:`File` class is a thin wrapper around a Python
-    :py:term:`file object` with some Django-specific additions.
+    :term:`file object` with some Django-specific additions.
     Internally, Django uses this class when it needs to represent a file.
 
     :class:`File` objects have the following attributes and methods:
@@ -29,18 +29,18 @@ The ``File`` class
 
     .. attribute:: file
 
-        The underlying :py:term:`file object` that this class wraps.
+        The underlying :term:`file object` that this class wraps.
 
         .. admonition:: Be careful with this attribute in subclasses.
 
             Some subclasses of :class:`File`, including
             :class:`~django.core.files.base.ContentFile` and
             :class:`~django.db.models.fields.files.FieldFile`, may replace this
-            attribute with an object other than a Python :py:term:`file object`.
-            In these cases, this attribute may itself be a :class:`File`
-            subclass (and not necessarily the same subclass). Whenever
-            possible, use the attributes and methods of the subclass itself
-            rather than the those of the subclass's ``file`` attribute.
+            attribute with an object other than a Python :term:`file
+            object`. In these cases, this attribute may itself be a
+            :class:`File` subclass (and not necessarily the same subclass).
+            Whenever possible, use the attributes and methods of the subclass
+            itself rather than the those of the subclass's ``file`` attribute.
 
     .. attribute:: mode
 
@@ -50,7 +50,7 @@ The ``File`` class
 
         Open or reopen the file (which also does ``File.seek(0)``).
         The ``mode`` argument allows the same values
-        as Python's built-in :func:`python:open()`. ``*args`` and ``**kwargs``
+        as Python's built-in :func:`python:open`. ``*args`` and ``**kwargs``
         are passed after ``mode`` to Python's built-in :func:`python:open`.
 
         When reopening a file, ``mode`` will override whatever mode the file

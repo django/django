@@ -225,8 +225,9 @@ def sort_dependencies(app_list, allow_cycles=False):
             model, deps = model_dependencies.pop()
 
             # If all of the models in the dependency list are either already
-            # on the final model list, or not on the original serialization list,
-            # then we've found another model with all it's dependencies satisfied.
+            # on the final model list, or not on the original serialization
+            # list, then we've found another model with all it's dependencies
+            # satisfied.
             if all(d not in models or d in model_list for d in deps):
                 model_list.append(model)
                 changed = True

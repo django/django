@@ -2,15 +2,15 @@
 #
 # Translators:
 # Bashar Al-Abdulhadi, 2015-2017
-# Muaaz Alsaied, 2020
+# Muaaz Alsaied, 2020,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2025-09-17 09:22+0000\n"
+"Last-Translator: Muaaz Alsaied, 2020,2025\n"
+"Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -121,11 +121,10 @@ msgstr "بعض المفاتيح المزوّدة غير معرّفه: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "تأكد من أن هذا المدى أقل من أو يساوي %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "تأكد من أن الحد الأعلى لهذا المجال أقل من أو يساوي %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "تأكد من أن هذا المدى أكثر من أو يساوي %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "تأكد من أن الحد الأدنى لهذا المجال أكبر من أو يساوي %(limit_value)s."

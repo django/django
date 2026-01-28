@@ -22,11 +22,11 @@ it should be doing.
 
 The preferred way to write tests in Django is using the :mod:`unittest` module
 built-in to the Python standard library. This is covered in detail in the
-:doc:`overview` document.
+:doc:`/topics/testing/overview` document.
 
 You can also use any *other* Python test framework; Django provides an API and
 tools for that kind of integration. They are described in the
-:ref:`other-testing-frameworks` section of :doc:`advanced`.
+:ref:`other-testing-frameworks` section of :doc:`/topics/testing/advanced`.
 
 .. toctree::
    :maxdepth: 1

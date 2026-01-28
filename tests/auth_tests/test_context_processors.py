@@ -145,7 +145,8 @@ class AuthContextProcessorTests(TestCase):
         # bug #12037 is tested by the {% url %} in the template:
         self.assertContains(response, "url: /userpage/super/")
 
-        # A Q() comparing a user and with another Q() (in an AND or OR fashion).
+        # A Q() comparing a user and with another Q() (in an AND or OR
+        # fashion).
         Q(user=response.context["user"]) & Q(someflag=True)
 
         # Tests for user equality. This is hard because User defines

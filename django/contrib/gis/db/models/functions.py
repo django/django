@@ -121,8 +121,8 @@ class GeomOutputGeoFunc(GeoFunc):
 
 class SQLiteDecimalToFloatMixin:
     """
-    By default, Decimal values are converted to str by the SQLite backend, which
-    is not acceptable by the GIS functions expecting numeric values.
+    By default, Decimal values are converted to str by the SQLite backend,
+    which is not acceptable by the GIS functions expecting numeric values.
     """
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -451,6 +451,10 @@ class IsEmpty(GeoFuncMixin, Transform):
     lookup_name = "isempty"
     output_field = BooleanField()
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = super().as_sql(compiler, connection, **extra_context)
+        return "NULLIF(%s, -1)" % sql, params
+
 
 @BaseSpatialField.register_lookup
 class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
@@ -483,7 +487,8 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
         if self.source_is_geography():
             clone.source_expressions.append(Value(self.spheroid))
         elif self.geo_field.geodetic(connection):
-            # Geometry fields with geodetic (lon/lat) coordinates need length_spheroid
+            # Geometry fields with geodetic (lon/lat) coordinates need
+            # length_spheroid
             function = connection.ops.spatial_function_name("LengthSpheroid")
             clone.source_expressions.append(Value(self.geo_field.spheroid(connection)))
         else:
@@ -512,6 +517,13 @@ class MakeValid(GeomOutputGeoFunc):
 
 
 class MemSize(GeoFunc):
+    output_field = IntegerField()
+    arity = 1
+
+
+@BaseSpatialField.register_lookup
+class NumDimensions(GeoFuncMixin, Transform):
+    lookup_name = "num_dimensions"
     output_field = IntegerField()
     arity = 1
 

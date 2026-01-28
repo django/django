@@ -1,5 +1,6 @@
 'use strict';
 {
+    const getOptionGroupName = (option) => option.parentElement.label;
     const SelectBox = {
         cache: {},
         init: function(id) {
@@ -7,7 +8,12 @@
             SelectBox.cache[id] = [];
             const cache = SelectBox.cache[id];
             for (const node of box.options) {
-                cache.push({value: node.value, text: node.text, displayed: 1});
+                const group = getOptionGroupName(node);
+                cache.push({group, value: node.value, text: node.text, displayed: 1});
+            }
+            // Only sort if there are any groups (to preserve existing behavior for non-grouped selects)
+            if (cache.some(item => item.group)) {
+                SelectBox.sort(id);
             }
         },
         redisplay: function(id) {
@@ -15,12 +21,25 @@
             const box = document.getElementById(id);
             const scroll_value_from_top = box.scrollTop;
             box.innerHTML = '';
-            for (const node of SelectBox.cache[id]) {
-                if (node.displayed) {
-                    const new_option = new Option(node.text, node.value, false, false);
+            let node = box;
+            let currentOptgroup = null;
+            for (const option of SelectBox.cache[id]) {
+                if (option.displayed) {
+                    // Create a new optgroup when the group changes
+                    if (option.group && option.group !== currentOptgroup) {
+                        currentOptgroup = option.group;
+                        node = document.createElement('optgroup');
+                        node.setAttribute('label', option.group);
+                        box.appendChild(node);
+                    } else if (!option.group && currentOptgroup !== null) {
+                        // Back to ungrouped options
+                        currentOptgroup = null;
+                        node = box;
+                    }
+                    const new_option = new Option(option.text, option.value, false, false);
                     // Shows a tooltip when hovering over the option
-                    new_option.title = node.text;
-                    box.appendChild(new_option);
+                    new_option.title = option.text;
+                    node.appendChild(new_option);
                 }
             }
             box.scrollTop = scroll_value_from_top;
@@ -57,7 +76,7 @@
             cache.splice(delete_index, 1);
         },
         add_to_cache: function(id, option) {
-            SelectBox.cache[id].push({value: option.value, text: option.text, displayed: 1});
+            SelectBox.cache[id].push({group: option.group, value: option.value, text: option.text, displayed: 1});
         },
         cache_contains: function(id, value) {
             // Check if an item is contained in the cache
@@ -73,9 +92,14 @@
             for (const option of from_box.options) {
                 const option_value = option.value;
                 if (option.selected && SelectBox.cache_contains(from, option_value)) {
-                    SelectBox.add_to_cache(to, {value: option_value, text: option.text, displayed: 1});
+                    const group = getOptionGroupName(option);
+                    SelectBox.add_to_cache(to, {group, value: option_value, text: option.text, displayed: 1});
                     SelectBox.delete_from_cache(from, option_value);
                 }
+            }
+            // Only sort if there are any groups (to preserve existing behavior for non-grouped selects)
+            if (SelectBox.cache[to].some(item => item.group)) {
+                SelectBox.sort(to);
             }
             SelectBox.redisplay(from);
             SelectBox.redisplay(to);
@@ -85,17 +109,22 @@
             for (const option of from_box.options) {
                 const option_value = option.value;
                 if (SelectBox.cache_contains(from, option_value)) {
-                    SelectBox.add_to_cache(to, {value: option_value, text: option.text, displayed: 1});
+                    const group = getOptionGroupName(option);
+                    SelectBox.add_to_cache(to, {group, value: option_value, text: option.text, displayed: 1});
                     SelectBox.delete_from_cache(from, option_value);
                 }
+            }
+            // Only sort if there are any groups (to preserve existing behavior for non-grouped selects)
+            if (SelectBox.cache[to].some(item => item.group)) {
+                SelectBox.sort(to);
             }
             SelectBox.redisplay(from);
             SelectBox.redisplay(to);
         },
         sort: function(id) {
             SelectBox.cache[id].sort(function(a, b) {
-                a = a.text.toLowerCase();
-                b = b.text.toLowerCase();
+                a = (a.group && a.group.toLowerCase() || '') + a.text.toLowerCase();
+                b = (b.group && b.group.toLowerCase() || '') + b.text.toLowerCase();
                 if (a > b) {
                     return 1;
                 }

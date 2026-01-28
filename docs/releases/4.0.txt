@@ -289,7 +289,7 @@ Management Commands
 
 * On PostgreSQL, :djadmin:`dbshell` now supports specifying a password file.
 
-* The :djadmin:`shell` command now respects :py:data:`sys.__interactivehook__`
+* The :djadmin:`shell` command now respects :data:`sys.__interactivehook__`
   at startup. This allows loading shell history between interactive sessions.
   As a consequence, ``readline`` is no longer loaded if running in *isolated*
   mode.
@@ -324,7 +324,7 @@ Models
   specifying a value to return when the function is used over an empty result
   set.
 
-* The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update()` is now
+* The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update` is now
   allowed on MariaDB 10.6+.
 
 * :class:`~django.db.models.Lookup` expressions may now be used in ``QuerySet``
@@ -349,7 +349,7 @@ Signals
 * The new ``stdout`` argument for :func:`~django.db.models.signals.pre_migrate`
   and :func:`~django.db.models.signals.post_migrate` signals allows redirecting
   output to a stream-like object. It should be preferred over
-  :py:data:`sys.stdout` and :py:func:`print` when emitting verbose output in
+  :data:`sys.stdout` and :func:`print` when emitting verbose output in
   order to allow proper capture when testing.
 
 Templates
@@ -370,7 +370,7 @@ Tests
 * The :option:`test --buffer` option now supports parallel tests.
 
 * The new ``logger`` argument to :class:`~django.test.runner.DiscoverRunner`
-  allows a Python :py:ref:`logger <logger>` to be used for logging.
+  allows a Python :ref:`logger <logger>` to be used for logging.
 
 * The new :meth:`.DiscoverRunner.log` method provides a way to log messages
   that uses the ``DiscoverRunner.logger``, or prints to the console if not set.

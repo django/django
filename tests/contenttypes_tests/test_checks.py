@@ -19,15 +19,17 @@ class GenericForeignKeyTests(SimpleTestCase):
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey()
 
+        field = TaggedItem._meta.get_field("content_object")
+
         expected = [
             checks.Error(
                 "The GenericForeignKey content type references the nonexistent "
                 "field 'TaggedItem.content_type'.",
-                obj=TaggedItem.content_object,
+                obj=field,
                 id="contenttypes.E002",
             )
         ]
-        self.assertEqual(TaggedItem.content_object.check(), expected)
+        self.assertEqual(field.check(), expected)
 
     def test_invalid_content_type_field(self):
         class Model(models.Model):
@@ -35,8 +37,10 @@ class GenericForeignKeyTests(SimpleTestCase):
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey("content_type", "object_id")
 
+        field = Model._meta.get_field("content_object")
+
         self.assertEqual(
-            Model.content_object.check(),
+            field.check(),
             [
                 checks.Error(
                     "'Model.content_type' is not a ForeignKey.",
@@ -44,7 +48,7 @@ class GenericForeignKeyTests(SimpleTestCase):
                         "GenericForeignKeys must use a ForeignKey to "
                         "'contenttypes.ContentType' as the 'content_type' field."
                     ),
-                    obj=Model.content_object,
+                    obj=field,
                     id="contenttypes.E003",
                 )
             ],
@@ -58,8 +62,10 @@ class GenericForeignKeyTests(SimpleTestCase):
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey("content_type", "object_id")
 
+        field = Model._meta.get_field("content_object")
+
         self.assertEqual(
-            Model.content_object.check(),
+            field.check(),
             [
                 checks.Error(
                     "'Model.content_type' is not a ForeignKey to "
@@ -68,8 +74,29 @@ class GenericForeignKeyTests(SimpleTestCase):
                         "GenericForeignKeys must use a ForeignKey to "
                         "'contenttypes.ContentType' as the 'content_type' field."
                     ),
-                    obj=Model.content_object,
+                    obj=field,
                     id="contenttypes.E004",
+                )
+            ],
+        )
+
+    def test_content_type_db_on_delete(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, models.DB_CASCADE)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey("content_type", "object_id")
+
+        field = Model._meta.get_field("content_object")
+
+        self.assertEqual(
+            field.check(),
+            [
+                checks.Error(
+                    "'Model.content_type' cannot use the database-level on_delete "
+                    "variant.",
+                    hint="Change the on_delete rule to the non-database variant.",
+                    obj=field,
+                    id="contenttypes.E006",
                 )
             ],
         )
@@ -80,13 +107,15 @@ class GenericForeignKeyTests(SimpleTestCase):
             # missing object_id field
             content_object = GenericForeignKey()
 
+        field = TaggedItem._meta.get_field("content_object")
+
         self.assertEqual(
-            TaggedItem.content_object.check(),
+            field.check(),
             [
                 checks.Error(
                     "The GenericForeignKey object ID references the nonexistent "
                     "field 'object_id'.",
-                    obj=TaggedItem.content_object,
+                    obj=field,
                     id="contenttypes.E001",
                 )
             ],
@@ -98,12 +127,14 @@ class GenericForeignKeyTests(SimpleTestCase):
             object_id = models.PositiveIntegerField()
             content_object_ = GenericForeignKey("content_type", "object_id")
 
+        field = Model._meta.get_field("content_object_")
+
         self.assertEqual(
-            Model.content_object_.check(),
+            field.check(),
             [
                 checks.Error(
                     "Field names must not end with an underscore.",
-                    obj=Model.content_object_,
+                    obj=field,
                     id="fields.E001",
                 )
             ],

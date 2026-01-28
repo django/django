@@ -7,10 +7,11 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (14,)
+    minimum_database_version = (15,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
+    can_return_rows_from_update = True
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
@@ -66,8 +67,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
     supports_stored_generated_columns = True
-    supports_virtual_generated_columns = False
+    supports_nulls_distinct_unique_constraints = True
+    supports_no_precision_decimalfield = True
     can_rename_index = True
+    prohibits_dollar_signs_in_column_aliases = True
     test_collations = {
         "deterministic": "C",
         "non_default": "sv-x-icu",
@@ -76,6 +79,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
     insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"
+    supports_uuid4_function = True
+
+    @cached_property
+    def supports_uuid7_function(self):
+        return self.is_postgresql_18
+
+    @cached_property
+    def supports_uuid7_function_shift(self):
+        return self.is_postgresql_18
 
     @cached_property
     def django_test_skips(self):
@@ -123,12 +135,27 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "test_group_by_nested_expression_with_params",
                 }
             )
+        if not is_psycopg3:
+            expected_failures.update(
+                {
+                    # operator does not exist: bigint[] = integer[]
+                    "postgres_tests.test_array.TestQuerying.test_gt",
+                    "postgres_tests.test_array.TestQuerying.test_in",
+                    "postgres_tests.test_array.TestQuerying.test_lt",
+                }
+            )
         return expected_failures
 
     @cached_property
     def uses_server_side_binding(self):
         options = self.connection.settings_dict["OPTIONS"]
         return is_psycopg3 and options.get("server_side_binding") is True
+
+    @cached_property
+    def max_query_params(self):
+        if self.uses_server_side_binding:
+            return 2**16 - 1
+        return None
 
     @cached_property
     def prohibits_null_characters_in_text_exception(self):
@@ -147,10 +174,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_15(self):
-        return self.connection.pg_version >= 150000
-
-    @cached_property
     def is_postgresql_16(self):
         return self.connection.pg_version >= 160000
 
@@ -158,9 +181,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_17(self):
         return self.connection.pg_version >= 170000
 
-    supports_unlimited_charfield = True
-    supports_nulls_distinct_unique_constraints = property(
-        operator.attrgetter("is_postgresql_15")
-    )
+    @cached_property
+    def is_postgresql_18(self):
+        return self.connection.pg_version >= 180000
 
+    supports_unlimited_charfield = True
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
+    supports_virtual_generated_columns = property(
+        operator.attrgetter("is_postgresql_18")
+    )

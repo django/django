@@ -2,7 +2,7 @@ import sqlite3
 import unittest
 
 from django.core.management.color import no_style
-from django.db import connection, models
+from django.db import connection
 from django.test import TestCase
 
 from ..models import Person, Tag
@@ -86,28 +86,6 @@ class SQLiteOperationsTests(TestCase):
             "zzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
             "zzz'",
             statements[-1],
-        )
-
-    def test_bulk_batch_size(self):
-        self.assertEqual(connection.ops.bulk_batch_size([], [Person()]), 1)
-        first_name_field = Person._meta.get_field("first_name")
-        last_name_field = Person._meta.get_field("last_name")
-        self.assertEqual(
-            connection.ops.bulk_batch_size([first_name_field], [Person()]), 500
-        )
-        self.assertEqual(
-            connection.ops.bulk_batch_size(
-                [first_name_field, last_name_field], [Person()]
-            ),
-            connection.features.max_query_params // 2,
-        )
-        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
-        composite_pk.fields = [first_name_field, last_name_field]
-        self.assertEqual(
-            connection.ops.bulk_batch_size(
-                [composite_pk, first_name_field], [Person()]
-            ),
-            connection.features.max_query_params // 3,
         )
 
     def test_bulk_batch_size_respects_variable_limit(self):

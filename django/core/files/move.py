@@ -19,8 +19,9 @@ def file_move_safe(
     """
     Move a file from one location to another in the safest way possible.
 
-    First, try ``os.rename``, which is simple but will break across filesystems.
-    If that fails, stream manually from one file to another in pure Python.
+    First, try ``os.rename``, which is simple but will break across
+    filesystems. If that fails, stream manually from one file to another in
+    pure Python.
 
     If the destination file exists and ``allow_overwrite`` is ``False``, raise
     ``FileExistsError``.

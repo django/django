@@ -6,11 +6,20 @@ from django import forms
 from django.apps import apps
 from django.conf import SettingsReference, settings
 from django.core import checks, exceptions
-from django.db import connection, router
+from django.db import connection, connections, router
 from django.db.backends import utils
-from django.db.models import Q
+from django.db.models import NOT_PROVIDED, Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.deletion import (
+    CASCADE,
+    DB_CASCADE,
+    DB_SET_DEFAULT,
+    DB_SET_NULL,
+    DO_NOTHING,
+    SET_DEFAULT,
+    SET_NULL,
+    DatabaseOnDelete,
+)
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.functional import cached_property
@@ -626,9 +635,10 @@ class ForeignObject(RelatedField):
                 if isinstance(field, CompositePrimaryKey):
                     errors.append(
                         checks.Error(
-                            "Field defines a relation to the CompositePrimaryKey of "
-                            f"model {self.remote_field.model._meta.object_name!r} "
-                            "which is not supported.",
+                            "Field defines a relation involving model "
+                            f"{self.remote_field.model._meta.object_name!r} which has "
+                            "a CompositePrimaryKey and such relations are not "
+                            "supported.",
                             obj=self,
                             id="fields.E347",
                         )
@@ -663,8 +673,8 @@ class ForeignObject(RelatedField):
                     frozenset(uc.fields) <= foreign_fields
                     for uc in remote_opts.total_unique_constraints
                 )
-                # If the model defines a composite primary key and the foreign key
-                # refers to it, the target is unique.
+                # If the model defines a composite primary key and the foreign
+                # key refers to it, the target is unique.
                 or (
                     frozenset(field.name for field in remote_opts.pk_fields)
                     == foreign_fields
@@ -746,8 +756,8 @@ class ForeignObject(RelatedField):
                 kwargs["to"] = self.remote_field.model.lower()
         else:
             kwargs["to"] = self.remote_field.model._meta.label_lower
-        # If swappable is True, then see if we're actually pointing to the target
-        # of a swap.
+        # If swappable is True, then see if we're actually pointing to the
+        # target of a swap.
         swappable_setting = self.swappable_setting
         if swappable_setting is not None:
             # If it's already a settings reference, error
@@ -1040,18 +1050,50 @@ class ForeignKey(ForeignObject):
         return cls
 
     def check(self, **kwargs):
+        databases = kwargs.get("databases") or []
         return [
             *super().check(**kwargs),
-            *self._check_on_delete(),
+            *self._check_on_delete(databases),
             *self._check_unique(),
         ]
 
-    def _check_on_delete(self):
+    def _check_on_delete_db_support(self, on_delete, feature_flag, databases):
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if feature_flag in self.model._meta.required_db_features or getattr(
+                connection.features, feature_flag
+            ):
+                continue
+            no_db_option_name = on_delete.__name__.removeprefix("DB_")
+            yield checks.Error(
+                f"{connection.display_name} does not support a {on_delete.__name__}.",
+                hint=f"Change the on_delete rule to {no_db_option_name}.",
+                obj=self,
+                id="fields.E324",
+            )
+
+    def _check_on_delete(self, databases):
         on_delete = getattr(self.remote_field, "on_delete", None)
-        if on_delete == SET_NULL and not self.null:
-            return [
+        errors = []
+        if on_delete == DB_CASCADE:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_cascade", databases
+                )
+            )
+        if on_delete == DB_SET_NULL:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_null", databases
+                )
+            )
+        if on_delete in [DB_SET_NULL, SET_NULL] and not self.null:
+            errors.append(
                 checks.Error(
-                    "Field specifies on_delete=SET_NULL, but cannot be null.",
+                    f"Field specifies on_delete={on_delete.__name__}, but cannot be "
+                    "null.",
                     hint=(
                         "Set null=True argument on the field, or change the on_delete "
                         "rule."
@@ -1059,18 +1101,67 @@ class ForeignKey(ForeignObject):
                     obj=self,
                     id="fields.E320",
                 )
-            ]
+            )
         elif on_delete == SET_DEFAULT and not self.has_default():
-            return [
+            errors.append(
                 checks.Error(
                     "Field specifies on_delete=SET_DEFAULT, but has no default value.",
                     hint="Set a default value, or change the on_delete rule.",
                     obj=self,
                     id="fields.E321",
                 )
-            ]
-        else:
-            return []
+            )
+        elif on_delete == DB_SET_DEFAULT:
+            if self.db_default is NOT_PROVIDED:
+                errors.append(
+                    checks.Error(
+                        "Field specifies on_delete=DB_SET_DEFAULT, but has "
+                        "no db_default value.",
+                        hint="Set a db_default value, or change the on_delete rule.",
+                        obj=self,
+                        id="fields.E322",
+                    )
+                )
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_default", databases
+                )
+            )
+        if not isinstance(self.remote_field.model, str) and on_delete != DO_NOTHING:
+            # Database and Python variants cannot be mixed in a chain of
+            # model references.
+            is_db_on_delete = isinstance(on_delete, DatabaseOnDelete)
+            ref_model_related_fields = (
+                ref_model_field.remote_field
+                for ref_model_field in self.remote_field.model._meta.get_fields()
+                if ref_model_field.related_model
+                and hasattr(ref_model_field.remote_field, "on_delete")
+            )
+
+            for ref_remote_field in ref_model_related_fields:
+                if (
+                    ref_remote_field.on_delete is not None
+                    and ref_remote_field.on_delete != DO_NOTHING
+                    and isinstance(ref_remote_field.on_delete, DatabaseOnDelete)
+                    is not is_db_on_delete
+                ):
+                    on_delete_type = "database" if is_db_on_delete else "Python"
+                    ref_on_delete_type = "Python" if is_db_on_delete else "database"
+                    errors.append(
+                        checks.Error(
+                            f"Field specifies {on_delete_type}-level on_delete "
+                            "variant, but referenced model uses "
+                            f"{ref_on_delete_type}-level variant.",
+                            hint=(
+                                "Use either database or Python on_delete variants "
+                                "uniformly in the references chain."
+                            ),
+                            obj=self,
+                            id="fields.E323",
+                        )
+                    )
+                    break
+        return errors
 
     def _check_unique(self, **kwargs):
         return (
@@ -1538,20 +1629,24 @@ class ManyToManyField(RelatedField):
                 to_model_name = to_model
             else:
                 to_model_name = to_model._meta.object_name
-            if (
-                self.remote_field.through_fields is None
-                and not isinstance(to_model, str)
-                and isinstance(to_model._meta.pk, CompositePrimaryKey)
+            if self.remote_field.through_fields is None and not isinstance(
+                to_model, str
             ):
-                errors.append(
-                    checks.Error(
-                        "Field defines a relation to the CompositePrimaryKey of model "
-                        f"{self.remote_field.model._meta.object_name!r} which is not "
-                        "supported.",
-                        obj=self,
-                        id="fields.E347",
+                model_name = None
+                if isinstance(to_model._meta.pk, CompositePrimaryKey):
+                    model_name = self.remote_field.model._meta.object_name
+                elif isinstance(from_model._meta.pk, CompositePrimaryKey):
+                    model_name = from_model_name
+                if model_name:
+                    errors.append(
+                        checks.Error(
+                            f"Field defines a relation involving model {model_name!r} "
+                            "which has a CompositePrimaryKey and such relations are "
+                            "not supported.",
+                            obj=self,
+                            id="fields.E347",
+                        )
                     )
-                )
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
             # Count foreign keys in intermediate model
@@ -1825,8 +1920,8 @@ class ManyToManyField(RelatedField):
                 kwargs["through"] = self.remote_field.through._meta.label
         if through_fields := getattr(self.remote_field, "through_fields", None):
             kwargs["through_fields"] = through_fields
-        # If swappable is True, then see if we're actually pointing to the target
-        # of a swap.
+        # If swappable is True, then see if we're actually pointing to the
+        # target of a swap.
         swappable_setting = self.swappable_setting
         if swappable_setting is not None:
             # If it's already a settings reference, error.
@@ -1843,6 +1938,10 @@ class ManyToManyField(RelatedField):
                 swappable_setting,
             )
         return name, path, args, kwargs
+
+    def get_attname_column(self):
+        attname, _ = super().get_attname_column()
+        return attname, None
 
     def _get_path_info(self, direct=False, filtered_relation=None):
         """Called by both direct and indirect m2m traversal."""

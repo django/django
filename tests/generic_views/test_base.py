@@ -114,7 +114,8 @@ class ViewTest(LoggingAssertionMixin, SimpleTestCase):
 
     def test_get_and_head(self):
         """
-        Test a view which supplies a GET method also responds correctly to HEAD.
+        Test a view which supplies a GET method also responds correctly to
+        HEAD.
         """
         self._assert_simple(SimpleView.as_view()(self.rf.get("/")))
         response = SimpleView.as_view()(self.rf.head("/"))
@@ -129,7 +130,8 @@ class ViewTest(LoggingAssertionMixin, SimpleTestCase):
 
     def test_head_no_get(self):
         """
-        Test a view which supplies no GET method responds to HEAD with HTTP 405.
+        Test a view which supplies no GET method responds to HEAD with HTTP
+        405.
         """
         response = PostOnlyView.as_view()(self.rf.head("/"))
         self.assertEqual(response.status_code, 405)
@@ -585,6 +587,31 @@ class RedirectViewTest(LoggingAssertionMixin, SimpleTestCase):
                     handler, f"Gone: {escaped}", logging.WARNING, 410, request
                 )
 
+    def test_redirect_with_querry_string_in_destination(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/bar/?pork=spam")
+
+    def test_redirect_with_query_string_in_destination_and_request(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo/?utm_source=social")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"], "/bar/?pork=spam&utm_source=social"
+        )
+
+    def test_redirect_with_same_query_string_param_will_append_not_replace(self):
+        response = RedirectView.as_view(url="/bar/?pork=spam", query_string=True)(
+            self.rf.get("/foo/?utm_source=social&pork=ham")
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"], "/bar/?pork=spam&utm_source=social&pork=ham"
+        )
+
 
 class GetContextDataTest(SimpleTestCase):
     def test_get_context_data_super(self):
@@ -608,7 +635,8 @@ class GetContextDataTest(SimpleTestCase):
         self.assertEqual(context["pony"], test_view.object)
 
     def test_object_in_get_context_data(self):
-        # Checks 'object' key presence in dict returned by get_context_date #20234
+        # Checks 'object' key presence in dict returned by get_context_date
+        # #20234
         test_view = views.CustomSingleObjectView()
         context = test_view.get_context_data()
         self.assertEqual(context["object"], test_view.object)

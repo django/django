@@ -408,7 +408,8 @@ class M2mThroughReferentialTests(TestCase):
 
         self.assertQuerySetEqual(chris.friends.all(), [])
 
-        # Since this isn't a symmetrical relation, Tony's friend link still exists.
+        # Since this isn't a symmetrical relation, Tony's friend link still
+        # exists.
         self.assertQuerySetEqual(tony.friends.all(), ["Chris"], attrgetter("name"))
 
     def test_self_referential_non_symmetrical_both(self):

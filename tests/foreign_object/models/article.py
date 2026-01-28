@@ -28,8 +28,8 @@ class ColConstraint:
 
 class ActiveTranslationField(models.ForeignObject):
     """
-    This field will allow querying and fetching the currently active translation
-    for Article from ArticleTranslation.
+    This field will allow querying and fetching the currently active
+    translation for Article from ArticleTranslation.
     """
 
     requires_unique_target = False

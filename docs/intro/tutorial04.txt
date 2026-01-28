@@ -2,8 +2,8 @@
 Writing your first Django app, part 4
 =====================================
 
-This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
-continuing the web-poll application and will focus on form processing and
+This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off.
+We're continuing the web-poll application and will focus on form processing and
 cutting down our code.
 
 .. admonition:: Where to get help:
@@ -42,8 +42,8 @@ A quick rundown:
   POST data ``choice=#`` where # is the ID of the selected choice. This is the
   basic concept of HTML forms.
 
-* We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and we
-  set ``method="post"``. Using ``method="post"`` (as opposed to
+* We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and
+  we set ``method="post"``. Using ``method="post"`` (as opposed to
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
@@ -158,8 +158,8 @@ As mentioned in :doc:`Tutorial 3 </intro/tutorial03>`, ``request`` is an
 :class:`~django.http.HttpRequest` objects, see the :doc:`request and
 response documentation </ref/request-response>`.
 
-After somebody votes in a question, the ``vote()`` view redirects to the results
-page for the question. Let's write that view:
+After somebody votes in a question, the ``vote()`` view redirects to the
+results page for the question. Let's write that view:
 
 .. code-block:: python
     :caption: ``polls/views.py``
@@ -190,8 +190,8 @@ Now, create a ``polls/results.html`` template:
 
     <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
 
-Now, go to ``/polls/1/`` in your browser and vote in the question. You should see a
-results page that gets updated each time you vote. If you submit the form
+Now, go to ``/polls/1/`` in your browser and vote in the question. You should
+see a results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
 Use generic views: Less code is better
@@ -206,12 +206,12 @@ the database according to a parameter passed in the URL, loading a template and
 returning the rendered template. Because this is so common, Django provides a
 shortcut, called the "generic views" system.
 
-Generic views abstract common patterns to the point where you don't even need to
-write Python code to write an app. For example, the
+Generic views abstract common patterns to the point where you don't even need
+to write Python code to write an app. For example, the
 :class:`~django.views.generic.list.ListView` and
-:class:`~django.views.generic.detail.DetailView` generic views
-abstract the concepts of "display a list of objects" and
-"display a detail page for a particular type of object" respectively.
+:class:`~django.views.generic.detail.DetailView` generic views abstract the
+concepts of "display a list of objects" and "display a detail page for a
+particular type of object" respectively.
 
 Let's convert our poll app to use the generic views system, so we can delete a
 bunch of our own code. We'll have to take a few steps to make the conversion.

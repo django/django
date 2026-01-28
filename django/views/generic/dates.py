@@ -651,8 +651,8 @@ class TodayArchiveView(MultipleObjectTemplateResponseMixin, BaseTodayArchiveView
 
 class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailView):
     """
-    Base detail view for a single object on a single date; this differs from the
-    standard DetailView by accepting a year/month/day in the URL.
+    Base detail view for a single object on a single date; this differs from
+    the standard DetailView by accepting a year/month/day in the URL.
 
     This requires subclassing to provide a response mixin.
     """

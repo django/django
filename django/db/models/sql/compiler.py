@@ -52,10 +52,11 @@ class SQLCompiler:
         # they would return an empty result set.
         self.elide_empty = elide_empty
         self.quote_cache = {"*": "*"}
-        # The select, klass_info, and annotations are needed by QuerySet.iterator()
-        # these are set as a side-effect of executing the query. Note that we calculate
-        # separately a list of extra select columns needed for grammatical correctness
-        # of the query, but these columns are not included in self.select.
+        # The select, klass_info, and annotations are needed by
+        # QuerySet.iterator() these are set as a side-effect of executing the
+        # query. Note that we calculate separately a list of extra select
+        # columns needed for grammatical correctness of the query, but these
+        # columns are not included in self.select.
         self.select = None
         self.annotation_col_map = None
         self.klass_info = None
@@ -227,6 +228,13 @@ class SQLCompiler:
             ]
         return expressions
 
+    @classmethod
+    def get_select_from_parent(cls, klass_info):
+        for ki in klass_info["related_klass_infos"]:
+            if ki["from_parent"]:
+                ki["select_fields"] = klass_info["select_fields"] + ki["select_fields"]
+            cls.get_select_from_parent(ki)
+
     def get_select(self, with_col_aliases=False):
         """
         Return three values:
@@ -299,15 +307,7 @@ class SQLCompiler:
             related_klass_infos = self.get_related_selections(select, select_mask)
             klass_info["related_klass_infos"] = related_klass_infos
 
-            def get_select_from_parent(klass_info):
-                for ki in klass_info["related_klass_infos"]:
-                    if ki["from_parent"]:
-                        ki["select_fields"] = (
-                            klass_info["select_fields"] + ki["select_fields"]
-                        )
-                    get_select_from_parent(ki)
-
-            get_select_from_parent(klass_info)
+            self.get_select_from_parent(klass_info)
 
         ret = []
         col_idx = 1
@@ -553,6 +553,14 @@ class SQLCompiler:
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
         """
+        if (
+            self.connection.features.prohibits_dollar_signs_in_column_aliases
+            and "$" in name
+        ):
+            raise ValueError(
+                "Dollar signs are not permitted in column aliases on "
+                f"{self.connection.display_name}."
+            )
         if name in self.quote_cache:
             return self.quote_cache[name]
         if (
@@ -946,9 +954,9 @@ class SQLCompiler:
                 # If the query is used as a subquery, the extra selects would
                 # result in more columns than the left-hand side expression is
                 # expecting. This can happen when a subquery uses a combination
-                # of order_by() and distinct(), forcing the ordering expressions
-                # to be selected as well. Wrap the query in another subquery
-                # to exclude extraneous selects.
+                # of order_by() and distinct(), forcing the ordering
+                # expressions to be selected as well. Wrap the query in another
+                # subquery to exclude extraneous selects.
                 sub_selects = []
                 sub_params = []
                 for index, (select, _, alias) in enumerate(self.select, start=1):
@@ -1621,9 +1629,12 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+            try:
+                cursor.close()
+            except DatabaseError:
+                raise e from None
             raise
 
         if result_type == ROW_COUNT:
@@ -1703,8 +1714,8 @@ class SQLInsertCompiler(SQLCompiler):
             sql, params = "%s", [val]
 
         # The following hook is only used by Oracle Spatial, which sometimes
-        # needs to yield 'NULL' and [] as its placeholder and params instead
-        # of '%s' and [None]. The 'NULL' placeholder is produced earlier by
+        # needs to yield 'NULL' and () as its placeholder and params instead
+        # of '%s' and (None,). The 'NULL' placeholder is produced earlier by
         # OracleOperations.get_geom_placeholder(). The following line removes
         # the corresponding None parameter. See ticket #10888.
         params = self.connection.ops.modify_insert_params(sql, params)
@@ -1808,9 +1819,13 @@ class SQLInsertCompiler(SQLCompiler):
             for field in list(fields):
                 field_prepare = partial(self.prepare_value, field)
                 field_pre_save = partial(self.pre_save_val, field)
-                field_values = [
-                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
-                ]
+
+                field_values = []
+                for obj in self.query.objs:
+                    value = field_pre_save(obj)
+                    if not isinstance(value, DatabaseDefault):
+                        value = field_prepare(value)
+                    field_values.append(value)
 
                 if not field.has_db_default():
                     value_cols.append(field_values)
@@ -1889,7 +1904,7 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(on_conflict_suffix_sql)
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
-            r_sql, self.returning_params = self.connection.ops.return_insert_columns(
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
                 self.returning_fields
             )
             if r_sql:
@@ -1924,20 +1939,16 @@ class SQLInsertCompiler(SQLCompiler):
                 cursor.execute(sql, params)
             if not self.returning_fields:
                 return []
+            obj_len = len(self.query.objs)
             if (
                 self.connection.features.can_return_rows_from_bulk_insert
-                and len(self.query.objs) > 1
+                and obj_len > 1
+            ) or (
+                self.connection.features.can_return_columns_from_insert and obj_len == 1
             ):
-                rows = self.connection.ops.fetch_returned_insert_rows(cursor)
-                cols = [field.get_col(opts.db_table) for field in self.returning_fields]
-            elif self.connection.features.can_return_columns_from_insert:
-                assert len(self.query.objs) == 1
-                rows = [
-                    self.connection.ops.fetch_returned_insert_columns(
-                        cursor,
-                        self.returning_params,
-                    )
-                ]
+                rows = self.connection.ops.fetch_returned_rows(
+                    cursor, self.returning_params
+                )
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             elif returning_fields and isinstance(
                 returning_field := returning_fields[0], AutoField
@@ -2023,6 +2034,9 @@ class SQLDeleteCompiler(SQLCompiler):
 
 
 class SQLUpdateCompiler(SQLCompiler):
+    returning_fields = None
+    returning_params = ()
+
     def as_sql(self):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -2090,6 +2104,15 @@ class SQLUpdateCompiler(SQLCompiler):
             params = []
         else:
             result.append("WHERE %s" % where)
+        if self.returning_fields:
+            # Skip empty r_sql to allow subclasses to customize behavior for
+            # 3rd party backends. Refs #19096.
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
+                self.returning_fields
+            )
+            if r_sql:
+                result.append(r_sql)
+                params.extend(self.returning_params)
         return " ".join(result), tuple(update_params + params)
 
     def execute_sql(self, result_type):
@@ -2107,11 +2130,43 @@ class SQLUpdateCompiler(SQLCompiler):
             # If the result_type is NO_RESULTS then the aux_row_count is None.
             aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
             if is_empty and aux_row_count:
-                # Returns the row count for any related updates as the number of
-                # rows updated.
+                # Returns the row count for any related updates as the number
+                # of rows updated.
                 row_count = aux_row_count
                 is_empty = False
         return row_count
+
+    def execute_returning_sql(self, returning_fields):
+        """
+        Execute the specified update and return rows of the returned columns
+        associated with the specified returning_field if the backend supports
+        it.
+        """
+        if self.query.get_related_updates():
+            raise NotImplementedError(
+                "Update returning is not implemented for queries with related updates."
+            )
+
+        if (
+            not returning_fields
+            or not self.connection.features.can_return_rows_from_update
+        ):
+            row_count = self.execute_sql(ROW_COUNT)
+            return [()] * row_count
+
+        self.returning_fields = returning_fields
+        with self.connection.cursor() as cursor:
+            sql, params = self.as_sql()
+            cursor.execute(sql, params)
+            rows = self.connection.ops.fetch_returned_rows(
+                cursor, self.returning_params
+            )
+        opts = self.query.get_meta()
+        cols = [field.get_col(opts.db_table) for field in self.returning_fields]
+        converters = self.get_converters(cols)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+        return list(rows)
 
     def pre_sql_setup(self):
         """

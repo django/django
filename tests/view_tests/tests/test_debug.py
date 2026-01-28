@@ -396,7 +396,8 @@ class DebugViewTests(SimpleTestCase):
 
     def test_no_template_source_loaders(self):
         """
-        Make sure if you don't specify a template, the debug view doesn't blow up.
+        Make sure if you don't specify a template, the debug view doesn't blow
+        up.
         """
         with self.assertLogs("django.request", "ERROR"):
             with self.assertRaises(TemplateDoesNotExist):
@@ -420,6 +421,16 @@ class DebugViewTests(SimpleTestCase):
         response = self.client.request(**{"path": "/FORCED_PREFIX/"})
         self.assertContains(
             response, "<h1>The install worked successfully! Congratulations!</h1>"
+        )
+
+    @override_settings(ROOT_URLCONF="view_tests.default_urls")
+    def test_default_urlconf_technical_404(self):
+        response = self.client.get("/favicon.ico")
+        self.assertContains(
+            response,
+            "<code>\nadmin/\n[namespace='admin']\n</code>",
+            status_code=404,
+            html=True,
         )
 
     @override_settings(ROOT_URLCONF="view_tests.regression_21530_urls")
@@ -493,7 +504,8 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
     def test_handle_db_exception(self):
         """
         Ensure the debug view works when a database exception is raised by
-        performing an invalid query and passing the exception to the debug view.
+        performing an invalid query and passing the exception to the debug
+        view.
         """
         with connection.cursor() as cursor:
             try:
@@ -614,7 +626,9 @@ class ExceptionReporterTests(SimpleTestCase):
         )
 
     def test_eol_support(self):
-        """The ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
+        """
+        The ExceptionReporter supports Unix, Windows and Macintosh EOL markers
+        """
         LINES = ["print %d" % i for i in range(1, 6)]
         reporter = ExceptionReporter(None, None, None, None)
 
@@ -1040,7 +1054,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn("<p>Request data not supplied</p>", html)
 
     def test_non_utf8_values_handling(self):
-        "Non-UTF-8 exceptions/values should not make the output generation choke."
+        """
+        Non-UTF-8 exceptions/values should not make the output generation
+        choke.
+        """
         try:
 
             class NonUtf8Output(Exception):
@@ -1446,7 +1463,8 @@ class ExceptionReportTestMixin:
         self, view, check_for_vars=True, check_for_POST_params=True
     ):
         """
-        Asserts that no variables or POST parameters are displayed in the response.
+        Asserts that no variables or POST parameters are displayed in the
+        response.
         """
         request = self.rf.post("/some_url/", self.breakfast_data)
         response = view(request)
@@ -1465,7 +1483,8 @@ class ExceptionReportTestMixin:
 
     def verify_unsafe_email(self, view, check_for_POST_params=True):
         """
-        Asserts that potentially sensitive info are displayed in the email report.
+        Asserts that potentially sensitive info are displayed in the email
+        report.
         """
         with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
@@ -1501,7 +1520,8 @@ class ExceptionReportTestMixin:
 
     def verify_safe_email(self, view, check_for_POST_params=True):
         """
-        Asserts that certain sensitive info are not displayed in the email report.
+        Asserts that certain sensitive info are not displayed in the email
+        report.
         """
         with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
@@ -1544,7 +1564,8 @@ class ExceptionReportTestMixin:
 
     def verify_paranoid_email(self, view):
         """
-        Asserts that no variables or POST parameters are displayed in the email report.
+        Asserts that no variables or POST parameters are displayed in the email
+        report.
         """
         with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox

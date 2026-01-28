@@ -131,7 +131,8 @@ class TestHashedFiles:
 
     def test_template_tag_absolute_root(self):
         """
-        Like test_template_tag_absolute, but for a file in STATIC_ROOT (#26249).
+        Like test_template_tag_absolute, but for a file in STATIC_ROOT
+        (#26249).
         """
         relpath = self.hashed_file_path("absolute_root.css")
         self.assertEqual(relpath, "absolute_root.f821df1b64f7.css")
@@ -198,8 +199,8 @@ class TestHashedFiles:
         Files that are alterable should always be post-processed; files that
         aren't should be skipped.
 
-        collectstatic has already been called once in setUp() for this testcase,
-        therefore we check by verifying behavior on a second run.
+        collectstatic has already been called once in setUp() for this
+        testcase, therefore we check by verifying behavior on a second run.
         """
         collectstatic_args = {
             "interactive": False,

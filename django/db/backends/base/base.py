@@ -595,8 +595,8 @@ class BaseDatabaseWrapper:
         """
         if self.connection is not None:
             self.health_check_done = False
-            # If the application didn't restore the original autocommit setting,
-            # don't take chances, drop the connection.
+            # If the application didn't restore the original autocommit
+            # setting, don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
                 self.close()
                 return
@@ -741,11 +741,8 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() (%s).",
-                        e,
-                        exc_info=True,
-                    )
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception("Error calling %s in on_commit() (%s).", name, e)
             else:
                 func()
 
@@ -759,11 +756,11 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() during "
-                        f"transaction (%s).",
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception(
+                        "Error calling %s in on_commit() during transaction (%s).",
+                        name,
                         e,
-                        exc_info=True,
                     )
             else:
                 func()

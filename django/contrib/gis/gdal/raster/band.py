@@ -71,8 +71,8 @@ class GDALBand(GDALRasterBase):
         If approximate=True, the statistics may be computed based on overviews
         or a subset of image tiles.
 
-        If refresh=True, the statistics will be computed from the data directly,
-        and the cache will be updated where applicable.
+        If refresh=True, the statistics will be computed from the data
+        directly, and the cache will be updated where applicable.
 
         For empty bands (where all pixel values are nodata), all statistics
         values are returned as None.

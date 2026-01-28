@@ -29,14 +29,12 @@ class ClearableFileInputTest(WidgetTest):
             self.widget,
             "myfile",
             FakeFieldFile(),
-            html=(
-                """
+            html=("""
             Currently: <a href="something">something</a>
             <input type="checkbox" name="myfile-clear" id="myfile-clear_id">
             <label for="myfile-clear_id">Clear</label><br>
             Change: <input type="file" name="myfile">
-            """
-            ),
+            """),
         )
 
     def test_html_escaped(self):
@@ -55,8 +53,7 @@ class ClearableFileInputTest(WidgetTest):
             ClearableFileInput(),
             "my<div>file",
             StrangeFieldFile(),
-            html=(
-                """
+            html=("""
                 Currently:
                 <a href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en">
                 something&lt;div onclick=&quot;alert(&#x27;oops&#x27;)&quot;&gt;.jpg</a>
@@ -64,8 +61,7 @@ class ClearableFileInputTest(WidgetTest):
                     id="my&lt;div&gt;file-clear_id">
                 <label for="my&lt;div&gt;file-clear_id">Clear</label><br>
                 Change: <input type="file" name="my&lt;div&gt;file">
-                """
-            ),
+                """),
         )
 
     def test_clear_input_renders_only_if_not_required(self):
@@ -79,12 +75,10 @@ class ClearableFileInputTest(WidgetTest):
             widget,
             "myfile",
             FakeFieldFile(),
-            html=(
-                """
+            html=("""
             Currently: <a href="something">something</a> <br>
             Change: <input type="file" name="myfile">
-            """
-            ),
+            """),
         )
 
     def test_clear_input_renders_only_if_initial(self):
@@ -143,14 +137,12 @@ class ClearableFileInputTest(WidgetTest):
             widget,
             "myfile",
             [FakeFieldFile()],
-            html=(
-                """
+            html=("""
             Currently: <a href="something">something</a>
             <input type="checkbox" name="myfile_0-clear" id="myfile_0-clear_id">
             <label for="myfile_0-clear_id">Clear</label><br>
             Change: <input type="file" name="myfile_0">
-            """
-            ),
+            """),
         )
 
     def test_clear_input_checked_returns_false(self):

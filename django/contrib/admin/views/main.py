@@ -11,6 +11,7 @@ from django.contrib.admin.exceptions import (
 from django.contrib.admin.options import (
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
     ShowFacets,
@@ -49,6 +50,7 @@ IGNORED_PARAMS = (
     SEARCH_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
 )
 
@@ -101,7 +103,7 @@ class ChangeList:
         self.preserved_filters = model_admin.get_preserved_filters(request)
         self.sortable_by = sortable_by
         self.search_help_text = search_help_text
-
+        self.formset = None
         # Get search parameters from the query string.
         _search_form = self.search_form_class(request.GET)
         if not _search_form.is_valid():
@@ -322,7 +324,8 @@ class ChangeList:
         self.result_count = result_count
         self.show_full_result_count = self.model_admin.show_full_result_count
         # Admin actions are shown if there is at least one entry
-        # or if entries are not counted because show_full_result_count is disabled
+        # or if entries are not counted because show_full_result_count is
+        # disabled
         self.show_admin_actions = not self.show_full_result_count or bool(
             full_result_count
         )
@@ -485,8 +488,8 @@ class ChangeList:
         """
         Return a dictionary of ordering field column numbers and asc/desc.
         """
-        # We must cope with more than one column having the same underlying sort
-        # field, so we base things on column numbers.
+        # We must cope with more than one column having the same underlying
+        # sort field, so we base things on column numbers.
         ordering = self._get_default_ordering()
         ordering_fields = {}
         if ORDER_VAR not in self.params:

@@ -50,9 +50,10 @@ class ExtraAssertMixin:
 
         :param method: The assertion method to test.
         :param method_args: Positional arguments to pass to the method.
-        :param expected_msg: The expected base error message (required keyword-only).
-        :param msg_prefix: Optional prefix to be added to the message in the second
-        subTest.
+        :param expected_msg: The expected base error message (required
+                             keyword-only).
+        :param msg_prefix: Optional prefix to be added to the message in the
+                           second subTest.
         :param method_kwargs: Keyword arguments to pass to the method.
 
         Used internally for testing Django's assertions.
@@ -236,7 +237,10 @@ class AssertContainsTests(ExtraAssertMixin, SimpleTestCase):
         self.assertContains(r, b"\xe5\xb3\xa0".decode())
 
     def test_unicode_not_contains(self):
-        "Unicode characters can be searched for, and not found in template context"
+        """
+        Unicode characters can be searched for, and not found in template
+        context
+        """
         # Regression test for #10183
         r = self.client.get("/check_unicode/")
         self.assertNotContains(r, "はたけ")
@@ -280,7 +284,8 @@ class AssertContainsTests(ExtraAssertMixin, SimpleTestCase):
 
     def test_assert_not_contains_renders_template_response(self):
         """
-        An unrendered SimpleTemplateResponse may be used in assertNotContains().
+        An unrendered SimpleTemplateResponse may be used in
+        assertNotContains().
         """
         template = engines["django"].from_string("Hello")
         response = SimpleTemplateResponse(template)
@@ -304,15 +309,13 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
         # The no template case doesn't mess with the template assertions
         self.assertTemplateNotUsed(response, "GET Template")
 
-        try:
+        msg = "No templates used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, "GET Template")
-        except AssertionError as e:
-            self.assertIn("No templates used to render the response", str(e))
 
-        try:
+        msg = "No templates used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, "GET Template", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn("abc: No templates used to render the response", str(e))
 
         msg = "No templates used to render the response"
         with self.assertRaisesMessage(AssertionError, msg):
@@ -378,7 +381,9 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
             self.assertTemplateUsed(response, "base.html", count=2)
 
     def test_template_rendered_multiple_times(self):
-        """Template assertions work when a template is rendered multiple times."""
+        """
+        Template assertions work when a template is rendered multiple times.
+        """
         response = self.client.get("/render_template_multiple_times/")
 
         self.assertTemplateUsed(response, "base.html", count=2)
@@ -387,26 +392,25 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
 class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
     def test_redirect_page(self):
-        "An assertion is raised if the original page couldn't be retrieved as expected"
+        """
+        An assertion is raised if the original page couldn't be retrieved as
+        expected
+        """
         # This page will redirect with code 301, not 302
         response = self.client.get("/permanent_redirect_view/")
-        try:
+        msg = (
+            "Response didn't redirect as expected: Response code was 301 "
+            "(expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response didn't redirect as expected: Response code was 301 "
-                "(expected 302)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "abc: Response didn't redirect as expected: Response code was 301 "
+            "(expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 301 "
-                "(expected 302)",
-                str(e),
-            )
 
     def test_followed_redirect_unexpected_initial_status_code(self):
         response = self.client.get("/permanent_redirect_view/", follow=True)
@@ -442,35 +446,25 @@ class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
         parameters.
         """
         response = self.client.get("/redirect_view/", {"var": "value"})
-        try:
+        msg = "Response redirected to '/get_view/?var=value', expected '/get_view/'"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response redirected to '/get_view/?var=value', expected '/get_view/'",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "abc: Response redirected to '/get_view/?var=value', expected '/get_view/'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Response redirected to '/get_view/?var=value', expected "
-                "'/get_view/'",
-                str(e),
-            )
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
         response = self.client.get("/permanent_redirect_view/")
-        try:
+        msg = (
+            "Response didn't redirect as expected: Response code was 301 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             # Should redirect to get_view
             self.assertRedirects(response, "/some_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response didn't redirect as expected: Response code was 301 "
-                "(expected 302)",
-                str(e),
-            )
 
     def test_target_page(self):
         """
@@ -478,26 +472,22 @@ class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
         retrieved as expected.
         """
         response = self.client.get("/double_redirect_view/")
-        try:
+        msg = (
+            "Couldn't retrieve redirection page '/permanent_redirect_view/': "
+            "response code was 301 (expected 200)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             # The redirect target responds with a 301 code, not 200
             self.assertRedirects(response, "http://testserver/permanent_redirect_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Couldn't retrieve redirection page '/permanent_redirect_view/': "
-                "response code was 301 (expected 200)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "abc: Couldn't retrieve redirection page '/permanent_redirect_view/': "
+            "response code was 301 (expected 200)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             # The redirect target responds with a 301 code, not 200
             self.assertRedirects(
                 response, "http://testserver/permanent_redirect_view/", msg_prefix="abc"
-            )
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Couldn't retrieve redirection page '/permanent_redirect_view/': "
-                "response code was 301 (expected 200)",
-                str(e),
             )
 
     def test_redirect_chain(self):
@@ -554,7 +544,8 @@ class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
         with self.assertRaises(RedirectCycleError) as context:
             self.client.get("/circular_redirect_1/", {}, follow=True)
         response = context.exception.last_response
-        # The chain of redirects will get back to the starting point, but stop there.
+        # The chain of redirects will get back to the starting point, but stop
+        # there.
         self.assertRedirects(
             response, "/circular_redirect_2/", status_code=302, target_status_code=302
         )
@@ -621,45 +612,38 @@ class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
         """
         # This page will redirect with code 301, not 302
         response = self.client.get("/get_view/", follow=True)
-        try:
+        msg = (
+            "Response didn't redirect as expected: Response code was 200 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response didn't redirect as expected: Response code was 200 "
-                "(expected 302)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "abc: Response didn't redirect as expected: Response code was 200 "
+            "(expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 200 "
-                "(expected 302)",
-                str(e),
-            )
 
     def test_redirect_on_non_redirect_page(self):
-        "An assertion is raised if the original page couldn't be retrieved as expected"
+        """
+        An assertion is raised if the original page couldn't be retrieved as
+        expected
+        """
         # This page will redirect with code 301, not 302
         response = self.client.get("/get_view/")
-        try:
+        msg = (
+            "Response didn't redirect as expected: Response code was 200 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response didn't redirect as expected: Response code was 200 "
-                "(expected 302)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "abc: Response didn't redirect as expected: Response code was 200 "
+            "(expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 200 "
-                "(expected 302)",
-                str(e),
-            )
 
     def test_redirect_scheme(self):
         """
@@ -800,7 +784,8 @@ class ExceptionTests(TestDataMixin, TestCase):
 
         # At this point, an exception has been raised, and should be cleared.
 
-        # This next operation should be successful; if it isn't we have a problem.
+        # This next operation should be successful; if it isn't we have a
+        # problem.
         login = self.client.login(username="staff", password="password")
         self.assertTrue(login, "Could not log in")
         self.client.get("/staff_only/")
@@ -822,9 +807,10 @@ class TemplateExceptionTests(SimpleTestCase):
             self.client.get("/no_such_view/")
 
 
-# We need two different tests to check URLconf substitution - one to check
-# it was changed, and another one (without self.urls) to check it was reverted on
-# teardown. This pair of tests relies upon the alphabetical ordering of test execution.
+# We need two different tests to check URLconf substitution - one to check it
+# was changed, and another one (without self.urls) to check it was reverted on
+# teardown. This pair of tests relies upon the alphabetical ordering of test
+# execution.
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
 class UrlconfSubstitutionTests(SimpleTestCase):
     def test_urlconf_was_changed(self):
@@ -837,7 +823,8 @@ class UrlconfSubstitutionTests(SimpleTestCase):
 # name is to ensure alphabetical ordering.
 class zzUrlconfSubstitutionTests(SimpleTestCase):
     def test_urlconf_was_reverted(self):
-        """URLconf is reverted to original value after modification in a TestCase
+        """URLconf is reverted to original value after modification in a
+        TestCase
 
         This will not find a match as the default ROOT_URLCONF is empty.
         """
@@ -984,7 +971,9 @@ class SessionTests(TestDataMixin, TestCase):
 
     @override_settings(AUTH_USER_MODEL="test_client_regress.CustomUser")
     def test_logout_with_custom_user(self):
-        """Logout should send user_logged_out signal if custom user was logged in."""
+        """
+        Logout should send user_logged_out signal if custom user was logged in.
+        """
 
         def listener(*args, **kwargs):
             self.assertEqual(kwargs["sender"], CustomUser)
@@ -1151,7 +1140,9 @@ class RequestMethodStringDataTests(SimpleTestCase):
         self.assertEqual(response.content, b"request method: PATCH")
 
     def test_empty_string_data(self):
-        "Request a view with empty string data via request method GET/POST/HEAD"
+        """
+        Request a view with empty string data via request method GET/POST/HEAD
+        """
         # Regression test for #21740
         response = self.client.get("/body/", data="", content_type="application/json")
         self.assertEqual(response.content, b"")

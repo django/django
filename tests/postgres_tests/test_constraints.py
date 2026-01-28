@@ -27,7 +27,13 @@ from django.test.utils import isolate_apps
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
-from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scene
+from .models import (
+    HotelReservation,
+    IntegerArrayModel,
+    RangesModel,
+    Room,
+    Scene,
+)
 
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
@@ -299,7 +305,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             )
 
     def test_invalid_index_type(self):
-        msg = "Exclusion constraints only support GiST or SP-GiST indexes."
+        msg = "Exclusion constraints only support GiST, Hash, or SP-GiST indexes."
         with self.assertRaisesMessage(ValueError, msg):
             ExclusionConstraint(
                 index_type="gin",
@@ -480,6 +486,18 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             "(F(datespan), '-|-')] name='exclude_overlapping' "
             "violation_error_code='overlapping_must_be_excluded'>",
         )
+        constraint = ExclusionConstraint(
+            name="exclude_equal_hash",
+            index_type="hash",
+            expressions=[(F("room"), RangeOperators.EQUAL)],
+            violation_error_code="room_must_be_unique",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type='hash' expressions=["
+            "(F(room), '=')] name='exclude_equal_hash' "
+            "violation_error_code='room_must_be_unique'>",
+        )
 
     def test_eq(self):
         constraint_1 = ExclusionConstraint(
@@ -535,6 +553,24 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ],
             include=["cancelled"],
         )
+        constraint_8 = ExclusionConstraint(
+            index_type="gist",
+            name="exclude_overlapping",
+            expressions=[
+                ("datespan", RangeOperators.OVERLAPS),
+                ("room", RangeOperators.EQUAL),
+            ],
+            include=["cancelled"],
+        )
+        constraint_9 = ExclusionConstraint(
+            index_type="GIST",
+            name="exclude_overlapping",
+            expressions=[
+                ("datespan", RangeOperators.OVERLAPS),
+                ("room", RangeOperators.EQUAL),
+            ],
+            include=["cancelled"],
+        )
         constraint_10 = ExclusionConstraint(
             name="exclude_overlapping",
             expressions=[
@@ -563,6 +599,12 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             violation_error_code="custom_code",
             violation_error_message="other custom error",
         )
+        constraint_13 = ExclusionConstraint(
+            name="exclude_equal_hash",
+            index_type="hash",
+            expressions=[(F("room"), RangeOperators.EQUAL)],
+            violation_error_code="room_must_be_unique",
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
@@ -572,13 +614,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
         self.assertNotEqual(constraint_2, constraint_7)
+        self.assertEqual(constraint_7, constraint_8)
+        self.assertEqual(constraint_7, constraint_9)
         self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_5, constraint_6)
         self.assertNotEqual(constraint_1, object())
         self.assertNotEqual(constraint_10, constraint_11)
         self.assertNotEqual(constraint_11, constraint_12)
+        self.assertNotEqual(constraint_12, constraint_13)
         self.assertEqual(constraint_10, constraint_10)
         self.assertEqual(constraint_12, constraint_12)
+        self.assertEqual(constraint_13, constraint_13)
 
     def test_deconstruct(self):
         constraint = ExclusionConstraint(
@@ -821,7 +867,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                     OpClass(TsTzRange("start", "end", RangeBoundary()), "range_ops"),
                     RangeOperators.OVERLAPS,
                 ),
-                (OpClass("room", "gist_int4_ops"), RangeOperators.EQUAL),
+                (OpClass("room", "gist_int8_ops"), RangeOperators.EQUAL),
             ],
             condition=Q(cancelled=False),
         )
@@ -1236,6 +1282,26 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(Room, constraint)
         self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
 
+    def test_hash_uniqueness(self):
+        constraint_name = "exclusion_equal_room_hash"
+        self.assertNotIn(constraint_name, self.get_constraints(Room._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            index_type="hash",
+            expressions=[(F("number"), RangeOperators.EQUAL)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Room, constraint)
+        self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
+        Room.objects.create(number=101)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Room.objects.create(number=101)
+        Room.objects.create(number=102)
+        # Drop the constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Room, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(Room._meta.db_table))
+
     @isolate_apps("postgres_tests")
     def test_table_create(self):
         constraint_name = "exclusion_equal_number_tc"
@@ -1267,3 +1333,39 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         msg = "Constraint “ints_equal” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(RangesModel, RangesModel())
+
+    def test_covering_hash_index_not_supported(self):
+        constraint_name = "covering_hash_index_not_supported"
+        msg = "Covering exclusion constraints using Hash indexes are not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name=constraint_name,
+                expressions=[("int1", RangeOperators.EQUAL)],
+                index_type="hash",
+                include=["int2"],
+            )
+
+    def test_composite_hash_index_not_supported(self):
+        constraint_name = "composite_hash_index_not_supported"
+        msg = "Composite exclusion constraints using Hash indexes are not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name=constraint_name,
+                expressions=[
+                    ("int1", RangeOperators.EQUAL),
+                    ("int2", RangeOperators.EQUAL),
+                ],
+                index_type="hash",
+            )
+
+    def test_non_equal_hash_index_not_supported(self):
+        constraint_name = "none_equal_hash_index_not_supported"
+        msg = (
+            "Exclusion constraints using Hash indexes only support the EQUAL operator."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name=constraint_name,
+                expressions=[("int1", RangeOperators.NOT_EQUAL)],
+                index_type="hash",
+            )

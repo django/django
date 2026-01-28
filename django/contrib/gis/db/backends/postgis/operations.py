@@ -176,6 +176,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             "BoundingCircle": "ST_MinimumBoundingCircle",
             "FromWKB": "ST_GeomFromWKB",
             "FromWKT": "ST_GeomFromText",
+            "NumDimensions": "ST_NDims",
             "NumPoints": "ST_NPoints",
             "GeometryType": "GeometryType",
         }
@@ -204,7 +205,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 3.1. "
+                    "GeoDjango requires at least PostGIS version 3.2. "
                     "Was the database created from a spatial database "
                     "template?" % self.connection.settings_dict["NAME"]
                 )
@@ -328,7 +329,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def _get_postgis_func(self, func):
         """
-        Helper routine for calling PostGIS functions and returning their result.
+        Helper routine for calling PostGIS functions and returning their
+        result.
         """
         # Close out the connection. See #9437.
         with self.connection.temporary_connection() as cursor:
@@ -340,7 +342,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func("postgis_geos_version")
 
     def postgis_lib_version(self):
-        "Return the version number of the PostGIS library used with PostgreSQL."
+        """
+        Return the version number of the PostGIS library used with PostgreSQL.
+        """
         return self._get_postgis_func("postgis_lib_version")
 
     def postgis_proj_version(self):

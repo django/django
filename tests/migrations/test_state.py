@@ -183,11 +183,12 @@ class StateTests(SimpleTestCase):
         self.assertTrue(all(isinstance(name, str) for name, mgr in food_state.managers))
         self.assertEqual(food_state.managers[0][1].args, ("a", "b", 1, 2))
 
-        # No explicit managers defined. Migrations will fall back to the default
+        # No explicit managers defined. Migrations will fall back to the
+        # default
         self.assertEqual(food_no_managers_state.managers, [])
 
-        # food_mgr is used in migration but isn't the default mgr, hence add the
-        # default
+        # food_mgr is used in migration but isn't the default mgr, hence add
+        # the default
         self.assertEqual(
             [name for name, mgr in food_no_default_manager_state.managers],
             ["food_no_mgr", "food_mgr"],
@@ -1302,7 +1303,8 @@ class StateRelationsTests(SimpleTestCase):
             with self.subTest(method=method):
                 project_state = self.get_base_project_state()
                 getattr(project_state, method)(*args)
-                # ProjectState's `_relations` are populated on `relations` access.
+                # ProjectState's `_relations` are populated on `relations`
+                # access.
                 self.assertIsNone(project_state._relations)
                 self.assertEqual(project_state.relations, project_state._relations)
                 self.assertIsNotNone(project_state._relations)

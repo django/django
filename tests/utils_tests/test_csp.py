@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.csp import CSP, LazyNonce, build_policy
+from django.utils.csp import CSP, LazyNonce, build_policy, generate_nonce
 from django.utils.functional import empty
 
 basic_config = {
@@ -67,8 +67,9 @@ class CSPBuildPolicyTest(SimpleTestCase):
         """
         Test that a set can be passed as a value.
 
-        Sets are often used in Django settings to ensure uniqueness, however, sets are
-        unordered. The middleware ensures consistency via sorting if a set is passed.
+        Sets are often used in Django settings to ensure uniqueness, however,
+        sets are unordered. The middleware ensures consistency via sorting if a
+        set is passed.
         """
         policy = {"default-src": {CSP.SELF, "foo.com", "bar.com"}}
         self.assertPolicyEqual(
@@ -147,12 +148,14 @@ class LazyNonceTests(SimpleTestCase):
             return result
 
         with patch("django.utils.csp.secrets.token_urlsafe", memento_token_urlsafe):
-            # Force usage, similar to template rendering, to generate the nonce.
+            # Force usage, similar to template rendering, to generate the
+            # nonce.
             val = str(nonce)
 
         self.assertTrue(nonce)
         self.assertEqual(nonce, val)
         self.assertIsInstance(nonce, str)
+        self.assertEqual(repr(nonce), f"<LazyNonce: '{nonce}'>")
         self.assertEqual(len(val), 22)  # Based on secrets.token_urlsafe of 16 bytes.
         self.assertEqual(generated_tokens, [nonce])
         # Also test the wrapped value.
@@ -164,3 +167,10 @@ class LazyNonceTests(SimpleTestCase):
         second = str(nonce)
 
         self.assertEqual(first, second)
+
+    def test_repr(self):
+        nonce = LazyNonce()
+        self.assertEqual(repr(nonce), f"<LazyNonce: {repr(generate_nonce)}>")
+
+        str(nonce)  # Force nonce generation.
+        self.assertRegex(repr(nonce), r"<LazyNonce: '[^']+'>")

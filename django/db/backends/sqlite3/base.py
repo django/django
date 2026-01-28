@@ -60,9 +60,9 @@ Database.register_adapter(datetime.datetime, adapt_datetime)
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "sqlite"
     display_name = "SQLite"
-    # SQLite doesn't actually support most of these types, but it "does the right
-    # thing" given more verbose field definitions, so leave them as is so that
-    # schema inspection is more useful.
+    # SQLite doesn't actually support most of these types, but it "does the
+    # right thing" given more verbose field definitions, so leave them as is so
+    # that schema inspection is more useful.
     data_types = {
         "AutoField": "integer",
         "BigAutoField": "integer",
@@ -81,7 +81,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "IPAddressField": "char(15)",
         "GenericIPAddressField": "char(39)",
         "JSONField": "text",
-        "OneToOneField": "integer",
         "PositiveBigIntegerField": "bigint unsigned",
         "PositiveIntegerField": "integer unsigned",
         "PositiveSmallIntegerField": "smallint unsigned",
@@ -124,13 +123,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
-    # the right-hand side of the lookup isn't a raw string (it might be an expression
-    # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # the right-hand side of the lookup isn't a raw string (it might be an
+    # expression or the result of a bilateral transformation). In those cases,
+    # special characters for LIKE operators (e.g. \, *, _) should be escaped on
+    # database side.
     #
-    # Note: we use str.format() here for readability as '%' is used as a wildcard for
-    # the LIKE operator.
+    # Note: we use str.format() here for readability as '%' is used as a
+    # wildcard for the LIKE operator.
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
         "contains": r"LIKE '%%' || {} || '%%' ESCAPE '\'",
