@@ -28,7 +28,8 @@ setting. It defaults to
 
 By specifying a custom form renderer and overriding
 :attr:`~.BaseRenderer.form_template_name` you can adjust the default form
-markup across your project from a single place.
+markup across your project from a single place. Note that this will include
+forms in :doc:`the admin site </ref/contrib/admin/index>`.
 
 You can also provide a custom renderer per-form or per-widget by setting the
 :attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
