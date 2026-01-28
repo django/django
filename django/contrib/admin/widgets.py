@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.forms.widgets import Select
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -49,7 +50,16 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         return context
 
 
-class BaseAdminDateWidget(forms.DateInput):
+class DateTimeWidgetContextMixin:
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["widget"]["attrs"][
+            "aria-describedby"
+        ] = f"id_{name}_timezone_warning_helptext"
+        return context
+
+
+class BaseAdminDateWidget(DateTimeWidgetContextMixin, forms.DateInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -65,7 +75,7 @@ class AdminDateWidget(BaseAdminDateWidget):
     template_name = "admin/widgets/date.html"
 
 
-class BaseAdminTimeWidget(forms.TimeInput):
+class BaseAdminTimeWidget(DateTimeWidgetContextMixin, forms.TimeInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -98,7 +108,12 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         context = super().get_context(name, value, attrs)
         context["date_label"] = _("Date:")
         context["time_label"] = _("Time:")
+        for widget in context["widget"]["subwidgets"]:
+            widget["attrs"]["aria-describedby"] = f"id_{name}_timezone_warning_helptext"
         return context
+
+    def id_for_label(self, id_):
+        return id_
 
 
 class AdminRadioSelect(forms.RadioSelect):
@@ -107,6 +122,7 @@ class AdminRadioSelect(forms.RadioSelect):
 
 class AdminFileWidget(forms.ClearableFileInput):
     template_name = "admin/widgets/clearable_file_input.html"
+    use_fieldset = True
 
 
 def url_params_from_lookup_dict(lookups):
@@ -215,8 +231,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
-    A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
-    in a <select multiple> box.
+    A Widget for displaying ManyToMany ids in the "raw_id" interface rather
+    than in a <select multiple> box.
     """
 
     template_name = "admin/widgets/many_to_many_raw_id.html"
@@ -270,17 +286,21 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         if can_add_related is None:
             can_add_related = admin_site.is_registered(rel.model)
         self.can_add_related = can_add_related
-        # XXX: The UX does not support multiple selected values.
-        multiple = getattr(widget, "allow_multiple_selected", False)
         if not isinstance(widget, AutocompleteMixin):
             self.attrs["data-context"] = "available-source"
-        self.can_change_related = not multiple and can_change_related
-        # XXX: The deletion UX can be confusing when dealing with cascading deletion.
+        # Only single-select Select widgets are supported.
+        supported = not getattr(
+            widget, "allow_multiple_selected", False
+        ) and isinstance(widget, Select)
+        self.can_change_related = supported and can_change_related
+        # XXX: The deletion UX can be confusing when dealing with cascading
+        # deletion.
         cascade = getattr(rel, "on_delete", None) is CASCADE
-        self.can_delete_related = not multiple and not cascade and can_delete_related
-        self.can_view_related = not multiple and can_view_related
-        # so we can check if the related object is registered with this AdminSite
+        self.can_delete_related = supported and not cascade and can_delete_related
+        self.can_view_related = supported and can_view_related
+        # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
+        self.use_fieldset = True
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -313,16 +333,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from django.contrib.admin.views.main import (
+            IS_POPUP_VAR,
+            SOURCE_MODEL_VAR,
+            TO_FIELD_VAR,
+        )
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
+        app_label = self.rel.field.model._meta.app_label
+        model_name = self.rel.field.model._meta.model_name
+
         url_params = "&".join(
             "%s=%s" % param
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
+                (SOURCE_MODEL_VAR, f"{app_label}.{model_name}"),
             ]
         )
         context = {

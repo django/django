@@ -563,7 +563,9 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
-        """{% blocktranslate %} takes message contexts into account (#14806)."""
+        """
+        {% blocktranslate %} takes message contexts into account (#14806).
+        """
         trans_real._active = Local()
         trans_real._translations = {}
         with translation.override("de"):
@@ -575,7 +577,7 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, "May")
 
-            # Existing context...  using a literal
+            # Existing context... using a literal
             t = self.get_template(
                 "{% load i18n %}"
                 '{% blocktranslate context "month name" %}May{% endblocktranslate %}'
@@ -733,8 +735,8 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
     def test_bad_placeholder_2(self):
         """
         Error in translation file should not crash template rendering (#18393).
-        (%(person) misses a 's' in fr.po, causing the string formatting to fail)
-        .
+        (%(person) misses a 's' in fr.po, causing the string formatting to
+        fail) .
         """
         with translation.override("fr"):
             t = Template(

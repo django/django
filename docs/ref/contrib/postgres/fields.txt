@@ -11,8 +11,8 @@ Indexing these fields
 =====================
 
 :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
-B-tree index, which isn't particularly helpful when querying complex data types.
-Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
+B-tree index, which isn't particularly helpful when querying complex data
+types. Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
 :class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
 the index choice is dependent on the queries that you're using. Generally, GiST
 may be a good choice for the :ref:`range fields <range-fields>` and
@@ -47,8 +47,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`) and file fields (
-        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ManyToManyField`) and file fields
+        (:class:`~django.db.models.FileField` and
         :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
@@ -450,8 +450,8 @@ operator ``?|``. For example:
 ``has_keys``
 ~~~~~~~~~~~~
 
-Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example:
+Returns objects where all of the given keys are in the data. Uses the SQL
+operator ``?&``. For example:
 
 .. code-block:: pycon
 
@@ -741,8 +741,8 @@ passed range.
 ``not_gt``
 ^^^^^^^^^^
 
-The returned ranges do not contain any points greater than the passed range, that
-is the upper bound of the returned range is at most the upper bound of the
+The returned ranges do not contain any points greater than the passed range,
+that is the upper bound of the returned range is at most the upper bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_gt=NumericRange(3, 10))

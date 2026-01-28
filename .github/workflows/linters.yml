@@ -21,13 +21,16 @@ jobs:
   flake8:
     name: flake8
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v6
         with:
-          python-version: '3.13'
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
       - run: python -m pip install flake8
       - name: flake8
         # Pinned to v3.0.0.
@@ -38,14 +41,17 @@ jobs:
 
   isort:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v6
         with:
-          python-version: '3.13'
-      - run: python -m pip install "isort<6"
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - run: python -m pip install isort
       - name: isort
         # Pinned to v3.0.0.
         uses: liskin/gh-problem-matcher-wrap@e7b7beaaafa52524748b31a381160759d68d61fb
@@ -55,8 +61,25 @@ jobs:
 
   black:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: black
         uses: psf/black@stable
+
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@e639db99335bc9038abc0e066dfcd72e23d26fb4 # v0.3.0
+        with:
+          advanced-security: false
+          annotations: true

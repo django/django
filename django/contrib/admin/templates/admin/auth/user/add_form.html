@@ -10,7 +10,3 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}">
 {% endblock %}
-{% block admin_change_form_document_ready %}
-  {{ block.super }}
-  <script src="{% static 'admin/js/unusable_password_field.js' %}" defer></script>
-{% endblock %}

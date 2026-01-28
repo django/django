@@ -27,8 +27,8 @@ class GeometryCollection(GEOSGeometry):
         else:
             init_geoms = args
 
-        # Ensuring that only the permitted geometries are allowed in this collection
-        # this is moved to list mixin super class
+        # Ensuring that only the permitted geometries are allowed in this
+        # collection this is moved to list mixin super class
         self._check_allowed(init_geoms)
 
         # Creating the geometry pointer array.
@@ -61,14 +61,19 @@ class GeometryCollection(GEOSGeometry):
         return capi.get_geomn(self.ptr, index)
 
     def _get_single_external(self, index):
-        "Return the Geometry from this Collection at the given index (0-based)."
+        """
+        Return the Geometry from this Collection at the given index (0-based).
+        """
         # Checking the index and returning the corresponding GEOS geometry.
         return GEOSGeometry(
             capi.geom_clone(self._get_single_internal(index)), srid=self.srid
         )
 
     def _set_list(self, length, items):
-        "Create a new collection, and destroy the contents of the previous pointer."
+        """
+        Create a new collection, and destroy the contents of the previous
+        pointer.
+        """
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_collection(length, items)

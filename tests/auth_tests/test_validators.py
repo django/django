@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 
 from django.contrib.auth import validators
 from django.contrib.auth.models import User
@@ -113,7 +114,8 @@ class PasswordValidationTest(SimpleTestCase):
 
         help_text = password_validators_help_text_html([AmpersandValidator()])
         self.assertEqual(help_text, "<ul><li>Must contain &amp;</li></ul>")
-        # help_text is marked safe and therefore unchanged by conditional_escape().
+        # help_text is marked safe and therefore unchanged by
+        # conditional_escape().
         self.assertEqual(help_text, conditional_escape(help_text))
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[])
@@ -132,17 +134,40 @@ class MinimumLengthValidatorTest(SimpleTestCase):
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator().validate("1234567")
         self.assertEqual(cm.exception.messages, [expected_error % 8])
-        self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
+        error = cm.exception.error_list[0]
+        self.assertEqual(error.code, "password_too_short")
+        self.assertEqual(error.params, {"min_length": 8})
 
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator(min_length=3).validate("12")
         self.assertEqual(cm.exception.messages, [expected_error % 3])
+        error = cm.exception.error_list[0]
+        self.assertEqual(error.code, "password_too_short")
+        self.assertEqual(error.params, {"min_length": 3})
 
     def test_help_text(self):
         self.assertEqual(
             MinimumLengthValidator().get_help_text(),
             "Your password must contain at least 8 characters.",
         )
+
+    @mock.patch("django.contrib.auth.password_validation.ngettext")
+    def test_l10n(self, mock_ngettext):
+        with self.subTest("get_error_message"):
+            MinimumLengthValidator().get_error_message()
+            mock_ngettext.assert_called_with(
+                "This password is too short. It must contain at least %d character.",
+                "This password is too short. It must contain at least %d characters.",
+                8,
+            )
+        mock_ngettext.reset()
+        with self.subTest("get_help_text"):
+            MinimumLengthValidator().get_help_text()
+            mock_ngettext.assert_called_with(
+                "Your password must contain at least %(min_length)d " "character.",
+                "Your password must contain at least %(min_length)d " "characters.",
+                8,
+            )
 
     def test_custom_error(self):
         class CustomMinimumLengthValidator(MinimumLengthValidator):
@@ -177,24 +202,24 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "email address"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator().validate("example.com", user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "email address"])
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "first name"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator(
                 user_attributes=["first_name"],
                 max_similarity=0.3,
             ).validate("testclient", user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
         # max_similarity=1 doesn't allow passwords that are identical to the
         # attribute's value.
-        with self.assertRaises(ValidationError) as cm:
+        msg = expected_error % "first name"
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator(
                 user_attributes=["first_name"],
                 max_similarity=1,
             ).validate(user.first_name, user=user)
-        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
         # Very low max_similarity is rejected.
         msg = "max_similarity must be at least 0.1"
         with self.assertRaisesMessage(ValueError, msg):
@@ -215,11 +240,9 @@ class UserAttributeSimilarityValidatorTest(TestCase):
             def username(self):
                 return "foobar"
 
-        with self.assertRaises(ValidationError) as cm:
+        msg = "The password is too similar to the username."
+        with self.assertRaisesMessage(ValidationError, msg):
             UserAttributeSimilarityValidator().validate("foobar", user=TestUser())
-        self.assertEqual(
-            cm.exception.messages, ["The password is too similar to the username."]
-        )
 
     def test_help_text(self):
         self.assertEqual(
@@ -269,18 +292,16 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         expected_error = "This password is too common."
         self.assertIsNone(CommonPasswordValidator().validate("a-safe-password"))
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error):
             CommonPasswordValidator().validate("godzilla")
-        self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_common_hexed_codes(self):
         expected_error = "This password is too common."
         common_hexed_passwords = ["asdfjkl:", "&#2336:"]
         for password in common_hexed_passwords:
             with self.subTest(password=password):
-                with self.assertRaises(ValidationError) as cm:
+                with self.assertRaisesMessage(ValidationError, expected_error):
                     CommonPasswordValidator().validate(password)
-                self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_validate_custom_list(self):
         path = os.path.join(

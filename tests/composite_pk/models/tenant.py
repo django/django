@@ -14,17 +14,18 @@ class Token(models.Model):
     secret = models.CharField(max_length=10, default="", blank=True)
 
 
-class BaseModel(models.Model):
+class AbstractUser(models.Model):
     pk = models.CompositePrimaryKey("tenant_id", "id")
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    email = models.EmailField(unique=True)
     id = models.SmallIntegerField(unique=True)
 
     class Meta:
         abstract = True
 
 
-class User(BaseModel):
-    email = models.EmailField(unique=True)
+class User(AbstractUser):
+    pass
 
 
 class Comment(models.Model):
@@ -35,13 +36,14 @@ class Comment(models.Model):
         related_name="comments",
     )
     id = models.SmallIntegerField(unique=True, db_column="comment_id")
-    user_id = models.SmallIntegerField()
+    user_id = models.SmallIntegerField(null=True)
     user = models.ForeignObject(
         User,
         on_delete=models.CASCADE,
         from_fields=("tenant_id", "user_id"),
         to_fields=("tenant_id", "id"),
         related_name="comments",
+        null=True,
     )
     text = models.TextField(default="", blank=True)
     integer = models.IntegerField(default=0)

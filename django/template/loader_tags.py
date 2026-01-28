@@ -58,7 +58,8 @@ class BlockNode(Node):
                 push = block = block_context.pop(self.name)
                 if block is None:
                     block = self
-                # Create new block so we can store context without thread-safety issues.
+                # Create new block so we can store context without
+                # thread-safety issues.
                 block = type(self)(block.name, block.nodelist)
                 block.context = context
                 context["block"] = block

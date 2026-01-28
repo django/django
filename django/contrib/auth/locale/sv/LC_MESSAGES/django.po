@@ -6,22 +6,26 @@
 # Anders Hovmöller <boxed@killingar.net>, 2023
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2014-2015
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # nip3o <n@niclasolofsson.se>, 2014
+# nip3o <n@niclasolofsson.se>, 2014
 # Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Samuel Linde <samuel@linde.im>, 2011
+# Thomas Lundqvist, 2013,2016
 # Thomas Lundqvist, 2013,2016
 # Tomas Lööw <tomas.loow@mailbox.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Jörgen Olofsson, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>, 2021\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -69,11 +73,11 @@ msgstr "lösenord"
 msgid "last login"
 msgstr "senaste inloggning"
 
-msgid "No password set."
-msgstr "Inget lösenord angivet."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
+
+msgid "No password set."
+msgstr "Inget lösenord angivet."
 
 msgid "Reset password"
 msgstr "Återställ lösenord"
@@ -84,15 +88,6 @@ msgstr "Sätt lösenord"
 msgid "The two password fields didn’t match."
 msgstr "De två lösenordsfälten stämmer inte överens."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Om användaren kommer att kunna autentisera sig med ett lösenord eller inte. "
-"Om inaktiverat, kan användaren fortfarande ha möjlighet att autentisera sig "
-"via andra backend-lösningar, såsom Single Sign-On eller LDAP."
-
 msgid "Password"
 msgstr "Lösenord"
 
@@ -102,8 +97,17 @@ msgstr "Lösenordsbekräftelse"
 msgid "Enter the same password as before, for verification."
 msgstr "Fyll i samma lösenord som tidigare för verifiering."
 
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Om användaren kommer att kunna autentisera sig med ett lösenord eller inte. "
+"Om inaktiverat, kan användaren fortfarande ha möjlighet att autentisera sig "
+"via andra backend-lösningar, såsom Single Sign-On eller LDAP."
+
 msgid "Password-based authentication"
-msgstr "Lösenordsbaserad autentisering."
+msgstr "Lösenordsbaserad autentisering"
 
 msgid "Enabled"
 msgstr "Aktiverad"
@@ -144,7 +148,7 @@ msgid "New password confirmation"
 msgstr "Bekräfta nytt lösenord"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Ditt gamla lösenord var felaktigt ifyllt. Var vänlig fyll i det igen."
+msgstr "Ditt gamla lösenord var felaktigt ifyllt. Fyll i det igen."
 
 msgid "Old password"
 msgstr "Gammalt lösenord"
@@ -275,16 +279,13 @@ msgid "users"
 msgstr "användare"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Detta lösenord är för kort. Det måste innehålla minst %(min_length)d tecken."
+"Det här lösenordet är för kort. Det måste innehålla minst %d tecken."
 msgstr[1] ""
-"Detta lösenord är för kort. Det måste innehålla minst %(min_length)d tecken."
+"Det här lösenordet är för kort. Det måste innehålla minst %d tecken."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

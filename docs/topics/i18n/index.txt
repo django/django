@@ -23,8 +23,8 @@ Django has full support for :doc:`translation of text
 
 Essentially, Django does two things:
 
-* It allows developers and template authors to specify which parts of their apps
-  should be translated or formatted for local languages and cultures.
+* It allows developers and template authors to specify which parts of their
+  apps should be translated or formatted for local languages and cultures.
 * It uses these hooks to localize web apps for particular users according to
   their preferences.
 
@@ -46,7 +46,8 @@ here's a simplified definition:
     localization
       Writing the translations and local formats. Usually done by translators.
 
-More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikipedia article`_ or the `GNU gettext documentation`_.
+More details can be found in the `W3C Web Internationalization FAQ`_, the
+`Wikipedia article`_ or the `GNU gettext documentation`_.
 
 .. _W3C Web Internationalization FAQ: https://www.w3.org/International/questions/qa-i18n
 .. _GNU gettext documentation: https://www.gnu.org/software/gettext/manual/gettext.html#Concepts
@@ -87,5 +88,5 @@ Here are some other terms that will help us to handle a common language:
       A literal that can be translated.
 
     format file
-      A format file is a Python module that defines the data formats for a given
-      locale.
+      A format file is a Python module that defines the data formats for a
+      given locale.

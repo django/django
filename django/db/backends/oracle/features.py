@@ -19,8 +19,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_of = True
     select_for_update_of_column = True
     can_return_columns_from_insert = True
+    can_return_rows_from_update = True
     supports_subqueries_in_group_by = False
     ignores_unnecessary_order_by_in_subqueries = False
+    supports_tuple_comparison_against_subquery = False
     supports_transactions = True
     supports_timezones = False
     has_native_duration_field = True
@@ -60,27 +62,23 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 NUMBER(11) NOT NULL,
-            column_2 NUMBER(11) NOT NULL,
-            PRIMARY KEY (column_1, column_2)
-        )
-    """
     supports_callproc_kwargs = True
+    supports_any_value = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
-    supports_stored_generated_columns = False
     supports_virtual_generated_columns = True
+    supports_alter_generated_column_data_type = False
     can_rename_index = True
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
+    supports_on_delete_db_default = False
+    supports_no_precision_decimalfield = True
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
@@ -91,6 +89,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
     )
+
+    @cached_property
+    def supports_json_negative_indexing(self):
+        return self.connection.oracle_version >= (21,)
 
     @cached_property
     def django_test_skips(self):
@@ -128,6 +130,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             },
             "Oracle doesn't support casting filters to NUMBER.": {
                 "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
+            },
+            "Oracle doesn't support some data types (e.g. BOOLEAN, BLOB) in "
+            "GeneratedField expressions (ORA-54003).": {
+                "schema.tests.SchemaTests.test_add_generated_field_contains",
+                "schema.tests.SchemaTests.test_add_generated_field_with_kt_model",
             },
         }
         if self.connection.oracle_version < (23,):
@@ -222,3 +229,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_tuple_lookups(self):
         # Support is known to be missing on 23.2 but available on 23.4.
         return self.connection.oracle_version >= (23, 4)
+
+    @cached_property
+    def supports_uuid4_function(self):
+        return self.connection.oracle_version >= (23, 9)
+
+    @cached_property
+    def supports_stored_generated_columns(self):
+        return self.connection.oracle_version >= (23, 7)

@@ -91,7 +91,10 @@
             message = interpolate(message, [timezoneOffset]);
 
             const warning = document.createElement('div');
+            const id = inp.id;
+            const field_id = inp.closest('p.datetime') ? id.slice(0, id.lastIndexOf("_")) : id;
             warning.classList.add('help', warningClass);
+            warning.id = `${field_id}_timezone_warning_helptext`;
             warning.textContent = message;
             inp.parentNode.appendChild(warning);
         },

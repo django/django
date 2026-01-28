@@ -81,7 +81,8 @@ class ModelInheritanceTests(TestCase):
             Restaurant.objects.filter(supplier__name="foo")
 
     def test_model_with_distinct_accessors(self):
-        # The Post model has distinct accessors for the Comment and Link models.
+        # The Post model has distinct accessors for the Comment and Link
+        # models.
         post = Post.objects.create(title="Lorem Ipsum")
         post.attached_comment_set.create(content="Save $ on V1agr@", is_spam=True)
         post.attached_link_set.create(
@@ -194,7 +195,8 @@ class ModelInheritanceTests(TestCase):
         with CaptureQueriesContext(connection) as captured_queries:
             Place.objects.filter(pk=supplier.pk).update(name=supplier.name)
         expected_sql = captured_queries[0]["sql"]
-        # Capture the queries executed when a subclassed model instance is saved.
+        # Capture the queries executed when a subclassed model instance is
+        # saved.
         with CaptureQueriesContext(connection) as captured_queries:
             supplier.save(update_fields=("name",))
         for query in captured_queries:

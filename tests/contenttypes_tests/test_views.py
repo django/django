@@ -8,7 +8,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
 
-from .models import (
+from .models import (  # isort:skip
     Article,
     Author,
     FooWithBrokenAbsoluteUrl,
@@ -17,9 +17,9 @@ from .models import (
     ModelWithM2MToSite,
     ModelWithNullFKToSite,
     SchemeIncludedURL,
+    Site as MockSite,
+    UUIDModel,
 )
-from .models import Site as MockSite
-from .models import UUIDModel
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")
@@ -63,7 +63,10 @@ class ContentTypesViewsTests(TestCase):
         Site.objects.clear_cache()
 
     def test_shortcut_with_absolute_url(self):
-        "Can view a shortcut for an Author object that has a get_absolute_url method"
+        """
+        Can view a shortcut for an Author object that has a get_absolute_url
+        method
+        """
         for obj in Author.objects.all():
             with self.subTest(obj=obj):
                 short_url = "/shortcut/%s/%s/" % (

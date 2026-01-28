@@ -3,6 +3,7 @@ Tests for django test runner
 """
 
 import collections.abc
+import functools
 import multiprocessing
 import os
 import sys
@@ -738,8 +739,10 @@ class TestRunnerInitializerTests(SimpleTestCase):
                     "test_runner_apps.simple.tests",
                 ]
             )
-        # Initializer must be a function.
-        self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
+        # Initializer must be a partial function binding _init_worker.
+        initializer = mocked_pool.call_args.kwargs["initializer"]
+        self.assertIsInstance(initializer, functools.partial)
+        self.assertIs(initializer.args[0], _init_worker)
         initargs = mocked_pool.call_args.kwargs["initargs"]
         self.assertEqual(len(initargs), 7)
         self.assertEqual(initargs[5], True)  # debug_mode
@@ -907,7 +910,8 @@ class SetupDatabasesTests(unittest.TestCase):
                 },
             }
         )
-        # Using the real current name as old_name to not mess with the test suite.
+        # Using the real current name as old_name to not mess with the test
+        # suite.
         old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
         with mock.patch("django.db.connections", new=tested_connections):
             tested_connections["default"].creation.destroy_test_db(
@@ -969,8 +973,9 @@ class AutoIncrementResetTest(TransactionTestCase):
 class EmptyDefaultDatabaseTest(unittest.TestCase):
     def test_empty_default_database(self):
         """
-        An empty default database in settings does not raise an ImproperlyConfigured
-        error when running a unit test that does not use a database.
+        An empty default database in settings does not raise an
+        ImproperlyConfigured error when running a unit test that does not use a
+        database.
         """
         tested_connections = db.ConnectionHandler({"default": {}})
         with mock.patch("django.db.connections", new=tested_connections):

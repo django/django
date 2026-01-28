@@ -1,0 +1,22 @@
+==========================
+Django 5.2.3 release notes
+==========================
+
+*June 10, 2025*
+
+Django 5.2.3 fixes several bugs in 5.2.2. Also, the latest string translations
+from Transifex are incorporated.
+
+Bugfixes
+========
+
+* Fixed a log injection possibility by migrating remaining response logging
+  to ``django.utils.log.log_response()``, which safely escapes arguments such
+  as the request path to prevent unsafe log output (:cve:`2025-48432`).
+
+* Fixed a regression in Django 5.2 that caused :meth:`.QuerySet.bulk_update` to
+  incorrectly convert ``None`` to JSON ``null`` instead of SQL ``NULL`` for
+  ``JSONField`` (:ticket:`36419`).
+
+* Fixed a regression in Django 5.2.2 where the ``q`` parameter was removed from
+  the internal ``django.http.MediaType.params`` property (:ticket:`36446`).

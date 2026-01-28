@@ -2,14 +2,14 @@
 #
 # Translators:
 # Abduqadir Abliz <sahranbay@gmail.com>, 2023
-# Azat, 2023
+# Azat, 2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023\n"
+"PO-Revision-Date: 2025-03-25 15:04-0500\n"
+"Last-Translator: Azat, 2023,2025\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,11 +23,8 @@ msgstr "ئىشلەتكىلى بولىدىغانى %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"بۇ، تاللاشقا بولىدىغان %s تىزىملىكى. تۆۋەندىكى تىزىملىكلەر ئارىسىدىن "
-"بەزىلىرنى تاللاڭ ئاندىن «تاللاش» نى چېكىڭ."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "%s تاللاش ئارقىلىق تاللاڭ ئاندىن «تاللاش» يا ئوق كۇنۇپكىسىنى تاللاڭ."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -36,18 +33,17 @@ msgstr "بۇ رامكىغا يېزىش ئارقىلىق قاتناشقىلى ب�
 msgid "Filter"
 msgstr "سۈزگۈچ"
 
-msgid "Choose all"
-msgstr "ھەممىنى تاللا"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "بارلىق %s نى تاللاڭ"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "بېسىب بارلىق تاللانغان %sنىڭ ھەممىسىنى تاللاڭ"
+msgid "Choose selected %s"
+msgstr "تاللانغان %s نى تاللاڭ"
 
-msgid "Choose"
-msgstr "تاللا"
-
-msgid "Remove"
-msgstr "چىقىرىۋەت"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "تاللانغان %s نى ئۆچۈرۈڭ"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -55,22 +51,19 @@ msgstr "تاللانغانلىرى %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"بۇ، تاللانغان %s  تىزىملىكى. تۆۋەندىكى تىزىملىكلەر ئارىسىدىن بەزىلىرنى "
-"تاللاڭ ئاندىن «چىقىرىش» نى چېكىڭ."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "%s نى تاللاش ئارقىلىق ئۆچۈرۈڭ ، ئاندىن «ئۆچۈرۈش»  كۇنۇپكىسىنى تاللاڭ."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "بۇ رامكىغا يېزىش ئارقىلىق تاللانغان %s سۈزۈڭ."
 
-msgid "Remove all"
-msgstr "ھەممىنى چىقىرىۋەت"
+msgid "(click to clear)"
+msgstr "(تازىلاش ئۈچۈن چېكىڭ)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "بېسىب بارلىق تاللانغان %sنىڭ ھەممىسىنى چىقىرىۋېتىڭ"
+msgid "Remove all %s"
+msgstr "%s نى تولۇق ئۆچۈرۈڭ"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -315,9 +308,3 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "كۆرسەت"
-
-msgid "Hide"
-msgstr "يوشۇر"

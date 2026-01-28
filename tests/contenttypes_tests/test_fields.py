@@ -15,13 +15,16 @@ class GenericForeignKeyTests(TestCase):
         class Model(models.Model):
             field = GenericForeignKey()
 
-        self.assertEqual(str(Model.field), "contenttypes_tests.Model.field")
+        field = Model._meta.get_field("field")
+
+        self.assertEqual(str(field), "contenttypes_tests.Model.field")
 
     def test_get_content_type_no_arguments(self):
+        field = Answer._meta.get_field("question")
         with self.assertRaisesMessage(
             Exception, "Impossible arguments to GFK.get_content_type!"
         ):
-            Answer.question.get_content_type()
+            field.get_content_type()
 
     def test_get_object_cache_respects_deleted_objects(self):
         question = Question.objects.create(text="Who?")
@@ -61,7 +64,8 @@ class GenericForeignKeyTests(TestCase):
         Answer.objects.create(text="answer", question=question)
         answer = Answer.objects.defer("text").get()
         old_question_obj = answer.question
-        # The reverse relation is refreshed even when the text field is deferred.
+        # The reverse relation is refreshed even when the text field is
+        # deferred.
         answer.refresh_from_db()
         self.assertIsNot(answer.question, old_question_obj)
 

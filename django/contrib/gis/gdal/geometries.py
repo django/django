@@ -5,12 +5,14 @@ OGRGeometry may be instantiated when reading geometries from OGR Data Sources
 (e.g. SHP files), or when given OGC WKT (a string).
 
 While the 'full' API is not present yet, the API is "pythonic" unlike
-the traditional and "next-generation" OGR Python bindings.  One major
+the traditional and "next-generation" OGR Python bindings. One major
 advantage OGR Geometries have over their GEOS counterparts is support
 for spatial reference systems and their transformation.
 
 Example:
- >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
+ >>> from django.contrib.gis.gdal import (
+ ...     OGRGeometry, OGRGeomType, SpatialReference
+ ... )
  >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
  >>> pnt = OGRGeometry(wkt1)
  >>> print(pnt)
@@ -28,14 +30,16 @@ Example:
  >>> print(mpnt.proj)
  +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
  >>> print(mpnt)
- MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
+ MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248
+ 29.99979788655764)
 
  The OGRGeomType class is to make it easy to specify an OGR geometry type:
  >>> from django.contrib.gis.gdal import OGRGeomType
  >>> gt1 = OGRGeomType(3) # Using an integer for the type
  >>> gt2 = OGRGeomType('Polygon') # Using a string
  >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
- >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+ >>> # Equivalence works w/non-OGRGeomType objects:
+ >>> print(gt1 == 3, gt1 == 'Polygon')
  True True
 """
 
@@ -245,7 +249,10 @@ class OGRGeometry(GDALBase):
 
     @property
     def area(self):
-        "Return the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
+        """
+        Return the area for a LinearRing, Polygon, or MultiPolygon; 0
+        otherwise.
+        """
         return capi.get_area(self.ptr)
 
     @property
@@ -408,7 +415,8 @@ class OGRGeometry(GDALBase):
         else:
             byteorder = 0  # wkbXDR
         sz = self.wkb_size
-        # Creating the unsigned character buffer, and passing it in by reference.
+        # Creating the unsigned character buffer, and passing it in by
+        # reference.
         buf = (c_ubyte * sz)()
         # For backward compatibility, export old-style 99-402 extended
         # dimension types when geometry does not have an M dimension.
@@ -454,7 +462,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID. By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """
@@ -480,8 +488,8 @@ class OGRGeometry(GDALBase):
 
     # #### Topology Methods ####
     def _topology(self, func, other):
-        """A generalized function for topology operations, takes a GDAL function and
-        the other geometry to perform the operation on."""
+        """A generalized function for topology operations, takes a GDAL
+        function and the other geometry to perform the operation on."""
         if not isinstance(other, OGRGeometry):
             raise TypeError(
                 "Must use another OGRGeometry object for topology operations!"

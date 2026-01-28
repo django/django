@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
 "Last-Translator: Manuela Silva <mmsrs@sky.com>, 2025\n"
 "Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
@@ -360,13 +360,13 @@ msgid "Models in the %(name)s application"
 msgstr "Modelos na aplicação %(name)s"
 
 msgid "Model name"
-msgstr ""
+msgstr "Nome do modelo"
 
 msgid "Add link"
-msgstr ""
+msgstr "Adicionar hiperligação"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Alterar ou ver a hiperligação da lista"
 
 msgid "Add"
 msgstr "Adicionar"
@@ -379,6 +379,7 @@ msgstr "Não tem permissões para visualizar ou editar nada. "
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
+"Depois de criar um utilizador, poderá editar mais opções de utilizador."
 
 msgid "Error:"
 msgstr ""

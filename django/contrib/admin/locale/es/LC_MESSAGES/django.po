@@ -2,11 +2,13 @@
 #
 # Translators:
 # abraham.martin <abraham.martin@gmail.com>, 2014
+# Alberto MH, 2025
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
+# Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -21,15 +23,15 @@
 # Natalia, 2024
 # Pablo, 2015
 # Salomon Herrera, 2023
-# Uriel Medina <urimeba511@gmail.com>, 2020-2024
+# Uriel Medina <urimeba511@gmail.com>, 2020-2025
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:05+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2025\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -50,8 +52,8 @@ msgstr "Eliminado/s %(count)d %(items)s satisfactoriamente."
 msgid "Cannot delete %(name)s"
 msgstr "No se puede eliminar %(name)s"
 
-msgid "Are you sure?"
-msgstr "¿Está seguro?"
+msgid "Delete multiple objects"
+msgstr "Eliminar múltiples objetos."
 
 msgid "Administration"
 msgstr "Administración"
@@ -286,6 +288,9 @@ msgstr[2] "%(total_count)s seleccionados en total"
 msgid "0 of %(cnt)s selected"
 msgstr "seleccionados 0 de %(cnt)s"
 
+msgid "Delete"
+msgstr "Eliminar"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de modificaciones: %s"
@@ -363,11 +368,20 @@ msgid "Clear selection"
 msgstr "Limpiar selección"
 
 msgid "Breadcrumbs"
-msgstr "Migas de pan"
+msgstr "Guía-rastro"
 
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelos en la aplicación %(name)s"
+
+msgid "Model name"
+msgstr "Nombre del modelo"
+
+msgid "Add link"
+msgstr "Añadir vínculo"
+
+msgid "Change or view list link"
+msgstr "Cambiar o ver el enlace de la lista"
 
 msgid "Add"
 msgstr "Añadir"
@@ -378,15 +392,12 @@ msgstr "Vista"
 msgid "You don’t have permission to view or edit anything."
 msgstr "No cuenta con permiso para ver ni editar nada."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Primero, ingrese un nombre de usuario y contraseña. Luego, podrá editar más "
-"opciones del usuario."
+"Después de haber creado un usuario, podrá editar más opciones del mismo."
 
-msgid "Enter a username and password."
-msgstr "Introduzca un nombre de usuario y contraseña"
+msgid "Error:"
+msgstr "Error:"
 
 msgid "Change password"
 msgstr "Cambiar contraseña"
@@ -475,9 +486,6 @@ msgstr "Cambiar tema (tema actual: claro)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Cambiar tema (tema actual: oscuro)"
 
-msgid "Delete"
-msgstr "Eliminar"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -512,9 +520,6 @@ msgstr "Si, estoy seguro"
 
 msgid "No, take me back"
 msgstr "No, llévame atrás"
-
-msgid "Delete multiple objects"
-msgstr "Eliminar múltiples objetos."
 
 #, python-format
 msgid ""
@@ -590,8 +595,8 @@ msgstr ""
 "Se ha autenticado como %(username)s, pero no está autorizado a acceder a "
 "esta página. ¿Desea autenticarse con una cuenta diferente?"
 
-msgid "Forgotten your password or username?"
-msgstr "¿Ha olvidado la contraseña o el nombre de usuario?"
+msgid "Forgotten your login credentials?"
+msgstr "¿Olvidó sus credenciales de inicio de sesión?"
 
 msgid "Toggle navigation"
 msgstr "Activar navegación"
@@ -761,8 +766,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor, vaya a la página siguiente y escoja una nueva contraseña."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Su nombre de usuario, en caso de que lo haya olvidado:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Por si lo ha olvidado, usted es:"
 
 msgid "Thanks for using our site!"
 msgstr "¡Gracias por usar nuestro sitio!"

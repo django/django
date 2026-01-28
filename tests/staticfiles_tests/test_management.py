@@ -291,11 +291,13 @@ class TestCollectionClear(CollectionTestCase):
     Test the ``--clear`` option of the ``collectstatic`` management command.
     """
 
+    run_collectstatic_in_setUp = False
+
     def run_collectstatic(self, **kwargs):
         clear_filepath = os.path.join(settings.STATIC_ROOT, "cleared.txt")
         with open(clear_filepath, "w") as f:
             f.write("should be cleared")
-        super().run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True, **kwargs)
 
     def test_cleared_not_found(self):
         self.assertFileNotFound("cleared.txt")
@@ -315,6 +317,39 @@ class TestCollectionClear(CollectionTestCase):
     def test_handle_path_notimplemented(self):
         self.run_collectstatic()
         self.assertFileNotFound("cleared.txt")
+
+    def test_verbosity_0(self):
+        for kwargs in [{}, {"dry_run": True}]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=0, stdout=stdout, **kwargs)
+                self.assertEqual(stdout.getvalue(), "")
+
+    def test_verbosity_1(self):
+        for deletion_message, kwargs in [
+            ("Deleting", {}),
+            ("Pretending to delete", {"dry_run": True}),
+        ]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=1, stdout=stdout, **kwargs)
+                output = stdout.getvalue()
+                self.assertIn("static file", output)
+                self.assertIn("deleted", output)
+                self.assertNotIn(deletion_message, output)
+
+    def test_verbosity_2(self):
+        for deletion_message, kwargs in [
+            ("Deleting", {}),
+            ("Pretending to delete", {"dry_run": True}),
+        ]:
+            with self.subTest(kwargs=kwargs):
+                stdout = StringIO()
+                self.run_collectstatic(verbosity=2, stdout=stdout, **kwargs)
+                output = stdout.getvalue()
+                self.assertIn("static file", output)
+                self.assertIn("deleted", output)
+                self.assertIn(deletion_message, output)
 
 
 class TestInteractiveMessages(CollectionTestCase):
@@ -439,8 +474,8 @@ class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
 class TestCollectionFilesOverride(CollectionTestCase):
     """
     Test overriding duplicated files by ``collectstatic`` management command.
-    Check for proper handling of apps order in installed apps even if file modification
-    dates are in different order:
+    Check for proper handling of apps order in installed apps even if file
+    modification dates are in different order:
         'staticfiles_test_app',
         'staticfiles_tests.apps.no_label',
     """
@@ -457,9 +492,9 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.orig_atime = os.path.getatime(self.orig_path)
 
         # prepare duplicate of file2.txt from a temporary app
-        # this file will have modification time older than no_label/static/file2.txt
-        # anyway it should be taken to STATIC_ROOT because the temporary app is before
-        # 'no_label' app in installed apps
+        # this file will have modification time older than
+        # no_label/static/file2.txt anyway it should be taken to STATIC_ROOT
+        # because the temporary app is before 'no_label' app in installed apps
         self.temp_app_path = os.path.join(self.temp_dir, "staticfiles_test_app")
         self.testfile_path = os.path.join(self.temp_app_path, "static", "file2.txt")
 
@@ -508,15 +543,17 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
     # looking for was emitted.
     warning_string = "Found another file"
 
-    def _collectstatic_output(self, **kwargs):
+    def _collectstatic_output(self, verbosity=3, **kwargs):
         """
-        Run collectstatic, and capture and return the output. We want to run
-        the command at highest verbosity, which is why we can't
-        just call e.g. BaseCollectionTestCase.run_collectstatic()
+        Run collectstatic, and capture and return the output.
         """
         out = StringIO()
         call_command(
-            "collectstatic", interactive=False, verbosity=3, stdout=out, **kwargs
+            "collectstatic",
+            interactive=False,
+            verbosity=verbosity,
+            stdout=out,
+            **kwargs,
         )
         return out.getvalue()
 
@@ -527,9 +564,10 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         output = self._collectstatic_output(clear=True)
         self.assertNotIn(self.warning_string, output)
 
-    def test_warning(self):
+    def test_warning_at_verbosity_2(self):
         """
-        There is a warning when there are duplicate destinations.
+        There is a warning when there are duplicate destinations at verbosity
+        2+.
         """
         with tempfile.TemporaryDirectory() as static_dir:
             duplicate = os.path.join(static_dir, "test", "file.txt")
@@ -538,15 +576,42 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
                 f.write("duplicate of file.txt")
 
             with self.settings(STATICFILES_DIRS=[static_dir]):
-                output = self._collectstatic_output(clear=True)
+                output = self._collectstatic_output(clear=True, verbosity=2)
             self.assertIn(self.warning_string, output)
 
-            os.remove(duplicate)
+    def test_no_warning_at_verbosity_1(self):
+        """
+        There is no individual warning at verbosity 1, but summary is shown.
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate = os.path.join(static_dir, "test", "file.txt")
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, "w+") as f:
+                f.write("duplicate of file.txt")
 
-            # Make sure the warning went away again.
             with self.settings(STATICFILES_DIRS=[static_dir]):
-                output = self._collectstatic_output(clear=True)
+                output = self._collectstatic_output(clear=True, verbosity=1)
             self.assertNotIn(self.warning_string, output)
+            self.assertIn("1 skipped due to conflict", output)
+
+    def test_summary_multiple_conflicts(self):
+        """
+        Summary shows correct count for multiple conflicts.
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate1 = os.path.join(static_dir, "test", "file.txt")
+            os.makedirs(os.path.dirname(duplicate1))
+            with open(duplicate1, "w+") as f:
+                f.write("duplicate of file.txt")
+            duplicate2 = os.path.join(static_dir, "test", "file1.txt")
+            with open(duplicate2, "w+") as f:
+                f.write("duplicate of file1.txt")
+            duplicate3 = os.path.join(static_dir, "test", "nonascii.css")
+            shutil.copy2(duplicate1, duplicate3)
+
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True, verbosity=1)
+            self.assertIn("3 skipped due to conflict", output)
 
 
 @override_settings(

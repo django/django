@@ -22,6 +22,7 @@ from django.db.models.functions.mixins import (
 
 __all__ = [
     "Aggregate",
+    "AnyValue",
     "Avg",
     "Count",
     "Max",
@@ -94,7 +95,7 @@ class Aggregate(Func):
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
 
         self.distinct = distinct
-        self.filter = filter and AggregateFilter(filter)
+        self.filter = None if filter is None else AggregateFilter(filter)
         self.default = default
         self.order_by = AggregateOrderBy.from_param(
             f"{self.__class__.__name__}.order_by", order_by
@@ -119,16 +120,6 @@ class Aggregate(Func):
     ):
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super().resolve_expression(query, allow_joins, reuse, summarize)
-        c.filter = (
-            c.filter.resolve_expression(query, allow_joins, reuse, summarize)
-            if c.filter
-            else None
-        )
-        c.order_by = (
-            c.order_by.resolve_expression(query, allow_joins, reuse, summarize)
-            if c.order_by
-            else None
-        )
         if summarize:
             # Summarized aggregates cannot refer to summarized aggregates.
             for ref in c.get_refs():
@@ -227,6 +218,20 @@ class Aggregate(Func):
         if self.order_by:
             options["order_by"] = self.order_by
         return options
+
+
+class AnyValue(Aggregate):
+    function = "ANY_VALUE"
+    name = "AnyValue"
+    arity = 1
+    window_compatible = False
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_any_value:
+            raise NotSupportedError(
+                "ANY_VALUE is not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
@@ -348,10 +353,10 @@ class StringAgg(Aggregate):
         extra_context["template"] = template
 
         c = self.copy()
-        # The creation of the delimiter SQL and the ordering of the parameters must be
-        # handled explicitly, as MySQL puts the delimiter at the end of the aggregate
-        # using the `SEPARATOR` declaration (rather than treating as an expression like
-        # other database backends).
+        # The creation of the delimiter SQL and the ordering of the parameters
+        # must be handled explicitly, as MySQL puts the delimiter at the end of
+        # the aggregate using the `SEPARATOR` declaration (rather than treating
+        # as an expression like other database backends).
         delimiter_params = []
         if c.delimiter:
             delimiter_sql, delimiter_params = compiler.compile(c.delimiter)

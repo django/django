@@ -43,6 +43,7 @@ from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
+from django.template.base import PartialTemplate
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -138,10 +139,22 @@ class _AssertTemplateUsedContext:
         self.rendered_templates.append(template)
         self.context.append(copy(context))
 
+    @property
+    def rendered_template_names(self):
+        return [
+            (
+                f"{t.origin.template_name}#{t.name}"
+                if isinstance(t, PartialTemplate)
+                else t.name
+            )
+            for t in self.rendered_templates
+            if t.name is not None
+        ]
+
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            [t.name for t in self.rendered_templates if t.name is not None],
+            self.rendered_template_names,
             self.msg_prefix,
             self.count,
         )
@@ -159,11 +172,8 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        rendered_template_names = [
-            t.name for t in self.rendered_templates if t.name is not None
-        ]
         self.test_case.assertFalse(
-            self.template_name in rendered_template_names,
+            self.template_name in self.rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )
@@ -281,7 +291,8 @@ class SimpleTestCase(unittest.TestCase):
                 # Dynamically created connections are always allowed.
                 and self.alias in connections
             ):
-                # Connection has not yet been established, but the alias is not allowed.
+                # Connection has not yet been established, but the alias is not
+                # allowed.
                 message = cls._disallowed_database_msg % {
                     "test": f"{cls.__module__}.{cls.__qualname__}",
                     "alias": self.alias,
@@ -536,6 +547,11 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Expected '%s' to equal '%s'." % (url1, url2),
         )
 
+    def _text_repr(self, content, force_string):
+        if isinstance(content, bytes) and not force_string:
+            return safe_repr(content)
+        return "'%s'" % str(content)
+
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
@@ -560,13 +576,10 @@ class SimpleTestCase(unittest.TestCase):
             content = b"".join(response.streaming_content)
         else:
             content = response.content
-        content_repr = safe_repr(content)
+        response_content = content
         if not isinstance(text, bytes) or html:
             text = str(text)
             content = content.decode(response.charset)
-            text_repr = "'%s'" % text
-        else:
-            text_repr = repr(text)
         if html:
             content = assert_and_parse_html(
                 self, content, None, "Response's content is not valid HTML:"
@@ -575,7 +588,7 @@ class SimpleTestCase(unittest.TestCase):
                 self, text, None, "Second argument is not valid HTML:"
             )
         real_count = content.count(text)
-        return text_repr, real_count, msg_prefix, content_repr
+        return real_count, msg_prefix, response_content
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -587,27 +600,29 @@ class SimpleTestCase(unittest.TestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
+        if (count is None and real_count > 0) or (
+            (count is not None and real_count == count)
+        ):
+            return
+
+        text_repr = self._text_repr(text, force_string=html)
+
         if count is not None:
-            self.assertEqual(
-                real_count,
-                count,
-                (
-                    f"{msg_prefix}Found {real_count} instances of {text_repr} "
-                    f"(expected {count}) in the following response\n{content_repr}"
-                ),
+            msg = (
+                f"{real_count} != {count} : {msg_prefix}Found {real_count} instances "
+                f"of {text_repr} (expected {count}) in the following response\n"
+                f"{response_content!r}"
             )
         else:
-            self.assertTrue(
-                real_count != 0,
-                (
-                    f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
-                    f"{content_repr}"
-                ),
+            msg = (
+                f"False is not true : {msg_prefix}Couldn't find {text_repr} in the "
+                f"following response\n{response_content!r}"
             )
+        self.fail(msg)
 
     def assertNotContains(
         self, response, text, status_code=200, msg_prefix="", html=False
@@ -617,18 +632,16 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occur in the content of the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
-        self.assertEqual(
-            real_count,
-            0,
-            (
-                f"{msg_prefix}{text_repr} unexpectedly found in the following response"
-                f"\n{content_repr}"
-            ),
-        )
+        if real_count != 0:
+            text_repr = self._text_repr(text, force_string=html)
+            self.fail(
+                f"{real_count} != 0 :{msg_prefix}{text_repr} unexpectedly found in the "
+                f"following response\n{response_content!r}"
+            )
 
     def _check_test_client_response(self, response, attribute, method_name):
         """
@@ -641,26 +654,42 @@ class SimpleTestCase(unittest.TestCase):
                 "the Django test Client."
             )
 
-    def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
+    def _form_repr(self, form, formset, form_index):
+        if formset is None:
+            return f"form {form!r}"
+        return f"form {form_index} of formset {formset!r}"
+
+    def _assert_form_error(
+        self, form, field, errors, msg_prefix, formset=None, form_index=None
+    ):
         if not form.is_bound:
             self.fail(
-                f"{msg_prefix}The {form_repr} is not bound, it will never have any "
-                f"errors."
+                "%sThe %s is not bound, it will never have any errors."
+                % (msg_prefix, self._form_repr(form, formset, form_index))
             )
 
         if field is not None and field not in form.fields:
             self.fail(
-                f"{msg_prefix}The {form_repr} does not contain the field {field!r}."
+                "%sThe %s does not contain the field %r."
+                % (msg_prefix, self._form_repr(form, formset, form_index), field)
             )
-        if field is None:
-            field_errors = form.non_field_errors()
-            failure_message = f"The non-field errors of {form_repr} don't match."
-        else:
-            field_errors = form.errors.get(field, [])
-            failure_message = (
-                f"The errors of field {field!r} on {form_repr} don't match."
-            )
+        field_errors = (
+            form.non_field_errors() if field is None else form.errors.get(field, [])
+        )
 
+        if field_errors == errors:
+            return
+
+        # Use assertEqual to show detailed diff if errors don't match.
+        if field is None:
+            failure_message = "The non-field errors of %s don't match." % (
+                self._form_repr(form, formset, form_index),
+            )
+        else:
+            failure_message = "The errors of field %r on %s don't match." % (
+                field,
+                self._form_repr(form, formset, form_index),
+            )
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
     def assertFormError(self, form, field, errors, msg_prefix=""):
@@ -676,7 +705,7 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
         errors = to_list(errors)
-        self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
+        self._assert_form_error(form, field, errors, msg_prefix)
 
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
@@ -708,15 +737,22 @@ class SimpleTestCase(unittest.TestCase):
                 f"{form_or_forms}."
             )
         if form_index is not None:
-            form_repr = f"form {form_index} of formset {formset!r}"
             self._assert_form_error(
-                formset.forms[form_index], field, errors, msg_prefix, form_repr
+                formset.forms[form_index],
+                field,
+                errors,
+                msg_prefix,
+                formset=formset,
+                form_index=form_index,
             )
         else:
+            formset_errors = formset.non_form_errors()
+            if formset_errors == errors:
+                # Skip assertion if errors already match.
+                return
+
             failure_message = f"The non-form errors of formset {formset!r} don't match."
-            self.assertEqual(
-                formset.non_form_errors(), errors, msg_prefix + failure_message
-            )
+            self.assertEqual(formset_errors, errors, msg_prefix + failure_message)
 
     def _get_template_used(self, response, template_name, msg_prefix, method_name):
         if response is None and template_name is None:
@@ -958,6 +994,10 @@ class SimpleTestCase(unittest.TestCase):
             self, haystack, None, "Second argument is not valid HTML:"
         )
         real_count = parsed_haystack.count(parsed_needle)
+
+        if (count is None and real_count > 0) or count == real_count:
+            return
+
         if msg_prefix:
             msg_prefix += ": "
         haystack_repr = safe_repr(haystack)
@@ -972,15 +1012,13 @@ class SimpleTestCase(unittest.TestCase):
                     f"Found {real_count} instances of {needle!r} (expected {count}) in "
                     f"the following response\n{haystack_repr}"
                 )
-            self.assertEqual(real_count, count, f"{msg_prefix}{msg}")
+            msg = f"{real_count} != {count} : {msg_prefix}{msg}"
         else:
-            self.assertTrue(
-                real_count != 0,
-                (
-                    f"{msg_prefix}Couldn't find {needle!r} in the following response\n"
-                    f"{haystack_repr}"
-                ),
+            msg = (
+                f"False is not true : {msg_prefix}Couldn't find {needle!r} in the "
+                f"following response\n{haystack_repr}"
             )
+        self.fail(msg)
 
     def assertNotInHTML(self, needle, haystack, msg_prefix=""):
         self.assertInHTML(needle, haystack, count=0, msg_prefix=msg_prefix)
@@ -1204,9 +1242,9 @@ class TransactionTestCase(SimpleTestCase):
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
-                # of these statements is lost, which can affect the operation of
-                # tests (e.g., losing a timezone setting causing objects to be
-                # created with the wrong time). To make sure this doesn't
+                # of these statements is lost, which can affect the operation
+                # of tests (e.g., losing a timezone setting causing objects to
+                # be created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
                 for conn in connections.all(initialized_only=True):
                     conn.close()
@@ -1485,11 +1523,11 @@ class TestCase(TransactionTestCase):
                             try:
                                 callback()
                             except Exception as e:
-                                logger.error(
-                                    f"Error calling {callback.__qualname__} in "
-                                    f"on_commit() (%s).",
+                                name = getattr(callback, "__qualname__", callback)
+                                logger.exception(
+                                    "Error calling %s in on_commit() (%s).",
+                                    name,
                                     e,
-                                    exc_info=True,
                                 )
                         else:
                             callback()
@@ -1582,9 +1620,7 @@ def _deferredSkip(condition, reason, name):
 def skipIfDBFeature(*features):
     """Skip a test if a database has at least one of the named features."""
     return _deferredSkip(
-        lambda: any(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: any(getattr(connection.features, feature) for feature in features),
         "Database has feature(s) %s" % ", ".join(features),
         "skipIfDBFeature",
     )
@@ -1593,9 +1629,7 @@ def skipIfDBFeature(*features):
 def skipUnlessDBFeature(*features):
     """Skip a test unless a database has all the named features."""
     return _deferredSkip(
-        lambda: not all(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: not all(getattr(connection.features, feature) for feature in features),
         "Database doesn't support feature(s): %s" % ", ".join(features),
         "skipUnlessDBFeature",
     )
@@ -1604,9 +1638,7 @@ def skipUnlessDBFeature(*features):
 def skipUnlessAnyDBFeature(*features):
     """Skip a test unless a database has any of the named features."""
     return _deferredSkip(
-        lambda: not any(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: not any(getattr(connection.features, feature) for feature in features),
         "Database doesn't support any of the feature(s): %s" % ", ".join(features),
         "skipUnlessAnyDBFeature",
     )
@@ -1762,9 +1794,9 @@ class LiveServerTestCase(TransactionTestCase):
     framework, such as Selenium for example, instead of the built-in dummy
     client.
     It inherits from TransactionTestCase instead of TestCase because the
-    threads don't share the same transactions (unless if using in-memory sqlite)
-    and each thread needs to commit all their transactions so that the other
-    thread can see the changes.
+    threads don't share the same transactions (unless if using in-memory
+    sqlite) and each thread needs to commit all their transactions so that the
+    other thread can see the changes.
     """
 
     host = "localhost"

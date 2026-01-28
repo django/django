@@ -82,6 +82,8 @@ view functions:
 * :func:`~django.views.decorators.cache.cache_control`
 * :func:`~django.views.decorators.cache.never_cache`
 * :func:`~django.views.decorators.common.no_append_slash`
+* :func:`~django.views.decorators.csp.csp_override`
+* :func:`~django.views.decorators.csp.csp_report_only_override`
 * :func:`~django.views.decorators.csrf.csrf_exempt`
 * :func:`~django.views.decorators.csrf.csrf_protect`
 * :func:`~django.views.decorators.csrf.ensure_csrf_cookie`
@@ -230,8 +232,8 @@ its own thread).
 
 The async context can be imposed upon you by the environment in which you are
 running your Django code. For example, Jupyter_ notebooks and IPython_
-interactive shells both transparently provide an active event loop so that it is
-easier to interact with asynchronous APIs.
+interactive shells both transparently provide an active event loop so that it
+is easier to interact with asynchronous APIs.
 
 If you're using an IPython shell, you can disable this event loop by running:
 
@@ -312,7 +314,7 @@ Threadlocals and contextvars values are preserved across the boundary in both
 directions.
 
 :func:`async_to_sync` is essentially a more powerful version of the
-:py:func:`asyncio.run` function in Python's standard library. As well
+:func:`asyncio.run` function in Python's standard library. As well
 as ensuring threadlocals work, it also enables the ``thread_sensitive`` mode of
 :func:`sync_to_async` when that wrapper is used below it.
 

@@ -21,7 +21,8 @@ class MigrationExecutor:
 
     def migration_plan(self, targets, clean_start=False):
         """
-        Given a set of targets, return a list of (Migration instance, backwards?).
+        Given a set of targets, return a list of (Migration instance,
+        backwards?).
         """
         plan = []
         if clean_start:
@@ -29,7 +30,8 @@ class MigrationExecutor:
         else:
             applied = dict(self.loader.applied_migrations)
         for target in targets:
-            # If the target is (app_label, None), that means unmigrate everything
+            # If the target is (app_label, None), that means unmigrate
+            # everything
             if target[1] is None:
                 for root in self.loader.graph.root_nodes():
                     if root[0] == target[0]:
@@ -302,8 +304,7 @@ class MigrationExecutor:
         """
         applied = self.recorder.applied_migrations()
         for key, migration in self.loader.replacements.items():
-            all_applied = all(m in applied for m in migration.replaces)
-            if all_applied and key not in applied:
+            if key not in applied and self.loader.all_replaced_applied(key, applied):
                 self.recorder.record_applied(*key)
 
     def detect_soft_applied(self, project_state, migration):

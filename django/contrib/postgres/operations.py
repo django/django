@@ -13,15 +13,16 @@ class CreateExtension(Operation):
     reversible = True
     category = OperationCategory.ADDITION
 
-    def __init__(self, name):
+    def __init__(self, name, hints=None):
         self.name = name
+        self.hints = hints or {}
 
     def state_forwards(self, app_label, state):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
-            schema_editor.connection.alias, app_label
+            schema_editor.connection.alias, app_label, **self.hints
         ):
             return
         if not self.extension_exists(schema_editor, self.name):
@@ -42,7 +43,9 @@ class CreateExtension(Operation):
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+        if not router.allow_migrate(
+            schema_editor.connection.alias, app_label, **self.hints
+        ):
             return
         if self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
@@ -69,43 +72,43 @@ class CreateExtension(Operation):
 
 
 class BloomExtension(CreateExtension):
-    def __init__(self):
-        self.name = "bloom"
+    def __init__(self, hints=None):
+        super().__init__("bloom", hints=hints)
 
 
 class BtreeGinExtension(CreateExtension):
-    def __init__(self):
-        self.name = "btree_gin"
+    def __init__(self, hints=None):
+        super().__init__("btree_gin", hints=hints)
 
 
 class BtreeGistExtension(CreateExtension):
-    def __init__(self):
-        self.name = "btree_gist"
+    def __init__(self, hints=None):
+        super().__init__("btree_gist", hints=hints)
 
 
 class CITextExtension(CreateExtension):
-    def __init__(self):
-        self.name = "citext"
+    def __init__(self, hints=None):
+        super().__init__("citext", hints=hints)
 
 
 class CryptoExtension(CreateExtension):
-    def __init__(self):
-        self.name = "pgcrypto"
+    def __init__(self, hints=None):
+        super().__init__("pgcrypto", hints=hints)
 
 
 class HStoreExtension(CreateExtension):
-    def __init__(self):
-        self.name = "hstore"
+    def __init__(self, hints=None):
+        super().__init__("hstore", hints=hints)
 
 
 class TrigramExtension(CreateExtension):
-    def __init__(self):
-        self.name = "pg_trgm"
+    def __init__(self, hints=None):
+        super().__init__("pg_trgm", hints=hints)
 
 
 class UnaccentExtension(CreateExtension):
-    def __init__(self):
-        self.name = "unaccent"
+    def __init__(self, hints=None):
+        super().__init__("unaccent", hints=hints)
 
 
 class NotInTransactionMixin:

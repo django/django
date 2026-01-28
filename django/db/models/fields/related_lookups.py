@@ -28,8 +28,9 @@ def get_normalized_value(value, lhs):
             try:
                 value_list.append(getattr(value, source.attname))
             except AttributeError:
-                # A case like Restaurant.objects.filter(place=restaurant_instance),
-                # where place is a OneToOneField and the primary key of Restaurant.
+                # A case like
+                # Restaurant.objects.filter(place=restaurant_instance), where
+                # place is a OneToOneField and the primary key of Restaurant.
                 pk = value.pk
                 return pk if isinstance(pk, tuple) else (pk,)
         return tuple(value_list)
@@ -101,10 +102,10 @@ class RelatedLookupMixin:
         ):
             # If we get here, we are dealing with single-column relations.
             self.rhs = get_normalized_value(self.rhs, self.lhs)[0]
-            # We need to run the related field's get_prep_value(). Consider case
-            # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
-            # doesn't have validation for non-integers, so we must run validation
-            # using the target field.
+            # We need to run the related field's get_prep_value(). Consider
+            # case ForeignKey to IntegerField given value 'abc'. The ForeignKey
+            # itself doesn't have validation for non-integers, so we must run
+            # validation using the target field.
             if self.prepare_rhs and hasattr(self.lhs.output_field, "path_infos"):
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.

@@ -41,7 +41,7 @@ them. In that case, connect to your Django database and run the query
 ``CreateExtension``
 ===================
 
-.. class:: CreateExtension(name)
+.. class:: CreateExtension(name, hints=None)
 
     An ``Operation`` subclass which installs a PostgreSQL extension. For common
     extensions, use one of the more specific subclasses below.
@@ -50,62 +50,134 @@ them. In that case, connect to your Django database and run the query
 
         This is a required argument. The name of the extension to be installed.
 
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
+
 ``BloomExtension``
 ==================
 
-.. class:: BloomExtension()
+.. class:: BloomExtension(hints=None)
 
     Installs the ``bloom`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``BtreeGinExtension``
 =====================
 
-.. class:: BtreeGinExtension()
+.. class:: BtreeGinExtension(hints=None)
 
     Installs the ``btree_gin`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``BtreeGistExtension``
 ======================
 
-.. class:: BtreeGistExtension()
+.. class:: BtreeGistExtension(hints=None)
 
     Installs the ``btree_gist`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``CITextExtension``
 ===================
 
-.. class:: CITextExtension()
+.. class:: CITextExtension(hints=None)
 
     Installs the ``citext`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``CryptoExtension``
 ===================
 
-.. class:: CryptoExtension()
+.. class:: CryptoExtension(hints=None)
 
     Installs the ``pgcrypto`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``HStoreExtension``
 ===================
 
-.. class:: HStoreExtension()
+.. class:: HStoreExtension(hints=None)
 
     Installs the ``hstore`` extension and also sets up the connection to
     interpret hstore data for possible use in subsequent migrations.
 
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
+
 ``TrigramExtension``
 ====================
 
-.. class:: TrigramExtension()
+.. class:: TrigramExtension(hints=None)
 
     Installs the ``pg_trgm`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 ``UnaccentExtension``
 =====================
 
-.. class:: UnaccentExtension()
+.. class:: UnaccentExtension(hints=None)
 
     Installs the ``unaccent`` extension.
+
+    .. attribute:: hints
+
+        .. versionadded:: 6.0
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        :ref:`making routing decisions <topics-db-multi-db-hints>`.
 
 .. _manage-postgresql-collations:
 

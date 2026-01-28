@@ -19,6 +19,9 @@ class MyWrapper:
             return self.value == other.value
         return self.value == other
 
+    def __hash__(self):
+        return hash(self.value)
+
 
 class MyWrapperField(models.CharField):
     def __init__(self, *args, **kwargs):

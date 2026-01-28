@@ -1,6 +1,7 @@
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
+from django.utils.datastructures import OrderedSet
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
@@ -71,16 +72,16 @@ class MigrationGraph:
     branch merges can be detected and resolved.
 
     Migrations files can be marked as replacing another set of migrations -
-    this is to support the "squash" feature. The graph handler isn't responsible
-    for these; instead, the code to load them in here should examine the
-    migration files and if the replaced migrations are all either unapplied
-    or not present, it should ignore the replaced ones, load in just the
-    replacing migration, and repoint any dependencies that pointed to the
+    this is to support the "squash" feature. The graph handler isn't
+    responsible for these; instead, the code to load them in here should
+    examine the migration files and if the replaced migrations are all either
+    unapplied or not present, it should ignore the replaced ones, load in just
+    the replacing migration, and repoint any dependencies that pointed to the
     replaced migrations to point to the replacing one.
 
-    A node should be a tuple: (app_path, migration_name). The tree special-cases
-    things within an app - namely, root nodes and leaf nodes ignore dependencies
-    to other apps.
+    A node should be a tuple: (app_path, migration_name). The tree
+    special-cases things within an app - namely, root nodes and leaf nodes
+    ignore dependencies to other apps.
     """
 
     def __init__(self):
@@ -145,7 +146,8 @@ class MigrationGraph:
                     child.parents.remove(replaced_node)
                     # We don't want to create dependencies between the replaced
                     # node and the replacement node as this would lead to
-                    # self-referencing on the replacement node at a later iteration.
+                    # self-referencing on the replacement node at a later
+                    # iteration.
                     if child.key not in replaced:
                         replacement_node.add_child(child)
                         child.add_parent(replacement_node)
@@ -304,18 +306,19 @@ class MigrationGraph:
         )
 
     def _generate_plan(self, nodes, at_end):
-        plan = []
+        plan = OrderedSet()
         for node in nodes:
             for migration in self.forwards_plan(node):
                 if migration not in plan and (at_end or migration not in nodes):
-                    plan.append(migration)
-        return plan
+                    plan.add(migration)
+        return list(plan)
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
         Given a migration node or nodes, return a complete ProjectState for it.
         If at_end is False, return the state before the migration has run.
-        If nodes is not provided, return the overall most current project state.
+        If nodes is not provided, return the overall most current project
+        state.
         """
         if nodes is None:
             nodes = list(self.leaf_nodes())

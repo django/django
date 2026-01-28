@@ -106,8 +106,8 @@ Note:
   See `Publishing Atom and RSS feeds in tandem`_, later, for an example.
 
 One thing is left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
-``<link>`` and ``<description>``. We need to tell the framework what data to put
-into those elements.
+``<link>`` and ``<description>``. We need to tell the framework what data to
+put into those elements.
 
 * For the contents of ``<title>`` and ``<description>``, Django tries
   calling the methods ``item_title()`` and ``item_description()`` on
@@ -138,10 +138,10 @@ into those elements.
 
   .. method:: Feed.get_context_data(**kwargs)
 
-      There is also a way to pass additional information to title and description
-      templates, if you need to supply more than the two variables mentioned
-      before. You can provide your implementation of ``get_context_data`` method
-      in your ``Feed`` subclass. For example::
+      There is also a way to pass additional information to title and
+      description templates, if you need to supply more than the two variables
+      mentioned before. You can provide your implementation of
+      ``get_context_data`` method in your ``Feed`` subclass. For example::
 
         from mysite.models import Article
         from django.contrib.syndication.views import Feed
@@ -204,11 +204,11 @@ The framework also supports more complex feeds, via arguments.
 
 For example, a website could offer an RSS feed of recent crimes for every
 police beat in a city. It'd be silly to create a separate
-:class:`~django.contrib.syndication.views.Feed` class for each police beat; that
-would violate the :ref:`DRY principle <dry>` and would couple data to
+:class:`~django.contrib.syndication.views.Feed` class for each police beat;
+that would violate the :ref:`DRY principle <dry>` and would couple data to
 programming logic. Instead, the syndication framework lets you access the
-arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can output
-items based on information in the feed's URL.
+arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can
+output items based on information in the feed's URL.
 
 The police beat feeds could be accessible via URLs like this:
 
@@ -311,8 +311,8 @@ Language
 
 Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). By
-default, this is :func:`django.utils.translation.get_language()`. You can change it
-by setting the ``language`` class attribute.
+default, this is :func:`django.utils.translation.get_language`. You can change
+it by setting the ``language`` class attribute.
 
 URLs
 ----
@@ -715,7 +715,7 @@ This example illustrates all possible attributes and methods for a
             Takes an item, as returned by items(), and returns a boolean.
             """
 
-        item_guid_is_permalink = False  # Hard coded value
+        item_guid_is_permalink = False  # Hardcoded value
 
         # ITEM AUTHOR NAME -- One of the following three is optional. The
         # framework looks for them in this order.
@@ -995,10 +995,6 @@ They share this interface:
     XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
 
-    .. versionchanged:: 5.2
-
-        The ``stylesheets`` argument was added.
-
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
 
@@ -1033,7 +1029,8 @@ They share this interface:
     * ``categories`` should be a sequence of strings.
 
 :meth:`.SyndicationFeed.write`
-    Outputs the feed in the given encoding to outfile, which is a file-like object.
+    Outputs the feed in the given encoding to outfile, which is a file-like
+    object.
 
 :meth:`.SyndicationFeed.writeString`
     Returns the feed as a string in the given encoding.
@@ -1078,8 +1075,8 @@ If the feed format is totally custom, you'll want to subclass
 However, if the feed format is a spin-off of RSS or Atom (i.e. GeoRSS_, Apple's
 `iTunes podcast format`_, etc.), you've got a better choice. These types of
 feeds typically add extra elements and/or attributes to the underlying format,
-and there are a set of methods that ``SyndicationFeed`` calls to get these extra
-attributes. Thus, you can subclass the appropriate feed generator class
+and there are a set of methods that ``SyndicationFeed`` calls to get these
+extra attributes. Thus, you can subclass the appropriate feed generator class
 (``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
 
 .. _georss: https://georss.org
@@ -1106,10 +1103,11 @@ attributes. Thus, you can subclass the appropriate feed generator class
 
 .. warning::
 
-    If you override any of these methods, be sure to call the superclass methods
-    since they add the required elements for each feed format.
+    If you override any of these methods, be sure to call the superclass
+    methods since they add the required elements for each feed format.
 
-For example, you might start implementing an iTunes RSS feed generator like so::
+For example, you might start implementing an iTunes RSS feed generator like
+so::
 
     class iTunesFeed(Rss201rev2Feed):
         def root_attributes(self):
@@ -1128,8 +1126,6 @@ above example should demonstrate the basic idea.
 
 Feed stylesheets
 ----------------
-
-.. versionadded:: 5.2
 
 If you wish to have your RSS feed render nicely in a browser, you will need to
 provide styling information for the XML file, typically in XSLT_ or CSS

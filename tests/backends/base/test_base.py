@@ -9,6 +9,7 @@ from django.test import (
     TransactionTestCase,
     skipUnlessDBFeature,
 )
+from django.test.runner import DebugSQLTextTestResult
 from django.test.utils import CaptureQueriesContext, override_settings
 
 from ..models import Person, Square
@@ -134,6 +135,8 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
                 )
 
     def test_no_logs_without_debug(self):
+        if isinstance(self._outcome.result, DebugSQLTextTestResult):
+            self.skipTest("--debug-sql interferes with this test")
         with self.assertNoLogs("django.db.backends", "DEBUG"):
             with self.assertRaises(Exception), transaction.atomic():
                 Person.objects.create(first_name="first", last_name="last")

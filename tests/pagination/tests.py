@@ -55,7 +55,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             got,
-            "For '%s', expected %s but got %s.  Paginator parameters were: %s"
+            "For '%s', expected %s but got %s. Paginator parameters were: %s"
             % (name, expected, got, params),
         )
 
@@ -65,7 +65,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             await got(),
-            "For '%s', expected %s but got %s.  Paginator parameters were: %s"
+            "For '%s', expected %s but got %s. Paginator parameters were: %s"
             % (name, expected, got, params),
         )
 
@@ -170,7 +170,8 @@ class PaginationTests(SimpleTestCase):
         for paginator_class in [Paginator, AsyncPaginator]:
             for orphans in [2, 3]:
                 with self.subTest(paginator_class=paginator_class, msg=msg):
-                    # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                    # RemovedInDjango70Warning: When the deprecation ends,
+                    # replace with:
                     # with self.assertRaisesMessage(ValueError, msg):
                     with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
                         paginator_class([1, 2, 3], 2, orphans)
@@ -208,7 +209,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(paginator.validate_number(1.0), 1)
 
     def test_no_content_allow_empty_first_page(self):
-        # With no content and allow_empty_first_page=True, 1 is a valid page number
+        # With no content and allow_empty_first_page=True, 1 is a valid page.
         paginator = Paginator([], 2)
         self.assertEqual(paginator.validate_number(1), 1)
 
@@ -511,8 +512,8 @@ class PaginationTests(SimpleTestCase):
         self,
     ):
         """
-        AsyncPaginator.aget_page() raises EmptyPage if allow_empty_first_page=False
-        and object_list is empty.
+        AsyncPaginator.aget_page() raises EmptyPage if
+        allow_empty_first_page=False and object_list is empty.
         """
         paginator = AsyncPaginator([], 2, allow_empty_first_page=False)
         with self.assertRaises(EmptyPage):
@@ -856,7 +857,8 @@ class ModelPaginationTests(TestCase):
         self.assertIsNone(p.object_list._result_cache)
         self.assertNotIsInstance(p.object_list, list)
 
-        # Make sure slicing the Page object with numbers and slice objects work.
+        # Make sure slicing the Page object with numbers and slice objects
+        # work.
         self.assertEqual(p[0], self.articles[0])
         self.assertSequenceEqual(p[slice(2)], self.articles[:2])
         # After __getitem__ is called, object_list is a list
@@ -899,7 +901,8 @@ class ModelPaginationTests(TestCase):
         with self.assertWarnsMessage(UnorderedObjectListWarning, msg) as cm:
             AsyncPaginator(Article.objects.all(), 5)
         # The warning points at the BasePaginator caller.
-        # The reason is that the UnorderedObjectListWarning occurs in BasePaginator.
+        # The reason is that the UnorderedObjectListWarning occurs in
+        # BasePaginator.
         base_paginator_path = pathlib.Path(inspect.getfile(BasePaginator))
         self.assertIn(
             cm.filename,

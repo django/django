@@ -193,8 +193,8 @@ class FormsMediaTestCase(SimpleTestCase):
         )
 
     def test_combine_media(self):
-        # Media objects can be combined. Any given media resource will appear only
-        # once. Duplicated media definitions are ignored.
+        # Media objects can be combined. Any given media resource will appear
+        # only once. Duplicated media definitions are ignored.
         class MyWidget1(TextInput):
             class Media:
                 css = {"all": ("path/to/css1", "/path/to/css2")}

@@ -1,6 +1,6 @@
 """
 The GDAL/OGR library uses an Envelope structure to hold the bounding
-box information for a geometry.  The envelope (bounding box) contains
+box information for a geometry. The envelope (bounding box) contains
 two pairs of coordinates, one for the lower left coordinate and one
 for the upper right coordinate:
 
@@ -17,8 +17,8 @@ from django.contrib.gis.gdal.error import GDALException
 
 
 # The OGR definition of an Envelope is a C structure containing four doubles.
-#  See the 'ogr_core.h' source file for more information:
-#   https://gdal.org/doxygen/ogr__core_8h_source.html
+# See the 'ogr_core.h' source file for more information:
+# https://gdal.org/doxygen/ogr__core_8h_source.html
 class OGREnvelope(Structure):
     "Represent the OGREnvelope C Structure."
 
@@ -33,14 +33,14 @@ class OGREnvelope(Structure):
 class Envelope:
     """
     The Envelope object is a C structure that contains the minimum and
-    maximum X, Y coordinates for a rectangle bounding box.  The naming
+    maximum X, Y coordinates for a rectangle bounding box. The naming
     of the variables is compatible with the OGR Envelope structure.
     """
 
     def __init__(self, *args):
         """
-        The initialization function may take an OGREnvelope structure, 4-element
-        tuple or list, or 4 individual arguments.
+        The initialization function may take an OGREnvelope structure,
+        4-element tuple or list, or 4 individual arguments.
         """
 
         if len(args) == 1:
@@ -128,7 +128,7 @@ class Envelope:
                         (args[0][0], args[0][1], args[0][0], args[0][1])
                     )
                 elif len(args[0]) == 4:
-                    (minx, miny, maxx, maxy) = args[0]
+                    minx, miny, maxx, maxy = args[0]
                     if minx < self._envelope.MinX:
                         self._envelope.MinX = minx
                     if miny < self._envelope.MinY:

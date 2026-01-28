@@ -29,6 +29,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     Min,
     Model,
@@ -83,6 +84,7 @@ from .models import (
     Company,
     Employee,
     Experiment,
+    JSONFieldModel,
     Manager,
     Number,
     RemoteEmployee,
@@ -134,6 +136,16 @@ class BasicExpressionsTests(TestCase):
             )
         )
         self.assertEqual(companies["result"], 2395)
+
+    def test_decimal_division_literal_value(self):
+        """
+        Division with a literal Decimal value preserves precision.
+        """
+        num = Number.objects.create(integer=2)
+        obj = Number.objects.annotate(
+            val=F("integer") / Value(Decimal("3.0"), output_field=DecimalField())
+        ).get(pk=num.pk)
+        self.assertAlmostEqual(obj.val, Decimal("0.6667"), places=4)
 
     def test_annotate_values_filter(self):
         companies = (
@@ -367,6 +379,21 @@ class BasicExpressionsTests(TestCase):
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
 
+    @skipUnlessDBFeature("supports_json_field")
+    def test_update_jsonfield_case_when_key_is_null(self):
+        obj = JSONFieldModel.objects.create(data={"key": None})
+        updated = JSONFieldModel.objects.update(
+            data=Case(
+                When(
+                    data__key=Value(None, JSONField()),
+                    then=Value({"key": "something"}, JSONField()),
+                ),
+            )
+        )
+        self.assertEqual(updated, 1)
+        obj.refresh_from_db()
+        self.assertEqual(obj.data, {"key": "something"})
+
     def test_filter_with_join(self):
         # F Expressions can also span joins
         Company.objects.update(point_of_contact=F("ceo"))
@@ -403,8 +430,11 @@ class BasicExpressionsTests(TestCase):
         # F expressions can be used to update attributes on single objects
         self.gmbh.num_employees = F("num_employees") + 4
         self.gmbh.save()
-        self.gmbh.refresh_from_db()
-        self.assertEqual(self.gmbh.num_employees, 36)
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(self.gmbh.num_employees, 36)
 
     def test_new_object_save(self):
         # We should be able to use Funcs when inserting new data
@@ -728,9 +758,27 @@ class BasicExpressionsTests(TestCase):
         subquery_test = Company.objects.filter(pk__in=Subquery(small_companies))
         self.assertCountEqual(subquery_test, [self.foobar_ltd, self.gmbh])
         subquery_test2 = Company.objects.filter(
-            pk=Subquery(small_companies.filter(num_employees=3))
+            pk=Subquery(small_companies.filter(num_employees=3)[:1])
         )
         self.assertCountEqual(subquery_test2, [self.foobar_ltd])
+
+    def test_lookups_subquery(self):
+        smallest_company = Company.objects.order_by("num_employees").values("name")[:1]
+        for lookup in CharField.get_lookups():
+            if lookup == "isnull":
+                continue  # not allowed, rhs must be a literal boolean.
+            if (
+                lookup == "in"
+                and not connection.features.allow_sliced_subqueries_with_in
+            ):
+                continue
+            if lookup == "range":
+                rhs = (Subquery(smallest_company), Subquery(smallest_company))
+            else:
+                rhs = Subquery(smallest_company)
+            with self.subTest(lookup=lookup):
+                qs = Company.objects.filter(**{f"name__{lookup}": rhs})
+                self.assertGreater(len(qs), 0)
 
     def test_uuid_pk_subquery(self):
         u = UUIDPK.objects.create()
@@ -953,10 +1001,23 @@ class BasicExpressionsTests(TestCase):
                 )
                 .order_by("-salary_raise")
                 .values("salary_raise")[:1],
-                output_field=IntegerField(),
             ),
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
+
+    def test_annotation_with_outerref_and_output_field(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef("num_employees") + F("num_employees"),
+                )
+                .order_by("-salary_raise")
+                .values("salary_raise")[:1],
+                output_field=DecimalField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332.0)
+        self.assertIsInstance(gmbh_salary.max_ceo_salary_raise, Decimal)
 
     def test_annotation_with_nested_outerref(self):
         self.gmbh.point_of_contact = Employee.objects.get(lastname="Meyer")
@@ -1520,6 +1581,24 @@ class SimpleExpressionTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             expression.get_expression_for_validation()
 
+    def test_replace_expressions_falsey(self):
+        class AssignableExpression(Expression):
+            def __init__(self, *source_expressions):
+                super().__init__()
+                self.set_source_expressions(list(source_expressions))
+
+            def get_source_expressions(self):
+                return self.source_expressions
+
+            def set_source_expressions(self, exprs):
+                self.source_expressions = exprs
+
+        expression = AssignableExpression()
+        falsey = Q()
+        expression.set_source_expressions([falsey])
+        replaced = expression.replace_expressions({"replacement": Expression()})
+        self.assertEqual(replaced.get_source_expressions(), [falsey])
+
 
 class ExpressionsNumericTests(TestCase):
     @classmethod
@@ -1596,8 +1675,11 @@ class ExpressionsNumericTests(TestCase):
         n = Number.objects.create(integer=1, decimal_value=Decimal("0.5"))
         n.decimal_value = F("decimal_value") - Decimal("0.4")
         n.save()
-        n.refresh_from_db()
-        self.assertEqual(n.decimal_value, Decimal("0.1"))
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(n.decimal_value, Decimal("0.1"))
 
 
 class ExpressionOperatorTests(TestCase):
@@ -2504,6 +2586,15 @@ class ExistsTests(TestCase):
         qs = Manager.objects.annotate(exists=Exists(Manager.objects.none())).filter(
             pk=manager.pk, exists=False
         )
+        self.assertSequenceEqual(qs, [manager])
+        self.assertIs(qs.get().exists, False)
+
+    def test_annotate_by_empty_custom_exists(self):
+        class CustomExists(Exists):
+            template = Subquery.template
+
+        manager = Manager.objects.create()
+        qs = Manager.objects.annotate(exists=CustomExists(Manager.objects.none()))
         self.assertSequenceEqual(qs, [manager])
         self.assertIs(qs.get().exists, False)
 

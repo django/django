@@ -14,7 +14,7 @@ c_uchar_p = POINTER(c_ubyte)
 # We create a simple subclass of c_char_p here because when the response
 # type is set to c_char_p, you get a _Python_ string and there's no way
 # to access the string's address inside the error checking function.
-# In other words, you can't free the memory allocated inside GEOS.  Previously,
+# In other words, you can't free the memory allocated inside GEOS. Previously,
 # the return type would just be omitted and the integer address would be
 # used -- but this allows us to be specific in the function definition and
 # keeps the reference so it may be free'd.

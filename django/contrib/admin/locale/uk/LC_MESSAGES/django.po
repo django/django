@@ -388,7 +388,7 @@ msgid "After you’ve created a user, you’ll be able to edit more user options
 msgstr ""
 
 msgid "Error:"
-msgstr ""
+msgstr "Помилка:"
 
 msgid "Change password"
 msgstr "Змінити пароль"

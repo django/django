@@ -22,8 +22,8 @@ only allows access to users with those two fields both set to True.
 How do I automatically set a field's value to the user who last edited the object in the admin?
 ===============================================================================================
 
-The :class:`~django.contrib.admin.ModelAdmin` class provides customization hooks
-that allow you to transform an object as it saved, using details from the
+The :class:`~django.contrib.admin.ModelAdmin` class provides customization
+hooks that allow you to transform an object as it saved, using details from the
 request. By extracting the current user from the request, and customizing the
 :meth:`~django.contrib.admin.ModelAdmin.save_model` hook, you can update an
 object to reflect the user that edited it. See :ref:`the documentation on
@@ -33,8 +33,8 @@ How do I limit admin access so that objects can only be edited by the users who 
 =============================================================================================
 
 The :class:`~django.contrib.admin.ModelAdmin` class also provides customization
-hooks that allow you to control the visibility and editability of objects in the
-admin. Using the same trick of extracting the user from the request, the
+hooks that allow you to control the visibility and editability of objects in
+the admin. Using the same trick of extracting the user from the request, the
 :meth:`~django.contrib.admin.ModelAdmin.get_queryset` and
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` can be used to
 control the visibility and editability of objects in the admin.

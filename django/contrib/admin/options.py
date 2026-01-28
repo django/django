@@ -8,6 +8,7 @@ from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
 
 from django import forms
+from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers, widgets
@@ -71,6 +72,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
+SOURCE_MODEL_VAR = "_source_model"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
 
@@ -170,10 +172,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         # ForeignKey or ManyToManyFields
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            # Combine the field kwargs with any options for formfield_overrides.
-            # Make sure the passed in **kwargs override anything in
-            # formfield_overrides because **kwargs is more specific, and should
-            # always win.
+            # Combine the field kwargs with any options for
+            # formfield_overrides. Make sure the passed in **kwargs override
+            # anything in formfield_overrides because **kwargs is more
+            # specific, and should always win.
             if db_field.__class__ in self.formfield_overrides:
                 kwargs = {**self.formfield_overrides[db_field.__class__], **kwargs}
 
@@ -250,7 +252,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def get_field_queryset(self, db, db_field, request):
         """
         If the ModelAdmin specifies ordering, the queryset should respect that
-        ordering.  Otherwise don't specify the queryset, let the field decide
+        ordering. Otherwise don't specify the queryset, let the field decide
         (return None in that case).
         """
         try:
@@ -1047,7 +1049,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
-        Return a list of choices for use in a form object.  Each choice is a
+        Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [*default_choices]
@@ -1059,7 +1061,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_action(self, action):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin.  Return is a tuple of
+        or the name of a method on the ModelAdmin. Return is a tuple of
         (callable, name, description).
         """
         # If the action is a callable, just use it.
@@ -1342,6 +1344,7 @@ class ModelAdmin(BaseModelAdmin):
                 "save_on_top": self.save_on_top,
                 "to_field_var": TO_FIELD_VAR,
                 "is_popup_var": IS_POPUP_VAR,
+                "source_model_var": SOURCE_MODEL_VAR,
                 "app_label": app_label,
             }
         )
@@ -1398,12 +1401,39 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
-            popup_response_data = json.dumps(
-                {
-                    "value": str(value),
-                    "obj": str(obj),
-                }
-            )
+            popup_response = {
+                "value": str(value),
+                "obj": str(obj),
+            }
+
+            # Find the optgroup for the new item, if available
+            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
+
+            if source_model_name:
+                app_label, model_name = source_model_name.split(".", 1)
+                try:
+                    source_model = apps.get_model(app_label, model_name)
+                except LookupError:
+                    msg = _('The app "%s" could not be found.') % source_model_name
+                    self.message_user(request, msg, messages.ERROR)
+                else:
+                    source_admin = self.admin_site._registry[source_model]
+                    form = source_admin.get_form(request)()
+                    if self.opts.verbose_name_plural in form.fields:
+                        field = form.fields[self.opts.verbose_name_plural]
+                        for option_value, option_label in field.choices:
+                            # Check if this is an optgroup (label is a sequence
+                            # of choices rather than a single string value).
+                            if isinstance(option_label, (list, tuple)):
+                                # It's an optgroup:
+                                # (group_name, [(value, label), ...])
+                                optgroup_label = option_value
+                                for choice_value, choice_display in option_label:
+                                    if choice_display == str(obj):
+                                        popup_response["optgroup"] = str(optgroup_label)
+                                        break
+
+            popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
                 request,
                 self.popup_response_template
@@ -1629,7 +1659,7 @@ class ModelAdmin(BaseModelAdmin):
             # the action explicitly on all objects.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
-                # Reminder that something needs to be selected or nothing will happen
+                # Something needs to be selected or nothing will happen.
                 msg = _(
                     "Items must be selected in order to perform "
                     "actions on them. No items have been changed."
@@ -1913,6 +1943,7 @@ class ModelAdmin(BaseModelAdmin):
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            "source_model": request.GET.get(SOURCE_MODEL_VAR),
             "to_field": to_field,
             "media": media,
             "inline_admin_formsets": inline_formsets,
@@ -2050,11 +2081,6 @@ class ModelAdmin(BaseModelAdmin):
             # me back" button on the action confirmation page.
             return HttpResponseRedirect(request.get_full_path())
 
-        # If we're allowing changelist editing, we need to construct a formset
-        # for the changelist given all the fields to be edited. Then we'll
-        # use the formset to validate/process POSTed data.
-        formset = cl.formset = None
-
         # Handle POSTed bulk-edit data.
         if request.method == "POST" and cl.list_editable and "_save" in request.POST:
             if not self.has_change_permission(request):
@@ -2063,13 +2089,11 @@ class ModelAdmin(BaseModelAdmin):
             modified_objects = self._get_list_editable_queryset(
                 request, FormSet.get_default_prefix()
             )
-            formset = cl.formset = FormSet(
-                request.POST, request.FILES, queryset=modified_objects
-            )
-            if formset.is_valid():
+            cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
+            if cl.formset.is_valid():
                 changecount = 0
                 with transaction.atomic(using=router.db_for_write(self.model)):
-                    for form in formset.forms:
+                    for form in cl.formset.forms:
                         if form.has_changed():
                             obj = self.save_form(request, form, change=True)
                             self.save_model(request, obj, form, change=True)
@@ -2095,11 +2119,11 @@ class ModelAdmin(BaseModelAdmin):
         # Handle GET -- construct a formset for display.
         elif cl.list_editable and self.has_change_permission(request):
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(queryset=cl.result_list)
+            cl.formset = FormSet(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
-        if formset:
-            media = self.media + formset.media
+        if cl.formset:
+            media = self.media + cl.formset.media
         else:
             media = self.media
 
@@ -2182,8 +2206,8 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
 
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
+        # Populate deleted_objects, a data structure of all related objects
+        # that will also be deleted.
         (
             deleted_objects,
             model_count,
@@ -2399,7 +2423,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Return a BaseInlineFormSet class for use in admin add/change views."""
+        """Return a BaseInlineFormSet class for use in add/change views."""
         if "fields" in kwargs:
             fields = kwargs.pop("fields")
         else:

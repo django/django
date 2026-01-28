@@ -126,15 +126,17 @@ class Field:
         # help_text -- An optional string to use as "help text" for this Field.
         # error_messages -- An optional dictionary to override the default
         #                   messages that the field will raise.
-        # show_hidden_initial -- Boolean that specifies if it is needed to render a
-        #                        hidden widget with initial value after widget.
+        # show_hidden_initial -- Boolean that specifies if it is needed to
+        #                        render a hidden widget with initial value
+        #                        after widget.
         # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
-        # disabled -- Boolean that specifies whether the field is disabled, that
-        #             is its widget is shown in the form but not editable.
+        # disabled -- Boolean that specifies whether the field is disabled,
+        #             that is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
-        # bound_field_class -- BoundField class to use in Field.get_bound_field.
+        # bound_field_class -- BoundField class to use in
+        #                      Field.get_bound_field.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
@@ -727,8 +729,8 @@ class ImageField(FileField):
 
         from PIL import Image
 
-        # We need to get a file object for Pillow. We might have a path or we might
-        # have to read the data into memory.
+        # We need to get a file object for Pillow. We might have a path or we
+        # might have to read the data into memory.
         if hasattr(data, "temporary_file_path"):
             file = data.temporary_file_path()
         else:
@@ -929,7 +931,8 @@ class TypedChoiceField(ChoiceField):
 
     def _coerce(self, value):
         """
-        Validate that the value can be coerced to the right type (if not empty).
+        Validate that the value can be coerced to the right type (if not
+        empty).
         """
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value

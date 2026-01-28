@@ -1,5 +1,4 @@
 from itertools import chain
-from types import MethodType
 
 from django.apps import apps
 from django.conf import settings
@@ -25,7 +24,7 @@ def _subclass_index(class_path, candidate_paths):
     return -1
 
 
-def check_user_model(app_configs=None, **kwargs):
+def check_user_model(app_configs, **kwargs):
     if app_configs is None:
         cls = apps.get_model(settings.AUTH_USER_MODEL)
     else:
@@ -98,7 +97,7 @@ def check_user_model(app_configs=None, **kwargs):
                 )
             )
 
-    if isinstance(cls().is_anonymous, MethodType):
+    if callable(cls().is_anonymous):
         errors.append(
             checks.Critical(
                 "%s.is_anonymous must be an attribute or property rather than "
@@ -108,7 +107,7 @@ def check_user_model(app_configs=None, **kwargs):
                 id="auth.C009",
             )
         )
-    if isinstance(cls().is_authenticated, MethodType):
+    if callable(cls().is_authenticated):
         errors.append(
             checks.Critical(
                 "%s.is_authenticated must be an attribute or property rather "
@@ -121,7 +120,7 @@ def check_user_model(app_configs=None, **kwargs):
     return errors
 
 
-def check_models_permissions(app_configs=None, **kwargs):
+def check_models_permissions(app_configs, **kwargs):
     if app_configs is None:
         models = apps.get_models()
     else:

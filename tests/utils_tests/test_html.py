@@ -1,4 +1,6 @@
+import math
 import os
+import sys
 from datetime import datetime
 
 from django.core.exceptions import SuspiciousOperation
@@ -115,6 +117,31 @@ class TestUtilsHtml(SimpleTestCase):
                 self.check_output(linebreaks, lazystr(value), output)
 
     def test_strip_tags(self):
+        # Python fixed a quadratic-time issue in HTMLParser in 3.13.6, 3.12.12.
+        # The fix slightly changes HTMLParser's output, so tests for
+        # particularly malformed input must handle both old and new results.
+        # The check below is temporary until all supported Python versions and
+        # CI workers include the fix. See:
+        # https://github.com/python/cpython/commit/6eb6c5db
+        min_fixed_security = {
+            (3, 13): (3, 13, 6),
+            (3, 12): (3, 12, 12),
+        }
+        # Similarly, there was a fix for terminating incomplete entities. See:
+        # https://github.com/python/cpython/commit/95296a9d
+        min_fixed_incomplete_entities = {
+            (3, 14): (3, 14, 1),
+            (3, 13): (3, 13, 10),
+            (3, 12): (3, 12, math.inf),  # not fixed in 3.12.
+        }
+        major_version = sys.version_info[:2]
+        htmlparser_fixed_security = sys.version_info >= min_fixed_security.get(
+            major_version, major_version
+        )
+        htmlparser_fixed_incomplete_entities = (
+            sys.version_info
+            >= min_fixed_incomplete_entities.get(major_version, major_version)
+        )
         items = (
             (
                 "<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>",
@@ -141,23 +168,46 @@ class TestUtilsHtml(SimpleTestCase):
             # https://bugs.python.org/issue20288
             ("&gotcha&#;<>", "&gotcha&#;<>"),
             ("<sc<!-- -->ript>test<<!-- -->/script>", "ript>test"),
-            ("<script>alert()</script>&h", "alert()h"),
-            ("><!" + ("&" * 16000) + "D", "><!" + ("&" * 16000) + "D"),
+            (
+                "<script>alert()</script>&h",
+                "alert()&h;" if htmlparser_fixed_incomplete_entities else "alert()h",
+            ),
+            (
+                "><!" + ("&" * 16000) + "D",
+                ">" if htmlparser_fixed_security else "><!" + ("&" * 16000) + "D",
+            ),
             ("X<<<<br>br>br>br>X", "XX"),
             ("<" * 50 + "a>" * 50, ""),
+            (
+                ">" + "<a" * 500 + "a",
+                ">" if htmlparser_fixed_security else ">" + "<a" * 500 + "a",
+            ),
+            ("<a" * 49 + "a" * 951, "<a" * 49 + "a" * 951),
+            ("<" + "a" * 1_002, "<" + "a" * 1_002),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
                 self.check_output(strip_tags, value, output)
                 self.check_output(strip_tags, lazystr(value), output)
 
-    def test_strip_tags_suspicious_operation(self):
+    def test_strip_tags_suspicious_operation_max_depth(self):
         value = "<" * 51 + "a>" * 51, "<a>"
         with self.assertRaises(SuspiciousOperation):
             strip_tags(value)
 
+    def test_strip_tags_suspicious_operation_large_open_tags(self):
+        items = [
+            ">" + "<a" * 501,
+            "<a" * 50 + "a" * 950,
+        ]
+        for value in items:
+            with self.subTest(value=value):
+                with self.assertRaises(SuspiciousOperation):
+                    strip_tags(value)
+
     def test_strip_tags_files(self):
-        # Test with more lengthy content (also catching performance regressions)
+        # Test with more lengthy content (also catching performance
+        # regressions)
         for filename in ("strip_tags1.html", "strip_tags2.txt"):
             with self.subTest(filename=filename):
                 path = os.path.join(os.path.dirname(__file__), "files", filename)
@@ -209,6 +259,9 @@ class TestUtilsHtml(SimpleTestCase):
                 "paragraph separator:\\u2029and line separator:\\u2028",
             ),
             ("`", "\\u0060"),
+            ("\u007f", "\\u007F"),
+            ("\u0080", "\\u0080"),
+            ("\u009f", "\\u009F"),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
@@ -420,6 +473,10 @@ class TestUtilsHtml(SimpleTestCase):
                 '<a href="mailto:idna-2008@%DE%89%DE%A8%DE%80%DE%A7%DE%83%DE%AA.ex'
                 'ample.mv">idna-2008@މިހާރު.example.mv</a>',
             ),
+            (
+                "host.djangoproject.com",
+                '<a href="https://host.djangoproject.com">host.djangoproject.com</a>',
+            ),
         )
         for value, output in tests:
             with self.subTest(value=value):
@@ -453,6 +510,7 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@localhost.",
             "test@example?;+!.com",
             "email me@example.com,then I'll respond",
+            "[a link](https://www.djangoproject.com/)",
             # trim_punctuation catastrophic tests
             "(" * 100_000 + ":" + ")" * 100_000,
             "(" * 100_000 + "&:" + ")" * 100_000,

@@ -40,20 +40,28 @@ class RedirectURLMixin:
     def get_success_url(self):
         return self.get_redirect_url() or self.get_default_redirect_url()
 
-    def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
-            self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
+    def get_redirect_url(self, request=None):
+        """Return the user-originating redirect URL if it's safe.
+
+        Optionally takes a request argument, allowing use outside class-based
+        views.
+        """
+        if request is None:
+            request = self.request
+        redirect_to = request.POST.get(
+            self.redirect_field_name, request.GET.get(self.redirect_field_name)
         )
         url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
-            require_https=self.request.is_secure(),
+            allowed_hosts=self.get_success_url_allowed_hosts(request),
+            require_https=request.is_secure(),
         )
         return redirect_to if url_is_safe else ""
 
-    def get_success_url_allowed_hosts(self):
-        return {self.request.get_host(), *self.success_url_allowed_hosts}
+    def get_success_url_allowed_hosts(self, request=None):
+        if request is None:
+            request = self.request
+        return {request.get_host(), *self.success_url_allowed_hosts}
 
     def get_default_redirect_url(self):
         """Return the default redirect URL."""
@@ -62,7 +70,10 @@ class RedirectURLMixin:
         raise ImproperlyConfigured("No URL to redirect to. Provide a next_page.")
 
 
-@method_decorator(login_not_required, name="dispatch")
+@method_decorator(
+    [login_not_required, sensitive_post_parameters(), csrf_protect, never_cache],
+    name="dispatch",
+)
 class LoginView(RedirectURLMixin, FormView):
     """
     Display the login form and handle the login action.
@@ -74,9 +85,6 @@ class LoginView(RedirectURLMixin, FormView):
     redirect_authenticated_user = False
     extra_context = None
 
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(csrf_protect)
-    @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
         if self.redirect_authenticated_user and self.request.user.is_authenticated:
             redirect_to = self.get_success_url()
@@ -122,6 +130,7 @@ class LoginView(RedirectURLMixin, FormView):
         return context
 
 
+@method_decorator([csrf_protect, never_cache], name="dispatch")
 class LogoutView(RedirectURLMixin, TemplateView):
     """
     Log out the user and display the 'You are logged out' message.
@@ -130,11 +139,6 @@ class LogoutView(RedirectURLMixin, TemplateView):
     http_method_names = ["post", "options"]
     template_name = "registration/logged_out.html"
     extra_context = None
-
-    @method_decorator(csrf_protect)
-    @method_decorator(never_cache)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Logout may be done via POST."""
@@ -211,7 +215,7 @@ class PasswordContextMixin:
         return context
 
 
-@method_decorator(login_not_required, name="dispatch")
+@method_decorator([login_not_required, csrf_protect], name="dispatch")
 class PasswordResetView(PasswordContextMixin, FormView):
     email_template_name = "registration/password_reset_email.html"
     extra_email_context = None
@@ -223,10 +227,6 @@ class PasswordResetView(PasswordContextMixin, FormView):
     template_name = "registration/password_reset_form.html"
     title = _("Password reset")
     token_generator = default_token_generator
-
-    @method_decorator(csrf_protect)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         opts = {
@@ -252,7 +252,9 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     title = _("Password reset sent")
 
 
-@method_decorator(login_not_required, name="dispatch")
+@method_decorator(
+    [login_not_required, sensitive_post_parameters(), never_cache], name="dispatch"
+)
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
@@ -263,8 +265,6 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     title = _("Enter new password")
     token_generator = default_token_generator
 
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
         if "uidb64" not in kwargs or "token" not in kwargs:
             raise ImproperlyConfigured(
@@ -351,17 +351,14 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
         return context
 
 
+@method_decorator(
+    [sensitive_post_parameters(), csrf_protect, login_required], name="dispatch"
+)
 class PasswordChangeView(PasswordContextMixin, FormView):
     form_class = PasswordChangeForm
     success_url = reverse_lazy("password_change_done")
     template_name = "registration/password_change_form.html"
     title = _("Password change")
-
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(csrf_protect)
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -376,10 +373,7 @@ class PasswordChangeView(PasswordContextMixin, FormView):
         return super().form_valid(form)
 
 
+@method_decorator(login_required, name="dispatch")
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
     template_name = "registration/password_change_done.html"
     title = _("Password change successful")
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
     <object pk="2" model="fixtures.visa">
-        <field type="CharField" name="person">
+        <field name="person" rel="ManyToOneRel" to="fixtures.person">
             <natural>Stephane Grappelli</natural>
         </field>
         <field to="auth.permission" name="permissions" rel="ManyToManyRel">
@@ -19,11 +19,11 @@
     </object>
     <object pk="3" model="fixtures.person">
         <field type="CharField" name="name">
-            <natural>Artist formerly known as &quot;Prince&quot;</natural>
+            Artist formerly known as &quot;Prince&quot;
         </field>
     </object>
     <object pk="3" model="fixtures.visa">
-        <field type="CharField" name="person">
+        <field name="person" rel="ManyToOneRel" to="fixtures.person">
             <natural>Artist formerly known as &quot;Prince&quot;</natural>
         </field>
         <field to="auth.permission" name="permissions" rel="ManyToManyRel">

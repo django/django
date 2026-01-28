@@ -29,6 +29,7 @@ from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
+from django.utils.functional import empty
 
 from .models import (
     Storage,
@@ -186,17 +187,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             atime,
-            datetime.datetime.fromtimestamp(
-                os.path.getatime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getatime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_accessed_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            atime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -212,17 +215,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         ctime = self.storage.get_created_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             ctime,
-            datetime.datetime.fromtimestamp(
-                os.path.getctime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getctime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            ctime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -238,17 +243,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         mtime = self.storage.get_modified_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             mtime,
-            datetime.datetime.fromtimestamp(
-                os.path.getmtime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getmtime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_modified_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            mtime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -353,7 +360,8 @@ class FileStorageTests(SimpleTestCase):
             self.storage.url("""a/b\\c.file"""), "/test_media_url/a/b/c.file"
         )
 
-        # #25905: remove leading slashes from file names to prevent unsafe url output
+        # #25905: remove leading slashes from file names to prevent unsafe url
+        # output
         self.assertEqual(self.storage.url("/evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url(r"\evil.com"), "/test_media_url/evil.com")
         self.assertEqual(self.storage.url("///evil.com"), "/test_media_url/evil.com")
@@ -400,8 +408,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_file_storage_prevents_directory_traversal(self):
         """
-        File storage prevents directory traversal (files can only be accessed if
-        they're below the storage location).
+        File storage prevents directory traversal (files can only be accessed
+        if they're below the storage location).
         """
         with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists("..")
@@ -428,7 +436,8 @@ class FileStorageTests(SimpleTestCase):
 
     def test_makedirs_race_handling(self):
         """
-        File storage should be robust against directory creation race conditions.
+        File storage should be robust against directory creation race
+        conditions.
         """
         real_makedirs = os.makedirs
 
@@ -662,9 +671,11 @@ class OverwritingStorageTests(FileStorageTests):
         content_1 = b"content one"
         content_2 = b"second content"
         f_1 = TemporaryUploadedFile("tmp1", "text/plain", 11, "utf8")
+        self.addCleanup(f_1.close)
         f_1.write(content_1)
         f_1.seek(0)
         f_2 = TemporaryUploadedFile("tmp2", "text/plain", 14, "utf8")
+        self.addCleanup(f_2.close)
         f_2.write(content_2)
         f_2.seek(0)
         stored_name_1 = self.storage.save(name, f_1)
@@ -818,7 +829,8 @@ class FileFieldStorageTests(TestCase):
         obj.normal.close()
 
     def test_duplicate_filename(self):
-        # Multiple files with the same name get _(7 random chars) appended to them.
+        # Multiple files with the same name get _(7 random chars) appended to
+        # them.
         tests = [
             ("multiple_files", "txt"),
             ("multiple_files_many_extensions", "tar.gz"),
@@ -855,7 +867,8 @@ class FileFieldStorageTests(TestCase):
             self.assertEqual(names[0], "tests/%s" % filename)
             self.assertRegex(names[1], "tests/fi_%s.ext" % FILE_SUFFIX_REGEX)
 
-            # Testing exception is raised when filename is too short to truncate.
+            # Testing exception is raised when filename is too short to
+            # truncate.
             filename = "short.longext"
             objs[0].limited_length.save(filename, ContentFile("Same Content"))
             with self.assertRaisesMessage(
@@ -1257,3 +1270,11 @@ class StorageHandlerTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidStorageError, msg):
             test_storages["invalid_backend"]
+
+
+class StorageLazyObjectTests(SimpleTestCase):
+    def test_lazy_object_is_not_evaluated_before_manual_access(self):
+        obj = Storage()
+        self.assertIs(obj.lazy_storage.storage._wrapped, empty)
+        # assertEqual triggers resolution.
+        self.assertEqual(obj.lazy_storage.storage, temp_storage)

@@ -77,12 +77,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT name, type FROM sqlite_master
             WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
-            ORDER BY name"""
-        )
+            ORDER BY name""")
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
@@ -115,7 +113,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ).fetchone()
                 if has_json_constraint:
                     json_columns.add(column)
-        return [
+        table_description = [
             FieldInfo(
                 name,
                 data_type,
@@ -126,7 +124,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 not notnull,
                 default,
                 collations.get(name),
-                pk == 1,
+                bool(pk),
                 name in json_columns,
             )
             for cid, name, data_type, notnull, default, pk, hidden in table_info
@@ -137,6 +135,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 3,  # Stored generated column.
             ]
         ]
+        # If the primary key is composed of multiple columns they should not
+        # be individually marked as pk.
+        primary_key = [
+            index for index, field_info in enumerate(table_description) if field_info.pk
+        ]
+        if len(primary_key) > 1:
+            for index in primary_key:
+                table_description[index] = table_description[index]._replace(pk=False)
+        return table_description
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         pk_col = self.get_primary_key_column(cursor, table_name)
@@ -144,20 +151,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {column_name: (ref_column_name, ref_table_name)}
+        Return a dictionary of
+            {column_name: (ref_column_name, ref_table_name, db_on_delete)}
         representing all foreign keys in the given table.
         """
         cursor.execute(
             "PRAGMA foreign_key_list(%s)" % self.connection.ops.quote_name(table_name)
         )
         return {
-            column_name: (ref_column_name, ref_table_name)
+            column_name: (
+                ref_column_name,
+                ref_table_name,
+                self.on_delete_types.get(on_delete),
+            )
             for (
                 _,
                 _,
                 ref_table_name,
                 column_name,
                 ref_column_name,
+                _,
+                on_delete,
                 *_,
             ) in cursor.fetchall()
         }
@@ -333,8 +347,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             "PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name)
         )
         for row in cursor.fetchall():
-            # SQLite 3.8.9+ has 5 columns, however older versions only give 3
-            # columns. Discard last 2 columns if there.
+            # Discard last 2 columns.
             number, index, unique = row[:3]
             cursor.execute(
                 "SELECT sql FROM sqlite_master WHERE type='index' AND name=%s",
@@ -399,7 +412,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "check": False,
                     "index": False,
                 }
-                for index, (column_name, (ref_column_name, ref_table_name)) in relations
+                for index, (
+                    column_name,
+                    (ref_column_name, ref_table_name, _),
+                ) in relations
             }
         )
         return constraints

@@ -218,6 +218,13 @@ class FunctionTests(SimpleTestCase):
             'rel="nofollow">https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
+    def test_parenthesis_and_bracket(self):
+        self.assertEqual(
+            urlize("[(https://en.wikipedia.org/)]"),
+            '[(<a href="https://en.wikipedia.org/" '
+            'rel="nofollow">https://en.wikipedia.org/</a>)]',
+        )
+
     def test_nofollow(self):
         """
         #12183 - Check urlize adds nofollow properly - see #12183
@@ -296,7 +303,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_trailing_period(self):
         """
-        #18644 - Check urlize trims trailing period when followed by parenthesis
+        #18644 - Check urlize trims trailing period when followed by
+        parenthesis
         """
         self.assertEqual(
             urlize("(Go to http://www.example.com/foo.)"),
@@ -358,9 +366,8 @@ class FunctionTests(SimpleTestCase):
             "www.example.com</a>]",
         )
         self.assertEqual(
-            urlize("see test[at[example.com"),
-            'see <a href="https://test[at[example.com" rel="nofollow">'
-            "test[at[example.com</a>",
+            urlize("see test[at[example.com"),  # Invalid hostname.
+            "see test[at[example.com",
         )
         self.assertEqual(
             urlize("[http://168.192.0.1](http://168.192.0.1)"),

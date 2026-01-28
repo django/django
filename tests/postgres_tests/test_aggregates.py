@@ -1,5 +1,3 @@
-import warnings
-
 from django.db import transaction
 from django.db.models import (
     CharField,
@@ -17,7 +15,7 @@ from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
 from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango61Warning, RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
@@ -146,46 +144,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
-
-    def test_ordering_warns_of_deprecation(self):
-        msg = "The ordering argument is deprecated. Use order_by instead."
-        with self.assertWarnsMessage(RemovedInDjango61Warning, msg) as ctx:
-            values = AggregateTestModel.objects.aggregate(
-                arrayagg=ArrayAgg("integer_field", ordering=F("integer_field").desc())
-            )
-            self.assertEqual(values, {"arrayagg": [2, 1, 0, 0]})
-        self.assertEqual(ctx.filename, __file__)
-
-    # RemovedInDjango61Warning: Remove this test
-    def test_ordering_and_order_by_causes_error(self):
-        with warnings.catch_warnings(record=True, action="always") as wm:
-            with self.assertRaisesMessage(
-                TypeError,
-                "Cannot specify both order_by and ordering.",
-            ):
-                AggregateTestModel.objects.aggregate(
-                    stringagg=StringAgg(
-                        "char_field",
-                        delimiter=Value("'"),
-                        order_by="char_field",
-                        ordering="char_field",
-                    )
-                )
-
-        first_warning = wm[0]
-        self.assertEqual(first_warning.category, RemovedInDjango70Warning)
-        self.assertEqual(
-            "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead.",
-            str(first_warning.message),
-        )
-
-        second_warning = wm[1]
-        self.assertEqual(second_warning.category, RemovedInDjango61Warning)
-        self.assertEqual(
-            "The ordering argument is deprecated. Use order_by instead.",
-            str(second_warning.message),
-        )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg("char_field"))
@@ -363,6 +321,18 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         queryset.values_list("test_array_agg", flat=True),
                         [[], [], [], []],
                     )
+
+    def test_array_agg_with_order_by_outer_ref(self):
+        StatTestModel.objects.annotate(
+            atm_ids=Subquery(
+                AggregateTestModel.objects.annotate(
+                    ids=ArrayAgg(
+                        "id",
+                        order_by=[OuterRef("int1")],
+                    )
+                ).values("ids")[:1]
+            )
+        )
 
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
@@ -658,7 +628,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         msg = (
             "delimiter: str will be resolved as a field reference instead "
             'of a string literal on Django 7.0. Pass `delimiter=Value("\'")` to '
-            "preserve the previous behaviour."
+            "preserve the previous behavior."
         )
 
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
@@ -671,7 +641,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_string_agg_deprecation(self):
         msg = (
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead."
+            "django.db.models.aggregates.StringAgg instead."
         )
 
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:

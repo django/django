@@ -80,7 +80,8 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         minlength/maxlength if min_length/max_length are defined on the field
         and the widget is not hidden.
         """
-        # Return an empty dictionary if max_length and min_length are both None.
+        # Return an empty dictionary if max_length and min_length are both
+        # None.
         f = CharField()
         self.assertEqual(f.widget_attrs(TextInput()), {})
         self.assertEqual(f.widget_attrs(Textarea()), {})

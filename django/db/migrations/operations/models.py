@@ -346,6 +346,21 @@ class CreateModel(ModelOperation):
                         },
                     ),
                 ]
+            elif isinstance(operation, AlterConstraint):
+                options_constraints = [
+                    constraint
+                    for constraint in self.options.get("constraints", [])
+                    if constraint.name != operation.name
+                ] + [operation.constraint]
+                return [
+                    replace(
+                        self,
+                        options={
+                            **self.options,
+                            "constraints": options_constraints,
+                        },
+                    ),
+                ]
             elif isinstance(operation, RemoveConstraint):
                 options_constraints = [
                     constraint

@@ -44,9 +44,9 @@ class AxisOrder(IntEnum):
 
 class SpatialReference(GDALBase):
     """
-    A wrapper for the OGRSpatialReference object. According to the GDAL web site,
-    the SpatialReference object "provide[s] services to represent coordinate
-    systems (projections and datums) and to transform between them."
+    A wrapper for the OGRSpatialReference object. According to the GDAL web
+    site, the SpatialReference object "provide[s] services to represent
+    coordinate systems (projections and datums) and to transform between them."
     """
 
     destructor = capi.release_srs
@@ -113,10 +113,14 @@ class SpatialReference(GDALBase):
     def __getitem__(self, target):
         """
         Return the value of the given string attribute node, None if the node
-        doesn't exist.  Can also take a tuple as a parameter, (target, child),
-        where child is the index of the attribute in the WKT.  For example:
+        doesn't exist. Can also take a tuple as a parameter, (target, child),
+        where child is the index of the attribute in the WKT. For example:
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
+        >>> wkt = (
+        ...     'GEOGCS["WGS 84",'
+        ...     '  DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]'
+        ...     ']'
+        ... )
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
         >>> print(srs['GEOGCS'])
         WGS 84
@@ -146,8 +150,8 @@ class SpatialReference(GDALBase):
     # #### SpatialReference Methods ####
     def attr_value(self, target, index=0):
         """
-        The attribute value for the given target node (e.g. 'PROJCS'). The index
-        keyword specifies an index of the child node to return.
+        The attribute value for the given target node (e.g. 'PROJCS'). The
+        index keyword specifies an index of the child node to return.
         """
         if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
@@ -284,7 +288,9 @@ class SpatialReference(GDALBase):
 
     @property
     def local(self):
-        "Return True if this SpatialReference is local (root node is LOCAL_CS)."
+        """
+        Return True if this SpatialReference is local (root node is LOCAL_CS).
+        """
         return bool(capi.islocal(self.ptr))
 
     @property

@@ -79,16 +79,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT
                 table_name,
                 table_type,
                 table_comment
             FROM information_schema.tables
             WHERE table_schema = DATABASE()
-            """
-        )
+            """)
         return [
             TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]), row[2])
             for row in cursor.fetchall()
@@ -131,9 +129,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         )
         row = cursor.fetchone()
         default_column_collation = row[0] if row else ""
-        # information_schema database gives more accurate results for some figures:
-        # - varchar length returned by cursor.description is an internal length,
-        #   not visible length (#5725)
+        # information_schema database gives more accurate results for some
+        # figures:
+        # - varchar length returned by cursor.description is an internal
+        #   length, not visible length (#5725)
         # - precision and scale (for decimal fields) (#5014)
         # - auto_increment is not available in cursor.description
         cursor.execute(
@@ -195,24 +194,36 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
         representing all foreign keys in the given table.
         """
         cursor.execute(
             """
-            SELECT column_name, referenced_column_name, referenced_table_name
-            FROM information_schema.key_column_usage
-            WHERE table_name = %s
-                AND table_schema = DATABASE()
-                AND referenced_table_schema = DATABASE()
-                AND referenced_table_name IS NOT NULL
-                AND referenced_column_name IS NOT NULL
+            SELECT
+                kcu.column_name,
+                kcu.referenced_column_name,
+                kcu.referenced_table_name,
+                rc.delete_rule
+            FROM
+                information_schema.key_column_usage kcu
+            JOIN
+                information_schema.referential_constraints rc
+                ON rc.constraint_name = kcu.constraint_name
+                AND rc.constraint_schema = kcu.constraint_schema
+            WHERE kcu.table_name = %s
+                AND kcu.table_schema = DATABASE()
+                AND kcu.referenced_table_schema = DATABASE()
+                AND kcu.referenced_table_name IS NOT NULL
+                AND kcu.referenced_column_name IS NOT NULL
             """,
             [table_name],
         )
         return {
-            field_name: (other_field, other_table)
-            for field_name, other_field, other_table in cursor.fetchall()
+            field_name: (other_field, other_table, self.on_delete_types.get(on_delete))
+            for field_name, other_field, other_table, on_delete in cursor.fetchall()
         }
 
     def get_storage_engine(self, cursor, table_name):

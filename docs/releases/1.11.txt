@@ -104,8 +104,8 @@ Minor features
   20%.
 
 * The :class:`~django.contrib.auth.views.LoginView` and
-  :class:`~django.contrib.auth.views.LogoutView` class-based views supersede the
-  deprecated ``login()`` and ``logout()`` function-based views.
+  :class:`~django.contrib.auth.views.LogoutView` class-based views supersede
+  the deprecated ``login()`` and ``logout()`` function-based views.
 
 * The :class:`~django.contrib.auth.views.PasswordChangeView`,
   :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
@@ -115,8 +115,8 @@ Minor features
   :class:`~django.contrib.auth.views.PasswordResetCompleteView` class-based
   views supersede the deprecated ``password_change()``,
   ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
-  ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
-  views.
+  ``password_reset_confirm()``, and ``password_reset_complete()``
+  function-based views.
 
 * The new ``post_reset_login`` attribute for
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
@@ -143,17 +143,18 @@ Minor features
 * Added password validators ``help_text`` to
   :class:`~django.contrib.auth.forms.UserCreationForm`.
 
-* The ``HttpRequest`` is now passed to :func:`~django.contrib.auth.authenticate`
-  which in turn passes it to the authentication backend if it accepts a
-  ``request`` argument.
+* The ``HttpRequest`` is now passed to
+  :func:`~django.contrib.auth.authenticate` which in turn passes it to the
+  authentication backend if it accepts a ``request`` argument.
 
 * The :func:`~django.contrib.auth.signals.user_login_failed` signal now
   receives a ``request`` argument.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm` supports custom user
-  models that use an email field named something other than ``'email'``.
-  Set :attr:`CustomUser.EMAIL_FIELD
-  <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the field.
+  models that use an email field named something other than ``'email'``. Set
+  :attr:`CustomUser.EMAIL_FIELD
+  <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the
+  field.
 
 * :func:`~django.contrib.auth.get_user_model` can now be called at import time,
   even in modules that define models.
@@ -231,10 +232,10 @@ Minor features
 Cache
 ~~~~~
 
-* Memcached backends now pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
-  as keyword arguments to the client constructors, allowing for more advanced
-  control of client behavior. See the :ref:`cache arguments <cache_arguments>`
-  documentation for examples.
+* Memcached backends now pass the contents of
+  :setting:`OPTIONS <CACHES-OPTIONS>` as keyword arguments to the client
+  constructors, allowing for more advanced control of client behavior. See the
+  :ref:`cache arguments <cache_arguments>` documentation for examples.
 
 * Memcached backends now allow defining multiple servers as a comma-delimited
   string in :setting:`LOCATION <CACHES-LOCATION>`, for convenience with
@@ -249,14 +250,14 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
+* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update`
   on PostgreSQL 9.5+ and Oracle to execute queries with
   ``FOR UPDATE SKIP LOCKED``.
 
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+* :meth:`.QuerySet.iterator` now uses `server-side cursors`_ on PostgreSQL.
   This feature transfers some of the worker memory load (used to hold query
   results) to the database and might increase database memory usage.
 
@@ -331,7 +332,8 @@ Models
 
 * :class:`~django.db.models.ImageField` now has a default
   :data:`~django.core.validators.validate_image_file_extension` validator.
-  (This validator moved to the form field in :doc:`Django 1.11.2 <1.11.2>`.)
+  (This validator moved to the form field in :doc:`Django 1.11.2
+  </releases/1.11.2>`.)
 
 * Added support for time truncation to
   :class:`~django.db.models.functions.Trunc` functions.
@@ -506,7 +508,8 @@ backends.
 
 * The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
   support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
-  arguments and returns the SQL necessary to cast a datetime value to time value.
+  arguments and returns the SQL necessary to cast a datetime value to time
+  value.
 
 * To enable ``FOR UPDATE SKIP LOCKED`` support, set
   ``DatabaseFeatures.has_select_for_update_skip_locked = True``.
@@ -646,7 +649,7 @@ described in :ref:`writing your own migration operation
 Server-side cursors on PostgreSQL
 ---------------------------------
 
-The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
+The change to make :meth:`.QuerySet.iterator` use server-side cursors on
 PostgreSQL prevents running Django with PgBouncer in transaction pooling mode.
 To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
@@ -831,9 +834,9 @@ Miscellaneous
   ``contrib.auth.views.logout_then_login()``  is deprecated.
 
 * ``contrib.auth``’s ``password_change()``, ``password_change_done()``,
-  ``password_reset()``, ``password_reset_done()``, ``password_reset_confirm()``,
-  and ``password_reset_complete()`` function-based views are deprecated in favor
-  of new class-based views
+  ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()``
+  function-based views are deprecated in favor of new class-based views
   :class:`~django.contrib.auth.views.PasswordChangeView`,
   :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
   :class:`~django.contrib.auth.views.PasswordResetView`,

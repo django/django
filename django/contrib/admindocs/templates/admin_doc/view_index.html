@@ -3,11 +3,11 @@
 
 {% block coltype %}colSM{% endblock %}
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
-&rsaquo; {% translate 'Views' %}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li><a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a></li>
+<li aria-current="page">{% translate 'Views' %}</li>
+</ol>
 {% endblock %}
 {% block title %}{% translate 'Views' %}{% endblock %}
 

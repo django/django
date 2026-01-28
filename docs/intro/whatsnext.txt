@@ -10,8 +10,10 @@ with this intro (in fact, if you've read every single word, you've read about
 So what's next?
 
 Well, we've always been big fans of learning by doing. At this point you should
-know enough to start a project of your own and start fooling around. As you need
-to learn new tricks, come back to the documentation.
+know enough to start a project of your own and start fooling around. As you
+need to learn new tricks, come back to the documentation. There's also a bigger
+`Django ecosystem`_ out there for you to explore that the community has
+created.
 
 We've put a lot of effort into making Django's documentation useful, clear and
 as complete as possible. The rest of this document explains more about how the
@@ -19,6 +21,8 @@ documentation works so that you can get the most out of it.
 
 (Yes, this is documentation about documentation. Rest assured we have no plans
 to write a document about how to read the document about documentation.)
+
+.. _Django ecosystem: https://www.djangoproject.com/community/ecosystem/
 
 Finding documentation
 =====================
@@ -96,8 +100,8 @@ reasons:
 * To add documentation for new features as new features get added, or as
   Django APIs or behaviors change.
 
-Django's documentation is kept in the same source control system as its code. It
-lives in the :source:`docs` directory of our Git repository. Each document
+Django's documentation is kept in the same source control system as its code.
+It lives in the :source:`docs` directory of our Git repository. Each document
 online is a separate text file in the repository.
 
 Where to get it
@@ -111,15 +115,16 @@ On the web
 
 The most recent version of the Django documentation lives at
 https://docs.djangoproject.com/en/dev/. These HTML pages are generated
-automatically from the text files in source control. That means they reflect the
-"latest and greatest" in Django -- they include the very latest corrections and
-additions, and they discuss the latest Django features, which may only be
+automatically from the text files in source control. That means they reflect
+the "latest and greatest" in Django -- they include the very latest corrections
+and additions, and they discuss the latest Django features, which may only be
 available to users of the Django development version. (See
 :ref:`differences-between-doc-versions` below.)
 
-We encourage you to help improve the docs by submitting changes, corrections and
-suggestions in the `ticket system`_. The Django developers actively monitor the
-ticket system and use your feedback to improve the documentation for everybody.
+We encourage you to help improve the docs by submitting changes, corrections
+and suggestions in the `ticket system`_. The Django developers actively monitor
+the ticket system and use your feedback to improve the documentation for
+everybody.
 
 Note, however, that tickets should explicitly relate to the documentation,
 rather than asking broad tech-support questions. If you need help with your

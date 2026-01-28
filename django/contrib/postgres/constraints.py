@@ -9,6 +9,9 @@ from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql import Query
 
+from .fields import RangeOperators
+from .utils import CheckPostgresInstalledMixin
+
 __all__ = ["ExclusionConstraint"]
 
 
@@ -16,7 +19,7 @@ class ExclusionConstraintExpression(IndexExpression):
     template = "%(expressions)s WITH %(operator)s"
 
 
-class ExclusionConstraint(BaseConstraint):
+class ExclusionConstraint(CheckPostgresInstalledMixin, BaseConstraint):
     template = (
         "CONSTRAINT %(name)s EXCLUDE USING %(index_type)s "
         "(%(expressions)s)%(include)s%(where)s%(deferrable)s"
@@ -34,9 +37,9 @@ class ExclusionConstraint(BaseConstraint):
         violation_error_code=None,
         violation_error_message=None,
     ):
-        if index_type and index_type.lower() not in {"gist", "spgist"}:
+        if index_type and index_type.lower() not in {"gist", "hash", "spgist"}:
             raise ValueError(
-                "Exclusion constraints only support GiST or SP-GiST indexes."
+                "Exclusion constraints only support GiST, Hash, or SP-GiST indexes."
             )
         if not expressions:
             raise ValueError(
@@ -55,6 +58,24 @@ class ExclusionConstraint(BaseConstraint):
             )
         if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("ExclusionConstraint.include must be a list or tuple.")
+        if index_type and index_type.lower() == "hash":
+            if include:
+                raise ValueError(
+                    "Covering exclusion constraints using Hash indexes are not "
+                    "supported."
+                )
+            if not expressions:
+                pass
+            elif len(expressions) > 1:
+                raise ValueError(
+                    "Composite exclusion constraints using Hash indexes are not "
+                    "supported."
+                )
+            elif expressions[0][1] != RangeOperators.EQUAL:
+                raise ValueError(
+                    "Exclusion constraints using Hash indexes only support the EQUAL "
+                    "operator."
+                )
         self.expressions = expressions
         self.index_type = index_type or "GIST"
         self.condition = condition
@@ -77,12 +98,14 @@ class ExclusionConstraint(BaseConstraint):
         return ExpressionList(*expressions).resolve_expression(query)
 
     def check(self, model, connection):
+        errors = super().check(model, connection)
         references = set()
         for expr, _ in self.expressions:
             if isinstance(expr, str):
                 expr = F(expr)
             references.update(model._get_expr_references(expr))
-        return self._check_references(model, references)
+        errors.extend(self._check_references(model, references))
+        return errors
 
     def _get_condition_sql(self, compiler, schema_editor, query):
         if self.condition is None:
@@ -144,7 +167,7 @@ class ExclusionConstraint(BaseConstraint):
         if isinstance(other, self.__class__):
             return (
                 self.name == other.name
-                and self.index_type == other.index_type
+                and self.index_type.lower() == other.index_type.lower()
                 and self.expressions == other.expressions
                 and self.condition == other.condition
                 and self.deferrable == other.deferrable

@@ -3,6 +3,8 @@ Testing some internals of the template processing.
 These are *not* examples to be copied in user code.
 """
 
+import unittest
+
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     FilterExpression,
@@ -15,6 +17,7 @@ from django.template.base import (
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
+from django.utils.version import PY314
 
 
 class ParserTests(SimpleTestCase):
@@ -126,6 +129,16 @@ class ParserTests(SimpleTestCase):
         ):
             Variable({})
 
+        # Variables should raise when invalid characters in name.
+        for c in ["+", "-"]:
+            with self.subTest(invalid_character=c):
+                variable_name = f"variable{c}name"
+                with self.assertRaisesMessage(
+                    TemplateSyntaxError,
+                    f"Invalid character ('{c}') in variable name: '{variable_name}'",
+                ):
+                    Variable(variable_name)
+
     def test_filter_args_count(self):
         parser = Parser("")
         register = Library()
@@ -174,6 +187,7 @@ class ParserTests(SimpleTestCase):
     def test_filter_numeric_argument_parsing(self):
         p = Parser("", builtins=[filter_library])
 
+        # Values that resolve to a numeric literal.
         cases = {
             "5": 5,
             "-5": -5,
@@ -193,6 +207,7 @@ class ParserTests(SimpleTestCase):
                     FilterExpression(f"0|default:{num}", p).resolve({}), expected
                 )
 
+        # Values that are interpreted as names of variables that do not exist.
         invalid_numbers = [
             "abc123",
             "123abc",
@@ -205,8 +220,6 @@ class ParserTests(SimpleTestCase):
             "1e2.0",
             "1e2a",
             "1e2e3",
-            "1e-",
-            "1e-a",
         ]
 
         for num in invalid_numbers:
@@ -216,3 +229,31 @@ class ParserTests(SimpleTestCase):
                 )
                 with self.assertRaises(VariableDoesNotExist):
                     FilterExpression(f"0|default:{num}", p).resolve({})
+
+        # Values that are interpreted as an invalid variable name.
+        invalid_numbers_and_var_names = [
+            "1e-",
+            "1e-a",
+            "1+1",
+            "1-1",
+        ]
+        for num in invalid_numbers_and_var_names:
+            with self.subTest(num=num):
+                with self.assertRaises(TemplateSyntaxError):
+                    FilterExpression(num, p).resolve({})
+                with self.assertRaises(TemplateSyntaxError):
+                    FilterExpression(f"0|default:{num}", p).resolve({})
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_filter_deferred_annotation(self):
+        register = Library()
+
+        @register.filter("example")
+        def example_filter(value: str, arg: SomeType):  # NOQA: F821
+            return f"{value}_{arg}"
+
+        result = FilterExpression.args_check(
+            "example", example_filter, ["extra_example"]
+        )
+
+        self.assertIs(result, True)

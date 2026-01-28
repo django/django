@@ -36,8 +36,8 @@ class TestDbSignatureTests(SimpleTestCase):
                 clone_settings_dict = creation_class.get_test_db_clone_settings("1")
                 self.assertEqual(clone_settings_dict["NAME"], expected_clone_name)
 
-    @mock.patch.object(multiprocessing, "get_start_method", return_value="forkserver")
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="unsupported")
     def test_get_test_db_clone_settings_not_supported(self, *mocked_objects):
-        msg = "Cloning with start method 'forkserver' is not supported."
+        msg = "Cloning with start method 'unsupported' is not supported."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.creation.get_test_db_clone_settings(1)

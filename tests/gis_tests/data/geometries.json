@@ -11,12 +11,12 @@
     {"wkt": "MULTIPOLYGON (((180 60, 240 160, 300 60, 180 60)), ((80 80, 180 60, 160 140, 240 160, 360 140, 300 60, 420 100, 320 280, 120 260, 80 80)))", "valid": true, "num_geom": 2, "n_p": 14}
   ],
   "errors": [
-    {"wkt": "GEOMETR##!@#%#............a32515", "bad": true, "hex": false},
-    {"wkt": "Foo.Bar", "bad": true, "hex": false},
-    {"wkt": "POINT (5, 23)", "bad": true, "hex": false},
-    {"wkt": "AAABBBDDDAAD##@#1113511111-098111111111111111533333333333333", "bad": true, "hex": true},
-    {"wkt": "FFFFFFFFFFFFFFFFF1355555555555555555565111", "bad": true, "hex": true},
-    {"wkt": "", "bad": true, "hex": false}
+    {"wkt": "GEOMETR##!@#%#............a32515", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
+    {"wkt": "Foo.Bar", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
+    {"wkt": "POINT (5, 23)", "bad": true, "hex": false, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKTReader_read_r\"."},
+    {"wkt": "AAABBBDDDAAD##@#1113511111-098111111111111111533333333333333", "bad": true, "hex": true, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."},
+    {"wkt": "FFFFFFFFFFFFFFFFF1355555555555555555565111", "bad": true, "hex": true, "msg": "Error encountered checking Geometry returned from GEOS C function \"GEOSWKBReader_readHEX_r\"."},
+    {"wkt": "", "bad": true, "hex": false, "msg": "String input unrecognized as WKT EWKT, and HEXEWKB."}
   ],
   "wkt_out": [
     {"wkt": "POINT (110 130)", "ewkt": "POINT (110 130)", "kml": "<Point><coordinates>110.0,130.0,0</coordinates></Point>", "gml": "<gml:Point><gml:coordinates>110,130</gml:coordinates></gml:Point>"},

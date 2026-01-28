@@ -38,6 +38,7 @@ class BaseDatabaseFeatures:
     can_use_chunked_reads = True
     can_return_columns_from_insert = False
     can_return_rows_from_bulk_insert = False
+    can_return_rows_from_update = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
@@ -195,12 +196,14 @@ class BaseDatabaseFeatures:
     # Does the backend support introspection of CHECK constraints?
     can_introspect_check_constraints = True
 
-    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # Does the backend support 'pyformat' style:
+    # ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
     # supported by the Python driver
     supports_paramstyle_pyformat = True
 
-    # Does the backend require literal defaults, rather than parameterized ones?
+    # Does the backend require literal defaults, rather than parameterized
+    # ones?
     requires_literal_defaults = False
 
     # Does the backend support functions in defaults?
@@ -212,7 +215,8 @@ class BaseDatabaseFeatures:
     # Does the backend support the DEFAULT keyword in bulk insert queries?
     supports_default_keyword_in_bulk_insert = True
 
-    # Does the backend require a connection reset after each material schema change?
+    # Does the backend require a connection reset after each material schema
+    # change?
     connection_persists_old_columns = False
 
     # What kind of error does the backend throw when accessing closed cursor?
@@ -227,11 +231,12 @@ class BaseDatabaseFeatures:
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
 
-    # Does the backend support "select for update" queries with limit (and offset)?
+    # Does the backend support "select for update" queries with limit (and
+    # offset)?
     supports_select_for_update_with_limit = True
 
-    # Does the backend ignore null expressions in GREATEST and LEAST queries unless
-    # every expression is null?
+    # Does the backend ignore null expressions in GREATEST and LEAST queries
+    # unless every expression is null?
     greatest_least_ignores_nulls = False
 
     # Can the backend clone databases for parallel test execution?
@@ -260,11 +265,14 @@ class BaseDatabaseFeatures:
     # Does the database support ORDER BY in aggregate expressions?
     supports_aggregate_order_by_clause = False
 
-    # Does the database backend support DISTINCT when using multiple arguments in an
-    # aggregate expression? For example, Sqlite treats the "delimiter" argument of
-    # STRING_AGG/GROUP_CONCAT as an extra argument and does not allow using a custom
-    # delimiter along with DISTINCT.
+    # Does the database backend support DISTINCT when using multiple arguments
+    # in an aggregate expression? For example, Sqlite treats the "delimiter"
+    # argument of STRING_AGG/GROUP_CONCAT as an extra argument and does not
+    # allow using a custom delimiter along with DISTINCT.
     supports_aggregate_distinct_multiple_argument = True
+
+    # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
+    supports_any_value = False
 
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
@@ -286,10 +294,6 @@ class BaseDatabaseFeatures:
     # functionality of the procedure isn't important.
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
-
-    # SQL to create a table with a composite primary key for use by the Django
-    # test suite.
-    create_test_table_with_composite_primary_key = None
 
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
@@ -351,6 +355,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON array indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -367,6 +373,8 @@ class BaseDatabaseFeatures:
     supports_stored_generated_columns = False
     # Does the backend support virtual generated columns?
     supports_virtual_generated_columns = False
+    # Does the backend support altering data types of generated columns?
+    supports_alter_generated_column_data_type = True
 
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
@@ -377,8 +385,20 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does the backend support numeric columns with no precision?
+    supports_no_precision_decimalfield = False
+
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
+
+    # Does the backend support native tuple gt(e), lt(e) comparisons against
+    # subqueries?
+    supports_tuple_comparison_against_subquery = True
+
+    # Does the backend support CASCADE, DEFAULT, NULL as delete options?
+    supports_on_delete_db_cascade = True
+    supports_on_delete_db_default = True
+    supports_on_delete_db_null = True
 
     # Collation names for use by the Django test suite.
     test_collations = {
@@ -397,12 +417,20 @@ class BaseDatabaseFeatures:
     # Does the Round() database function round to even?
     rounds_to_even = False
 
+    # Should dollar signs be prohibited in column aliases to prevent SQL
+    # injection?
+    prohibits_dollar_signs_in_column_aliases = False
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
+
+    supports_uuid4_function = False
+    supports_uuid7_function = False
+    supports_uuid7_function_shift = False
 
     def __init__(self, connection):
         self.connection = connection

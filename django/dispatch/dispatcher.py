@@ -1,4 +1,5 @@
 import asyncio
+import contextvars
 import logging
 import threading
 import weakref
@@ -22,14 +23,64 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
+def _restore_context(context):
+    """
+    Check for changes in contextvars, and set them to the current
+    context for downstream consumers.
+    """
+    for cvar in context:
+        cvalue = context.get(cvar)
+        try:
+            if cvar.get() != cvalue:
+                cvar.set(cvalue)
+        except LookupError:
+            cvar.set(cvalue)
+
+
+async def _run_parallel(*coros):
+    """
+    Execute multiple asynchronous coroutines in parallel,
+    sharing the current context between them.
+    """
+    context = contextvars.copy_context()
+
+    if len(coros) == 0:
+        return []
+
+    async def run(i, coro):
+        results[i] = await coro
+
+    try:
+        async with asyncio.TaskGroup() as tg:
+            results = [None] * len(coros)
+            for i, coro in enumerate(coros):
+                tg.create_task(run(i, coro), context=context)
+        return results
+    except BaseExceptionGroup as exception_group:
+        if len(exception_group.exceptions) == 1:
+            raise exception_group.exceptions[0]
+        raise
+    finally:
+        _restore_context(context=context)
+
+
 class Signal:
     """
     Base class for all signals
 
     Internal attributes:
 
-        receivers
-            { receiverkey (id) : weakref(receiver) }
+        receivers:
+            [
+                (
+                    (id(receiver), id(sender)),
+                    ref(receiver),
+                    ref(sender),
+                    is_async,
+                )
+            ]
+        sender_receivers_cache:
+            WeakKeyDictionary[sender, list[receiver]]
     """
 
     def __init__(self, use_caching=False):
@@ -73,12 +124,12 @@ class Signal:
             weak
                 Whether to use weak references to the receiver. By default, the
                 module will attempt to use weak references to the receiver
-                objects. If this parameter is false, then strong references will
-                be used.
+                objects. If this parameter is false, then strong references
+                will be used.
 
             dispatch_uid
-                An identifier used to uniquely identify a particular instance of
-                a receiver. This will usually be a string, though it may be
+                An identifier used to uniquely identify a particular instance
+                of a receiver. This will usually be a string, though it may be
                 anything hashable.
         """
         from django.conf import settings
@@ -108,20 +159,31 @@ class Signal:
                 ref = weakref.WeakMethod
                 receiver_object = receiver.__self__
             receiver = ref(receiver)
-            weakref.finalize(receiver_object, self._remove_receiver)
+            weakref.finalize(receiver_object, self._flag_dead_receivers)
+
+        # Keep a weakref to sender if possible to ensure associated receivers
+        # are cleared if it gets garbage collected. This ensures there is no
+        # id(sender) collisions for distinct senders with non-overlapping
+        # lifetimes.
+        sender_ref = None
+        if sender is not None:
+            try:
+                sender_ref = weakref.ref(sender, self._flag_dead_receivers)
+            except TypeError:
+                pass
 
         with self.lock:
             self._clear_dead_receivers()
-            if not any(r_key == lookup_key for r_key, _, _ in self.receivers):
-                self.receivers.append((lookup_key, receiver, is_async))
+            if not any(r_key == lookup_key for r_key, _, _, _ in self.receivers):
+                self.receivers.append((lookup_key, receiver, sender_ref, is_async))
             self.sender_receivers_cache.clear()
 
     def disconnect(self, receiver=None, sender=None, dispatch_uid=None):
         """
         Disconnect receiver from sender for signal.
 
-        If weak references are used, disconnect need not be called. The receiver
-        will be removed from dispatch automatically.
+        If weak references are used, disconnect need not be called. The
+        receiver will be removed from dispatch automatically.
 
         Arguments:
 
@@ -160,13 +222,13 @@ class Signal:
         """
         Send signal from sender to all connected receivers.
 
-        If any receiver raises an error, the error propagates back through send,
-        terminating the dispatch loop. So it's possible that all receivers
-        won't be called if an error is raised.
+        If any receiver raises an error, the error propagates back through
+        send, terminating the dispatch loop. So it's possible that all
+        receivers won't be called if an error is raised.
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -191,7 +253,7 @@ class Signal:
         if async_receivers:
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _run_parallel(
                     *(
                         receiver(signal=self, sender=sender, **named)
                         for receiver in async_receivers
@@ -215,7 +277,7 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather().
+        concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -233,6 +295,7 @@ class Signal:
         ):
             return []
         sync_receivers, async_receivers = self._live_receivers(sender)
+
         if sync_receivers:
 
             @sync_to_async
@@ -248,14 +311,12 @@ class Signal:
             async def sync_send():
                 return []
 
-        responses, async_responses = await asyncio.gather(
-            sync_send(),
-            asyncio.gather(
-                *(
-                    receiver(signal=self, sender=sender, **named)
-                    for receiver in async_receivers
-                )
-            ),
+        responses = await sync_send()
+        async_responses = await _run_parallel(
+            *(
+                receiver(signal=self, sender=sender, **named)
+                for receiver in async_receivers
+            )
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses
@@ -274,13 +335,13 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
             sender
-                The sender of the signal. Can be any Python object (normally one
-                registered with a connect if you actually want something to
+                The sender of the signal. Can be any Python object (normally
+                one registered with a connect if you actually want something to
                 occur).
 
             named
@@ -320,7 +381,7 @@ class Signal:
                 return response
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _run_parallel(
                     *(
                         asend_and_wrap_exception(receiver)
                         for receiver in async_receivers
@@ -339,13 +400,13 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather.
+        concurrently with asyncio.TaskGroup.
 
         Arguments:
 
             sender
-                The sender of the signal. Can be any Python object (normally one
-                registered with a connect if you actually want something to
+                The sender of the signal. Can be any Python object (normally
+                one registered with a connect if you actually want something to
                 occur).
 
             named
@@ -394,11 +455,9 @@ class Signal:
                 return err
             return response
 
-        responses, async_responses = await asyncio.gather(
-            sync_send(),
-            asyncio.gather(
-                *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
-            ),
+        responses = await sync_send()
+        async_responses = await _run_parallel(
+            *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses
@@ -410,7 +469,10 @@ class Signal:
             self.receivers = [
                 r
                 for r in self.receivers
-                if not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+                if (
+                    not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+                    and not (r[2] is not None and r[2]() is None)
+                )
             ]
 
     def _live_receivers(self, sender):
@@ -423,8 +485,9 @@ class Signal:
         receivers = None
         if self.use_caching and not self._dead_receivers:
             receivers = self.sender_receivers_cache.get(sender)
-            # We could end up here with NO_RECEIVERS even if we do check this case in
-            # .send() prior to calling _live_receivers() due to concurrent .send() call.
+            # We could end up here with NO_RECEIVERS even if we do check this
+            # case in .send() prior to calling _live_receivers() due to
+            # concurrent .send() call.
             if receivers is NO_RECEIVERS:
                 return [], []
         if receivers is None:
@@ -432,9 +495,14 @@ class Signal:
                 self._clear_dead_receivers()
                 senderkey = _make_id(sender)
                 receivers = []
-                for (_receiverkey, r_senderkey), receiver, is_async in self.receivers:
+                for (
+                    (_receiverkey, r_senderkey),
+                    receiver,
+                    sender_ref,
+                    is_async,
+                ) in self.receivers:
                     if r_senderkey == NONE_ID or r_senderkey == senderkey:
-                        receivers.append((receiver, is_async))
+                        receivers.append((receiver, sender_ref, is_async))
                 if self.use_caching:
                     if not receivers:
                         self.sender_receivers_cache[sender] = NO_RECEIVERS
@@ -443,27 +511,25 @@ class Signal:
                         self.sender_receivers_cache[sender] = receivers
         non_weak_sync_receivers = []
         non_weak_async_receivers = []
-        for receiver, is_async in receivers:
+        for receiver, sender_ref, is_async in receivers:
+            # Skip if the receiver/sender is a dead weakref
             if isinstance(receiver, weakref.ReferenceType):
-                # Dereference the weak reference.
                 receiver = receiver()
-                if receiver is not None:
-                    if is_async:
-                        non_weak_async_receivers.append(receiver)
-                    else:
-                        non_weak_sync_receivers.append(receiver)
+                if receiver is None:
+                    continue
+            if sender_ref is not None and sender_ref() is None:
+                continue
+            if is_async:
+                non_weak_async_receivers.append(receiver)
             else:
-                if is_async:
-                    non_weak_async_receivers.append(receiver)
-                else:
-                    non_weak_sync_receivers.append(receiver)
+                non_weak_sync_receivers.append(receiver)
         return non_weak_sync_receivers, non_weak_async_receivers
 
-    def _remove_receiver(self, receiver=None):
+    def _flag_dead_receivers(self, reference=None):
         # Mark that the self.receivers list has dead weakrefs. If so, we will
         # clean those up in connect, disconnect and _live_receivers while
         # holding self.lock. Note that doing the cleanup here isn't a good
-        # idea, _remove_receiver() will be called as side effect of garbage
+        # idea, _flag_dead_receivers() will be called as side effect of garbage
         # collection, and so the call can happen while we are already holding
         # self.lock.
         self._dead_receivers = True

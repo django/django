@@ -48,7 +48,7 @@ city_data = (
 city_dict = {name: coords for name, coords in city_data}
 
 # 3D freeway data derived from the National Elevation Dataset:
-#  http://seamless.usgs.gov/products/9arc.php
+# http://seamless.usgs.gov/products/9arc.php
 interstate_data = (
     (
         "I-45",
@@ -137,7 +137,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
     tries to test the features that can handle 3D and that are also
-    available within GeoDjango.  For more information, see the PostGIS docs
+    available within GeoDjango. For more information, see the PostGIS docs
     on the routines that support 3D:
 
     https://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
@@ -226,7 +226,8 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         ref_union = GEOSGeometry(ref_ewkt)
         union = City3D.objects.aggregate(Union("point"))["point__union"]
         self.assertTrue(union.hasz)
-        # Ordering of points in the resulting geometry may vary between implementations
+        # Ordering of points in the resulting geometry may vary between
+        # implementations
         self.assertEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
     @skipUnlessDBFeature("supports_3d_functions")
@@ -283,7 +284,8 @@ class Geo3DFunctionsTests(FuncTestMixin, Geo3DLoadingHelper, TestCase):
             name="Houston"
         )
         # GeoJSON should be 3D
-        # `SELECT ST_AsGeoJSON(point, 6) FROM geo3d_city3d WHERE name='Houston';`
+        # `SELECT ST_AsGeoJSON(point, 6) FROM geo3d_city3d
+        #     WHERE name='Houston';`
         ref_json_regex = re.compile(
             r'^{"type":"Point","coordinates":\[-95.363151,29.763374,18(\.0+)?\]}$'
         )
@@ -295,7 +297,8 @@ class Geo3DFunctionsTests(FuncTestMixin, Geo3DLoadingHelper, TestCase):
         """
         self._load_polygon_data()
         # Reference query for values below:
-        #  `SELECT ST_Perimeter3D(poly), ST_Perimeter2D(poly) FROM geo3d_polygon3d;`
+        #  `SELECT ST_Perimeter3D(poly), ST_Perimeter2D(poly)
+        #      FROM geo3d_polygon3d;`
         ref_perim_3d = 76859.2620451
         ref_perim_2d = 76859.2577803
         tol = 6
@@ -314,7 +317,8 @@ class Geo3DFunctionsTests(FuncTestMixin, Geo3DLoadingHelper, TestCase):
         """
         # ST_Length_Spheroid Z-aware, and thus does not need to use
         # a separate function internally.
-        # `SELECT ST_Length_Spheroid(line, 'SPHEROID["GRS 1980",6378137,298.257222101]')
+        # `SELECT ST_Length_Spheroid(
+        #     line, 'SPHEROID["GRS 1980",6378137,298.257222101]')
         #    FROM geo3d_interstate[2d|3d];`
         self._load_interstate_data()
         tol = 3

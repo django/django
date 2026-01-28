@@ -144,10 +144,10 @@ class TimeFormat(Formatter):
 
     def P(self):
         """
-        Time, in 12-hour hours, minutes and 'a.m.'/'p.m.', with minutes left off
-        if they're zero and the strings 'midnight' and 'noon' if appropriate.
-        Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon', '12:30 p.m.'
-        Proprietary extension.
+        Time, in 12-hour hours, minutes and 'a.m.'/'p.m.', with minutes left
+        off if they're zero and the strings 'midnight' and 'noon' if
+        appropriate. Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon',
+        '12:30 p.m.' Proprietary extension.
         """
         if self.data.minute == 0 and self.data.hour == 0:
             return _("midnight")
@@ -189,7 +189,8 @@ class TimeFormat(Formatter):
 
         # `offset` is a datetime.timedelta. For negative values (to the west of
         # UTC) only days can be negative (days=-1) and seconds are always
-        # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
+        # positive.
+        # e.g.: UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
         # Positive offsets have days=0
         return offset.days * 86400 + offset.seconds
 
@@ -215,7 +216,10 @@ class DateFormat(TimeFormat):
         return WEEKDAYS_ABBR[self.data.weekday()]
 
     def E(self):
-        "Alternative month names as required by some locales. Proprietary extension."
+        """
+        Alternative month names as required by some locales. Proprietary
+        extension.
+        """
         return MONTHS_ALT[self.data.month]
 
     def F(self):

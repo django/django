@@ -37,9 +37,9 @@ Using CSRF protection with AJAX
 ===============================
 
 While the above method can be used for AJAX POST requests, it has some
-inconveniences: you have to remember to pass the CSRF token in as POST data with
-every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
+inconveniences: you have to remember to pass the CSRF token in as POST data
+with every POST request. For this reason, there is an alternative method: on
+each XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
 :setting:`CSRF_HEADER_NAME` setting) to the value of the CSRF token. This is
 often easier because many JavaScript frameworks provide hooks that allow
 headers to be set on every request.
@@ -217,11 +217,11 @@ Testing and CSRF protection
 ===========================
 
 The ``CsrfViewMiddleware`` will usually be a big hindrance to testing view
-functions, due to the need for the CSRF token which must be sent with every POST
-request. For this reason, Django's HTTP client for tests has been modified to
-set a flag on requests which relaxes the middleware and the ``csrf_protect``
-decorator so that they no longer rejects requests. In every other respect
-(e.g. sending cookies etc.), they behave the same.
+functions, due to the need for the CSRF token which must be sent with every
+POST request. For this reason, Django's HTTP client for tests has been modified
+to set a flag on requests which relaxes the middleware and the ``csrf_protect``
+decorator so that they no longer rejects requests. In every other respect (e.g.
+sending cookies etc.), they behave the same.
 
 If, for some reason, you *want* the test client to perform CSRF
 checks, you can create an instance of the test client that enforces
@@ -237,8 +237,8 @@ Edge cases
 
 Certain views can have unusual requirements that mean they don't fit the normal
 pattern envisaged here. A number of utilities can be useful in these
-situations. The scenarios they might be needed in are described in the following
-section.
+situations. The scenarios they might be needed in are described in the
+following section.
 
 Disabling CSRF protection for just a few views
 ----------------------------------------------
@@ -265,8 +265,8 @@ There may be some views that are unprotected and have been exempted by
 ``csrf_exempt``, but still need to include the CSRF token.
 
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
-:func:`~django.views.decorators.csrf.requires_csrf_token`. (i.e. ``requires_csrf_token``
-should be the innermost decorator).
+:func:`~django.views.decorators.csrf.requires_csrf_token`. (i.e.
+``requires_csrf_token`` should be the innermost decorator).
 
 Protecting a view for only one path
 -----------------------------------
@@ -304,8 +304,8 @@ view that sends the page.
 CSRF protection in reusable applications
 ========================================
 
-Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
-all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
-the security of these applications against CSRF. It is recommended that the
-developers of other reusable apps that want the same guarantees also use the
-``csrf_protect`` decorator on their views.
+Because it is possible for the developer to turn off the
+``CsrfViewMiddleware``, all relevant views in contrib apps use the
+``csrf_protect`` decorator to ensure the security of these applications against
+CSRF. It is recommended that the developers of other reusable apps that want
+the same guarantees also use the ``csrf_protect`` decorator on their views.

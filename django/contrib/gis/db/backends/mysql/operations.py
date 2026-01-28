@@ -45,6 +45,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "bboverlaps": SpatialOperator(func="MBROverlaps"),  # ...
             "contained": SpatialOperator(func="MBRWithin"),  # ...
             "contains": SpatialOperator(func="ST_Contains"),
+            "coveredby": SpatialOperator(func="MBRCoveredBy"),
             "crosses": SpatialOperator(func="ST_Crosses"),
             "disjoint": SpatialOperator(func="ST_Disjoint"),
             "equals": SpatialOperator(func="ST_Equals"),
@@ -57,9 +58,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_is_mariadb:
             operators["relate"] = SpatialOperator(func="ST_Relate")
+            if self.connection.mysql_version < (12, 0, 1):
+                del operators["coveredby"]
         else:
             operators["covers"] = SpatialOperator(func="MBRCovers")
-            operators["coveredby"] = SpatialOperator(func="MBRCoveredBy")
         return operators
 
     @cached_property
@@ -71,8 +73,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             models.Union,
         ]
         is_mariadb = self.connection.mysql_is_mariadb
-        if is_mariadb or self.connection.mysql_version < (8, 0, 24):
-            disallowed_aggregates.insert(0, models.Collect)
+        if is_mariadb:
+            if self.connection.mysql_version < (12, 0, 1):
+                disallowed_aggregates.insert(0, models.Collect)
         return tuple(disallowed_aggregates)
 
     function_names = {
@@ -95,6 +98,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
+            "NumDimensions",
             "Perimeter",
             "PointOnSurface",
             "Reverse",
@@ -106,7 +110,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_is_mariadb:
             unsupported.remove("PointOnSurface")
-            unsupported.update({"GeoHash", "IsValid"})
+            if self.connection.mysql_version < (12, 0, 1):
+                unsupported.update({"GeoHash", "IsValid"})
         return unsupported
 
     def geo_db_type(self, f):

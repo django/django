@@ -307,8 +307,9 @@ class TestFixtures(TestCase):
 
     def test_empty(self):
         """
-        Test for ticket #18213 -- Loading a fixture file with no data output a warning.
-        Previously empty fixture raises an error exception, see ticket #4371.
+        Test for ticket #18213 -- Loading a fixture file with no data output a
+        warning. Previously empty fixture raises an error exception, see ticket
+        #4371.
         """
         msg = "No fixture data found for 'empty'. (File format may be invalid.)"
         with self.assertWarnsMessage(RuntimeWarning, msg):
@@ -598,7 +599,8 @@ class TestFixtures(TestCase):
     def test_fixture_dirs_with_default_fixture_path(self):
         """
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
-        for application (app/fixtures) in order to avoid repeated fixture loading.
+        for application (app/fixtures) in order to avoid repeated fixture
+        loading.
         """
         msg = (
             "'%s' is a default fixture directory for the '%s' app "
@@ -612,7 +614,8 @@ class TestFixtures(TestCase):
     def test_fixture_dirs_with_default_fixture_path_as_pathlib(self):
         """
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
-        for application (app/fixtures) in order to avoid repeated fixture loading.
+        for application (app/fixtures) in order to avoid repeated fixture
+        loading.
         """
         msg = (
             "'%s' is a default fixture directory for the '%s' app "
@@ -686,7 +689,8 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_on_serialize(self):
         """
-        Natural key requirements are taken into account when serializing models.
+        Natural key requirements are taken into account when serializing
+        models.
         """
         management.call_command(
             "loaddata",
@@ -722,7 +726,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting(self):
         """
-        It doesn't matter what order you mention the models,  Store *must* be
+        It doesn't matter what order you mention the models, Store *must* be
         serialized before then Person, and both must be serialized before Book.
         """
         sorted_deps = serializers.sort_dependencies(
@@ -869,7 +873,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_simple(self):
         """
-        M2M relations without explicit through models SHOULD count as dependencies
+        M2M relations without explicit through models SHOULD count as
+        dependencies
 
         Regression test for bugs that could be caused by flawed fixes to
         #14226, namely if M2M checks are removed from sort_dependencies
@@ -897,7 +902,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_m2m_complex(self):
         """
         M2M relations with explicit through models should NOT count as
-        dependencies.  The through model itself will have dependencies, though.
+        dependencies. The through model itself will have dependencies, though.
         """
         sorted_deps = serializers.sort_dependencies(
             [("fixtures_regress", [M2MComplexA, M2MComplexB, M2MThroughAB])]
@@ -908,7 +913,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_complex_circular_1(self):
         """
-        Circular M2M relations with explicit through models should be serializable
+        Circular M2M relations with explicit through models should be
+        serializable
         """
         A, B, C, AtoB, BtoC, CtoA = (
             M2MComplexCircular1A,
@@ -929,8 +935,9 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_m2m_complex_circular_2(self):
         """
-        Circular M2M relations with explicit through models should be serializable
-        This test tests the circularity with explicit natural_key.dependencies
+        Circular M2M relations with explicit through models should be
+        serializable This test tests the circularity with explicit
+        natural_key.dependencies
         """
         sorted_deps = serializers.sort_dependencies(
             [
@@ -945,7 +952,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dump_and_load_m2m_simple(self):
         """
-        Test serializing and deserializing back models with simple M2M relations
+        Test serializing and deserializing back models with simple M2M
+        relations
         """
         a = M2MSimpleA.objects.create(data="a")
         b1 = M2MSimpleB.objects.create(data="b1")

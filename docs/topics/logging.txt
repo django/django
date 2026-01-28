@@ -419,7 +419,7 @@ logger, you can specify your own configuration scheme.
 
 The :setting:`LOGGING_CONFIG` setting defines the callable that will
 be used to configure Django's loggers. By default, it points at
-Python's :func:`logging.config.dictConfig()` function. However, if you want to
+Python's :func:`logging.config.dictConfig` function. However, if you want to
 use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
 be provided as the value of that argument when logging is configured.

@@ -47,3 +47,6 @@ class Store(models.Model):
 
 class Employee(models.Model):
     work_day_preferences = models.JSONField()
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

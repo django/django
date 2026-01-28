@@ -25,7 +25,7 @@ class YamlImportModuleMock:
     In order to run tests that verify the behavior of the YAML serializer
     when run on a system that has yaml installed (like the django CI server),
     mock import_module, so that it raises an ImportError when the yaml
-    serializer is being imported.  The importlib.import_module() call is
+    serializer is being imported. The importlib.import_module() call is
     being made in the serializers.register_serializer().
 
     Refs: #12756

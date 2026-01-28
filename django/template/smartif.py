@@ -3,7 +3,7 @@ Parser and utilities for the smart 'if' tag
 """
 
 # Using a simple top down parser, as described here:
-#    https://11l-lang.org/archive/simple-top-down-parsing/
+# https://11l-lang.org/archive/simple-top-down-parsing/
 # 'led' = left denotation
 # 'nud' = null denotation
 # 'bp' = binding power (left = lbp, right = rbp)
@@ -11,8 +11,8 @@ Parser and utilities for the smart 'if' tag
 
 class TokenBase:
     """
-    Base class for operators and literals, mainly for debugging and for throwing
-    syntax errors.
+    Base class for operators and literals, mainly for debugging and for
+    throwing syntax errors.
     """
 
     id = None  # node/token type name
@@ -60,9 +60,10 @@ def infix(bp, func):
             try:
                 return func(context, self.first, self.second)
             except Exception:
-                # Templates shouldn't throw exceptions when rendering.  We are
-                # most likely to get exceptions for things like {% if foo in bar
-                # %} where 'bar' does not support 'in', so default to False
+                # Templates shouldn't throw exceptions when rendering. We are
+                # most likely to get exceptions for things like:
+                # {% if foo in bar %}
+                # where 'bar' does not support 'in', so default to False.
                 return False
 
     return Operator

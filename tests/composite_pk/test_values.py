@@ -3,7 +3,7 @@ from uuid import UUID
 
 from django.test import TestCase
 
-from .models import Post, Tenant, User
+from .models import Comment, Post, Tenant, User
 
 
 class CompositePKValuesTests(TestCase):
@@ -128,18 +128,18 @@ class CompositePKValuesTests(TestCase):
             self.assertSequenceEqual(
                 User.objects.values_list("pk", "pk").order_by("pk"),
                 (
-                    (self.user_1.pk,),
-                    (self.user_2.pk,),
-                    (self.user_3.pk,),
+                    (self.user_1.pk, self.user_1.pk),
+                    (self.user_2.pk, self.user_2.pk),
+                    (self.user_3.pk, self.user_3.pk),
                 ),
             )
         with self.subTest('User.objects.values_list("pk", "id", "pk", "id")'):
             self.assertSequenceEqual(
                 User.objects.values_list("pk", "id", "pk", "id").order_by("pk"),
                 (
-                    (self.user_1.pk, self.user_1.id),
-                    (self.user_2.pk, self.user_2.id),
-                    (self.user_3.pk, self.user_3.id),
+                    (self.user_1.pk, self.user_1.id, self.user_1.pk, self.user_1.id),
+                    (self.user_2.pk, self.user_2.id, self.user_2.pk, self.user_2.id),
+                    (self.user_3.pk, self.user_3.id, self.user_3.pk, self.user_3.id),
                 ),
             )
 
@@ -210,3 +210,17 @@ class CompositePKValuesTests(TestCase):
                     {"pk": self.user_3.pk, "id": self.user_3.id},
                 ),
             )
+
+    def test_foreign_object_values(self):
+        Comment.objects.create(id=1, user=self.user_1, integer=42)
+        testcases = {
+            "all": Comment.objects.all(),
+            "exclude_user_email": Comment.objects.exclude(user__email__endswith="net"),
+        }
+        for name, queryset in testcases.items():
+            with self.subTest(name=name):
+                values = list(queryset.values("user", "integer"))
+                self.assertEqual(
+                    values[0]["user"], (self.user_1.tenant_id, self.user_1.id)
+                )
+                self.assertEqual(values[0]["integer"], 42)

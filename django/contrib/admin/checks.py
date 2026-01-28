@@ -236,14 +236,20 @@ class BaseModelAdminChecks:
                     id="admin.E038",
                 )
             try:
+                if isinstance(field.remote_field.model, str):
+                    raise NotRegistered
                 related_admin = obj.admin_site.get_model_admin(field.remote_field.model)
             except NotRegistered:
+                # field.remote_field.model could be a string or a class.
+                remote_model = getattr(
+                    field.remote_field.model, "__name__", field.remote_field.model
+                )
                 return [
                     checks.Error(
                         'An admin for model "%s" has to be registered '
                         "to be referenced by %s.autocomplete_fields."
                         % (
-                            field.remote_field.model.__name__,
+                            remote_model,
                             type(obj).__name__,
                         ),
                         obj=obj.__class__,
@@ -316,7 +322,8 @@ class BaseModelAdminChecks:
 
     def _check_fields(self, obj):
         """Check that `fields` only refer to existing fields, doesn't contain
-        duplicates. Check if at most one of `fields` and `fieldsets` is defined.
+        duplicates. Check if at most one of `fields` and `fieldsets` is
+        defined.
         """
 
         if obj.fields is None:
@@ -331,11 +338,15 @@ class BaseModelAdminChecks:
                     id="admin.E005",
                 )
             ]
-        fields = flatten(obj.fields)
-        if len(fields) != len(set(fields)):
+        field_counts = collections.Counter(flatten(obj.fields))
+        if duplicate_fields := [
+            field for field, count in field_counts.items() if count > 1
+        ]:
             return [
                 checks.Error(
                     "The value of 'fields' contains duplicate field(s).",
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E006",
                 )
@@ -397,11 +408,20 @@ class BaseModelAdminChecks:
                 id="admin.E008",
             )
 
-        seen_fields.extend(flatten(fieldset[1]["fields"]))
-        if len(seen_fields) != len(set(seen_fields)):
+        fieldset_fields = flatten(fieldset[1]["fields"])
+        seen_fields.extend(fieldset_fields)
+        field_counts = collections.Counter(seen_fields)
+        fieldset_fields_set = set(fieldset_fields)
+        if duplicate_fields := [
+            field
+            for field, count in field_counts.items()
+            if count > 1 and field in fieldset_fields_set
+        ]:
             return [
                 checks.Error(
                     "There are duplicate field(s) in '%s[1]'." % label,
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E012",
                 )
@@ -469,10 +489,15 @@ class BaseModelAdminChecks:
             return must_be(
                 "a list or tuple", option="exclude", obj=obj, id="admin.E014"
             )
-        elif len(obj.exclude) > len(set(obj.exclude)):
+        field_counts = collections.Counter(obj.exclude)
+        if duplicate_fields := [
+            field for field, count in field_counts.items() if count > 1
+        ]:
             return [
                 checks.Error(
                     "The value of 'exclude' contains duplicate field(s).",
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E015",
                 )
@@ -889,7 +914,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return inline(obj.model, obj.admin_site).check()
 
     def _check_list_display(self, obj):
-        """Check that list_display only contains fields or usable attributes."""
+        """Check list_display only contains fields or usable attributes."""
 
         if not isinstance(obj.list_display, (list, tuple)):
             return must_be(
@@ -994,7 +1019,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_filter_item(self, obj, item, label):
         """
-        Check one item of `list_filter`, i.e. check if it is one of three options:
+        Check one item of `list_filter`, the three valid options are:
         1. 'field' -- a basic field filter, possibly w/ relationships (e.g.
            'field__rel')
         2. ('field', SomeFieldListFilter) - a field-based list filter class
@@ -1008,7 +1033,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return must_inherit_from(
                     parent="ListFilter", option=label, obj=obj, id="admin.E113"
                 )
-            # ...  but not a FieldListFilter.
+            # ... but not a FieldListFilter.
             elif issubclass(item, FieldListFilter):
                 return [
                     checks.Error(

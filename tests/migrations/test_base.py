@@ -21,7 +21,8 @@ from django.utils.module_loading import module_dir
 
 class MigrationTestBase(TransactionTestCase):
     """
-    Contains an extended set of asserts for testing migrations and schema operations.
+    Contains an extended set of asserts for testing migrations and schema
+    operations.
     """
 
     available_apps = ["migrations"]
@@ -107,6 +108,7 @@ class MigrationTestBase(TransactionTestCase):
                     .values()
                     if (
                         c["columns"] == list(columns)
+                        and c["index"] is True
                         and (index_type is None or c["type"] == index_type)
                         and not c["unique"]
                     )

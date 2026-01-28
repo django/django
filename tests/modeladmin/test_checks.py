@@ -222,6 +222,7 @@ class FieldsetsCheckTests(CheckTestCase):
             ValidationTestModel,
             "There are duplicate field(s) in 'fieldsets[0][1]'.",
             "admin.E012",
+            "Remove duplicates of 'name'.",
         )
 
     def test_duplicate_fields_in_fieldsets(self):
@@ -236,6 +237,7 @@ class FieldsetsCheckTests(CheckTestCase):
             ValidationTestModel,
             "There are duplicate field(s) in 'fieldsets[1][1]'.",
             "admin.E012",
+            "Remove duplicates of 'name'.",
         )
 
     def test_fieldsets_with_custom_form_validation(self):
@@ -255,6 +257,7 @@ class FieldsCheckTests(CheckTestCase):
             ValidationTestModel,
             "The value of 'fields' contains duplicate field(s).",
             "admin.E006",
+            "Remove duplicates of 'name'.",
         )
 
     def test_inline(self):
@@ -788,7 +791,8 @@ class ListDisplayLinksCheckTests(CheckTestCase):
 
     def test_list_display_links_check_skipped_if_get_list_display_overridden(self):
         """
-        list_display_links check is skipped if get_list_display() is overridden.
+        list_display_links check is skipped if get_list_display() is
+        overridden.
         """
 
         class TestModelAdmin(ModelAdmin):
@@ -1714,6 +1718,28 @@ class AutocompleteFieldsTests(CheckTestCase):
             Song,
             msg=(
                 'An admin for model "Band" has to be registered '
+                "to be referenced by Admin.autocomplete_fields."
+            ),
+            id="admin.E039",
+            invalid_obj=Admin,
+        )
+
+    @isolate_apps("modeladmin")
+    def test_autocomplete_e039_unresolved_model(self):
+        class UnresolvedForeignKeyModel(models.Model):
+            unresolved = models.ForeignKey("missing.Model", models.CASCADE)
+
+            class Meta:
+                app_label = "modeladmin"
+
+        class Admin(ModelAdmin):
+            autocomplete_fields = ("unresolved",)
+
+        self.assertIsInvalid(
+            Admin,
+            UnresolvedForeignKeyModel,
+            msg=(
+                'An admin for model "missing.Model" has to be registered '
                 "to be referenced by Admin.autocomplete_fields."
             ),
             id="admin.E039",

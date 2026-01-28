@@ -11,7 +11,7 @@ except ImportError:
 
 from django import forms
 from django.core import serializers
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
@@ -147,6 +147,84 @@ class CompositePKTests(TestCase):
         result = Comment.objects.in_bulk([self.comment.pk])
         self.assertEqual(result, {self.comment.pk: self.comment})
 
+    def test_in_bulk_batching(self):
+        Comment.objects.all().delete()
+        num_objects = 10
+        connection.features.__dict__.pop("max_query_params", None)
+        with unittest.mock.patch.object(
+            type(connection.features), "max_query_params", num_objects
+        ):
+            comments = [
+                Comment(id=i, tenant=self.tenant, user=self.user)
+                for i in range(1, num_objects + 1)
+            ]
+            Comment.objects.bulk_create(comments)
+            id_list = list(Comment.objects.values_list("pk", flat=True))
+            with self.assertNumQueries(2):
+                comment_dict = Comment.objects.in_bulk(id_list=id_list)
+        self.assertQuerySetEqual(comment_dict, id_list)
+
+    def test_in_bulk_values(self):
+        result = Comment.objects.values().in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {
+                self.comment.pk: {
+                    "tenant_id": self.comment.tenant_id,
+                    "id": self.comment.id,
+                    "user_id": self.comment.user_id,
+                    "text": self.comment.text,
+                    "integer": self.comment.integer,
+                }
+            },
+        )
+
+    def test_in_bulk_values_field(self):
+        result = Comment.objects.values("text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_fields(self):
+        result = Comment.objects.values("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"pk": self.comment.pk, "text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_list(self):
+        result = Comment.objects.values_list("text").in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: (self.comment.text,)})
+
+    def test_in_bulk_values_list_multiple_fields(self):
+        result = Comment.objects.values_list("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.pk, self.comment.text)}
+        )
+
+    def test_in_bulk_values_list_fields_are_pk(self):
+        result = Comment.objects.values_list("tenant", "id").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.tenant_id, self.comment.id)}
+        )
+
+    def test_in_bulk_values_list_flat(self):
+        result = Comment.objects.values_list("text", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.comment.text})
+
+    def test_in_bulk_values_list_flat_pk(self):
+        result = Comment.objects.values_list("pk", flat=True).in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: self.comment.pk})
+
+    def test_in_bulk_values_list_flat_tenant(self):
+        result = Comment.objects.values_list("tenant", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.tenant.id})
+
     def test_iterator(self):
         """
         Test the .iterator() method of composite_pk models.
@@ -157,6 +235,20 @@ class CompositePKTests(TestCase):
     def test_query(self):
         users = User.objects.values_list("pk").order_by("pk")
         self.assertNotIn('AS "pk"', str(users.query))
+
+    def test_raw(self):
+        users = User.objects.raw("SELECT * FROM composite_pk_user")
+        self.assertEqual(len(users), 1)
+        user = users[0]
+        self.assertEqual(user.tenant_id, self.user.tenant_id)
+        self.assertEqual(user.id, self.user.id)
+        self.assertEqual(user.email, self.user.email)
+
+    def test_raw_missing_PK_fields(self):
+        query = "SELECT tenant_id, email FROM composite_pk_user"
+        msg = "Raw query must include the primary key"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(User.objects.raw(query))
 
     def test_only(self):
         users = User.objects.only("pk")
@@ -169,6 +261,14 @@ class CompositePKTests(TestCase):
             self.assertEqual(user.id, self.user.id)
         with self.assertNumQueries(1):
             self.assertEqual(user.email, self.user.email)
+
+    def test_select_related(self):
+        Comment.objects.create(tenant=self.tenant, id=2)
+        with self.assertNumQueries(1):
+            comments = list(Comment.objects.select_related("user").order_by("pk"))
+            self.assertEqual(len(comments), 2)
+            self.assertEqual(comments[0].user, self.user)
+            self.assertIsNone(comments[1].user)
 
     def test_model_forms(self):
         fields = ["tenant", "id", "user_id", "text", "integer"]

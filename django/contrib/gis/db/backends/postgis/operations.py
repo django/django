@@ -176,7 +176,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             "BoundingCircle": "ST_MinimumBoundingCircle",
             "FromWKB": "ST_GeomFromWKB",
             "FromWKT": "ST_GeomFromText",
+            "NumDimensions": "ST_NDims",
             "NumPoints": "ST_NPoints",
+            "GeometryType": "GeometryType",
         }
         return function_names
 
@@ -184,7 +186,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_version(self):
         """Determine the version of the PostGIS library."""
         # Trying to get the PostGIS version because the function
-        # signatures will depend on the version used.  The cost
+        # signatures will depend on the version used. The cost
         # here is a database query to determine the version, which
         # can be mitigated by setting `POSTGIS_VERSION` with a 3-tuple
         # comprising user-supplied values for the major, minor, and
@@ -203,7 +205,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 3.1. "
+                    "GeoDjango requires at least PostGIS version 3.2. "
                     "Was the database created from a spatial database "
                     "template?" % self.connection.settings_dict["NAME"]
                 )
@@ -266,7 +268,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
         This is the most complex implementation of the spatial backends due to
         what is supported on geodetic geometry columns vs. what's available on
-        projected geometry columns.  In addition, it has to take into account
+        projected geometry columns. In addition, it has to take into account
         the geography column type.
         """
         # Getting the distance parameter
@@ -327,9 +329,10 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def _get_postgis_func(self, func):
         """
-        Helper routine for calling PostGIS functions and returning their result.
+        Helper routine for calling PostGIS functions and returning their
+        result.
         """
-        # Close out the connection.  See #9437.
+        # Close out the connection. See #9437.
         with self.connection.temporary_connection() as cursor:
             cursor.execute("SELECT %s()" % func)
             return cursor.fetchone()[0]
@@ -339,7 +342,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func("postgis_geos_version")
 
     def postgis_lib_version(self):
-        "Return the version number of the PostGIS library used with PostgreSQL."
+        """
+        Return the version number of the PostGIS library used with PostgreSQL.
+        """
         return self._get_postgis_func("postgis_lib_version")
 
     def postgis_proj_version(self):

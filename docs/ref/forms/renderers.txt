@@ -40,7 +40,7 @@ discussion.
 Use one of the :ref:`built-in template form renderers
 <built-in-template-form-renderers>` or implement your own. Custom renderers
 must implement a ``render(template_name, context, request=None)`` method. It
-should return a rendered templates (as a string) or raise
+should return a rendered template (as a string) or raise
 :exc:`~django.template.TemplateDoesNotExist`.
 
 .. class:: BaseRenderer
@@ -66,8 +66,6 @@ should return a rendered templates (as a string) or raise
         Defaults to ``"django/forms/field.html"``
 
     .. attribute:: bound_field_class
-
-        .. versionadded:: 5.2
 
         The default class used to represent form fields across the project.
 

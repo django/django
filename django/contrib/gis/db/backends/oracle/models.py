@@ -54,7 +54,7 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     auth_name = models.CharField(max_length=256)
     wktext = models.CharField(max_length=2046)
     # Optional geometry representing the bounds of this coordinate
-    # system.  By default, all are NULL in the table.
+    # system. By default, all are NULL in the table.
     cs_bounds = models.PolygonField(null=True)
 
     class Meta:

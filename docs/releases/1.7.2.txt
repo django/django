@@ -19,8 +19,8 @@ Bugfixes
   SQLite (:ticket:`23702`).
 
 * Added a warning for duplicate models when a module is reloaded. Previously a
-  ``RuntimeError`` was raised every time two models clashed in the app registry.
-  (:ticket:`23621`).
+  ``RuntimeError`` was raised every time two models clashed in the app
+  registry. (:ticket:`23621`).
 
 * Prevented :djadmin:`flush` from loading initial data for migrated apps
   (:ticket:`23699`).
@@ -87,8 +87,8 @@ Bugfixes
 * Fixed a regression with dynamically generated inlines and allowed field
   references in the admin (:ticket:`23754`).
 
-* Fixed an infinite loop bug for certain cyclic migration dependencies, and made
-  the error message for cyclic dependencies much more helpful.
+* Fixed an infinite loop bug for certain cyclic migration dependencies, and
+  made the error message for cyclic dependencies much more helpful.
 
 * Added missing ``index_together`` handling for SQLite (:ticket:`23880`).
 
@@ -137,9 +137,9 @@ Bugfixes
 * Fixed ``timesince`` filter translations in Korean (:ticket:`23989`).
 
 * Fixed the SQLite ``SchemaEditor`` to properly add defaults in the absence of
-  a user specified ``default``. For example, a ``CharField`` with ``blank=True``
-  didn't set existing rows to an empty string which resulted in a crash when
-  adding the ``NOT NULL`` constraint (:ticket:`23987`).
+  a user specified ``default``. For example, a ``CharField`` with
+  ``blank=True`` didn't set existing rows to an empty string which resulted in
+  a crash when adding the ``NOT NULL`` constraint (:ticket:`23987`).
 
 * ``makemigrations`` no longer prompts for a default value when adding
   ``TextField()`` or ``CharField()`` without a ``default`` (:ticket:`23405`).
@@ -163,10 +163,10 @@ Bugfixes
 
 * Fixed admindocs crash on apps installed as eggs (:ticket:`23525`).
 
-* Changed migrations autodetector to generate an ``AlterModelOptions`` operation
-  instead of ``DeleteModel`` and ``CreateModel`` operations when changing
-  ``Meta.managed``. This prevents data loss when changing ``managed`` from
-  ``False`` to ``True`` and vice versa (:ticket:`24037`).
+* Changed migrations autodetector to generate an ``AlterModelOptions``
+  operation instead of ``DeleteModel`` and ``CreateModel`` operations when
+  changing ``Meta.managed``. This prevents data loss when changing ``managed``
+  from ``False`` to ``True`` and vice versa (:ticket:`24037`).
 
 * Enabled the ``sqlsequencereset`` command on apps with migrations
   (:ticket:`24054`).
@@ -187,8 +187,8 @@ Bugfixes
 * Restored the ability to use more than five levels of subqueries
   (:ticket:`23758`).
 
-* Fixed crash when ``ValidationError`` is initialized with a ``ValidationError``
-  that is initialized with a dictionary (:ticket:`24008`).
+* Fixed crash when ``ValidationError`` is initialized with a
+  ``ValidationError`` that is initialized with a dictionary (:ticket:`24008`).
 
 * Prevented a crash on apps without migrations when running ``migrate --list``
   (:ticket:`23366`).

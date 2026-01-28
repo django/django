@@ -39,7 +39,10 @@ class StaticTests(SimpleTestCase):
             )
 
     def test_chunked(self):
-        "The static view should stream files in chunks to avoid large memory usage"
+        """
+        The static view should stream files in chunks to avoid large memory
+        usage
+        """
         response = self.client.get("/%s/%s" % (self.prefix, "long-line.txt"))
         response_iterator = iter(response)
         first_chunk = next(response_iterator)

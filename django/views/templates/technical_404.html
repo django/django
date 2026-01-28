@@ -3,13 +3,14 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Page not found at {{ request.path_info }}</title>
+  <meta name="color-scheme" content="light" />
   <meta name="robots" content="NONE,NOARCHIVE">
   <style>
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
     body * * { padding:0; }
     body { font-family: sans-serif; background:#eee; color:#000; }
-    body > :where(header, main, footer) { border-bottom:1px solid #ddd; }
+    body > header, body > main, body > footer { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; margin-bottom:.4em; }
     h1 small { font-size:60%; color:#666; font-weight:normal; }
     table { border:none; border-collapse: collapse; width:100%; }
@@ -46,18 +47,18 @@
   </header>
 
   <main id="info">
-    {% if urlpatterns %}
+    {% if urlpatterns_debug %}
       <p>
       Using the URLconf defined in <code>{{ urlconf }}</code>,
       Django tried these URL patterns, in this order:
       </p>
       <ol>
-        {% for pattern in urlpatterns %}
+        {% for pattern in urlpatterns_debug %}
           <li>
             {% for pat in pattern %}
               <code>
-                {{ pat.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+                {{ pat.tried.pattern }}
+                {% if forloop.last and pat.debug_val %}[{{ pat.debug_key }}='{{ pat.debug_val }}']{% endif %}
               </code>
             {% endfor %}
           </li>

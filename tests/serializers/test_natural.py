@@ -6,9 +6,13 @@ from .models import (
     Child,
     FKAsPKNoNaturalKey,
     FKDataNaturalKey,
+    FKToNaturalKeyWithNullable,
     NaturalKeyAnchor,
     NaturalKeyThing,
+    NaturalKeyWithNullableField,
     NaturalPKWithDefault,
+    PostToOptOutSubclassUser,
+    SubclassNaturalKeyOptOutUser,
 )
 from .tests import register_tests
 
@@ -250,6 +254,88 @@ def fk_as_pk_natural_key_not_called(self, format):
         self.assertEqual(obj.object.pk, o1.pk)
 
 
+def natural_key_opt_out_test(self, format):
+    """
+    When a subclass of AbstractBaseUser opts out of natural key serialization
+    by returning an empty tuple, both FK and M2M relations serialize as
+    integer PKs and can be deserialized without error.
+    """
+    user1 = SubclassNaturalKeyOptOutUser.objects.create(email="user1@example.com")
+    user2 = SubclassNaturalKeyOptOutUser.objects.create(email="user2@example.com")
+
+    post = PostToOptOutSubclassUser.objects.create(
+        author=user1, title="Post 2 (Subclass Opt-out)"
+    )
+    post.subscribers.add(user1, user2)
+
+    user_data = serializers.serialize(format, [user1], use_natural_primary_keys=True)
+    post_data = serializers.serialize(format, [post], use_natural_foreign_keys=True)
+
+    list(serializers.deserialize(format, user_data))
+    deserialized_posts = list(serializers.deserialize(format, post_data))
+
+    post_obj = deserialized_posts[0].object
+    self.assertEqual(user1.email, post_obj.author.email)
+    self.assertEqual(
+        sorted([user1.email, user2.email]),
+        sorted(post_obj.subscribers.values_list("email", flat=True)),
+    )
+
+
+def nullable_natural_key_fk_test(self, format):
+    target_with_none = NaturalKeyWithNullableField.objects.create(
+        name="test_none",
+        optional_id=None,
+    )
+    target_with_value = NaturalKeyWithNullableField.objects.create(
+        name="test_value",
+        optional_id="some_id",
+    )
+    fk_to_none = FKToNaturalKeyWithNullable.objects.create(
+        ref=target_with_none,
+        data="points_to_none",
+    )
+    fk_to_value = FKToNaturalKeyWithNullable.objects.create(
+        ref=target_with_value,
+        data="points_to_value",
+    )
+    objects = [target_with_none, target_with_value, fk_to_none, fk_to_value]
+    serialized = serializers.serialize(
+        format,
+        objects,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    )
+    objs = list(serializers.deserialize(format, serialized))
+    self.assertEqual(objs[2].object.ref_id, target_with_none.pk)
+    self.assertEqual(objs[3].object.ref_id, target_with_value.pk)
+
+
+def nullable_natural_key_m2m_test(self, format):
+    target_with_none = NaturalKeyWithNullableField.objects.create(
+        name="test_none",
+        optional_id=None,
+    )
+    target_with_value = NaturalKeyWithNullableField.objects.create(
+        name="test_value",
+        optional_id="some_id",
+    )
+    m2m_obj = FKToNaturalKeyWithNullable.objects.create(data="m2m_test")
+    m2m_obj.refs.set([target_with_none, target_with_value])
+    objects = [target_with_none, target_with_value, m2m_obj]
+    serialized = serializers.serialize(
+        format,
+        objects,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    )
+    objs = list(serializers.deserialize(format, serialized))
+    self.assertCountEqual(
+        objs[2].m2m_data["refs"],
+        [target_with_none.pk, target_with_value.pk],
+    )
+
+
 # Dynamically register tests for each serializer
 register_tests(
     NaturalKeySerializerTests,
@@ -283,4 +369,19 @@ register_tests(
     NaturalKeySerializerTests,
     "test_%s_fk_as_pk_natural_key_not_called",
     fk_as_pk_natural_key_not_called,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_natural_key_opt_out",
+    natural_key_opt_out_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_nullable_natural_key_fk",
+    nullable_natural_key_fk_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_nullable_natural_key_m2m",
+    nullable_natural_key_m2m_test,
 )

@@ -1,10 +1,9 @@
 import collections.abc
 import inspect
 import warnings
-from asyncio import iscoroutinefunction
 from math import ceil
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import iscoroutinefunction, sync_to_async
 
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
@@ -57,7 +56,8 @@ class BasePaginator:
             else self.default_error_messages | error_messages
         )
         if self.per_page <= self.orphans:
-            # RemovedInDjango70Warning: When the deprecation ends, replace with:
+            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # with:
             # raise ValueError(
             #     "The orphans argument cannot be larger than or equal to the "
             #     "per_page argument."

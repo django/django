@@ -48,9 +48,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "relate": SpatialiteNullCheckOperator(func="Relate"),
         "coveredby": SpatialiteNullCheckOperator(func="CoveredBy"),
         "covers": SpatialiteNullCheckOperator(func="Covers"),
-        # Returns true if B's bounding box completely contains A's bounding box.
+        # Returns true if B's bounding box completely contains A's bounding
+        # box.
         "contained": SpatialOperator(func="MbrWithin"),
-        # Returns true if A's bounding box completely contains B's bounding box.
+        # Returns true if A's bounding box completely contains B's bounding
+        # box.
         "bbcontains": SpatialOperator(func="MbrContains"),
         # Returns true if A's bounding box overlaps B's bounding box.
         "bboverlaps": SpatialOperator(func="MbrOverlaps"),
@@ -71,8 +73,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "ForcePolygonCW": "ST_ForceLHR",
         "FromWKB": "ST_GeomFromWKB",
         "FromWKT": "ST_GeomFromText",
+        "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
+        "NumDimensions": "ST_NDims",
         "NumPoints": "ST_NPoints",
         "Reverse": "ST_Reverse",
         "Scale": "ScaleCoords",
@@ -82,7 +86,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"GeometryDistance", "IsEmpty", "MemSize", "Rotate"}
+        unsupported = {"GeometryDistance", "MemSize", "Rotate"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
         if self.spatial_version < (5, 1):
