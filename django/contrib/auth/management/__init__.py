@@ -9,7 +9,9 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.utils import IntegrityError
+from django.utils.text import camel_case_to_spaces
 
 
 def _get_all_permissions(opts):
@@ -106,6 +108,95 @@ def create_permissions(
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
+
+
+def rename_permissions_after_model_rename(
+    app_config,
+    verbosity=2,
+    plan=None,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
+    if not app_config.models_module:
+        return
+
+    # This handler is connected to the global post_migrate signal, which is
+    # emitted for *all* apps — including test configurations where
+    # django.contrib.auth is NOT installed.
+    # Therefore, we must guard against 'auth' not being present, otherwise
+    # apps.get_model("auth", "Permission") will raise LookupError and break
+    # unrelated test suites (especially under parallel test execution).
+    try:
+        Permission = apps.get_model("auth", "Permission")
+    except LookupError:
+        return
+    if not router.allow_migrate_model(using, Permission):
+        return
+
+    db = using or router.db_for_write(Permission)
+
+    app_label = app_config.label
+
+    # Collect (from_model, to_model) pairs
+    renames = [
+        (op.new_name, op.old_name) if backward else (op.old_name, op.new_name)
+        for migration, backward in (plan or [])
+        for op in migration.operations
+        if isinstance(op, migrations.RenameModel)
+        and migration.app_label == app_config.label
+    ]
+
+    if not renames:
+        return
+
+    for old_name, new_name in renames:
+        old_suffix = f"_{old_name.lower()}"
+        new_suffix = f"_{new_name.lower()}"
+
+        perms = Permission.objects.using(db).filter(
+            content_type__app_label=app_label,
+            codename__endswith=old_suffix,
+        )
+
+        for perm in perms:
+            for action in ("add", "change", "delete", "view"):
+                if not perm.codename.startswith(action + "_"):
+                    continue
+
+                old_codename = perm.codename
+                new_codename = f"{action}{new_suffix}"
+                new_name_str = f"Can {action} {camel_case_to_spaces(new_name)}"
+
+                if perm.codename == new_codename and perm.name == new_name_str:
+                    continue
+
+                perm.codename = new_codename
+                perm.name = new_name_str
+
+                try:
+                    with transaction.atomic(using=db):
+                        perm.save(update_fields={"codename", "name"}, using=db)
+                except IntegrityError as exc:
+                    # IntegrityError is most likely caused by duplicate
+                    # permissions created in pre-Django 6.0 projects before
+                    # permission renames were handled.
+                    msg = (
+                        "Failed to rename permission %(pk)s "
+                        "from '%(old)s' to  '%(new)s' because a permission "
+                        "with the target codename already exists. \n"
+                        "Please resolve the conflict manually."
+                    ) % {
+                        "pk": perm.pk,
+                        "old": old_codename,
+                        "new": perm.codename,
+                    }
+                    exc.add_note(msg)
+                    raise
+
+    for from_name, to_name in renames:
+        if verbosity >= 2:
+            print(f"Renamed permission(s): " f"{app_label}.{from_name} → {to_name}")
 
 
 def get_system_username():
