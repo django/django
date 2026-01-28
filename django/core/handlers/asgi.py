@@ -329,8 +329,8 @@ class ASGIHandler(base.BaseHandler):
             await send({"type": "http.response.body"})
         # Streaming responses need to be pinned to their iterator.
         elif response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly, to
-            #   allow mapping of a sync iterator.
+            # - Consume via `__aiter__` and not `streaming_content` directly,
+            #   to allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter. See
             #   https://github.com/python/cpython/commit/6e8dcdaaa49
             async with aclosing(aiter(response)) as content:
