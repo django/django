@@ -38,11 +38,15 @@ class GZipMiddleware(MiddlewareMixin):
             @contextlib.asynccontextmanager
             async def gzip_acmgr_wrapper():
                 async with original_iterator as v:
-                    async for chunk in v:
-                        yield compress_string(
-                            chunk,
-                            max_random_bytes=self.max_random_bytes,
-                        )
+
+                    async def agen():
+                        async for chunk in v:
+                            yield compress_string(
+                                chunk,
+                                max_random_bytes=self.max_random_bytes,
+                            )
+
+                    yield agen()
 
             response.streaming_acmgr_content = gzip_acmgr_wrapper()
             # Delete the `Content-Length` header for streaming content, because
