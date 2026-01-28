@@ -15,7 +15,7 @@ from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
-from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.formsets import BaseFormSet, FormSetMeta, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput,
@@ -1104,6 +1104,71 @@ def modelformset_factory(
     return FormSet
 
 
+class ModelFormSetMeta(FormSetMeta):
+    """Meta class for creating modelformset using Declarative Syntax."""
+
+    def __new__(cls, name, bases, attrs):
+        """Initialize the attributes given to the ModelFormSet class."""
+        if "model" not in set(attrs):
+            raise TypeError(
+                "ModelFormSet() missing 1 required positional argument: 'model'"
+            )
+
+        kwargs = {}
+
+        form = ModelForm
+        if (passed_form := attrs.get("form")) is not None:
+            kwargs.update({"form": passed_form})
+            if hasattr(passed_form, "Meta"):
+                kwargs.update({"fields": passed_form._meta.fields})
+                kwargs.update({"exclude": passed_form._meta.exclude})
+        else:
+            kwargs.update({"form": form})
+
+        default_modelform_factory_attrs = [
+            "fields",
+            "exclude",
+            "formfield_callback",
+            "widgets",
+            "localized_fields",
+            "labels",
+            "help_texts",
+            "error_messages",
+            "field_classes",
+        ]
+        for key in default_modelform_factory_attrs:
+            if key in attrs:
+                kwargs.update({key: attrs.get(key)})
+                attrs.pop(key)
+
+        if (model := attrs.get("model")) is not None:
+            form = modelform_factory(model, **kwargs)
+            attrs.update({"form": form})
+
+        default_formset_attrs = {
+            "form": ModelForm,
+            "formset": BaseModelFormSet,
+            "extra": 1,
+            "can_delete_extra": True,
+        }
+        for key, value in default_formset_attrs.items():
+            if key not in attrs.keys():
+                attrs.update({key: value})
+
+        return super().__new__(cls, name, bases, attrs)
+
+
+class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
+    """Base class for which can be used to create modelformset classes."""
+
+    form = None
+    model = None
+
+    def __init__(self, queryset=None):
+        """Initialize ModelFormSet."""
+        super().__init__(queryset=queryset)
+
+
 # InlineFormSets #############################################################
 
 
@@ -1367,6 +1432,61 @@ def inlineformset_factory(
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
     return FormSet
+
+
+class InlineFormSetMeta(ModelFormSetMeta):
+    """Meta class for creating inlineformset using Declarative Syntax."""
+
+    def __new__(cls, name, bases, attrs):
+        if "parent_model" not in set(attrs):
+            raise TypeError(
+                "InlineFormSet() missing 1 required positional argument: 'parent_model'"
+            )
+        if "model" not in set(attrs):
+            raise TypeError(
+                "InlineFormSet() missing 1 required positional argument: 'model'"
+            )
+
+        parent_model = attrs.get("parent_model", None)
+        model = attrs.get("model", None)
+        fk_name = attrs.get("fk_name", None)
+
+        default_formset_attrs = {
+            "form": ModelForm,
+            "formset": BaseInlineFormSet,
+            "extra": 3,
+            "can_delete": True,
+            "can_delete_extra": True,
+        }
+        for key, value in default_formset_attrs.items():
+            if key not in attrs.keys():
+                attrs.update({key: value})
+
+        if model is not None and parent_model is not None:
+            fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
+            if fk.unique:
+                attrs.update({"max_num": 1})
+            ModelFormSet = super().__new__(cls, name, bases, attrs)
+            ModelFormSet.fk = fk
+            return ModelFormSet
+        return super().__new__(cls, name, bases, attrs)
+
+
+class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta):
+    """Base class for which can be used to create inlineformset classes."""
+
+    form = None
+    model = None
+    parent_model = None
+
+    def __init__(
+        self,
+        instance=None,
+    ):
+        """Initialize ModelFormSet."""
+        super().__init__(
+            instance,
+        )
 
 
 # Fields #####################################################################
