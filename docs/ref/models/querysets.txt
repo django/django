@@ -549,22 +549,17 @@ Examples (those after the first will only work on PostgreSQL):
 .. code-block:: pycon
 
     >>> Author.objects.distinct()
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("pub_date").distinct("pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog").distinct("blog")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author", "pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog__name", "mod_date").distinct("blog__name", "mod_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author")
-    [...]
+    <QuerySet [...]>
 
 .. note::
     Keep in mind that :meth:`order_by` uses any default related model ordering
@@ -1204,7 +1199,7 @@ and run:
 .. code-block:: pycon
 
     >>> Pizza.objects.all()
-    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
+    <QuerySet [<Pizza: Hawaiian (ham, pineapple)>, <Pizza: Seafood (prawns, smoked salmon)>, ...]>
 
 The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
@@ -1990,13 +1985,12 @@ them:
 .. code-block:: pycon
 
     >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
-    <QuerySet [<Person: ...)>, ...]>
+    <QuerySet [<Person: ...>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB only supports the ``nowait``
-argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
-argument is only supported on PostgreSQL.
+``select_for_update()``. However, MariaDB only supports the ``nowait`` and
+``skip_locked`` arguments, and MySQL supports the ``nowait``, ``skip_locked``,
+and ``of`` arguments. The ``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -4240,7 +4234,7 @@ attribute:
 
     >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

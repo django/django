@@ -57,15 +57,12 @@ class Command(BaseCommand):
         )
 
         if interactive:
-            confirm = input(
-                """You have requested a flush of the database.
+            confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
 and return each table to an empty state.
 Are you sure you want to do this?
 
-    Type 'yes' to continue, or 'no' to cancel: """
-                % connection.settings_dict["NAME"]
-            )
+    Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict["NAME"])
         else:
             confirm = "yes"
 

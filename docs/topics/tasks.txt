@@ -207,7 +207,6 @@ To receive the Task context as an argument to your Task function, pass
     from django.core.mail import send_mail
     from django.tasks import task
 
-
     logger = logging.getLogger(__name__)
 
 
@@ -327,7 +326,6 @@ committed to the database, use :func:`transaction.on_commit()
     from functools import partial
 
     from django.db import transaction
-
 
     with transaction.atomic():
         Thing.objects.create(num=1)

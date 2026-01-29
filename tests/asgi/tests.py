@@ -94,7 +94,7 @@ class ASGITest(SimpleTestCase):
     # StreamingHTTPResponse triggers a warning when iterating the file.
     # assertWarnsMessage is not async compatible, so ignore_warnings for the
     # test.
-    @ignore_warnings(module="django.http.response")
+    @ignore_warnings(module="django.core.handlers.asgi")
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.

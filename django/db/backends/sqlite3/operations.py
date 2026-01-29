@@ -29,26 +29,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     # SQLite. Use JSON_TYPE() instead.
     jsonfield_datatype_values = frozenset(["null", "false", "true"])
 
-    def bulk_batch_size(self, fields, objs):
-        """
-        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
-        (reflected in max_query_params).
-        """
-        fields = list(
-            chain.from_iterable(
-                (
-                    field.fields
-                    if isinstance(field, models.CompositePrimaryKey)
-                    else [field]
-                )
-                for field in fields
-            )
-        )
-        if fields:
-            return self.connection.features.max_query_params // len(fields)
-        else:
-            return len(objs)
-
     def check_expression_support(self, expression):
         bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
         bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
@@ -320,10 +300,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = parse_time(value)
         return value
 
+    @staticmethod
+    def _create_decimal(value):
+        if isinstance(value, (int, str)):
+            return decimal.Decimal(value)
+        return decimal.Context(prec=15).create_decimal_from_float(value)
+
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        create_decimal = decimal.Context(prec=15).create_decimal_from_float
         if isinstance(expression, Col):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
@@ -331,7 +316,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value).quantize(
+                    return self._create_decimal(value).quantize(
                         quantize_value, context=expression.output_field.context
                     )
 
@@ -339,7 +324,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value)
+                    return self._create_decimal(value)
 
         return converter
 

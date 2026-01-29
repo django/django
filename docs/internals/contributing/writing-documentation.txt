@@ -420,6 +420,43 @@ documentation:
 * Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
   Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
+* When documenting Python objects (classes, methods, attributes, etc.) using
+  `Sphinx directives`__ such as ``.. class::``, ``.. method::``, and
+  ``.. attribute::``, all content must be properly indented to ensure correct
+  rendering and to support features like automatic table of contents
+  generation.
+
+  Follow these rules:
+
+  * The directive itself remains flush with the left margin (no indentation).
+  * All descriptive text under the directive must be indented by 4 spaces.
+  * Multi-line descriptions must keep the same indentation level.
+  * Nested directives (for example, methods inside a class) require an
+    additional 4 spaces of indentation to maintain hierarchy.
+  * Field lists (such as ``:param:``, ``:returns:``, etc.) must align with the
+    directive's content level.
+
+  Example:
+
+  .. code-block:: rst
+
+      .. class:: MyClass
+
+          A brief description of the class.
+
+          .. method:: my_method(arg1, arg2)
+
+              Method description.
+
+              :param arg1: Description of the first parameter
+              :param arg2: Description of the second parameter
+
+          .. attribute:: my_attribute
+
+              Attribute description.
+
+__ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+
 Django-specific markup
 ======================
 
@@ -483,7 +520,7 @@ define some extra description units:
 
 Django's documentation uses a custom ``console`` directive for documenting
 command-line examples involving ``django-admin``, ``manage.py``, ``python``,
-etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
+etc. In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
 For example, you can replace this fragment:
@@ -547,7 +584,7 @@ blank line and an optional description (indented).
 
 General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
-as the ``versionadded`` mentioned above.
+as the ``versionadded`` mentioned above).
 
 These ``versionadded`` and ``versionchanged`` blocks should be
 "self-contained." In other words, since we only keep these annotations around

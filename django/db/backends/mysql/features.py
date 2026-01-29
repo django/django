@@ -64,7 +64,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
-            return (10, 6)
+            return (10, 11)
         else:
             return (8, 4)
 
@@ -207,8 +207,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_index_column_ordering(self):
         if self._mysql_storage_engine != "InnoDB":
             return False
-        if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 8)
         return True
 
     @cached_property
@@ -220,8 +218,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def has_native_uuid_field(self):
-        is_mariadb = self.connection.mysql_is_mariadb
-        return is_mariadb and self.connection.mysql_version >= (10, 7)
+        return self.connection.mysql_is_mariadb
 
     @cached_property
     def allows_group_by_selected_pks(self):
@@ -232,3 +229,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_any_value(self):
         return not self.connection.mysql_is_mariadb
+
+    @cached_property
+    def supports_uuid4_function(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (11, 7)
+        return False
+
+    @cached_property
+    def supports_uuid7_function(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (11, 7)
+        return False

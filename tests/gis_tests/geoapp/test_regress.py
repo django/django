@@ -5,6 +5,7 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
+from ..utils import skipUnlessGISLookup
 from .models import City, PennsylvaniaCity, State, Truth
 
 
@@ -66,6 +67,7 @@ class GeoRegressionTests(TestCase):
             founded, PennsylvaniaCity.objects.aggregate(Min("founded"))["founded__min"]
         )
 
+    @skipUnlessGISLookup("contains")
     def test_empty_count(self):
         """
         Testing that PostGISAdapter.__eq__ does check empty strings. See

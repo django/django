@@ -1491,7 +1491,7 @@ class OperationTests(OperationTestBase):
                             "name_and_id",
                             models.GeneratedField(
                                 expression=Concat(("name"), ("rider_id")),
-                                output_field=models.TextField(),
+                                output_field=models.CharField(max_length=60),
                                 db_persist=True,
                             ),
                         ),
@@ -3336,11 +3336,11 @@ class OperationTests(OperationTestBase):
         # unique_together has the renamed column.
         self.assertIn(
             "blue",
-            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+            list(new_state.models["test_rnflut", "pony"].options["unique_together"])[0],
         )
         self.assertNotIn(
             "pink",
-            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+            list(new_state.models["test_rnflut", "pony"].options["unique_together"])[0],
         )
         # Rename field.
         self.assertColumnExists("test_rnflut_pony", "pink")
@@ -3377,7 +3377,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -3390,10 +3390,12 @@ class OperationTests(OperationTestBase):
         self.assertNotIn("pink", new_state.models["test_rnflit", "pony"].fields)
         # index_together has the renamed column.
         self.assertIn(
-            "blue", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+            "blue",
+            list(new_state.models["test_rnflit", "pony"].options["index_together"])[0],
         )
         self.assertNotIn(
-            "pink", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+            "pink",
+            list(new_state.models["test_rnflit", "pony"].options["index_together"])[0],
         )
 
         # Rename field.
@@ -3952,7 +3954,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -3972,6 +3974,11 @@ class OperationTests(OperationTestBase):
         )
         new_state = project_state.clone()
         operation.state_forwards(app_label, new_state)
+        # Ensure the model state has the correct type for the index_together
+        # option.
+        self.assertIsInstance(
+            new_state.models[app_label, "pony"].options["index_together"], set
+        )
         # Rename index.
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, new_state)
@@ -4079,7 +4086,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -6363,6 +6370,15 @@ class OperationTests(OperationTestBase):
             ("test_igfc_2", generated_1, regular),
             ("test_igfc_3", generated_1, generated_2),
         ]
+        if not connection.features.supports_alter_generated_column_data_type:
+            generated_3 = models.GeneratedField(
+                expression=F("pink") + F("pink"),
+                output_field=models.DecimalField(decimal_places=2, max_digits=16),
+                db_persist=db_persist,
+            )
+            tests.append(
+                ("test_igfc_4", generated_1, generated_3),
+            )
         for app_label, add_field, alter_field in tests:
             project_state = self.set_up_test_model(app_label)
             operations = [
@@ -6441,7 +6457,7 @@ class OperationTests(OperationTestBase):
                 "Pony",
                 "modified_pink",
                 models.GeneratedField(
-                    expression=F("pink"),
+                    expression=F("pink") + 2,
                     output_field=models.IntegerField(),
                     db_persist=True,
                 ),
@@ -6450,7 +6466,7 @@ class OperationTests(OperationTestBase):
                 "Pony",
                 "modified_pink",
                 models.GeneratedField(
-                    expression=F("pink"),
+                    expression=F("pink") + 2,
                     output_field=models.IntegerField(),
                     db_persist=False,
                 ),
@@ -6489,7 +6505,9 @@ class OperationTests(OperationTestBase):
             operation.database_backwards(app_label, editor, new_state, project_state)
         self.assertColumnNotExists(f"{app_label}_pony", "modified_pink")
 
-    @skipUnlessDBFeature("supports_stored_generated_columns")
+    @skipUnlessDBFeature(
+        "supports_stored_generated_columns", "supports_alter_generated_column_data_type"
+    )
     def test_generated_field_changes_output_field(self):
         app_label = "test_gfcof"
         operation = migrations.AddField(

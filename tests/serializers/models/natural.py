@@ -91,3 +91,31 @@ class PostToOptOutSubclassUser(models.Model):
     subscribers = models.ManyToManyField(
         SubclassNaturalKeyOptOutUser, related_name="subscribed_posts", blank=True
     )
+
+
+class NaturalKeyWithNullableFieldManager(models.Manager):
+    def get_by_natural_key(self, name, optional_id):
+        return self.get(name=name, optional_id=optional_id)
+
+
+class NaturalKeyWithNullableField(models.Model):
+    name = models.CharField(max_length=100)
+    optional_id = models.CharField(max_length=100, null=True, blank=True)
+
+    objects = NaturalKeyWithNullableFieldManager()
+
+    class Meta:
+        unique_together = [["name", "optional_id"]]
+
+    def natural_key(self):
+        return (self.name, self.optional_id)
+
+
+class FKToNaturalKeyWithNullable(models.Model):
+    ref = models.ForeignKey(
+        NaturalKeyWithNullableField, on_delete=models.CASCADE, null=True
+    )
+    refs = models.ManyToManyField(
+        NaturalKeyWithNullableField, related_name="m2m_referrers"
+    )
+    data = models.CharField(max_length=100, default="")

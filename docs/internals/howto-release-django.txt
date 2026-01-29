@@ -63,7 +63,7 @@ permissions.
 
 * A Unix environment with these tools installed (in alphabetical order):
 
-  * bash
+  * bash (version 4.0+)
   * git
   * GPG
   * make

@@ -95,6 +95,10 @@ Minor features
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
+* The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
+  preserve :ref:`named groups <field-choices-named-groups>` (e.g.
+  ``choices=[("Group", [("1", "Item")]), ...]``).
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,6 +138,9 @@ Minor features
 * :djadmin:`inspectdb` now introspects
   :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
   installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
+
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
+  supports the Hash index type.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,6 +244,10 @@ Management Commands
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
   suggestions for mistyped subcommand names and argument choices.
 
+* The :djadmin:`loaddata` command now calls
+  :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
+  loading fixtures.
+
 Migrations
 ~~~~~~~~~~
 
@@ -263,6 +274,16 @@ Models
   :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
   21c+.
 
+* The new :class:`~django.db.models.functions.UUID4` and
+  :class:`~django.db.models.functions.UUID7` database functions were added.
+
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
+
+* The :data:`~django.db.models.signals.m2m_changed` signal now receives a
+  ``raw`` argument.
+
 Pagination
 ~~~~~~~~~~
 
@@ -285,6 +306,10 @@ Serialization
   natural key serialization by overriding the method to return an empty tuple:
   ``()``. This ensures primary keys are serialized when using
   :option:`dumpdata --natural-primary`.
+
+* The XML deserializer now raises
+  :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
+  unexpected nested tags.
 
 Signals
 ~~~~~~~
@@ -314,7 +339,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
+  durations expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~
@@ -377,6 +403,12 @@ Dropped support for MySQL < 8.4
 Upstream support for MySQL 8.0 ends in April 2026, and MySQL 8.1-8.3 are
 short-term innovation releases. Django 6.1 supports MySQL 8.4 and higher.
 
+Dropped support for MariaDB < 10.11
+-----------------------------------
+
+Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
+short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
+
 Miscellaneous
 -------------
 
@@ -384,6 +416,11 @@ Miscellaneous
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
 
 .. _deprecated-features-6.1:
 

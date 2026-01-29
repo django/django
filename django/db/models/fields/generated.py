@@ -30,6 +30,7 @@ class GeneratedField(Field):
         self.expression = expression
         self.output_field = output_field
         self.db_persist = db_persist
+        self.has_null_arg = "null" in kwargs
         super().__init__(**kwargs)
 
     @cached_property
@@ -82,6 +83,7 @@ class GeneratedField(Field):
             *super().check(**kwargs),
             *self._check_supported(databases),
             *self._check_persistence(databases),
+            *self._check_ignored_options(databases),
         ]
         output_field_clone = self.output_field.clone()
         output_field_clone.model = self.model
@@ -187,6 +189,20 @@ class GeneratedField(Field):
                     )
                 )
         return errors
+
+    def _check_ignored_options(self, databases):
+        warnings = []
+
+        if self.has_null_arg:
+            warnings.append(
+                checks.Warning(
+                    "null has no effect on GeneratedField.",
+                    obj=self,
+                    id="fields.W225",
+                )
+            )
+
+        return warnings
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

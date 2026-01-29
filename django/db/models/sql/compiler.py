@@ -1629,9 +1629,12 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+            try:
+                cursor.close()
+            except DatabaseError:
+                raise e from None
             raise
 
         if result_type == ROW_COUNT:
@@ -1816,9 +1819,13 @@ class SQLInsertCompiler(SQLCompiler):
             for field in list(fields):
                 field_prepare = partial(self.prepare_value, field)
                 field_pre_save = partial(self.pre_save_val, field)
-                field_values = [
-                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
-                ]
+
+                field_values = []
+                for obj in self.query.objs:
+                    value = field_pre_save(obj)
+                    if not isinstance(value, DatabaseDefault):
+                        value = field_prepare(value)
+                    field_values.append(value)
 
                 if not field.has_db_default():
                     value_cols.append(field_values)

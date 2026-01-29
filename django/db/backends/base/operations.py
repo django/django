@@ -2,12 +2,14 @@ import datetime
 import decimal
 import json
 from importlib import import_module
+from itertools import chain
 
 import sqlparse
 
 from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.models.expressions import Col
+from django.db.models.fields.composite import CompositePrimaryKey
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
@@ -78,7 +80,17 @@ class BaseDatabaseOperations:
         are the fields going to be inserted in the batch, the objs contains
         all the objects to be inserted.
         """
-        return len(objs)
+        if self.connection.features.max_query_params is None or not fields:
+            return len(objs)
+
+        return self.connection.features.max_query_params // len(
+            list(
+                chain.from_iterable(
+                    field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                    for field in fields
+                )
+            )
+        )
 
     def format_for_duration_arithmetic(self, sql):
         raise NotImplementedError(

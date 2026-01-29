@@ -59,6 +59,11 @@ details on these changes.
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   will raise ``TypeError``.
 
+* The use of ``None`` when querying a :class:`~django.db.models.JSONField`
+  top-level value will compile to SQL ``IS NULL``. Use
+  :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
+  instead.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

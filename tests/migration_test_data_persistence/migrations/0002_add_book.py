@@ -1,4 +1,4 @@
-from django.db import migrations
+from django.db import migrations, models
 
 
 def add_book(apps, schema_editor):
@@ -15,5 +15,30 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             add_book,
+        ),
+        migrations.CreateModel(
+            name="Unmanaged",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+            ],
+            options={
+                "managed": False,
+            },
+        ),
+        migrations.AlterField(
+            model_name="book",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]

@@ -171,6 +171,24 @@ class AggregationTests(TestCase):
         for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
+    def test_count_preserve_group_by(self):
+        # new release of the same book
+        Book.objects.create(
+            isbn="113235613",
+            name=self.b4.name,
+            pages=self.b4.pages,
+            rating=4.0,
+            price=Decimal("39.69"),
+            contact=self.a5,
+            publisher=self.p3,
+            pubdate=datetime.date(2018, 11, 3),
+        )
+        qs = Book.objects.values("contact__name", "publisher__name").annotate(
+            publications=Count("id")
+        )
+        self.assertEqual(qs.order_by("id").count(), len(qs.order_by("id")))
+        self.assertEqual(qs.extra(order_by=["id"]).count(), len(qs.order_by("id")))
+
     def test_annotation_with_value(self):
         values = (
             Book.objects.filter(
@@ -831,7 +849,7 @@ class AggregationTests(TestCase):
             ],
         )
 
-    def test_more_more(self):
+    def test_order_by_group_by_join(self):
         # Regression for #10113 - Fields mentioned in order_by() must be
         # included in the GROUP BY. This only becomes a problem when the
         # order_by introduces a new join.
@@ -851,6 +869,7 @@ class AggregationTests(TestCase):
             lambda b: b.name,
         )
 
+    def test_annotate_select_related(self):
         # Regression for #10127 - Empty select_related() works with annotate
         qs = (
             Book.objects.filter(rating__lt=4.5)
@@ -879,6 +898,7 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authors__age__avg, b.publisher.name, b.contact.name),
         )
 
+    def test_values_extra_grouping(self):
         # Regression for #10132 - If the values() clause only mentioned extra
         # (select=) columns, those columns are used for grouping
         qs = (
@@ -913,6 +933,7 @@ class AggregationTests(TestCase):
             ],
         )
 
+    def test_aggregate_subquery_annotation(self):
         # Regression for #10182 - Queries with aggregate calls are correctly
         # realiased when used in a subquery
         ids = (
@@ -929,6 +950,7 @@ class AggregationTests(TestCase):
             lambda b: b.name,
         )
 
+    def test_group_by_field_uniqueness(self):
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
         qstr = str(
@@ -1028,7 +1050,7 @@ class AggregationTests(TestCase):
             query,
         )
 
-    def test_more_more_more(self):
+    def test_aggregate_cloning(self):
         # Regression for #10199 - Aggregate calls clone the original query so
         # the original query can still be used
         books = Book.objects.all()
@@ -1047,6 +1069,7 @@ class AggregationTests(TestCase):
             lambda b: b.name,
         )
 
+    def test_annotate_with_dates(self):
         # Regression for #10248 - Annotations work with dates()
         qs = (
             Book.objects.annotate(num_authors=Count("authors"))
@@ -1061,6 +1084,7 @@ class AggregationTests(TestCase):
             ],
         )
 
+    def test_extra_select_grouping_with_params(self):
         # Regression for #10290 - extra selects with parameters can be used for
         # grouping.
         qs = (
@@ -1073,6 +1097,7 @@ class AggregationTests(TestCase):
             qs, [150, 175, 224, 264, 473, 566], lambda b: int(b["sheets"])
         )
 
+    def test_annotate_and_count(self):
         # Regression for 10425 - annotations don't get in the way of a count()
         # clause
         self.assertEqual(
@@ -1082,6 +1107,7 @@ class AggregationTests(TestCase):
             Book.objects.annotate(Count("publisher")).values("publisher").count(), 6
         )
 
+    def test_annotate_ordering_by_annotation_and_filtering(self):
         # Note: intentionally no order_by(), that case needs tests, too.
         publishers = Publisher.objects.filter(id__in=[self.p1.id, self.p2.id])
         self.assertEqual(sorted(p.name for p in publishers), ["Apress", "Sams"])
@@ -1105,6 +1131,7 @@ class AggregationTests(TestCase):
         )
         self.assertEqual(sorted(p.name for p in publishers), ["Apress", "Sams"])
 
+    def test_inherited_fields_aggregation(self):
         # Regression for 10666 - inherited fields work with annotations and
         # aggregations
         self.assertEqual(
@@ -1157,6 +1184,7 @@ class AggregationTests(TestCase):
             ],
         )
 
+    def test_aggregate_referencing_aggregate(self):
         # Regression for #10766 - Shouldn't be able to reference an aggregate
         # fields in an aggregate() call.
         msg = "Cannot compute Avg('mean_age'): 'mean_age' is an aggregate"

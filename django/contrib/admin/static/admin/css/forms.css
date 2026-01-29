@@ -102,7 +102,7 @@ fieldset .inline-heading,
 }
 
 .aligned legend {
-    float: left;
+    float: inline-start;
 }
 
 .aligned legend,
@@ -148,13 +148,9 @@ form .aligned ul {
 }
 
 form .aligned div.radiolist {
-    display: inline-block;
+    display: block;
     margin: 0;
     padding: 0;
-}
-
-form .aligned fieldset div.help {
-    margin-left: 0;
 }
 
 form .aligned p.help,

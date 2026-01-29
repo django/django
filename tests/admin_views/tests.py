@@ -11,7 +11,7 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
-from django.contrib.admin.options import TO_FIELD_VAR
+from django.contrib.admin.options import SOURCE_MODEL_VAR, TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
@@ -467,6 +467,126 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         }
         response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
         self.assertContains(response, "title with a new\\nline")
+
+    def test_popup_add_POST_with_valid_source_model(self):
+        """
+        Popup add with a valid source_model returns a successful response.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 0)
+
+    def test_popup_add_POST_with_optgroups(self):
+        """
+        Popup add with source_model containing optgroup choices includes
+        the optgroup in the response.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(
+            reverse("admin11:admin_views_article_add"), post_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "&quot;optgroup&quot;: &quot;Published&quot;")
+
+    def test_popup_add_POST_without_optgroups(self):
+        """
+        Popup add where source_model form exists but doesn't have the field
+        should work without crashing.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Test Article 2",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        # Use regular admin (not admin11) where Section doesn't have optgroups.
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        self.assertNotContains(response, "&quot;optgroup&quot;")
+
+    def test_popup_add_POST_with_object_optgroups(self):
+        """
+        Popup add with source_model containing optgroups where the optgroup
+        keys are model instances (not strings) still serialize to strings.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Article 1",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(
+            reverse("admin12:admin_views_article_add"), post_data
+        )
+        self.assertEqual(response.status_code, 200)
+        # Check that optgroup is in the response with str() of Section instance
+        # The form uses Section.objects.all()[:2] which includes cls.s1
+        # ("Test section") as the first optgroup key (HTML encoded).
+        self.assertContains(response, "&quot;optgroup&quot;: &quot;Test section&quot;")
+
+    def test_popup_add_POST_with_dynamic_optgroups(self):
+        """
+        Popup add with source_model where optgroup field is added dynamically
+        in __init__. This ensures the implementation doesn't rely on accessing
+        the uninstantiated form class's _meta or fields, but instead properly
+        instantiates the form with get_form(request)() to access field info.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.section",
+            "title": "Item 1",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(
+            reverse("admin13:admin_views_article_add"), post_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "&quot;optgroup&quot;: &quot;Category A&quot;")
+
+    def test_popup_add_POST_with_invalid_source_model(self):
+        """
+        Popup add with an invalid source_model (non-existent app/model)
+        shows an error message instead of crashing.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            SOURCE_MODEL_VAR: "admin_views.nonexistent",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn("admin_views.nonexistent", str(messages[0]))
+        self.assertIn("could not be found", str(messages[0]))
 
     def test_basic_edit_POST(self):
         """
@@ -7084,6 +7204,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         show_all = self.selenium.find_element(By.CSS_SELECTOR, "a.showall")
         self.assertTrue(show_all.is_displayed())
         self.take_screenshot("pagination")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_changelist_filter_sidebar_with_long_verbose_fields(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        Person.objects.create(name="John", gender=1)
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_person_changelist")
+        )
+        changelist_filter = self.selenium.find_element(By.ID, "changelist-filter")
+        self.assertTrue(changelist_filter.is_displayed())
+        self.take_screenshot("filter_sidebar")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

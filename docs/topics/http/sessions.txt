@@ -448,7 +448,7 @@ serializing these values is often straightforward
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
-``datetime``\s).
+``datetime``\s.
 
 Your serializer class must implement two methods,
 ``dumps(self, obj)`` and ``loads(self, data)``, to serialize and deserialize

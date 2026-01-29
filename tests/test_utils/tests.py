@@ -4,6 +4,7 @@ import threading
 import traceback
 import unittest
 import warnings
+from functools import partial
 from io import StringIO
 from unittest import mock
 
@@ -709,20 +710,16 @@ class HTMLEqualTests(SimpleTestCase):
 
     def test_parse_html_in_script(self):
         parse_html('<script>var a = "<p" + ">";</script>')
-        parse_html(
-            """
+        parse_html("""
             <script>
             var js_sha_link='<p>***</p>';
             </script>
-        """
-        )
+        """)
 
         # script content will be parsed to text
-        dom = parse_html(
-            """
+        dom = parse_html("""
             <script><p>foo</p> '</scr'+'ipt>' <span>bar</span></script>
-        """
-        )
+        """)
         self.assertEqual(len(dom.children), 1)
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
@@ -1021,12 +1018,10 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertHTMLEqual("<p><foo></p>", "<p>&#60;foo&#62;</p>")
 
     def test_contains_html(self):
-        response = HttpResponse(
-            """<body>
+        response = HttpResponse("""<body>
         This is a form: <form method="get">
             <input type="text" name="Hello" />
-        </form></body>"""
-        )
+        </form></body>""")
 
         self.assertNotContains(response, "<input name='Hello' type='text'>")
         self.assertContains(response, '<form method="get">')
@@ -1223,9 +1218,7 @@ class XMLEqualTests(SimpleTestCase):
 - <elem attr1='a' />
 + <elem attr2='b' attr1='a' />
 ?      ++++++++++
-""".format(
-            xml1=repr(xml1), xml2=repr(xml2)
-        )
+""".format(xml1=repr(xml1), xml2=repr(xml2))
 
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertXMLEqual(xml1, xml2)
@@ -2139,6 +2132,33 @@ class CaptureOnCommitCallbacksTests(TestCase):
             log_record.getMessage(),
             "Error calling CaptureOnCommitCallbacksTests.test_execute_robust.<locals>."
             "hook in on_commit() (robust callback).",
+        )
+        self.assertIsNotNone(log_record.exc_info)
+        raised_exception = log_record.exc_info[1]
+        self.assertIsInstance(raised_exception, MyException)
+        self.assertEqual(str(raised_exception), "robust callback")
+
+    def test_execute_robust_with_callback_as_partial(self):
+        class MyException(Exception):
+            pass
+
+        def hook():
+            self.callback_called = True
+            raise MyException("robust callback")
+
+        hook_partial = partial(hook)
+
+        with self.assertLogs("django.test", "ERROR") as cm:
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                transaction.on_commit(hook_partial, robust=True)
+
+        self.assertEqual(len(callbacks), 1)
+        self.assertIs(self.callback_called, True)
+
+        log_record = cm.records[0]
+        self.assertEqual(
+            log_record.getMessage(),
+            f"Error calling {hook_partial} in on_commit() (robust callback).",
         )
         self.assertIsNotNone(log_record.exc_info)
         raised_exception = log_record.exc_info[1]
