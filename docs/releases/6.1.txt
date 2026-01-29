@@ -367,6 +367,12 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``object-tools`` block is hoisted out of the ``content`` block on
+  changelist pages.
+
 :mod:`django.contrib.gis`
 -------------------------
 
