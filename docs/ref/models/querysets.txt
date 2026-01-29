@@ -4170,6 +4170,19 @@ by the aggregate.
         A ``Value`` or expression representing the string that should separate
         each of the values. For example, ``Value(",")``.
 
+``JSONArrayAgg``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+.. class:: JSONArrayAgg(expression, output_field=None, filter=None, order_by=None, default=None, **extra)
+
+    Converts each expression to a JSON value and returns a single JSON array
+    containing those JSON values.
+
+    * Return type: ``list`` containing an element for each value
+      in a set of JSON or SQL values.
+
 Query-related tools
 ===================
 

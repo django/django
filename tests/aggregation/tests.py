@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 from decimal import Decimal
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -19,6 +20,7 @@ from django.db.models import (
     F,
     FloatField,
     IntegerField,
+    JSONArrayAgg,
     Max,
     Min,
     OuterRef,
@@ -2729,3 +2731,151 @@ class AggregateAnnotationPruningTests(TestCase):
             )
         )
         self.assertEqual(qs.count(), 3)
+
+
+@skipUnlessDBFeature("supports_json_field")
+class JSONArrayAggTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(name="Adrian Holovaty", age=34, rating=1.5)
+        cls.a2 = Author.objects.create(name="Jacob Kaplan-Moss", age=45)
+        cls.a3 = Author.objects.create(name="Brad Dayley", age=40)
+        cls.p1 = Publisher.objects.create(num_awards=3)
+        cls.p2 = Publisher.objects.create(num_awards=1)
+        cls.p3 = Publisher.objects.create(num_awards=7)
+        cls.b1 = Book.objects.create(
+            isbn="159059725",
+            name="b1",
+            pages=447,
+            rating=4.5,
+            price=Decimal("30.00"),
+            contact=cls.a1,
+            publisher=cls.p1,
+            pubdate=datetime.date(2007, 12, 6),
+        )
+        cls.b1.authors.add(cls.a1)
+        cls.b2 = Book.objects.create(
+            isbn="067232959",
+            name="b2",
+            pages=528,
+            rating=3.0,
+            price=Decimal("23.09"),
+            contact=cls.a2,
+            publisher=cls.p2,
+            pubdate=datetime.date(2008, 3, 3),
+        )
+        cls.b2.authors.add(cls.a2)
+        cls.b3 = Book.objects.create(
+            isbn="159059996",
+            name="Practical Django Projects",
+            pages=300,
+            rating=4.0,
+            price=Decimal("29.69"),
+            contact=cls.a3,
+            publisher=cls.p3,
+            pubdate=datetime.date(2008, 6, 23),
+        )
+        cls.b3.authors.add(cls.a3)
+
+    def test_text(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
+        self.assertEqual(
+            vals,
+            {"jsonarrayagg": ["Adrian Holovaty", "Jacob Kaplan-Moss", "Brad Dayley"]},
+        )
+
+    def test_datefield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pubdate"))
+        self.assertEqual(
+            vals,
+            {"jsonarrayagg": ["2007-12-06", "2008-03-03", "2008-06-23"]},
+        )
+
+    def test_decimalfield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__price"))
+        self.assertEqual(vals, {"jsonarrayagg": [30.0, 23.09, 29.69]})
+
+    def test_integerfield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pages"))
+        self.assertEqual(vals, {"jsonarrayagg": [447, 528, 300]})
+
+    def test_null_on_null(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("rating"))
+        self.assertEqual(vals, {"jsonarrayagg": [1.5, None, None]})
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null(self):
+        vals = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("rating", absent_on_null=True)
+        )
+        self.assertEqual(vals, {"jsonarrayagg": [1.5]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_filter(self):
+        vals = Book.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("contact__age", filter=Q(contact__age__gt=35))
+        )
+        self.assertEqual(vals, {"jsonarrayagg": [45, 40]})
+
+    def test_empty_result_set(self):
+        Author.objects.all().delete()
+        val = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("age"))
+        self.assertEqual(val, {"jsonarrayagg": None})
+
+    def test_default_set(self):
+        Author.objects.all().delete()
+        val = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("name", default=["<empty>"])
+        )
+        self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
+
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_order_by(self):
+        for order_by, expected_result in (
+            (
+                "book__publisher__num_awards",
+                {"authors": ["Jacob Kaplan-Moss", "Adrian Holovaty", "Brad Dayley"]},
+            ),
+            (
+                "-book__publisher__num_awards",
+                {"authors": ["Brad Dayley", "Adrian Holovaty", "Jacob Kaplan-Moss"]},
+            ),
+        ):
+            with self.subTest(order_by=order_by):
+                val = Author.objects.aggregate(
+                    authors=JSONArrayAgg("name", order_by=order_by)
+                )
+                self.assertEqual(val, expected_result)
+
+    @skipUnless(connection.vendor == "mysql", "JSONArrayAgg not supported.")
+    def test_order_by_not_supported(self):
+        msg = "JSONArrayAgg(order_by) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(arrayagg=JSONArrayAgg("age", order_by="-name"))
+
+    @skipIfDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null_not_supported(self):
+        msg = "JSONArrayAgg(absent_on_null) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(
+                arrayagg=JSONArrayAgg("rating", absent_on_null=True)
+            )
+
+    def test_distinct_true(self):
+        msg = "JSONArrayAgg does not allow distinct."
+        with self.assertRaisesMessage(TypeError, msg):
+            JSONArrayAgg("age", distinct=True)
+
+    @skipIfDBFeature("supports_aggregate_filter_clause")
+    def test_not_supported(self):
+        msg = "JSONArrayAgg(filter) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(arrayagg=JSONArrayAgg("age", filter=Q(age__gt=35)))
+
+
+@skipIfDBFeature("supports_json_field")
+class JSONArrayAggNotSupportedTests(TestCase):
+    def test_not_supported(self):
+        msg = "JSONFields are not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
