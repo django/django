@@ -4,6 +4,7 @@ accessors
 Aceh
 admindocs
 affordances
+ai
 Ai
 Alchin
 allowlist
@@ -245,6 +246,8 @@ kwargs
 Kyrgyz
 latin
 lawrence
+lexeme
+lexemes
 Libera
 lifecycle
 lifecycles
@@ -531,6 +534,7 @@ unapplied
 unapplying
 uncategorized
 unclaim
+unclosed
 uncopyable
 unencoded
 unencrypted
