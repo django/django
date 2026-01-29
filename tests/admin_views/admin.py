@@ -319,9 +319,13 @@ class CustomArticleAdmin(admin.ModelAdmin):
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={"extra_var": "Hello!"})
 
-
-class ThingAdmin(admin.ModelAdmin):
-    list_filter = ("color", "color__warm", "color__value", "pub_date")
+    list_filter = (
+        "color",
+        "color__warm",
+        "color__value",
+        "pub_date",
+        "very_long_filter_field",
+    )
 
 
 class InquisitionAdmin(admin.ModelAdmin):
@@ -1182,6 +1186,16 @@ class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
 
 class CountryAdmin(admin.ModelAdmin):
     search_fields = ["name"]
+
+
+class ThingAdmin(admin.ModelAdmin):
+    list_filter = (
+        "color",
+        "color__warm",
+        "color__value",
+        "pub_date",
+        "very_long_filter_field",
+    )
 
 
 class TravelerAdmin(admin.ModelAdmin):

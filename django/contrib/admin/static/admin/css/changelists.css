@@ -230,8 +230,11 @@
 #changelist-filter a {
     display: block;
     color: var(--body-quiet-color);
+    overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+
 
 #changelist-filter li.selected {
     border-left: 5px solid var(--hairline-color);
@@ -254,6 +257,10 @@
     margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
+#changelist-filter li {
+    overflow-wrap: anywhere;
+}
+
 
 /* DATE DRILLDOWN */
 

@@ -164,6 +164,12 @@ class Thing(models.Model):
     color = models.ForeignKey(Color, models.CASCADE, limit_choices_to={"warm": True})
     pub_date = models.DateField(blank=True, null=True)
 
+    very_long_filter_field = models.BooleanField(
+        "This is an extremely long verbose name for an admin filter sidebar "
+        "that should wrap instead of breaking the layout",
+        default=False,
+    )
+
     def __str__(self):
         return self.title
 
