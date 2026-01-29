@@ -1,7 +1,7 @@
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import CharField, IntegerField, TextField
-from django.db.models.functions import Cast, Coalesce
+from django.db.models.functions import Cast
 from django.db.models.lookups import Transform
 
 
@@ -110,15 +110,20 @@ class ConcatPair(Func):
         )
 
     def coalesce(self):
-        # null on either side results in null for expression, wrap with
-        # coalesce
+        # Move imports here to avoid circular dependencies
+        from django.db.models import Value
+        from django.db.models.functions import Coalesce
+
         c = self.copy()
-        c.set_source_expressions(
-            [
-                Coalesce(expression, Value(""))
-                for expression in c.get_source_expressions()
-            ]
-        )
+        new_source_expressions = []
+        for expression in c.get_source_expressions():
+            # The optimization logic
+            if isinstance(expression, Value) and expression.value is not None:
+                new_source_expressions.append(expression)
+            else:
+                new_source_expressions.append(Coalesce(expression, Value("")))
+
+        c.set_source_expressions(new_source_expressions)
         return c
 
 
