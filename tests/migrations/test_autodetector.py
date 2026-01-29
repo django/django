@@ -716,7 +716,10 @@ class AutodetectorTests(BaseAutodetectorTests):
         "testapp", "AuthorUnmanaged", [], {}, ("testapp.author",)
     )
     author_unmanaged_default_pk = ModelState(
-        "testapp", "Author", [("id", models.AutoField(primary_key=True))]
+        "testapp",
+        "Author",
+        [("id", models.AutoField(primary_key=True))],
+        {"managed": False},
     )
     author_unmanaged_custom_pk = ModelState(
         "testapp",
@@ -724,6 +727,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         [
             ("pk_field", models.IntegerField(primary_key=True)),
         ],
+        {"managed": False},
     )
     author_with_m2m = ModelState(
         "testapp",
@@ -1077,6 +1081,34 @@ class AutodetectorTests(BaseAutodetectorTests):
         {
             "unique_together": {("title", "newfield2")},
         },
+    )
+    book_unmanaged_with_fk = ModelState(
+        "otherapp",
+        "BookUnmanaged",
+        [
+            ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+            ("name", models.CharField(max_length=200)),
+            ("published", models.PositiveSmallIntegerField()),
+        ],
+        {"managed": False},
+    )
+    book_unmanaged_without_fk = ModelState(
+        "otherapp",
+        "BookUnmanaged",
+        [
+            ("name", models.CharField(max_length=200)),
+        ],
+        {"managed": False},
+    )
+    book_unmanaged_rename_fk = ModelState(
+        "otherapp",
+        "BookUnmanaged",
+        [
+            ("author_old", models.ForeignKey("testapp.Author", models.CASCADE)),
+            ("name_old", models.CharField(max_length=200)),
+            ("published", models.PositiveSmallIntegerField()),
+        ],
+        {"managed": False},
     )
     attribution = ModelState(
         "otherapp",
@@ -4080,6 +4112,65 @@ class AutodetectorTests(BaseAutodetectorTests):
         # The model the FK on the book model points to.
         fk_field = changes["otherapp"][0].operations[0].fields[2][1]
         self.assertEqual(fk_field.remote_field.model, "testapp.Author")
+
+    def test_unmanaged_with_fk(self):
+        """
+        #29177 - The autodetector must correctly deal with FK of unmanaged
+                 on managed models - add FK to unmanaged model
+                                     fields(and other fields also)
+        """
+
+        changes = self.get_changes([], [self.author_empty, self.book_unmanaged_with_fk])
+        fk_field = changes["otherapp"][0].operations[0].fields[2][1]
+        name_field = changes["otherapp"][0].operations[0].fields[0]
+        published_field = changes["otherapp"][0].operations[0].fields[1]
+        self.assertEqual(fk_field.remote_field.model, "testapp.Author")
+        self.assertEqual(name_field[0], "name")
+        self.assertEqual(name_field[1].get_internal_type(), "CharField")
+        self.assertEqual(published_field[0], "published")
+        self.assertEqual(
+            published_field[1].get_internal_type(), "PositiveSmallIntegerField"
+        )
+
+    def test_unmanaged_removing_fk(self):
+        """
+        #29177 - The autodetector must correctly deal with FK of unmanaged
+                 on managed models - remove FK from unmanaged model
+                                     fields(and other fields also)
+        """
+        changes = self.get_changes(
+            [self.author_empty, self.book_unmanaged_with_fk],
+            [self.author_empty, self.book_unmanaged_without_fk],
+        )
+        remove_fk = changes["otherapp"][0].operations[0]
+        remove_published = changes["otherapp"][0].operations[1]
+        self.assertEqual(remove_fk.name, "author")
+        self.assertTrue("REMOVAL" in remove_fk.category.__str__())
+        self.assertEqual(remove_published.name, "published")
+        self.assertTrue("REMOVAL" in remove_published.category.__str__())
+
+    def test_unmanaged_rename_fk(self):
+        """
+        #29177 - The autodetector must correctly deal with FK of unmanaged
+                 on managed models - rename FK(and other field also)
+        """
+
+        changes = self.get_changes(
+            [self.author_empty, self.book_unmanaged_with_fk],
+            [self.author_empty, self.book_unmanaged_rename_fk],
+        )
+        remove_author_fk = changes["otherapp"][0].operations[0]
+        remove_name = changes["otherapp"][0].operations[1]
+        add_author_old_fk = changes["otherapp"][0].operations[2]
+        add_name_old = changes["otherapp"][0].operations[3]
+        self.assertEqual(remove_author_fk.name, "author")
+        self.assertTrue("REMOVAL" in remove_author_fk.category.__str__())
+        self.assertEqual(remove_name.name, "name")
+        self.assertTrue("REMOVAL" in remove_name.category.__str__())
+        self.assertEqual(add_author_old_fk.name, "author_old")
+        self.assertTrue("ADDITION" in add_author_old_fk.category.__str__())
+        self.assertEqual(add_name_old.name, "name_old")
+        self.assertTrue("ADDITION" in add_name_old.category.__str__())
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
