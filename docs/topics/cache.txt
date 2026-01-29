@@ -662,6 +662,14 @@ Cache keys also include the :ref:`current time zone
 
 __ `Controlling cache: Using other headers`_
 
+.. warning::
+
+    If you use the per-site cache on a site that sets cookies (for example,
+    if you use sessions or CSRF protection), the cache key will include 
+    the user's session cookie. This can cause your cache to grow very large 
+    on busy sites, as a separate version of the page is stored for every 
+    unique visitor cookie.
+
 The per-view cache
 ==================
 
