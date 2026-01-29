@@ -856,6 +856,76 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_exact_lookup_with_valid_value(self):
+        """Exact lookups use native field type when to_python succeeds."""
+        child = Child.objects.create(name="Test", age=10)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["pk__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: str(child.pk)})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
+    def test_exact_lookup_skips_invalid_value(self):
+        """Exact lookups are skipped when to_python fails."""
+        Child.objects.create(name="Test", age=10)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["pk__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "foo"})
+        request.user = self.superuser
+
+        # Should not crash and should return empty results.
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_exact_lookup_mixed_terms(self):
+        """
+        Multi-term search validates each term independently.
+
+        For 'foo 123' with search_fields=['name__icontains', 'age__exact']:
+        - 'foo': age lookup skipped (invalid), name lookup used
+        - '123': both lookups used (valid for age)
+        No Cast should be used; invalid lookups are simply skipped.
+        """
+        child = Child.objects.create(name="foo123", age=123)
+        Child.objects.create(name="other", age=456)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["name__icontains", "age__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "foo 123"})
+        request.user = self.superuser
+
+        # One result matching on foo and 123.
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
+        # "xyz" - invalid for age (skipped), no match for name either.
+        request = self.factory.get("/", data={SEARCH_VAR: "xyz"})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_exact_lookup_with_boolean_field(self):
+        """
+        Exact lookups on BooleanField use formfield().to_python() for lenient
+        parsing. Using model field's to_python() would reject 'false' whereas
+        the form field accepts it.
+        """
+        obj = UnorderedObject.objects.create(bool=False)
+        UnorderedObject.objects.create(bool=True)
+        m = admin.ModelAdmin(UnorderedObject, custom_site)
+        m.search_fields = ["bool__exact"]
+
+        # 'false' is accepted by form field but rejected by model field.
+        request = self.factory.get("/", data={SEARCH_VAR: "false"})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [obj])
+
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
         model_admin = ChildAdmin(Child, custom_site)
