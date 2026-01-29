@@ -178,8 +178,9 @@ Spelling check
 ~~~~~~~~~~~~~~
 
 Before you commit your docs, it's a good idea to run the spelling checker.
-You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
-``docs`` directory, run:
+You'll need to install :pypi:`sphinxcontrib-spelling` first. The spell checker
+also requires a system-level spell checking backend such as `Aspell
+<http://aspell.net/>`__. Then from the ``docs`` directory, run:
 
 .. console::
 
