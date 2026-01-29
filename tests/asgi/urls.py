@@ -82,6 +82,9 @@ class QueueIterator:
             raise StopAsyncIteration
         return msg
 
+    async def aclose(self):
+        pass
+
 
 @contextlib.asynccontextmanager
 async def streaming_acmgr_inner(sleep_time):

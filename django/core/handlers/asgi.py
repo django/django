@@ -312,7 +312,10 @@ class ASGIHandler(base.BaseHandler):
         # Streaming responses with TaskGroup/Timeout need to be pinned to their
         # iterator.
         if response.streaming_acmgr:
-            async with response.streaming_acmgr_content as content:
+            async with (
+                response.streaming_acmgr_content as content_gen,
+                aclosing(content_gen) as content,
+            ):
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
                         await send(
