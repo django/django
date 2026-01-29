@@ -1,7 +1,7 @@
 import json
 
 from django.conf import settings
-from django.contrib.admin.utils import quote
+from django.contrib.admin.utils import label_for_field, quote
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import NoReverseMatch, reverse
@@ -9,6 +9,9 @@ from django.utils import timezone
 from django.utils.text import get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import capfirst
+from django.core.exceptions import FieldDoesNotExist
+from django.contrib.admin.utils import label_for_field
 
 ADDITION = 1
 CHANGE = 2
@@ -114,7 +117,8 @@ class LogEntry(models.Model):
 
     def is_deletion(self):
         return self.action_flag == DELETION
-
+    
+    
     def get_change_message(self):
         """
         If self.change_message is a JSON structure, interpret it as a change
@@ -141,13 +145,31 @@ class LogEntry(models.Model):
                         messages.append(gettext("Added."))
 
                 elif "changed" in sub_message:
+                    
+                    if "name" in sub_message["changed"]:
+                        from django.contrib.contenttypes.models import ContentType
+
+                        ct = ContentType.objects.get(model=sub_message["changed"]["name"])
+                        model = ct.model_class()
+                    else:
+                        model = self.content_type.model_class()
+
+                    field_labels = []
+
+                    for field_name in sub_message["changed"]["fields"]:
+                        try:
+                            field = model._meta.get_field(field_name)
+                            label = capfirst(gettext(field.verbose_name))
+                        except FieldDoesNotExist:
+                            label = field_name
+
+                        field_labels.append(label)
+
                     sub_message["changed"]["fields"] = get_text_list(
-                        [
-                            gettext(field_name)
-                            for field_name in sub_message["changed"]["fields"]
-                        ],
-                        gettext("and"),
+                        field_labels, gettext("and")
                     )
+
+
                     if "name" in sub_message["changed"]:
                         sub_message["changed"]["name"] = gettext(
                             sub_message["changed"]["name"]
@@ -174,8 +196,8 @@ class LogEntry(models.Model):
                         )
                     )
 
-            change_message = " ".join(msg[0].upper() + msg[1:] for msg in messages)
-            return change_message or gettext("No fields changed.")
+            return " ".join(messages) or gettext("No fields changed.")
+
         else:
             return self.change_message
 
@@ -197,3 +219,5 @@ class LogEntry(models.Model):
             except NoReverseMatch:
                 pass
         return None
+    
+
