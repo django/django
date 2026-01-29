@@ -221,7 +221,7 @@
     window.showAddAnotherPopup = showRelatedObjectPopup;
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', function(evt) {
         if (document.visibilityState === 'hidden') {
             window.dismissChildPopups();
         }
