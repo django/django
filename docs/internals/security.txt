@@ -46,8 +46,8 @@ the industry-standard 90 days. Confirmed vulnerabilities with a
 Reporting guidelines
 --------------------
 
-Include a runnable proof of concept
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Include a working proof of concept
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please privately share a minimal Django project or code snippet that
 demonstrates the potential vulnerability. Include clear instructions on how to
