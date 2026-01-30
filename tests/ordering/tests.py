@@ -707,3 +707,9 @@ class TotallyOrderedTests(TestCase):
         self.assertIs(
             OrderingConstraint.objects.order_by("barcode").totally_ordered, True
         )
+
+    def test_group_by_queries(self):
+        self.assertIs(
+            Author.objects.values("name").annotate(count=Count("id")).totally_ordered,
+            False,
+        )
