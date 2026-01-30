@@ -511,9 +511,9 @@ Code review process
 The general process to reviewing a patch for Django is as follows:
 
 1. Pick a patch to review. This can be from the `review queue`_ or the
-   `Pull Requests in GitHub with the no ticket label`_. If you're new, pick a
-   specific component to stick with. Django is a big codebase, so it's best to
-   contribute consistently with a narrow focus and grow it slowly.
+   `Pull Requests in GitHub with the "no ticket" label`_. If you're new, pick
+   a specific component to stick with. Django is a big codebase, so it's best
+   to contribute consistently with a narrow focus and grow it slowly.
 
 2. Pull the branch. See the :ref:`handling-pull-requests`, including the git
    alias to make checking out other pull requests easier.
