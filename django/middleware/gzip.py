@@ -37,7 +37,7 @@ class GZipMiddleware(MiddlewareMixin):
 
             @contextlib.asynccontextmanager
             async def gzip_acmgr_wrapper():
-                async with original_iterator as v:
+                async with original_iterator as v, contextlib.aclosing(v):
 
                     async def agen():
                         async for chunk in v:
