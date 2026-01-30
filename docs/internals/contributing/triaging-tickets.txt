@@ -537,12 +537,11 @@ The general process to reviewing a patch for Django is as follows:
 6. Are you happy with the patch? This is fairly subjective, but that's fine.
    You should ask, does the approach make sense to you and is there another
    way to do it that's better? Also ask yourself, is the scope of the change
-   appropriate? Does the change :ref:`adhere to the guidelines for
-   contributing <patch-style>`? Are things named appropriately? Renaming
-   things is slow and challenging in Django, so we should try to get it
-   right from the start. Are there backwards compatibility concerns? Lastly,
-   are there any other general concerns such as things that may worry you or
-   that should be looked into?
+   appropriate? Are things named appropriately? Renaming things is slow and
+   challenging in Django, so we should try to get it right from the start.
+   Are there backwards compatibility concerns? Lastly, are there any other
+   general concerns such as things that may worry you or that should be looked
+   into?
 
 7. Submit feedback on GitHub and update flags, "patch needs improvement",
    "needs tests", and "needs documentation", as needed. This will move the
