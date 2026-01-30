@@ -501,9 +501,9 @@ Django tends to receive more patches than it can review which causes the
 reviewing patches.
 
 The `review queue`_ is defined by tickets in Trac_ that are in the "Accepted"
-state with the flag Has patch set and the flags "patch needs improvement",
+state with the flag "has patch" set and the flags "patch needs improvement",
 "needs tests" and "needs documentation" unset. There is also a set of
-`Pull Requests in GitHub with the no ticket label`_ that can be reviewed.
+`Pull Requests in GitHub with the "no ticket" label`_ that can be reviewed.
 
 Code review process
 -------------------
@@ -520,11 +520,14 @@ The general process to reviewing a patch for Django is as follows:
 
 3. Check the tests. If the ticket is for a bug, there should be a regression
    test. Confirm that the test fails if the change is reverted. Check that the
-   tests are adequately covering the code and logic as well.
+   tests are adequately covering the code and logic as well. See
+   :ref:`patch-review-checklist`.
 
 4. Test in your own Django project. See :ref:`installing-development-version`
    for how. Explore the user interface and user experience with the change.
-   Does it feel right? Can you break it?
+   Does it feel right? Can you break it? Another approach is to assume
+   everything is wrong. Can you demonstrate to yourself that each piece is
+   correct?
 
 5. Check the documentation. Is the documentation understandable? Does it
    provide the information the reader needs at that moment? Does it read well?
@@ -537,41 +540,43 @@ The general process to reviewing a patch for Django is as follows:
    appropriate? Does the change :ref:`adhere to the guidelines for
    contributing <patch-style>`? Are things named appropriately? Renaming
    things is slow and challenging in Django, so we should try to get it
-   right from the start. Lastly, are there any other general concerns such
-   as things that may worry you or that should be looked into?
+   right from the start. Are there backwards compatibility concerns? Lastly,
+   are there any other general concerns such as things that may worry you or
+   that should be looked into?
 
 7. Submit feedback on GitHub and update flags, "patch needs improvement",
-   "needs tests", and "needs documentation", as needed. If you have given a
+   "needs tests", and "needs documentation", as needed. This will move the
+   ticket to the `"waiting for author" queue`_. If you have given a
    specific type of code review, please indicate that on the Pull Request.
 
 Types of code reviews
 ---------------------
 
-Not everyone is or should give the same type of code review. Having a diverse
+Not everyone will or should give the same type of code review. Having a diverse
 set of opinions and experiences helps Django be better. If you are providing a
-specific review, please indicate that on the Pull Request in GitHub.
+specific review, please indicate that on the Pull Request in GitHub. Below
+are some of the types of code review you can perform:
 
 * Accessibility review. Does it conform to our :ref:`accessibility-standards`?
 
 * :ref:`Patch style <patch-style>` and contribution process review.
 
-  * Check that types are used.
-
-  * Check tests coverage.
-
-  * Check documentation coverage.
-
 * Usability and developer experience review.
 
   * Use the change and provide feedback from that experience.
 
-  * Are the APIs and documentation accessible and well explained.
+  * Are the APIs and documentation accessible and well explained?
 
 * Domain expertise review. Do you have a personal expertise that is relevant
-  such as databases, HTTP, security, etc.
+  such as databases, HTTP, security, etc?
 
 * Benchmarking and performance review. There are benchmarking tests, but
   sometimes changes require additional testing.
 
+  * Utilize :ref:`django-asv-benchmarks` to check performance over time.
+
+  * Run benchmark tests by labeling the pull request with "benchmark".
+
 .. _review queue: https://code.djangoproject.com/query?has_patch=1&needs_better_patch=0&needs_docs=0&needs_tests=0&stage=Accepted&status=!closed&order=changetime&desc=1
-.. _Pull Requests in GitHub with the no ticket label: https://github.com/django/django/pulls?q=is%3Aopen+is%3Apr+label%3A%22no+ticket%22
+.. _Pull Requests in GitHub with the "no ticket" label: https://github.com/django/django/pulls?q=is%3Aopen+is%3Apr+label%3A%22no+ticket%22
+.. _"waiting for author" queue: https://code.djangoproject.com/query?has_patch=1&needs_better_patch=1&stage=Accepted&status=assigned&status=new&or&has_patch=1&needs_docs=1&stage=Accepted&status=assigned&status=new&or&has_patch=1&needs_tests=1&stage=Accepted&status=assigned&status=new&order=changetime&desc=1
