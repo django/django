@@ -330,9 +330,9 @@ interested in the exact number of entries, you could do this:
     >>> blogs = Blog.objects.alias(entries=Count("entry")).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
-:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
-with other methods (e.g. :meth:`aggregate`), you must promote it to an
-annotation::
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use an aliased
+expression with other methods (e.g. :meth:`aggregate`), you must promote it to
+an annotation::
 
     Blog.objects.alias(entries=Count("entry")).annotate(
         entries=F("entries"),
@@ -341,9 +341,9 @@ annotation::
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
 example, ``QuerySet`` method creates expressions, for later use in views).
-``alias()`` allows building complex expressions incrementally, possibly
-spanning multiple methods and modules, refer to the expression parts by their
-aliases and only use :meth:`annotate` for the final result.
+``alias()`` allows building complex expressions incrementally (possibly
+spanning multiple methods and modules), referring to the expression parts by
+their aliases, and only using :meth:`annotate` for the final result.
 
 ``order_by()``
 ~~~~~~~~~~~~~~
