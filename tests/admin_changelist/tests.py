@@ -856,6 +856,18 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_exact_lookup_with_invalid_value(self):
+        Child.objects.create(name="Test", age=10)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["pk__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "foo"})
+        request.user = self.superuser
+
+        # Invalid values are gracefully ignored.
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
         model_admin = ChildAdmin(Child, custom_site)
