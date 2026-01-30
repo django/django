@@ -148,16 +148,22 @@ The 400 (bad request) view
 
 .. function:: defaults.bad_request(request, exception, template_name='400.html')
 
+Similarly, Django has a view to handle 400 Bad Request errors.
+
+This view either produces a "Bad Request" message or loads and renders the
+template ``400.html`` if you created it in your root template directory.
+It returns with status code 400 indicating that the error condition was the
+result of a client operation.
+By default, nothing related to the exception that triggered the view is passed
+to the template context, as the exception message might contain sensitive
+information like filesystem paths.
+
+``django.views.defaults.bad_request`` is triggered by a
+:exc:`~django.core.exceptions.BadRequest` exception.
+
 When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
 it may be handled by a component of Django (for example resetting the session
 data). If not specifically handled, Django will consider the current request a
 'bad request' instead of a server error.
-
-``django.views.defaults.bad_request``, is otherwise very similar to the
-``server_error`` view, but returns with the status code 400 indicating that
-the error condition was the result of a client operation. By default, nothing
-related to the exception that triggered the view is passed to the template
-context, as the exception message might contain sensitive information like
-filesystem paths.
 
 ``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.
