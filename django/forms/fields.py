@@ -13,7 +13,6 @@ import uuid
 import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
-from urllib.parse import urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core import validators
@@ -797,33 +796,24 @@ class URLField(CharField):
         super().__init__(strip=True, **kwargs)
 
     def to_python(self, value):
-        def split_url(url):
-            """
-            Return a list of url parts via urlsplit(), or raise
-            ValidationError for some malformed URLs.
-            """
-            try:
-                return list(urlsplit(url))
-            except ValueError:
-                # urlsplit can raise a ValueError with some
-                # misformatted URLs.
-                raise ValidationError(self.error_messages["invalid"], code="invalid")
-
         value = super().to_python(value)
         if value:
-            url_fields = split_url(value)
-            if not url_fields[0]:
-                # If no URL scheme given, add a scheme.
-                url_fields[0] = self.assume_scheme
-            if not url_fields[1]:
-                # Assume that if no domain is provided, that the path segment
-                # contains the domain.
-                url_fields[1] = url_fields[2]
-                url_fields[2] = ""
-                # Rebuild the url_fields list, since the domain segment may now
-                # contain the path too.
-                url_fields = split_url(urlunsplit(url_fields))
-            value = urlunsplit(url_fields)
+            # Detect scheme via partition to avoid calling urlsplit() on
+            # potentially large or slow-to-normalize inputs.
+            scheme, sep, _ = value.partition(":")
+            if (
+                not sep
+                or not scheme
+                or not scheme[0].isascii()
+                or not scheme[0].isalpha()
+                or "/" in scheme
+            ):
+                # No valid scheme found -- prepend the assumed scheme. Handle
+                # scheme-relative URLs ("//example.com") separately.
+                if value.startswith("//"):
+                    value = self.assume_scheme + ":" + value
+                else:
+                    value = self.assume_scheme + "://" + value
         return value
 
 
