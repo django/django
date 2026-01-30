@@ -1,6 +1,5 @@
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 
 def _make_csp_decorator(config_attr_name, config_attr_value):

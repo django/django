@@ -1,7 +1,6 @@
 from functools import partial
+from inspect import iscoroutinefunction, markcoroutinefunction
 from urllib.parse import urlsplit
-
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 from django.conf import settings
 from django.contrib import auth
