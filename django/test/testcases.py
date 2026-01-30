@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from inspect import iscoroutinefunction
 from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
@@ -25,7 +26,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings

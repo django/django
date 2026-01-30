@@ -3,8 +3,9 @@ import inspect
 import os
 import warnings
 from collections import Counter
+from inspect import iscoroutinefunction, markcoroutinefunction
 
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
 import django
 

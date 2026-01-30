@@ -1,6 +1,5 @@
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.utils.cache import patch_vary_headers
 
