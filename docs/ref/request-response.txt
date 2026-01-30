@@ -220,6 +220,8 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.multipart_parser_class
 
+    .. versionadded:: 6.1
+
     The class used to parse ``multipart/form-data`` request data. By default,
     this is ``django.http.multipartparser.MultiPartParser``.
 
@@ -239,8 +241,6 @@ All attributes should be considered read-only, unless stated otherwise.
 
         # In middleware or view:
         request.multipart_parser_class = CustomMultiPartParser
-
-    .. versionadded:: 6.1
 
 Attributes set by application code
 ----------------------------------
