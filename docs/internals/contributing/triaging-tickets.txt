@@ -543,7 +543,15 @@ The general process to reviewing a patch for Django is as follows:
    general concerns such as things that may worry you or that should be looked
    into?
 
-7. Submit feedback on GitHub and update flags, "patch needs improvement",
+7. Review your feedback. Before you submit your feedback, consider the
+   feedback you want to share. It takes courage to open a Pull Request, we
+   should be thoughtful and considerate of the leap the author has made. If
+   there are nitpicky or small suggestions, use GitHub's suggestion feature.
+   If the approach isn't what you expected, consider asking the author why
+   before requesting several changes. Seek to understand their reasoning
+   first.
+
+8. Submit feedback on GitHub and update flags, "patch needs improvement",
    "needs tests", and "needs documentation", as needed. This will move the
    ticket to the `"waiting for author" queue`_. If you have given a
    specific type of code review, please indicate that on the Pull Request.
