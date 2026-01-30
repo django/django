@@ -565,7 +565,11 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
     def __init__(self, streaming_acmgr_content=(), *args, **kwargs):
         super().__init__(*args, **kwargs)
         # `streaming_content` should be an
-        # class AsyncBytesIteratorResource(Protocol, SupportsAclose, AsyncIterator[bytes]): ...
+        # class AsyncBytesIteratorResource(
+        #     Protocol,
+        #     SupportsAclose,
+        #     AsyncIterator[bytes]
+        # ): ...
         # AbstractAsyncContextManager[AsyncBytesIteratorResource].
         self.streaming_acmgr_content = streaming_acmgr_content
 
