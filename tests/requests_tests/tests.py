@@ -1149,7 +1149,7 @@ class RequestsTests(SimpleTestCase):
             }
         )
 
-        # This assertion would FAIL without the _multipart_parser_class change
+        # This assertion would FAIL without the multipart_parser_class change
         # because the hardcoded MultiPartParser would be used instead.
         self.assertEqual(request.POST.get("custom_parser_used"), "yes")
         self.assertEqual(request.POST.get("name"), "value")
