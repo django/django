@@ -69,10 +69,13 @@ vote of the :ref:`Steering Council <steering-council>`.
 * Mergers: people with commit access who make the final decision to merge a
   change.
 
-Our Trac system is intentionally open to the public, and anyone can help by
-working on tickets. Django is a community project, and we encourage
-:ref:`triage and collaboration by the community
-<how-can-i-help-with-triaging>`. This could be you!
+.. admonition:: When we say anyone, we mean you!
+
+    Our Trac system and GitHub repositories are intentionally open to the
+    public. Anyone can help by working on tickets, triaging tickets and
+    reviewing changes. Django is a community project, and we encourage
+    :ref:`triage and collaboration by the community
+    <how-can-i-help-with-triaging>`. We truly want you to help!
 
 For example, here's the typical lifecycle of a ticket:
 
