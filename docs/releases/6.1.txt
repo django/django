@@ -242,7 +242,7 @@ Management Commands
 
 * Management commands now set :class:`~argparse.ArgumentParser`\'s
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
-  suggestions for mistyped subcommand names and argument choices.
+  suggestions for incorrectly typed subcommand names and argument choices.
 
 * The :djadmin:`loaddata` command now calls
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
@@ -340,7 +340,7 @@ Utilities
 ~~~~~~~~~
 
 * :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
-  durations expressed in weeks (``PnW``).
+  time periods expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~

@@ -300,10 +300,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = parse_time(value)
         return value
 
+    @staticmethod
+    def _create_decimal(value):
+        if isinstance(value, (int, str)):
+            return decimal.Decimal(value)
+        return decimal.Context(prec=15).create_decimal_from_float(value)
+
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        create_decimal = decimal.Context(prec=15).create_decimal_from_float
         if isinstance(expression, Col):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
@@ -311,7 +316,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value).quantize(
+                    return self._create_decimal(value).quantize(
                         quantize_value, context=expression.output_field.context
                     )
 
@@ -319,7 +324,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value)
+                    return self._create_decimal(value)
 
         return converter
 
