@@ -58,7 +58,7 @@ Syntax
     see the :doc:`language syntax reference </ref/templates/language>`.
 
 A Django template is a text document or a Python string marked-up using the
-Django template language. Some constructs are recognized and interpreted by the
+Django template language,commonly used to generate HTML dynamically . Some constructs are recognized and interpreted by the
 template engine. The main ones are variables and tags.
 
 A template is rendered with a context. Rendering replaces variables with their
