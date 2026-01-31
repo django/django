@@ -124,6 +124,8 @@ Create and activate a virtual environment, then install the dependencies:
      $ source .venv/bin/activate
      $ python -m pip install -r docs/requirements.txt
 
+.. _build-documentation-locally:
+
 Build the documentation locally
 -------------------------------
 
