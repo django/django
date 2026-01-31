@@ -29,9 +29,12 @@ class RedisSerializer:
 
 
 class RedisCacheClient:
+    _pools = {}
+
     def __init__(
         self,
         servers,
+        alias=None,
         serializer=None,
         pool_class=None,
         parser_class=None,
@@ -41,7 +44,7 @@ class RedisCacheClient:
 
         self._lib = redis
         self._servers = servers
-        self._pools = {}
+        self._alias = alias
 
         self._client = self._lib.Redis
 
@@ -70,12 +73,17 @@ class RedisCacheClient:
 
     def _get_connection_pool(self, write):
         index = self._get_connection_pool_index(write)
-        if index not in self._pools:
-            self._pools[index] = self._pool_class.from_url(
-                self._servers[index],
-                **self._pool_options,
+        key = f"{self._alias}:{index}"
+
+        if key not in self._pools:
+            self._pools.setdefault(
+                key,
+                self._pool_class.from_url(
+                    self._servers[index],
+                    **self._pool_options,
+                ),
             )
-        return self._pools[index]
+        return self._pools[key]
 
     def get_client(self, key=None, *, write=False):
         # key is used so that the method signature remains the same and custom
@@ -170,7 +178,7 @@ class RedisCache(BaseCache):
 
     @cached_property
     def _cache(self):
-        return self._class(self._servers, **self._options)
+        return self._class(self._servers, alias=self.alias, **self._options)
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         if timeout == DEFAULT_TIMEOUT:
