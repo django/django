@@ -3805,8 +3805,14 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
-    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    @skipUnlessDBFeature(
+        "supports_expression_indexes", "supports_nulls_distinct_unique_constraints"
+    )
     def test_unique_constraint_index_nulls_distinct(self):
+        """
+        For a UniqueConstraint with expressions, the backend executes:
+        CREATE UNIQUE INDEX ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         nulls_distinct = UniqueConstraint(
@@ -3831,6 +3837,10 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
     def test_unique_constraint_nulls_distinct(self):
+        """
+        For UniqueConstraint(fields=...), the backend executes:
+        ALTER TABLE "schema_author" ADD CONSTRAINT ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         constraint = UniqueConstraint(
