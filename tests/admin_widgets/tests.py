@@ -1020,7 +1020,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         )
 
         # First, with the date picker widget ---------------------------------
-        cal_icon = self.selenium.find_element(By.ID, "calendarlink0")
+        cal_icon = self.selenium.find_element(By.ID, "calendarbutton0")
         # The date picker is hidden
         self.assertFalse(
             self.selenium.find_element(By.ID, "calendarbox0").is_displayed()
@@ -1039,7 +1039,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         )
         # Click the calendar icon, then on the 15th of current month
         cal_icon.click()
-        self.selenium.find_element(By.XPATH, "//a[contains(text(), '15')]").click()
+        self.selenium.find_element(By.XPATH, "//button[contains(text(), '15')]").click()
         self.assertFalse(
             self.selenium.find_element(By.ID, "calendarbox0").is_displayed()
         )
@@ -1049,7 +1049,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         )
 
         # Then, with the time picker widget ----------------------------------
-        time_icon = self.selenium.find_element(By.ID, "clocklink0")
+        time_icon = self.selenium.find_element(By.ID, "clockbutton0")
         # The time picker is hidden
         self.assertFalse(self.selenium.find_element(By.ID, "clockbox0").is_displayed())
         # Click the time icon
@@ -1060,7 +1060,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
             [
                 x.text
                 for x in self.selenium.find_elements(
-                    By.XPATH, "//ul[@class='timelist']/li/a"
+                    By.XPATH, "//ul[@class='timelist']/li/button"
                 )
             ],
             ["Now", "Midnight", "6 a.m.", "Noon", "6 p.m."],
@@ -1071,7 +1071,9 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertFalse(self.selenium.find_element(By.ID, "clockbox0").is_displayed())
         # Click the time icon, then select the 'Noon' value
         time_icon.click()
-        self.selenium.find_element(By.XPATH, "//a[contains(text(), 'Noon')]").click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Noon')]"
+        ).click()
         self.assertFalse(self.selenium.find_element(By.ID, "clockbox0").is_displayed())
         self.assertEqual(
             self.selenium.find_element(By.ID, "id_birthdate_1").get_attribute("value"),
@@ -1095,7 +1097,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "id_birthdate_0").send_keys("2013-06-01")
 
         # Click the calendar icon
-        self.selenium.find_element(By.ID, "calendarlink0").click()
+        self.selenium.find_element(By.ID, "calendarbutton0").click()
 
         # get all the tds within the calendar
         calendar0 = self.selenium.find_element(By.ID, "calendarin0")
@@ -1122,7 +1124,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "id_birthdate_0").send_keys("2013-06-01")
 
         # Click the calendar icon
-        self.selenium.find_element(By.ID, "calendarlink0").click()
+        self.selenium.find_element(By.ID, "calendarbutton0").click()
 
         # get all the tds within the calendar
         calendar0 = self.selenium.find_element(By.ID, "calendarin0")
@@ -1148,7 +1150,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         )
 
         # Click the calendar icon
-        self.selenium.find_element(By.ID, "calendarlink0").click()
+        self.selenium.find_element(By.ID, "calendarbutton0").click()
 
         # get all the tds within the calendar
         calendar0 = self.selenium.find_element(By.ID, "calendarin0")
@@ -1199,7 +1201,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                     # Open a page that has a date picker widget.
                     self.selenium.get(self.live_server_url + url)
                     # Click on the calendar icon.
-                    self.selenium.find_element(By.ID, "calendarlink0").click()
+                    self.selenium.find_element(By.ID, "calendarbutton0").click()
                     # The right month and year are displayed.
                     self.wait_for_text("#calendarin0 caption", expected_caption)
 
@@ -1243,7 +1245,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
         now = datetime.now()
         for shortcut in shortcuts:
-            shortcut.find_element(By.TAG_NAME, "a").click()
+            shortcut.find_element(By.TAG_NAME, "button").click()
 
         # There is a time zone mismatch warning.
         # Warning: This would effectively fail if the TIME_ZONE defined in the
