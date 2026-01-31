@@ -111,7 +111,12 @@
                 option = new Option(newRepr, newId);
                 select.options.add(option);
                 // Update SelectBox cache for related fields.
-                if (window.SelectBox !== undefined && !SelectBox.cache[currentSelect.id]) {
+                if (
+                    window.SelectBox !== undefined
+                    && !SelectBox.cache[currentSelect.id]
+                    // Only if SelectBox is managing that field.
+                    && SelectBox.cache[select.id]
+                ) {
                     SelectBox.add_to_cache(select.id, option);
                     // Sort if there are any groups present
                     if (SelectBox.cache[select.id].some(item => item.group)) {

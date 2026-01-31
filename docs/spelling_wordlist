@@ -4,6 +4,7 @@ accessors
 Aceh
 admindocs
 affordances
+ai
 Ai
 Alchin
 allowlist
@@ -245,6 +246,8 @@ kwargs
 Kyrgyz
 latin
 lawrence
+lexeme
+lexemes
 Libera
 lifecycle
 lifecycles
@@ -313,6 +316,7 @@ needsinfo
 needsnewfeatureprocess
 německy
 nginx
+nitpicky
 noding
 nonces
 nonnegative
@@ -531,6 +535,7 @@ unapplied
 unapplying
 uncategorized
 unclaim
+unclosed
 uncopyable
 unencoded
 unencrypted
