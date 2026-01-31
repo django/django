@@ -914,6 +914,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [obj])
 
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
     def test_exact_lookup_validates_each_field_independently(self):
         """
         Each field validates the search term independently without leaking
