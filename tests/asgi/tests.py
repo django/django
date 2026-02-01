@@ -707,6 +707,23 @@ class ASGITest(SimpleTestCase):
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
 
+    async def test_streaming_noop_acmgr(self):
+        scope = self.async_request_factory._base_scope(
+            path="/streaming_noop_acmgr/"
+        )
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Fetch http.response.start.
+        await communicator.receive_output(timeout=1)
+        # Fetch the 'first' and 'last'.
+        first_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(first_response["body"], b"")
+        # Fetch the rest of the response so that coroutines are cleaned up.
+        await communicator.receive_output(timeout=1)
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output(timeout=1)
+
     async def test_read_body_thread(self):
         """Write runs on correct thread depending on rollover."""
         handler = ASGIHandler()

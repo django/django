@@ -95,6 +95,9 @@ async def streaming_acmgr_view(request):
     sleep_time = float(request.GET["sleep"])
     return StreamingAcmgrHttpResponse(streaming_acmgr_inner(sleep_time))
 
+async def streaming_noop_acmgr_view(request):
+    return StreamingAcmgrHttpResponse()
+
 
 test_filename = __file__
 
@@ -109,4 +112,5 @@ urlpatterns = [
     path("delayed_hello/", hello_with_delay),
     path("streaming/", streaming_view),
     path("streaming_acmgr/", streaming_acmgr_view),
+    path("streaming_noop_acmgr/", streaming_noop_acmgr_view),
 ]
