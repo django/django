@@ -2115,10 +2115,10 @@ class Queries6Tests(TestCase):
 
     def test_nested_queries_sql(self):
         # Nested queries should not evaluate the inner query as part of
-        # constructing the SQL (so we should see a nested query here, indicated
-        # by two "SELECT" calls).
+        # constructing the SQL (so we should see a nested query here). The
+        # auto-CTE transform adds an extra SELECT for the CTE body.
         qs = Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy"))
-        self.assertEqual(qs.query.get_compiler(qs.db).as_sql()[0].count("SELECT"), 2)
+        self.assertEqual(qs.query.get_compiler(qs.db).as_sql()[0].count("SELECT"), 3)
 
     def test_tickets_8921_9188(self):
         # Incorrect SQL was being generated for certain types of exclude()
