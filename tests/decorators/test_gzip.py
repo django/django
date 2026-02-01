@@ -85,10 +85,7 @@ class GzipPageTests(SimpleTestCase):
         self.assertEqual(response.get("Content-Encoding"), "gzip")
 
         buff = io.BytesIO()
-        async with (
-            response.streaming_acmgr_content as agen,
-            contextlib.aclosing(agen),
-        ):
+        async with response as agen, contextlib.aclosing(agen):
             async for v in agen:
                 buff.write(v)
 
