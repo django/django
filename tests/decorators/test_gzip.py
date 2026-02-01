@@ -1,6 +1,10 @@
+import asyncio
+import contextlib
+import io
+from gzip import GzipFile
 from inspect import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, StreamingAcmgrHttpResponse
 from django.test import SimpleTestCase
 from django.views.decorators.gzip import gzip_page
 
@@ -44,3 +48,50 @@ class GzipPageTests(SimpleTestCase):
         response = await async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get("Content-Encoding"), "gzip")
+
+    async def test_gzip_page_decorator_acmgr_view(self):
+        @contextlib.asynccontextmanager
+        async def streaming_acmgr_inner(sleep_time):
+            eof = object()
+            q = asyncio.Queue(0)
+
+            async def push():
+                await q.put(b"first\n")
+                await asyncio.sleep(sleep_time)
+                await q.put(b"last\n")
+                await q.put(eof)
+
+            async def agen():
+                while True:
+                    v = await q.get()
+                    if v is eof:
+                        return
+                    yield v
+
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(push())
+                yield agen()
+
+        @gzip_page
+        async def streaming_acmgr_view(request):
+            sleep_time = float(request.GET["sleep"])
+            return StreamingAcmgrHttpResponse(streaming_acmgr_inner(sleep_time))
+
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        request.GET["sleep"] = 0.1
+        response = await streaming_acmgr_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get("Content-Encoding"), "gzip")
+
+        buff = io.BytesIO()
+        async with (
+            response.streaming_acmgr_content as agen,
+            contextlib.aclosing(agen),
+        ):
+            async for v in agen:
+                buff.write(v)
+
+        buff.seek(0)
+        with GzipFile(fileobj=buff, mode="rb") as f:
+            self.assertEqual(f.read(), b"first\nlast\n")
