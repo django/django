@@ -440,6 +440,7 @@ def _correlated_aggregate_info(outer_query, subquery, outer_alias):
 
 
 def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
+    """Rewrite eligible correlated aggregate subqueries into a grouped CTE join."""
     annotation_source = getattr(query, "_annotation_unresolved", query.annotations)
     candidates = []
     for alias, expression in annotation_source.items():
@@ -766,6 +767,7 @@ def _split_where_by_annotation_refs(node, annotation_names, annotation_exprs=Non
 
 
 def _auto_cte_annotation_reuse(query, name_generator, collector):
+    """Materialize dependent annotation chains into a CTE to avoid duplication."""
     if getattr(query, "_auto_cte_annotation_skip", False):
         return query
     original_selected = query.selected
