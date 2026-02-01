@@ -68,24 +68,6 @@ async def streaming_view(request):
     return StreamingHttpResponse(streaming_inner(sleep_time))
 
 
-class QueueIterator:
-    def __init__(self, q, eof):
-        self._q = q
-        self._eof = eof
-
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        msg = await self._q.get()
-        if msg is self._eof:
-            raise StopAsyncIteration
-        return msg
-
-    async def aclose(self):
-        pass
-
-
 @contextlib.asynccontextmanager
 async def streaming_acmgr_inner(sleep_time):
     eof = object()
@@ -97,9 +79,16 @@ async def streaming_acmgr_inner(sleep_time):
         await q.put(b"last\n")
         await q.put(eof)
 
+    async def agen():
+        while True:
+            v = await q.get()
+            if v is eof:
+                return
+            yield v
+
     async with asyncio.TaskGroup() as tg:
         tg.create_task(push())
-        yield QueueIterator(q=q, eof=eof)
+        yield agen()
 
 
 async def streaming_acmgr_view(request):
