@@ -261,7 +261,7 @@ expression into the CSP header.
 To use this nonce in templates, the
 :func:`~django.template.context_processors.csp` context processor needs to be
 enabled. It adds a ``csp_nonce`` variable to the template context, allowing
-inline elements to include a matching ``nonce={{ csp_nonce }}`` attribute in
+inline elements to include a matching ``nonce="{{ csp_nonce }}"`` attribute in
 inline scripts or styles.
 
 The browser will only execute inline elements that include a ``nonce=<value>``
