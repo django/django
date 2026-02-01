@@ -439,9 +439,7 @@ class SQLCompiler:
                 table, col = col.split(".", 1)
                 yield (
                     OrderBy(
-                        RawSQL(
-                            "%s.%s" % (self.quote_name_unless_alias(table), col), []
-                        ),
+                        RawSQL("%s.%s" % (self.quote_name(table), col), []),
                         descending=descending,
                     ),
                     False,
@@ -547,35 +545,19 @@ class SQLCompiler:
                     extra_select.append((expr, (without_ordering, params), None))
         return extra_select
 
-    def quote_name_unless_alias(self, name):
+    def quote_name(self, name):
         """
-        A wrapper around connection.ops.quote_name that doesn't quote aliases
-        for table names. This avoids problems with some SQL dialects that treat
-        quoted strings specially (e.g. PostgreSQL).
+        A wrapper around connection.ops.quote_name that memoizes quoted
+        name values.
         """
-        if (
-            self.connection.features.prohibits_dollar_signs_in_column_aliases
-            and "$" in name
-        ):
-            raise ValueError(
-                "Dollar signs are not permitted in column aliases on "
-                f"{self.connection.display_name}."
-            )
-        if name in self.quote_cache:
-            return self.quote_cache[name]
-        if (
-            (name in self.query.alias_map and name not in self.query.table_map)
-            or name in self.query.extra_select
-            or (
-                self.query.external_aliases.get(name)
-                and name not in self.query.table_map
-            )
-        ):
-            self.quote_cache[name] = name
-            return name
-        r = self.connection.ops.quote_name(name)
-        self.quote_cache[name] = r
-        return r
+        if (quoted := self.quote_cache.get(name)) is not None:
+            return quoted
+        quoted = self.connection.ops.quote_name(name)
+        self.quote_cache[name] = quoted
+        return quoted
+
+    # Kept for backward compatiblity until duly done deprecation.
+    quote_name_unless_alias = quote_name
 
     def compile(self, node):
         vendor_impl = getattr(node, "as_" + self.connection.vendor, None)
@@ -1175,7 +1157,7 @@ class SQLCompiler:
                 alias not in self.query.alias_map
                 or self.query.alias_refcount[alias] == 1
             ):
-                result.append(", %s" % self.quote_name_unless_alias(alias))
+                result.append(", %s" % self.quote_name(alias))
         return result, params
 
     def get_related_selections(
@@ -1504,7 +1486,7 @@ class SQLCompiler:
                 if self.connection.features.select_for_update_of_column:
                     result.append(self.compile(col)[0])
                 else:
-                    result.append(self.quote_name_unless_alias(col.alias))
+                    result.append(self.quote_name(col.alias))
         if invalid_names:
             raise FieldError(
                 "Invalid field name(s) given in select_for_update(of=(...)): %s. "
@@ -1800,9 +1782,7 @@ class SQLInsertCompiler(SQLCompiler):
         return placeholder_rows, param_rows
 
     def as_sql(self):
-        # We don't need quote_name_unless_alias() here, since these are all
-        # going to be column names (so we can avoid the extra overhead).
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name
         opts = self.query.get_meta()
         insert_statement = self.connection.ops.insert_statement(
             on_conflict=self.query.on_conflict,
@@ -2001,7 +1981,7 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        delete = "DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)
+        delete = "DELETE FROM %s" % self.quote_name(query.base_table)
         try:
             where, params = self.compile(query.where)
         except FullResultSet:
@@ -2045,7 +2025,7 @@ class SQLUpdateCompiler(SQLCompiler):
         self.pre_sql_setup()
         if not self.query.values:
             return "", ()
-        qn = self.quote_name_unless_alias
+        qn = self.quote_name
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, "resolve_expression"):
