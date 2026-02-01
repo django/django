@@ -1,8 +1,7 @@
 "Functions that help with dynamically creating decorators for views."
 
 from functools import partial, update_wrapper, wraps
-
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+from inspect import iscoroutinefunction, markcoroutinefunction
 
 
 class classonlymethod(classmethod):
