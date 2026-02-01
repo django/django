@@ -437,6 +437,16 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+Models
+------
+
+* SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
+  calls as well as table and ``JOIN`` aliases are now systematically quoted to
+  prevent special character collisions. Because quoted aliases are
+  case-sensitive, *raw* SQL references to aliases mixing case, such as when
+  using :class:`.RawSQL`, might have to be adjusted to also make use of
+  quoting.
+
 System checks
 -------------
 
