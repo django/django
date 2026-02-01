@@ -104,6 +104,7 @@ class TruncateHTMLParser(HTMLParser):
         super().__init__(convert_charrefs=convert_charrefs)
         self.tags = deque()
         self.output = []
+        self.output_length = 0
         self.remaining = length
         self.replacement = replacement
 
@@ -113,19 +114,24 @@ class TruncateHTMLParser(HTMLParser):
 
         return VOID_ELEMENTS
 
+    def update_output_fields(self, outputs):
+        for output in outputs:
+            self.output.append(output)
+            self.output_length += len(output)
+
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
         if tag not in self.void_elements:
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
-        self.output.append(self.get_starttag_text())
+        self.update_output_fields([self.get_starttag_text()])
         if tag not in self.void_elements:
             self.tags.appendleft(tag)
 
     def handle_endtag(self, tag):
         if tag not in self.void_elements:
-            self.output.append(f"</{tag}>")
+            self.update_output_fields([f"</{tag}>"])
             try:
                 self.tags.remove(tag)
             except ValueError:
@@ -136,16 +142,16 @@ class TruncateHTMLParser(HTMLParser):
         data_len = len(data)
         if self.remaining < data_len:
             self.remaining = 0
-            self.output.append(add_truncation_text(output, self.replacement))
+            self.update_output_fields([add_truncation_text(output, self.replacement)])
             raise self.TruncationCompleted
         self.remaining -= data_len
-        self.output.append(output)
+        self.update_output_fields([output])
 
     def feed(self, data):
         try:
             super().feed(data)
         except self.TruncationCompleted:
-            self.output.extend([f"</{tag}>" for tag in self.tags])
+            self.update_output_fields([f"</{tag}>" for tag in self.tags])
             self.tags.clear()
             self.reset()
         else:
@@ -166,9 +172,9 @@ class TruncateCharsHTMLParser(TruncateHTMLParser):
     def process(self, data):
         self.processed_chars += len(data)
         if (self.processed_chars == self.length) and (
-            sum(len(p) for p in self.output) + len(data) == len(self.rawdata)
+            self.output_length + len(data) == len(self.rawdata)
         ):
-            self.output.append(data)
+            self.update_output_fields(data)
             raise self.TruncationCompleted
         output = escape("".join(data[: self.remaining]))
         return data, output
