@@ -550,6 +550,17 @@ class StreamingHttpResponse(HttpResponseBase):
         return b"".join(self.streaming_content)
 
 
+class _NoopStreamingAcmgr:
+    async def __aenter__(self):
+        async def gen():
+            yield b""
+
+        return gen()
+
+    async def __aexit__(self, *exc_info):
+        return
+
+
 class StreamingAcmgrHttpResponse(HttpResponseBase):
     """
     A streaming HTTP response class with an iterator as content.
@@ -563,7 +574,7 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
     streaming = True
     streaming_acmgr = True
 
-    def __init__(self, streaming_acmgr_content=(), *args, **kwargs):
+    def __init__(self, streaming_acmgr_content=_NoopStreamingAcmgr(), *args, **kwargs):
         super().__init__(*args, **kwargs)
         # `streaming_content` should be an
         # class AsyncBytesIteratorResource(
