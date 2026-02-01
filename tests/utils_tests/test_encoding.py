@@ -123,23 +123,13 @@ class TestEncodingUtils(SimpleTestCase):
         except RecursionError:
             self.fail("Unexpected RecursionError raised.")
 
-    def test_repercent_broken_unicode_small_fragments(self):
+    @mock.patch("django.utils.encoding.quote")
+    def test_repercent_broken_unicode_quote_called_once(self, mock_quote):
+        mock_quote.side_effect = lambda *args, **kwargs: quote(*args, **kwargs)
         data = b"test\xfctest\xfctest\xfc"
-        decoded_paths = []
 
-        def mock_quote(*args, **kwargs):
-            # The second frame is the call to repercent_broken_unicode().
-            decoded_paths.append(inspect.currentframe().f_back.f_locals["path"])
-            return quote(*args, **kwargs)
-
-        with mock.patch("django.utils.encoding.quote", mock_quote):
-            self.assertEqual(repercent_broken_unicode(data), b"test%FCtest%FCtest%FC")
-
-        # decode() is called on smaller fragment of the path each time.
-        self.assertEqual(
-            decoded_paths,
-            [b"test\xfctest\xfctest\xfc", b"test\xfctest\xfc", b"test\xfc"],
-        )
+        self.assertEqual(repercent_broken_unicode(data), b"test%FCtest%FCtest%FC")
+        mock_quote.assert_called_once_with(b'\xfc#\xfc#\xfc', safe=b"/#%[]=:;$&()+,!?*@'~")
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):
