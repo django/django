@@ -95,6 +95,7 @@ async def streaming_acmgr_view(request):
     sleep_time = float(request.GET["sleep"])
     return StreamingAcmgrHttpResponse(streaming_acmgr_inner(sleep_time))
 
+
 async def streaming_noop_acmgr_view(request):
     return StreamingAcmgrHttpResponse()
 

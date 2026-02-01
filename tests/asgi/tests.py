@@ -708,9 +708,7 @@ class ASGITest(SimpleTestCase):
             await communicator.receive_output(timeout=0.2)
 
     async def test_streaming_noop_acmgr(self):
-        scope = self.async_request_factory._base_scope(
-            path="/streaming_noop_acmgr/"
-        )
+        scope = self.async_request_factory._base_scope(path="/streaming_noop_acmgr/")
         application = get_asgi_application()
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({"type": "http.request"})
