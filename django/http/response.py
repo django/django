@@ -586,10 +586,10 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
         self.streaming_acmgr_content = streaming_acmgr_content
 
     async def __aenter__(self):
-        return self.streaming_acmgr_content.__aenter__()
+        return await self.streaming_acmgr_content.__aenter__()
 
     async def __aexit__(self, *exc_info):
-        return self.streaming_acmgr_content.__aexit__(*exc_info)
+        return await self.streaming_acmgr_content.__aexit__(*exc_info)
 
     def __repr__(self):
         return "<%(cls)s status_code=%(status_code)d%(content_type)s>" % {
