@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import warnings
+from contextlib import aclosing
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlsplit
@@ -590,7 +591,7 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
     def content(self):
         raise AttributeError(
             "This %s instance has no `content` attribute. Use "
-            "`streaming_content` instead." % self.__class__.__name__
+            "`streaming_acmgr_content` instead." % self.__class__.__name__
         )
 
     @property
@@ -616,12 +617,10 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
 
         # async iterator. Consume in async_to_sync and map back.
         async def to_list():
-            async with self.streaming_acmgr_content as v:
+            async with self as v, aclosing(v):
                 return [chunk async for chunk in v]
 
-        return map(
-            self.make_bytes, iter(async_to_sync(to_list)(self.streaming_acmgr_content))
-        )
+        return map(self.make_bytes, iter(async_to_sync(to_list)))
 
     async def __aiter__(self):
         warnings.warn(
@@ -630,8 +629,11 @@ class StreamingAcmgrHttpResponse(HttpResponseBase):
             Warning,
             stacklevel=2,
         )
-        async with self.streaming_acmgr_content as v:
-            return iter([chunk async for chunk in v])
+        async with self as v, aclosing(v):
+            content = [chunk async for chunk in v]
+
+        for chunk in content:
+            yield chunk
 
 
 class FileResponse(StreamingHttpResponse):
