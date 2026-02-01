@@ -221,10 +221,8 @@
     window.showAddAnotherPopup = showRelatedObjectPopup;
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
-    document.addEventListener('visibilitychange', function(evt) {
-        if (document.visibilityState === 'hidden') {
-            window.dismissChildPopups();
-        }
+    document.addEventListener('pagehide', function(evt) {
+        window.dismissChildPopups();
     });
 
     $(document).ready(function() {
