@@ -1024,6 +1024,42 @@ Has the following optional arguments:
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
 
+Using a ``FileField`` in a model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you use a :class:`FileField`, the model field provides an API to
+interact with the file's content and attributes.
+
+For example::
+
+    from django.core.files.base import ContentFile
+    from myapp.models import MyModel
+
+    # Create a model instance
+    instance = MyModel()
+
+    # Save a file to the field and persist the model instance.
+    instance.upload.save('contact.txt', ContentFile('content'), save=True)
+
+    # Access the file name and path
+    print(instance.upload.name)
+    # 'uploads/contact.txt'
+
+    print(instance.upload.path)
+    # '/home/user/media/uploads/contact.txt'
+
+    # Delete the file
+    instance.upload.delete(save=True)
+
+The ``path`` attribute is only available for storage backends that expose a
+local filesystem path, such as
+:class:`~django.core.files.storage.FileSystemStorage`.
+For other storage backends, accessing ``path`` may raise
+:exc:`NotImplementedError`.
+
+For a complete list of available attributes and methods, see
+:class:`~django.db.models.fields.files.FieldFile`.
+
 .. attribute:: FileField.storage
 
     A storage object, or a callable which returns a storage object. This
