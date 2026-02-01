@@ -420,10 +420,6 @@ class BaseDatabaseFeatures:
     # Does the Round() database function round to even?
     rounds_to_even = False
 
-    # Should dollar signs be prohibited in column aliases to prevent SQL
-    # injection?
-    prohibits_dollar_signs_in_column_aliases = False
-
     # Should PatternLookup.process_rhs() use self.param_pattern? It's unneeded
     # on databases that don't use LIKE for pattern matching.
     pattern_lookup_needs_param_pattern = True

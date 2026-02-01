@@ -400,6 +400,9 @@ backends.
 * Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
   if the management command isn't supported.
 
+* The ``DatabaseFeatures.prohibits_dollar_signs_in_column_aliases`` feature
+  flag is removed.
+
 * The ``DatabaseOperations.binary_placeholder_sql()`` method now expects a
   query compiler as an extra positional argument and should return a
   two-elements tuple composed of an SQL format string and a tuple of associated
