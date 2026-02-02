@@ -255,6 +255,10 @@ You can edit it multiple times.
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout` function calls it).
 
+    .. method:: is_empty()
+
+      Returns ``True`` if the session does not have a key and is empty.
+
     .. method:: set_test_cookie()
     .. method:: aset_test_cookie()
 
