@@ -588,10 +588,24 @@ class AggregateTestCase(TestCase):
             Book.objects.aggregate(
                 ratings=StringAgg(
                     Cast(F("rating"), CharField()),
-                    Value(","),
+                    Value(";"),
                     distinct=True,
                 )
             )
+
+    def test_string_agg_distinct_with_default_delimiter(self):
+        books = Book.objects.aggregate(
+            pages_list=StringAgg(
+                Cast(F("pages"), CharField()),
+                Value(","),
+                distinct=True,
+            )
+        )
+
+        expected_pages = set(
+            str(p) for p in Book.objects.values_list("pages", flat=True)
+        )
+        self.assertEqual(set(books["pages_list"].split(",")), expected_pages)
 
     def test_non_grouped_annotation_not_in_group_by(self):
         """
