@@ -104,6 +104,10 @@ class BaseCache:
         at the time of cache construction; alternatively, you can subclass the
         cache backend to provide custom key making behavior.
         """
+        if not isinstance(key, str):
+            raise TypeError("Cache key must be a str")
+        if not isinstance(self.key_prefix, str):
+            raise TypeError("Cache key prefix must be a str")
         if version is None:
             version = self.version
 

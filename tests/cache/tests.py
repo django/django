@@ -363,6 +363,14 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
+    def test_cache_key_must_be_str(self):
+        """Cache keys must be strings."""
+        with self.assertRaises(TypeError):
+            cache.get(123)
+
+        with self.assertRaises(TypeError):
+            cache.set(123, "value")
+
     def test_get_many(self):
         # Multiple cache keys can be returned using get_many
         cache.set_many({"a": "a", "b": "b", "c": "c", "d": "d"})
@@ -1515,43 +1523,43 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
     def test_lru_get(self):
         """get() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key)
-        cache.set(9, 9, timeout=None)
+            self.assertEqual(cache.get(str(key)), key)
+        cache.set("9", 9, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key)
+            self.assertEqual(cache.get(str(key)), key)
         for key in range(6, 9):
-            self.assertIsNone(cache.get(key))
-        self.assertEqual(cache.get(9), 9)
+            self.assertIsNone(cache.get(str(key)))
+        self.assertEqual(cache.get("9"), 9)
 
     @limit_locmem_entries
     def test_lru_set(self):
         """set() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(3, 9):
-            cache.set(key, key, timeout=None)
-        cache.set(9, 9, timeout=None)
+            cache.set(str(key), key, timeout=None)
+        cache.set("9", 9, timeout=None)
         for key in range(3, 10):
-            self.assertEqual(cache.get(key), key)
+            self.assertEqual(cache.get(str(key)), key)
         for key in range(3):
-            self.assertIsNone(cache.get(key))
+            self.assertIsNone(cache.get(str(key)))
 
     @retry()
     @limit_locmem_entries
     def test_lru_incr(self):
         """incr() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.incr(key), key + 1)
-        cache.set(9, 9, timeout=None)
+            self.assertEqual(cache.incr(str(key)), key + 1)
+        cache.set("9", 9, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key + 1)
+            self.assertEqual(cache.get(str(key)), key + 1)
         for key in range(6, 9):
-            self.assertIsNone(cache.get(key))
-        self.assertEqual(cache.get(9), 9)
+            self.assertIsNone(cache.get(str(key)))
+        self.assertEqual(cache.get("9"), 9)
 
 
 # memcached and redis backends aren't guaranteed to be available.
