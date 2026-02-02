@@ -4175,7 +4175,14 @@ by the aggregate.
     .. attribute:: delimiter
 
         A ``Value`` or expression representing the string that should separate
-        each of the values. For example, ``Value(",")``.
+        each of the values. For example, ``Value(",")``. (On SQLite, the
+        literal delimiter ``Value(",")`` is the only delimiter compatible with
+        ``distinct=True``.)
+
+        .. versionchanged:: 6.1
+
+            Support for using ``distinct=True`` with a delimiter of
+            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================
