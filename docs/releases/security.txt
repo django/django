@@ -36,6 +36,74 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 3, 2026 - :cve:`2025-13473`
+------------------------------------
+
+Username enumeration through timing difference in mod_wsgi authentication
+handler.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <d72cc3be3be0bbebdcaea5a8c8106b4d6f2a32bd>`
+* Django 5.2 :commit:`(patch) <184e38ab0a061c365f5775676a074796d8abd02f>`
+* Django 4.2 :commit:`(patch) <6dc23508f3395e1254c315084c7334ef81c4c09a>`
+
+February 3, 2026 - :cve:`2025-14550`
+------------------------------------
+
+Potential denial-of-service vulnerability via repeated headers when using ASGI.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <972dbdd4f7f69e9c405e6fe12a1b90e4713c1611>`
+* Django 5.2 :commit:`(patch) <1ba90069c12836db46981bdf75b0e661db5849ce>`
+* Django 4.2 :commit:`(patch) <f578acc8c54530fffabd52d2db654c8669b011af>`
+
+February 3, 2026 - :cve:`2026-1207`
+-----------------------------------
+
+Potential SQL injection via raster lookups on PostGIS.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <8f77e7301174834573614ae90e1826fdf27f8a24>`
+* Django 5.2 :commit:`(patch) <17a1d64a58ef24c0c3b78d66d86f5415075f18f0>`
+* Django 4.2 :commit:`(patch) <a14363102d98fa29b8cced578eb3a0fadaa5bcb7>`
+
+February 3, 2026 - :cve:`2026-1285`
+-----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.text.Truncator``
+HTML methods.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <4b86ba51e486530db982341a23e53c7a1e1e6e71>`
+* Django 5.2 :commit:`(patch) <9f2ada875bbee62ac46032e38ddb22755d67ae5a>`
+* Django 4.2 :commit:`(patch) <b40cfc6052ced26dcd8166a58ea6f841d0d2cac8>`
+
+February 3, 2026 - :cve:`2026-1287`
+-----------------------------------
+
+Potential SQL injection in column aliases via control characters.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <0c0f5c2178c01ada5410cd53b4b207bf7858b952>`
+* Django 5.2 :commit:`(patch) <3e68ccdc11c127758745ddf0b4954990b14892bc>`
+* Django 4.2 :commit:`(patch) <f75f8f3597e1ce351d5ac08b6ba7ebd9dadd9b5d>`
+
+February 3, 2026 - :cve:`2026-1312`
+-----------------------------------
+
+Potential SQL injection via ``QuerySet.order_by`` and ``FilteredRelation``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <15e70cb83e6f7a9a2a2f651f30b28b5cb20febeb>`
+* Django 5.2 :commit:`(patch) <e863ee273c6553e9b6fa4960a17acb535851857b>`
+* Django 4.2 :commit:`(patch) <90f5b10784ba5bf369caed87640e2b4394ea3314>`
+
 December 2, 2025 - :cve:`2025-13372`
 ------------------------------------
 
