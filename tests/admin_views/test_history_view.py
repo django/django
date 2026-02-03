@@ -85,7 +85,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         description = self.selenium.find_element(By.CSS_SELECTOR, "#%s" % labelledby)
         self.assertHTMLEqual(
             description.get_attribute("outerHTML"),
-            '<h2 id="pagination" class="visually-hidden">Pagination user entries</h2>',
+            '<h2 id="pagination" class="visually-hidden">Pagination</h2>',
         )
         self.assertTrue(paginator.is_displayed())
         aria_current_link = paginator.find_elements(By.CSS_SELECTOR, "[aria-current]")
