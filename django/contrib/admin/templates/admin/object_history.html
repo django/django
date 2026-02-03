@@ -35,7 +35,7 @@
         </tbody>
     </table>
     <nav class="paginator" aria-labelledby="pagination">
-      <h2 id="pagination" class="visually-hidden">{% blocktranslate with name=opts.verbose_name %}Pagination {{ name }} entries{% endblocktranslate %}</h2>
+      <h2 id="pagination" class="visually-hidden">{% translate 'Pagination' %}</h2>
       {% if pagination_required %}
         <ul>
         {% for i in page_range %}
