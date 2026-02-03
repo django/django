@@ -1182,6 +1182,86 @@ class QuerySet(AltersData):
     async def alast(self):
         return await sync_to_async(self.last)()
 
+    def random(self, count: int = 1) -> "QuerySet":
+        """
+        Return a QuerySet containing random objects optimized for performance.
+        
+        This method uses a two-step approach for better performance on large tables:
+        1. Fetch random primary keys using order_by('?') with LIMIT
+        2. Fetch full objects using those PKs with original queryset filters
+        
+        Args:
+            count: The number of random objects to return. Defaults to 1.
+        
+        Returns:
+            A QuerySet with the specified number of random objects.
+        
+        Raises:
+            ValueError: If count is less than 1.
+        
+        Examples:
+            # Get one random object
+            random_user = User.objects.random()
+            
+            # Get 5 random objects
+            random_users = User.objects.filter(is_active=True).random(5)
+        """
+        if count < 1:
+            raise ValueError("Count must be at least 1.")
+        
+        # For very small counts on potentially large tables, fetch only PKs first
+        # then retrieve full objects. This is more efficient than ordering
+        # the entire result set.
+        if self.query.is_sliced:
+            raise TypeError("Cannot use random() on a sliced queryset.")
+        
+        # Get random PKs using a subquery approach
+        # This limits the random ordering to just the PK field
+        random_pks = (
+            self.order_by('?')
+            .values_list('pk', flat=True)[:count]
+        )
+        
+        # Convert to list to execute the query
+        pk_list = list(random_pks)
+        
+        if not pk_list:
+            # Return empty queryset if no results
+            return self.none()
+        
+        # Fetch full objects maintaining original queryset's select_related,
+        # prefetch_related, and other optimizations
+        # Use pk__in with the random PKs, then apply random ordering to maintain
+        # randomness (in case of ties in the original random selection)
+        return self.filter(pk__in=pk_list).order_by('?')
+
+    async def arandom(self, count: int = 1) -> list:
+        """
+        Asynchronously return a list of random objects.
+        
+        This is the async version of random(). It returns a list of objects
+        rather than a QuerySet.
+        
+        Args:
+            count: The number of random objects to return. Defaults to 1.
+        
+        Returns:
+            A list with the specified number of random objects.
+        
+        Raises:
+            ValueError: If count is less than 1.
+            TypeError: If called on a sliced queryset.
+        
+        Examples:
+            # Get one random object
+            random_user = await User.objects.arandom()
+            
+            # Get 5 random objects
+            random_users = await User.objects.filter(is_active=True).arandom(5)
+        """
+        return await sync_to_async(list)(self.random(count=count))
+
+
     def in_bulk(self, id_list=None, *, field_name="pk"):
         """
         Return a dictionary mapping each of the given IDs to the object with
