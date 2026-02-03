@@ -1378,5 +1378,5 @@ class SessionBaseTests(SimpleTestCase):
         # Empty session is falsy
         self.assertIs(bool(self.session), False)
         # Session with data is truthy
-        self.session._session_cache = {"foo": "bar"}
+        self.session["foo"] = "bar"
         self.assertIs(bool(self.session), True)
