@@ -8,8 +8,7 @@ class RandomTests(TestCase):
     def setUpTestData(cls):
         extra = ExtraInfo.objects.create(info="e1", value=1)
         cls.authors = [
-            Author.objects.create(name="a%d" % i, num=i, extra=extra)
-            for i in range(10)
+            Author.objects.create(name="a%d" % i, num=i, extra=extra) for i in range(10)
         ]
 
     def test_random(self):
