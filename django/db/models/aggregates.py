@@ -13,12 +13,14 @@ from django.db.models.expressions import (
     Value,
     When,
 )
-from django.db.models.fields import IntegerField, TextField
+from django.db.models.fields import DateField, IntegerField, TextField
+from django.db.models.fields.json import JSONField
 from django.db.models.functions import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
     NumericOutputFieldMixin,
 )
+from django.db.models.lookups import IsNull
 
 __all__ = [
     "Aggregate",
@@ -31,6 +33,7 @@ __all__ = [
     "StringAgg",
     "Sum",
     "Variance",
+    "JSONArrayAgg",
 ]
 
 
@@ -397,3 +400,122 @@ class Variance(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}
+
+
+class JSONArrayAgg(Aggregate):
+    function = "JSON_ARRAYAGG"
+    output_field = JSONField()
+    allow_order_by = True
+    arity = 1
+
+    def __init__(self, *expressions, absent_on_null=False, **extra):
+        self.absent_on_null = absent_on_null
+        super().__init__(*expressions, **extra)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if self.filter and not connection.features.supports_aggregate_filter_clause:
+            raise NotSupportedError(
+                "JSONArrayAgg(filter) is not supported on this database backend."
+            )
+        if self.absent_on_null and not connection.features.supports_json_absent_on_null:
+            raise NotSupportedError(
+                "JSONArrayAgg(absent_on_null) is not supported on this database "
+                "backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        if self.order_by is not None:
+            raise NotSupportedError(
+                "JSONArrayAgg(order_by) is not supported on this database backend."
+            )
+        return self.as_sql(compiler, connection, **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(
+            compiler, connection, function="JSON_GROUP_ARRAY", **extra_context
+        )
+        # JSON_GROUP_ARRAY defaults to returning an empty array on an empty
+        # set. Modifies the SQL to support a custom default value to be
+        # returned, if a default argument is not passed, null is returned
+        # instead of [].
+        if (default := self.default) == []:
+            return sql, params
+        # Ensure Count() is against the exact same parameters (filter,
+        # distinct)
+        count = self.copy()
+        count.__class__ = Count
+        count_sql, count_params = compiler.compile(count)
+        default_sql = ""
+        default_params = ()
+        if default is not None:
+            default_sql, default_params = compiler.compile(default)
+            default_sql = f" ELSE {default_sql}"
+        sql = f"(CASE WHEN {count_sql} > 0 THEN {sql}{default_sql} END)"
+        return sql, count_params + params + default_params
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        if not connection.features.is_postgresql_16:
+            sql, params = self.as_sql(
+                compiler,
+                connection,
+                function="ARRAY_AGG",
+                **extra_context,
+            )
+            # Use a filter to cleanly remove null values from the array to
+            # match the behaviour of ABSENT ON NULL on Oracle and
+            # PostgreSQL 16+.
+            if self.absent_on_null:
+                expression = self.get_source_expressions()[0]
+                if self.filter:
+                    not_null_condition = IsNull(expression, False)
+                    copy = self.copy()
+                    copy.filter.source_expressions[0].add(not_null_condition, "AND")
+                    sql, params = copy.as_sql(
+                        compiler, connection, function="ARRAY_AGG", **extra_context
+                    )
+                    return f"TO_JSONB({sql})", params
+                else:
+                    expr, _ = compiler.compile(expression)
+                    filter_sql = f"FILTER (WHERE {expr} IS NOT NULL)"
+                    return f"TO_JSONB({sql} {filter_sql})", params
+            else:
+                return f"TO_JSONB({sql})", params
+        # PostgreSQL 16+ defaults to removing SQL null values from the returned
+        # array, adding NULL ON NULL clause preserves the null values
+        # to match SQLite, MySQL default behaviour, the null values are removed
+        # when ABSENT ON NULL is specified.
+        on_null_clause = "ABSENT ON NULL" if self.absent_on_null else "NULL ON NULL"
+        extra_context.setdefault(
+            "template",
+            "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+            f"{on_null_clause} RETURNING JSONB) %(filter)s",
+        )
+        return self.as_sql(compiler, connection, **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # Oracle defaults to removing SQL null values from the returned
+        # array, adding NULL ON NULL clause preserves the null values
+        # to match SQLite, MySQL default behaviour, the null values are
+        # removed when ABSENT ON NULL is specified.
+        on_null_clause = "ABSENT ON NULL" if self.absent_on_null else "NULL ON NULL"
+        extra_context.setdefault(
+            "template",
+            "%(function)s(%(distinct)s%(expressions)s%(order_by)s "
+            f"{on_null_clause}) %(filter)s",
+        )
+        # Oracle turns DATE columns into ISO 8601 timestamp including T00:00:00
+        # suffixed when converting to JSON while other backends only include
+        # the date part.
+        source_expressions = self.get_source_expressions()
+        expression = source_expressions[0]
+        if isinstance(expression.output_field, DateField):
+            clone = self.copy()
+            clone.set_source_expressions(
+                [
+                    Func(expression, Value("YYYY-MM-DD"), function="TO_CHAR"),
+                    *source_expressions[1:],
+                ]
+            )
+            return clone.as_sql(compiler, connection, **extra_context)
+        return self.as_sql(compiler, connection, **extra_context)
