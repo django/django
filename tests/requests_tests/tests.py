@@ -1154,6 +1154,38 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST.get("custom_parser_used"), "yes")
         self.assertEqual(request.POST.get("name"), "value")
 
+    def test_multipart_parser_class_immutable_after_parse(self):
+
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+
+        # Access POST to trigger parsing.
+        request.POST
+
+        with self.assertRaisesMessage(
+            AttributeError,
+            "You cannot set the multipart parser class after the upload has been "
+            "processed.",
+        ):
+            request.multipart_parser_class = MultiPartParser
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [

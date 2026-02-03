@@ -56,7 +56,7 @@ class HttpRequest:
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
     _upload_handlers = []
-    multipart_parser_class = MultiPartParser
+    _multipart_parser_class = MultiPartParser
 
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
@@ -364,6 +364,19 @@ class HttpRequest:
                 "processed."
             )
         self._upload_handlers = upload_handlers
+
+    @property
+    def multipart_parser_class(self):
+        return self._multipart_parser_class
+
+    @multipart_parser_class.setter
+    def multipart_parser_class(self, multipart_parser_class):
+        if hasattr(self, "_files"):
+            raise AttributeError(
+                "You cannot set the multipart parser class after the upload has been "
+                "processed."
+            )
+        self._multipart_parser_class = multipart_parser_class
 
     def parse_file_upload(self, META, post_data):
         """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
