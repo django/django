@@ -1233,7 +1233,7 @@ class QuerySet(AltersData):
         # selection)
         return self.filter(pk__in=pk_list).order_by("?")
 
-    async def arandom(self, count: int = 1) -> list:
+    async def arandom(self, count=1):
         """
         Asynchronously return a list of random objects.
 
@@ -1256,7 +1256,7 @@ class QuerySet(AltersData):
             # Get 5 random objects
             random_users = await User.objects.filter(is_active=True).arandom(5)
         """
-        return await sync_to_async(list)(self.random(count=count))
+        return await sync_to_async(lambda: list(self.random(count=count)))()
 
     def in_bulk(self, id_list=None, *, field_name="pk"):
         """

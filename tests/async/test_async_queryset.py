@@ -257,3 +257,21 @@ class AsyncQuerySetTest(TestCase):
         sql = "SELECT id, field FROM async_simplemodel WHERE created=%s"
         qs = SimpleModel.objects.raw(sql, [self.s1.created])
         self.assertEqual([o async for o in qs], [self.s1])
+
+    async def test_arandom(self):
+        # Basic functionality
+        self.assertEqual(len(await SimpleModel.objects.arandom(2)), 2)
+        self.assertEqual(len(await SimpleModel.objects.arandom(3)), 3)
+
+        # Test default count=1
+        self.assertEqual(len(await SimpleModel.objects.arandom()), 1)
+
+        # Test error handling
+        msg = "Count must be at least 1."
+        with self.assertRaisesMessage(ValueError, msg):
+            await SimpleModel.objects.arandom(0)
+
+        # Test slicing error
+        msg = "Cannot use random() on a sliced queryset."
+        with self.assertRaisesMessage(TypeError, msg):
+             await SimpleModel.objects.all()[:5].arandom(2)
