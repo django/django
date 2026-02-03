@@ -1217,10 +1217,7 @@ class QuerySet(AltersData):
 
         # Get random PKs using a subquery approach
         # This limits the random ordering to just the PK field
-        random_pks = (
-            self.order_by('?')
-            .values_list('pk', flat=True)[:count]
-        )
+        random_pks = self.order_by("?").values_list("pk", flat=True)[:count]
 
         # Convert to list to execute the query
         pk_list = list(random_pks)
@@ -1234,7 +1231,7 @@ class QuerySet(AltersData):
         # Use pk__in with the random PKs, then apply random ordering to
         # maintain randomness (in case of ties in the original random
         # selection)
-        return self.filter(pk__in=pk_list).order_by('?')
+        return self.filter(pk__in=pk_list).order_by("?")
 
     async def arandom(self, count: int = 1) -> list:
         """
