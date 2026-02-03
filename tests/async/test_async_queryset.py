@@ -274,4 +274,4 @@ class AsyncQuerySetTest(TestCase):
         # Test slicing error
         msg = "Cannot use random() on a sliced queryset."
         with self.assertRaisesMessage(TypeError, msg):
-             await SimpleModel.objects.all()[:5].arandom(2)
+            await SimpleModel.objects.all()[:5].arandom(2)

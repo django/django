@@ -1,4 +1,3 @@
-from django.db import models
 from django.test import TestCase
 
 from .models import Author, ExtraInfo
@@ -17,15 +16,15 @@ class RandomTests(TestCase):
         # Basic functionality
         self.assertEqual(len(Author.objects.random(5)), 5)
         self.assertEqual(len(Author.objects.random(10)), 10)
-        
+
         # Test default count=1
         self.assertEqual(len(Author.objects.random()), 1)
 
         # Ensure random order (statistically likely for 10 items)
         # Note: This is non-deterministic but highly probable.
         # Running it multiple times should yield different results.
-        qs1 = list(Author.objects.random(5))
-        qs2 = list(Author.objects.random(5))
+        list(Author.objects.random(5))
+        list(Author.objects.random(5))
         # It's possible but unlikely they are identical.
         # We mainly want to ensure it works without error.
 
@@ -49,6 +48,6 @@ class RandomTests(TestCase):
             self.assertLess(author.num, 5)
 
     def test_random_exceeds_count(self):
-         # Requesting more than exists should return all
-         qs = Author.objects.filter(num__lt=2).random(5)
-         self.assertEqual(len(qs), 2)
+        # Requesting more than exists should return all
+        qs = Author.objects.filter(num__lt=2).random(5)
+        self.assertEqual(len(qs), 2)
