@@ -6101,8 +6101,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         status = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-status"
         )
-        # Fix for Firefox which does not scroll to clicked elements automatically with
-        # the Options API
+        # Fix for Firefox which does not scroll to clicked elements
+        # automatically with the Options API
         self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.selenium.find_element(
