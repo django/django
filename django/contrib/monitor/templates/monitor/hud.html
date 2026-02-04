@@ -1,0 +1,100 @@
+<div id="dj-monitor-hud"
+    style="position: fixed; bottom: 20px; right: 20px; width: 300px; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); color: #0f0; border: 1px solid #333; border-radius: 8px; font-family: monospace; z-index: 999999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease; overflow: hidden; font-size: 12px;">
+
+    <!-- Header / Summary -->
+    <div style="padding: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;"
+        onclick="toggleDjHud()">
+        <div>
+            <span style="font-weight: bold; color: #fff;">DJANGO MONITOR</span>
+            <span style="margin-left: 10px; color: #0ff;">{{ duration_ms }} ms</span>
+        </div>
+        <div style="width: 10px; height: 10px; background: {% if debug_on %}#0f0{% else %}#f00{% endif %}; border-radius: 50%; box-shadow: 0 0 5px {% if debug_on %}#0f0{% else %}#f00{% endif %};"
+            title="Debug/Query Monitor Status"></div>
+    </div>
+
+    <!-- Main Content (Collapsible) -->
+    <div id="dj-hud-details" style="display: none; padding: 10px;">
+
+        <!-- Latency Stats -->
+        <div style="margin-bottom: 15px;">
+            <div style="color: #888; margin-bottom: 5px;">LATENCY (ms) [Last 100]</div>
+            <div style="display: flex; justify-content: space-between; color: #fff; font-size: 10px;">
+                <span>Min: {{ min_lat_ms }}</span>
+                <span>Avg: {{ avg_lat_ms }}</span>
+                <span>Max: {{ max_lat_ms }}</span>
+            </div>
+
+            <!-- SVG Sparkline -->
+            <div style="width: 100%; height: 40px; margin-top: 5px; border-bottom: 1px solid #333; position: relative;">
+                <svg width="100%" height="100%" preserveAspectRatio="none">
+                    <polyline fill="none" stroke="#0ff" stroke-width="1" points="" vector-effect="non-scaling-stroke"
+                        id="dj-sparkline" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Slow Queries -->
+        <div>
+            <div style="color: #888; margin-bottom: 5px;">SLOWEST QUERIES (Global Top 10)</div>
+            {% if not debug_on %}
+            <div style="color: #f00;">DEBUG=False. Queries not tracked.</div>
+            {% else %}
+            <ul style="list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto;">
+                {% for duration, sql in top_queries %}
+                <li style="border-bottom: 1px solid #222; padding: 5px 0;">
+                    <span style="color: #fce94f; display: inline-block; width: 60px;">{{ duration }}s</span>
+                    <span
+                        style="color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 200px;"
+                        title="{{ sql }}">{{ sql }}</span>
+                </li>
+                {% empty %}
+                <li style="color: #555;">No queries recorded yet.</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleDjHud() {
+        var details = document.getElementById('dj-hud-details');
+        var hud = document.getElementById('dj-monitor-hud');
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            hud.style.width = '400px';
+        } else {
+            details.style.display = 'none';
+            hud.style.width = '200px';
+        }
+    }
+
+    (function () {
+        var rawData = [
+            {% for val in chart_data %}
+                { { val } },
+    {% endfor %}
+        ];
+
+    var svg = document.querySelector('#dj-sparkline');
+    if (!svg || rawData.length < 2) return;
+
+    var maxVal = Math.max.apply(null, rawData);
+    var minVal = Math.min.apply(null, rawData);
+    var range = maxVal - minVal;
+    if (range === 0) range = 1;
+
+    var height = 40;
+    var effWidth = 280; // Approximate width of container
+
+    var pointsStr = rawData.map(function (val, idx) {
+        var x_coord = (idx / (rawData.length - 1)) * effWidth;
+        var normalized = (val - minVal) / range;
+        var y_coord = height - (normalized * height);
+        return x_coord + "," + y_coord;
+    }).join(" ");
+
+    svg.setAttribute('points', pointsStr);
+    }) ();
+</script>
