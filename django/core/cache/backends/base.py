@@ -104,6 +104,20 @@ class BaseCache:
         at the time of cache construction; alternatively, you can subclass the
         cache backend to provide custom key making behavior.
         """
+        if not isinstance(key, str):
+            warnings.warn(
+                "Cache keys must be strings. Using non-string keys is deprecated "
+                "and will raise an error in a future Django release.",
+                CacheKeyWarning,
+                stacklevel=2,
+            )
+        if not isinstance(self.key_prefix, str):
+            warnings.warn(
+                "Cache keys must be strings. Using non-string keys is deprecated "
+                "and will raise an error in a future Django release.",
+                CacheKeyWarning,
+                stacklevel=2,
+            )
         if version is None:
             version = self.version
 
