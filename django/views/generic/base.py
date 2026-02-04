@@ -1,7 +1,6 @@
 import logging
+from inspect import iscoroutinefunction, markcoroutinefunction
 from urllib.parse import urlparse
-
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import (
