@@ -418,6 +418,15 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = base_qs.filter(name="a2")
         self.assertEqual(qs1.union(qs2).first(), a1)
 
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_applies_default_ordering_afterward(self):
+        c = Tag.objects.create(name="C")
+        Tag.objects.create(name="B")
+        a = Tag.objects.create(name="A")
+        qs1 = Tag.objects.filter(name__in=["A", "B"])[:1]
+        qs2 = Tag.objects.filter(name__in=["C"])[:1]
+        self.assertSequenceEqual(qs1.union(qs2), [a, c])
+
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
         qs1 = Celebrity.objects.all()

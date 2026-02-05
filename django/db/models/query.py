@@ -1679,6 +1679,7 @@ class QuerySet(AltersData):
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
+        clone.query.default_ordering = True
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
