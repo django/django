@@ -6676,7 +6676,7 @@ class OperationTests(OperationTestBase):
     @skipUnlessDBFeature("supports_foreign_keys")
     def test_delete_model_fails_on_fk(self):
         """
-        DeleteModel should raise an IntegrityError if the model is still
+        DeleteModel raises a Database/IntegrityError if the model is still
         referenced by a ForeignKey.
         """
         app_label = "test_dm_fk"
@@ -6711,12 +6711,12 @@ class OperationTests(OperationTestBase):
         operation.state_forwards(app_label, new_state)
 
         try:
-            with self.assertRaises((IntegrityError, DatabaseError)):
-                with transaction.atomic(using=connection.alias):
-                    with connection.schema_editor() as editor:
-                        operation.database_forwards(
-                            app_label, editor, project_state, new_state
-                        )
+            with (
+                self.assertRaises((IntegrityError, DatabaseError)),
+                transaction.atomic(using=connection.alias),
+                connection.schema_editor() as editor,
+            ):
+                operation.database_forwards(app_label, editor, project_state, new_state)
         finally:
             with connection.schema_editor() as editor:
                 for model in [Book, Author]:

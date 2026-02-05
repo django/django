@@ -10,7 +10,6 @@ from django.db.models import CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-    sql_delete_table = "DROP TABLE %(table)s"
     sql_delete_table_cascade = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (

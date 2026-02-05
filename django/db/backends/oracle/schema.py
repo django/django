@@ -23,7 +23,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)"
         "s%(deferrable)s"
     )
-    sql_delete_table = "DROP TABLE %(table)s"
     sql_delete_table_cascade = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
