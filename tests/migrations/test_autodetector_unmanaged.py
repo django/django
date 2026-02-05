@@ -27,8 +27,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
             call_command("makemigrations", "unmanaged_model_with_fk", verbosity=0)
             call_command("migrate", "unmanaged_model_with_fk", verbosity=0)
             with open(Path(tmp_dir) / "0002_custom.py", "w") as custom_migration_file:
-                custom_migration_content = textwrap.dedent(
-                    """
+                custom_migration_content = textwrap.dedent("""
                 from django.db import migrations
 
 
@@ -49,8 +48,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                             reverse_code=migrations.RunPython.noop
                         ),
                     ]
-                """
-                )
+                """)
                 custom_migration_file.write(custom_migration_content)
             try:
                 call_command("migrate", "unmanaged_model_with_fk", stdout=out)
@@ -65,8 +63,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
     )
     def test_add_field_operation_is_detected(self):
         out = io.StringIO()
-        initial_migration_content = textwrap.dedent(
-            """
+        initial_migration_content = textwrap.dedent("""
             from django.db import migrations, models
 
 
@@ -113,8 +110,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                         },
                     ),
                 ]
-            """
-        )
+            """)
         with self.temporary_migration_module("unmanaged_model_with_fk") as tmp_dir:
             with open(Path(tmp_dir) / "0001_initial.py", "w") as initial_migration_file:
                 initial_migration_file.write(initial_migration_content)
@@ -140,8 +136,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
     )
     def test_remove_field_operation_is_detected(self):
         out = io.StringIO()
-        initial_migration_content = textwrap.dedent(
-            """
+        initial_migration_content = textwrap.dedent("""
             from django.db import migrations, models
 
 
@@ -202,8 +197,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                         },
                     ),
                 ]
-            """
-        )
+            """)
         with self.temporary_migration_module("unmanaged_model_with_fk") as tmp_dir:
             with open(Path(tmp_dir) / "0001_initial.py", "w") as initial_migration_file:
                 initial_migration_file.write(initial_migration_content)
