@@ -1158,7 +1158,7 @@ class QuerySet(AltersData):
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
@@ -1171,7 +1171,7 @@ class QuerySet(AltersData):
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self.reverse()
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
