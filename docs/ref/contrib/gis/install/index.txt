@@ -242,8 +242,8 @@ Postgres.app
 ~~~~~~~~~~~~
 
 `Postgres.app <https://postgresapp.com/>`_ is a standalone PostgreSQL server
-that includes the PostGIS extension. You will also need to install
-``gdal`` with :ref:`homebrew`.
+that includes the PostGIS extension. You will also need to install ``gdal``
+with :ref:`homebrew`.
 
 After installing Postgres.app, add the following to your ``.bash_profile`` so
 you can run the package's programs from the command-line. Replace ``X.Y`` with
@@ -309,7 +309,6 @@ Summary:
     $ sudo port install proj6
     $ sudo port install postgis3
     $ sudo port install gdal
-
 
 .. note::
 
