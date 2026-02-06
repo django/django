@@ -143,6 +143,18 @@ class PickleabilityTestCase(TestCase):
             .values_list("title", "group__name")
         )
 
+    def test_queryset_initial_filter(self):
+        group = Group.objects.create(name="Convention")
+        Event.objects.create(title="X-Men Convention", group=group)
+        qs = Event.objects_title_x.all()
+        self.assert_pickles(qs)
+
+    def test_queryset_initial_filter_chained(self):
+        group = Group.objects.create(name="Convention")
+        Event.objects.create(title="X-Men Convention Y", group=group)
+        qs = Event.objects_title_x_y.all()
+        self.assert_pickles(qs)
+
     def test_pickle_prefetch_related_idempotence(self):
         g = Group.objects.create(name="foo")
         groups = Group.objects.prefetch_related("event_set")
