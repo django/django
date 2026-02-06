@@ -44,7 +44,7 @@ def natural_key_serializer_test(self, format):
         self.assertEqual(
             obj.data,
             instance.data,
-            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)"
+            "Objects with PK=%s not equal; expected '%s' (%s), got '%s' (%s)"
             % (
                 obj.pk,
                 obj.data,

@@ -1300,7 +1300,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_workhour_changelist"))
         self.assertContains(response, "employee__person_ptr__exact")
         response = self.client.get(
-            "%s?employee__person_ptr__exact=%d"
+            "%s?employee__person_ptr__exact=%s"
             % (reverse("admin:admin_views_workhour_changelist"), e1.pk)
         )
         self.assertEqual(response.status_code, 200)
@@ -4769,13 +4769,13 @@ class AdminViewListEditable(TestCase):
         self.assertContains(
             response,
             '<div class="hiddenfields">\n'
-            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
-            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n'
+            '<input type="hidden" name="form-0-id" value="%s" id="id_form-0-id">'
+            '<input type="hidden" name="form-1-id" value="%s" id="id_form-1-id">\n'
             "</div>" % (story2.id, story1.id),
             html=True,
         )
-        self.assertContains(response, '<td class="field-id">%d</td>' % story1.id, 1)
-        self.assertContains(response, '<td class="field-id">%d</td>' % story2.id, 1)
+        self.assertContains(response, '<td class="field-id">%s</td>' % story1.id, 1)
+        self.assertContains(response, '<td class="field-id">%s</td>' % story2.id, 1)
 
     def test_pk_hidden_fields_with_list_display_links(self):
         """Similarly as test_pk_hidden_fields, but when the hidden pk fields
@@ -4798,19 +4798,19 @@ class AdminViewListEditable(TestCase):
         self.assertContains(
             response,
             '<div class="hiddenfields">\n'
-            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
-            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n'
+            '<input type="hidden" name="form-0-id" value="%s" id="id_form-0-id">'
+            '<input type="hidden" name="form-1-id" value="%s" id="id_form-1-id">\n'
             "</div>" % (story2.id, story1.id),
             html=True,
         )
         self.assertContains(
             response,
-            '<th class="field-id"><a href="%s">%d</a></th>' % (link1, story1.id),
+            '<th class="field-id"><a href="%s">%s</a></th>' % (link1, story1.id),
             1,
         )
         self.assertContains(
             response,
-            '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id),
+            '<th class="field-id"><a href="%s">%s</a></th>' % (link2, story2.id),
             1,
         )
 
@@ -7321,7 +7321,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(
             reverse("admin:admin_views_post_change", args=(p.pk,))
         )
-        self.assertContains(response, "%d amount of cool" % p.pk)
+        self.assertContains(response, "%s amount of cool" % p.pk)
 
     def test_readonly_text_field(self):
         p = Post.objects.create(
