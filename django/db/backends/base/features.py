@@ -444,6 +444,15 @@ class BaseDatabaseFeatures:
         return self.connection.ops.explain_prefix is not None
 
     @cached_property
+    def supports_inspectdb(self):
+        with self.connection.cursor() as cursor:
+            try:
+                self.connection.introspection.get_table_list(cursor)
+            except NotImplementedError:
+                return False
+            return True
+
+    @cached_property
     def supports_transactions(self):
         """Confirm support for transactions."""
         with self.connection.cursor() as cursor:
