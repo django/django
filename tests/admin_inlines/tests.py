@@ -1198,7 +1198,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_Author_books-0-id" value="%i" '
+            '<input type="hidden" id="id_Author_books-0-id" value="%s" '
             'name="Author_books-0-id">' % self.author_book_auto_m2m_intermediate_id,
             html=True,
         )
@@ -1226,7 +1226,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertNotContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            '<input type="hidden" id="id_inner2_set-0-id" value="%s" '
             'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
@@ -1258,7 +1258,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            '<input type="hidden" id="id_inner2_set-0-id" value="%s" '
             'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
@@ -1305,7 +1305,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            '<input type="hidden" id="id_inner2_set-0-id" value="%s" '
             'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
@@ -1335,7 +1335,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            '<input type="hidden" id="id_inner2_set-0-id" value="%s" '
             'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
@@ -1375,7 +1375,7 @@ class TestInlinePermissions(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            '<input type="hidden" id="id_inner2_set-0-id" value="%s" '
             'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )

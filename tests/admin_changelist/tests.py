@@ -418,7 +418,7 @@ class ChangeListTests(TestCase):
         # make sure that hidden fields are in the correct place
         hiddenfields_div = (
             '<div class="hiddenfields">'
-            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
+            '<input type="hidden" name="form-0-id" value="%s" id="id_form-0-id">'
             "</div>"
         ) % new_child.id
         self.assertInHTML(
