@@ -1,7 +1,6 @@
-import inspect
-
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
+from django.utils.inspect import signature
 
 W003 = Warning(
     "You don't appear to be using Django's built-in "
@@ -56,7 +55,7 @@ def check_csrf_failure_view(app_configs, **kwargs):
         errors.append(Error(msg, id="security.E102"))
     else:
         try:
-            inspect.signature(view).bind(None, reason=None)
+            signature(view).bind(None, reason=None)
         except TypeError:
             msg = (
                 "The CSRF failure view '%s' does not take the correct number of "

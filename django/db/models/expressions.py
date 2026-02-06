@@ -1,7 +1,6 @@
 import copy
 import datetime
 import functools
-import inspect
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
@@ -17,6 +16,7 @@ from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property, classproperty
 from django.utils.hashable import make_hashable
+from django.utils.inspect import signature
 
 
 class SQLiteNumericMixin:
@@ -523,7 +523,7 @@ class Expression(BaseExpression, Combinable):
     @classproperty
     @functools.lru_cache(maxsize=128)
     def _constructor_signature(cls):
-        return inspect.signature(cls.__init__)
+        return signature(cls.__init__)
 
     @classmethod
     def _identity(cls, value):
