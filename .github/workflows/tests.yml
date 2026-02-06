@@ -19,7 +19,6 @@ permissions:
 
 jobs:
   windows:
-    if: github.event_name == 'push'
     runs-on: windows-latest
     strategy:
       matrix:
