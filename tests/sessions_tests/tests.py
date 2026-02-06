@@ -1373,3 +1373,10 @@ class SessionBaseTests(SimpleTestCase):
 
     def test_is_empty(self):
         self.assertIs(self.session.is_empty(), True)
+
+    def test_bool(self):
+        # Empty session is falsy
+        self.assertIs(bool(self.session), False)
+        # Session with data is truthy
+        self.session["foo"] = "bar"
+        self.assertIs(bool(self.session), True)
