@@ -1180,7 +1180,7 @@ class RequestsTests(SimpleTestCase):
         request.POST
 
         with self.assertRaisesMessage(
-            AttributeError,
+            RuntimeError,
             "You cannot set the multipart parser class after the upload has been "
             "processed.",
         ):

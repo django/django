@@ -372,7 +372,7 @@ class HttpRequest:
     @multipart_parser_class.setter
     def multipart_parser_class(self, multipart_parser_class):
         if hasattr(self, "_files"):
-            raise AttributeError(
+            raise RuntimeError(
                 "You cannot set the multipart parser class after the upload has been "
                 "processed."
             )
