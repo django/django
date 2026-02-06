@@ -5,9 +5,9 @@ Fixtures
 ========
 
 A *fixture* is a collection of files that contain serialized representations
-of database data (for example, model instances exported as JSON or XML).
-Each fixture has a unique name, and the files that comprise the
-fixture can be distributed over multiple directories, in multiple applications.
+of database data (for example, model instances exported as JSON or XML). Each
+fixture has a unique name, and the files that comprise the fixture can be
+distributed over multiple directories, in multiple applications.
 
 .. seealso::
 
