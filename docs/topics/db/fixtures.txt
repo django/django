@@ -17,9 +17,10 @@ How to produce a fixture
 ========================
 
 Fixtures can be generated using :djadmin:`manage.py dumpdata <dumpdata>` and
-later reloaded into the database using :djadmin:`loaddata`.
-It's also possible to generate custom fixtures by directly using :doc:`serialization
-tools </topics/serialization>` or even by handwriting them.
+later reloaded into the database using :djadmin:`loaddata`. It's also possible
+to generate custom fixtures by directly using
+:doc:`serialization tools </topics/serialization>` or even by handwriting
+them.
 
 How to use a fixture
 ====================
@@ -71,8 +72,8 @@ would look for any fixture of any fixture type called ``mydata``. If a fixture
 directory contained ``mydata.json``, that fixture would be loaded as a JSON
 fixture.
 
-The fixtures that are named can include directory components. These directories
-will be included in the search path. For example:
+The fixtures that are named can include directory components. These
+directories will be included in the search path. For example:
 
 .. code-block:: shell
 
@@ -99,13 +100,13 @@ or in a test case class:
         fixtures = ["mammals", "birds", "insects"]
 
 The order in which fixtures are loaded follows the order in which they are
-listed, whether it's when using the management command or when listing them in
-the test case class as shown above.
+listed, whether it's when using the management command or when listing them
+in the test case class as shown above.
 
-In these examples, all the fixtures named ``mammals`` from all applications (in
-the order in which applications are defined in :setting:`INSTALLED_APPS`) will
-be loaded first. Subsequently, all the ``birds`` fixtures will be loaded,
-followed by all the ``insects`` fixtures.
+In these examples, all the fixtures named ``mammals`` from all applications
+(in the order in which applications are defined in
+:setting:`INSTALLED_APPS`) will be loaded first. Subsequently, all the
+``birds`` fixtures will be loaded, followed by all the ``insects`` fixtures.
 
 Be aware that if the database backend supports row-level constraints, these
 constraints will be checked at the end of the transaction. Any relationships
@@ -119,14 +120,14 @@ How fixtures are saved to the database
 ======================================
 
 When fixture files are processed, the data is saved to the database as is.
-Model defined :meth:`~django.db.models.Model.save` methods are not called, and
+Model-defined :meth:`~django.db.models.Model.save` methods are not called, and
 any :data:`~django.db.models.signals.pre_save`,
 :data:`~django.db.models.signals.post_save`, or
 :data:`~django.db.models.signals.m2m_changed` signals will be called with
 ``raw=True`` since the instance only contains attributes that are local to the
-model. You may, for example, want to disable handlers that access
-related fields that aren't present during fixture loading and would otherwise
-raise an exception::
+model. You may, for example, want to disable handlers that access related
+fields that aren't present during fixture loading and would otherwise raise
+an exception::
 
     from django.db.models.signals import post_save
     from .models import MyModel
@@ -161,7 +162,8 @@ You could also write a decorator to encapsulate this logic::
 
 
     @disable_for_loaddata
-    def my_handler(**kwargs): ...
+    def my_handler(**kwargs):
+        ...
 
 Just be aware that this logic will disable the signals whenever fixtures are
 deserialized, not just during :djadmin:`loaddata`.
@@ -180,14 +182,16 @@ format. For example:
 
     django-admin loaddata mydata.json
 
-would look for any of ``mydata.json``, ``mydata.json.zip``, ``mydata.json.gz``,
-``mydata.json.bz2``, ``mydata.json.lzma``, or ``mydata.json.xz``. The first
-file contained within a compressed archive is used.
+would look for any of ``mydata.json``, ``mydata.json.zip``,
+``mydata.json.gz``, ``mydata.json.bz2``, ``mydata.json.lzma``, or
+``mydata.json.xz``. The first file contained within a compressed archive is
+used.
 
 Note that if two fixtures with the same name but different fixture type are
-discovered (for example, if ``mydata.json`` and ``mydata.xml.gz`` were found in
-the same fixture directory), fixture installation will be aborted, and any data
-installed in the call to :djadmin:`loaddata` will be removed from the database.
+discovered (for example, if ``mydata.json`` and ``mydata.xml.gz`` were found
+in the same fixture directory), fixture installation will be aborted, and
+any data installed in the call to :djadmin:`loaddata` will be removed from the
+database.
 
 .. admonition:: MySQL with MyISAM and fixtures
 
@@ -198,11 +202,11 @@ installed in the call to :djadmin:`loaddata` will be removed from the database.
 Database-specific fixtures
 ==========================
 
-If you're in a multi-database setup, you might have fixture data that
-you want to load onto one database, but not onto another. In this
-situation, you can add a database identifier into the names of your fixtures.
+If you're in a multi-database setup, you might have fixture data that you want
+to load onto one database, but not onto another. In this situation, you can
+add a database identifier into the names of your fixtures.
 
 For example, if your :setting:`DATABASES` setting has a ``users`` database
 defined, name the fixture ``mydata.users.json`` or
-``mydata.users.json.gz`` and the fixture will only be loaded when you
-specify you want to load data into the ``users`` database.
+``mydata.users.json.gz`` and the fixture will only be loaded when you specify
+you want to load data into the ``users`` database.
