@@ -17,16 +17,7 @@ if PY314:
 
 @functools.lru_cache(maxsize=512)
 def _get_func_parameters(func, remove_first):
-    # As the annotations are not used in any case, inspect the signature with
-    # FORWARDREF to leave any deferred annotations unevaluated.
-    if PY314:
-        signature = inspect.signature(
-            func, annotation_format=annotationlib.Format.FORWARDREF
-        )
-    else:
-        signature = inspect.signature(func)
-
-    parameters = tuple(signature.parameters.values())
+    parameters = tuple(signature(func).parameters.values())
     if remove_first:
         parameters = parameters[1:]
     return parameters
@@ -130,3 +121,12 @@ def lazy_annotations():
             yield
         finally:
             inspect._signature_from_callable = original_helper
+
+
+def signature(obj):
+    # As the annotations are not used in any case, inspect the signature with
+    # FORWARDREF to leave any deferred annotations unevaluated.
+    if PY314:
+        return inspect.signature(obj, annotation_format=annotationlib.Format.FORWARDREF)
+    else:
+        return inspect.signature(obj)
