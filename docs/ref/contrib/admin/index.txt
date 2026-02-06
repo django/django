@@ -1297,7 +1297,7 @@ subclass::
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     While ``search_fields`` is optimized for text fields, non-text fields such
-    as ``IntegerField``, ``DateField``, or ``pk`` can be searched by specifying
+    as ``IntegerField`` or ``DateField`` can be searched by specifying
     an explicit lookup::
 
         search_fields = ["user__id__exact", "age__exact"]
