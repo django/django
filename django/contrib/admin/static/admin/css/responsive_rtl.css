@@ -64,10 +64,6 @@
         margin-right: 0;
     }
 
-    [dir="rtl"] .object-tools {
-        text-align: right;
-    }
-
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;
     }

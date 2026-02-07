@@ -828,7 +828,6 @@ a.deletelink:focus, a.deletelink:hover {
 
 .titles-and-tools {
     display: flex;
-    align-content: space-between;
 }
 
 .titles {
@@ -839,14 +838,11 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools {
     padding: 0;
-    overflow: hidden;
-    text-align: right;
     margin: 0 0 15px;
 }
 
 .object-tools li {
     display: inline-block;
-    height: auto;
 }
 
 .object-tools li + li {
