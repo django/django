@@ -2,12 +2,14 @@
 Multiple object mixins
 ======================
 
-``MultipleObjectMixin``
+``PaginationMixin``
 =======================
 
-.. class:: django.views.generic.list.MultipleObjectMixin
+.. class:: django.views.generic.list.PaginationMixin
 
-    A mixin that can be used to display a list of objects.
+    .. versionadded:: 6.1
+
+    A mixin that can be used to paginate a list of objects.
 
     If ``paginate_by`` is specified, Django will paginate the results returned
     by this. You can specify the page number in the URL in one of two ways:
@@ -43,10 +45,6 @@ Multiple object mixins
     Note that ``page`` *must* be either a valid page number or the value
     ``last``; any other value for ``page`` will result in a 404 error.
 
-    **Extends**
-
-    * :class:`django.views.generic.base.ContextMixin`
-
     **Methods and Attributes**
 
     .. attribute:: allow_empty
@@ -55,32 +53,6 @@ Multiple object mixins
         available. If this is ``False`` and no objects are available, the view
         will raise a 404 instead of displaying an empty page. By default, this
         is ``True``.
-
-    .. attribute:: model
-
-        The model that this view will display data for. Specifying ``model
-        = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
-        :ref:`default manager <default-managers>`.
-
-    .. attribute:: queryset
-
-        A ``QuerySet`` that represents the objects. If provided, the value of
-        ``queryset`` supersedes the value provided for :attr:`model`.
-
-        .. warning::
-
-            ``queryset`` is a class attribute with a *mutable* value so care
-            must be taken when using it directly. Before using it, either call
-            its :meth:`~django.db.models.query.QuerySet.all` method or
-            retrieve it with :meth:`get_queryset` which takes care of the
-            cloning behind the scenes.
-
-    .. attribute:: ordering
-
-        A string or list of strings specifying the ordering to apply to the
-        ``queryset``. Valid values are the same as those for
-        :meth:`~django.db.models.query.QuerySet.order_by`.
 
     .. attribute:: paginate_by
 
@@ -111,22 +83,6 @@ Multiple object mixins
        paginator class doesn't have the same constructor interface as
        :class:`django.core.paginator.Paginator`, you will also need to provide
        an implementation for :meth:`get_paginator`.
-
-    .. attribute:: context_object_name
-
-        Designates the name of the variable to use in the context.
-
-    .. method:: get_queryset()
-
-        Get the list of items for this view. This must be an iterable and may
-        be a queryset (in which queryset-specific behavior will be enabled).
-
-    .. method:: get_ordering()
-
-        Returns a string (or iterable of strings) that defines the ordering
-        that will be applied to the ``queryset``.
-
-        Returns :attr:`ordering` by default.
 
     .. method:: paginate_queryset(queryset, page_size)
 
@@ -160,6 +116,67 @@ Multiple object mixins
         are available. If this method returns ``False`` and no objects are
         available, the view will raise a 404 instead of displaying an empty
         page. By default, this is ``True``.
+
+    .. method:: get_pagination_context(queryset, **kwargs)
+
+        Returns context data for paginating the list of objects.
+
+
+``MultipleObjectMixin``
+=======================
+
+.. class:: django.views.generic.list.MultipleObjectMixin
+
+    A mixin that can be used to display a list of objects.
+
+    **Extends**
+
+    * :class:`django.views.generic.list.PaginationMixin`
+    * :class:`django.views.generic.base.ContextMixin`
+
+    **Methods and Attributes**
+
+    .. attribute:: model
+
+        The model that this view will display data for. Specifying ``model
+        = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
+
+    .. attribute:: queryset
+
+        A ``QuerySet`` that represents the objects. If provided, the value of
+        ``queryset`` supersedes the value provided for :attr:`model`.
+
+        .. warning::
+
+            ``queryset`` is a class attribute with a *mutable* value so care
+            must be taken when using it directly. Before using it, either call
+            its :meth:`~django.db.models.query.QuerySet.all` method or
+            retrieve it with :meth:`get_queryset` which takes care of the
+            cloning behind the scenes.
+
+    .. attribute:: ordering
+
+        A string or list of strings specifying the ordering to apply to the
+        ``queryset``. Valid values are the same as those for
+        :meth:`~django.db.models.query.QuerySet.order_by`.
+
+    .. attribute:: context_object_name
+
+        Designates the name of the variable to use in the context.
+
+    .. method:: get_queryset()
+
+        Get the list of items for this view. This must be an iterable and may
+        be a queryset (in which queryset-specific behavior will be enabled).
+
+    .. method:: get_ordering()
+
+        Returns a string (or iterable of strings) that defines the ordering
+        that will be applied to the ``queryset``.
+
+        Returns :attr:`ordering` by default.
 
     .. method:: get_context_object_name(object_list)
 

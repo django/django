@@ -225,7 +225,8 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.views.generic.list.PaginationMixin` mixin
+  provides pagination functionality.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
