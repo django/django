@@ -284,13 +284,20 @@ class SelectForUpdateTests(TransactionTestCase):
         select_for_update(of=['self']) when the only columns selected are from
         related tables.
         """
-        with transaction.atomic():
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            # Note: select_related() is canceled by values()
             values = list(
-                Person.objects.select_related("born")
-                .select_for_update(of=("self",))
-                .values("born__name")
+                Person.objects.select_for_update(of=("self",)).values("born__name")
             )
         self.assertEqual(values, [{"born__name": self.city1.name}])
+        # Check for #36398 -- locking is limited to self
+        features = connections["default"].features
+        if features.select_for_update_of_column:
+            expected = ['select_for_update_person"."id']
+        else:
+            expected = ["select_for_update_person"]
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
     @skipUnlessDBFeature(
         "has_select_for_update_of",

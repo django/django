@@ -1480,6 +1480,10 @@ class SQLCompiler:
             klass_info = self.klass_info
             if name == "self":
                 col = _get_first_selected_col_from_model(klass_info)
+                if col is None:
+                    concrete_model = klass_info["model"]._meta.concrete_model
+                    alias = self.query.base_table or self.query.get_initial_alias()
+                    col = concrete_model._meta.pk.get_col(alias)
             else:
                 for part in name.split(LOOKUP_SEP):
                     klass_infos = (
