@@ -1,8 +1,12 @@
 import copy
+import inspect
 import os
 import sys
+import warnings
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
+
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 
 
 def cached_import(module_path, class_name):
@@ -13,7 +17,22 @@ def cached_import(module_path, class_name):
         and getattr(spec, "_initializing", False) is False
     ):
         module = import_module(module_path)
-    return getattr(module, class_name)
+    cls = getattr(module, class_name)
+    if inspect.ismodule(cls):
+        dotted_path = ".".join([module_path, class_name])
+        # RemovedInDjango70Warning.
+        # Replace warning with:
+        # msg = "%s looks like a module path. " % dotted_path
+        # msg += "Call importlib.import_module() instead."
+        # raise ImportError(msg)
+        msg = (
+            "import_string() will raise ImportError in Django 7.0 when given a "
+            f"module. Call importlib.import_module() instead. Got: {dotted_path}"
+        )
+        warnings.warn(
+            msg, RemovedInDjango70Warning, skip_file_prefixes=django_file_prefixes()
+        )
+    return cls
 
 
 def import_string(dotted_path):
