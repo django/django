@@ -326,13 +326,14 @@ class RegisterLookupMixin:
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
         ]
-        return cls.merge_dicts(class_lookups)
+        return cls.remove_none_from_dict(cls.merge_dicts(class_lookups))
 
     def get_instance_lookups(self):
         class_lookups = self.get_class_lookups()
         if instance_lookups := getattr(self, "instance_lookups", None):
-            return {**class_lookups, **instance_lookups}
-        return class_lookups
+            # TODO: confirm whether not not None filtering is needed.
+            return self.remove_none_from_dict({**class_lookups, **instance_lookups})
+        return self.remove_none_from_dict(class_lookups)
 
     get_lookups = class_or_instance_method(get_class_lookups, get_instance_lookups)
     get_class_lookups = classmethod(get_class_lookups)
@@ -369,6 +370,10 @@ class RegisterLookupMixin:
             merged.update(d)
         return merged
 
+    @staticmethod
+    def remove_none_from_dict(dict_):
+        return {k: v for k, v in dict_.items() if v is not None}
+
     @classmethod
     def _clear_cached_class_lookups(cls):
         for subclass in subclasses(cls):
@@ -397,23 +402,22 @@ class RegisterLookupMixin:
     register_class_lookup = classmethod(register_class_lookup)
 
     def _unregister_class_lookup(cls, lookup, lookup_name=None):
-        """
-        Remove given lookup from cls lookups. For use in tests only as it's
-        not thread-safe.
-        """
         if lookup_name is None:
             lookup_name = lookup.lookup_name
-        del cls.class_lookups[lookup_name]
+        if "class_lookups" not in cls.__dict__:
+            cls.class_lookups = {}
+        cls.class_lookups[lookup_name] = None
         cls._clear_cached_class_lookups()
 
     def _unregister_instance_lookup(self, lookup, lookup_name=None):
-        """
-        Remove given lookup from instance lookups. For use in tests only as
-        it's not thread-safe.
-        """
         if lookup_name is None:
             lookup_name = lookup.lookup_name
-        del self.instance_lookups[lookup_name]
+        if "instance_lookups" not in self.__dict__:
+            self.instance_lookups = {}
+        if lookup_name in self.instance_lookups:
+            del self.instance_lookups[lookup_name]
+        else:
+            self.instance_lookups[lookup_name] = None
 
     _unregister_lookup = class_or_instance_method(
         _unregister_class_lookup, _unregister_instance_lookup
