@@ -71,11 +71,21 @@ class WSGIRequest(HttpRequest):
         self.method = environ["REQUEST_METHOD"].upper()
         # Set content_type, content_params, and encoding.
         self._set_content_type_params(environ)
+        transfer_encoding = environ.get("HTTP_TRANSFER_ENCODING", "").lower()
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
             content_length = 0
-        self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
+            if transfer_encoding and len(transfer_encoding) < 2048:
+                if any(
+                    enc.strip() == "chunked" for enc in transfer_encoding.split(",")
+                ):
+                    content_length = None
+
+        if content_length is None:
+            self._stream = self.environ["wsgi.input"]
+        else:
+            self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False
         self.resolver_match = None
 
