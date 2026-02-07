@@ -185,7 +185,9 @@ Cache
 CSP
 ~~~
 
-* ...
+* Admin templates now include CSP nonces on inline ``<script>`` tags when
+  Content Security Policy nonces are enabled, improving compatibility with
+  strict CSP configurations.
 
 CSRF
 ~~~~
