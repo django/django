@@ -46,6 +46,7 @@ class Article(models.Model):
     sub_section = models.ForeignKey(
         Section, models.SET_NULL, null=True, blank=True, related_name="+"
     )
+    collapsible_open_field = models.TextField(blank=True, default="")
 
     def __str__(self):
         return self.title
