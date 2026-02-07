@@ -10,7 +10,7 @@
 <thead>
 <tr>
 {% for header in result_headers %}
-<th scope="col"{{ header.class_attrib }}>
+<th scope="col" id="{{ header.col_id }}" {{ header.class_attrib }}>
    {% if header.sortable and header.sort_priority > 0 %}
        <div class="sortoptions">
          <a class="sortremove" href="{{ header.url_remove }}" title="{% translate "Remove from sorting" %}"></a>
