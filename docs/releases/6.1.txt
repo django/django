@@ -284,6 +284,10 @@ Models
 * The :data:`~django.db.models.signals.m2m_changed` signal now receives a
   ``raw`` argument.
 
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
