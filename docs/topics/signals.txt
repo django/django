@@ -52,7 +52,7 @@ the order they were registered.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
-    :param receiver: The receiver function which will be connected to this
+    :param receiver: The callback function which will be connected to this
         signal. See :ref:`receiver-functions` for more information.
 
     :param sender: Specifies a particular sender to receive signals from. See
