@@ -295,7 +295,7 @@ Date-based mixins
         will display an empty page instead of raising a 404.
 
         This is identical to
-        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        :attr:`django.views.generic.list.PaginationMixin.allow_empty`,
         except for the default value, which is ``False``.
 
     .. attribute:: date_list_period

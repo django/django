@@ -188,7 +188,7 @@ many projects they are typically the most commonly used views.
     .. method:: get(request, *args, **kwargs)
 
         Adds ``object_list`` to the context. If
-        :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty`
+        :attr:`~django.views.generic.list.PaginationMixin.allow_empty`
         is True then display an empty list. If
-        :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` is
+        :attr:`~django.views.generic.list.PaginationMixin.allow_empty` is
         False then raise a 404 error.

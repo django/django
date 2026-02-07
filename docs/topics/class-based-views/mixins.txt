@@ -136,7 +136,7 @@ using that list of objects.
 To get the objects, :class:`~django.views.generic.list.ListView` uses
 :class:`~django.views.generic.list.MultipleObjectMixin`, which provides both
 :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` and
-:meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`.
+:meth:`~django.views.generic.list.PaginationMixin.paginate_queryset`.
 Unlike with :class:`~django.views.generic.detail.SingleObjectMixin`, there's no
 need to key off parts of the URL to figure out the queryset to work with, so
 the default uses the
