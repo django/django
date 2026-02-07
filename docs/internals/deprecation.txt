@@ -1252,9 +1252,8 @@ details on these changes.
   ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  ``include()``, ``patterns()``, and ``url()``, plus
-  :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
-  are now available through ``django.conf.urls``.
+  ``include()``, ``patterns()``, and ``url()``, plus ``handler404` and
+  ``handler500`` are now available through ``django.conf.urls``.
 
 * The functions ``setup_environ()`` and ``execute_manager()`` will be removed
   from :mod:`django.core.management`. This also means that the old (pre-1.4)

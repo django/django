@@ -139,33 +139,46 @@ template.
 
 .. _customizing-error-views:
 
-Customizing error views
-=======================
+Customizing error view
+======================
 
-The default error views in Django should suffice for most web applications,
-but can easily be overridden if you need any custom behavior. Specify the
-handlers as seen below in your URLconf (setting them anywhere else will have no
-effect).
+The default error view in Django should suffice for most web applications, but
+but can easily be overridden if you need any custom behavior.
 
-The :func:`~django.views.defaults.page_not_found` view is overridden by
-:data:`~django.conf.urls.handler404`::
+The default error view can be overridden by setting a view in the
+``error_handler`` variable in your URLconf (setting it anywhere else will have
+no effect)::
 
-    handler404 = "mysite.views.my_custom_page_not_found_view"
+    error_handler = views.my_custom_error_view
 
-The :func:`~django.views.defaults.server_error` view is overridden by
-:data:`~django.conf.urls.handler500`::
+or if you have a class-based-view::
 
-    handler500 = "mysite.views.my_custom_error_view"
+    error_handler = views.MyCustomErrorView.as_view()
 
-The :func:`~django.views.defaults.permission_denied` view is overridden by
-:data:`~django.conf.urls.handler403`::
+.. versionchanged:: 5.2
 
-    handler403 = "mysite.views.my_custom_permission_denied_view"
+    On previous versions, there are multiple variables to define to override
+    particular views.
 
-The :func:`~django.views.defaults.bad_request` view is overridden by
-:data:`~django.conf.urls.handler400`::
+    The :func:`~django.views.defaults.page_not_found` view is overridden by
+    :data:`~django.conf.urls.handler404`::
 
-    handler400 = "mysite.views.my_custom_bad_request_view"
+        handler404 = "mysite.views.my_custom_page_not_found_view"
+
+    The :func:`~django.views.defaults.server_error` view is overridden by
+    :data:`~django.conf.urls.handler500`::
+
+        handler500 = "mysite.views.my_custom_error_view"
+
+    The :func:`~django.views.defaults.permission_denied` view is overridden by
+    :data:`~django.conf.urls.handler403`::
+
+        handler403 = "mysite.views.my_custom_permission_denied_view"
+
+    The :func:`~django.views.defaults.bad_request` view is overridden by
+    :data:`~django.conf.urls.handler400`::
+
+        handler400 = "mysite.views.my_custom_bad_request_view"
 
 .. seealso::
 

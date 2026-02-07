@@ -185,6 +185,11 @@ By default, this is :func:`django.views.defaults.bad_request`. If you
 implement a custom view, be sure it accepts ``request`` and ``exception``
 arguments and returns an :class:`~django.http.HttpResponseBadRequest`.
 
+.. deprecated:: 5.2
+
+    The ``handler<code>`` handlers are deprecated and should be replaced by a
+    generic ``error_handler`` view function.
+
 ``handler403``
 ==============
 
@@ -198,6 +203,12 @@ By default, this is :func:`django.views.defaults.permission_denied`. If you
 implement a custom view, be sure it accepts ``request`` and ``exception``
 arguments and returns an :class:`~django.http.HttpResponseForbidden`.
 
+
+.. deprecated:: 5.2
+
+    The ``handler<code>`` handlers are deprecated and should be replaced by a
+    generic ``error_handler`` view function.
+
 ``handler404``
 ==============
 
@@ -209,6 +220,12 @@ that should be called if none of the URL patterns match.
 By default, this is :func:`django.views.defaults.page_not_found`. If you
 implement a custom view, be sure it accepts ``request`` and ``exception``
 arguments and returns an :class:`~django.http.HttpResponseNotFound`.
+
+
+.. deprecated:: 5.2
+
+    The ``handler<code>`` handlers are deprecated and should be replaced by a
+    generic ``error_handler`` view function.
 
 ``handler500``
 ==============
@@ -222,3 +239,8 @@ have runtime errors in view code.
 By default, this is :func:`django.views.defaults.server_error`. If you
 implement a custom view, be sure it accepts a ``request`` argument and returns
 an :class:`~django.http.HttpResponseServerError`.
+
+.. deprecated:: 5.2
+
+    The ``handler<code>`` handlers are deprecated and should be replaced by a
+    generic ``error_handler`` view function.

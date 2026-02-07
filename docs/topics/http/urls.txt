@@ -338,25 +338,28 @@ Error handling
 When Django can't find a match for the requested URL, or when an exception is
 raised, Django invokes an error-handling view.
 
-The views to use for these cases are specified by four variables. Their
-default values should suffice for most projects, but further customization is
-possible by overriding their default values.
+The default view Django uses for these cases is
+:class:`django.views.defaults.DefaultErrorView`. This view should suffice for
+most projects but further customization is possible by defining a custom view
+to handle errors, either by subclassing this view or by creating your own.
 
-See the documentation on :ref:`customizing error views
+See the documentation on :ref:`customizing error view
 <customizing-error-views>` for the full details.
 
-Such values can be set in your root URLconf. Setting these variables in any
-other URLconf will have no effect.
+.. versionchanged:: 5.2
 
-Values must be callables, or strings representing the full Python import path
-to the view that should be called to handle the error condition at hand.
+    In previous versions, the views to use for these cases are specified by four
+    variables.
 
-The variables are:
+    Values must be callables, or strings representing the full Python import path
+    to the view that should be called to handle the error condition at hand.
 
-* ``handler400`` -- See :data:`django.conf.urls.handler400`.
-* ``handler403`` -- See :data:`django.conf.urls.handler403`.
-* ``handler404`` -- See :data:`django.conf.urls.handler404`.
-* ``handler500`` -- See :data:`django.conf.urls.handler500`.
+    The variables are:
+
+    * ``handler400``
+    * ``handler403``
+    * ``handler404``
+    * ``handler500``
 
 .. _including-other-urlconfs:
 

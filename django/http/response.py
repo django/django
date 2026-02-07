@@ -215,6 +215,23 @@ class HttpResponseBase:
     def get(self, header, alternate=None):
         return self.headers.get(header, alternate)
 
+    @classmethod
+    def response_class_by_status_code(cls, status_code):
+        return {
+            200: HttpResponse,
+            301: HttpResponsePermanentRedirect,
+            302: HttpResponseRedirect,
+            304: HttpResponseNotModified,
+            307: HttpResponseRedirect,
+            308: HttpResponsePermanentRedirect,
+            400: HttpResponseBadRequest,
+            403: HttpResponseForbidden,
+            404: HttpResponseNotFound,
+            405: HttpResponseNotAllowed,
+            410: HttpResponseGone,
+            500: HttpResponseServerError,
+        }.get(status_code, cls)
+
     def set_cookie(
         self,
         key,

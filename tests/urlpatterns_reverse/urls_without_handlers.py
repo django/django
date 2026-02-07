@@ -1,4 +1,4 @@
-# A URLconf that doesn't define any handlerXXX.
+# A URLconf that doesn't define any error handler view.
 from django.urls import path
 
 from .views import bad_view, empty_view

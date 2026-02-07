@@ -10,6 +10,7 @@ import functools
 import inspect
 import re
 import string
+import warnings
 from importlib import import_module
 from pickle import PicklingError
 from urllib.parse import quote
@@ -21,6 +22,7 @@ from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import _lazy_re_compile, normalize
@@ -739,15 +741,26 @@ class URLResolver:
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
         return patterns
 
-    def resolve_error_handler(self, view_type):
-        callback = getattr(self.urlconf_module, "handler%s" % view_type, None)
-        if not callback:
+    def resolve_error_handler(self, status_code):
+        # RemovedInDjango61Warning.
+        callback = getattr(self.urlconf_module, f"handler{status_code}", None)
+        if callback:
+            warnings.warn(
+                "handler<status> custom error handlers are deprecated, please "
+                "replace them by a generic `error_handler` view function.",
+                RemovedInDjango61Warning,
+            )
+            return get_callable(callback)
+        error_view = getattr(self.urlconf_module, "error_handler", None)
+        if error_view:
+            error_view.status_code = status_code
+        else:
             # No handler specified in file; use lazy import, since
-            # django.conf.urls imports this file.
-            from django.conf import urls
+            # django.views.defaults imports this file.
+            from django.views.defaults import DefaultErrorView
 
-            callback = getattr(urls, "handler%s" % view_type)
-        return get_callable(callback)
+            error_view = DefaultErrorView.as_view(status_code=status_code)
+        return error_view
 
     def reverse(self, lookup_view, *args, **kwargs):
         return self._reverse_with_prefix(lookup_view, "", *args, **kwargs)

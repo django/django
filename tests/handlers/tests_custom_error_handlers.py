@@ -1,7 +1,13 @@
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
-from django.test import SimpleTestCase, modify_settings, override_settings
+from django.test import (
+    SimpleTestCase,
+    ignore_warnings,
+    modify_settings,
+    override_settings,
+)
 from django.urls import path
+from django.utils.deprecation import RemovedInDjango61Warning
 
 
 class MiddlewareAccessingContent:
@@ -38,6 +44,7 @@ handler403 = template_response_error_handler
     }
 )
 class CustomErrorHandlerTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_handler_renders_template_response(self):
         """
         BaseHandler should render TemplateResponse if necessary.

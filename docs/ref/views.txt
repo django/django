@@ -58,8 +58,61 @@ parameter will be transparently passed to the view.
 Error views
 ===========
 
-Django comes with a few views by default for handling HTTP errors. To override
-these with your own custom views, see :ref:`customizing-error-views`.
+When any uncaught exception is produced by a view of your site, Django is
+calling an error handling view, which is by default the following view.
+
+.. _default_error_view:
+
+The default error view
+----------------------
+
+.. class:: defaults.DefaultErrorView
+
+    .. versionadded:: 5.2 
+
+    The view is a class-based-view inheriting from
+    :class:`~django.views.generic.base.ContextMixin`
+    and class:`~django.views.generic.base.View`, so refer to theses classes for
+    common attributes and methods.
+
+    .. attribute:: status_code
+
+        The status code of the HTTP response to return.
+
+    .. attribute:: exception
+
+        The exception that produced the error leading to the call of this error
+        view.
+
+    .. method:: get_template_name()
+
+        Return by default a name on the pattern ``<status_code>.html``.
+
+    .. method:: exception_as_string()
+
+        Produce a string from the exception having triggered the error view.
+
+If you provide any template in your root template directory named after an error
+response code (``404.html``, ``500.html``, etc.), that template will be used to
+produce an error path. Otherwise, Django will produce a very simple page
+containing an error title and a standard message.
+
+The context used to render the error templates contains the following keys:
+
+    * ``title``: A short title for the error (like ``Not Found`` for a 404
+      error).
+    * ``details``: A short message explaining the error, possibley empty.
+    * ``request_path``: The original request path of the view producing the
+      error, quoted to prevent a content injection attack.
+    * ``exception``: The uncaught exception that triggered the error view, as a
+      string.
+
+which either produces a "Not
+Found" message or loads and renders the template ``404.html`` if you created it
+in your root template directory.
+
+To override this default view with your custom view, see
+:ref:`customizing-error-views`.
 
 .. _http_not_found_view:
 
@@ -67,6 +120,11 @@ The 404 (page not found) view
 -----------------------------
 
 .. function:: defaults.page_not_found(request, exception, template_name='404.html')
+
+.. deprecated:: 5.2
+
+    This view is deprecated as it has been replaced by the :ref:`default error
+    view <_default_error_view>`.
 
 When you raise :exc:`~django.http.Http404` from within a view, Django loads a
 special view devoted to handling 404 errors. By default, it's the view
@@ -99,6 +157,11 @@ The 500 (server error) view
 
 .. function:: defaults.server_error(request, template_name='500.html')
 
+.. deprecated:: 5.2
+
+    This view is deprecated as it has been replaced by the :ref:`default error
+    view <_default_error_view>`.
+
 Similarly, Django executes special-case behavior in the case of runtime errors
 in view code. If a view results in an exception, Django will, by default, call
 the view ``django.views.defaults.server_error``, which either produces a
@@ -118,6 +181,11 @@ The 403 (HTTP Forbidden) view
 -----------------------------
 
 .. function:: defaults.permission_denied(request, exception, template_name='403.html')
+
+.. deprecated:: 5.2
+
+    This view is deprecated as it has been replaced by the :ref:`default error
+    view <_default_error_view>`.
 
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by
@@ -147,6 +215,11 @@ The 400 (bad request) view
 --------------------------
 
 .. function:: defaults.bad_request(request, exception, template_name='400.html')
+
+.. deprecated:: 5.2
+
+    This view is deprecated as it has been replaced by the :ref:`default error
+    view <_default_error_view>`.
 
 When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
 it may be handled by a component of Django (for example resetting the session
