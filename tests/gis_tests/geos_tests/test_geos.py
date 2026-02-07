@@ -23,6 +23,7 @@ from django.contrib.gis.geos import (
     fromfile,
     fromstr,
 )
+from django.contrib.gis.geos.error import GEOSLibraryError
 from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
@@ -122,6 +123,18 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertRaisesMessage((GEOSException, ValueError), err.msg),
             ):
                 fromstr(err.wkt)
+
+        msg = (
+            "Error encountered checking Geometry returned from GEOS C "
+            'function "GEOSWKTReader_read_r".'
+        )
+        with self.assertRaisesMessage(GEOSException, msg) as context:
+            GEOSGeometry("Point(5, 2)")
+        self.assertIsInstance(context.exception.__cause__, GEOSLibraryError)
+        self.assertEqual(
+            str(context.exception.__cause__),
+            "ParseException: Expected number but encountered ','",
+        )
 
         # Bad WKB
         with self.assertRaisesMessage(
