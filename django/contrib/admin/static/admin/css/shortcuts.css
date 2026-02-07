@@ -1,0 +1,79 @@
+#open-shortcuts kbd, .keyboard-shortcuts kbd {
+  background-color: var(--body-bg);
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.2),
+    0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+  color: var(--body-fg);
+  display: inline-block;
+  font-size: 1em;
+  line-height: 1;
+  padding: 0.5em 0.5em;
+  white-space: nowrap;
+}
+
+.keyboard-shortcuts {
+  background-color: var(--darkened-bg);
+  color: var(--body-fg);
+  min-width: 20em;
+  padding: 1em;
+  height: 50vh;
+  width: 40vw;
+}
+
+.keyboard-shortcuts .dialog-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.keyboard-shortcuts .dialog-heading h2 {
+  margin: 0;
+}
+
+.keyboard-shortcuts h3 {
+  background: var(--header-bg);
+  color: var(--header-color);
+  margin: 0;
+  padding: 0.5em 1em;
+}
+
+.keyboard-shortcuts button {
+  background: inherit;
+  cursor: pointer;
+  border: 0;
+  font-size: 1.5em;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.keyboard-shortcuts dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  padding: 0;
+  margin: 0;
+}
+
+.shortcut-description, .shortcut-keys {
+  border-top: 1px solid var(--border-color);
+  padding: 1em;
+  margin: 0;
+}
+
+.shortcut-keys {
+  text-align: right;
+}
+
+dt.shortcut-description {
+  font-weight: normal; /* Revert bold styling from base.css for dt */
+}
+
+#toggle-shortcuts {
+  margin-left: .5em;
+}
+
+#toggle-shortcuts:not(:checked) ~ section {
+  opacity: 0.5; /* gray out shortcuts sections when toggle is off */
+}
