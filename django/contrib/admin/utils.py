@@ -18,6 +18,7 @@ from django.utils import formats, timezone
 from django.utils.hashable import make_hashable
 from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.safestring import SafeString
 from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
@@ -131,6 +132,8 @@ def get_deleted_objects(objs, request, admin_site):
     Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
+    from django.contrib.admin.options import EMPTY_VALUE_STRING
+
     try:
         obj = objs[0]
     except IndexError:
@@ -164,8 +167,12 @@ def get_deleted_objects(objs, request, admin_site):
                 return no_edit_link
 
             # Display a link to the admin page.
+            obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
             return format_html(
-                '{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj
+                '{}: <a href="{}">{}</a>',
+                capfirst(opts.verbose_name),
+                admin_url,
+                obj_display,
             )
         else:
             # Don't display link to edit, because it either has no
@@ -468,7 +475,9 @@ def display_for_value(value, empty_value_display, boolean=False):
 
     if boolean:
         return _boolean_icon(value)
-    elif value in EMPTY_VALUES:
+    if isinstance(value, str) and not isinstance(value, SafeString):
+        value = value.strip()
+    if value in EMPTY_VALUES:
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)
