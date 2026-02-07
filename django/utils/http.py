@@ -275,7 +275,7 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlsplit is not so flexible. Treat any url with three slashes as unsafe.
-    if url.startswith("///") or len(url) > MAX_URL_LENGTH:
+    if url.startswith("///") or len(url) > MAX_URL_REDIRECT_LENGTH:
         # urlsplit does not perform validation of inputs. Unicode normalization
         # is very slow on Windows and can be a DoS attack vector.
         # https://docs.python.org/3/library/urllib.parse.html#url-parsing-security
