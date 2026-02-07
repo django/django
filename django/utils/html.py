@@ -48,6 +48,8 @@ MAX_STRIP_TAGS_DEPTH = 50
 # HTML tag that opens but has no closing ">" after 1k+ chars.
 long_open_tag_without_closing_re = _lazy_re_compile(r"<[a-zA-Z][^>]{1000,}")
 
+_linebreaks_re = _lazy_re_compile(r"\n{2,}")
+
 
 @keep_lazy(SafeString)
 def escape(text):
@@ -174,8 +176,8 @@ def format_html_join(sep, format_string, args_generator):
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Convert newlines into <p> and <br>s."""
-    value = normalize_newlines(value)
-    paras = re.split("\n{2,}", str(value))
+    value = normalize_newlines(str(value))
+    paras = _linebreaks_re.split(value)
     if autoescape:
         paras = ["<p>%s</p>" % escape(p).replace("\n", "<br>") for p in paras]
     else:
@@ -234,10 +236,13 @@ def strip_tags(value):
     return value
 
 
+_strip_spaces_between_tags_re = re.compile(r">\s+<")
+
+
 @keep_lazy_text
 def strip_spaces_between_tags(value):
     """Return the given HTML with spaces between tags removed."""
-    return re.sub(r">\s+<", "><", str(value))
+    return _strip_spaces_between_tags_re.sub("><", str(value))
 
 
 def smart_urlquote(url):

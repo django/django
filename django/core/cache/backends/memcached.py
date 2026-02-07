@@ -1,6 +1,5 @@
 "Memcached cache backend"
 
-import re
 import time
 
 from django.core.cache.backends.base import (
@@ -9,6 +8,7 @@ from django.core.cache.backends.base import (
     InvalidCacheKey,
     memcache_key_warnings,
 )
+from django.core.cache.utils import server_separator_re
 from django.utils.functional import cached_property
 
 
@@ -16,7 +16,7 @@ class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split("[;,]", server)
+            self._servers = server_separator_re.split(server)
         else:
             self._servers = server
 

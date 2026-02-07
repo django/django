@@ -88,7 +88,7 @@ class Command(BaseCommand):
             self.addr = ""
             self.port = self.default_port
         else:
-            m = re.match(naiveip_re, options["addrport"])
+            m = naiveip_re.match(options["addrport"])
             if m is None:
                 raise CommandError(
                     '"%s" is not a valid port number '
