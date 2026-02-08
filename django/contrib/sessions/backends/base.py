@@ -191,6 +191,10 @@ class SessionBase:
         except AttributeError:
             return True
 
+    def __bool__(self):
+        """Return False if the session is empty, True otherwise."""
+        return not self.is_empty()
+
     def _get_new_session_key(self):
         "Return session key that isn't being used."
         while True:
