@@ -1003,7 +1003,7 @@ class SQLCompiler:
             base_params = tuple(params)
             return self._apply_ctes(lambda: (base_sql, base_params))
         finally:
-            # Finally do cleanup - get rid of the joins we created above.       
+            # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
 
     def get_default_columns(
@@ -2024,8 +2024,7 @@ class SQLDeleteCompiler(SQLCompiler):
 
     def as_sql(self):
         """
-        Create the SQL for this query. Return the SQL string and list of        
-        parameters.
+        Create the SQL for this query. Return the SQL string and list of parameters.
         """
         if (
             self.auto_cte_enabled
