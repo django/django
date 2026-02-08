@@ -11,15 +11,12 @@ from itertools import groupby
 
 from django.conf import settings
 from django.http import QueryDict
+
 from django.utils import timezone
 from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
-from collections.abc import Mapping, Iterable
-from django.http import QueryDict
-from django.template import TemplateSyntaxError
-
 
 from .base import (
     BLOCK_TAG_END,
@@ -1293,13 +1290,11 @@ def partial_func(parser, token):
 
 
 @register.simple_tag(name="querystring", takes_context=True)
-
 def querystring(context, *args, **kwargs):
     if not args:
         try:
             request = context["request"]
         except KeyError:
-            # Let AttributeError be raised naturally (tests expect exact message)
             request = context.request
 
         args = [request.GET]
@@ -1336,11 +1331,6 @@ def querystring(context, *args, **kwargs):
                 params[key] = value
 
     return f"?{params.urlencode()}"
-
-
-
-
-
 
 
 @register.tag
