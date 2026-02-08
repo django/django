@@ -204,6 +204,7 @@
     color: var(--body-quiet-color);
     word-break: break-word;
 }
+
 #changelist-filter summary,
 #changelist-filter a {
     overflow-wrap: anywhere;
