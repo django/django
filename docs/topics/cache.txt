@@ -1208,6 +1208,12 @@ are joined using colons to produce a final string::
     def make_key(key, key_prefix, version):
         return "%s:%s:%s" % (key_prefix, version, key)
 
+.. deprecated:: 6.1
+
+   Support for non-string cache keys and key prefixes is deprecated. Cache
+   keys and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>` setting should be
+   strings. Support for other types will be removed in Django 7.0.
+
 If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key
 parts), you can provide a custom key function.

@@ -27,6 +27,7 @@ from django.core.cache import (
     caches,
 )
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
+from django.core.cache.backends.locmem import LocMemCache
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -62,6 +63,7 @@ from django.utils.cache import (
     patch_cache_control,
     patch_vary_headers,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
@@ -363,6 +365,37 @@ class BaseCacheTests:
         """Nonexistent cache keys return as None/default."""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
+
+    def test_non_string_key_warning(self):
+        """Non-string cache keys emit a deprecation warning but still work."""
+        msg = (
+            "Cache keys must be strings. Support for non-string keys is "
+            "deprecated and will be removed in Django 7.0."
+        )
+
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            cache.set(123, "value")
+
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            self.assertEqual(cache.get(123), "value")
+
+    def test_non_string_key_prefix_warning(self):
+        """
+        Non-string cache key prefixes emit a deprecation warning but still
+        work.
+        """
+        test_cache = LocMemCache("test", {"KEY_PREFIX": 123})
+
+        msg = (
+            "Cache key prefixes must be strings. Support for non-string key "
+            "prefixes is deprecated and will be removed in Django 7.0."
+        )
+
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            test_cache.set("key", "value")
+
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            self.assertEqual(test_cache.get("key"), "value")
 
     def test_get_many(self):
         # Multiple cache keys can be returned using get_many
@@ -1516,43 +1549,43 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
     def test_lru_get(self):
         """get() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key)
-        cache.set(9, 9, timeout=None)
+            self.assertEqual(cache.get(str(key)), key)
+        cache.set("9", 9, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key)
+            self.assertEqual(cache.get(str(key)), key)
         for key in range(6, 9):
-            self.assertIsNone(cache.get(key))
-        self.assertEqual(cache.get(9), 9)
+            self.assertIsNone(cache.get(str(key)))
+        self.assertEqual(cache.get("9"), 9)
 
     @limit_locmem_entries
     def test_lru_set(self):
         """set() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(3, 9):
-            cache.set(key, key, timeout=None)
-        cache.set(9, 9, timeout=None)
+            cache.set(str(key), key, timeout=None)
+        cache.set("9", 9, timeout=None)
         for key in range(3, 10):
-            self.assertEqual(cache.get(key), key)
+            self.assertEqual(cache.get(str(key)), key)
         for key in range(3):
-            self.assertIsNone(cache.get(key))
+            self.assertIsNone(cache.get(str(key)))
 
     @retry()
     @limit_locmem_entries
     def test_lru_incr(self):
         """incr() moves cache keys."""
         for key in range(9):
-            cache.set(key, key, timeout=None)
+            cache.set(str(key), key, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.incr(key), key + 1)
-        cache.set(9, 9, timeout=None)
+            self.assertEqual(cache.incr(str(key)), key + 1)
+        cache.set("9", 9, timeout=None)
         for key in range(6):
-            self.assertEqual(cache.get(key), key + 1)
+            self.assertEqual(cache.get(str(key)), key + 1)
         for key in range(6, 9):
-            self.assertIsNone(cache.get(key))
-        self.assertEqual(cache.get(9), 9)
+            self.assertIsNone(cache.get(str(key)))
+        self.assertEqual(cache.get("9"), 9)
 
 
 # memcached and redis backends aren't guaranteed to be available.

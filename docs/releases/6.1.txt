@@ -441,6 +441,10 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+* Support for non-string cache keys and key prefixes is deprecated. Cache keys
+  and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>` setting should be strings.
+  Support for other types will be removed in Django 7.0.
+
 Features removed in 6.1
 =======================
 

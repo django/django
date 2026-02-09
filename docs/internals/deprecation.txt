@@ -64,6 +64,8 @@ details on these changes.
   :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
   instead.
 
+* Support for non-string cache keys and key prefixes will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
