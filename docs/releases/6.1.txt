@@ -422,6 +422,10 @@ Miscellaneous
   ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
   transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
 
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1
