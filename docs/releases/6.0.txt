@@ -517,6 +517,13 @@ Miscellaneous
 * The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
   available :class:`~django.db.models.StringAgg` class.
 
+* Passing a string to the
+  :attr:`~django.contrib.postgres.aggregates.StringAgg.delimiter` argument of
+  the (deprecated) PostgreSQL ``StringAgg`` class is deprecated. Use a
+  :class:`~django.db.models.Value` or expression instead to prepare for
+  compatibility with the generally available
+  :class:`~django.db.models.StringAgg` class.
+
 * The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
   ``order_by`` attribute now available on the
   :class:`~django.db.models.Aggregate` class.
