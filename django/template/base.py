@@ -60,7 +60,7 @@ from django.template.context import BaseContext
 from django.utils.deprecation import django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
-from django.utils.inspect import lazy_annotations
+from django.utils.inspect import lazy_annotations, signature
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
@@ -1000,12 +1000,12 @@ class Variable:
                             current = current()
                         except TypeError:
                             try:
-                                signature = inspect.signature(current)
+                                current_signature = signature(current)
                             except ValueError:  # No signature found.
                                 current = context.template.engine.string_if_invalid
                             else:
                                 try:
-                                    signature.bind()
+                                    current_signature.bind()
                                 except TypeError:  # Arguments *were* required.
                                     # Invalid method call.
                                     current = context.template.engine.string_if_invalid
