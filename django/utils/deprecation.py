@@ -7,6 +7,7 @@ from collections import Counter
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 import django
+from django.utils.inspect import signature
 
 
 @functools.cache
@@ -163,7 +164,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
         if isinstance(func, staticmethod):
             raise TypeError("Apply @staticmethod before @deprecate_posargs.")
 
-        params = inspect.signature(func).parameters
+        params = signature(func).parameters
         num_by_kind = Counter(param.kind for param in params.values())
 
         if num_by_kind[inspect.Parameter.VAR_POSITIONAL] > 0:

@@ -9,4 +9,5 @@ Django 6.0.3 fixes several bugs in 6.0.2.
 Bugfixes
 ========
 
-* ...
+* Fixed :exc:`NameError` when inspecting functions making use of deferred
+  annotations in Python 3.14 (:ticket:`36903`).
