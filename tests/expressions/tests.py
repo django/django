@@ -5,6 +5,7 @@ import uuid
 from collections import namedtuple
 from copy import deepcopy
 from decimal import Decimal
+from typing import TYPE_CHECKING, TypeAlias
 from unittest import mock
 
 from django.core.exceptions import FieldError
@@ -77,6 +78,7 @@ from django.test.utils import (
     register_lookup,
 )
 from django.utils.functional import SimpleLazyObject
+from django.utils.version import PY314
 
 from .models import (
     UUID,
@@ -93,6 +95,9 @@ from .models import (
     Text,
     Time,
 )
+
+if TYPE_CHECKING:
+    AnnotatedKwarg: TypeAlias = str
 
 
 class BasicExpressionsTests(TestCase):
@@ -1554,6 +1559,14 @@ class SimpleExpressionTests(SimpleTestCase):
         expression.set_source_expressions([falsey])
         replaced = expression.replace_expressions({"replacement": Expression()})
         self.assertEqual(replaced.get_source_expressions(), [falsey])
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_expression_signature_uses_deferred_annotations(self):
+        class AnnotatedExpression(Expression):
+            def __init__(self, *args, my_kw: AnnotatedKwarg, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        self.assertEqual(AnnotatedExpression(my_kw=""), AnnotatedExpression(my_kw=""))
 
 
 class ExpressionsNumericTests(TestCase):

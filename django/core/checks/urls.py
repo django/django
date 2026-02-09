@@ -1,8 +1,8 @@
-import inspect
 from collections import Counter
 
 from django.conf import settings
 from django.core.exceptions import ViewDoesNotExist
+from django.utils.inspect import signature
 
 from . import Error, Tags, Warning, register
 
@@ -142,10 +142,9 @@ def check_custom_error_handlers(app_configs, **kwargs):
             ).format(status_code=status_code, path=path)
             errors.append(Error(msg, hint=str(e), id="urls.E008"))
             continue
-        signature = inspect.signature(handler)
         args = [None] * num_parameters
         try:
-            signature.bind(*args)
+            signature(handler).bind(*args)
         except TypeError:
             msg = (
                 "The custom handler{status_code} view '{path}' does not "

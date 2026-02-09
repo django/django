@@ -1,4 +1,3 @@
-import inspect
 import re
 import warnings
 
@@ -8,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.deprecation import RemovedInDjango61Warning
+from django.utils.inspect import signature
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_variables
 
@@ -42,7 +42,7 @@ def get_backends():
 
 def _get_compatible_backends(request, **credentials):
     for backend, backend_path in _get_backends(return_tuples=True):
-        backend_signature = inspect.signature(backend.authenticate)
+        backend_signature = signature(backend.authenticate)
         try:
             backend_signature.bind(request, **credentials)
         except TypeError:
