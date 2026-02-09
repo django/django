@@ -59,11 +59,10 @@ and time availability), claim it by following these steps:
 * Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
-    The Django software foundation requests that anyone contributing more than
-    a :ref:`trivial change <trivial-change>`, to Django sign and submit a
-    `Contributor License Agreement`_, this ensures that the Django Software
-    Foundation has clear license to all contributions allowing for a clear
-    license for all users.
+    If your change is not :ref:`trivial <trivial-change>`, you have the option
+    to sign and submit a `Contributor License Agreement`_ clarifying the status
+    of your contribution. This ensures that the Django Software Foundation has
+    clear license to your contribution.
 
 .. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
@@ -450,7 +449,8 @@ All tickets
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?
 * Are you the patch author and a new contributor? Please add yourself to the
-  :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
+  :source:`AUTHORS` file. At your option, submit a
+  `Contributor License Agreement`_.
 * Does this have an accepted ticket on Trac? All contributions require a ticket
   unless the :ref:`change is considered trivial <trivial-change>`.
 
