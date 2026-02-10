@@ -39,6 +39,7 @@ backends
 backport
 backported
 backports
+backpressure
 backtick
 backticks
 backtraces
@@ -71,6 +72,7 @@ bytestrings
 cacheable
 callables
 camelCase
+cancelled
 cardinality
 centric
 centroid

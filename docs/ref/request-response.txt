@@ -807,7 +807,7 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
-If you're using an asgi server you are likely to need
+If you're using an async server you are likely to need
 :class:`StreamingAcmgrHttpResponse` instead
 
 .. _streaming-with-taskgroups:
