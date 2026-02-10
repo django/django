@@ -812,8 +812,10 @@ If you're using an asgi server you are likely to need
 
 .. _streaming-with-taskgroups:
 
-Streaming responses with TaskGroups
-====================================
+``StreamingAcmgrHttpResponse`` objects
+=================================
+
+.. class:: StreamingAcmgrHttpResponse
 
 .. versionadded:: 6.1
 
@@ -874,7 +876,7 @@ async iterator bytes resource for example an async generator.
 This allows proper cleanup and cancellation handling.
 
 Example with anyio
-^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 Here's the correct way to combine multiple streams using ``anyio``::
 
@@ -920,7 +922,7 @@ Here's the correct way to combine multiple streams using ``anyio``::
         return StreamingAcmgrHttpResponse(stream_manager())
 
 Example with asyncio
-^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""
 
 Here's the equivalent implementation using Python's built-in ``asyncio``::
 
