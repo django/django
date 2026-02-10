@@ -875,7 +875,7 @@ and wrap your streaming logic in an async context manager that yields an
 async iterator bytes resource for example an async generator.
 This allows proper cleanup and cancellation handling.
 
-Example with anyio
+Example with AnyIO
 ~~~~~~~~~~~~~~~~~~
 
 Here's the correct way to combine multiple streams using ``anyio``::
