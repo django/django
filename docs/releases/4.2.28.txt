@@ -7,3 +7,72 @@ Django 4.2.28 release notes
 Django 4.2.28 fixes three security issues with severity "high", two security
 issues with severity "moderate", and one security issue with severity "low" in
 4.2.27.
+
+CVE-2025-13473: Username enumeration through timing difference in mod_wsgi authentication handler
+=================================================================================================
+
+The ``django.contrib.auth.handlers.modwsgi.check_password()`` function for
+:doc:`authentication via mod_wsgi</howto/deployment/wsgi/apache-auth>`
+allowed remote attackers to enumerate users via a timing attack.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2025-14550: Potential denial-of-service vulnerability via repeated headers when using ASGI
+==============================================================================================
+
+When receiving duplicates of a single header, ``ASGIRequest`` allowed a remote
+attacker to cause a potential denial-of-service via a specifically created
+request with multiple duplicate headers. The vulnerability resulted from
+repeated string concatenation while combining repeated headers, which
+produced super-linear computation resulting in service degradation or outage.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
+
+CVE-2026-1207: Potential SQL injection via raster lookups on PostGIS
+====================================================================
+
+:ref:`Raster lookups <spatial-lookup-raster>` on GIS fields (only implemented
+on PostGIS) were subject to SQL injection if untrusted data was used as a band
+index.
+
+As a reminder, all untrusted user input should be validated before use.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-1285: Potential denial-of-service vulnerability in ``django.utils.text.Truncator`` HTML methods
+========================================================================================================
+
+``django.utils.text.Truncator.chars()`` and ``Truncator.words()`` methods (with
+``html=True``) and the :tfilter:`truncatechars_html` and
+:tfilter:`truncatewords_html` template filters were subject to a potential
+denial-of-service attack via certain inputs with a large number of unmatched
+HTML end tags, which could cause quadratic time complexity during HTML parsing.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
+
+CVE-2026-1287: Potential SQL injection in column aliases via control characters
+===============================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases via
+control characters, using a suitably crafted dictionary, with dictionary
+expansion, as the ``**kwargs`` passed to :meth:`.QuerySet.annotate`,
+:meth:`~.QuerySet.aggregate`, :meth:`~.QuerySet.extra`,
+:meth:`~.QuerySet.values`, :meth:`~.QuerySet.values_list`, and
+:meth:`~.QuerySet.alias`.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-1312: Potential SQL injection via ``QuerySet.order_by`` and ``FilteredRelation``
+=========================================================================================
+
+:meth:`.QuerySet.order_by` was subject to SQL injection in column aliases
+containing periods when the same alias was, using a suitably crafted
+dictionary, with dictionary expansion, used in :class:`.FilteredRelation`.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<security-disclosure>`.

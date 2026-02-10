@@ -2774,8 +2774,9 @@ the direction is changed.
 *Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key. This can affect
+is no matching object. If the ``QuerySet`` has no ordering defined (and has not
+had ordering forcibly cleared by calling :meth:`order_by` with no arguments),
+then the queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
@@ -2789,6 +2790,12 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
+
+.. versionchanged:: 6.1
+
+    ``first()`` and :meth:`last` no longer order by the primary key when
+    ordering has been forcibly cleared by calling :meth:`order_by` with no
+    arguments.
 
 ``last()``
 ~~~~~~~~~~

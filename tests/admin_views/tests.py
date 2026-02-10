@@ -6101,6 +6101,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         status = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-status"
         )
+        # Fix for Firefox which does not scroll to clicked elements
+        # automatically with the Options API
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-pubdate"
@@ -6135,6 +6138,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         status = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-1-status"
         )
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option("#id_relatedprepopulated_set-2-1-status", "option one")
         self.selenium.find_element(
@@ -6163,6 +6167,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         row_id = "id_relatedprepopulated_set-4-0-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("2011-12-12")
         status = self.selenium.find_element(By.ID, f"{row_id}status")
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option(f"#{row_id}status", "option one")
         self.selenium.find_element(By.ID, f"{row_id}name").send_keys(
@@ -6177,13 +6182,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "stacked-inline-2011-12-12")
         self.assertEqual(slug2, "option-one")
         # Add inline.
-        self.selenium.find_elements(
+        add_link = self.selenium.find_elements(
             By.LINK_TEXT,
             "Add another Related prepopulated",
-        )[3].click()
+        )[3]
+        self.selenium.execute_script("arguments[0].scrollIntoView();", add_link)
+        add_link.click()
         row_id = "id_relatedprepopulated_set-4-1-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("1999-01-20")
         status = self.selenium.find_element(By.ID, f"{row_id}status")
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option(f"#{row_id}status", "option two")
         self.selenium.find_element(By.ID, f"{row_id}name").send_keys(
@@ -7065,10 +7073,10 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="Django Class", materials="django_documents"
         )
         expected_legend_tags_text = [
-            "Materials:",
             "Difficulty:",
-            "Categories:",
+            "Materials:",
             "Start datetime:",
+            "Categories:",
         ]
         url = reverse("admin:admin_views_course_change", args=(course.pk,))
         self.selenium.get(self.live_server_url + url)
@@ -7078,6 +7086,29 @@ class SeleniumTests(AdminSeleniumTestCase):
         for index, fieldset in enumerate(fieldsets):
             legend = fieldset.find_element(By.TAG_NAME, "legend")
             self.assertEqual(legend.text, expected_legend_tags_text[index])
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_use_fieldset_with_grouped_fields(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_course_add")
+        )
+        multiline = self.selenium.find_element(
+            By.CSS_SELECTOR, "#content-main .field-difficulty, .form-multiline"
+        )
+        # Two field boxes.
+        field_boxes = multiline.find_elements(By.CSS_SELECTOR, "div > div.fieldBox")
+        self.assertEqual(len(field_boxes), 2)
+        # One of them is under a <fieldset>.
+        under_fieldset = multiline.find_elements(
+            By.CSS_SELECTOR, "fieldset > div > div.fieldBox"
+        )
+        self.assertEqual(len(under_fieldset), 1)
+        self.take_screenshot("horizontal_fieldset")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     @override_settings(MESSAGE_LEVEL=10)
