@@ -319,7 +319,7 @@ class UtilsTests(SimpleTestCase):
             ("        cheeze", "cheeze"),
             ("pizza       ", "pizza"),
             ("       chicken        ", "chicken"),
-            (mark_safe("  soy chicken  "), "  soy chicken  "),
+            (mark_safe("  <em>soy chicken</em>  "), "  <em>soy chicken</em>  "),
         ]
         for value, expect_display_value in cases:
             with self.subTest(value=value):
