@@ -882,12 +882,12 @@ Here's the correct way to combine multiple streams using ``anyio``::
 
     import contextlib
     from typing import AsyncGenerator
-    from django.http import StreamingHttpResponse, HttpRequest
+    from django.http import StreamingAcmgrHttpResponse, HttpRequest
     import anyio
     from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 
 
-    async def news_and_weather(request: HttpRequest) -> StreamingHttpResponse:
+    async def news_and_weather(request: HttpRequest) -> StreamingAcmgrHttpResponse:
         @contextlib.asynccontextmanager
         async def stream_manager() -> (
             AsyncGenerator[MemoryObjectReceiveStream[bytes], None]
