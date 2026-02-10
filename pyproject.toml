@@ -17,7 +17,7 @@ authors = [
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 readme = "README.rst"
 license = "BSD-3-Clause"
-license-files = ["LICENSE", "LICENSE.python"]
+license-files = ["LICENSE", "LICENSE.python", "AUTHORS"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
