@@ -515,6 +515,14 @@ form .related-widget-wrapper ul {
     padding-left: 0;
 }
 
+form .related-widget-wrapper a.change-related img {
+    transform: scale(0.85);
+}
+
+form .related-widget-wrapper a.view-related img {
+    transform: scale(0.95);
+}
+
 .clearable-file-input input {
     margin-top: 0;
 }
