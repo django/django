@@ -4,6 +4,25 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 
 
+def parse_migration_identifier(identifier):
+    """
+    Parse a migration identifier into (app_label, migration_name).
+
+    Supports path format from makemigrations output:
+        app/migrations/name.py
+    and dot format from migrate --plan output:
+        app_label.migration_name
+    """
+    identifier = identifier.lstrip("./").removesuffix(".py")
+    parts = identifier.split("/")
+    if len(parts) == 3 and parts[1] == "migrations":
+        return parts[0], parts[2]
+    parts = identifier.split(".")
+    if len(parts) == 2:
+        return parts[0], parts[1]
+    return None
+
+
 class Command(BaseCommand):
     help = "Prints the SQL statements for the named migration."
 
@@ -14,7 +33,9 @@ class Command(BaseCommand):
             "app_label", help="App label of the application containing the migration."
         )
         parser.add_argument(
-            "migration_name", help="Migration name to print the SQL for."
+            "migration_name",
+            nargs="?",
+            help="Migration name to print the SQL for.",
         )
         parser.add_argument(
             "--database",
@@ -47,6 +68,19 @@ class Command(BaseCommand):
 
         # Resolve command-line arguments into a migration
         app_label, migration_name = options["app_label"], options["migration_name"]
+
+        # Support path format: app/migrations/0001_name.py
+        if migration_name is None:
+            parsed = parse_migration_identifier(app_label)
+            if parsed is None:
+                raise CommandError(
+                    "When using a single argument, provide a migration path "
+                    "(e.g., 'app/migrations/0001_initial.py') or a dotted name "
+                    "(e.g., 'app.0001_initial'). "
+                    "Otherwise, provide both app_label and migration_name."
+                )
+            app_label, migration_name = parsed
+
         # Validate app_label
         try:
             apps.get_app_config(app_label)

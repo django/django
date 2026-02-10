@@ -1179,6 +1179,29 @@ class MigrateTests(MigrationTestBase):
                 "sqlmigrate", "migrations", "0001", skip_checks=False, no_color=False
             )
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_sqlmigrate_single_arg_formats(self):
+        """sqlmigrate accepts a path or dotted name as a single argument."""
+        for identifier in [
+            "migrations/migrations/0001_initial.py",
+            "migrations/migrations/0001_initial",
+            "migrations/migrations/0001",
+            "migrations.0001_initial",
+            "migrations.0001",
+        ]:
+            with self.subTest(identifier=identifier):
+                out = io.StringIO()
+                call_command("sqlmigrate", identifier, stdout=out, no_color=True)
+                self.assertIn("Create model Author", out.getvalue())
+
+    def test_sqlmigrate_invalid_single_arg(self):
+        """sqlmigrate raises an error for an invalid single argument."""
+        with self.assertRaisesMessage(
+            CommandError,
+            "When using a single argument, provide a migration path",
+        ):
+            call_command("sqlmigrate", "invalid_path")
+
     @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",

@@ -1194,6 +1194,12 @@ Prints the SQL for the named migration. This requires an active database
 connection, which it will use to resolve constraint names; this means you must
 generate the SQL against a copy of the database you wish to later apply it on.
 
+You can also pass a single argument using the path format shown by
+:djadmin:`makemigrations` (e.g.
+``django-admin sqlmigrate app/migrations/0001_initial.py``) or the dotted
+format shown by :djadmin:`migrate` ``--plan`` (e.g.
+``django-admin sqlmigrate app.0001_initial``).
+
 Note that ``sqlmigrate`` doesn't colorize its output.
 
 .. django-admin-option:: --backwards

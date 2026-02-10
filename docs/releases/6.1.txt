@@ -248,6 +248,10 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* The :djadmin:`sqlmigrate` command now accepts a single argument as a
+  migration file path (e.g. ``app/migrations/0001_initial.py``) or a dotted
+  name (e.g. ``app.0001_initial``).
+
 Migrations
 ~~~~~~~~~~
 
