@@ -454,7 +454,7 @@ class ChangeListTests(TestCase):
         with self.assertRaises(IncorrectLookupParameters):
             m.get_changelist_instance(request)
 
-    @skipUnlessDBFeature("supports_transactions")
+    @skipUnlessDBFeature("uses_savepoints")
     def test_list_editable_atomicity(self):
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
         b = Swallow.objects.create(origin="Swallow B", load=2, speed=2)
