@@ -930,6 +930,7 @@ Here's the equivalent implementation using Python's built-in ``asyncio``::
                     await q.put(eof)
 
             async with asyncio.TaskGroup() as tg:
+                # Create a Queue with backpressure (max 0 items buffered)
                 q = asyncio.Queue[Eof|bytes](0)
                 eof_1 = Eof()
                 eof_2 = Eof()
