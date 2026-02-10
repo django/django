@@ -1,7 +1,8 @@
+import hmac
 from datetime import datetime
 
 from django.conf import settings
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
 
@@ -67,7 +68,7 @@ class PasswordResetTokenGenerator:
 
         # Check that the timestamp/uid has not been tampered with
         for secret in [self.secret, *self.secret_fallbacks]:
-            if constant_time_compare(
+            if hmac.compare_digest(
                 self._make_token_with_timestamp(user, ts, secret),
                 token,
             ):
