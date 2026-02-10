@@ -400,7 +400,7 @@ class Serializer:
 
 def serializer_factory(value):
     if isinstance(value, Promise):
-        value = str(value)
+        value = value._proxy____cast()
     elif isinstance(value, LazyObject):
         # The unwrapped value is returned as the first item of the arguments
         # tuple.

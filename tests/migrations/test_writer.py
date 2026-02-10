@@ -25,7 +25,7 @@ from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, lazy
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -366,9 +366,20 @@ class WriterTests(SimpleTestCase):
         )
 
     def test_serialize_lazy_objects(self):
-        pattern = re.compile(r"^foo$")
-        lazy_pattern = SimpleLazyObject(lambda: pattern)
-        self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
+        objects = (
+            re.compile(r"^foo$"),
+            "%s" % "foo",
+            ((2, "2"), (1, "1")),
+            [(2, "2"), (1, "1")],
+            {(2, "2"), (1, "1")},
+            {"Group": [(2, "2"), (1, "1")]},
+        )
+        for obj in objects:
+            with self.subTest(type(obj)):
+                simple_lazy_obj = SimpleLazyObject(lambda: obj)
+                self.assertEqual(self.serialize_round_trip(simple_lazy_obj), obj)
+                full_lazy_obj = lazy(lambda: obj, type(obj))()
+                self.assertEqual(self.serialize_round_trip(full_lazy_obj), obj)
 
     def test_serialize_enums(self):
         self.assertSerializedResultEqual(
@@ -533,6 +544,30 @@ class WriterTests(SimpleTestCase):
                 self.assertEqual(
                     string,
                     "models.IntegerField(choices=[('Group', [(2, '2'), (1, '1')])])",
+                )
+
+    def test_serialize_lazy_choices(self):
+        """
+        Ticket #36892: Test serialization of lazily evaluated collections to
+        yield their native collection types and not string.
+        """
+        choices = [("A", "A value"), ("B", "B value")]
+        for collection_type, open_symbol, close_symbol in (
+            (tuple, "(", ")"),
+            (list, "[", "]"),
+            (set, "{", "}"),
+        ):
+            with self.subTest(collection_type):
+                lazy_collection = lazy(
+                    lambda: collection_type(choices),
+                    collection_type,
+                )()
+                field = models.CharField(default=choices[1][0], choices=lazy_collection)
+                string = MigrationWriter.serialize(field)[0]
+                self.assertEqual(
+                    string,
+                    "models.CharField(choices=%s('A', 'A value'), ('B', 'B value')%s,"
+                    " default='B')" % (open_symbol, close_symbol),
                 )
 
     def test_serialize_callable_choices(self):
