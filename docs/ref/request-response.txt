@@ -953,7 +953,7 @@ Here's the equivalent implementation using Python's built-in ``asyncio``::
                     while True:
                         v = await q.get()
                         if isinstance(v, bytes):
-                            yield bytes
+                            yield v
                         else:
                             eofs.discard(v)
                             if not eofs:
