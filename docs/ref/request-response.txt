@@ -815,7 +815,7 @@ If you're using an asgi server you are likely to need
 Streaming responses with TaskGroups
 ====================================
 
-.. versionadded:: 5.2
+.. versionadded:: 6.1
 
 When working with asynchronous views you may need to combine multiple
 streams of data using structured concurrency
@@ -962,7 +962,7 @@ When you pass an async context manager to
 
 1. Enters the async context manager by calling ``__aenter__()``
 2. Expects the context manager to yield an async iterator bytes resource
-3. Iterates over that async iterable to stream chunks to the client
+3. Iterates over that async iterator to stream chunks to the client
 4. calls ``.aclose()`` on the resource then ``__aexit__()`` when streaming
    completes, fails, or the client disconnects
 
@@ -979,7 +979,7 @@ Requirements
 To use this feature, your async context manager must:
 
 * Be an async context manager (implement ``__aenter__`` and ``__aexit__``)
-* Yield an object that is async iterable (implements ``__aiter__`` and ``__anext__``)
+* Yield an object that is async iterator bytes resource (implements ``__aiter__`` and ``aclose``)
 * Handle cleanup properly in ``__aexit__``, including when cancelled
 
 Note that both ``anyio.MemoryObjectReceiveStream`` and async generators are
