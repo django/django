@@ -836,6 +836,7 @@ The following code appears logical but **does not work** and will cause issues::
     from django.http import StreamingHttpResponse, HttpRequest
     from typing import AsyncGenerator
 
+
     async def news_and_weather(request: HttpRequest) -> StreamingHttpResponse:
         async def gen() -> AsyncGenerator[bytes, None]:
             async def push(ws_url: str, tx: MemoryObjectSendStream) -> None:
@@ -880,9 +881,12 @@ Here's the correct way to combine multiple streams using ``anyio``::
     import anyio
     from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 
+
     async def news_and_weather(request: HttpRequest) -> StreamingHttpResponse:
         @contextlib.asynccontextmanager
-        async def stream_manager() -> AsyncGenerator[MemoryObjectReceiveStream[bytes], None]:
+        async def stream_manager() -> (
+            AsyncGenerator[MemoryObjectReceiveStream[bytes], None]
+        ):
             """Context manager that combines multiple WebSocket streams."""
 
             async def push(ws_url: str, tx: MemoryObjectSendStream[bytes]) -> None:
@@ -920,10 +924,11 @@ Here's the equivalent implementation using Python's built-in ``asyncio``::
     class Eof(object):
         pass
 
+
     async def news_and_weather(request: HttpRequest) -> StreamingAcmgrHttpResponse:
         @contextlib.asynccontextmanager
         async def acmgr_gen() -> AsyncGenerator[AsyncGenerator[bytes]]:
-            async def push(ws_url: str, q: asyncio.Queue[Eof|bytes], eof: Eof) -> None:
+            async def push(ws_url: str, q: asyncio.Queue[Eof | bytes], eof: Eof) -> None:
                 async with connect_ws(ws_url) as conn:
                     async for msg in conn:
                         await q.put(msg)
@@ -931,7 +936,7 @@ Here's the equivalent implementation using Python's built-in ``asyncio``::
 
             async with asyncio.TaskGroup() as tg:
                 # Create a Queue with backpressure (max 0 items buffered)
-                q = asyncio.Queue[Eof|bytes](0)
+                q = asyncio.Queue[Eof | bytes](0)
                 eof_1 = Eof()
                 eof_2 = Eof()
                 eofs = {eof_1, eof_2}
@@ -948,7 +953,6 @@ Here's the equivalent implementation using Python's built-in ``asyncio``::
                             eofs.discard(v)
                             if not eofs:
                                 return
-
 
                 yield agen_fn()  # yield inside asynccontextmanager, permitted inside TaskGroup
 
