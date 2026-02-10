@@ -819,7 +819,8 @@ Streaming responses with TaskGroups
 
 When working with asynchronous views you may need to combine multiple
 streams of data using structured concurrency
-with task groups (such as ``anyio.create_task_group()`` or ``asyncio.TaskGroup``).
+with task groups (such as ``anyio.create_task_group()`` or
+``asyncio.TaskGroup``).
 However, standard async generators cannot be used directly inside task groups
 because they don't properly handle cancellation when the task group exits.
 
@@ -829,7 +830,8 @@ limitations of async generators in task group contexts.
 The Problem: Illegal Use of Yield Inside TaskGroups
 ----------------------------------------------------
 
-The following code appears logical but **does not work** and will cause issues::
+The following code appears logical but **does not work** and will cause
+issues::
 
     import anyio
     from anyio.streams.memory import MemoryObjectSendStream
@@ -859,7 +861,8 @@ The following code appears logical but **does not work** and will cause issues::
 manager prevents the TaskGroup from properly canceling tasks and catching
 cancellation errors. When the client disconnects or the stream ends, calling
 ``aclose()`` on the async generator is not sufficient for the TaskGroup to
-clean up properly. See :pep:`789` for a detailed explanation of this limitation.
+clean up properly. See :pep:`789` for a detailed explanation of this
+limitation.
 
 The Solution: Using Async Context Managers
 -------------------------------------------
@@ -984,7 +987,8 @@ Requirements
 To use this feature, your async context manager must:
 
 * Be an async context manager (implement ``__aenter__`` and ``__aexit__``)
-* Yield an object that is async iterator bytes resource (implements ``__aiter__`` and ``aclose``)
+* Yield an object that is async iterator bytes resource
+  (implements ``__aiter__`` and ``aclose``)
 * Handle cleanup properly in ``__aexit__``, including when cancelled
 
 Note that both ``anyio.MemoryObjectReceiveStream`` and async generators are
