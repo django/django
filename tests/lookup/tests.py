@@ -570,7 +570,7 @@ class LookupTests(TestCase):
             },
         )
 
-    def test_values(self):
+    def test_values_filter_and_no_fields(self):
         # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
         self.assertSequenceEqual(
@@ -592,6 +592,8 @@ class LookupTests(TestCase):
                 },
             ],
         )
+
+    def test_values_single_field(self):
         self.assertSequenceEqual(
             Article.objects.values("headline"),
             [
@@ -604,10 +606,14 @@ class LookupTests(TestCase):
                 {"headline": "Article 1"},
             ],
         )
+
+    def test_values_filter_and_single_field(self):
         self.assertSequenceEqual(
             Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values("id"),
             [{"id": self.a2.id}, {"id": self.a3.id}, {"id": self.a7.id}],
         )
+
+    def test_values_two_fields(self):
         self.assertSequenceEqual(
             Article.objects.values("id", "headline"),
             [
@@ -620,6 +626,8 @@ class LookupTests(TestCase):
                 {"id": self.a1.id, "headline": "Article 1"},
             ],
         )
+
+    def test_values_iterator(self):
         # You can use values() with iterator() for memory savings,
         # because iterator() uses database-level iteration.
         self.assertSequenceEqual(
@@ -634,6 +642,8 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
+
+    def test_values_extra(self):
         # The values() method works with "extra" fields specified in
         # extra(select).
         self.assertSequenceEqual(
@@ -675,6 +685,8 @@ class LookupTests(TestCase):
                 }
             ],
         )
+
+    def test_values_relations(self):
         # You can specify fields from forward and reverse relations, just like
         # filter().
         self.assertSequenceEqual(
@@ -757,6 +769,8 @@ class LookupTests(TestCase):
                 },
             ],
         )
+
+    def test_values_nonexistent_field(self):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
@@ -768,6 +782,8 @@ class LookupTests(TestCase):
             Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
                 "id", "id_plus_two"
             )
+
+    def test_values_no_field_names(self):
         # If you don't specify field names to values(), all are returned.
         self.assertSequenceEqual(
             Article.objects.filter(id=self.a5.id).values(),
@@ -782,7 +798,7 @@ class LookupTests(TestCase):
             ],
         )
 
-    def test_values_list(self):
+    def test_values_list_filter_and_no_fields(self):
         # values_list() is similar to values(), except that the results are
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
@@ -806,8 +822,9 @@ class LookupTests(TestCase):
                 ),
             ],
         )
-        # RemovedInDjango70Warning: When the deprecation ends, remove this
-        # assertion.
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
+    def test_values_list_flat_no_fields(self):
         with ignore_warnings(category=RemovedInDjango70Warning):
             qs = Article.objects.values_list(flat=True)
         self.assertSequenceEqual(
@@ -822,6 +839,8 @@ class LookupTests(TestCase):
                 self.a1.id,
             ],
         )
+
+    def test_values_list_single_field(self):
         self.assertSequenceEqual(
             Article.objects.values_list("headline"),
             [
@@ -834,6 +853,8 @@ class LookupTests(TestCase):
                 ("Article 1",),
             ],
         )
+
+    def test_values_list_single_field_order_by(self):
         self.assertSequenceEqual(
             Article.objects.values_list("id").order_by("id"),
             [
@@ -846,6 +867,8 @@ class LookupTests(TestCase):
                 (self.a7.id,),
             ],
         )
+
+    def test_values_list_flat_order_by(self):
         self.assertSequenceEqual(
             Article.objects.values_list("id", flat=True).order_by("id"),
             [
@@ -858,6 +881,8 @@ class LookupTests(TestCase):
                 self.a7.id,
             ],
         )
+
+    def test_values_list_extra(self):
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id+1"})
             .order_by("id")
@@ -900,6 +925,8 @@ class LookupTests(TestCase):
                 (self.a7.id, self.a7.id + 1),
             ],
         )
+
+    def test_values_list_relations(self):
         args = ("name", "article__headline", "article__tag__name")
         self.assertSequenceEqual(
             Author.objects.values_list(*args).order_by(*args),
@@ -915,7 +942,10 @@ class LookupTests(TestCase):
                 (self.au2.name, self.a7.headline, self.t3.name),
             ],
         )
-        with self.assertRaises(TypeError):
+
+    def test_values_list_flat_more_than_one_field(self):
+        msg = "'flat' is not valid when values_list is called with more than one field."
+        with self.assertRaisesMessage(TypeError, msg):
             Article.objects.values_list("id", "headline", flat=True)
 
     # RemovedInDjango70Warning: When the deprecation ends, replace with:
