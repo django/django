@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+import sys
 import unittest
 import zoneinfo
 from unittest import mock
@@ -5983,6 +5984,12 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="A Long Title", published=True, slug="a-long-title"
         )
 
+    @property
+    def modifier_key(self):
+        from selenium.webdriver.common.keys import Keys
+
+        return Keys.COMMAND if sys.platform == "darwin" else Keys.CONTROL
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_login_button_centered(self):
         from selenium.webdriver.common.by import By
@@ -6406,8 +6413,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             elem = self.selenium.find_element(
                 By.CSS_SELECTOR, f"#id_user_permissions_from option[value='{perm.id}']"
             )
-            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
-                Keys.CONTROL
+            ActionChains(self.selenium).key_down(self.modifier_key).click(elem).key_up(
+                self.modifier_key
             ).perform()
 
         # Move focus to other element.
@@ -6425,8 +6432,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             elem = self.selenium.find_element(
                 By.CSS_SELECTOR, f"#id_user_permissions_to option[value='{perm.id}']"
             )
-            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
-                Keys.CONTROL
+            ActionChains(self.selenium).key_down(self.modifier_key).click(elem).key_up(
+                self.modifier_key
             ).perform()
 
         # Move focus to other element.
