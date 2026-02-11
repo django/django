@@ -222,9 +222,10 @@ times as it is imported.
 If this behavior is problematic (such as when using signals to send
 an email whenever a model is saved), pass a unique identifier as the
 ``dispatch_uid`` argument to identify your receiver function. This
-identifier will usually be a string, although any hashable object will
-suffice. The end result is that your receiver function will only be
-bound to the signal once for each unique ``dispatch_uid`` value::
+identifier will usually be a string, although any hashable object
+will suffice. The end result is that your receiver function will
+only be bound to the signal once for each unique
+``dispatch_uid`` value::
 
     from django.core.signals import request_finished
 
@@ -240,9 +241,10 @@ its own signals.
 
 .. admonition:: When to use custom signals
 
-    Signals are implicit function calls, which can make debugging harder. If the
-    sender and receiver of your custom signal are both within your project,
-    you're better off using an explicit function call.
+    Signals are implicit function calls, which can make
+    debugging harder. If the sender and receiver of your
+    custom signal are both within your project, you're
+    better off using an explicit function call.
 
 Defining signals
 ----------------
@@ -286,7 +288,11 @@ For example, here's how sending our ``pizza_done`` signal might look::
         ...
 
         def send_pizza(self, toppings, size):
-            pizza_done.send(sender=self.__class__, toppings=toppings, size=size)
+            pizza_done.send(
+                sender=self.__class__,
+                toppings=toppings,
+                size=size,
+            )
             ...
 
 All four methods return a list of tuple pairs ``[(receiver, response), ...]``,
@@ -309,7 +315,11 @@ returned when calling ``send_robust()``.
 awaited::
 
     async def asend_pizza(self, toppings, size):
-        await pizza_done.asend(sender=self.__class__, toppings=toppings, size=size)
+        await pizza_done.asend(
+            sender=self.__class__,
+            toppings=toppings,
+            size=size,
+            )
         ...
 
 Whether synchronous or asynchronous, receivers will be correctly adapted to
