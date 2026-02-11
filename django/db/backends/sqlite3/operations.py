@@ -48,10 +48,10 @@ class DatabaseOperations(BaseDatabaseOperations):
                     pass
                 else:
                     if isinstance(output_field, DATETIME_FIELDS):
+                        klass = expression.__class__.__name__
                         raise NotSupportedError(
-                            "You cannot use Sum, Avg, StdDev, and Variance "
-                            "aggregations on date/time fields in sqlite3 "
-                            "since date/time is saved as text."
+                            f"SQLite does not support {klass} on date or time "
+                            "fields, because they are stored as text."
                         )
         if (
             isinstance(expression, models.Aggregate)
