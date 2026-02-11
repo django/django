@@ -307,8 +307,7 @@ middleware class is listed in :setting:`MIDDLEWARE`.
         else:
             ...  # Do something for anonymous users.
 
-    The :meth:`auser` method does the same thing but can be used from async
-    contexts.
+    The :meth:`auser` can be used to access the user in async contexts.
 
 Methods
 -------

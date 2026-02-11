@@ -636,8 +636,8 @@ a ``contains`` lookup using the ``pnt_wkt`` as the parameter:
     >>> WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
     <QuerySet [<WorldBorder: United States>]>
 
-Here, you retrieved a ``QuerySet`` with only one model: the border of the
-United States (exactly what you would expect).
+Here, you retrieved a ``QuerySet`` with only one model instance: the border of
+the United States (exactly what you would expect).
 
 Similarly, you may also use a :doc:`GEOS geometry object
 </ref/contrib/gis/geos>`. Here, you can combine the ``intersects`` spatial
