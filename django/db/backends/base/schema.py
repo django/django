@@ -2008,6 +2008,19 @@ class BaseDatabaseSchemaEditor:
         exclude=None,
     ):
         """Return all constraint names matching the columns and conditions."""
+        if self.collect_sql:
+            return self._constraint_names_from_state(
+                model,
+                column_names=column_names,
+                unique=unique,
+                primary_key=primary_key,
+                index=index,
+                foreign_key=foreign_key,
+                check=check,
+                type_=type_,
+                exclude=exclude,
+            )
+
         if column_names is not None:
             column_names = [
                 (
@@ -2041,6 +2054,93 @@ class BaseDatabaseSchemaEditor:
                 if not exclude or name not in exclude:
                     result.append(name)
         return result
+
+    def _constraint_names_from_state(
+        self,
+        model,
+        column_names=None,
+        unique=None,
+        primary_key=None,
+        index=None,
+        foreign_key=None,
+        check=None,
+        type_=None,
+        exclude=None,
+    ):
+        """
+        Return constraint names based on model state without
+        database introspection.
+        """
+        if column_names is not None:
+            column_names = [
+                self.connection.introspection.identifier_converter(name)
+                for name in column_names
+            ]
+
+        found_names = []
+
+        # Foreign key constraints
+        if foreign_key is not None:
+            for field in model._meta.local_fields:
+                if not field.many_to_one:
+                    continue
+                if column_names is not None and field.column not in column_names:
+                    continue
+
+                # Generate FK constraint name following Django's convention
+                suffix = "_fk"
+                base_name = self._create_index_name(
+                    model._meta.db_table, [field.column], suffix=suffix
+                )
+                max_length = self.connection.ops.max_name_length()
+                if max_length:
+                    base_name = base_name[: max_length - len(suffix)]
+                constraint_name = base_name + suffix
+                found_names.append(constraint_name)
+
+        # Index constraints
+        if index is not None:
+            for field in model._meta.local_fields:
+                if not field.db_index:
+                    continue
+                if column_names is not None and field.column not in column_names:
+                    continue
+
+                index_name = self._create_index_name(
+                    model._meta.db_table, [field.column]
+                )
+                found_names.append(index_name)
+
+        # Unique constraints
+        if unique is not None:
+            for field in model._meta.local_fields:
+                if not field.unique:
+                    continue
+                if column_names is not None and field.column not in column_names:
+                    continue
+
+                suffix = "_uniq"
+                base_name = self._create_index_name(
+                    model._meta.db_table, [field.column], suffix=suffix
+                )
+                max_length = self.connection.ops.max_name_length()
+                if max_length:
+                    base_name = base_name[: max_length - len(suffix)]
+                constraint_name = base_name + suffix
+                found_names.append(constraint_name)
+
+        # Check constraints
+        if check is not None:
+            for constraint in model._meta.constraints:
+                if hasattr(constraint, "check"):
+                    found_names.append(constraint.name)
+
+        # Primary key
+        if primary_key is not None:
+            pk_name = f"{model._meta.db_table}_pkey"
+            found_names.append(pk_name)
+
+        return found_names
 
     def _pk_constraint_sql(self, columns):
         return self.sql_pk_constraint % {
