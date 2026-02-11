@@ -219,9 +219,9 @@ during testing. More generally, this occurs everywhere your project imports the
 module where you define the signals, because signal registration runs as many
 times as it is imported.
 
-If this behavior is problematic (such as when using signals to
-send an email whenever a model is saved), pass a unique identifier as
-the ``dispatch_uid`` argument to identify your receiver function. This
+If this behavior is problematic (such as when using signals to send
+an email whenever a model is saved), pass a unique identifier as the
+``dispatch_uid`` argument to identify your receiver function. This
 identifier will usually be a string, although any hashable object will
 suffice. The end result is that your receiver function will only be
 bound to the signal once for each unique ``dispatch_uid`` value::
