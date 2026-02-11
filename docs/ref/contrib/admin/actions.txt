@@ -221,7 +221,7 @@ that the action was successful::
                 messages.SUCCESS,
             )
 
-This make the action match what the admin itself does after successfully
+This makes the action match what the admin itself does after successfully
 performing an action:
 
 .. image:: _images/actions-as-modeladmin-methods.png

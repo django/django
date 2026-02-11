@@ -3097,7 +3097,7 @@ Templates can override or extend base admin templates as described in
     as options to the admin class.
 
     Raises :class:`~django.core.exceptions.ImproperlyConfigured` if a model is
-    abstract. and ``django.contrib.admin.exceptions.AlreadyRegistered`` if a
+    abstract, and ``django.contrib.admin.exceptions.AlreadyRegistered`` if a
     model is already registered.
 
 .. method:: AdminSite.unregister(model_or_iterable)
