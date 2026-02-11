@@ -319,7 +319,7 @@ awaited::
             sender=self.__class__,
             toppings=toppings,
             size=size,
-            )
+        )
         ...
 
 Whether synchronous or asynchronous, receivers will be correctly adapted to
