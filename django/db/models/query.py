@@ -140,8 +140,34 @@ class ModelIterable(BaseIterable):
             for rel_populator in related_populators:
                 rel_populator.populate(row, obj)
             if annotation_col_map:
+                # Check for geometry annotations that need conversion
+                try:
+                    from django.contrib.gis.db.models import GeometryField
+                    from django.contrib.gis.geos import GEOSGeometry
+
+                    has_gis = True
+                except ImportError:
+                    has_gis = False
+
+                # Determine which annotations are geometry fields
+                geom_annotations = set()
+                if has_gis and compiler.query.annotations:
+                    for attr_name, annotation in compiler.query.annotations.items():
+                        if hasattr(annotation, "output_field") and isinstance(
+                            annotation.output_field, GeometryField
+                        ):
+                            geom_annotations.add(attr_name)
+
                 for attr_name, col_pos in annotation_col_map.items():
-                    setattr(obj, attr_name, row[col_pos])
+                    value = row[col_pos]
+                    # Convert geometry annotations from raw WKB
+                    if (
+                        attr_name in geom_annotations
+                        and value is not None
+                        and not isinstance(value, GEOSGeometry)
+                    ):
+                        value = GEOSGeometry(value)
+                    setattr(obj, attr_name, value)
 
             # Add the known related objects to the model.
             for field, rel_objs, rel_attnames, rel_getter in known_related_objects:
@@ -229,6 +255,28 @@ class ValuesIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
+        # Ensure compiler.select is set up
+        if compiler.select is None:
+            compiler.setup_query()
+
+        # Determine which columns are geometry fields that need conversion
+        try:
+            from django.contrib.gis.db.models import GeometryField
+            from django.contrib.gis.geos import GEOSGeometry
+
+            has_gis = True
+        except ImportError:
+            has_gis = False
+
+        # Map column indexes to whether they're geometry fields
+        geom_cols = set()
+        if has_gis and compiler.select:
+            for i, (expression, _, _) in enumerate(compiler.select):
+                if hasattr(expression, "output_field") and isinstance(
+                    expression.output_field, GeometryField
+                ):
+                    geom_cols.add(i)
+
         if query.selected:
             names = list(query.selected)
         else:
@@ -242,7 +290,16 @@ class ValuesIterable(BaseIterable):
         for row in compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
-            yield {names[i]: row[i] for i in indexes}
+            result = {}
+            for i in indexes:
+                value = row[i]
+                # Convert raw WKB/geometry bytes to GEOSGeometry for values()
+                if i in geom_cols and value is not None:
+                    # Guard against double conversion
+                    if not isinstance(value, GEOSGeometry):
+                        value = GEOSGeometry(value)
+                result[names[i]] = value
+            yield result
 
 
 class ValuesListIterable(BaseIterable):
@@ -255,11 +312,51 @@ class ValuesListIterable(BaseIterable):
         queryset = self.queryset
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
-        return compiler.results_iter(
+
+        # Ensure compiler.select is set up
+        if compiler.select is None:
+            compiler.setup_query()
+
+        # Determine which columns are geometry fields that need conversion
+        try:
+            from django.contrib.gis.db.models import GeometryField
+            from django.contrib.gis.geos import GEOSGeometry
+
+            has_gis = True
+        except ImportError:
+            has_gis = False
+
+        # Map column indexes to whether they're geometry fields
+        geom_cols = set()
+        if has_gis and compiler.select:
+            for i, (expression, _, _) in enumerate(compiler.select):
+                if hasattr(expression, "output_field") and isinstance(
+                    expression.output_field, GeometryField
+                ):
+                    geom_cols.add(i)
+
+        # If no geometry columns, use the fast path
+        if not geom_cols:
+            yield from compiler.results_iter(
+                tuple_expected=True,
+                chunked_fetch=self.chunked_fetch,
+                chunk_size=self.chunk_size,
+            )
+            return
+
+        # Otherwise, convert geometry fields in each row
+        for row in compiler.results_iter(
             tuple_expected=True,
             chunked_fetch=self.chunked_fetch,
             chunk_size=self.chunk_size,
-        )
+        ):
+            row = list(row)
+            for i in geom_cols:
+                if row[i] is not None:
+                    # Guard against double conversion
+                    if not isinstance(row[i], GEOSGeometry):
+                        row[i] = GEOSGeometry(row[i])
+            yield tuple(row)
 
 
 class NamedValuesListIterable(ValuesListIterable):
@@ -294,10 +391,38 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
+
+        # Ensure compiler.select is set up
+        if compiler.select is None:
+            compiler.setup_query()
+
+        # Check if the single column is a geometry field
+        try:
+            from django.contrib.gis.db.models import GeometryField
+            from django.contrib.gis.geos import GEOSGeometry
+
+            has_gis = True
+        except ImportError:
+            has_gis = False
+
+        is_geom_field = False
+        if has_gis and compiler.select and len(compiler.select) > 0:
+            expression, _, _ = compiler.select[0]
+            if hasattr(expression, "output_field") and isinstance(
+                expression.output_field, GeometryField
+            ):
+                is_geom_field = True
+
         for row in compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
-            yield row[0]
+            value = row[0]
+            # Convert geometry field from raw WKB
+            if is_geom_field and value is not None:
+                # Guard against double conversion
+                if not isinstance(value, GEOSGeometry):
+                    value = GEOSGeometry(value)
+            yield value
 
 
 class QuerySet(AltersData):

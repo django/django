@@ -2,8 +2,6 @@ from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.geos.geometry import GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
 from django.utils.functional import cached_property
@@ -133,18 +131,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return [dist_param]
 
     def get_geometry_converter(self, expression):
-        read = wkb_r().read
-        srid = expression.output_field.srid
-        if srid == -1:
-            srid = None
-        geom_class = expression.output_field.geom_class
-
         def converter(value, expression, connection):
-            if value is not None:
-                geom = GEOSGeometryBase(read(memoryview(value)), geom_class)
-                if srid:
-                    geom.srid = srid
-                return geom
+            if value is None:
+                return None
+            # Return raw value (memoryview) for lazy loading
+            return memoryview(value)
 
         return converter
 

@@ -5,8 +5,6 @@ from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geos.geometry import GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, ProgrammingError
@@ -420,13 +418,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return ST_Polygon(arg) if is_raster else arg
 
     def get_geometry_converter(self, expression):
-        read = wkb_r().read
-        geom_class = expression.output_field.geom_class
-
         def converter(value, expression, connection):
-            if isinstance(value, str):  # Coming from hex strings.
+            if value is None:
+                return None
+            # Return raw value for lazy loading via SpatialProxy or
+            # explicit conversion in ValuesIterable
+            if isinstance(value, str):  # Hex strings
                 value = value.encode("ascii")
-            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+            return value
 
         return converter
 
