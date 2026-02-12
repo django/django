@@ -3415,6 +3415,12 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE 'Lennon%';
 
+.. note::
+
+   The SQL shown is representative and may vary depending on the
+   database backend. Django translates these lookups into the
+   appropriate operator for each supported database.
+
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
 
