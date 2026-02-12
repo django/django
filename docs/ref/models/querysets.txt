@@ -3185,6 +3185,10 @@ Django's built-in lookups are listed below. It is also possible to write
 As a convenience when no lookup type is provided (like in
 ``Entry.objects.get(id=14)``) the lookup type is assumed to be :lookup:`exact`.
 
+The SQL equivalents shown in the lookup documentation are
+representative examples. The exact SQL generated depends on
+the database backend in use.
+
 .. fieldlookup:: exact
 
 ``exact``
@@ -3414,6 +3418,12 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE headline LIKE 'Lennon%';
+
+.. note::
+
+   The SQL shown is representative and may vary depending on the
+   database backend. Django translates these lookups into the
+   appropriate operator for each supported database.
 
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
