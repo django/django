@@ -457,6 +457,10 @@ short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 Miscellaneous
 -------------
 
+* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
+  sending functions (such as :func:`~django.core.mail.send_mail`) while also
+  providing a ``connection`` now raises a ``TypeError``.
+
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 

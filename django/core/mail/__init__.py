@@ -94,6 +94,17 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
+    if connection is not None:
+        if fail_silently:
+            raise TypeError(
+                "fail_silently cannot be used with a connection. "
+                "Pass fail_silently to get_connection() instead."
+            )
+        if auth_user is not None or auth_password is not None:
+            raise TypeError(
+                "auth_user and auth_password cannot be used with a connection. "
+                "Pass auth_user and auth_password to get_connection() instead."
+            )
     connection = connection or get_connection(
         username=auth_user,
         password=auth_password,
@@ -137,6 +148,17 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
+    if connection is not None:
+        if fail_silently:
+            raise TypeError(
+                "fail_silently cannot be used with a connection. "
+                "Pass fail_silently to get_connection() instead."
+            )
+        if auth_user is not None or auth_password is not None:
+            raise TypeError(
+                "auth_user and auth_password cannot be used with a connection. "
+                "Pass auth_user and auth_password to get_connection() instead."
+            )
     connection = connection or get_connection(
         username=auth_user,
         password=auth_password,
@@ -158,6 +180,11 @@ def _send_server_message(
     fail_silently=False,
     connection=None,
 ):
+    if connection is not None and fail_silently:
+        raise TypeError(
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
     recipients = getattr(settings, setting_name)
     if not recipients:
         return
