@@ -349,12 +349,22 @@ class EmailMessage:
         """
         return [email for email in (self.to + self.cc + self.bcc) if email]
 
-    def send(self, fail_silently=False):
+    def send(self, fail_silently=None):
         """Send the email message."""
         if not self.recipients():
             # Don't bother creating the network connection if there's nobody to
             # send to.
             return 0
+
+        if fail_silently is not None and self.connection is not None:
+            raise TypeError(
+                "fail_silently cannot be used with a connection. "
+                "Pass fail_silently to get_connection() instead."
+            )
+
+        if fail_silently is None:
+            fail_silently = False
+
         return self.get_connection(fail_silently).send_messages([self])
 
     def attach(self, filename=None, content=None, mimetype=None):
