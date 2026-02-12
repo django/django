@@ -52,7 +52,7 @@ jobs:
             }
             const commentBody = (
               '#### Uncovered lines in changed files\n\n```\n' + body + '```\n' +
-              + '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
+              '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
             );
 
             const prNumber = parseInt(process.env.PR_NUMBER);
