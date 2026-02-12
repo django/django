@@ -217,10 +217,8 @@ than once, and thus called as many times for a signal event. For example, the
 :meth:`~django.apps.AppConfig.ready` method may be executed more than once
 during testing.
 
-Note that Python modules are executed only once per interpreter session, so
-simply importing a module multiple times does not cause duplicate signal
-registrations. Django automatically prevents duplicate registrations for global
-functions and static or class methods by using the receiver's identity.
+Django automatically prevents duplicate registrations for global functions and
+static or class methods by using the receiver's identity.
 
 However, when connecting instance methods, Django uses both the instance and
 method identity. If a new instance is created each time the connection code
