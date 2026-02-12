@@ -3234,6 +3234,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE '%Lennon%';
 
+(The exact SQL syntax varies for each database engine.)
+
 Note this will match the headline ``'Lennon honored today'`` but not ``'lennon
 honored today'``.
 
@@ -3260,6 +3262,8 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE headline ILIKE '%Lennon%';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
@@ -3386,6 +3390,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE 'Lennon%';
 
+(The exact SQL syntax varies for each database engine.)
+
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
 
@@ -3405,6 +3411,8 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE headline ILIKE 'Lennon%';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
@@ -3428,6 +3436,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE '%Lennon';
 
+(The exact SQL syntax varies for each database engine.)
+
 .. admonition:: SQLite users
 
     SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith``
@@ -3449,7 +3459,9 @@ SQL equivalent:
 
 .. code-block:: sql
 
-    SELECT ... WHERE headline ILIKE '%Lennon'
+    SELECT ... WHERE headline ILIKE '%Lennon';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
