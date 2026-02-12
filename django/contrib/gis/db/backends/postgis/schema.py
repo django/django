@@ -30,14 +30,16 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         return self._create_spatial_index_sql(model, fields[0], **kwargs)
 
     def _alter_column_type_sql(
-        self, table, old_field, new_field, new_type, old_collation, new_collation
+        self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
         """
         Special case when dimension changed.
         """
-        if not hasattr(old_field, "dim") or not hasattr(new_field, "dim"):
+        if (not hasattr(old_field, "dim") or not hasattr(new_field, "dim")) and getattr(
+            old_field, "geography", False
+        ) == getattr(new_field, "geography", False):
             return super()._alter_column_type_sql(
-                table, old_field, new_field, new_type, old_collation, new_collation
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
 
         if old_field.dim == 2 and new_field.dim == 3:
@@ -46,6 +48,14 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             sql_alter = self.sql_alter_column_to_2d
         else:
             sql_alter = self.sql_alter_column_type
+
+        # Switching from geography to geometry needs USING (#23902).
+        if getattr(old_field, "geography", False) and not getattr(
+            new_field, "geography", False
+        ):
+            # self._using_sql works as-is in this instance.
+            sql_alter += self._using_sql(new_field, old_field)
+
         return (
             (
                 sql_alter
