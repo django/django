@@ -48,7 +48,7 @@ CSRF_SESSION_KEY = "_csrftoken"
 
 
 def _make_xlat(chars: str):
-    xlat = [0 for _ in range(1 + max((ord(x) for x in chars)))]
+    xlat = [-1 for _ in range(1 + max((ord(x) for x in chars)))]
     for i, c in enumerate(chars):
         xlat[ord(c)] = i
     return xlat
