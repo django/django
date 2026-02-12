@@ -1766,7 +1766,7 @@ class LiveServerThread(threading.Thread):
             self.httpd.set_app(handler)
             self.is_ready.set()
             self.httpd.serve_forever()
-        except Exception as e:
+        except BaseException as e:
             self.error = e
             self.is_ready.set()
         finally:

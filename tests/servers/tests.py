@@ -135,7 +135,7 @@ class LiveServerInMemoryDatabaseLockTest(LiveServerBase):
 
 class FailingLiveServerThread(LiveServerThread):
     def _create_server(self, connections_override=None):
-        raise RuntimeError("Error creating server.")
+        raise SystemExit("Error creating server.")
 
 
 class LiveServerTestCaseSetupTest(LiveServerBase):
@@ -151,7 +151,7 @@ class LiveServerTestCaseSetupTest(LiveServerBase):
         cls.check_allowed_hosts(["testserver"])
         try:
             super().setUpClass()
-        except RuntimeError:
+        except SystemExit:
             # LiveServerTestCase's change to ALLOWED_HOSTS should be reverted.
             cls.doClassCleanups()
             cls.check_allowed_hosts(["testserver"])
