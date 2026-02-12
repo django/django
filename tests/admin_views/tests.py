@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+import sys
 import unittest
 import zoneinfo
 from unittest import mock
@@ -587,6 +588,31 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(len(messages), 1)
         self.assertIn("admin_views.nonexistent", str(messages[0]))
         self.assertIn("could not be found", str(messages[0]))
+
+    def test_popup_add_POST_with_unregistered_source_model(self):
+        """
+        Popup add where source_model is a valid Django model but is not
+        registered in the admin site (e.g. a model only used as an inline)
+        should succeed without raising a KeyError.
+        """
+        post_data = {
+            IS_POPUP_VAR: "1",
+            # Chapter exists as a model but is not registered in site (only
+            # in site6), simulating a model used only as an inline.
+            SOURCE_MODEL_VAR: "admin_views.chapter",
+            "title": "Test Article",
+            "content": "some content",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
+        }
+        response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-popup-response")
+        # No error messages - unregistered model is silently skipped.
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 0)
+        # No optgroup in the response.
+        self.assertNotContains(response, "&quot;optgroup&quot;")
 
     def test_basic_edit_POST(self):
         """
@@ -5983,6 +6009,12 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="A Long Title", published=True, slug="a-long-title"
         )
 
+    @property
+    def modifier_key(self):
+        from selenium.webdriver.common.keys import Keys
+
+        return Keys.COMMAND if sys.platform == "darwin" else Keys.CONTROL
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_login_button_centered(self):
         from selenium.webdriver.common.by import By
@@ -6406,8 +6438,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             elem = self.selenium.find_element(
                 By.CSS_SELECTOR, f"#id_user_permissions_from option[value='{perm.id}']"
             )
-            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
-                Keys.CONTROL
+            ActionChains(self.selenium).key_down(self.modifier_key).click(elem).key_up(
+                self.modifier_key
             ).perform()
 
         # Move focus to other element.
@@ -6425,8 +6457,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             elem = self.selenium.find_element(
                 By.CSS_SELECTOR, f"#id_user_permissions_to option[value='{perm.id}']"
             )
-            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
-                Keys.CONTROL
+            ActionChains(self.selenium).key_down(self.modifier_key).click(elem).key_up(
+                self.modifier_key
             ).perform()
 
         # Move focus to other element.
