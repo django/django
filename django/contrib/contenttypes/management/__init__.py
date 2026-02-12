@@ -27,14 +27,18 @@ class RenameContentType(migrations.RunPython):
                 with transaction.atomic(using=db):
                     content_type.save(using=db, update_fields={"model"})
             except IntegrityError:
-                # Gracefully fallback if a stale content type causes a
-                # conflict as remove_stale_contenttypes will take care of
-                # asking the user what should be done next.
-                content_type.model = old_model
-            else:
-                # Clear the cache as the `get_by_natural_key()` call will cache
-                # the renamed ContentType instance by its old model name.
-                ContentType.objects.clear_cache()
+                # A stale content type with the new model name already
+                # exists. Delete it and retry the rename so that any
+                # existing references (e.g. GenericForeignKey) follow
+                # the renamed model.
+                ContentType.objects.db_manager(db).filter(
+                    app_label=self.app_label, model=new_model
+                ).delete()
+                with transaction.atomic(using=db):
+                    content_type.save(using=db, update_fields={"model"})
+            # Clear the cache as the `get_by_natural_key()` call will cache
+            # the renamed ContentType instance by its old model name.
+            ContentType.objects.clear_cache()
 
     def rename_forward(self, apps, schema_editor):
         self._rename(apps, schema_editor, self.old_model, self.new_model)

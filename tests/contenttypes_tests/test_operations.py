@@ -161,7 +161,8 @@ class ContentTypeOperationsTests(TransactionTestCase):
             interactive=False,
             verbosity=0,
         )
-        self.assertTrue(
+        # The stale "renamedfoo" content type is deleted and "foo" is renamed.
+        self.assertFalse(
             ContentType.objects.filter(
                 app_label="contenttypes_tests", model="foo"
             ).exists()
@@ -184,7 +185,7 @@ class ContentTypeOperationsTests(TransactionTestCase):
                 app_label="contenttypes_tests", model="foo"
             ).exists()
         )
-        self.assertTrue(
+        self.assertFalse(
             ContentType.objects.filter(
                 app_label="contenttypes_tests", model="renamedfoo"
             ).exists()
