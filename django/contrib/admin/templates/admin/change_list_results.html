@@ -10,16 +10,19 @@
 <thead>
 <tr>
 {% for header in result_headers %}
-<th scope="col"{{ header.class_attrib }}>
-   {% if header.sortable and header.sort_priority > 0 %}
-       <div class="sortoptions">
-         <a class="sortremove" href="{{ header.url_remove }}" title="{% translate "Remove from sorting" %}"></a>
-         {% if num_sorted_fields > 1 %}<span class="sortpriority" title="{% blocktranslate with priority_number=header.sort_priority %}Sorting priority: {{ priority_number }}{% endblocktranslate %}">{{ header.sort_priority }}</span>{% endif %}
-         <a href="{{ header.url_toggle }}" class="toggle {{ header.ascending|yesno:'ascending,descending' }}" title="{% translate "Toggle sorting" %}"></a>
-       </div>
-   {% endif %}
-   <div class="text">{% if header.sortable %}<a role="button" href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}</div>
-   <div class="clear"></div>
+<th scope="col"{{ header.class_attrib }}{% if header.sortable %} id="col-{{ header.field_name }}" aria-labelledby="col-label-{{ header.field_name }}"{% if header.sorted_direction == "asc" %} aria-sort="ascending"{% elif header.sorted_direction == "desc" %} aria-sort="descending"{% endif %}{% endif %}>
+  {% if header.sortable %}
+  <a href="{{ header.url_toggle }}" >
+    <span id="col-label-{{ header.field_name }}">{{ header.text|capfirst }}</span>
+    <div>
+      {% if num_sorted_fields > 1 and header.sort_priority %}<span class="sortpriority" aria-hidden="true" title="{% blocktranslate with priority_number=header.sort_priority %}Sorting priority: {{ priority_number }}{% endblocktranslate %}">{{ header.sort_priority }}</span>{% endif %}
+      <span aria-hidden="true"></span>
+      <span class="visually-hidden" aria-describedby="col-{{ header.field_name }}">{{ header.description }}</span>
+    </div>
+  </a>
+  {% else %}
+  <span>{{ header.text|capfirst }}</span>
+  {% endif %}
 </th>{% endfor %}
 </tr>
 </thead>

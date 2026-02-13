@@ -22,6 +22,7 @@ class Child(models.Model):
 class GrandChild(models.Model):
     parent = models.ForeignKey(Child, models.SET_NULL, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
+    age = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
