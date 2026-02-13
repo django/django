@@ -563,18 +563,25 @@ Examples (those after the first will only work on PostgreSQL):
 
 .. note::
     Keep in mind that :meth:`order_by` uses any default related model ordering
-    that has been defined. You might have to explicitly order by the relation
-    ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
-    match those at the beginning of the ``ORDER BY`` clause. For example, if
-    the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
-    ``name``::
+    defined in :attr:`~django.db.models.Options.ordering`. As a consequence,
+    ordering by a related field may be expanded to the fields defined in the
+    related model's default ordering, while :meth:`distinct` may resolve the
+    relation to its primary key field. This can cause the ``DISTINCT ON``
+    expressions to differ from the initial ``ORDER BY`` expressions.
+
+    You might have to explicitly order by the relation ``_id`` or referenced
+    field to make sure the ``DISTINCT ON`` expressions match those at the
+    beginning of the ``ORDER BY`` clause. For example, if the ``Blog`` model
+    defined an :attr:`~django.db.models.Options.ordering` by ``name``::
 
         Entry.objects.order_by("blog").distinct("blog")
 
     ...wouldn't work because the query would be ordered by ``blog__name`` thus
     mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
     by the relation ``_id`` field (``blog_id`` in this case) or the referenced
-    one (``blog__pk``) to make sure both expressions match.
+    one (``blog__pk``) to make sure both expressions match::
+
+        Entry.objects.order_by("blog_id").distinct("blog_id")
 
 ``values()``
 ~~~~~~~~~~~~
