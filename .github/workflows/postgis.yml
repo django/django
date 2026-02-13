@@ -4,14 +4,14 @@ on:
   pull_request:
     types: [labeled, synchronize, opened, reopened]
     paths-ignore:
-      - 'docs/**'
+      - "docs/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-   contents: read
+  contents: read
 
 jobs:
   postgis:
@@ -20,8 +20,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgis-version: ["latest", "18-3.6-alpine", "17-master"]
+        include:
+          - postgis-version: "latest"
+            package-manager: "apt"
+          - postgis-version: "18-3.6-alpine"
+            package-manager: "apk"
+          - postgis-version: "17-master"
+            package-manager: "apt"
     name: PostGIS ${{ matrix.postgis-version }}
+    container:
+      image: postgis/postgis:${{ matrix.postgis-version }}
     services:
       postgres:
         image: postgis/postgis:${{ matrix.postgis-version }}
@@ -42,29 +50,34 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Update apt repo
-        run: sudo apt update
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt install -y libmemcached-dev
-      - name: Install geospatial dependencies
-        run: sudo apt install -y binutils libproj-dev gdal-bin
-      - name: Print PostGIS versions
+      - name: Install system dependencies
+        run: |
+          if [ "${{ matrix.package-manager }}" = "apt" ]; then
+            apt update
+            apt install -y git libmemcached-dev curl ca-certificates
+          else
+            apk add --no-cache git libmemcached-dev build-base curl ca-certificates
+          fi
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh
+      - name: Install Python
+        run: uv python install 3.14
+      - name: Print PostGIS and geospatial library versions
         env:
           POSTGRES_DB: geodjango
           POSTGRES_USER: user
           POSTGRES_PASSWORD: postgres
         run: |
           PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -c "SELECT PostGIS_full_version();"
+          gdal --version
+          proj
+          geosop
       - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+        run: uv pip install --upgrade pip wheel
+      - run: uv pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
       - name: Run PostGIS tests
-        run: python -Wall tests/runtests.py -v2 --settings=test_postgis
+        run: uv run tests/runtests.py -v2 --settings=test_postgis
+        env:
+          PYTHONWARNINGS: all
