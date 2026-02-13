@@ -637,8 +637,8 @@ class ModelAdminTests(TestCase):
             '<select data-context="available-source" '
             'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
-            '<option value="%d">The Beatles</option>'
-            '<option value="%d">The Doors</option>'
+            '<option value="%s">The Beatles</option>'
+            '<option value="%s">The Doors</option>'
             "</select></div>" % (band2.id, self.band.id),
         )
 
@@ -661,7 +661,7 @@ class ModelAdminTests(TestCase):
             '<select data-context="available-source" '
             'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
-            '<option value="%d">The Doors</option>'
+            '<option value="%s">The Doors</option>'
             "</select></div>" % self.band.id,
         )
 

@@ -1555,8 +1555,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         # Usable password field.
         self.assertContains(
             response,
-            '<fieldset class="flex-container">'
-            "<legend>Password-based authentication:</legend>",
+            "<fieldset><legend>Password-based authentication:</legend>",
         )
         # Submit buttons
         self.assertContains(response, '<input type="submit" name="set-password"')

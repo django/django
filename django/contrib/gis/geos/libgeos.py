@@ -60,12 +60,15 @@ def load_geos():
     # See the GEOS C API source code for more details on the library function
     # calls: https://libgeos.org/doxygen/geos__c_8h_source.html
     _lgeos = CDLL(lib_path)
-    # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
-    # routines. These functions aren't actually called until they are
+    # Here we set up the prototypes for the GEOS_init_r and GEOS_finish_r
+    # routines, as well as the context handler setters.
+    # These functions aren't actually called until they are
     # attached to a GEOS context handle -- this actually occurs in
     # geos/prototypes/threadsafe.py.
-    _lgeos.initGEOS_r.restype = CONTEXT_PTR
-    _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    _lgeos.GEOS_init_r.restype = CONTEXT_PTR
+    _lgeos.GEOS_finish_r.argtypes = [CONTEXT_PTR]
+    _lgeos.GEOSContext_setErrorHandler_r.argtypes = [CONTEXT_PTR, ERRORFUNC]
+    _lgeos.GEOSContext_setNoticeHandler_r.argtypes = [CONTEXT_PTR, NOTICEFUNC]
     # Set restype for compatibility across 32 and 64-bit platforms.
     _lgeos.GEOSversion.restype = c_char_p
     return _lgeos

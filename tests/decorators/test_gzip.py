@@ -1,4 +1,4 @@
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.test import SimpleTestCase

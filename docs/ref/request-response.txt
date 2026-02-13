@@ -186,7 +186,7 @@ All attributes should be considered read-only, unless stated otherwise.
     .. code-block:: pycon
 
         >>> request.headers
-        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...)}
 
         >>> "User-Agent" in request.headers
         True
@@ -217,6 +217,30 @@ All attributes should be considered read-only, unless stated otherwise.
     which means it's available in all views but not in middleware which are
     executed before URL resolving takes place (you can use it in
     :meth:`process_view` though).
+
+.. attribute:: HttpRequest.multipart_parser_class
+
+    .. versionadded:: 6.1
+
+    The class used to parse ``multipart/form-data`` request data. By default,
+    this is ``django.http.multipartparser.MultiPartParser``.
+
+    You can set this attribute to use a custom multipart parser, either via
+    middleware or directly in views::
+
+        from django.http.multipartparser import MultiPartParser
+
+
+        class CustomMultiPartParser(MultiPartParser):
+            def parse(self):
+                post = QueryDict(mutable=True)
+                files = MultiValueDict()
+                # Custom processing logic here
+                return post, files
+
+
+        # In middleware or view:
+        request.multipart_parser_class = CustomMultiPartParser
 
 Attributes set by application code
 ----------------------------------

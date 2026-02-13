@@ -162,6 +162,7 @@ class ExecutorTests(MigrationTestBase):
         self.assertTrue(Publisher.objects.exists())
         self.assertTableNotExists("migrations_book")
 
+    @skipUnlessDBFeature("supports_transactions")
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_atomic_operation"}
     )

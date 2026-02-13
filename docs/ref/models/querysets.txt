@@ -330,9 +330,9 @@ interested in the exact number of entries, you could do this:
     >>> blogs = Blog.objects.alias(entries=Count("entry")).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
-:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
-with other methods (e.g. :meth:`aggregate`), you must promote it to an
-annotation::
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use an aliased
+expression with other methods (e.g. :meth:`aggregate`), you must promote it to
+an annotation::
 
     Blog.objects.alias(entries=Count("entry")).annotate(
         entries=F("entries"),
@@ -341,9 +341,9 @@ annotation::
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
 example, ``QuerySet`` method creates expressions, for later use in views).
-``alias()`` allows building complex expressions incrementally, possibly
-spanning multiple methods and modules, refer to the expression parts by their
-aliases and only use :meth:`annotate` for the final result.
+``alias()`` allows building complex expressions incrementally (possibly
+spanning multiple methods and modules), referring to the expression parts by
+their aliases, and only using :meth:`annotate` for the final result.
 
 ``order_by()``
 ~~~~~~~~~~~~~~
@@ -549,22 +549,17 @@ Examples (those after the first will only work on PostgreSQL):
 .. code-block:: pycon
 
     >>> Author.objects.distinct()
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("pub_date").distinct("pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog").distinct("blog")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author", "pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog__name", "mod_date").distinct("blog__name", "mod_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author")
-    [...]
+    <QuerySet [...]>
 
 .. note::
     Keep in mind that :meth:`order_by` uses any default related model ordering
@@ -1204,7 +1199,7 @@ and run:
 .. code-block:: pycon
 
     >>> Pizza.objects.all()
-    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
+    <QuerySet [<Pizza: Hawaiian (ham, pineapple)>, <Pizza: Seafood (prawns, smoked salmon)>, ...]>
 
 The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
@@ -1990,13 +1985,12 @@ them:
 .. code-block:: pycon
 
     >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
-    <QuerySet [<Person: ...)>, ...]>
+    <QuerySet [<Person: ...>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB only supports the ``nowait``
-argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
-argument is only supported on PostgreSQL.
+``select_for_update()``. However, MariaDB only supports the ``nowait`` and
+``skip_locked`` arguments, and MySQL supports the ``nowait``, ``skip_locked``,
+and ``of`` arguments. The ``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2780,8 +2774,9 @@ the direction is changed.
 *Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key. This can affect
+is no matching object. If the ``QuerySet`` has no ordering defined (and has not
+had ordering forcibly cleared by calling :meth:`order_by` with no arguments),
+then the queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
@@ -2795,6 +2790,12 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
+
+.. versionchanged:: 6.1
+
+    ``first()`` and :meth:`last` no longer order by the primary key when
+    ordering has been forcibly cleared by calling :meth:`order_by` with no
+    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -4174,7 +4175,14 @@ by the aggregate.
     .. attribute:: delimiter
 
         A ``Value`` or expression representing the string that should separate
-        each of the values. For example, ``Value(",")``.
+        each of the values. For example, ``Value(",")``. (On SQLite, the
+        literal delimiter ``Value(",")`` is the only delimiter compatible with
+        ``distinct=True``.)
+
+        .. versionchanged:: 6.1
+
+            Support for using ``distinct=True`` with a delimiter of
+            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================
@@ -4240,7 +4248,7 @@ attribute:
 
     >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

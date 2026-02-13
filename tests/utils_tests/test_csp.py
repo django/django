@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.csp import CSP, LazyNonce, build_policy
+from django.utils.csp import CSP, LazyNonce, build_policy, generate_nonce
 from django.utils.functional import empty
 
 basic_config = {
@@ -155,6 +155,7 @@ class LazyNonceTests(SimpleTestCase):
         self.assertTrue(nonce)
         self.assertEqual(nonce, val)
         self.assertIsInstance(nonce, str)
+        self.assertEqual(repr(nonce), f"<LazyNonce: '{nonce}'>")
         self.assertEqual(len(val), 22)  # Based on secrets.token_urlsafe of 16 bytes.
         self.assertEqual(generated_tokens, [nonce])
         # Also test the wrapped value.
@@ -166,3 +167,10 @@ class LazyNonceTests(SimpleTestCase):
         second = str(nonce)
 
         self.assertEqual(first, second)
+
+    def test_repr(self):
+        nonce = LazyNonce()
+        self.assertEqual(repr(nonce), f"<LazyNonce: {repr(generate_nonce)}>")
+
+        str(nonce)  # Force nonce generation.
+        self.assertRegex(repr(nonce), r"<LazyNonce: '[^']+'>")

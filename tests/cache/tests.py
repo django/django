@@ -15,6 +15,7 @@ from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
+import django
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
@@ -25,7 +26,7 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1165,6 +1166,90 @@ class BaseCacheTests:
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set("key", "default"), "default")
 
+    async def test_get_many_async_uses_specialized_implementation(self):
+        if (
+            cache.get_many.__func__ is not BaseCache.get_many
+            and cache.aget_many.__func__ is BaseCache.aget_many
+        ):
+            with mock.patch.object(cache, "get_many") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aget_many({})
+                mocked.assert_called_once()
+
+    async def test_set_many_async_uses_specialized_implementation(self):
+        if (
+            cache.set_many.__func__ is not BaseCache.set_many
+            and cache.aset_many.__func__ is BaseCache.aset_many
+        ):
+            with mock.patch.object(cache, "set_many") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aset_many({})
+                mocked.assert_called_once()
+
+    async def test_delete_many_async_uses_specialized_implementation(self):
+        if (
+            cache.delete_many.__func__ is not BaseCache.delete_many
+            and cache.adelete_many.__func__ is BaseCache.adelete_many
+        ):
+            with mock.patch.object(cache, "delete_many") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.adelete_many({})
+                mocked.assert_called_once()
+
+    async def test_get_or_set_async_uses_specialized_implementation(self):
+        await cache.aset("key", "value")
+        if (
+            cache.get_or_set.__func__ is not BaseCache.get_or_set
+            and cache.aget_or_set.__func__ is BaseCache.aget_or_set
+        ):
+            with mock.patch.object(cache, "get_or_set") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aget_or_set("key")
+                mocked.assert_called_once()
+
+    async def test_has_key_async_uses_specialized_implementation(self):
+        await cache.aset("key", "value")
+        if (
+            cache.has_key.__func__ is not BaseCache.has_key
+            and cache.ahas_key.__func__ is BaseCache.ahas_key
+        ):
+            with mock.patch.object(cache, "has_key") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.ahas_key("key")
+                mocked.assert_called_once()
+
+    async def test_incr_async_uses_specialized_implementation(self):
+        await cache.aset("key", 1)
+        if (
+            cache.incr.__func__ is not BaseCache.incr
+            and cache.aincr.__func__ is BaseCache.aincr
+        ):
+            with mock.patch.object(cache, "incr") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aincr("key")
+                mocked.assert_called_once()
+
+    async def test_incr_version_async_uses_specialized_implementation(self):
+        await cache.aset("key", "value", version=1)
+        if (
+            cache.incr_version.__func__ is not BaseCache.incr_version
+            and cache.aincr_version.__func__ is BaseCache.aincr_version
+        ):
+            with mock.patch.object(cache, "incr_version") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aincr_version("key")
+                mocked.assert_called_once()
+
+    async def test_close_async_uses_specialized_implementation(self):
+        if (
+            cache.close.__func__ is not BaseCache.close
+            and cache.aclose.__func__ is BaseCache.aclose
+        ):
+            with mock.patch.object(cache, "close") as mocked:
+                mocked.__func__ = lambda x: x
+                await cache.aclose()
+                mocked.assert_called_once()
+
 
 @override_settings(
     CACHES=caches_setting_for_tests(
@@ -1901,6 +1986,24 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["db"], 5)
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
+
+    def test_client_driver_info(self):
+        client_info = cache._cache.get_client().client_info()
+        if {"lib-name", "lib-ver"}.issubset(client_info):
+            version = django.get_version()
+            if hasattr(self.lib, "DriverInfo"):
+                info = self._lib.DriverInfo().add_upstream_driver("django", version)
+                correct_lib_name = info.formatted_name
+            else:
+                correct_lib_name = f"redis-py(django_v{version})"
+            # Relax the assertion to allow date variance in editable installs.
+            truncated_lib_name = correct_lib_name.rsplit(".dev", maxsplit=1)[0]
+            self.assertIn(truncated_lib_name, client_info["lib-name"])
+            self.assertEqual(client_info["lib-ver"], self.lib.__version__)
+        else:
+            # Redis versions below 7.2 lack CLIENT SETINFO.
+            self.assertNotIn("lib-ver", client_info)
+            self.assertNotIn("lib-name", client_info)
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):

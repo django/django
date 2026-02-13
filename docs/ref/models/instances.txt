@@ -814,7 +814,7 @@ The ``__hash__()`` method is based on the instance's primary key value. It
 is effectively ``hash(obj.pk)``. If the instance doesn't have a primary key
 value then a ``TypeError`` will be raised (otherwise the ``__hash__()``
 method would return different values before and after the instance is
-saved, but changing the :meth:`~object.__hash__` value of an instance is
+saved), but changing the :meth:`~object.__hash__` value of an instance is
 forbidden in Python.
 
 ``get_absolute_url()``

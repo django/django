@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set up Python
@@ -35,6 +35,8 @@ jobs:
           python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'docs/requirements.txt'
+      - name: Install system spell checker
+        run: sudo apt update && sudo apt install -y aspell aspell-en
       - run: python -m pip install -r docs/requirements.txt
       - name: Build docs
         run: |
@@ -47,7 +49,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set up Python
@@ -71,7 +73,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set up Python

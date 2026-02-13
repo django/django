@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from inspect import iscoroutinefunction
 from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
@@ -25,7 +26,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -1523,11 +1524,11 @@ class TestCase(TransactionTestCase):
                             try:
                                 callback()
                             except Exception as e:
-                                logger.error(
-                                    f"Error calling {callback.__qualname__} in "
-                                    f"on_commit() (%s).",
+                                name = getattr(callback, "__qualname__", callback)
+                                logger.exception(
+                                    "Error calling %s in on_commit() (%s).",
+                                    name,
                                     e,
-                                    exc_info=True,
                                 )
                         else:
                             callback()

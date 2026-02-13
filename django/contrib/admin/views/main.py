@@ -11,6 +11,7 @@ from django.contrib.admin.exceptions import (
 from django.contrib.admin.options import (
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
     ShowFacets,
@@ -49,6 +50,7 @@ IGNORED_PARAMS = (
     SEARCH_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
 )
 
@@ -101,7 +103,7 @@ class ChangeList:
         self.preserved_filters = model_admin.get_preserved_filters(request)
         self.sortable_by = sortable_by
         self.search_help_text = search_help_text
-
+        self.formset = None
         # Get search parameters from the query string.
         _search_form = self.search_form_class(request.GET)
         if not _search_form.is_valid():

@@ -49,9 +49,9 @@ class DeferTests(AssertionMixin, TestCase):
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
-        # The related_id is always set even if it's not fetched from the DB,
-        # so pk and related_id are not deferred.
-        self.assert_delayed(self.s1.primary_set.only("pk")[0], 2)
+        # The related_id is not set if it's not fetched from the DB,
+        # so pk is not deferred, but related_id is.
+        self.assert_delayed(self.s1.primary_set.only("pk")[0], 3)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()
@@ -83,6 +83,15 @@ class DeferTests(AssertionMixin, TestCase):
         msg = "Cannot pass None as an argument to only()."
         with self.assertRaisesMessage(TypeError, msg):
             Primary.objects.only(None)
+
+    def test_only_related_manager_optimization(self):
+        s = Secondary.objects.create(first="one", second="two")
+        Primary.objects.bulk_create(
+            [Primary(name="p1", value="v1", related=s) for _ in range(5)]
+        )
+        with self.assertNumQueries(1):
+            for p in s.primary_set.only("pk"):
+                _ = p.pk
 
     def test_defer_extra(self):
         qs = Primary.objects.all()

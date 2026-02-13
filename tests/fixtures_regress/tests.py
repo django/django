@@ -499,6 +499,7 @@ class TestFixtures(TestCase):
         self.assertEqual(Book.objects.all()[0].id, 1)
         self.assertEqual(Person.objects.all()[0].id, 4)
 
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_loaddata_raises_error_when_fixture_has_invalid_foreign_key(self):
         """
         Data with nonexistent child key references raises error.

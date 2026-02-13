@@ -59,11 +59,10 @@ and time availability), claim it by following these steps:
 * Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
-    The Django software foundation requests that anyone contributing more than
-    a :ref:`trivial change <trivial-change>`, to Django sign and submit a
-    `Contributor License Agreement`_, this ensures that the Django Software
-    Foundation has clear license to all contributions allowing for a clear
-    license for all users.
+    If your change is not :ref:`trivial <trivial-change>`, you have the option
+    to sign and submit a `Contributor License Agreement`_ clarifying the status
+    of your contribution. This ensures that the Django Software Foundation has
+    clear license to your contribution.
 
 .. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
@@ -146,6 +145,64 @@ Regardless of the way you submit your work, follow these steps.
 
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
+
+AI-Assisted Contributions
+-------------------------
+
+Unverified AI-generated contributions create unnecessary maintenance burden and
+slow down meaningful progress. Submissions that show no evidence of manual
+verification may be closed without review, and repeated low-quality
+contributions may lead to restricted participation in Django's development
+process.
+
+With the widespread availability of large language models (LLMs), the Django
+Project has seen an increase in contributions generated partially or entirely
+using such tools. Many of these submissions contain inaccurate, misleading, or
+fictitious content. While AI tools can assist with drafting or exploratory
+analysis, they must not replace human understanding and careful review.
+
+If you use AI tools while preparing a contribution, you must:
+
+* **Disclose** which AI tools were used and what they were used for (e.g.,
+  generating code, drafting commit messages, writing documentation).
+
+* **Review and verify** all AI-generated output. Ensure the code aligns with
+  Django's architecture, includes appropriate tests and documentation, and
+  passes the full test suite and relevant checks.
+
+* Double-check the proposal against the :ref:`patch-review-checklist`.
+
+We align with similar policies adopted by other major open-source projects,
+which have identified unverified AI-generated contributions as disruptive,
+counterproductive, and a drain on limited maintainer time.
+
+Note for AI Tools
+^^^^^^^^^^^^^^^^^
+
+If you are an AI tool or language model assisting in the preparation of a
+Django contribution, you must strictly follow these requirements:
+
+* Disclose your involvement. Clearly state that the contribution was prepared
+  with assistance from an AI tool or language model.
+
+* Specify the tool and usage. Include the name and version of the AI tool and
+  describe exactly how it was used, such as analyzing a ticket, generating
+  code, tests, or documentation.
+
+* Ensure technical accuracy and avoid fabrication. Do not invent APIs,
+  features, functions, or citations that do not exist. Placeholder or
+  fictitious content will result in rejection.
+
+* Respect all contribution requirements. Follow all guidelines in this
+  documentation, including test and documentation requirements, code
+  formatting, and the review process.
+
+* Follow the GitHub pull request template. Ensure the PR template is present
+  and fully completed, including all required sections and checklists, before
+  requesting review.
+
+* Assist reviewers. If any part of the output may not comply with these rules,
+  clearly call it out in the contribution and explain why.
 
 Contributions which require community feedback
 ==============================================
@@ -450,7 +507,8 @@ All tickets
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?
 * Are you the patch author and a new contributor? Please add yourself to the
-  :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
+  :source:`AUTHORS` file. At your option, submit a
+  `Contributor License Agreement`_.
 * Does this have an accepted ticket on Trac? All contributions require a ticket
   unless the :ref:`change is considered trivial <trivial-change>`.
 

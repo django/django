@@ -18,7 +18,12 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.decorators.common import no_append_slash
 
-from .forms import MediaActionForm
+from .forms import (
+    MediaActionForm,
+    SectionFormWithDynamicOptgroups,
+    SectionFormWithObjectOptgroups,
+    SectionFormWithOptgroups,
+)
 from .models import (
     Actor,
     AdminOrderedAdminMethod,
@@ -612,7 +617,7 @@ class PostAdmin(admin.ModelAdmin):
     @admin.display
     def coolness(self, instance):
         if instance.pk:
-            return "%d amount of cool." % instance.pk
+            return "%s amount of cool." % instance.pk
         else:
             return "Unknown coolness."
 
@@ -1193,6 +1198,18 @@ class CamelCaseAdmin(admin.ModelAdmin):
 
 class CourseAdmin(admin.ModelAdmin):
     radio_fields = {"difficulty": admin.VERTICAL}
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    ("title", "difficulty"),
+                    ("materials", "start_datetime"),
+                    ("categories"),
+                ),
+            },
+        ),
+    )
 
 
 site = admin.AdminSite(name="admin")
@@ -1345,6 +1362,32 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+
+
+# Admin for testing optgroup in popup response
+class SectionAdminWithOptgroups(admin.ModelAdmin):
+    form = SectionFormWithOptgroups
+
+
+class SectionAdminWithObjectOptgroups(admin.ModelAdmin):
+    form = SectionFormWithObjectOptgroups
+
+
+class SectionAdminWithDynamicOptgroups(admin.ModelAdmin):
+    form = SectionFormWithDynamicOptgroups
+
+
+site11 = admin.AdminSite(name="admin11")
+site11.register(Article, ArticleAdmin2)
+site11.register(Section, SectionAdminWithOptgroups)
+
+site12 = admin.AdminSite(name="admin12")
+site12.register(Article, ArticleAdmin2)
+site12.register(Section, SectionAdminWithObjectOptgroups)
+
+site13 = admin.AdminSite(name="admin13")
+site13.register(Article, ArticleAdmin2)
+site13.register(Section, SectionAdminWithDynamicOptgroups)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 site7.register(
     Pizza,

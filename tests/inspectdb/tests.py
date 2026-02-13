@@ -2,11 +2,16 @@ import re
 from io import StringIO
 from unittest import mock, skipUnless
 
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.core.management.commands import inspectdb
 from django.db import connection
 from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from .models import PeopleMoreData, test_collation
 
@@ -40,6 +45,7 @@ def cursor_execute(*queries):
     return results
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTestCase(TestCase):
     unique_re = re.compile(r".*unique_together = \((.+),\).*")
 
@@ -519,6 +525,7 @@ class InspectDBTestCase(TestCase):
         )
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTransactionalTests(TransactionTestCase):
     available_apps = ["inspectdb"]
 
@@ -671,3 +678,14 @@ class InspectDBTransactionalTests(TransactionTestCase):
         out = StringIO()
         call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
         self.assertNotIn("unique_together", out.getvalue())
+
+
+@skipIfDBFeature("supports_inspectdb")
+class InspectDBNotSupportedTests(TestCase):
+    def test_not_supported(self):
+        msg = (
+            "Database inspection isn't supported for the currently selected "
+            "database backend."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("inspectdb")

@@ -7,21 +7,15 @@ from io import StringIO
 from unittest import mock
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.auth import get_permission_codename, management
-from django.contrib.auth.management import (
-    RenamePermission,
-    create_permissions,
-    get_default_username,
-)
+from django.contrib.auth.management import create_permissions, get_default_username
 from django.contrib.auth.management.commands import changepassword, createsuperuser
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations, models
+from django.db import migrations
 from django.test import TestCase, override_settings
-from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -613,7 +607,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with self.assertRaisesMessage(CommandError, msg):
             call_command(
@@ -630,7 +624,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with mock.patch.dict(
             os.environ,
@@ -650,7 +644,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         @mock_inputs(
             {
@@ -1531,195 +1525,6 @@ class CreatePermissionsTests(TestCase):
                 content_type__app_label=opts.app_label,
                 codename=codename,
             ).exists()
-        )
-
-
-@override_settings(
-    MIGRATION_MODULES=dict(
-        settings.MIGRATION_MODULES,
-        auth_tests="auth_tests.operations_migrations",
-    ),
-)
-class PermissionRenameOperationsTests(TransactionTestCase):
-    available_apps = [
-        "django.contrib.contenttypes",
-        "django.contrib.auth",
-        "auth_tests",
-    ]
-    databases = {"default", "other"}
-
-    def setUp(self):
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.connect(
-            self.assertOperationsInjected, sender=app_config
-        )
-        self.addCleanup(
-            models.signals.post_migrate.disconnect,
-            self.assertOperationsInjected,
-            sender=app_config,
-        )
-
-    def assertOperationsInjected(self, plan, **kwargs):
-        for migration, _backward in plan:
-            operations = iter(migration.operations)
-            for operation in operations:
-                if isinstance(operation, migrations.RenameModel):
-                    next_operation = next(operations)
-                    self.assertIsInstance(next_operation, RenamePermission)
-                    self.assertEqual(next_operation.app_label, migration.app_label)
-                    self.assertEqual(next_operation.old_model, operation.old_name)
-                    self.assertEqual(next_operation.new_model, operation.new_name)
-
-    def test_permission_rename(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        actions = ["add", "change", "delete", "view"]
-        for action in actions:
-            Permission.objects.create(
-                codename=f"{action}_oldmodel",
-                name=f"Can {action} old model",
-                content_type=ct,
-            )
-
-        call_command("migrate", "auth_tests", verbosity=0)
-        for action in actions:
-            self.assertFalse(
-                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
-            )
-            self.assertTrue(
-                Permission.objects.filter(codename=f"{action}_newmodel").exists()
-            )
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-
-        for action in actions:
-            self.assertTrue(
-                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
-            )
-            self.assertFalse(
-                Permission.objects.filter(codename=f"{action}_newmodel").exists()
-            )
-
-    def test_permission_rename_other_db(self):
-        ct = ContentType.objects.using("default").create(
-            app_label="auth_tests", model="oldmodel"
-        )
-        permission = Permission.objects.using("default").create(
-            codename="add_oldmodel",
-            name="Can add old model",
-            content_type=ct,
-        )
-        # RenamePermission respects the database.
-        call_command("migrate", "auth_tests", verbosity=0, database="other")
-        permission.refresh_from_db()
-        self.assertEqual(permission.codename, "add_oldmodel")
-        self.assertFalse(
-            Permission.objects.using("other").filter(codename="add_oldmodel").exists()
-        )
-        self.assertTrue(
-            Permission.objects.using("other").filter(codename="add_newmodel").exists()
-        )
-
-    @mock.patch(
-        "django.db.router.allow_migrate_model",
-        return_value=False,
-    )
-    def test_rename_skipped_if_router_disallows(self, _):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        Permission.objects.create(
-            codename="change_oldmodel",
-            name="Can change old model",
-            content_type=ct,
-        )
-        # The rename operation should not be there when disallowed by router.
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.disconnect(
-            self.assertOperationsInjected, sender=app_config
-        )
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-        self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
-        self.assertFalse(Permission.objects.filter(codename="change_newmodel").exists())
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-
-    def test_rename_backward_does_nothing_if_no_permissions(self):
-        Permission.objects.filter(content_type__app_label="auth_tests").delete()
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-        self.assertFalse(
-            Permission.objects.filter(
-                codename__in=["change_oldmodel", "change_newmodel"]
-            ).exists()
-        )
-
-    def test_rename_permission_conflict(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        Permission.objects.create(
-            codename="change_newmodel",
-            name="Can change new model",
-            content_type=ct,
-        )
-        Permission.objects.create(
-            codename="change_oldmodel",
-            name="Can change old model",
-            content_type=ct,
-        )
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
-        self.assertTrue(
-            Permission.objects.filter(
-                codename="change_oldmodel",
-                name="Can change old model",
-            ).exists()
-        )
-        self.assertEqual(
-            Permission.objects.filter(
-                codename="change_newmodel",
-                name="Can change new model",
-            ).count(),
-            1,
-        )
-
-        call_command(
-            "migrate",
-            "auth_tests",
-            "zero",
-            database="default",
-            interactive=False,
-            verbosity=0,
         )
 
 

@@ -265,7 +265,7 @@ class UniqueConstraint(BaseConstraint):
         self,
         *expressions,
         fields=(),
-        name=None,
+        name,
         condition=None,
         deferrable=None,
         include=None,
@@ -408,8 +408,8 @@ class UniqueConstraint(BaseConstraint):
         ):
             errors.append(
                 checks.Warning(
-                    f"{connection.display_name} does not support unique constraints "
-                    "with nulls distinct.",
+                    f"{connection.display_name} does not support "
+                    "UniqueConstraint.nulls_distinct.",
                     hint=(
                         "A constraint won't be created. Silence this warning if you "
                         "don't care about it."

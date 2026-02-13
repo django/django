@@ -938,7 +938,7 @@ class BaseDatabaseSchemaEditor:
 
     def _field_db_check(self, field, field_db_params):
         # Always check constraints with the same mocked column name to avoid
-        # recreating constrains when the column is renamed.
+        # recreating constraints when the column is renamed.
         check_constraints = self.connection.data_type_check_constraints
         data = field.db_type_parameters(self.connection)
         data["column"] = "__column_name__"
@@ -1690,7 +1690,7 @@ class BaseDatabaseSchemaEditor:
         _, old_path, old_args, old_kwargs = old_field.deconstruct()
         _, new_path, new_args, new_kwargs = new_field.deconstruct()
         # Don't alter when:
-        # - changing only a field name
+        # - changing only a field name (unless it's a many-to-many)
         # - changing an attribute that doesn't affect the schema
         # - changing an attribute in the provided set of ignored attributes
         # - adding only a db_column and the column name is not changed
@@ -1708,7 +1708,7 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("to", None)
             new_kwargs.pop("to", None)
-        # db_default can take many form but result in the same SQL.
+        # db_default can take many forms but result in the same SQL.
         if (
             old_kwargs.get("db_default")
             and new_kwargs.get("db_default")
@@ -1716,11 +1716,19 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("db_default")
             new_kwargs.pop("db_default")
-        return (
+        if (
             old_field.concrete
             and new_field.concrete
             and (self.quote_name(old_field.column) != self.quote_name(new_field.column))
-        ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
+        ):
+            return True
+        if (
+            old_field.many_to_many
+            and new_field.many_to_many
+            and old_field.name != new_field.name
+        ):
+            return True
+        return (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 
     def _field_should_be_indexed(self, model, field):
         return field.db_index and not field.unique

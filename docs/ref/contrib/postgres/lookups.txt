@@ -28,7 +28,7 @@ The ``trigram_similar`` lookup can be used on
 .. code-block:: pycon
 
     >>> City.objects.filter(name__trigram_similar="Middlesborough")
-    ['<City: Middlesbrough>']
+    <QuerySet [<City: Middlesbrough>]>
 
 .. fieldlookup:: trigram_word_similar
 
@@ -54,7 +54,7 @@ The ``trigram_word_similar`` lookup can be used on
 .. code-block:: pycon
 
     >>> Sentence.objects.filter(name__trigram_word_similar="Middlesborough")
-    ['<Sentence: Gumby rides on the path of Middlesbrough>']
+    <QuerySet [<Sentence: Gumby rides on the path of Middlesbrough>]>
 
 .. fieldlookup:: trigram_strict_word_similar
 
@@ -89,7 +89,7 @@ can be chained with other lookup functions. To use it, you need to add
 the `unaccent extension on PostgreSQL`_. The
 :class:`~django.contrib.postgres.operations.UnaccentExtension` migration
 operation is available if you want to perform this activation using
-migrations).
+migrations.
 
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
@@ -99,10 +99,10 @@ The ``unaccent`` lookup can be used on
 .. code-block:: pycon
 
     >>> City.objects.filter(name__unaccent="México")
-    ['<City: Mexico>']
+    <QuerySet [<City: Mexico>]>
 
     >>> User.objects.filter(first_name__unaccent__startswith="Jerem")
-    ['<User: Jeremy>', '<User: Jérémy>', '<User: Jérémie>', '<User: Jeremie>']
+    <QuerySet [<User: Jeremy>, <User: Jérémy>, <User: Jérémie>, <User: Jeremie>]>
 
 .. warning::
 

@@ -8,13 +8,12 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
+from inspect import iscoroutinefunction
 from io import StringIO
 from itertools import chain
 from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
-
-from asgiref.sync import iscoroutinefunction
 
 from django.apps import apps
 from django.apps.registry import Apps
