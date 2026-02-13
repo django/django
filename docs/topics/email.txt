@@ -399,8 +399,9 @@ email backend API :ref:`provides an alternative
         Sends the message. If a connection was specified when the email was
         constructed, that connection will be used. Otherwise, an instance of
         the default backend will be instantiated and used. If the keyword
-        argument ``fail_silently`` is ``True``, exceptions raised while sending
-        the message will be quashed. An empty list of recipients will not raise
+        argument ``fail_silently`` is ``True``, some exceptions raised while sending
+        the message may be silently ignored. The exact exceptions depend on the email
+        backend used. An empty list of recipients will not raise
         an exception. It will return ``1`` if the message was sent
         successfully, otherwise ``0``.
 
