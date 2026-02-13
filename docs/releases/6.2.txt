@@ -276,6 +276,12 @@ backends.
   consistently returning an HTTP 403 response for staff users without the view
   or change permission regardless of whether the object exists.
 
+* The undocumented ``django.contrib.admin.helpers.AdminForm``,
+  ``InlineAdminForm``, and ``AdminReadonlyField`` classes now require the
+  ``model_admin`` argument, which must be passed as a keyword argument to
+  ``AdminForm`` and ``InlineAdminForm``. Previously it defaulted to ``None``,
+  which raised ``AttributeError`` as soon as a read-only field was rendered.
+
 Miscellaneous
 -------------
 

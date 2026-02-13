@@ -9,6 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
@@ -1695,6 +1696,13 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
             reverse("auth_test_admin:auth_user_password_change", args=("foobar",))
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_user_change_password_admin_form_has_model_admin(self):
+        response = self.client.get(
+            reverse("auth_test_admin:auth_user_password_change", args=(self.admin.pk,))
+        )
+        admin_form = response.context["adminForm"]
+        self.assertIsInstance(admin_form.model_admin, UserAdmin)
 
     @mock.patch("django.contrib.auth.admin.UserAdmin.has_change_permission")
     def test_user_change_password_passes_user_to_has_change_permission(
