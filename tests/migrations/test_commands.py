@@ -1180,6 +1180,17 @@ class MigrateTests(MigrationTestBase):
             )
 
     @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_sqlmigrate_33185"}
+    )
+    def test_sqlmigrate_rename_model_self_referencing_fk(self):
+        out = io.StringIO()
+        call_command("migrate", "migrations", "0001", verbosity=0)
+        call_command("sqlmigrate", "migrations", "0002", stdout=out)
+        output = out.getvalue()
+        self.assertGreater(len(output.strip()), 0, "sqlmigrate should generate SQL")
+        self.assertIn("RENAME", output.upper(), "SQL should contain RENAME operation")
+
+    @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",
             "migrations.migrations_test_apps.migrated_unapplied_app",
