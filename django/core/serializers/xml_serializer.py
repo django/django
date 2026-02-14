@@ -173,14 +173,15 @@ class Serializer(base.Serializer):
                         self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
-                    manager = getattr(obj, field.name)
-                    qs = manager.all()
-                    if not qs.ordered:
-                        qs = qs.order_by("pk")
+                    query_set = getattr(obj, field.name)
                     chunk_size = (
-                        2000 if getattr(manager, "prefetch_cache_name", None) else None
+                        2000
+                        if getattr(query_set, "prefetch_cache_name", None)
+                        else None
                     )
-                    return qs.iterator(chunk_size)
+                    if not query_set.all().totally_ordered:
+                        query_set = query_set.order_by("pk")
+                    return query_set.iterator(chunk_size)
 
             else:
 
@@ -189,6 +190,8 @@ class Serializer(base.Serializer):
 
                 def queryset_iterator(obj, field):
                     query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    if not query_set.totally_ordered:
+                        query_set = query_set.order_by("pk")
                     chunk_size = 2000 if query_set._prefetch_related_lookups else None
                     return query_set.iterator(chunk_size=chunk_size)
 
