@@ -753,6 +753,13 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                         pass
                     else:
                         kwargs["instance"] = self._existing_object(pk)
+                if kwargs.get("instance") is None and getattr(
+                    self, "save_as_new", False
+                ):
+                    try:
+                        kwargs["instance"] = self.get_queryset()[i]
+                    except IndexError:
+                        pass
             else:
                 kwargs["instance"] = self.get_queryset()[i]
         elif self.initial_extra:
@@ -1141,7 +1148,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             self.form._meta.fields.append(self.fk.name)
 
     def initial_form_count(self):
-        if self.save_as_new:
+        if self.save_as_new and not self.is_bound:
             return 0
         return super().initial_form_count()
 
@@ -1159,6 +1166,9 @@ class BaseInlineFormSet(BaseModelFormSet):
             form.data[form.add_prefix(self.fk.name)] = None
             if mutable is not None:
                 form.data._mutable = mutable
+            # Remove the primary key from the instance, we are only
+            # creating new instances.
+            setattr(form.instance, self._pk_field.name, None)
 
         # Set the fk value here so that the form can do its validation.
         fk_value = self.instance.pk

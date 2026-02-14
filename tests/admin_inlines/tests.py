@@ -2570,3 +2570,90 @@ class SeleniumTests(AdminSeleniumTestCase):
         m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
         self.assertTrue(m2m_widget.is_displayed())
         self.take_screenshot("tabular")
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
+class Ticket29969Tests(TestCase):
+    def test_save_as_new_with_view_only_inline(self):
+        """
+        Ticket #29969: Admin inline with view permission is shown when save_as
+        validation fails.
+        """
+        # Create a user with change/view permission on parent and view-only
+        # on child.
+        staff_user = User.objects.create_user(
+            username="staff", password="password", is_staff=True
+        )
+        parent_ct = ContentType.objects.get_for_model(ParentModelWithCustomPk)
+        child_ct = ContentType.objects.get_for_model(ChildModel1)
+
+        staff_user.user_permissions.add(
+            Permission.objects.get(
+                content_type=parent_ct, codename="add_parentmodelwithcustompk"
+            )
+        )
+        staff_user.user_permissions.add(
+            Permission.objects.get(
+                content_type=parent_ct, codename="change_parentmodelwithcustompk"
+            )
+        )
+        staff_user.user_permissions.add(
+            Permission.objects.get(
+                content_type=parent_ct, codename="view_parentmodelwithcustompk"
+            )
+        )
+        staff_user.user_permissions.add(
+            Permission.objects.get(
+                content_type=child_ct, codename="view_childmodel1"
+            )
+        )
+
+        # Create data
+        parent = ParentModelWithCustomPk.objects.create(my_own_pk="P1", name="Parent 1")
+        ChildModel1.objects.create(my_own_pk="C1", name="Child 1", parent=parent)
+
+        # Setup admin with save_as=True
+        class ChildInline(TabularInline):
+            model = ChildModel1
+            extra = 0
+
+        class ParentAdmin(ModelAdmin):
+            save_as = True
+            inlines = [ChildInline]
+
+        # Register ParentAdmin for this test
+        original_admin = admin_site._registry.get(ParentModelWithCustomPk)
+        admin_site.unregister(ParentModelWithCustomPk)
+        admin_site.register(ParentModelWithCustomPk, ParentAdmin)
+
+        try:
+            self.client.force_login(staff_user)
+
+            url = reverse(
+                "admin:admin_inlines_parentmodelwithcustompk_change", args=(parent.pk,)
+            )
+
+            # Try "Save as new" with same PK
+            data = {
+                "my_own_pk": "P1",
+                "name": "Parent 1 Copy",
+                "_saveasnew": "1",
+                "childmodel1_set-TOTAL_FORMS": "1",
+                "childmodel1_set-INITIAL_FORMS": "1",
+                "childmodel1_set-MIN_NUM_FORMS": "0",
+                "childmodel1_set-MAX_NUM_FORMS": "1000",
+            }
+            response = self.client.post(url, data)
+            self.assertEqual(response.status_code, 200)
+
+            # Bug: ChildModel1 inline is shown as editable with empty forms.
+            # Fix: Should be read-only and show data.
+
+            # Check if ChildModel1 inline is shown as read-only
+            self.assertNotContains(response, 'name="childmodel1_set-0-name"')
+            # And it should contain the child's name
+            self.assertContains(response, "Child 1")
+        finally:
+            admin_site.unregister(ParentModelWithCustomPk)
+            if original_admin:
+                admin_site.register(ParentModelWithCustomPk, type(original_admin))

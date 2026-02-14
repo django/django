@@ -343,6 +343,13 @@ class InlineAdminFormSet:
                 self.fieldsets
             )
 
+        if self.has_add_permission:
+            readonly_fields_for_adding = self.readonly_fields
+        else:
+            readonly_fields_for_adding = self.readonly_fields + flatten_fieldsets(
+                self.fieldsets
+            )
+
         for form, original in zip(
             self.formset.initial_forms, self.formset.get_queryset()
         ):
@@ -364,7 +371,7 @@ class InlineAdminFormSet:
                 self.fieldsets,
                 self.prepopulated_fields,
                 None,
-                self.readonly_fields,
+                readonly_fields_for_adding,
                 model_admin=self.opts,
             )
         if self.has_add_permission:

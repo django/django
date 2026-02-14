@@ -1851,7 +1851,10 @@ class ModelAdmin(BaseModelAdmin):
             )
 
         if request.method == "POST" and "_saveasnew" in request.POST:
+            orig_obj = self.get_object(request, unquote(object_id), to_field)
             object_id = None
+        else:
+            orig_obj = None
 
         add = object_id is None
 
@@ -1859,9 +1862,9 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_add_permission(request):
                 raise PermissionDenied
             obj = None
-
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
+            orig_obj = obj
 
             if request.method == "POST":
                 if not self.has_change_permission(request, obj):
@@ -1885,6 +1888,7 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 form.instance,
                 change=not add,
+                orig_obj=orig_obj,
             )
             form_validated = form.is_valid()
             if form_validated:
@@ -1915,7 +1919,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(
-                    request, obj, change=True
+                    request, obj, change=True, orig_obj=obj
                 )
 
         if not add and not self.has_change_permission(request, obj):
@@ -1937,7 +1941,7 @@ class ModelAdmin(BaseModelAdmin):
         media = self.media + admin_form.media
 
         inline_formsets = self.get_inline_formsets(
-            request, formsets, inline_instances, obj
+            request, formsets, inline_instances, orig_obj if add else obj
         )
         for inline_formset in inline_formsets:
             media += inline_formset.media
@@ -2342,21 +2346,25 @@ class ModelAdmin(BaseModelAdmin):
             )
         return formset_params
 
-    def _create_formsets(self, request, obj, change):
+    def _create_formsets(self, request, obj, change, orig_obj=None):
         "Helper function to generate formsets for add/change_view."
         formsets = []
         inline_instances = []
         prefixes = {}
         get_formsets_args = [request]
-        if change:
-            get_formsets_args.append(obj)
+        if change or orig_obj:
+            get_formsets_args.append(orig_obj if orig_obj else obj)
         for FormSet, inline in self.get_formsets_with_inlines(*get_formsets_args):
             prefix = FormSet.get_default_prefix()
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
-            formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
+            formset_params = self.get_formset_kwargs(
+                request, orig_obj if orig_obj else obj, inline, prefix
+            )
             formset = FormSet(**formset_params)
+            if orig_obj:
+                formset.instance = obj
 
             def user_deleted_form(request, obj, formset, index, inline):
                 """Return whether or not the user deleted the form."""
