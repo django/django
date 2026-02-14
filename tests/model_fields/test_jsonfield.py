@@ -1304,6 +1304,43 @@ class TestQuerying(TestCase):
         ).first()
         self.assertEqual(result.coalesced_value, "This is valid JSON primitive.")
 
+    def test_numeric_lookups_with_expression(self):
+        obj_greater = NullableJSONModel.objects.create(
+            value={"target": 5, "comparison": 2}
+        )
+        obj_lesser = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 5}
+        )
+        obj_equal = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 2}
+        )
+        objs = [obj_greater.pk, obj_lesser.pk, obj_equal.pk]
+
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(
+                id__in=objs, value__target__gt=F("value__comparison")
+            ),
+            [obj_greater],
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(
+                id__in=objs, value__target__lt=F("value__comparison")
+            ),
+            [obj_lesser],
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.filter(
+                id__in=objs, value__target__gte=F("value__comparison")
+            ),
+            [obj_greater, obj_equal],
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.filter(
+                id__in=objs, value__target__lte=F("value__comparison")
+            ),
+            [obj_lesser, obj_equal],
+        )
+
 
 @skipUnlessDBFeature("supports_primitives_in_json_field")
 class JSONNullTests(TestCase):
