@@ -3,7 +3,7 @@ import datetime
 import pickle
 from operator import attrgetter
 
-from django.core.exceptions import FieldError, ValidationError
+from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
 from django.db import connection, models
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -835,3 +835,42 @@ class ForeignObjectModelValidationTests(TestCase):
     def test_validate_constraints_excluding_foreign_object_member(self):
         customer_tab = CustomerTab(customer_id=150)
         customer_tab.validate_constraints(exclude={"customer_id"})
+
+
+class ForeignObjectSelectRelatedWithDeferTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.usa = Country.objects.create(name="United States of America")
+        cls.bob = Person.objects.create(name="Bob", person_country=cls.usa)
+
+    def test_accessing_related_id_does_not_issue_extra_query(self):
+        with self.assertNumQueries(1):
+            _ = [
+                (
+                    x.id,
+                    x.person_country.id,
+                )
+                for x in Person.objects.select_related("person_country").defer(
+                    "person_country__name"
+                )
+            ]
+
+    def test_accessing_deferred_related_field_triggers_additional_query(self):
+        with self.assertNumQueries(2):
+            _ = [
+                (
+                    x.id,
+                    x.person_country.id,
+                    x.person_country.name,
+                )
+                for x in Person.objects.select_related("person_country").defer(
+                    "person_country__name"
+                )
+            ]
+
+    def test_defer_nonexistent_related_field_raises_field_does_not_exist(self):
+        qs = Person.objects.select_related("person_country").defer(
+            "person_country__no_such_field"
+        )
+        with self.assertRaises(FieldDoesNotExist):
+            list(qs)
