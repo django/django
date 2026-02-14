@@ -77,6 +77,14 @@ class SQLCompiler:
             and not getattr(self.query, "_auto_cte_processed", False)
         ):
             self.query = self.query._auto_cte_query(clone_query=False)
+        # django-cte wraps compiler.as_sql() and prepends CTE SQL itself.
+        # If we also prepend here, the query is wrapped twice.
+        if any(
+            mixin.__name__ == "CTECompiler"
+            and mixin.__module__.startswith("django_cte.")
+            for mixin in getattr(type(self), "_jit_mixins", ())
+        ):
+            return as_sql()
         return generate_cte_sql(self.connection, self.query, as_sql)
 
     def setup_query(self, with_col_aliases=False):

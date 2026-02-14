@@ -367,7 +367,8 @@ def generate_cte_sql(connection, query, as_sql):
             _ignore_with_col_aliases(cte.query)
 
         alias = query.alias_map.get(cte.name)
-        should_elide_empty = not isinstance(alias, QJoin) or alias.join_type != LOUTER
+        # Accept django-cte's join objects too (same shape, different class).
+        should_elide_empty = getattr(alias, "join_type", None) != LOUTER
 
         compiler = cte.query.get_compiler(connection=connection, elide_empty=should_elide_empty)
         qn = compiler.quote_name_unless_alias
