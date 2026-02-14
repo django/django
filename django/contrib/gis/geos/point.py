@@ -1,4 +1,4 @@
-from ctypes import c_uint
+from ctypes import c_double
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import prototypes as capi
@@ -67,12 +67,13 @@ class Point(GEOSGeometry):
         if ndim < 2 or ndim > 3:
             raise TypeError("Invalid point dimension: %s" % ndim)
 
-        cs = capi.create_cs(c_uint(1), c_uint(ndim))
-        i = iter(coords)
-        capi.cs_setx(cs, 0, next(i))
-        capi.cs_sety(cs, 0, next(i))
-        if ndim == 3:
-            capi.cs_setz(cs, 0, next(i))
+        coords_buffer = (c_double * ndim)(*coords)
+        cs = capi.coordseq_from_buffer(
+            coords_buffer,
+            1,
+            int(ndim == 3),
+            0,  # hazM not yet supported.
+        )
 
         return capi.create_point(cs)
 
