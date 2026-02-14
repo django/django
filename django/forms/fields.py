@@ -775,6 +775,10 @@ class URLField(CharField):
     }
     default_validators = [validators.URLValidator()]
 
+    # Schemes that use a hierarchical structure with a network location
+    # (authority) component, i.e. scheme://netloc/path.
+    hierarchical_schemes = ("http", "https", "ftp", "ftps")
+
     def __init__(self, *, assume_scheme=None, **kwargs):
         self.assume_scheme = assume_scheme or "https"
         super().__init__(strip=True, **kwargs)
@@ -798,9 +802,12 @@ class URLField(CharField):
             if not url_fields[0]:
                 # If no URL scheme given, add a scheme.
                 url_fields[0] = self.assume_scheme
-            if not url_fields[1]:
+            if url_fields[0] in self.hierarchical_schemes and not url_fields[1]:
                 # Assume that if no domain is provided, that the path segment
-                # contains the domain.
+                # contains the domain. Only do this for hierarchical schemes
+                # (e.g. http, https) where a network location is expected.
+                # Non-hierarchical schemes like mailto: and tel: use opaque
+                # data in the path component and should not be rewritten.
                 url_fields[1] = url_fields[2]
                 url_fields[2] = ""
                 # Rebuild the url_fields list, since the domain segment may now

@@ -143,3 +143,44 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean("example.com"), "http://example.com")
         f = URLField(assume_scheme="https")
         self.assertEqual(f.clean("example.com"), "https://example.com")
+    def test_urlfield_non_hierarchical_schemes_not_mangled(self):
+        """
+        Non-hierarchical URI schemes (e.g. mailto:, tel:) should not have
+        their path component moved to the netloc by to_python().
+        """
+        from django.core.validators import URLValidator
+
+        class NonHierarchicalURLField(URLField):
+            default_validators = [
+                URLValidator(schemes=["http", "https", "ftp", "ftps", "mailto", "tel"])
+            ]
+
+        f = NonHierarchicalURLField(required=False)
+        tests = [
+            # mailto: URIs must not be rewritten to mailto://
+            ("mailto:test@example.com", "mailto:test@example.com"),
+            (
+                "mailto:test@example.com?subject=Hello",
+                "mailto:test@example.com?subject=Hello",
+            ),
+            # tel: URIs must not be rewritten to tel://
+            ("tel:+1234567890", "tel:+1234567890"),
+        ]
+        for url, expected in tests:
+            with self.subTest(url=url):
+                self.assertEqual(f.to_python(url), expected)
+
+    def test_urlfield_hierarchical_schemes_still_normalized(self):
+        """
+        Hierarchical schemes (http, https, ftp, ftps) should still have
+        their path moved to netloc when no netloc is present.
+        """
+        f = URLField(required=False)
+        tests = [
+            ("example.com", "https://example.com"),
+            ("example.com/path", "https://example.com/path"),
+            ("http://example.com", "http://example.com"),
+        ]
+        for url, expected in tests:
+            with self.subTest(url=url):
+                self.assertEqual(f.clean(url), expected)
