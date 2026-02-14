@@ -3,6 +3,7 @@ import math
 import re
 from decimal import Decimal
 from itertools import chain
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -579,6 +580,16 @@ class AggregateTestCase(TestCase):
         )
         self.assertCountEqual(books["ratings"].split(","), ["3", "4", "4.5", "5"])
 
+    @skipUnless(connection.vendor == "sqlite", "Special default case for SQLite.")
+    def test_distinct_on_stringagg_sqlite_special_case(self):
+        """
+        Value(",") is the only delimiter usable on SQLite with distinct=True.
+        """
+        books = Book.objects.aggregate(
+            ratings=StringAgg(Cast(F("rating"), CharField()), Value(","), distinct=True)
+        )
+        self.assertCountEqual(books["ratings"].split(","), ["3.0", "4.0", "4.5", "5.0"])
+
     @skipIfDBFeature("supports_aggregate_distinct_multiple_argument")
     def test_raises_error_on_multiple_argument_distinct(self):
         message = (
@@ -589,7 +600,7 @@ class AggregateTestCase(TestCase):
             Book.objects.aggregate(
                 ratings=StringAgg(
                     Cast(F("rating"), CharField()),
-                    Value(","),
+                    Value(";"),
                     distinct=True,
                 )
             )

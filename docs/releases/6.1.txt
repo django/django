@@ -289,6 +289,13 @@ Models
 * The :data:`~django.db.models.signals.m2m_changed` signal now receives a
   ``raw`` argument.
 
+* :class:`~django.db.models.StringAgg` now supports ``distinct=True`` on SQLite
+  when using the default delimiter ``Value(",")`` only.
+
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
@@ -297,7 +304,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
+  can now be customized to use a different multipart parser class.
 
 Security
 ~~~~~~~~

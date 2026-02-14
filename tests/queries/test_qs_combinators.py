@@ -24,6 +24,7 @@ from .models import (
     ExtraInfo,
     Note,
     Number,
+    Report,
     ReservedName,
     Tag,
 )
@@ -156,6 +157,24 @@ class QuerySetSetOperationTests(TestCase):
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             ordered=False,
         )
+
+    def test_union_with_different_models(self):
+        Celebrity.objects.create(name="Angel")
+        Celebrity.objects.create(name="Lionel")
+        Celebrity.objects.create(name="Emiliano")
+        Celebrity.objects.create(name="Demetrio")
+        Report.objects.create(name="Demetrio")
+        Report.objects.create(name="Daniel")
+        Report.objects.create(name="Javier")
+        expected = {"Angel", "Lionel", "Emiliano", "Demetrio", "Daniel", "Javier"}
+        qs1 = Celebrity.objects.values(alias=F("name"))
+        qs2 = Report.objects.values(alias_author=F("name"))
+        qs3 = qs1.union(qs2).values("name")
+        self.assertCountEqual((e["name"] for e in qs3), expected)
+        qs4 = qs1.union(qs2)
+        self.assertCountEqual((e["alias"] for e in qs4), expected)
+        qs5 = qs2.union(qs1)
+        self.assertCountEqual((e["alias_author"] for e in qs5), expected)
 
     @skipUnlessDBFeature("supports_select_intersection")
     def test_intersection_with_empty_qs(self):
@@ -587,6 +606,15 @@ class QuerySetSetOperationTests(TestCase):
         Author.objects.create(name="a1", num=1, extra=e1)
         qs = Author.objects.select_related("extra").order_by()
         self.assertEqual(qs.union(qs).count(), 1)
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_count_union_with_select_related_in_values(self):
+        e1 = ExtraInfo.objects.create(value=1, info="e1")
+        a1 = Author.objects.create(name="a1", num=1, extra=e1)
+        qs = Author.objects.select_related("extra").values("pk", "name", "extra__value")
+        self.assertCountEqual(
+            qs.union(qs), [{"pk": a1.id, "name": "a1", "extra__value": 1}]
+        )
 
     @skipUnlessDBFeature("supports_select_difference")
     def test_count_difference(self):

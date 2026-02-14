@@ -1650,9 +1650,9 @@ class ModelFormBasicTests(TestCase):
 <input id="id_headline" type="text" name="headline" maxlength="50" required></li>
 <li><label for="id_categories">Categories:</label>
 <select multiple name="categories" id="id_categories">
-<option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&#x27;s a test</option>
-<option value="%d">Third test</option>
+<option value="%s" selected>Entertainment</option>
+<option value="%s" selected>It&#x27;s a test</option>
+<option value="%s">Third test</option>
 </select></li>""" % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 

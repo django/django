@@ -1419,7 +1419,7 @@ class ModelAdmin(BaseModelAdmin):
 
             # Find the optgroup for the new item, if available
             source_model_name = request.POST.get(SOURCE_MODEL_VAR)
-
+            source_admin = None
             if source_model_name:
                 app_label, model_name = source_model_name.split(".", 1)
                 try:
@@ -1428,21 +1428,23 @@ class ModelAdmin(BaseModelAdmin):
                     msg = _('The app "%s" could not be found.') % source_model_name
                     self.message_user(request, msg, messages.ERROR)
                 else:
-                    source_admin = self.admin_site._registry[source_model]
-                    form = source_admin.get_form(request)()
-                    if self.opts.verbose_name_plural in form.fields:
-                        field = form.fields[self.opts.verbose_name_plural]
-                        for option_value, option_label in field.choices:
-                            # Check if this is an optgroup (label is a sequence
-                            # of choices rather than a single string value).
-                            if isinstance(option_label, (list, tuple)):
-                                # It's an optgroup:
-                                # (group_name, [(value, label), ...])
-                                optgroup_label = option_value
-                                for choice_value, choice_display in option_label:
-                                    if choice_display == str(obj):
-                                        popup_response["optgroup"] = str(optgroup_label)
-                                        break
+                    source_admin = self.admin_site._registry.get(source_model)
+
+            if source_admin:
+                form = source_admin.get_form(request)()
+                if self.opts.verbose_name_plural in form.fields:
+                    field = form.fields[self.opts.verbose_name_plural]
+                    for option_value, option_label in field.choices:
+                        # Check if this is an optgroup (label is a sequence
+                        # of choices rather than a single string value).
+                        if isinstance(option_label, (list, tuple)):
+                            # It's an optgroup:
+                            # (group_name, [(value, label), ...])
+                            optgroup_label = option_value
+                            for choice_value, choice_display in option_label:
+                                if choice_display == str(obj):
+                                    popup_response["optgroup"] = str(optgroup_label)
+                                    break
 
             popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
