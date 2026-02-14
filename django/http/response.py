@@ -467,6 +467,18 @@ class StreamingHttpResponse(HttpResponseBase):
             "content_type": self._content_type_for_repr,
         }
 
+    async def __aenter__(self):
+        # - noop acmgr interface so StreamingHttpResponse can be used in the
+        #   same way as StreamingAcmgrHttpResponse
+        # - Consume via `__aiter__` and not `streaming_content` directly,
+        #   to allow mapping of a sync iterator.
+        # - Use aclosing() when consuming aiter. See
+        #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
+        return aiter(self)
+
+    async def __aexit__(self, *exc_info):
+        return None
+
     @property
     def content(self):
         raise AttributeError(

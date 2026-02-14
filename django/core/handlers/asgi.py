@@ -312,30 +312,9 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses with TaskGroup/Timeout need to be pinned to their
         # iterator.
-        if response.streaming_acmgr:
+        if response.streaming_acmgr or response.streaming:
             async with response as agen, aclosing(agen):
                 async for part in agen:
-                    for chunk, _ in self.chunk_bytes(part):
-                        await send(
-                            {
-                                "type": "http.response.body",
-                                "body": chunk,
-                                # Ignore "more" as there may be more parts;
-                                # instead, use an empty final closing message
-                                # with False.
-                                "more_body": True,
-                            }
-                        )
-            # Final closing message.
-            await send({"type": "http.response.body"})
-        # Streaming responses need to be pinned to their iterator.
-        elif response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly,
-            #   to allow mapping of a sync iterator.
-            # - Use aclosing() when consuming aiter. See
-            #   https://github.com/python/cpython/commit/6e8dcdaaa49
-            async with aclosing(aiter(response)) as content:
-                async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
                         await send(
                             {
