@@ -143,6 +143,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean("example.com"), "http://example.com")
         f = URLField(assume_scheme="https")
         self.assertEqual(f.clean("example.com"), "https://example.com")
+
     def test_urlfield_non_hierarchical_schemes_not_mangled(self):
         """
         Non-hierarchical URI schemes (e.g. mailto:, tel:) should not have
