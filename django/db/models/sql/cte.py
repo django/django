@@ -1,3 +1,9 @@
+# Copyright (c) 2018, Dimagi Inc., and individual contributors.
+# All rights reserved.
+#
+# This file includes code derived from software licensed under the BSD 3-Clause License.
+# See the LICENSE or THIRD_PARTY_LICENSES file for the full license text.
+
 from copy import copy
 import weakref
 
