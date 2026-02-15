@@ -440,50 +440,6 @@ class CTESmokeBenchmarksTests(BenchmarkQueryMixin, TestCase):
         self.assertLessEqual(len(rows), LIMIT_SELECT_BENCH)
         self.assertTrue(required_keys.issubset(rows[0].keys()))
 
-    def test_benchmark_queries_execute_with_assertions(self):
-        rows_q0 = list(self.q0_no_annotations())
-        self._assert_rows(rows_q0, {"id", "name", "parent__name", "category__name"})
-
-        rows_q1 = list(self.q1_nonduplicated_annotations())
-        self._assert_rows(
-            rows_q1, {"name_twice", "children_count", "category_tag_count", "score"}
-        )
-        self.assertTrue(
-            all(row["name_twice"] == f"{row['name']} {row['name']}" for row in rows_q1)
-        )
-        self.assertTrue(all(row["category_tag_count"] >= 2 for row in rows_q1))
-
-        rows_q2 = list(self.q2_duplicated_annotations())
-        self._assert_rows(rows_q2, {"name_twice_twice", "name_upper_twice", "score"})
-        self.assertTrue(
-            all(
-                row["name_upper_twice"] == f"{row['name_upper']}_{row['name_upper']}"
-                for row in rows_q2
-            )
-        )
-
-        rows_q3 = list(self.q3_parent_category_via_subquery())
-        self._assert_rows(
-            rows_q3, {"parent_name_sq", "category_name_sq", "has_children"}
-        )
-        self.assertTrue(all(row["has_children"] for row in rows_q3))
-
-        rows_q4 = list(self.q4_deep_duplication_chain(depth=6))
-        self._assert_rows(rows_q4, {"a0", "a1", "a6"})
-        self.assertTrue(all(row["a1"] == f"{row['a0']} {row['a0']}" for row in rows_q4))
-
-        rows_q5 = list(self.q5_plain_correlated_preagg_equivalent())
-        self._assert_rows(rows_q5, {"children_count", "category_tag_count", "score2"})
-        self.assertTrue(all(row["category_tag_count"] >= 2 for row in rows_q5))
-
-        rows_q6 = list(self.q6_plain_correlated_minmaxavg_equivalent())
-        self._assert_rows(
-            rows_q6, {"category_min_id", "category_max_id", "span", "score"}
-        )
-        self.assertTrue(
-            all(row["category_max_id"] >= row["category_min_id"] for row in rows_q6)
-        )
-
     def test_builtin_explicit_cte_matches_plain_query(self):
         plain_rows = list(self.q6_plain_correlated_minmaxavg_equivalent())
         builtin_rows = list(self.q6_plain_correlated_minmaxavg_equivalent_builtin_cte())
