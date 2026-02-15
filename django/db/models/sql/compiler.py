@@ -21,8 +21,8 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
-from django.db.models.sql.query import Query, get_order_dir
 from django.db.models.sql.cte import generate_cte_sql
+from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -72,9 +72,8 @@ class SQLCompiler:
         )
 
     def _apply_ctes(self, as_sql):
-        if (
-            self.auto_cte_enabled
-            and not getattr(self.query, "_auto_cte_processed", False)
+        if self.auto_cte_enabled and not getattr(
+            self.query, "_auto_cte_processed", False
         ):
             self.query = self.query._auto_cte_query(clone_query=False)
         # django-cte wraps compiler.as_sql() and prepends CTE SQL itself.
@@ -2032,11 +2031,11 @@ class SQLDeleteCompiler(SQLCompiler):
 
     def as_sql(self):
         """
-        Create the SQL for this query. Return the SQL string and list of parameters.
+        Create the SQL for this query. Return the SQL string and list of
+        parameters.
         """
-        if (
-            self.auto_cte_enabled
-            and not getattr(self.query, "_auto_cte_processed", False)
+        if self.auto_cte_enabled and not getattr(
+            self.query, "_auto_cte_processed", False
         ):
             self.query = self.query._auto_cte_query(clone_query=False)
         if self.single_alias and (

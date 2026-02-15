@@ -12,12 +12,12 @@ import difflib
 import functools
 import sys
 import warnings
-import django
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
+import django
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
@@ -43,8 +43,8 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.cte import CTE, QJoin
+from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
@@ -158,7 +158,10 @@ class _CTECollector:
         self.seen = {}
 
     def add(self, cte):
-        """Register `cte` or raise ValueError if a different CTE uses the same name."""
+        """
+        Register `cte` or raise ValueError if a different CTE uses the
+        same name.
+        """
         existing = self.seen.get(cte.name)
         if existing is None:
             self.ctes.append(cte)
@@ -348,7 +351,10 @@ def _outer_ref_field_name(lookup, *, external_aliases=None):
 
 
 def _split_where_by_outer_refs(node, *, external_aliases=None):
-    """Split a where tree into outer-ref predicates and remaining predicates."""
+    """
+    Split a where tree into outer-ref predicates and remaining
+    predicates.
+    """
     if node is None:
         return None, None, True
     if isinstance(node, WhereNode):
@@ -418,7 +424,10 @@ def _unique_cte_column_name(preferred, used):
 
 
 def _correlated_aggregate_info(outer_query, subquery, outer_alias):
-    """Return rewrite metadata for a supported correlated aggregate subquery."""
+    """
+    Return rewrite metadata for a supported correlated aggregate
+    subquery.
+    """
     inner = subquery.query if isinstance(subquery, Subquery) else subquery
     if inner.model is None or inner.model is not outer_query.model:
         return None
@@ -462,7 +471,10 @@ def _correlated_aggregate_info(outer_query, subquery, outer_alias):
 
 
 def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
-    """Rewrite eligible correlated aggregate subqueries into a grouped CTE join."""
+    """
+    Rewrite eligible correlated aggregate subqueries into a grouped
+    CTE join.
+    """
     annotation_source = getattr(query, "_annotation_unresolved", query.annotations)
     candidates = []
     for alias, expression in annotation_source.items():
@@ -526,7 +538,9 @@ def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
         for aggregate in group["aggregates"].values():
             cte_query.add_annotation(aggregate["agg_expr"], aggregate["cte_alias"])
 
-        cte = CTE(_queryset_from_query(cte_query, clone_query=False), name=name_generator())
+        cte = CTE(
+            _queryset_from_query(cte_query, clone_query=False), name=name_generator()
+        )
         cte._column_names = list(group_by_fields) + [
             aggregate["cte_alias"] for aggregate in group["aggregates"].values()
         ]
@@ -550,9 +564,7 @@ def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
             aggregate = group["aggregates"].get(agg_key)
             if not aggregate:
                 continue
-            replacements[subquery] = getattr(
-                group["cte"].col, aggregate["cte_alias"]
-            )
+            replacements[subquery] = getattr(group["cte"].col, aggregate["cte_alias"])
 
     for alias, expression in query.annotations.items():
         add_replacements(expression, alias=alias)
@@ -593,14 +605,10 @@ def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
     for group in grouped.values():
         cte = group["cte"]
         group_by_fields = group["group_by_fields"]
-        join_filter = {
-            field: getattr(cte.col, field) for field in group_by_fields
-        }
+        join_filter = {field: getattr(cte.col, field) for field in group_by_fields}
         q_object = Q(**join_filter)
         existing_inner = {
-            alias
-            for alias, join in query.alias_map.items()
-            if join.join_type == INNER
+            alias for alias, join in query.alias_map.items() if join.join_type == INNER
         }
         if django.VERSION >= (5, 2):
             on_clause, _ = query._add_q(
@@ -701,7 +709,9 @@ def _node_refs_annotations(node, annotation_names):
         except Exception:
             return False
     if isinstance(node, Node):
-        return any(_node_refs_annotations(child, annotation_names) for child in node.children)
+        return any(
+            _node_refs_annotations(child, annotation_names) for child in node.children
+        )
     if isinstance(node, (list, tuple)):
         return any(_node_refs_annotations(child, annotation_names) for child in node)
     return False
@@ -716,9 +726,14 @@ def _node_refs_annotation_exprs(node, annotation_exprs):
     if isinstance(node, NothingNode):
         return False
     if isinstance(node, Node):
-        return any(_node_refs_annotation_exprs(child, annotation_exprs) for child in node.children)
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs)
+            for child in node.children
+        )
     if isinstance(node, (list, tuple)):
-        return any(_node_refs_annotation_exprs(child, annotation_exprs) for child in node)
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs) for child in node
+        )
     if hasattr(node, "get_source_expressions"):
         return any(
             _node_refs_annotation_exprs(child, annotation_exprs)
@@ -791,21 +806,25 @@ def _split_where_by_annotation_refs(node, annotation_names, annotation_exprs=Non
             else None
         )
         other_node = (
-            WhereNode(other_children, connector=node.connector) if other_children else None
+            WhereNode(other_children, connector=node.connector)
+            if other_children
+            else None
         )
         return annotation_node, other_node, True
     return node, None, True
 
 
 def _auto_cte_annotation_reuse(query, name_generator, collector):
-    """Materialize dependent annotation chains into a CTE to avoid duplication."""
+    """
+    Materialize dependent annotation chains into a CTE to avoid
+    duplication.
+    """
     if getattr(query, "_auto_cte_annotation_skip", False):
         return query
     original_selected = query.selected
     if original_selected is not None:
         if any(
-            not isinstance(value, (int, str))
-            for value in original_selected.values()
+            not isinstance(value, (int, str)) for value in original_selected.values()
         ):
             return query
     original_annotation_select_mask = query.annotation_select_mask
@@ -833,15 +852,17 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
     if not referenced:
         return query
     last_materialized_index = max(
-        (idx for idx, level in enumerate(levels) if any(name in referenced for name in level)),
+        (
+            idx
+            for idx, level in enumerate(levels)
+            if any(name in referenced for name in level)
+        ),
         default=-1,
     )
     if last_materialized_index < 0:
         return query
     materialized_names = [
-        name
-        for level in levels[: last_materialized_index + 1]
-        for name in level
+        name for level in levels[: last_materialized_index + 1] for name in level
     ]
     annotation_exprs = {query.annotations[name] for name in materialized_names}
     annotation_where, base_where, ok = _split_where_by_annotation_refs(
@@ -913,7 +934,10 @@ def _auto_cte_annotation_reuse(query, name_generator, collector):
                 cte_query._annotation_select_cache = None
                 cte_query._auto_cte_selected = auto_cte_selected
                 cte_query._auto_cte_selected_deferred = auto_cte_selected_deferred
-            cte = CTE(_queryset_from_query(cte_query, clone_query=False), name=name_generator())
+            cte = CTE(
+                _queryset_from_query(cte_query, clone_query=False),
+                name=name_generator(),
+            )
             collector.add(cte)
             current_query = cte.queryset().query
             cte_created = True
@@ -1347,9 +1371,7 @@ class Query(BaseExpression):
                 combined_queries.append(combined_processed)
             clone.combined_queries = tuple(combined_queries)
 
-        clone = _auto_cte_correlated_aggregate_rewrite(
-            clone, name_generator, collector
-        )
+        clone = _auto_cte_correlated_aggregate_rewrite(clone, name_generator, collector)
         clone = _auto_cte_annotation_reuse(clone, name_generator, collector)
         if explain_info is not None:
             clone.explain_info = explain_info
@@ -2282,9 +2304,7 @@ class Query(BaseExpression):
             qn = compiler.quote_name_unless_alias
             columns = _cte_select_columns(self, compiler)
             select_list = (
-                ", ".join(qn(column) for column in columns)
-                if columns
-                else "*"
+                ", ".join(qn(column) for column in columns) if columns else "*"
             )
             sql = "SELECT %s FROM %s" % (select_list, qn(cte_name))
             if self.subquery:

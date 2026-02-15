@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
+from django.db.models import CTE as DjangoCTE
 from django.db.models import (
     Avg,
     BooleanField,
-    CTE as DjangoCTE,
     Case,
     Count,
     Exists,
@@ -15,9 +15,17 @@ from django.db.models import (
     Subquery,
     Value,
     When,
-    with_cte as django_with_cte,
 )
-from django.db.models.functions import Cast, Coalesce, Concat, Length, Lower, Substr, Upper
+from django.db.models import with_cte as django_with_cte
+from django.db.models.functions import (
+    Cast,
+    Coalesce,
+    Concat,
+    Length,
+    Lower,
+    Substr,
+    Upper,
+)
 from django.test import TestCase
 
 from .models import NamedCategory, Tag
@@ -59,7 +67,9 @@ class BenchmarkQueryMixin:
     @staticmethod
     def sq_latest_child_name():
         return Subquery(
-            Tag.objects.filter(parent_id=OuterRef("pk")).order_by("-id").values("name")[:1]
+            Tag.objects.filter(parent_id=OuterRef("pk"))
+            .order_by("-id")
+            .values("name")[:1]
         )
 
     @staticmethod
@@ -69,7 +79,9 @@ class BenchmarkQueryMixin:
     @staticmethod
     def ex_has_sibling_same_category():
         return Exists(
-            Tag.objects.filter(category_id=OuterRef("category_id")).exclude(pk=OuterRef("pk"))
+            Tag.objects.filter(category_id=OuterRef("category_id")).exclude(
+                pk=OuterRef("pk")
+            )
         )
 
     @staticmethod
@@ -97,8 +109,12 @@ class BenchmarkQueryMixin:
                 name_len=Length(F("name")),
                 name_prefix_3=Substr(F("name"), 1, 3),
                 name_suffix_3=Substr(F("name"), Length(F("name")) - 2, 3),
-                children_count=Coalesce(children_cnt, Value(0), output_field=IntegerField()),
-                category_tag_count=Coalesce(cat_cnt, Value(0), output_field=IntegerField()),
+                children_count=Coalesce(
+                    children_cnt, Value(0), output_field=IntegerField()
+                ),
+                category_tag_count=Coalesce(
+                    cat_cnt, Value(0), output_field=IntegerField()
+                ),
                 latest_child_name=Coalesce(latest_child, Value("")),
                 has_children=Case(
                     When(self.ex_has_children(), then=Value(True)),
@@ -116,7 +132,9 @@ class BenchmarkQueryMixin:
                     + Cast(Length(F("name")), IntegerField())
                 ),
                 name_twice=Concat(F("name"), Value(" "), F("name")),
-                name_thrice=Concat(F("name"), Value(" "), F("name"), Value(" "), F("name")),
+                name_thrice=Concat(
+                    F("name"), Value(" "), F("name"), Value(" "), F("name")
+                ),
             )
             .filter(category_tag_count__gte=2)
             .order_by("-children_count", "name", "id")
@@ -149,7 +167,9 @@ class BenchmarkQueryMixin:
             .annotate(
                 name_twice=Concat(F("name"), Value(" "), F("name")),
                 name_upper=Upper(F("name")),
-                children_count=Coalesce(self.sq_children_count(), Value(0), output_field=IntegerField()),
+                children_count=Coalesce(
+                    self.sq_children_count(), Value(0), output_field=IntegerField()
+                ),
                 category_tag_count=Coalesce(
                     self.sq_category_tag_count(), Value(0), output_field=IntegerField()
                 ),
@@ -181,7 +201,9 @@ class BenchmarkQueryMixin:
         )
 
     def q3_parent_category_via_subquery(self):
-        parent_name_sq = Subquery(Tag.objects.filter(pk=OuterRef("parent_id")).values("name")[:1])
+        parent_name_sq = Subquery(
+            Tag.objects.filter(pk=OuterRef("parent_id")).values("name")[:1]
+        )
         category_name_sq = Subquery(
             NamedCategory.objects.filter(pk=OuterRef("category_id")).values("name")[:1]
         )
@@ -215,9 +237,13 @@ class BenchmarkQueryMixin:
             .annotate(a0=Concat(F("name"), Value(" "), F("name")))
         )
         for i in range(1, depth + 1):
-            qs = qs.annotate(**{f"a{i}": Concat(F(f"a{i - 1}"), Value(" "), F(f"a{i - 1}"))})
+            qs = qs.annotate(
+                **{f"a{i}": Concat(F(f"a{i - 1}"), Value(" "), F(f"a{i - 1}"))}
+            )
 
-        fields = ["id", "name", "parent__name", "category__name"] + [f"a{i}" for i in range(0, depth + 1)]
+        fields = ["id", "name", "parent__name", "category__name"] + [
+            f"a{i}" for i in range(0, depth + 1)
+        ]
         return qs.order_by("id").values(*fields)[:LIMIT_SELECT_BENCH]
 
     @staticmethod
@@ -241,12 +267,17 @@ class BenchmarkQueryMixin:
             .filter(category__isnull=False)
             .exclude(name="")
             .annotate(
-                children_count=Coalesce(children_cnt, Value(0), output_field=IntegerField()),
-                category_tag_count=Coalesce(category_cnt, Value(0), output_field=IntegerField()),
+                children_count=Coalesce(
+                    children_cnt, Value(0), output_field=IntegerField()
+                ),
+                category_tag_count=Coalesce(
+                    category_cnt, Value(0), output_field=IntegerField()
+                ),
                 score=F("children_count") * Value(10)
                 + F("category_tag_count")
                 + Cast(Length(F("name")), IntegerField()),
-                score2=F("children_count") * Value(3) + F("category_tag_count") * Value(7),
+                score2=F("children_count") * Value(3)
+                + F("category_tag_count") * Value(7),
                 name_twice=Concat(F("name"), Value(" "), F("name")),
             )
             .filter(category_tag_count__gte=2)
@@ -292,8 +323,12 @@ class BenchmarkQueryMixin:
             .filter(category__isnull=False)
             .exclude(name="")
             .annotate(
-                category_min_id=Coalesce(cat_min_id, Value(0), output_field=IntegerField()),
-                category_max_id=Coalesce(cat_max_id, Value(0), output_field=IntegerField()),
+                category_min_id=Coalesce(
+                    cat_min_id, Value(0), output_field=IntegerField()
+                ),
+                category_max_id=Coalesce(
+                    cat_max_id, Value(0), output_field=IntegerField()
+                ),
                 category_avg_name_len=Coalesce(cat_avg_name_len, Value(0.0)),
                 span=F("category_max_id") - F("category_min_id"),
                 is_near_min=Case(
@@ -338,8 +373,12 @@ class BenchmarkQueryMixin:
             .filter(category__isnull=False)
             .exclude(name="")
             .annotate(
-                category_min_id=Coalesce(cte.col.min_id, Value(0), output_field=IntegerField()),
-                category_max_id=Coalesce(cte.col.max_id, Value(0), output_field=IntegerField()),
+                category_min_id=Coalesce(
+                    cte.col.min_id, Value(0), output_field=IntegerField()
+                ),
+                category_max_id=Coalesce(
+                    cte.col.max_id, Value(0), output_field=IntegerField()
+                ),
                 category_avg_name_len=Coalesce(cte.col.avg_len, Value(0.0)),
                 span=cte.col.max_id - cte.col.min_id,
                 is_near_min=Case(
@@ -380,7 +419,9 @@ class CTESmokeBenchmarksTests(BenchmarkQueryMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cats = [NamedCategory.objects.create(name=f"cat{i}") for i in range(6)]
-        tags = [Tag(name=f"tag_{i:04d}", category=cats[i % len(cats)]) for i in range(80)]
+        tags = [
+            Tag(name=f"tag_{i:04d}", category=cats[i % len(cats)]) for i in range(80)
+        ]
         Tag.objects.bulk_create(tags)
         tags = list(Tag.objects.order_by("pk")[:80])
 
@@ -404,18 +445,27 @@ class CTESmokeBenchmarksTests(BenchmarkQueryMixin, TestCase):
         self._assert_rows(rows_q0, {"id", "name", "parent__name", "category__name"})
 
         rows_q1 = list(self.q1_nonduplicated_annotations())
-        self._assert_rows(rows_q1, {"name_twice", "children_count", "category_tag_count", "score"})
-        self.assertTrue(all(row["name_twice"] == f"{row['name']} {row['name']}" for row in rows_q1))
+        self._assert_rows(
+            rows_q1, {"name_twice", "children_count", "category_tag_count", "score"}
+        )
+        self.assertTrue(
+            all(row["name_twice"] == f"{row['name']} {row['name']}" for row in rows_q1)
+        )
         self.assertTrue(all(row["category_tag_count"] >= 2 for row in rows_q1))
 
         rows_q2 = list(self.q2_duplicated_annotations())
         self._assert_rows(rows_q2, {"name_twice_twice", "name_upper_twice", "score"})
         self.assertTrue(
-            all(row["name_upper_twice"] == f"{row['name_upper']}_{row['name_upper']}" for row in rows_q2)
+            all(
+                row["name_upper_twice"] == f"{row['name_upper']}_{row['name_upper']}"
+                for row in rows_q2
+            )
         )
 
         rows_q3 = list(self.q3_parent_category_via_subquery())
-        self._assert_rows(rows_q3, {"parent_name_sq", "category_name_sq", "has_children"})
+        self._assert_rows(
+            rows_q3, {"parent_name_sq", "category_name_sq", "has_children"}
+        )
         self.assertTrue(all(row["has_children"] for row in rows_q3))
 
         rows_q4 = list(self.q4_deep_duplication_chain(depth=6))
@@ -427,14 +477,20 @@ class CTESmokeBenchmarksTests(BenchmarkQueryMixin, TestCase):
         self.assertTrue(all(row["category_tag_count"] >= 2 for row in rows_q5))
 
         rows_q6 = list(self.q6_plain_correlated_minmaxavg_equivalent())
-        self._assert_rows(rows_q6, {"category_min_id", "category_max_id", "span", "score"})
-        self.assertTrue(all(row["category_max_id"] >= row["category_min_id"] for row in rows_q6))
+        self._assert_rows(
+            rows_q6, {"category_min_id", "category_max_id", "span", "score"}
+        )
+        self.assertTrue(
+            all(row["category_max_id"] >= row["category_min_id"] for row in rows_q6)
+        )
 
     def test_builtin_explicit_cte_matches_plain_query(self):
         plain_rows = list(self.q6_plain_correlated_minmaxavg_equivalent())
         builtin_rows = list(self.q6_plain_correlated_minmaxavg_equivalent_builtin_cte())
 
-        self.assertEqual([row["id"] for row in plain_rows], [row["id"] for row in builtin_rows])
+        self.assertEqual(
+            [row["id"] for row in plain_rows], [row["id"] for row in builtin_rows]
+        )
         for plain, builtin in zip(plain_rows, builtin_rows):
             self.assertEqual(plain["category_min_id"], builtin["category_min_id"])
             self.assertEqual(plain["category_max_id"], builtin["category_max_id"])
@@ -457,7 +513,9 @@ class ExternalCTECoexistenceTests(BenchmarkQueryMixin, TestCase):
         plain_rows = list(self.q6_plain_correlated_minmaxavg_equivalent())
         external_rows = list(self.q6_plain_correlated_minmaxavg_equivalent_django_cte())
 
-        self.assertEqual([row["id"] for row in plain_rows], [row["id"] for row in external_rows])
+        self.assertEqual(
+            [row["id"] for row in plain_rows], [row["id"] for row in external_rows]
+        )
         for plain, external in zip(plain_rows, external_rows):
             self.assertEqual(plain["category_min_id"], external["category_min_id"])
             self.assertEqual(plain["category_max_id"], external["category_max_id"])
@@ -479,21 +537,22 @@ class ExternalCTECoexistenceTests(BenchmarkQueryMixin, TestCase):
             name="external_totals",
         )
 
-        qs = builtin_cte.join(Tag.objects.all(), category_id=builtin_cte.col.category_id).annotate(
-            category_total=builtin_cte.col.category_total
-        )
+        qs = builtin_cte.join(
+            Tag.objects.all(), category_id=builtin_cte.col.category_id
+        ).annotate(category_total=builtin_cte.col.category_total)
         qs = external_with_cte(
             external_cte,
-            select=external_cte.join(qs, category_id=external_cte.col.category_id).annotate(
-                category_max_id=external_cte.col.category_max_id
-            ),
+            select=external_cte.join(
+                qs, category_id=external_cte.col.category_id
+            ).annotate(category_max_id=external_cte.col.category_max_id),
         )
-        qs = django_with_cte(builtin_cte, select=qs).order_by("id").values(
-            "id", "category_total", "category_max_id"
-        )[:LIMIT_SELECT_BENCH]
+        qs = (
+            django_with_cte(builtin_cte, select=qs)
+            .order_by("id")
+            .values("id", "category_total", "category_max_id")[:LIMIT_SELECT_BENCH]
+        )
 
         rows = list(qs)
         self.assertTrue(rows)
         self.assertTrue(all(row["category_total"] >= 1 for row in rows))
         self.assertTrue(all(row["category_max_id"] >= row["id"] for row in rows))
-

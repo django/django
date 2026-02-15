@@ -1,20 +1,19 @@
 # Copyright (c) 2018, Dimagi Inc., and individual contributors.
 # All rights reserved.
 #
-# This file includes code derived from software licensed under the BSD 3-Clause License.
+# This file includes code derived from software licensed under the
+# BSD 3-Clause License.
 # See the LICENSE or THIRD_PARTY_LICENSES file for the full license text.
 
-from copy import copy
 import weakref
+from copy import copy
 
 import django
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Col, Expression, Ref
 from django.db.models.query_utils import Q
 from django.db.models.sql.constants import INNER, LOUTER
 from django.db.models.sql.datastructures import BaseTable
-
 
 __all__ = ["CTE", "with_cte"]
 
@@ -120,13 +119,17 @@ class CTE:
         if django.VERSION < (5, 2) and cte_query.values_select:
             query.set_values(cte_query.values_select)
 
-        if cte_query.select and not cte_query.default_cols and not getattr(
-            cte_query, "selected", None
+        if (
+            cte_query.select
+            and not cte_query.default_cols
+            and not getattr(cte_query, "selected", None)
         ):
             query.select = [
-                CTEColumnRef(expr.target.column, self.name, expr.output_field)
-                if isinstance(expr, Col)
-                else expr
+                (
+                    CTEColumnRef(expr.target.column, self.name, expr.output_field)
+                    if isinstance(expr, Col)
+                    else expr
+                )
                 for expr in cte_query.select
             ]
 
@@ -140,9 +143,7 @@ class CTE:
         if selected is None:
             selected = getattr(cte_query, "selected", None)
         if selected:
-            selected_deferred = getattr(
-                cte_query, "_auto_cte_selected_deferred", set()
-            )
+            selected_deferred = getattr(cte_query, "_auto_cte_selected_deferred", set())
             for alias, value in selected.items():
                 if alias in selected_deferred:
                     continue
@@ -197,9 +198,8 @@ class CTEColumn(Expression):
         if self._cte.query is None:
             raise ValueError(
                 "cannot resolve '{cte}.{name}' in recursive CTE setup. "
-                "Hint: use ExpressionWrapper({cte}.col.{name}, output_field=...).".format(
-                    cte=self._cte.name, name=self.name
-                )
+                "Hint: use ExpressionWrapper({cte}.col.{name}, "
+                "output_field=...).".format(cte=self._cte.name, name=self.name)
             )
         ref = self._cte._resolve_ref(self.name)
         if ref is self or self in ref.get_source_expressions():
@@ -247,11 +247,13 @@ class CTEColumnRef(Expression):
     ):
         if query:
             clone = self.copy()
-            clone._alias = self._alias or query.table_map.get(self.cte_name, [self.cte_name])[
-                0
-            ]
+            clone._alias = (
+                self._alias or query.table_map.get(self.cte_name, [self.cte_name])[0]
+            )
             return clone
-        return super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        return super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
 
     def relabeled_clone(self, change_map):
         if self.cte_name not in change_map and self._alias not in change_map:
@@ -265,9 +267,10 @@ class CTEColumnRef(Expression):
 
     def as_sql(self, compiler, connection):
         qn = compiler.quote_name_unless_alias
-        table = self._alias or compiler.query.table_map.get(
-            self.cte_name, [self.cte_name]
-        )[0]
+        table = (
+            self._alias
+            or compiler.query.table_map.get(self.cte_name, [self.cte_name])[0]
+        )
         return "%s.%s" % (qn(table), qn(self.name)), []
 
 
@@ -276,7 +279,15 @@ class QJoin:
 
     filtered_relation = None
 
-    def __init__(self, parent_alias, table_name, table_alias, on_clause, join_type=INNER, nullable=None):
+    def __init__(
+        self,
+        parent_alias,
+        table_name,
+        table_alias,
+        on_clause,
+        join_type=INNER,
+        nullable=None,
+    ):
         self.parent_alias = parent_alias
         self.table_name = table_name
         self.table_alias = table_alias
@@ -286,7 +297,13 @@ class QJoin:
 
     @property
     def identity(self):
-        return (self.__class__, self.table_name, self.parent_alias, self.join_type, self.on_clause)
+        return (
+            self.__class__,
+            self.table_name,
+            self.parent_alias,
+            self.join_type,
+            self.on_clause,
+        )
 
     def __hash__(self):
         return hash(self.identity)
@@ -307,7 +324,12 @@ class QJoin:
         else:
             alias = " %s" % self.table_alias
         qn = compiler.quote_name_unless_alias
-        sql = "%s %s%s ON %s" % (self.join_type, qn(self.table_name), alias, on_clause_sql)
+        sql = "%s %s%s ON %s" % (
+            self.join_type,
+            qn(self.table_name),
+            alias,
+            on_clause_sql,
+        )
         return sql, params
 
     def relabeled_clone(self, change_map):
@@ -340,9 +362,7 @@ def generate_cte_sql(connection, query, as_sql):
     if explain_query_or_info:
         try:
             sql.append(
-                connection.ops.explain_query_prefix(
-                    explain_format, **explain_options
-                )
+                connection.ops.explain_query_prefix(explain_format, **explain_options)
             )
         except ValueError:
             if (
@@ -376,7 +396,9 @@ def generate_cte_sql(connection, query, as_sql):
         # Accept django-cte's join objects too (same shape, different class).
         should_elide_empty = getattr(alias, "join_type", None) != LOUTER
 
-        compiler = cte.query.get_compiler(connection=connection, elide_empty=should_elide_empty)
+        compiler = cte.query.get_compiler(
+            connection=connection, elide_empty=should_elide_empty
+        )
         qn = compiler.quote_name_unless_alias
         ignore_cte_name = getattr(cte.query, "_ignore_cte_name", None)
         if getattr(cte.query, "_cte_name", None):
@@ -396,9 +418,7 @@ def generate_cte_sql(connection, query, as_sql):
                 setattr(cte.query, explain_attribute, cte_explain_info)
         cte_entries.append((cte, qn(cte.name), cte_sql, cte_params))
 
-    used = {
-        name for name, quoted in quoted_names.items() if quoted in base_sql
-    }
+    used = {name for name, quoted in quoted_names.items() if quoted in base_sql}
     queue = list(used)
     sql_by_name = {cte.name: cte_sql for cte, _, cte_sql, _ in cte_entries}
     while queue:
@@ -420,7 +440,9 @@ def generate_cte_sql(connection, query, as_sql):
         cte_name = cte_name_sql
         column_names = getattr(cte, "_column_names", None)
         if column_names:
-            cols_sql = ", ".join(connection.ops.quote_name(name) for name in column_names)
+            cols_sql = ", ".join(
+                connection.ops.quote_name(name) for name in column_names
+            )
             cte_name = f"{cte_name_sql} ({cols_sql})"
         ctes.append(template.format(name=cte_name, query=cte_sql))
         params.extend(cte_params)
