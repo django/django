@@ -817,11 +817,14 @@ class Query(BaseExpression):
         if select_mask is None:
             select_mask = {}
         select_mask[opts.pk] = {}
-        # All concrete fields and related objects that are not part of the
-        # defer mask must be included. If a relational field is encountered it
-        # gets added to the mask for it be considered if `select_related` and
-        # the cycle continues by recursively calling this function.
-        for field in opts.concrete_fields + opts.related_objects:
+        # All fields and related objects that are not part of the defer mask
+        # must be included. Non-concrete fields (e.g. ForeignObject) are
+        # included so that select_related() can descend into them even when
+        # defer() is used on other fields. If a relational field is
+        # encountered it gets added to the mask for it be considered if
+        # `select_related` and the cycle continues by recursively calling
+        # this function.
+        for field in opts.fields + opts.related_objects:
             field_mask = mask.pop(field.name, None)
             field_att_mask = None
             if field_attname := getattr(field, "attname", None):

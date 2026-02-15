@@ -835,3 +835,69 @@ class ForeignObjectModelValidationTests(TestCase):
     def test_validate_constraints_excluding_foreign_object_member(self):
         customer_tab = CustomerTab(customer_id=150)
         customer_tab.validate_constraints(exclude={"customer_id"})
+
+
+class ForeignObjectDeferTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = Country.objects.create(name="Testland")
+        cls.person = Person.objects.create(
+            name="Alice", person_country_id=cls.country.pk
+        )
+        cls.group = Group.objects.create(
+            name="Group A", group_country=cls.country
+        )
+        cls.membership = Membership.objects.create(
+            membership_country=cls.country,
+            person_id=cls.person.pk,
+            group_id=cls.group.pk,
+            invite_reason="testing",
+        )
+
+    def test_select_related_foreign_object_with_defer(self):
+        """
+        select_related() on a ForeignObject should work when defer() is used
+        on a different field.
+        """
+        qs = Membership.objects.select_related("person").defer("invite_reason")
+        with self.assertNumQueries(1):
+            result = list(qs)
+        self.assertEqual(result[0].person.name, "Alice")
+        self.assertEqual(result[0].membership_country_id, self.country.pk)
+
+    def test_select_related_foreign_object_with_defer_on_fk(self):
+        """
+        select_related() on a ForeignObject should work when defer() is used
+        on a traversal of a different ForeignKey.
+        """
+        qs = Membership.objects.select_related("person").defer(
+            "membership_country__name"
+        )
+        with self.assertNumQueries(1):
+            result = list(qs)
+        self.assertEqual(result[0].person.name, "Alice")
+
+    def test_select_related_multiple_foreign_objects_with_defer(self):
+        """
+        select_related() on multiple ForeignObjects should work when defer()
+        is used on a different field.
+        """
+        qs = Membership.objects.select_related("person", "group").defer(
+            "invite_reason"
+        )
+        with self.assertNumQueries(1):
+            result = list(qs)
+        self.assertEqual(result[0].person.name, "Alice")
+        self.assertEqual(result[0].group.name, "Group A")
+
+    def test_defer_concrete_fk_with_select_related_still_errors(self):
+        """
+        Deferring a concrete ForeignKey that is also in select_related()
+        should still raise FieldError.
+        """
+        with self.assertRaises(FieldError):
+            list(
+                Membership.objects.select_related("membership_country").defer(
+                    "membership_country"
+                )
+            )
