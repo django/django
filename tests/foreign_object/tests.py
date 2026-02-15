@@ -844,9 +844,7 @@ class ForeignObjectDeferTests(TestCase):
         cls.person = Person.objects.create(
             name="Alice", person_country_id=cls.country.pk
         )
-        cls.group = Group.objects.create(
-            name="Group A", group_country=cls.country
-        )
+        cls.group = Group.objects.create(name="Group A", group_country=cls.country)
         cls.membership = Membership.objects.create(
             membership_country=cls.country,
             person_id=cls.person.pk,
@@ -882,9 +880,7 @@ class ForeignObjectDeferTests(TestCase):
         select_related() on multiple ForeignObjects should work when defer()
         is used on a different field.
         """
-        qs = Membership.objects.select_related("person", "group").defer(
-            "invite_reason"
-        )
+        qs = Membership.objects.select_related("person", "group").defer("invite_reason")
         with self.assertNumQueries(1):
             result = list(qs)
         self.assertEqual(result[0].person.name, "Alice")
