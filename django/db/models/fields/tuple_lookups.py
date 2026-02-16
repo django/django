@@ -19,8 +19,24 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.db.models.sql import Query
 from django.db.models.sql.where import AND, OR, WhereNode
+
+_QUERY_CLASS = None
+
+
+def _is_query(value):
+    """
+    Check if the value is a Query instance without
+    importing the Query class at the module level to avoid
+    circular imports.
+    """
+    global _QUERY_CLASS
+
+    if _QUERY_CLASS is None:
+        from django.db.models.sql.query import Query
+
+        _QUERY_CLASS = Query
+    return isinstance(value, _QUERY_CLASS)
 
 
 class Tuple(Func):
@@ -74,7 +90,7 @@ class TupleLookupMixin:
             )
 
     def check_rhs_is_supported_expression(self):
-        if not isinstance(self.rhs, (ResolvedOuterRef, Query)):
+        if not isinstance(self.rhs, ResolvedOuterRef) and not _is_query(self.rhs):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
@@ -115,7 +131,7 @@ class TupleLookupMixin:
             sql, params = compiler.compile(self.rhs)
             if isinstance(self.rhs, ColPairs):
                 return "(%s)" % sql, params
-            elif isinstance(self.rhs, Query):
+            elif _is_query(self.rhs):
                 return super().process_rhs(compiler, connection)
             else:
                 raise ValueError(
@@ -131,7 +147,7 @@ class TupleLookupMixin:
     def as_sql(self, compiler, connection):
         if (
             not connection.features.supports_tuple_comparison_against_subquery
-            and isinstance(self.rhs, Query)
+            and _is_query(self.rhs)
             and self.rhs.subquery
             and isinstance(
                 self, (GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual)
@@ -150,7 +166,7 @@ class TupleLookupMixin:
 
 class TupleExact(TupleLookupMixin, Exact):
     def get_fallback_sql(self, compiler, connection):
-        if isinstance(self.rhs, Query):
+        if _is_query(self.rhs):
             return super(TupleLookupMixin, self).as_sql(compiler, connection)
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
@@ -326,7 +342,7 @@ class TupleIn(TupleLookupMixin, In):
             )
 
     def check_rhs_is_query(self):
-        if not isinstance(self.rhs, (Query, Subquery)):
+        if not _is_query(self.rhs) and not isinstance(self.rhs, Subquery):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
@@ -374,7 +390,7 @@ class TupleIn(TupleLookupMixin, In):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
-        if isinstance(rhs, Query):
+        if _is_query(rhs):
             rhs_exprs = itertools.chain.from_iterable(
                 (
                     select_expr
