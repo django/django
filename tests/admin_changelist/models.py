@@ -17,6 +17,7 @@ class Child(models.Model):
     parent = models.ForeignKey(Parent, models.SET_NULL, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
     age = models.IntegerField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
 
 class GrandChild(models.Model):
