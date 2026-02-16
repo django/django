@@ -726,7 +726,7 @@ def parse_boundary_stream(stream, max_header_size):
             name = header_name.lower().rstrip(" ")
             value, params = parse_header_parameters(value_and_params.lstrip(" "))
             params = {k: v.encode() for k, v in params.items()}
-        except ValueError:  # Invalid header.
+        except (ValueError, LookupError):  # Invalid header.
             continue
 
         if name == "content-disposition":

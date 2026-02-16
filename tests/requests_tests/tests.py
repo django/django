@@ -1182,6 +1182,36 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg):
             request.multipart_parser_class = MultiPartParser
 
+    def test_multipart_rfc2231_invalid_encoding(self):
+        """
+        RFC 2231 headers with invalid encoding names don't crash (#36931).
+        """
+        # Multipart payload with invalid RFC 2231 encoding in filename*
+        boundary = "----PoC"
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{boundary}",
+                    'Content-Disposition: form-data; name="file"; '
+                    "filename*=BOGUS''test%20file.txt",
+                    "Content-Type: application/octet-stream",
+                    "",
+                    "content",
+                    f"--{boundary}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": f"multipart/form-data; boundary={boundary}",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        # Should not raise LookupError when accessing POST.
+        request.POST
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
