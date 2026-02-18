@@ -19,3 +19,6 @@ Bugfixes
 
 * Fixed a visual regression where fieldset legends were misaligned in the admin
   (:ticket:`36920`).
+
+* Prevented the :data:`django.tasks.signals.task_finished` signal from writing
+  extraneous log messages when no exceptions are encountered (:ticket:`36951`).
