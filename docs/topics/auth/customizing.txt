@@ -471,6 +471,10 @@ different user model.
 
 .. function:: get_user_model()
 
+     The get_user_model() function returns the currently active User model
+    class as defined by the AUTH_USER_MODEL setting.
+    `` It does not return a user instance, but the model class itself.``
+
     Instead of referring to :class:`~django.contrib.auth.models.User` directly,
     you should reference the user model using
     ``django.contrib.auth.get_user_model()``. This method will return the
@@ -1032,7 +1036,7 @@ authentication app::
 
 
     class MyUserManager(BaseUserManager):
-        def create_user(self, email, date_of_birth, password=None):
+        def create_user(self, email, date_of_birth, password=None,**extra_fields):
             """
             Creates and saves a User with the given email, date of
             birth and password.
@@ -1043,26 +1047,29 @@ authentication app::
             user = self.model(
                 email=self.normalize_email(email),
                 date_of_birth=date_of_birth,
+                 **extra_fields,
             )
 
             user.set_password(password)
             user.save(using=self._db)
             return user
 
-        def create_superuser(self, email, date_of_birth, password=None):
-            """
-            Creates and saves a superuser with the given email, date of
-            birth and password.
-            """
-            user = self.create_user(
-                email,
-                password=password,
-                date_of_birth=date_of_birth,
-            )
-            user.is_admin = True
-            user.save(using=self._db)
-            return user
+        def create_superuser(self, email, date_of_birth, password=None, **extra_fields):
+             extra_fields.setdefault("is_staff", True)
+             extra_fields.setdefault("is_superuser", True)
+             extra_fields.setdefault("is_active", True)
 
+            if extra_fields.get("is_staff") is not True:
+                raise ValueError("Superuser must have is_staff=True.")
+            if extra_fields.get("is_superuser") is not True:
+                raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(
+            email,
+            date_of_birth=date_of_birth,
+            password=password,
+            **extra_fields,
+        )
 
     class MyUser(AbstractBaseUser):
         email = models.EmailField(
@@ -1097,6 +1104,22 @@ authentication app::
             "Is the user a member of staff?"
             # Simplest possible answer: All admins are staff
             return self.is_admin
+    ---
+    .. note::
+    
+        If you are subclassing ``AbstractBaseUser`` and intend to use Django’s
+        built-in permission framework or the Django admin, you should also
+        inherit from ``PermissionsMixin``.
+    
+        ``PermissionsMixin`` provides the ``is_superuser`` field, as well as the
+        ``groups`` and ``user_permissions`` many-to-many relationships. It also
+        adds helper methods such as ``has_perm()``, ``has_perms()``, and
+        ``has_module_perms()``.
+    
+        Without ``PermissionsMixin``, permission checks and Django admin
+        authorization may not function as expected.
+    ---
+
 
 Then, to register this custom user model with Django's admin, the following
 code would be required in the app's ``admin.py`` file::
@@ -1109,16 +1132,26 @@ code would be required in the app's ``admin.py`` file::
     from django.core.exceptions import ValidationError
 
     from customauth.models import MyUser
-
+    ===
+    Note:
+        Use ::get_user_model() because the user model is configurable via :AUTH_USER_MODEL, and you shouldn’t hardcode a specific class.
+        It ensures your code works even if the project swaps MyUser for another custom user model later.
+        This makes your forms, admin, and apps more flexible and future-proof.
+    
+            from django.contrib.auth import get_user_model
+            
+            User = get_user_model()
+            
+            class Meta:
+                model = User
+    ===
 
     class UserCreationForm(forms.ModelForm):
         """A form for creating new users. Includes all the required
         fields, plus a repeated password."""
 
         password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-        password2 = forms.CharField(
-            label="Password confirmation", widget=forms.PasswordInput
-        )
+        password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput)
 
         class Meta:
             model = MyUser
@@ -1133,7 +1166,8 @@ code would be required in the app's ``admin.py`` file::
             return password2
 
         def save(self, commit=True):
-            # Save the provided password in hashed format
+            # Create the user instance without saving it to the database yet.
+            # This allows us to set the hashed password before the object is saved.
             user = super().save(commit=False)
             user.set_password(self.cleaned_data["password1"])
             if commit:
@@ -1155,41 +1189,57 @@ code would be required in the app's ``admin.py`` file::
 
 
     class UserAdmin(BaseUserAdmin):
-        # The forms to add and change user instances
+        # Forms used for creating and updating users
         form = UserChangeForm
         add_form = UserCreationForm
 
-        # The fields to be used in displaying the User model.
-        # These override the definitions on the base UserAdmin
-        # that reference specific fields on auth.User.
-        list_display = ["email", "date_of_birth", "is_admin"]
-        list_filter = ["is_admin"]
-        fieldsets = [
-            (None, {"fields": ["email", "password"]}),
-            ("Personal info", {"fields": ["date_of_birth"]}),
-            ("Permissions", {"fields": ["is_admin"]}),
-        ]
-        # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
-        # overrides get_fieldsets to use this attribute when creating a user.
-        add_fieldsets = [
+          # Fields displayed in the user list page
+        list_display = ("email", "date_of_birth", "is_staff", "is_active")
+        list_filter = ("is_staff", "is_superuser", "is_active")
+    
+        # Fields displayed when editing an existing user
+        fieldsets = (
+            (None, {"fields": ("email", "password")}),
+            (_("Personal info"), {"fields": ("date_of_birth",)}),
+            (
+                _("Permissions"),
+                {
+                    "fields": (
+                        "is_active",
+                        "is_staff",
+                        "is_superuser",
+                        "groups",
+                        "user_permissions",
+                    )
+                },
+            ),
+            (_("Important dates"), {"fields": ("last_login",)}),
+        )
+    
+        # Fields displayed when creating a new user
+        add_fieldsets = (
             (
                 None,
                 {
-                    "classes": ["wide"],
-                    "fields": ["email", "date_of_birth", "password1", "password2"],
+                    "classes": ("wide",),
+                    "fields": ("email", "date_of_birth", "password1", "password2"),
                 },
             ),
-        ]
-        search_fields = ["email"]
-        ordering = ["email"]
-        filter_horizontal = []
+      )
+    
+        search_fields = ("email",)
+        ordering = ("email",)
+        filter_horizontal = ("groups", "user_permissions")
 
 
     # Now register the new UserAdmin...
-    admin.site.register(MyUser, UserAdmin)
+
+        admin.site.register(MyUser, UserAdmin)
+
     # ... and, since we're not using Django's built-in permissions,
     # unregister the Group model from admin.
-    admin.site.unregister(Group)
+
+            admin.site.unregister(Group)
 
 Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
