@@ -328,8 +328,12 @@ class BaseCacheTests:
     # with a non-integer value.
     incr_decr_type_error = TypeError
 
+    def setUp(self):
+        caches._global_connections = {}
+
     def tearDown(self):
         cache.clear()
+        caches._global_connections = {}
 
     def test_simple(self):
         # Simple cache set/get works
@@ -1595,6 +1599,9 @@ class BaseMemcachedTests(BaseCacheTests):
                 with self.settings(CACHES={"default": params}):
                     self.assertEqual(cache._servers, ["server1.tld", "server2:11211"])
 
+                # The subtest needs to clear singleton connections (pooling)
+                caches._global_connections = {}
+
     def _perform_invalid_key_test(self, key, expected_warning):
         """
         While other backends merely warn, memcached should raise for an invalid
@@ -1683,7 +1690,10 @@ class BaseMemcachedTests(BaseCacheTests):
                 cache._class, "disconnect_all", autospec=True
             ) as mock_disconnect:
                 signals.request_finished.send(self.__class__)
-                self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
+                self.assertIs(
+                    mock_disconnect.called,
+                    self.should_disconnect_on_close and cache.thread_sensitive,
+                )
         finally:
             signals.request_finished.connect(close_old_connections)
 
@@ -1782,6 +1792,25 @@ class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
     )
     def test_pymemcache_options(self):
         self.assertIs(cache._cache.default_kwargs["no_delay"], True)
+
+    def test_pymemcache_pooling_thread_sensitive(self):
+        with self.settings(
+            CACHES=caches_setting_for_tests(
+                base=PyMemcacheCache_params,
+                exclude=memcached_excluded_caches,
+                OPTIONS={"use_pooling": False},
+            )
+        ):
+            self.assertTrue(cache.thread_sensitive)
+
+        with self.settings(
+            CACHES=caches_setting_for_tests(
+                base=PyMemcacheCache_params,
+                exclude=memcached_excluded_caches,
+                OPTIONS={"use_pooling": True},
+            )
+        ):
+            self.assertFalse(cache.thread_sensitive)
 
 
 @override_settings(
@@ -3080,6 +3109,9 @@ class CacheHandlerTest(SimpleTestCase):
 
         def runner():
             c.append(caches["default"])
+            # Avoid singleton connections (thread_sensitive=False)
+            if not cache.thread_sensitive:
+                caches._global_connections = {}
 
         for x in range(2):
             t = threading.Thread(target=runner)
@@ -3087,6 +3119,27 @@ class CacheHandlerTest(SimpleTestCase):
             t.join()
 
         self.assertIsNot(c[0], c[1])
+
+    def test_per_thread_single_connection(self):
+        """
+        Requesting the same alias from separate threads should yield the same instance
+        if global_connections are used
+        """
+        c = []
+
+        caches._global_connections = {"default": caches["default"]}
+
+        def runner():
+            c.append(caches["default"])
+
+        for x in range(2):
+            t = threading.Thread(target=runner)
+            t.start()
+            t.join()
+
+        caches._global_connections = {}
+
+        self.assertIs(c[0], c[1])
 
     def test_nonexistent_alias(self):
         msg = "The connection 'nonexistent' doesn't exist."
