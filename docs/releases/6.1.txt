@@ -130,7 +130,8 @@ Minor features
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* `add_message` now accepts arbitrary keyword arguments which get stored on
+  the Message class to be used with a custom Storage class
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
