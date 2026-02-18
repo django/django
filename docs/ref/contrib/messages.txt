@@ -96,7 +96,9 @@ To write your own storage class, subclass the ``BaseStorage`` class in
 Custom Storage Classes
 ----------------------
 
-Here is an example of a custom storage class which uses ``extra_kwargs`` passed to the message to specify whether a message should be permanent and therefore never expire after a single request::
+Here is an example of a custom storage class which uses ``extra_kwargs``
+passed to the message to specify whether a message should be permanent and
+therefore never expire after a single request::
 
     class PermanentStorage(SessionStorage):
         """
