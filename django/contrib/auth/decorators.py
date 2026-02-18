@@ -89,6 +89,13 @@ def login_required(
 def login_not_required(view_func):
     """
     Decorator for views that allows access to unauthenticated requests.
+    Note:
+        The ``login_not_required`` decorator only has effect when
+        :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+        is enabled in your ``MIDDLEWARE`` setting.
+    
+        If ``LoginRequiredMiddleware`` is not installed, this decorator
+        does not alter view behavior.
     """
     view_func.login_required = False
     return view_func
