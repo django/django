@@ -30,15 +30,11 @@ __ `executing custom SQL directly`_
 
 .. warning::
 
-    **Do not use string formatting on raw SQL or quote placeholders in your
-    SQL strings!**
-
     You should be very careful whenever you write raw SQL. Every time you use
-    it, you must properly escape any parameters that the user can control by
-    using ``params`` in order to protect against SQL injection attacks. Do not
-    use string interpolation or quote placeholders, as this leaves you
-    vulnerable to SQL injection. Please read more about
-    :ref:`SQL injection protection <sql-injection-protection>`.
+    it, you should properly escape any parameters that the user can control
+    by using ``params`` in order to protect against SQL injection attacks.
+    Please read more about :ref:`SQL injection protection
+    <sql-injection-protection>`.
 
 .. _raw-sql-fragments:
 
@@ -158,15 +154,14 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances:
 
 .. code-block:: pycon
 
-    >>> Person.objects.raw(
-    ...     """
+    >>> Person.objects.raw("""
     ...     SELECT first AS first_name,
     ...            last AS last_name,
     ...            bd AS birth_date,
     ...            pk AS id,
     ...     FROM some_other_table
-    ...     """
-    ... )
+    ...     """)
+    ...
 
 As long as the names match, the model instances will be created correctly.
 
@@ -250,9 +245,8 @@ of people with their ages calculated by the database:
     Jane is 42.
     ...
 
-You can often avoid using raw SQL to compute annotations by using either
-:ref:`Func() expressions <func-expressions>` or
-:class:`~django.db.models.expressions.RawSQL` (see :ref:`raw-sql-fragments`).
+You can often avoid using raw SQL to compute annotations by instead using a
+:ref:`Func() expression <func-expressions>`.
 
 __ https://www.postgresql.org/docs/current/functions-datetime.html
 
@@ -277,6 +271,35 @@ replaced with parameters from the ``params`` argument.
 
    Dictionary params are not supported with the SQLite backend; with
    this backend, you must pass parameters as a list.
+
+.. warning::
+
+    **Do not use string formatting on raw queries or quote placeholders in your
+    SQL strings!**
+
+    It's tempting to write the above query as:
+
+    .. code-block:: pycon
+
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = %s" % lname
+        >>> Person.objects.raw(query)
+
+    You might also think you should write your query like this (with quotes
+    around ``%s``):
+
+    .. code-block:: pycon
+
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
+
+    **Don't make either of these mistakes.**
+
+    As discussed in :ref:`sql-injection-protection`, using the ``params``
+    argument and leaving the placeholders unquoted protects you from `SQL
+    injection attacks`__, a common exploit where attackers inject arbitrary
+    SQL into your database. If you use string interpolation or quote the
+    placeholder, you're at risk for SQL injection.
+
+__ https://en.wikipedia.org/wiki/SQL_injection
 
 .. _executing-custom-sql:
 
