@@ -6,6 +6,7 @@ from typing import Any
 
 from asgiref.sync import async_to_sync, sync_to_async
 
+from django.db.migrations.serializer import serializer_factory
 from django.db.models.enums import TextChoices
 from django.utils.json import normalize_json
 from django.utils.module_loading import import_string
@@ -54,6 +55,28 @@ class Task:
 
     def __post_init__(self):
         self.get_backend().validate_task(self)
+
+    @classmethod
+    def _reconstruct(cls, kwargs):
+        func = import_string(kwargs["func"])
+        if isinstance(func, cls):
+            func = func.func
+        kwargs["func"] = func
+        return cls(**kwargs)
+
+    def __reduce__(self):
+        serializer = serializer_factory(self.func)
+        func_path, _ = serializer.serialize()
+
+        kwargs = {
+            "priority": self.priority,
+            "func": func_path,
+            "backend": self.backend,
+            "queue_name": self.queue_name,
+            "run_after": self.run_after,
+            "takes_context": self.takes_context,
+        }
+        return (self.__class__._reconstruct, (kwargs,))
 
     @property
     def name(self):
