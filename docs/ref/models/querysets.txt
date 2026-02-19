@@ -1974,7 +1974,13 @@ using the same fields syntax as :meth:`select_related`. Use the value
 
     If you want to lock models and specify selected fields, e.g. using
     :meth:`values`, you must select at least one field from each model in the
-    ``of`` argument. Models without selected fields will not be locked.
+    ``of`` argument. Models without selected fields will not be locked, except
+    the queryset's model when ``'self'`` is included in ``of``.
+
+    .. versionchanged:: 6.1
+
+        ``select_for_update(of=("self",))`` now locks the queryset's model
+        even when no fields from that model are selected.
 
 On PostgreSQL only, you can pass ``no_key=True`` in order to acquire a weaker
 lock, that still allows creating rows that merely reference locked rows
