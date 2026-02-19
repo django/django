@@ -1,3 +1,4 @@
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms import URLField
 from django.test import SimpleTestCase
@@ -143,3 +144,26 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean("example.com"), "http://example.com")
         f = URLField(assume_scheme="https")
         self.assertEqual(f.clean("example.com"), "https://example.com")
+
+    def test_urlfield_opaque_scheme(self):
+        # Opaque URIs without an authority component (//) shouldn't be
+        # URL-normalized, scheme and data segments should be preserved.
+
+        class OpaqueUrlFormField(URLField):
+            default_validators = [
+                validators.URLValidator(schemes=["mailto", "tel", "ldap", "news"])
+            ]
+
+        f = OpaqueUrlFormField()
+        self.assertEqual(
+            f.clean("mailto:John.Doe@example.com"), "mailto:John.Doe@example.com"
+        )
+        self.assertEqual(f.clean("tel:+1-816-555-1212"), "tel:+1-816-555-1212")
+        self.assertEqual(
+            f.clean("ldap://[2001:db8::7]/c=GB?objectClass?one"),
+            "ldap://[2001:db8::7]/c=GB?objectClass?one",
+        )
+        self.assertEqual(
+            f.clean("news:comp.infosystems.www.servers.unix"),
+            "news:comp.infosystems.www.servers.unix",
+        )

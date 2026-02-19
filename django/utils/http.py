@@ -41,6 +41,11 @@ RFC3986_SUBDELIMS = "!$&'()*+,;="
 MAX_URL_LENGTH = 2048
 MAX_URL_REDIRECT_LENGTH = 16384
 
+# RFC 3986: Hierarchical schemes that use the '//' authority component.
+HIERARCHICAL_SCHEMES = frozenset(
+    ["http", "https", "ftp", "ftps", "ws", "wss", "git", "ssh", "file"]
+)
+
 
 def urlencode(query, doseq=False):
     """

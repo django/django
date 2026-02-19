@@ -43,6 +43,7 @@ from django.utils import formats
 from django.utils.choices import normalize_choices
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
+from django.utils.http import HIERARCHICAL_SCHEMES
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
@@ -798,7 +799,7 @@ class URLField(CharField):
             if not url_fields[0]:
                 # If no URL scheme given, add a scheme.
                 url_fields[0] = self.assume_scheme
-            if not url_fields[1]:
+            if not url_fields[1] and url_fields[0] in HIERARCHICAL_SCHEMES:
                 # Assume that if no domain is provided, that the path segment
                 # contains the domain.
                 url_fields[1] = url_fields[2]
