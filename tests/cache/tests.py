@@ -1992,7 +1992,7 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         if {"lib-name", "lib-ver"}.issubset(client_info):
             version = django.get_version()
             if hasattr(self.lib, "DriverInfo"):
-                info = self._lib.DriverInfo().add_upstream_driver("django", version)
+                info = self.lib.DriverInfo().add_upstream_driver("django", version)
                 correct_lib_name = info.formatted_name
             else:
                 correct_lib_name = f"redis-py(django_v{version})"
