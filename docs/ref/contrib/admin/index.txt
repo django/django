@@ -1302,15 +1302,6 @@ subclass::
 
         search_fields = ["user__id__exact", "age__exact"]
 
-    .. admonition:: Performance consideration
-
-        Searching non-text fields converts field values to strings for
-        comparison, which prevents the database from using indexes on those
-        fields. This may cause slow queries on large tables. For
-        performance-critical searches on non-text fields, consider implementing
-        a custom :meth:`~ModelAdmin.get_search_results` method that performs
-        native type comparisons.
-
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
