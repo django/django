@@ -33,20 +33,9 @@ class FileProxyMixin:
                 self.file = file
     """
 
-    encoding = property(lambda self: self.file.encoding)
-    fileno = property(lambda self: self.file.fileno)
-    flush = property(lambda self: self.file.flush)
-    isatty = property(lambda self: self.file.isatty)
-    newlines = property(lambda self: self.file.newlines)
-    read = property(lambda self: self.file.read)
-    readinto = property(lambda self: self.file.readinto)
-    readline = property(lambda self: self.file.readline)
-    readlines = property(lambda self: self.file.readlines)
-    seek = property(lambda self: self.file.seek)
-    tell = property(lambda self: self.file.tell)
-    truncate = property(lambda self: self.file.truncate)
-    write = property(lambda self: self.file.write)
-    writelines = property(lambda self: self.file.writelines)
+    def __getattr__(self, name):
+        return getattr(self.file, name)
+
 
     @property
     def closed(self):
