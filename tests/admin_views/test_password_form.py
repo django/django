@@ -1,6 +1,7 @@
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.test import override_settings
+from django.test.selenium import screenshot_cases
 from django.urls import reverse
 
 
@@ -142,3 +143,12 @@ class SeleniumAuthTests(AdminSeleniumTestCase):
         # Only the set password submit button is visible.
         self.assertIs(submit_set.is_displayed(), True)
         self.assertIs(submit_unset.is_displayed(), False)
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_fieldset_legend_wide_alignment(self):
+        user_add_url = reverse("auth_test_admin:auth_user_add")
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(self.live_server_url + user_add_url)
+
+        # The fieldset legend is aligned with other fields.
+        self.take_screenshot("fieldset_legend_wide")

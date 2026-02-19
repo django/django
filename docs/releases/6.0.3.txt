@@ -15,3 +15,6 @@ Bugfixes
 * Fixed :exc:`AttributeError` when subclassing builtin lookups and neglecting
   to :ref:`override<tuple-for-params>` ``as_sql()`` to accept any sequence
   (:ticket:`36934`).
+
+* Fixed a visual regression where fieldset legends were misaligned in the admin
+  (:ticket:`36920`).
