@@ -393,7 +393,7 @@ email backend API :ref:`provides an alternative
 
     The class has the following methods:
 
-    .. method:: send(fail_silently=False)
+    .. method:: send(*, fail_silently=False)
 
         Sends the message. If a connection was specified when the email was
         constructed, that connection will be used. Otherwise, an instance of
@@ -402,6 +402,10 @@ email backend API :ref:`provides an alternative
         the message will be quashed. An empty list of recipients will not raise
         an exception. It will return ``1`` if the message was sent
         successfully, otherwise ``0``.
+
+        .. deprecated:: 6.1
+
+            Passing ``fail_silently`` as a positional argument is deprecated.
 
     .. method:: message(policy=email.policy.default)
 
