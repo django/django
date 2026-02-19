@@ -98,10 +98,6 @@ fieldset .inline-heading,
     border-top: none;
 }
 
-.aligned fieldset > div {
-    width: 100%;
-}
-
 .aligned legend {
     float: inline-start;
 }
