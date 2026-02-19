@@ -378,6 +378,9 @@ Tasks
   forwarded to the backend's
   :attr:`~django.tasks.backends.base.BaseTaskBackend.task_class`.
 
+* :class:`~django.tasks.Task` and :class:`~django.tasks.TaskResult` instances
+  can now be pickled and unpickled.
+
 Templates
 ~~~~~~~~~
 
