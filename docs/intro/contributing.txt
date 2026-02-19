@@ -67,7 +67,7 @@ and the processes involved. Specifically, we'll be covering the following:
 
 Once you're done with the tutorial, you can look through the rest of
 :doc:`Django's documentation on contributing</internals/contributing/index>`.
-It contains lots of great information and is a must read for anyone who'd like
+It contains lots of great information and is a must-read for anyone who'd like
 to become a regular contributor to Django. If you've got questions, it's
 probably got the answers.
 
@@ -121,7 +121,7 @@ Download the Django source code repository using the following command:
 .. admonition:: Low bandwidth connection?
 
     You can add the ``--depth 1`` argument to ``git clone`` to skip downloading
-    all of Django's commit history, which reduces data transfer from  ~250 MB
+    all of Django's commit history, which reduces data transfer from ~250 MB
     to ~70 MB.
 
 Now that you have a local copy of Django, you can install it just like you
@@ -283,7 +283,7 @@ Writing some tests for your ticket
 
 In most cases, for a contribution to be accepted into Django it has to include
 tests. For bug fix contributions, this means writing a regression test to
-ensure that  the bug is never reintroduced into Django later on. A regression
+ensure that the bug is never reintroduced into Django later on. A regression
 test should be written in such a way that it will fail while the bug still
 exists and pass once the bug has been fixed. For contributions containing new
 features, you'll need to include tests which ensure that the new features are
