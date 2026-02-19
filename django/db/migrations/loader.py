@@ -422,7 +422,7 @@ class MigrationLoader:
                 collect_sql=True, atomic=migration.atomic
             ) as schema_editor:
                 if state is None:
-                    state = self.project_state(
+                    state = self._create_project_state_for_collect_sql(
                         (migration.app_label, migration.name), at_end=False
                     )
                 if not backwards:
@@ -431,3 +431,32 @@ class MigrationLoader:
                     state = migration.unapply(state, schema_editor, collect_sql=True)
             statements.extend(schema_editor.collected_sql)
         return statements
+
+    def _create_project_state_for_collect_sql(self, node, at_end=True):
+        """
+        Create a ProjectState for collect_sql that includes applied migrations
+        from other apps not in the target migration's dependency graph.
+        """
+        target_plan_set = set(self.graph.forwards_plan(node))
+        state = self.project_state(node, at_end=at_end)
+
+        pending = {
+            key
+            for key in self.applied_migrations
+            if key in self.graph.nodes
+            and key not in target_plan_set
+            and key[0] != node[0]
+        }
+
+        if not pending:
+            return state
+
+        for leaf in self.graph.leaf_nodes():
+            for key in self.graph.forwards_plan(leaf):
+                if key in pending:
+                    pending.discard(key)
+                    self.graph.nodes[key].mutate_state(state, preserve=False)
+                    if not pending:
+                        return state
+
+        return state
