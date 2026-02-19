@@ -13,8 +13,8 @@ from django.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):
-    def __init__(self, server, params, library, value_not_found_exception, alias):
-        super().__init__(params, alias=alias)
+    def __init__(self, server, params, library, value_not_found_exception, **kwargs):
+        super().__init__(params, **kwargs)
         if isinstance(server, str):
             self._servers = re.split("[;,]", server)
         else:
