@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed :exc:`NameError` when inspecting functions making use of deferred
   annotations in Python 3.14 (:ticket:`36903`).
+
+* Fixed :exc:`AttributeError` when subclassing builtin lookups and neglecting
+  to :ref:`override<tuple-for-params>` ``as_sql()`` to accept any sequence
+  (:ticket:`36934`).
