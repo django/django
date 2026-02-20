@@ -388,7 +388,7 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
-* Support for GEOS 3.8 is removed.
+* Support for GEOS 3.8 and 3.9 is removed.
 
 * Support for GDAL 3.1 and 3.2 is removed.
 
