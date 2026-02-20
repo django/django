@@ -3626,8 +3626,9 @@ class AdminConsecutiveWhiteSpaceObjectDisplayTest(TestCase):
             ),
         ]
         for url, expected_breadcrumbs in cases:
-            response = self.client.get(url)
-            self.assertContains(response, expected_breadcrumbs, html=True)
+            with self.subTest(url=url, expected_breadcrumbs=expected_breadcrumbs):
+                response = self.client.get(url)
+                self.assertContains(response, expected_breadcrumbs, html=True)
 
     def test_display_consecutive_whitespace_object_in_delete_confirmation_page(self):
         response = self.client.get(
