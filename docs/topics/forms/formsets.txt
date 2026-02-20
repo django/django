@@ -195,8 +195,9 @@ all forms in the formset:
     >>> formset.is_valid()
     True
 
-We passed in no data to the formset which is resulting in a valid form. The
-formset is smart enough to ignore extra forms that were not changed. If we
+We passed in only the required management form data and no actual form
+field data, so the formset is valid.
+The formset is smart enough to ignore extra forms that were not changed. If we
 provide an invalid article:
 
 .. code-block:: pycon
