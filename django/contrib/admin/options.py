@@ -22,6 +22,7 @@ from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects,
     construct_change_message,
+    display_for_value,
     flatten_fieldsets,
     get_deleted_objects,
     lookup_spawns_duplicates,
@@ -74,6 +75,7 @@ IS_POPUP_VAR = "_popup"
 SOURCE_MODEL_VAR = "_source_model"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
+EMPTY_VALUE_STRING = "-"
 
 
 class ShowFacets(enum.Enum):
@@ -1394,10 +1396,13 @@ class ModelAdmin(BaseModelAdmin):
             current_app=self.admin_site.name,
         )
         # Add a link to the object's change form if the user can edit the obj.
+        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
         if self.has_change_permission(request, obj):
-            obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
+            obj_repr = format_html(
+                '<a href="{}">{}</a>', urlquote(obj_url), obj_display
+            )
         else:
-            obj_repr = str(obj)
+            obj_repr = obj_display
         msg_dict = {
             "name": opts.verbose_name,
             "obj": obj_repr,
@@ -1547,9 +1552,12 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
+        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
         msg_dict = {
             "name": opts.verbose_name,
-            "obj": format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+            "obj": format_html(
+                '<a href="{}">{}</a>', urlquote(request.path), obj_display
+            ),
         }
         if "_continue" in request.POST:
             msg = format_html(
@@ -1728,7 +1736,7 @@ class ModelAdmin(BaseModelAdmin):
             _("The %(name)s “%(obj)s” was deleted successfully.")
             % {
                 "name": self.opts.verbose_name,
-                "obj": obj_display,
+                "obj": display_for_value(str(obj_display), EMPTY_VALUE_STRING),
             },
             messages.SUCCESS,
         )
@@ -1951,7 +1959,9 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             "title": title % self.opts.verbose_name,
-            "subtitle": str(obj) if obj else None,
+            "subtitle": (
+                display_for_value(str(obj), EMPTY_VALUE_STRING) if obj else None
+            ),
             "adminform": admin_form,
             "object_id": object_id,
             "original": obj,
@@ -2252,6 +2262,7 @@ class ModelAdmin(BaseModelAdmin):
             "subtitle": None,
             "object_name": object_name,
             "object": obj,
+            "escaped_object": display_for_value(str(obj), EMPTY_VALUE_STRING),
             "deleted_objects": deleted_objects,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
@@ -2300,7 +2311,8 @@ class ModelAdmin(BaseModelAdmin):
 
         context = {
             **self.admin_site.each_context(request),
-            "title": _("Change history: %s") % obj,
+            "title": _("Change history: %s")
+            % display_for_value(str(obj), EMPTY_VALUE_STRING),
             "subtitle": None,
             "action_list": page_obj,
             "page_range": page_range,

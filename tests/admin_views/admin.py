@@ -709,6 +709,8 @@ class CoverLetterAdmin(admin.ModelAdmin):
     For testing fix for ticket #14529.
     """
 
+    formfield_overrides = {models.CharField: {"strip": False}}
+
     def get_queryset(self, request):
         return super().get_queryset(request).defer("date_written")
 
