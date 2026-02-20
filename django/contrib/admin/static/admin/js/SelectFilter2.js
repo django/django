@@ -267,7 +267,7 @@ Requires core.js and SelectBox.js.
         filter_key_press: function(event, field_id, source, target) {
             const source_box = document.getElementById(field_id + source);
             // don't submit form if user pressed Enter
-            if ((event.which && event.which === 13) || (event.keyCode && event.keyCode === 13)) {
+            if (event.key === 'Enter') {
                 source_box.selectedIndex = 0;
                 SelectBox.move(field_id + source, field_id + target);
                 source_box.selectedIndex = 0;
@@ -285,10 +285,10 @@ Requires core.js and SelectBox.js.
         },
         filter_key_down: function(event, field_id, source, target) {
             const source_box = document.getElementById(field_id + source);
-            // right key (39) or left key (37)
-            const direction = source === '_from' ? 39 : 37;
+            // right arrow or left arrow
+            const direction = source === '_from' ? 'ArrowRight' : 'ArrowLeft';
             // right arrow -- move across
-            if ((event.which && event.which === direction) || (event.keyCode && event.keyCode === direction)) {
+            if (event.key === direction) {
                 const old_index = source_box.selectedIndex;
                 SelectBox.move(field_id + source, field_id + target);
                 SelectFilter.refresh_filtered_selects(field_id);
@@ -297,11 +297,11 @@ Requires core.js and SelectBox.js.
                 return;
             }
             // down arrow -- wrap around
-            if ((event.which && event.which === 40) || (event.keyCode && event.keyCode === 40)) {
+            if (event.key === 'ArrowDown') {
                 source_box.selectedIndex = (source_box.length === source_box.selectedIndex + 1) ? 0 : source_box.selectedIndex + 1;
             }
             // up arrow -- wrap around
-            if ((event.which && event.which === 38) || (event.keyCode && event.keyCode === 38)) {
+            if (event.key === 'ArrowUp') {
                 source_box.selectedIndex = (source_box.selectedIndex === 0) ? source_box.length - 1 : source_box.selectedIndex - 1;
             }
         }
