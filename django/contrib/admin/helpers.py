@@ -231,6 +231,7 @@ class AdminReadonlyField:
             "help_text": help_text,
             "field": field,
             "is_hidden": is_hidden,
+            "id_for_label": "readonly_%s" % class_name if class_name else None,
         }
         self.form = form
         self.model_admin = model_admin

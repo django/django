@@ -7561,6 +7561,19 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             response = self.client.get(url)
         self.assertContains(response, "<label>Toppings\u00a0:</label>", html=True)
 
+    def test_readonly_field_has_id_for_label(self):
+        """
+        AdminReadonlyField should define id_for_label so that
+        help_text elements get a proper id attribute (#36359).
+        """
+        response = self.client.get(reverse("admin:admin_views_post_add"))
+        # The 'posted' field is readonly and has help_text.
+        # The help_text div should have an id based on id_for_label.
+        self.assertContains(
+            response,
+            'id="readonly_posted_helptext"',
+        )
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):
