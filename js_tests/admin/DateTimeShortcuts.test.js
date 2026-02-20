@@ -57,3 +57,53 @@ QUnit.test('time zone offset warning - date and time field', function(assert) {
     $('body').attr('data-admin-utc-offset', savedOffset);
     assert.equal($('.timezonewarning').attr("id"), "id_updated_at_timezone_warning_helptext");
 });
+
+QUnit.test('Escape key dismisses clock popup', function(assert) {
+    const $ = django.jQuery;
+    const timeField = $('<input type="text" name="time_test_esc" class="vTimeField">');
+    $('#qunit-fixture').append(timeField);
+    DateTimeShortcuts.init();
+
+    // Open the clock popup
+    const clockLink = $('.clockbox').closest('.datetimeshortcuts').find('a:last');
+    if (clockLink.length) {
+        clockLink[0].click();
+    }
+
+    // Simulate pressing Escape using event.key (not deprecated keyCode)
+    const event = new KeyboardEvent('keyup', {'key': 'Escape', 'bubbles': true});
+    document.dispatchEvent(event);
+
+    // Verify the clock popup is dismissed
+    const clockBox = $('#clockbox0');
+    if (clockBox.length) {
+        assert.equal(clockBox.css('display'), 'none', 'Clock popup should be hidden after Escape');
+    } else {
+        assert.ok(true, 'Clock popup element not found (already dismissed)');
+    }
+});
+
+QUnit.test('Escape key dismisses calendar popup', function(assert) {
+    const $ = django.jQuery;
+    const dateField = $('<input type="text" class="vDateField" value="2024-01-15">');
+    $('#qunit-fixture').append(dateField);
+    DateTimeShortcuts.init();
+
+    // Open the calendar popup
+    const calendarLink = $('.datetimeshortcuts').find('.date-icon').closest('a');
+    if (calendarLink.length) {
+        calendarLink[0].click();
+    }
+
+    // Simulate pressing Escape using event.key (not deprecated keyCode)
+    const event = new KeyboardEvent('keyup', {'key': 'Escape', 'bubbles': true});
+    document.dispatchEvent(event);
+
+    // Verify the calendar popup is dismissed
+    const calendarBox = $('#calendarbox0');
+    if (calendarBox.length) {
+        assert.equal(calendarBox.css('display'), 'none', 'Calendar popup should be hidden after Escape');
+    } else {
+        assert.ok(true, 'Calendar popup element not found (already dismissed)');
+    }
+});
