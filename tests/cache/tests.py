@@ -47,6 +47,7 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
+    AsyncRequestFactory,
     RequestFactory,
     SimpleTestCase,
     TestCase,
@@ -58,11 +59,13 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key,
+    invalidate_view_cache,
     learn_cache_key,
     patch_cache_control,
     patch_vary_headers,
 )
 from django.views.decorators.cache import cache_control, cache_page
+from django.views.decorators.vary import vary_on_headers
 
 from .models import Poll, expensive_calculation
 
@@ -2637,6 +2640,7 @@ def csrf_view(request):
 )
 class CacheMiddlewareTest(SimpleTestCase):
     factory = RequestFactory()
+    async_factory = AsyncRequestFactory()
 
     def setUp(self):
         self.default_cache = caches["default"]
@@ -2727,6 +2731,114 @@ class CacheMiddlewareTest(SimpleTestCase):
         result = timeout_middleware.process_request(request)
         self.assertIsNotNone(result)
         self.assertEqual(result.content, b"Hello World 1")
+
+    def test_invalidate_view_decorator_cache_from_request(self):
+        """Invalidate cache key/value from request object"""
+        view = cache_page(10)(hello_world_view)
+        request = self.factory.get("/view/")
+        _ = view(request, "0")
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
+
+    def test_invalidate_view_decorator_cache_from_path(self):
+        """Invalidate cache key/value from path"""
+        view = cache_page(10)(hello_world_view)
+        path = "/view/"
+        request = self.factory.get(path)
+        _ = view(request, "0")
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(path, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
+
+    def test_invalidate_view_decorator_cache_from_path_with_vary_headers(self):
+        """Invalidate cache key/value from path with Vary headers"""
+
+        # Cache view and inject Vary headers to Response object
+        view = cache_page(10, key_prefix="")(
+            vary_on_headers("Accept-Encoding", "Accept")(hello_world_view)
+        )
+        path = "/view/"
+        request = self.factory.get(path)
+        response = view(request, "0")
+
+        # Check response headers
+        self.assertTrue(response.has_header("Vary"))
+
+        cache_key = get_cache_key(request=request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(path, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
+
+    def test_cache_key_prefix_missmatch(self):
+        # Wrap the view with the cache_page decorator (no key_prefix specified)
+        view = cache_page(10)(hello_world_view)
+        path = "/view/"
+        request = self.factory.get(path)
+        _ = view(request, "0")
+
+        # Attempt to retrieve the cache key without specifying key_prefix
+        cache_key = get_cache_key(request=request, cache=cache)
+
+        # Because get_cache_key defaults to using
+        # settings.CACHE_MIDDLEWARE_KEY_PREFIX when key_prefix is None,
+        # this should not match the cached key
+        self.assertIsNone(cache_key)
+
+        # Try again, explicitly passing the default cache_page key_prefix
+        # (empty string)
+        cache_key = get_cache_key(request=request, cache=cache, key_prefix="")
+
+        # The key should now be found
+        self.assertIsNotNone(cache_key)
+
+        # Confirm that the cached response content matches the view output
+        cached_response = cache.get(cache_key)
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+    def test_invalidate_view_decorator_cache_from_async_request(self):
+        """Invalidate cache key/value from async request object"""
+        view = cache_page(10)(hello_world_view)
+        async_request = self.async_factory.get("/view/")
+        _ = view(async_request, "0")
+        cache_key = get_cache_key(request=async_request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Verify request.content has been chached
+        self.assertEqual(cached_response.content, b"Hello World 0")
+
+        # Delete cache key/value
+        invalidate_view_cache(async_request, key_prefix="", cache=cache)
+        cached_response = cache.get(cache_key)
+
+        # Confirm key/value has been deleted from cache
+        self.assertIsNone(cached_response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
