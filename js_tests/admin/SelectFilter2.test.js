@@ -183,8 +183,8 @@ QUnit.test('Enter key moves selected option', function(assert) {
     assert.equal($('#select_to option').length, 0);
     const done = assert.async();
     $('#select_from')[0].selectedIndex = 0;
-    const event = new KeyboardEvent('keypress', {'key': 'Enter'});
-    SelectFilter.filter_key_press(event, 'select', '_from', '_to');
+    const event = new KeyboardEvent('keydown', {'key': 'Enter'});
+    SelectFilter.filter_key_down(event, 'select', '_from', '_to');
     setTimeout(() => {
         assert.equal($('#select_from option').length, 1);
         assert.equal($('#select_to option').length, 1);

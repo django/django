@@ -184,17 +184,11 @@ Requires core.js and SelectBox.js.
                 SelectFilter.refresh_filtered_warning(field_id);
                 SelectFilter.refresh_icons(field_id);
             });
-            filter_input.addEventListener('keypress', function(e) {
-                SelectFilter.filter_key_press(e, field_id, '_from', '_to');
-            });
             filter_input.addEventListener('keyup', function(e) {
                 SelectFilter.filter_key_up(e, field_id, '_from');
             });
             filter_input.addEventListener('keydown', function(e) {
                 SelectFilter.filter_key_down(e, field_id, '_from', '_to');
-            });
-            filter_selected_input.addEventListener('keypress', function(e) {
-                SelectFilter.filter_key_press(e, field_id, '_to', '_from');
             });
             filter_selected_input.addEventListener('keyup', function(e) {
                 SelectFilter.filter_key_up(e, field_id, '_to', '_selected_input');
@@ -264,16 +258,6 @@ Requires core.js and SelectBox.js.
             document.getElementById(field_id + '_add_all').disabled = !from.querySelector('option');
             document.getElementById(field_id + '_remove_all').disabled = !to.querySelector('option');
         },
-        filter_key_press: function(event, field_id, source, target) {
-            const source_box = document.getElementById(field_id + source);
-            // don't submit form if user pressed Enter
-            if (event.key === 'Enter') {
-                source_box.selectedIndex = 0;
-                SelectBox.move(field_id + source, field_id + target);
-                source_box.selectedIndex = 0;
-                event.preventDefault();
-            }
-        },
         filter_key_up: function(event, field_id, source, filter_input) {
             const input = filter_input || '_input';
             const source_box = document.getElementById(field_id + source);
@@ -285,6 +269,14 @@ Requires core.js and SelectBox.js.
         },
         filter_key_down: function(event, field_id, source, target) {
             const source_box = document.getElementById(field_id + source);
+            // don't submit form if user pressed Enter
+            if (event.key === 'Enter') {
+                source_box.selectedIndex = 0;
+                SelectBox.move(field_id + source, field_id + target);
+                source_box.selectedIndex = 0;
+                event.preventDefault();
+                return;
+            }
             // right arrow or left arrow
             const direction = source === '_from' ? 'ArrowRight' : 'ArrowLeft';
             // right arrow -- move across
