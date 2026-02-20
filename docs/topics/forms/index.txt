@@ -55,8 +55,7 @@ data is returned to ``/admin/``.
 
 ``GET`` and ``POST``
 --------------------
-
-``GET`` and ``POST`` are the only HTTP methods to use when dealing with forms.
+In standard HTML forms, ``GET`` and ``POST`` are the only HTTP methods available.
 
 Django's login form is returned using the ``POST`` method, in which the browser
 bundles up the form data, encodes it for transmission, sends it to the server,
