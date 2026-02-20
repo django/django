@@ -1240,8 +1240,8 @@ subclass::
 
     These fields are typically text fields such as ``CharField`` or
     ``TextField``, but non-text fields like ``IntegerField`` can also be
-    searched when an explicit lookup is specified (see
-    :ref:`searching-non-text-fields` below). You can also perform a related
+    searched when an explicit lookup is specified, for example
+    ``age__exact``. You can also perform a related
     lookup on a ``ForeignKey`` or ``ManyToManyField`` with the lookup API
     "follow" notation::
 
@@ -1257,14 +1257,14 @@ subclass::
     search query into words and returns all objects that contain each of the
     words, case-insensitive (using the :lookup:`icontains` lookup), where each
     word must be in at least one of ``search_fields``. For example, if
-    ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
-    searches for ``john lennon``, Django will do the equivalent of this SQL
-    ``WHERE`` clause:
+    ``search_fields`` is set to ``['first_name', 'last_name', 'age__exact']``
+    and a user searches for ``john 25``, Django will do the equivalent of this
+    SQL ``WHERE`` clause:
 
     .. code-block:: sql
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
-        AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+        AND (first_name ILIKE '%25%' OR last_name ILIKE '%25%' OR age = 25)
 
     The search query can contain quoted phrases with spaces. For example, if a
     user searches for ``"john winston"`` or ``'john winston'``, Django will do
@@ -1290,17 +1290,6 @@ subclass::
     @       :lookup:`search`
     None    :lookup:`icontains`
     ======  ====================
-
-    .. _searching-non-text-fields:
-
-    Searching non-text fields
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    While ``search_fields`` is optimized for text fields, non-text fields such
-    as ``IntegerField`` or ``DateField`` can be searched by specifying
-    an explicit lookup::
-
-        search_fields = ["user__id__exact", "age__exact"]
 
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
