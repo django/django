@@ -164,7 +164,7 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    margin: 0 0 20px;
+    margin: 0;
     font-weight: 300;
     font-size: 1.25rem;
 }
@@ -828,6 +828,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .titles-and-tools {
     display: flex;
+    margin: 0 0 10px;
 }
 
 .titles {
@@ -838,7 +839,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools {
     padding: 0;
-    margin: 0 0 15px;
+    margin: 0;
 }
 
 .object-tools li {

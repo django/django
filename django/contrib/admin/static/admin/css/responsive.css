@@ -447,6 +447,14 @@ input[type="submit"], button {
 
     /* Forms */
 
+    .titles-and-tools {
+        flex-direction: column;
+    }
+
+    .object-tools {
+        margin-top: 10px;
+    }
+
     .form-row {
         padding: 15px 0;
     }
