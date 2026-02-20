@@ -396,6 +396,12 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``wide`` class has been removed, as it was made obsolete by the
+  new admin layout.
+
 System checks
 -------------
 
@@ -436,6 +442,19 @@ Miscellaneous
 * :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* In order to improve accessibility of the admin change forms:
+
+  * Form fields are now shown below their respective labels instead of next to
+    them.
+
+  * Help text is now shown after the field label and before the field input.
+
+  * Validation errors are now shown after the help text and before the field
+    input.
 
 .. _deprecated-features-6.1:
 
