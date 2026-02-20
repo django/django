@@ -99,6 +99,11 @@ class ResponseHeaders(CaseInsensitiveMapping):
         if key not in self:
             self[key] = value
 
+    def copy(self):
+        headers = ResponseHeaders({})
+        headers._store = self._store.copy()
+        return headers
+
 
 class BadHeaderError(ValueError):
     pass
