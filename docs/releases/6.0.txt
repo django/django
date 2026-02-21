@@ -454,6 +454,8 @@ If you haven't dealt with this warning by now, add
 settings, or ``default_auto_field = 'django.db.models.AutoField'`` to an app's
 ``AppConfig``, as needed.
 
+.. _tuple-for-params:
+
 Custom ORM expressions should return params as a tuple
 ------------------------------------------------------
 

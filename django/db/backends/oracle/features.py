@@ -85,6 +85,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
+        # A bug in Django with respect to unioning ordered querysets (#36938).
+        "queries.test_qs_combinators.QuerySetSetOperationTests."
+        "test_count_union_with_select_related_in_values",
     }
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"

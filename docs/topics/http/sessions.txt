@@ -191,6 +191,17 @@ You can edit it multiple times.
 
       Example: ``'fav_color' in request.session``
 
+    .. method:: __bool__()
+
+      .. versionadded:: 6.1
+
+      Returns the inverse of :meth:`is_empty`. This allows checking if a
+      session has data::
+
+          if request.session:
+              # Session has data or a key
+              pass
+
     .. method:: get(key, default=None)
     .. method:: aget(key, default=None)
 
