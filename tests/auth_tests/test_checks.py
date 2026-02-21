@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib.auth.checks import (
     check_middleware,
     check_models_permissions,
@@ -14,6 +16,7 @@ from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.test import SimpleTestCase, override_settings, override_system_checks
 from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import CustomUserNonUniqueUsername
 
@@ -427,7 +430,12 @@ class MiddlewareChecksTests(SimpleTestCase):
         ]
     )
     def test_invalid_middleware_skipped(self):
-        errors = checks.run_checks()
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # errors = checks.run_checks()
+        with warnings.catch_warnings(
+            action="ignore", category=RemovedInDjango70Warning
+        ):
+            errors = checks.run_checks()
         self.assertEqual(errors, [])
 
     @override_settings(
