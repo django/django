@@ -6,7 +6,7 @@ DATABASES = {
         "USER": "user",
         "NAME": "geodjango",
         "PASSWORD": "postgres",
-        "HOST": "localhost",
+        "HOST": "postgres",
         "PORT": 5432,
     },
     "other": {
@@ -14,7 +14,7 @@ DATABASES = {
         "USER": "user",
         "NAME": "geodjango2",
         "PASSWORD": "postgres",
-        "HOST": "localhost",
+        "HOST": "postgres",
         "PORT": 5432,
     },
 }
