@@ -41,7 +41,7 @@ geographic SRSes.
 ``Distance``
 ------------
 
-.. class:: Distance(expr1, expr2, spheroid=None, **extra)
+.. class:: Distance(expr1, expr2, spheroid=None, radius=None, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__,
@@ -61,6 +61,16 @@ case with the default WGS84 (4326) SRID, you can set the ``spheroid`` keyword
 argument to decide if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive).
+For geodetic SRIDs (4326), MySQL automatically uses `ST_Distance_Sphere()`_
+(the ``radius`` parameter can be used to specify the sphere's radius, and
+``spheroid`` is not supported).
+For planar SRIDs, MySQL uses ``ST_Distance()``.
+
+.. versionchanged:: 6.1
+
+    ``ST_Distance_Sphere`` support was added on MySQL.
+
+.. _ST_Distance_Sphere(): https://dev.mysql.com/doc/refman/5.7/en/spatial-convenience-functions.html#function_st-distance-sphere
 
 In the following example, the distance from the city of Hobart to every other
 :class:`~django.contrib.gis.db.models.PointField` in the ``AustraliaCity``
