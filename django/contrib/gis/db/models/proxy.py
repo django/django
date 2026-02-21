@@ -70,7 +70,7 @@ class SpatialProxy(DeferredAttribute):
             if value.srid is None:
                 # Assigning the field SRID if the geometry has no SRID.
                 value.srid = self.field.srid
-        elif value is None or isinstance(value, (str, memoryview)):
+        elif value is None or isinstance(value, (str, bytes, memoryview)):
             # Set geometries with None, WKT, HEX, or WKB
             pass
         else:

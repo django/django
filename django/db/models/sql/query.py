@@ -646,6 +646,27 @@ class Query(BaseExpression):
                 rows = compiler.composite_fields_to_tuples(rows, cols)
             result = next(rows)
 
+            # Convert geometry aggregates from raw WKB to GEOSGeometry
+            try:
+                from django.contrib.gis.db.models import GeometryField
+                from django.contrib.gis.geos import GEOSGeometry
+
+                has_gis = True
+            except ImportError:
+                has_gis = False
+
+            if has_gis:
+                result = list(result)
+                annotations = list(outer_query.annotation_select.items())
+                for i, (alias, annotation) in enumerate(annotations):
+                    if hasattr(annotation, "output_field") and isinstance(
+                        annotation.output_field, GeometryField
+                    ):
+                        if result[i] is not None and not isinstance(
+                            result[i], GEOSGeometry
+                        ):
+                            result[i] = GEOSGeometry(result[i])
+
         return dict(zip(outer_query.annotation_select, result))
 
     def get_count(self, using):
