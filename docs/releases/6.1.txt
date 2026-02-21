@@ -456,6 +456,10 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+* The ``fail_silently`` argument to :meth:`.EmailMessage.send` must be passed
+  as a keyword argument. Using a positional argument now emits a deprecation
+  warning and will raise a :exc:`TypeError` when the deprecation period ends.
+
 Features removed in 6.1
 =======================
 

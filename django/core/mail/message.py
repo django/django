@@ -349,7 +349,8 @@ class EmailMessage:
         """
         return [email for email in (self.to + self.cc + self.bcc) if email]
 
-    def send(self, fail_silently=False):
+    @deprecate_posargs(RemovedInDjango70Warning, ["fail_silently"])
+    def send(self, *, fail_silently=False):
         """Send the email message."""
         if not self.recipients():
             # Don't bother creating the network connection if there's nobody to

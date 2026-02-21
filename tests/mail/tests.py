@@ -2116,6 +2116,11 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 ["reply-to@example.com"],
             )
 
+    def test_email_message_send(self):
+        email = EmailMessage()
+        with self.assertDeprecatedIn70("'fail_silently'", "send"):
+            email.send(True)
+
 
 @requires_tz_support
 class MailTimeZoneTests(MailTestsMixin, SimpleTestCase):
