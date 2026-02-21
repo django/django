@@ -1,7 +1,6 @@
 import json
 
 from django.core import checks
-from django.db.models import NOT_PROVIDED, Field
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -13,6 +12,8 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThanOrEqual,
 )
 from django.utils.functional import cached_property
+
+from . import NOT_PROVIDED, Field
 
 
 class AttributeSetter:

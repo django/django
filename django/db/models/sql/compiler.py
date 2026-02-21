@@ -21,6 +21,7 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
+from django.db.models.sql.cte import generate_cte_sql
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
@@ -43,6 +44,7 @@ class SQLCompiler:
         r"^(.*)\s(?:ASC|DESC).*",
         re.MULTILINE | re.DOTALL,
     )
+    auto_cte_enabled = True
 
     def __init__(self, query, connection, using, elide_empty=True):
         self.query = query
@@ -68,6 +70,21 @@ class SQLCompiler:
             f"model={self.query.model.__qualname__} "
             f"connection={self.connection!r} using={self.using!r}>"
         )
+
+    def _apply_ctes(self, as_sql):
+        if self.auto_cte_enabled and not getattr(
+            self.query, "_auto_cte_processed", False
+        ):
+            self.query = self.query._auto_cte_query(clone_query=False)
+        # django-cte wraps compiler.as_sql() and prepends CTE SQL itself.
+        # If we also prepend here, the query is wrapped twice.
+        if any(
+            mixin.__name__ == "CTECompiler"
+            and mixin.__module__.startswith("django_cte.")
+            for mixin in getattr(type(self), "_jit_mixins", ())
+        ):
+            return as_sql()
+        return generate_cte_sql(self.connection, self.query, as_sql)
 
     def setup_query(self, with_col_aliases=False):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
@@ -253,6 +270,8 @@ class SQLCompiler:
 
         The annotations is a dictionary of {'attname': column position} values.
         """
+        if with_col_aliases and getattr(self.query, "_ignore_with_col_aliases", False):
+            with_col_aliases = False
         select = []
         klass_info = None
         annotations = {}
@@ -768,6 +787,8 @@ class SQLCompiler:
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
+        if not getattr(self.query, "_auto_cte_processed", False):
+            self.query = self.query._auto_cte_query(clone_query=False)
         refcounts_before = self.query.alias_refcount.copy()
         try:
             combinator = self.query.combinator
@@ -920,7 +941,8 @@ class SQLCompiler:
                     result.append("HAVING %s" % having)
                     params.extend(h_params)
 
-            if self.query.explain_info:
+            # EXPLAIN for CTE queries is handled in generate_cte_sql()
+            if self.query.explain_info and not self.query._with_ctes:
                 result.insert(
                     0,
                     self.connection.ops.explain_query_prefix(
@@ -977,12 +999,16 @@ class SQLCompiler:
                         )
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return "SELECT %s FROM (%s) subquery" % (
+                base_sql = "SELECT %s FROM (%s) subquery" % (
                     ", ".join(sub_selects),
                     " ".join(result),
-                ), tuple(sub_params + params)
+                )
+                base_params = tuple(sub_params + params)
+                return self._apply_ctes(lambda: (base_sql, base_params))
 
-            return " ".join(result), tuple(params)
+            base_sql = " ".join(result)
+            base_params = tuple(params)
+            return self._apply_ctes(lambda: (base_sql, base_params))
         finally:
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
@@ -1974,6 +2000,8 @@ class SQLInsertCompiler(SQLCompiler):
 
 
 class SQLDeleteCompiler(SQLCompiler):
+    auto_cte_enabled = False
+
     @cached_property
     def single_alias(self):
         # Ensure base table is in aliases.
@@ -2013,11 +2041,15 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
+        if self.auto_cte_enabled and not getattr(
+            self.query, "_auto_cte_processed", False
+        ):
+            self.query = self.query._auto_cte_query(clone_query=False)
         if self.single_alias and (
             self.connection.features.delete_can_self_reference_subquery
             or not self.contains_self_reference_subquery
         ):
-            return self._as_sql(self.query)
+            return self._apply_ctes(lambda: self._as_sql(self.query))
         innerq = self.query.clone()
         innerq.__class__ = Query
         innerq.clear_select_clause()
@@ -2030,10 +2062,11 @@ class SQLDeleteCompiler(SQLCompiler):
             sql, params = innerq.get_compiler(connection=self.connection).as_sql()
             innerq = RawSQL("SELECT * FROM (%s) subquery" % sql, params)
         outerq.add_filter("pk__in", innerq)
-        return self._as_sql(outerq)
+        return self._apply_ctes(lambda: self._as_sql(outerq))
 
 
 class SQLUpdateCompiler(SQLCompiler):
+    auto_cte_enabled = False
     returning_fields = None
     returning_params = ()
 
@@ -2042,6 +2075,8 @@ class SQLUpdateCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
+        if not getattr(self.query, "_auto_cte_processed", False):
+            self.query = self.query._auto_cte_query(clone_query=False)
         self.pre_sql_setup()
         if not self.query.values:
             return "", ()
@@ -2113,7 +2148,9 @@ class SQLUpdateCompiler(SQLCompiler):
             if r_sql:
                 result.append(r_sql)
                 params.extend(self.returning_params)
-        return " ".join(result), tuple(update_params + params)
+        base_sql = " ".join(result)
+        base_params = tuple(update_params + params)
+        return self._apply_ctes(lambda: (base_sql, base_params))
 
     def execute_sql(self, result_type):
         """
@@ -2240,6 +2277,8 @@ class SQLAggregateCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
+        if not getattr(self.query, "_auto_cte_processed", False):
+            self.query = self.query._auto_cte_query(clone_query=False)
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
             ann_sql, ann_params = self.compile(annotation)
@@ -2256,7 +2295,7 @@ class SQLAggregateCompiler(SQLCompiler):
         ).as_sql(with_col_aliases=True)
         sql = "SELECT %s FROM (%s) subquery" % (sql, inner_query_sql)
         params += inner_query_params
-        return sql, params
+        return self._apply_ctes(lambda: (sql, params))
 
 
 def cursor_iter(cursor, sentinel, col_count, itersize):

@@ -17,6 +17,7 @@ from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
+import django
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
@@ -31,6 +32,7 @@ from django.db.models.expressions import (
     RawSQL,
     Ref,
     ResolvedOuterRef,
+    Subquery,
     Value,
 )
 from django.db.models.fields import Field
@@ -41,8 +43,9 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
+from django.db.models.sql.cte import CTE, QJoin
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
-from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
@@ -150,6 +153,912 @@ JoinInfo = namedtuple(
     "JoinInfo",
     ("final_field", "targets", "opts", "joins", "path", "transform_function"),
 )
+
+
+class _CTECollector:
+    """Track collected CTEs while enforcing unique CTE names."""
+
+    def __init__(self):
+        self.ctes = []
+        self.seen = {}
+
+    def add(self, cte):
+        """
+        Register `cte` or raise ValueError if a different CTE uses the
+        same name.
+        """
+        existing = self.seen.get(cte.name)
+        if existing is None:
+            self.ctes.append(cte)
+            self.seen[cte.name] = cte
+        elif existing is not cte:
+            raise ValueError(
+                f"Found two or more CTEs named '{cte.name}'. "
+                "Hint: assign a unique name to each CTE."
+            )
+
+    def add_many(self, ctes):
+        """Register every CTE in `ctes`."""
+        for cte in ctes:
+            self.add(cte)
+
+
+class _CTENameGenerator:
+    """Generate collision-free CTE names for auto-CTE rewrites."""
+
+    def __init__(self, query, collector):
+        """Track aliases already used by `query` and collected CTEs."""
+        self.collector = collector
+        self.used = set(query.alias_map)
+        self.counter = 0
+
+    def __call__(self):
+        """Return the next unused CTE name."""
+        while True:
+            self.counter += 1
+            name = f"subquery_cte_{self.counter}"
+            if name not in self.used and name not in self.collector.seen:
+                self.used.add(name)
+                return name
+
+
+class _CTEAutoTransformer:
+    """Collect subqueries that can be rewritten as CTE references."""
+
+    def __init__(self, query, name_generator, collector):
+        """Store traversal state for a single auto-CTE transformation pass."""
+        self.query = query
+        self.name_generator = name_generator
+        self.collector = collector
+        self.replacements = {}
+
+    def add_cte_for_expression(self, expr, subquery):
+        """Materialize a `Subquery` expression as a reusable CTE."""
+        if _has_outer_refs(subquery):
+            return
+        if getattr(subquery, "is_empty", None) and subquery.is_empty():
+            return
+        if getattr(subquery, "is_sliced", False):
+            return
+        cte_name = getattr(subquery, "_cte_name", None)
+        if cte_name is None:
+            cte_name = self.name_generator()
+        cte = CTE(_queryset_from_query(subquery), name=cte_name)
+        self.collector.add(cte)
+        self.replacements[expr] = _clone_subquery_expression(expr, cte.name, subquery)
+
+    def add_cte_for_query(self, query):
+        """Materialize a bare subquery `Query` as a reusable CTE."""
+        if _has_outer_refs(query):
+            return
+        if getattr(query, "is_empty", None) and query.is_empty():
+            return
+        if query.is_sliced:
+            return
+        cte_name = getattr(query, "_auto_cte_name", None)
+        cte = self.collector.seen.get(cte_name)
+        created = False
+        if cte is None:
+            if cte_name is None or cte_name in self.collector.seen:
+                cte_name = self.name_generator()
+                query._auto_cte_name = cte_name
+            cte = CTE(_queryset_from_query(query), name=cte_name)
+            created = True
+        if created:
+            self.collector.add(cte)
+        replacement = _clone_subquery_expression(query, cte.name, query)
+        replacement._auto_cte_skip = True
+        replacement._auto_cte = cte
+        replacement._db = getattr(query, "_db", None)
+        self.replacements[query] = replacement
+
+    def inspect_expression(self, expr, *, allow_query=False):
+        """Traverse an expression tree and collect eligible subqueries."""
+        from django.db.models.fields.tuple_lookups import TupleLookupMixin
+
+        if (
+            isinstance(expr, Lookup)
+            and isinstance(getattr(expr, "lhs", None), ColPairs)
+            and getattr(expr, "lookup_name", None) == "in"
+            and isinstance(getattr(expr, "rhs", None), (Query, Subquery))
+        ):
+            self.inspect_expression(expr.lhs, allow_query=allow_query)
+            return
+        if isinstance(expr, TupleLookupMixin):
+            self.inspect_expression(expr.lhs, allow_query=allow_query)
+            return
+        if allow_query and isinstance(expr, Query) and expr.subquery:
+            if getattr(expr, "_auto_cte_skip", False):
+                cte = getattr(expr, "_auto_cte", None)
+                if cte is not None:
+                    self.collector.add(cte)
+                return
+            self.add_cte_for_query(expr)
+            return
+        if isinstance(expr, Subquery):
+            self.add_cte_for_expression(expr, expr.query)
+            return
+        if not hasattr(expr, "get_source_expressions"):
+            return
+        for child in expr.get_source_expressions():
+            if child is not None:
+                self.inspect_expression(child, allow_query=allow_query)
+
+    def inspect_node(self, node, *, allow_query=False):
+        """Traverse a where-tree node and inspect nested expressions."""
+        if node is None:
+            return
+        if isinstance(node, WhereNode):
+            for child in node.children:
+                self.inspect_node(child, allow_query=allow_query)
+            return
+        if isinstance(node, (list, tuple)):
+            for child in node:
+                self.inspect_node(child, allow_query=allow_query)
+            return
+        self.inspect_expression(node, allow_query=allow_query)
+
+
+def _iter_subquery_expressions(expr):
+    """Yield every nested `Subquery`/subquery `Query` from `expr`."""
+    if expr is None:
+        return
+    if isinstance(expr, Subquery):
+        yield expr
+        return
+    if isinstance(expr, Query) and expr.subquery:
+        yield expr
+        return
+    if isinstance(expr, Node):
+        for child in expr.children:
+            yield from _iter_subquery_expressions(child)
+        return
+    if isinstance(expr, (list, tuple)):
+        for child in expr:
+            yield from _iter_subquery_expressions(child)
+        return
+    if hasattr(expr, "get_source_expressions"):
+        for child in expr.get_source_expressions():
+            if child is not None:
+                yield from _iter_subquery_expressions(child)
+
+
+def _outer_ref_field_name(lookup, *, external_aliases=None):
+    """Return the outer field name from a supported correlation predicate."""
+    if not isinstance(lookup, Lookup) or lookup.lookup_name != "exact":
+        return None
+    lhs = getattr(lookup, "lhs", None)
+    rhs = getattr(lookup, "rhs", None)
+    if not isinstance(lhs, Col):
+        return None
+    if isinstance(rhs, (OuterRef, ResolvedOuterRef)):
+        outer_name = rhs.name
+        if LOOKUP_SEP in outer_name:
+            return None
+        inner_field = lhs.target
+        valid_names = {inner_field.attname, inner_field.name, inner_field.column}
+        if inner_field.primary_key:
+            valid_names.add("pk")
+        if outer_name not in valid_names:
+            return None
+        return outer_name
+    if (
+        isinstance(rhs, Col)
+        and external_aliases
+        and rhs.alias in external_aliases
+        and lhs.alias not in external_aliases
+    ):
+        outer_name = rhs.target.attname
+        if LOOKUP_SEP in outer_name:
+            return None
+        return outer_name
+    return None
+
+
+def _split_where_by_outer_refs(node, *, external_aliases=None):
+    """
+    Split a where tree into outer-ref predicates and remaining
+    predicates.
+    """
+    if node is None:
+        return None, None, True
+    if isinstance(node, WhereNode):
+        # Keep boolean semantics intact by only splitting conjunctions.
+        if node.negated or node.connector in (OR, XOR):
+            return None, node, False
+        outer_children = []
+        other_children = []
+        for child in node.children:
+            outer_child, other_child, ok = _split_where_by_outer_refs(
+                child, external_aliases=external_aliases
+            )
+            if not ok:
+                return None, node, False
+            if outer_child is not None:
+                outer_children.append(outer_child)
+            if other_child is not None:
+                other_children.append(other_child)
+        outer_node = (
+            WhereNode(outer_children, connector=node.connector)
+            if outer_children
+            else None
+        )
+        other_node = (
+            WhereNode(other_children, connector=node.connector)
+            if other_children
+            else None
+        )
+        return outer_node, other_node, True
+    if _outer_ref_field_name(node, external_aliases=external_aliases) is not None:
+        return node, None, True
+    return None, node, True
+
+
+def _outer_ref_field_names(node, *, external_aliases=None):
+    """Return unique outer-ref field names referenced by `node`."""
+    names = []
+    if node is None:
+        return names
+    if isinstance(node, WhereNode):
+        for child in node.children:
+            for name in _outer_ref_field_names(
+                child, external_aliases=external_aliases
+            ):
+                if name not in names:
+                    names.append(name)
+        return names
+    name = _outer_ref_field_name(node, external_aliases=external_aliases)
+    if name is not None and name not in names:
+        names.append(name)
+    return names
+
+
+def _unique_cte_column_name(preferred, used):
+    """Return `preferred` or a suffixed variant that is not in `used`."""
+    if preferred and preferred not in used:
+        used.add(preferred)
+        return preferred
+    base = preferred or "agg"
+    name = base
+    suffix = 1
+    while name in used:
+        suffix += 1
+        name = f"{base}_{suffix}"
+    used.add(name)
+    return name
+
+
+def _correlated_aggregate_info(outer_query, subquery, outer_alias):
+    """
+    Return rewrite metadata for a supported correlated aggregate
+    subquery.
+    """
+    inner = subquery.query if isinstance(subquery, Subquery) else subquery
+    if inner.model is None or inner.model is not outer_query.model:
+        return None
+    if inner.combinator or inner.combined_queries:
+        return None
+    if inner.extra or inner.extra_select or inner.extra_order_by:
+        return None
+    if inner.distinct or inner.distinct_fields:
+        return None
+    if len(inner.annotations) != 1:
+        return None
+    agg_expr = next(iter(inner.annotations.values()))
+    if not getattr(agg_expr, "contains_aggregate", False):
+        return None
+    if _contains_outer_ref(agg_expr):
+        return None
+    if inner.is_sliced and not (inner.low_mark == 0 and inner.high_mark == 1):
+        return None
+    outer_node, other_node, ok = _split_where_by_outer_refs(
+        inner.where, external_aliases=inner.external_aliases
+    )
+    if not ok or outer_node is None:
+        return None
+    if other_node and other_node.children:
+        return None
+    group_by_fields = tuple(
+        _outer_ref_field_names(outer_node, external_aliases=inner.external_aliases)
+    )
+    if not group_by_fields:
+        return None
+    base_query = inner.clone()
+    base_query.where = other_node or WhereNode()
+    agg_expr = agg_expr.copy() if hasattr(agg_expr, "copy") else agg_expr
+    return {
+        "subquery": subquery,
+        "outer_alias": outer_alias,
+        "agg_expr": agg_expr,
+        "group_by_fields": group_by_fields,
+        "base_query": base_query,
+    }
+
+
+def _auto_cte_correlated_aggregate_rewrite(query, name_generator, collector):
+    """
+    Rewrite eligible correlated aggregate subqueries into a grouped
+    CTE join.
+    """
+    annotation_source = getattr(query, "_annotation_unresolved", query.annotations)
+    candidates = []
+    for alias, expression in annotation_source.items():
+        for subquery in _iter_subquery_expressions(expression):
+            candidates.append((subquery, alias))
+    if not candidates:
+        return query
+
+    grouped = {}
+    for subquery, outer_alias in candidates:
+        info = _correlated_aggregate_info(query, subquery, outer_alias)
+        if info is None:
+            continue
+        key = (info["base_query"].model, info["group_by_fields"])
+        group = grouped.setdefault(
+            key,
+            {
+                "group_by_fields": info["group_by_fields"],
+                "base_query": info["base_query"],
+                "aggregates": {},
+            },
+        )
+        agg_expr = info["agg_expr"]
+        agg_key = getattr(agg_expr, "identity", agg_expr)
+        aggregate = group["aggregates"].setdefault(
+            agg_key, {"agg_expr": agg_expr, "preferred_names": []}
+        )
+        if outer_alias:
+            aggregate["preferred_names"].append(outer_alias)
+
+    if not grouped:
+        return query
+
+    for group in grouped.values():
+        group_by_fields = group["group_by_fields"]
+        base_query = group["base_query"]
+        used_names = set(group_by_fields)
+        for aggregate in group["aggregates"].values():
+            preferred = next(
+                (name for name in aggregate["preferred_names"] if name), None
+            )
+            aggregate["cte_alias"] = _unique_cte_column_name(preferred, used_names)
+
+        cte_query = base_query.clone()
+        cte_query.clear_limits()
+        cte_query.subquery = False
+        cte_query.order_by = ()
+        cte_query.extra_order_by = ()
+        cte_query.default_ordering = False
+        cte_query._with_ctes = ()
+        cte_query._auto_cte_processed = True
+        cte_query._auto_cte_annotation_skip = True
+        cte_query.annotations = {}
+        cte_query._annotation_select_cache = None
+        cte_query.annotation_select_mask = None
+        if hasattr(cte_query, "_annotation_unresolved"):
+            cte_query._annotation_unresolved = {}
+        if hasattr(cte_query, "_annotation_deps"):
+            cte_query._annotation_deps = {}
+        cte_query.set_values(group_by_fields)
+        for aggregate in group["aggregates"].values():
+            cte_query.add_annotation(aggregate["agg_expr"], aggregate["cte_alias"])
+
+        cte = CTE(
+            _queryset_from_query(cte_query, clone_query=False), name=name_generator()
+        )
+        cte._column_names = list(group_by_fields) + [
+            aggregate["cte_alias"] for aggregate in group["aggregates"].values()
+        ]
+        collector.add(cte)
+        group["cte"] = cte
+
+    replacements = {}
+
+    def add_replacements(expression, alias=None):
+        """Map correlated aggregate subqueries to their CTE column refs."""
+        for subquery in _iter_subquery_expressions(expression):
+            info = _correlated_aggregate_info(query, subquery, alias)
+            if info is None:
+                continue
+            key = (info["base_query"].model, info["group_by_fields"])
+            group = grouped.get(key)
+            if not group:
+                continue
+            agg_expr = info["agg_expr"]
+            agg_key = getattr(agg_expr, "identity", agg_expr)
+            aggregate = group["aggregates"].get(agg_key)
+            if not aggregate:
+                continue
+            replacements[subquery] = getattr(group["cte"].col, aggregate["cte_alias"])
+
+    for alias, expression in query.annotations.items():
+        add_replacements(expression, alias=alias)
+    if hasattr(query, "_annotation_unresolved"):
+        for alias, expression in query._annotation_unresolved.items():
+            add_replacements(expression, alias=alias)
+    add_replacements(query.where)
+    for expression in query.select:
+        add_replacements(expression)
+    if isinstance(query.group_by, tuple):
+        for expression in query.group_by:
+            add_replacements(expression)
+
+    if not replacements:
+        return query
+
+    if replacements:
+        query.annotations = {
+            key: value.replace_expressions(replacements)
+            for key, value in query.annotations.items()
+        }
+        if hasattr(query, "_annotation_unresolved"):
+            query._annotation_unresolved = {
+                key: value.replace_expressions(replacements)
+                for key, value in query._annotation_unresolved.items()
+            }
+        query.where = query.where.replace_expressions(replacements)
+        query.select = tuple(
+            expr.replace_expressions(replacements) for expr in query.select
+        )
+        if isinstance(query.group_by, tuple):
+            query.group_by = tuple(
+                expr.replace_expressions(replacements) for expr in query.group_by
+            )
+        query._annotation_select_cache = None
+        query._auto_cte_annotation_skip = True
+
+    for group in grouped.values():
+        cte = group["cte"]
+        group_by_fields = group["group_by_fields"]
+        join_filter = {field: getattr(cte.col, field) for field in group_by_fields}
+        q_object = Q(**join_filter)
+        existing_inner = {
+            alias for alias, join in query.alias_map.items() if join.join_type == INNER
+        }
+        if django.VERSION >= (5, 2):
+            on_clause, _ = query._add_q(
+                q_object, query.used_aliases, update_join_types=True
+            )
+        else:
+            on_clause, _ = query._add_q(q_object, query.used_aliases)
+        query.demote_joins(existing_inner)
+        parent = query.get_initial_alias()
+        query.join(QJoin(parent, cte.name, cte.name, on_clause, INNER))
+    return query
+
+
+def _annotation_refs_in_expression(expr, annotation_names):
+    """Return annotation aliases referenced by `expr`."""
+    if expr is None:
+        return set()
+    if isinstance(expr, F):
+        return {expr.name} if expr.name in annotation_names else set()
+    if isinstance(expr, Ref):
+        return {expr.refs} if expr.refs in annotation_names else set()
+    refs = set()
+    if isinstance(expr, (list, tuple)):
+        for child in expr:
+            refs.update(_annotation_refs_in_expression(child, annotation_names))
+        return refs
+    if hasattr(expr, "get_source_expressions"):
+        for child in expr.get_source_expressions():
+            refs.update(_annotation_refs_in_expression(child, annotation_names))
+    return refs
+
+
+def _annotation_is_simple(expr):
+    """Return `True` for expressions safe to evaluate before joins/filters."""
+    from django.db.models.expressions import CombinedExpression, Func
+    from django.db.models.lookups import Transform
+
+    allowed = (F, Value, Func, CombinedExpression, Col, ColPairs)
+    if isinstance(expr, Transform):
+        return False
+    if isinstance(expr, allowed):
+        pass
+    elif hasattr(expr, "get_source_expressions"):
+        return all(
+            _annotation_is_simple(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    else:
+        return False
+    if hasattr(expr, "get_source_expressions"):
+        return all(
+            _annotation_is_simple(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    return True
+
+
+def _annotation_dependency_levels(annotations, annotation_deps=None):
+    """Topologically group annotations by dependency order."""
+    annotation_order = list(annotations)
+    deps = {}
+    for name, expr in annotations.items():
+        if annotation_deps is not None and name in annotation_deps:
+            refs = set(annotation_deps[name])
+        else:
+            refs = set()
+            if hasattr(expr, "get_refs"):
+                refs = set(expr.get_refs())
+        deps[name] = {ref for ref in refs if ref in annotations}
+    remaining = set(annotation_order)
+    resolved = set()
+    levels = []
+    while remaining:
+        ready = [
+            name
+            for name in annotation_order
+            if name in remaining and deps[name].issubset(resolved)
+        ]
+        if not ready:
+            break
+        levels.append(ready)
+        resolved.update(ready)
+        remaining.difference_update(ready)
+    return levels, deps
+
+
+def _node_refs_annotations(node, annotation_names):
+    """Return whether `node` references any annotation alias."""
+    if node is None or not annotation_names:
+        return False
+    if isinstance(node, NothingNode):
+        return False
+    if hasattr(node, "get_refs"):
+        try:
+            return bool(annotation_names.intersection(node.get_refs()))
+        except Exception:
+            return False
+    if isinstance(node, Node):
+        return any(
+            _node_refs_annotations(child, annotation_names) for child in node.children
+        )
+    if isinstance(node, (list, tuple)):
+        return any(_node_refs_annotations(child, annotation_names) for child in node)
+    return False
+
+
+def _node_refs_annotation_exprs(node, annotation_exprs):
+    """Return whether `node` contains any expression in `annotation_exprs`."""
+    if node is None or not annotation_exprs:
+        return False
+    if node in annotation_exprs:
+        return True
+    if isinstance(node, NothingNode):
+        return False
+    if isinstance(node, Node):
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs)
+            for child in node.children
+        )
+    if isinstance(node, (list, tuple)):
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs) for child in node
+        )
+    if hasattr(node, "get_source_expressions"):
+        return any(
+            _node_refs_annotation_exprs(child, annotation_exprs)
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    return False
+
+
+def _where_has_annotation_transform(node, annotation_exprs):
+    """Return whether `node` applies a transform directly on annotations."""
+    from django.db.models.lookups import Transform
+
+    if node is None or not annotation_exprs:
+        return False
+    if isinstance(node, Transform):
+        return any(
+            child in annotation_exprs
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    if isinstance(node, Node):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs)
+            for child in node.children
+        )
+    if isinstance(node, (list, tuple)):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs) for child in node
+        )
+    if hasattr(node, "get_source_expressions"):
+        return any(
+            _where_has_annotation_transform(child, annotation_exprs)
+            for child in node.get_source_expressions()
+            if child is not None
+        )
+    return False
+
+
+def _split_where_by_annotation_refs(node, annotation_names, annotation_exprs=None):
+    """Split where predicates by whether they depend on annotations."""
+    if node is None:
+        return None, None, True
+    if annotation_exprs:
+        if not _node_refs_annotation_exprs(node, annotation_exprs):
+            return None, node, True
+    elif not _node_refs_annotations(node, annotation_names):
+        return None, node, True
+    if isinstance(node, NothingNode):
+        return None, node, True
+    if isinstance(node, WhereNode):
+        # Keep boolean semantics intact by only splitting conjunctions.
+        if node.negated or node.connector in (OR, XOR):
+            return None, node, False
+        annotation_children = []
+        other_children = []
+        for child in node.children:
+            annotation_child, other_child, ok = _split_where_by_annotation_refs(
+                child, annotation_names, annotation_exprs
+            )
+            if not ok:
+                return None, node, False
+            if annotation_child is not None:
+                annotation_children.append(annotation_child)
+            if other_child is not None:
+                other_children.append(other_child)
+        annotation_node = (
+            WhereNode(annotation_children, connector=node.connector)
+            if annotation_children
+            else None
+        )
+        other_node = (
+            WhereNode(other_children, connector=node.connector)
+            if other_children
+            else None
+        )
+        return annotation_node, other_node, True
+    return node, None, True
+
+
+def _auto_cte_annotation_reuse(query, name_generator, collector):
+    """
+    Materialize dependent annotation chains into a CTE to avoid
+    duplication.
+    """
+    if getattr(query, "_auto_cte_annotation_skip", False):
+        return query
+    original_selected = query.selected
+    if original_selected is not None:
+        if any(
+            not isinstance(value, (int, str)) for value in original_selected.values()
+        ):
+            return query
+    original_annotation_select_mask = query.annotation_select_mask
+    if original_annotation_select_mask is not None:
+        original_annotation_select = set(query.annotation_select)
+    if (
+        query.model is None
+        or query.__class__ is not Query
+        or query.combinator
+        or query.subquery
+        or query.group_by is not None
+        or not query.annotations
+    ):
+        return query
+    levels, deps = _annotation_dependency_levels(
+        query.annotations, getattr(query, "_annotation_deps", None)
+    )
+    if not levels:
+        return query
+    if not any(deps.values()):
+        return query
+    refs_in_where = set(getattr(query, "_annotation_filter_refs", ()))
+    referenced = set().union(*deps.values(), refs_in_where)
+    referenced = {name for name in referenced if name in query.annotations}
+    if not referenced:
+        return query
+    last_materialized_index = max(
+        (
+            idx
+            for idx, level in enumerate(levels)
+            if any(name in referenced for name in level)
+        ),
+        default=-1,
+    )
+    if last_materialized_index < 0:
+        return query
+    materialized_names = [
+        name for level in levels[: last_materialized_index + 1] for name in level
+    ]
+    annotation_exprs = {query.annotations[name] for name in materialized_names}
+    annotation_where, base_where, ok = _split_where_by_annotation_refs(
+        query.where, set(query.annotations), annotation_exprs
+    )
+    if not ok:
+        return query
+    base_alias = query.get_initial_alias()
+    source_annotations = getattr(query, "_annotation_unresolved", query.annotations)
+    move_annotation_where = (
+        annotation_where is not None
+        and base_where is None
+        and len(query.alias_map) == 1
+        and all(
+            _annotation_is_simple(source_annotations.get(name, query.annotations[name]))
+            for name in materialized_names
+        )
+        and not _where_has_annotation_transform(query.where, annotation_exprs)
+    )
+    if not move_annotation_where:
+        annotation_where = None
+        base_where = query.where
+    is_sliced = query.is_sliced
+    original_low_mark = query.low_mark
+    original_high_mark = query.high_mark
+    base_query = query.clone()
+    if is_sliced:
+        base_query.clear_limits()
+    base_query.where = base_where or WhereNode()
+    base_query.annotations = {}
+    if base_query.annotation_select_mask is not None:
+        base_query.set_annotation_mask(set())
+    if base_query.selected:
+        base_query.selected = {
+            key: value
+            for key, value in base_query.selected.items()
+            if not isinstance(value, str) or value not in query.annotations
+        }
+    base_query._annotation_select_cache = None
+    base_query.order_by = ()
+    base_query.extra_order_by = ()
+    base_query.default_ordering = False
+    current_query = base_query
+    auto_cte_selected = None
+    if original_selected is not None:
+        auto_cte_selected = dict(original_selected)
+        auto_cte_selected_deferred = set(query.annotations)
+    cte_created = False
+    for idx, level in enumerate(levels):
+        for name in level:
+            annotation_expr = source_annotations.get(name, query.annotations[name])
+            current_query.add_annotation(annotation_expr, name)
+        if idx <= last_materialized_index and not cte_created:
+            cte_query = current_query.clone()
+            cte_query._with_ctes = ()
+            cte_query._auto_cte_annotation_skip = True
+            cte_query._auto_cte_processed = True
+            cte_query.select_related = False
+            if auto_cte_selected is not None:
+                selected_for_cte = dict(base_query.selected or {})
+                for name in materialized_names:
+                    if name not in cte_query.annotations:
+                        annotation_expr = source_annotations.get(
+                            name, query.annotations[name]
+                        )
+                        cte_query.add_annotation(annotation_expr, name)
+                    selected_for_cte[name] = cte_query.annotations[name]
+                cte_query.selected = selected_for_cte
+                cte_query._annotation_select_cache = None
+                cte_query._auto_cte_selected = auto_cte_selected
+                cte_query._auto_cte_selected_deferred = auto_cte_selected_deferred
+            cte = CTE(
+                _queryset_from_query(cte_query, clone_query=False),
+                name=name_generator(),
+            )
+            collector.add(cte)
+            current_query = cte.queryset().query
+            cte_created = True
+    if annotation_where is not None:
+        annotation_where.relabel_aliases(
+            {base_alias: current_query.get_initial_alias()}
+        )
+        replacements = {
+            query.annotations[name]: current_query.annotations[name]
+            for name in materialized_names
+            if name in current_query.annotations
+        }
+        annotation_where = annotation_where.replace_expressions(replacements)
+    current_query.where = annotation_where or WhereNode()
+    current_query.order_by = query.order_by
+    current_query.extra_order_by = query.extra_order_by
+    current_query.default_ordering = query.default_ordering
+    if original_annotation_select_mask is not None:
+        current_query.set_annotation_mask(original_annotation_select)
+    if is_sliced:
+        current_query.low_mark = original_low_mark
+        current_query.high_mark = original_high_mark
+    return current_query
+
+
+def _queryset_from_query(query, *, clone_query=True):
+    """Build a queryset wrapper around `query` for CTE construction."""
+    qs = query.model._default_manager.all()
+    qs.query = query.clone() if clone_query else query
+    return qs
+
+
+def _clone_subquery_expression(expr, cte_name, query):
+    """Clone `expr` and retarget it to read from `cte_name`."""
+    if isinstance(expr, Subquery):
+        clone = expr.copy()
+        clone.query._cte_name = cte_name
+        return clone
+    if isinstance(expr, Query):
+        clone = query.clone()
+        clone._cte_name = cte_name
+        clone.subquery = True
+        return clone
+    return expr
+
+
+def _has_outer_refs(query):
+    """Return `True` if `query` references an outer query context."""
+    try:
+        if query.get_external_cols():
+            return True
+    except Exception:
+        return True
+    for expr in chain(query.annotations.values(), query.where.children):
+        if _contains_outer_ref(expr):
+            return True
+    return False
+
+
+def _contains_outer_ref(expr):
+    """Return `True` if `expr` contains `OuterRef` nodes."""
+    if expr is None:
+        return False
+    if isinstance(expr, (OuterRef, ResolvedOuterRef)):
+        return True
+    if isinstance(expr, Node):
+        return any(_contains_outer_ref(child) for child in expr.children)
+    if hasattr(expr, "get_source_expressions"):
+        return any(
+            _contains_outer_ref(child)
+            for child in expr.get_source_expressions()
+            if child is not None
+        )
+    if isinstance(expr, (list, tuple)):
+        return any(_contains_outer_ref(child) for child in expr)
+    return False
+
+
+def _cte_select_columns(query, compiler):
+    """Return projected column names used by `SELECT * FROM <cte_name>`."""
+
+    def columns_from_expr(expr):
+        """Extract concrete SQL column names represented by `expr`."""
+        if isinstance(expr, Col):
+            return [expr.target.column]
+        if isinstance(expr, ColPairs):
+            return [target.column for target in expr.targets]
+        return []
+
+    if query.selected is not None:
+        columns = []
+        cols = list(query.select)
+        for alias, expression in query.selected.items():
+            if isinstance(expression, int) and 0 <= expression < len(cols):
+                expr_columns = columns_from_expr(cols[expression])
+                # ColPairs expand to multiple SQL columns (e.g. tuple lookups),
+                # so keep all concrete column names instead of the alias.
+                if len(expr_columns) > 1:
+                    columns.extend(expr_columns)
+                else:
+                    columns.append(alias)
+            else:
+                columns.append(alias)
+        return columns
+
+    columns = list(query.extra_select.keys())
+    if query.default_cols and query.model is not None:
+        select_mask = query.get_select_mask()
+        cols = compiler.get_default_columns(select_mask)
+        columns.extend(column.target.column for column in cols)
+    else:
+        columns.extend(
+            column for expr in query.select for column in columns_from_expr(expr)
+        )
+    columns.extend(query.annotation_select.keys())
+    return columns
 
 
 class RawQuery:
@@ -301,6 +1210,7 @@ class Query(BaseExpression):
     deferred_loading = (frozenset(), True)
 
     explain_info = None
+    _with_ctes = ()
 
     def __init__(self, model, alias_cols=True):
         self.model = model
@@ -328,6 +1238,7 @@ class Query(BaseExpression):
         self.extra = {}  # Maps col_alias -> (col_sql, params).
 
         self._filtered_relations = {}
+        self._auto_cte_processed = False
 
     @property
     def output_field(self):
@@ -425,9 +1336,77 @@ class Query(BaseExpression):
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
         obj._filtered_relations = self._filtered_relations.copy()
+        obj._auto_cte_processed = False
         # Clear the cached_property, if it exists.
         obj.__dict__.pop("base_table", None)
         return obj
+
+    def _auto_cte_query(self, name_generator=None, collector=None, clone_query=True):
+        """Return a query with automatic CTE rewrites applied."""
+        if (
+            self._auto_cte_processed
+            and collector is None
+            and getattr(self, "_with_ctes", ())
+        ):
+            # Root queries may already carry the final CTE list; avoid
+            # regenerating names and rewriting expressions a second time.
+            return self
+        clone = self.clone() if clone_query else self
+        explain_info = getattr(clone, "explain_info", None)
+        clone._auto_cte_processed = True
+
+        if collector is None:
+            collector = _CTECollector()
+            is_root = True
+        else:
+            is_root = False
+
+        collector.add_many(getattr(clone, "_with_ctes", ()))
+        if name_generator is None:
+            name_generator = _CTENameGenerator(clone, collector)
+
+        if clone.combined_queries:
+            combined_queries = []
+            for combined_query in clone.combined_queries:
+                combined_query._auto_cte_annotation_skip = True
+                combined_processed = combined_query._auto_cte_query(
+                    name_generator=name_generator, collector=collector
+                )
+                combined_processed._with_ctes = ()
+                combined_queries.append(combined_processed)
+            clone.combined_queries = tuple(combined_queries)
+
+        clone = _auto_cte_correlated_aggregate_rewrite(clone, name_generator, collector)
+        clone = _auto_cte_annotation_reuse(clone, name_generator, collector)
+        if explain_info is not None:
+            clone.explain_info = explain_info
+
+        transformer = _CTEAutoTransformer(clone, name_generator, collector)
+        for annotation in clone.annotations.values():
+            transformer.inspect_expression(annotation, allow_query=True)
+        transformer.inspect_node(clone.where, allow_query=True)
+
+        if transformer.replacements:
+            clone.annotations = {
+                key: value.replace_expressions(transformer.replacements)
+                for key, value in clone.annotations.items()
+            }
+            clone.where = clone.where.replace_expressions(transformer.replacements)
+            clone.select = tuple(
+                expr.replace_expressions(transformer.replacements)
+                for expr in clone.select
+            )
+            if isinstance(clone.group_by, tuple):
+                clone.group_by = tuple(
+                    expr.replace_expressions(transformer.replacements)
+                    for expr in clone.group_by
+                )
+
+        if is_root:
+            clone._with_ctes = tuple(collector.ctes)
+        else:
+            clone._with_ctes = ()
+        return clone
 
     def chain(self, klass=None):
         """
@@ -1239,6 +2218,19 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
+        if not hasattr(self, "_annotation_unresolved"):
+            self._annotation_unresolved = {}
+        if hasattr(annotation, "copy"):
+            self._annotation_unresolved[alias] = annotation.copy()
+        else:
+            self._annotation_unresolved[alias] = annotation
+        deps = _annotation_refs_in_expression(annotation, set(self.annotations))
+        if deps:
+            if not hasattr(self, "_annotation_deps"):
+                self._annotation_deps = {}
+            self._annotation_deps[alias] = deps
+        elif hasattr(self, "_annotation_deps") and alias in self._annotation_deps:
+            self._annotation_deps.pop(alias, None)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
@@ -1304,7 +2296,25 @@ class Query(BaseExpression):
             return [wrapper or self]
         return external_cols
 
+    def replace_expressions(self, replacements):
+        """Replace this query when present in `replacements`."""
+        if not replacements:
+            return self
+        return replacements.get(self, self)
+
     def as_sql(self, compiler, connection):
+        if not getattr(self, "_ignore_cte_name", False) and (
+            cte_name := getattr(self, "_cte_name", None)
+        ):
+            qn = compiler.quote_name_unless_alias
+            columns = _cte_select_columns(self, compiler)
+            select_list = (
+                ", ".join(qn(column) for column in columns) if columns else "*"
+            )
+            sql = "SELECT %s FROM %s" % (select_list, qn(cte_name))
+            if self.subquery:
+                sql = "(%s)" % sql
+            return sql, ()
         # Some backends (e.g. Oracle) raise an error when a subquery contains
         # unnecessary ORDER BY clause.
         if (
@@ -1350,6 +2360,9 @@ class Query(BaseExpression):
                 lookup_splitted, self.annotations
             )
             if annotation:
+                if not hasattr(self, "_annotation_filter_refs"):
+                    self._annotation_filter_refs = set()
+                self._annotation_filter_refs.add(annotation)
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
