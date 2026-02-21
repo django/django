@@ -30,6 +30,8 @@ from .converters import get_converters
 from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
+_brackets_re = _lazy_re_compile(r"[<>]")
+
 
 class ResolverMatch:
     def __init__(
@@ -365,7 +367,7 @@ class RoutePattern(CheckURLMixin):
     def _check_pattern_unmatched_angle_brackets(self):
         warnings = []
         msg = "Your URL pattern %s has an unmatched '%s' bracket."
-        brackets = re.findall(r"[<>]", str(self._route))
+        brackets = _brackets_re.findall(str(self._route))
         open_bracket_counter = 0
         for bracket in brackets:
             if bracket == "<":
