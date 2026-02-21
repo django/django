@@ -76,29 +76,6 @@ class SimpleStorage(ManifestStaticFilesStorage):
         return "deploy12345"
 
 
-class ExtraPatternsStorage(ManifestStaticFilesStorage):
-    """
-    A storage class to test pattern substitutions with more than one pattern
-    entry. The added pattern rewrites strings like "url(...)" to JS_URL("...").
-    """
-
-    patterns = tuple(ManifestStaticFilesStorage.patterns) + (
-        (
-            "*.js",
-            (
-                (
-                    r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
-                    'JS_URL("%(url)s")',
-                ),
-            ),
-        ),
-    )
-
-
 class NoneHashStorage(ManifestStaticFilesStorage):
     def file_hash(self, name, content=None):
         return None
-
-
-class NoPostProcessReplacedPathStorage(ManifestStaticFilesStorage):
-    max_post_process_passes = 0
