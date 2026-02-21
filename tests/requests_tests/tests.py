@@ -482,6 +482,35 @@ class RequestsTests(SimpleTestCase):
                 )
                 self.assertEqual(request.POST, {"name": ["value"]})
 
+    def test_multipart_rfc2231_invalid_encoding(self):
+        """
+        Invalid RFC 2231 encoding name in Content-Disposition should not
+        crash the multipart parser (#36931).
+        """
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="file"; '
+                    "filename*=BOGUS''test%20file.txt",
+                    "Content-Type: application/octet-stream",
+                    "",
+                    "file content",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST, {})
+        self.assertEqual(request.FILES, {})
+
     def test_body_after_POST_multipart_related(self):
         """
         Reading body after parsing multipart that isn't form-data is allowed

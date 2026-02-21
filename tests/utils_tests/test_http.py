@@ -521,6 +521,15 @@ class ParseHeaderParameterTests(unittest.TestCase):
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
+    def test_rfc2231_invalid_encoding(self):
+        """
+        Invalid RFC 2231 encoding name should raise ValueError (#36931).
+        """
+        with self.assertRaises(ValueError):
+            parse_header_parameters(
+                "Content-Disposition: attachment; " "filename*=BOGUS''test%20file.txt"
+            )
+
     def test_header_max_length(self):
         base_header = "Content-Type: application/x-stuff; title*="
         base_header_len = len(base_header)
