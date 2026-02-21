@@ -301,6 +301,29 @@ class CustomChoicesTests(SimpleTestCase):
             with self.subTest(choice_enum.__name__):
                 self.assertNotIn(None, choice_enum.labels)
 
+    def test_str_valid(self):
+        enum_members_expected_str = [
+            (member, str(member.value))
+            for enum in (
+                Separator,
+                Constants,
+                Set,
+                MoonLandings,
+                DateAndTime,
+                MealTimes,
+                Frequency,
+                Number,
+                # IPv4Address,
+                # IPv6Address,
+                # IPv4Network,
+                # IPv6Network,
+            )
+            for member in enum.__members__.values()
+        ]
+        for member, expected_str in enum_members_expected_str:
+            with self.subTest(f"{member.__class__.__name__}{member.name}"):
+                self.assertEqual(str(member), expected_str)
+
     def test_bool_unsupported(self):
         msg = "type 'bool' is not an acceptable base type"
         with self.assertRaisesMessage(TypeError, msg):
