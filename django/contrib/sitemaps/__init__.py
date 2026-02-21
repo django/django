@@ -4,6 +4,8 @@ from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import translation
 
+from functools import cached_property
+
 
 class Sitemap:
     # This limit is defined by Google. See the index documentation at
@@ -26,6 +28,10 @@ class Sitemap:
     # Add an alternate/hreflang link with value 'x-default'.
     x_default = False
 
+    def __init__(self):
+        # Cached items
+        self._cached_items = None
+
     def _get(self, name, item, default=None):
         try:
             attr = getattr(self, name)
@@ -41,8 +47,9 @@ class Sitemap:
 
     def get_languages_for_item(self, item):
         """Languages for which this item is displayed."""
-        return self._languages()
+        return self._languages
 
+    @cached_property
     def _languages(self):
         if self.languages is not None:
             return self.languages
@@ -50,15 +57,16 @@ class Sitemap:
 
     def _items(self):
         if self.i18n:
-            # Create (item, lang_code) tuples for all items and languages.
-            # This is necessary to paginate with all languages already
-            # considered.
-            items = [
-                (item, lang_code)
-                for item in self.items()
-                for lang_code in self.get_languages_for_item(item)
-            ]
-            return items
+            cached_items = self.items()
+
+            result = []
+            for item in cached_items:
+                item_languages = self.get_languages_for_item(item)
+                for lang_code in item_languages:
+                    result.append((item, lang_code))
+
+            return result
+
         return self.items()
 
     def _location(self, item, force_lang_code=None):
@@ -75,7 +83,10 @@ class Sitemap:
         return paginator.Paginator(self._items(), self.limit)
 
     def items(self):
-        return []
+        """Return items with caching"""
+        if self._cached_items is None:
+            self._cached_items = [] # Actual items
+        return self._cached_items
 
     def location(self, item):
         return item.get_absolute_url()
