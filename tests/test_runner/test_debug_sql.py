@@ -1,4 +1,5 @@
 import logging
+import os
 import unittest
 from io import StringIO
 from time import time
@@ -183,6 +184,7 @@ class QueryFormatterTests(unittest.TestCase):
 @unittest.skipUnless(
     connection.vendor == "sqlite", "Only run on sqlite so we can check output SQL."
 )
+@mock.patch.dict(os.environ, {"FORCE_COLOR": ""})
 class TestDebugSQL(unittest.TestCase):
     class PassingTest(TestCase):
         def runTest(self):

@@ -698,7 +698,8 @@ class LoaderTests(TestCase):
             test_settings.write(f"INSTALLED_APPS += {INSTALLED_APPS}\n")
 
         test_environ = os.environ.copy()
-        test_environ["PYTHONPATH"] = str(tests_dir)
+        if sys.platform == "win32":
+            test_environ["PYTHONPATH"] = str(tests_dir)
         # Ensure deterministic failures.
         test_environ["PYTHONHASHSEED"] = "1"
 
