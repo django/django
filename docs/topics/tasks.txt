@@ -4,6 +4,10 @@ Django's Tasks framework
 
 .. versionadded:: 6.0
 
+    Django 6.0 introduced the Tasks framework. Users of older Django versions
+    can make use of the functionality using the
+    `django-tasks <https://pypi.org/project/django-tasks/>`__ backport.
+
 For a web application, there's often more than just turning HTTP requests into
 HTTP responses. For some functionality, it may be beneficial to run code
 outside the request-response cycle.
