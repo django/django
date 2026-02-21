@@ -77,7 +77,7 @@ def send_mail(
     from_email,
     recipient_list,
     *,
-    fail_silently=False,
+    fail_silently=None,
     auth_user=None,
     auth_password=None,
     connection=None,
@@ -94,6 +94,19 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
+    if connection is not None:
+        if fail_silently is not None:
+            raise TypeError(
+                "fail_silently cannot be used with a connection. "
+                "Pass fail_silently to get_connection() instead."
+            )
+        if auth_user is not None or auth_password is not None:
+            raise TypeError(
+                "auth_user and auth_password cannot be used with a connection. "
+                "Pass auth_user and auth_password to get_connection() instead."
+            )
+    if fail_silently is None:
+        fail_silently = False
     connection = connection or get_connection(
         username=auth_user,
         password=auth_password,
@@ -120,7 +133,7 @@ def send_mail(
 def send_mass_mail(
     datatuple,
     *,
-    fail_silently=False,
+    fail_silently=None,
     auth_user=None,
     auth_password=None,
     connection=None,
@@ -137,6 +150,19 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
+    if connection is not None:
+        if fail_silently is not None:
+            raise TypeError(
+                "fail_silently cannot be used with a connection. "
+                "Pass fail_silently to get_connection() instead."
+            )
+        if auth_user is not None or auth_password is not None:
+            raise TypeError(
+                "auth_user and auth_password cannot be used with a connection. "
+                "Pass auth_user and auth_password to get_connection() instead."
+            )
+    if fail_silently is None:
+        fail_silently = False
     connection = connection or get_connection(
         username=auth_user,
         password=auth_password,
@@ -155,9 +181,14 @@ def _send_server_message(
     subject,
     message,
     html_message=None,
-    fail_silently=False,
+    fail_silently=None,
     connection=None,
 ):
+    if connection is not None and fail_silently is not None:
+        raise TypeError(
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
     recipients = getattr(settings, setting_name)
     if not recipients:
         return
@@ -195,7 +226,7 @@ def _send_server_message(
     RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_admins(
-    subject, message, *, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=None, connection=None, html_message=None
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     _send_server_message(
@@ -212,7 +243,7 @@ def mail_admins(
     RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_managers(
-    subject, message, *, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=None, connection=None, html_message=None
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     _send_server_message(
