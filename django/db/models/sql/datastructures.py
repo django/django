@@ -82,7 +82,7 @@ class Join:
         """
         join_conditions = []
         params = []
-        qn = compiler.quote_name_unless_alias
+        qn = compiler.quote_name
         # Add a join condition for each pair of joining columns.
         for lhs, rhs in self.join_fields:
             lhs, rhs = connection.ops.prepare_join_on_clause(
@@ -120,7 +120,9 @@ class Join:
             )
         on_clause_sql = " AND ".join(join_conditions)
         alias_str = (
-            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+            ""
+            if self.table_alias == self.table_name
+            else (" %s" % qn(self.table_alias))
         )
         sql = "%s %s%s ON (%s)" % (
             self.join_type,
@@ -193,10 +195,13 @@ class BaseTable:
         self.table_alias = alias
 
     def as_sql(self, compiler, connection):
+        qn = compiler.quote_name
         alias_str = (
-            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+            ""
+            if self.table_alias == self.table_name
+            else (" %s" % qn(self.table_alias))
         )
-        base_sql = compiler.quote_name_unless_alias(self.table_name)
+        base_sql = qn(self.table_name)
         return base_sql + alias_str, []
 
     def relabeled_clone(self, change_map):
