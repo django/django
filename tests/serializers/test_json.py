@@ -2,6 +2,7 @@ import datetime
 import decimal
 import json
 import re
+from unittest import mock
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
@@ -11,8 +12,8 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
-from .tests import SerializersTestBase, SerializersTransactionTestBase
+from .models import Article, Author, CategoryMetaData, Score
+from .tests import SerializersTestBase, SerializersTransactionTestBase, register_tests
 
 
 class JsonSerializerTestCase(SerializersTestBase, TestCase):
@@ -329,3 +330,35 @@ class DjangoJSONEncoderTests(SimpleTestCase):
             json.dumps({"duration": duration}, cls=DjangoJSONEncoder),
             '{"duration": "P0DT00H00M00S"}',
         )
+
+
+class SerializerDeterminismTests(TestCase):
+    """
+    M2M relations with natural keys are serialized in a deterministic
+    order (by PK) when the model does not have a total ordering.
+    """
+
+
+def test_deterministic_m2m_natural_key_ordering(self, format_):
+    jane = Author.objects.create(name="Jane")
+    article = Article.objects.create(
+        author=jane,
+        headline="Deterministic M2M Ordering",
+        pub_date=datetime.datetime(2006, 6, 16, 11, 00),
+    )
+    m1 = CategoryMetaData.objects.create(kind="Alpha_Kind")
+    m2 = CategoryMetaData.objects.create(kind="Bravo_Kind")
+    article.meta_data.add(m2, m1)
+
+    with mock.patch.object(
+        models.QuerySet, "order_by", side_effect=models.QuerySet.order_by, autospec=True
+    ) as mock_order_by:
+        serializers.serialize(format_, [article], use_natural_foreign_keys=True)
+        mock_order_by.assert_any_call(mock.ANY, "pk")
+
+
+register_tests(
+    SerializerDeterminismTests,
+    "test_deterministic_m2m_natural_key_ordering_%s",
+    test_deterministic_m2m_natural_key_ordering,
+)

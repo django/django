@@ -395,7 +395,7 @@ class SerializersTestBase:
         Mapping such as fields should be deterministically ordered. (#24558)
         """
         output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
-        categories = self.a1.categories.values_list("pk", flat=True)
+        categories = self.a1.categories.order_by("pk").values_list("pk", flat=True)
         self.assertEqual(
             output,
             self.mapping_ordering_str
