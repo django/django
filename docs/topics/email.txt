@@ -25,6 +25,7 @@ plain text message::
         "Here is the message.",
         "from@example.com",
         ["to@example.com"],
+        fail_silently=False,
     )
 
 When additional email sending functionality is needed, use
@@ -398,8 +399,9 @@ email backend API :ref:`provides an alternative
         Sends the message. If a connection was specified when the email was
         constructed, that connection will be used. Otherwise, an instance of
         the default backend will be instantiated and used. If the keyword
-        argument ``fail_silently`` is ``True``, exceptions raised while sending
-        the message will be quashed. An empty list of recipients will not raise
+        argument ``fail_silently`` is ``True``, some exceptions raised while sending
+        the message may be silently ignored. The exact exceptions depend on the email
+        backend used. An empty list of recipients will not raise
         an exception. It will return ``1`` if the message was sent
         successfully, otherwise ``0``.
 
@@ -470,26 +472,17 @@ email backend API :ref:`provides an alternative
           directly to the resulting message. For example, to attach an inline
           image with a :mailheader:`Content-ID`::
 
-              import email.utils
-              from email.message import MIMEPart
-              from django.core.mail import EmailMultiAlternatives
-
-              message = EmailMultiAlternatives(...)
-              image_data_bytes = ...  # Load image as bytes
-
-              # Create a random Content-ID, including angle brackets
               cid = email.utils.make_msgid()
               inline_image = email.message.MIMEPart()
               inline_image.set_content(
                   image_data_bytes,
                   maintype="image",
-                  subtype="png",  # or "jpeg", etc. depending on the image type
+                  subtype="png",
                   disposition="inline",
-                  cid=cid,
+                  cid=f"<{cid}>",
               )
               message.attach(inline_image)
-              # Refer to Content-ID in HTML without angle brackets
-              message.attach_alternative(f'… <img src="cid:{cid[1:-1]}"> …', "text/html")
+              message.attach_alternative(f'… <img src="cid:${cid}"> …', "text/html")
 
           Python's :meth:`email.contentmanager.set_content` documentation
           describes the supported arguments for ``MIMEPart.set_content()``.
@@ -667,9 +660,9 @@ By default, a call to ``get_connection()`` will return an instance of the
 email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
 ``backend`` argument, an instance of that backend will be instantiated.
 
-The keyword-only ``fail_silently`` argument controls how the backend should
-handle errors. If ``fail_silently`` is True, exceptions during the email
-sending process will be silently ignored.
+get_connection(): The keyword-only ``fail_silently`` argument controls how the backend should
+handle errors. If ``fail_silently`` is True, some exceptions during the email sending process
+may be silently ignored. The exact exceptions depend on the email backend used.
 
 All other keyword arguments are passed directly to the constructor of the
 email backend.
