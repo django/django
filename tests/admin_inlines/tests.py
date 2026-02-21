@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext
 
 from .admin import InnerInline
@@ -883,7 +884,12 @@ class TestInlineAdminForm(TestCase):
         john = Parent.objects.create(name="John")
         joe = Child.objects.create(name="Joe", teacher=sally, parent=john)
 
-        iaf = InlineAdminForm(None, None, {}, {}, joe)
+        msg = (
+            "Passing model_admin=None to AdminForm is deprecated. "
+            "Provide a ModelAdmin instance instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            iaf = InlineAdminForm(None, None, {}, {}, joe)
         parent_ct = ContentType.objects.get_for_model(Parent)
         self.assertEqual(iaf.original.content_type, parent_ct)
 
