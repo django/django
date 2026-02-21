@@ -589,6 +589,10 @@ ul.timelist, .timelist li {
     margin-bottom: 5px;
 }
 
+.related-widget-wrapper:has(select:not([multiple])) {
+    align-items: center;
+}
+
 .related-widget-wrapper-link {
     opacity: .6;
     filter: grayscale(1);
