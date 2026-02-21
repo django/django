@@ -95,7 +95,7 @@
 .selector ul.selector-chooser {
     align-self: center;
     width: 30px;
-    background-color: var(--selected-bg);
+    background-color: var(--darkened-bg);
     border-radius: 10px;
     margin: 0;
     padding: 0;
@@ -225,7 +225,6 @@
     height: 30px;
     width: 64px;
     margin: 0 0 10px 40%;
-    background-color: #eee;
     border-radius: 10px;
     transform: none;
 }
