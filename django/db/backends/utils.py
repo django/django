@@ -35,8 +35,7 @@ class CursorWrapper:
             return cursor_attr
 
     def __iter__(self):
-        with self.db.wrap_database_errors:
-            yield from self.cursor
+        yield from self.cursor
 
     def __enter__(self):
         return self
@@ -92,17 +91,25 @@ class CursorWrapper:
         return executor(sql, params, many, context)
 
     def _execute(self, sql, params, *ignored_wrapper_args):
-        # Raise a warning during app initialization (stored_app_configs is only
-        # ever set during testing).
         if not apps.ready and not apps.stored_app_configs:
             warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+
         self.db.validate_no_broken_transaction()
+
         with self.db.wrap_database_errors:
+            start_time = time.time()
+
             if params is None:
-                # params default might be backend specific.
-                return self.cursor.execute(sql)
+                result = self.cursor.execute(sql)
             else:
-                return self.cursor.execute(sql, params)
+                result = self.cursor.execute(sql, params)
+
+            duration = time.time() - start_time
+
+            if duration > 0.5:
+                print(f"[SLOW QUERY] Took {duration:.2f}s: {sql}")
+
+            return result
 
     def _executemany(self, sql, param_list, *ignored_wrapper_args):
         # Raise a warning during app initialization (stored_app_configs is only
