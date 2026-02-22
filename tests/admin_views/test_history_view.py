@@ -21,10 +21,10 @@ class AdminHistoryViewTests(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def test_changed_message_uses_form_labels(self):
+    def test_changed_message_uses_verbose_names(self):
         """
-        Admin's model history change messages use form labels instead of
-        field names.
+        Admin's model history change messages use model field verbose_name
+        for correct translation (#36884).
         """
         state = State.objects.create(name="My State Name")
         city = City.objects.create(name="My City Name", state=state)
@@ -44,8 +44,8 @@ class AdminHistoryViewTests(TestCase):
         )
         self.assertEqual(
             logentry.get_change_message(),
-            "Changed State name (from form’s Meta.labels), "
-            "nolabel_form_field and not_a_form_field. "
+            "Changed State verbose_name, "
+            "Nolabel_form_field and Not_a_form_field. "
             "Changed City verbose_name for city “%s”." % city,
         )
 

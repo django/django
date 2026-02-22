@@ -458,6 +458,16 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+Bugfixes
+========
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* Fixed translation of field names in admin log change messages by storing
+  the original ``verbose_name`` instead of the capitalized form label
+  (:ticket:`36884`).
+
 Features removed in 6.1
 =======================
 
