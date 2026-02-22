@@ -757,6 +757,23 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
+
+.. note::
+
+   When using :meth:`values()` together with :meth:`annotate()`, if an
+   annotation uses the same name as an existing model field, the annotation
+   will override the field's value in the resulting dictionaries.
+
+   For example::
+
+    >>> from django.db.models import Count
+       >>> Blog.objects.values("name").annotate(name=Count("entry"))
+       <QuerySet [{'name': 5}, ...]>   
+
+   In this case, the annotated ``name`` replaces the original ``name`` field
+   in the returned result. To avoid ambiguity and unexpected results, use
+   distinct names for annotations whenever possible.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -802,6 +819,17 @@ of a small performance penalty for transforming the results into a named tuple.
 
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
+
+
+.. note::
+
+   Similar to :meth:`values()`, when combining :meth:`values_list()` with
+   :meth:`annotate()`, annotation names that conflict with existing field
+   names will override the original field values in the returned tuples.
+
+   To keep results predictable and readable, it is recommended to use
+   unique names for annotations.
+
 
 A common need is to get a specific field value of a certain model instance. To
 achieve that, use ``values_list()`` followed by a ``get()`` call:
