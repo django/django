@@ -347,11 +347,11 @@ class ModelChoiceFieldTests(TestCase):
             field.widget.render("name", []),
             (
                 "<div>"
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="entertainment">Entertainment</label></div>'
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="test">A test</label></div>'
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="third-test">Third</label></div>'
                 "</div>"
             )
@@ -393,17 +393,16 @@ class ModelChoiceFieldTests(TestCase):
             field.widget.render("name", []),
             """
             <div><div>
-            <label><input type="checkbox" name="name" value="%d"
+            <label><input type="checkbox" name="name" value="%s"
                 data-slug="entertainment">Entertainment
             </label></div>
             <div><label>
-            <input type="checkbox" name="name" value="%d" data-slug="test">A test
+            <input type="checkbox" name="name" value="%s" data-slug="test">A test
             </label></div>
             <div><label>
-            <input type="checkbox" name="name" value="%d" data-slug="third-test">Third
+            <input type="checkbox" name="name" value="%s" data-slug="third-test">Third
             </label></div></div>
-            """
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+            """ % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_choice_value_hash(self):

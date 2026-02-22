@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from functools import lru_cache
-from itertools import chain
 
 from django.conf import settings
 from django.db import NotSupportedError
@@ -9,7 +8,6 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
 from django.db.models import (
     AutoField,
-    CompositePrimaryKey,
     Exists,
     ExpressionWrapper,
     Lookup,
@@ -352,7 +350,11 @@ END;
                 statement = statement.replace(
                     key, force_str(params[key], errors="replace")
                 )
-        return statement
+        return (
+            super().last_executed_query(cursor, sql, params)
+            if statement is None
+            else statement
+        )
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
@@ -703,18 +705,6 @@ END;
             )
         return super().subtract_temporals(internal_type, lhs, rhs)
 
-    def bulk_batch_size(self, fields, objs):
-        """Oracle restricts the number of parameters in a query."""
-        fields = list(
-            chain.from_iterable(
-                field.fields if isinstance(field, CompositePrimaryKey) else [field]
-                for field in fields
-            )
-        )
-        if fields:
-            return self.connection.features.max_query_params // len(fields)
-        return len(objs)
-
     def conditional_expression_supported_in_where_clause(self, expression):
         """
         Oracle supports only EXISTS(...) or filters in the WHERE clause, others
@@ -729,3 +719,8 @@ END;
         if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False
+
+    def format_json_path_numeric_index(self, num):
+        if num < 0:
+            return "[last-%s]" % abs(num + 1)  # Indexing is zero-based.
+        return super().format_json_path_numeric_index(num)

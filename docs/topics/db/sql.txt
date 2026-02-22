@@ -121,15 +121,14 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances:
 
 .. code-block:: pycon
 
-    >>> Person.objects.raw(
-    ...     """
+    >>> Person.objects.raw("""
     ...     SELECT first AS first_name,
     ...            last AS last_name,
     ...            bd AS birth_date,
     ...            pk AS id,
     ...     FROM some_other_table
-    ...     """
-    ... )
+    ...     """)
+    ...
 
 As long as the names match, the model instances will be created correctly.
 

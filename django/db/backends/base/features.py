@@ -373,6 +373,8 @@ class BaseDatabaseFeatures:
     supports_stored_generated_columns = False
     # Does the backend support virtual generated columns?
     supports_virtual_generated_columns = False
+    # Does the backend support altering data types of generated columns?
+    supports_alter_generated_column_data_type = True
 
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
@@ -383,6 +385,9 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does the backend support numeric columns with no precision?
+    supports_no_precision_decimalfield = False
+
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
 
@@ -390,8 +395,13 @@ class BaseDatabaseFeatures:
     # subqueries?
     supports_tuple_comparison_against_subquery = True
 
-    # Does the backend support DEFAULT as delete option?
+    # Does the backend support CASCADE, DEFAULT, NULL as delete options?
+    supports_on_delete_db_cascade = True
     supports_on_delete_db_default = True
+    supports_on_delete_db_null = True
+
+    # Does the backend support the inspectdb management command?
+    supports_inspectdb = True
 
     # Collation names for use by the Django test suite.
     test_collations = {
@@ -410,12 +420,20 @@ class BaseDatabaseFeatures:
     # Does the Round() database function round to even?
     rounds_to_even = False
 
+    # Should dollar signs be prohibited in column aliases to prevent SQL
+    # injection?
+    prohibits_dollar_signs_in_column_aliases = False
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
+
+    supports_uuid4_function = False
+    supports_uuid7_function = False
+    supports_uuid7_function_shift = False
 
     def __init__(self, connection):
         self.connection = connection

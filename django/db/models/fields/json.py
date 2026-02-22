@@ -12,6 +12,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
+from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.translation import gettext_lazy as _
 
@@ -150,6 +151,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         )
 
 
+@deconstructible(path="django.db.models.JSONNull")
 class JSONNull(expressions.Value):
     """Represent JSON `null` primitive."""
 
@@ -373,6 +375,113 @@ class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
     pass
 
 
+class ProcessJSONLHSMixin:
+    def _get_json_path(self, connection, key_transforms):
+        if key_transforms is None:
+            return "$"
+        return connection.ops.compile_json_path(key_transforms)
+
+    def _process_as_oracle(self, sql, params, connection, key_transforms=None):
+        json_path = self._get_json_path(connection, key_transforms)
+        if connection.features.supports_primitives_in_json_field:
+            template = (
+                "COALESCE("
+                "JSON_VALUE(%s, q'\uffff%s\uffff'),"
+                "JSON_QUERY(%s, q'\uffff%s\uffff' DISALLOW SCALARS)"
+                ")"
+            )
+        else:
+            template = (
+                "COALESCE("
+                "JSON_QUERY(%s, q'\uffff%s\uffff'),"
+                "JSON_VALUE(%s, q'\uffff%s\uffff')"
+                ")"
+            )
+        # Add paths directly into SQL because path expressions cannot be passed
+        # as bind variables on Oracle. Use a custom delimiter to prevent the
+        # JSON path from escaping the SQL literal. Each key in the JSON path is
+        # passed through json.dumps() with ensure_ascii=True (the default),
+        # which converts the delimiter into the escaped \uffff format. This
+        # ensures that the delimiter is not present in the JSON path.
+        sql = template % ((sql, json_path) * 2)
+        return sql, params * 2
+
+    def _process_as_sqlite(self, sql, params, connection, key_transforms=None):
+        json_path = self._get_json_path(connection, key_transforms)
+        datatype_values = ",".join(
+            [repr(value) for value in connection.ops.jsonfield_datatype_values]
+        )
+        return (
+            "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
+            "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
+        ) % (sql, datatype_values, sql, sql), (*params, json_path) * 3
+
+    def _process_as_mysql(self, sql, params, connection, key_transforms=None):
+        json_path = self._get_json_path(connection, key_transforms)
+        return "JSON_EXTRACT(%s, %%s)" % sql, (*params, json_path)
+
+
+class JSONIn(ProcessJSONLHSMixin, lookups.In):
+    def resolve_expression_parameter(self, compiler, connection, sql, param):
+        sql, params = super().resolve_expression_parameter(
+            compiler,
+            connection,
+            sql,
+            param,
+        )
+        if not connection.features.has_native_json_field and (
+            not hasattr(param, "as_sql") or isinstance(param, expressions.Value)
+        ):
+            if connection.vendor == "oracle":
+                value = param.value if hasattr(param, "value") else json.loads(param)
+                sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
+                if isinstance(value, (list, dict)):
+                    sql %= "JSON_QUERY"
+                else:
+                    sql %= "JSON_VALUE"
+            elif connection.vendor == "mysql" or (
+                connection.vendor == "sqlite"
+                and params[0] not in connection.ops.jsonfield_datatype_values
+            ):
+                sql = "JSON_EXTRACT(%s, '$')"
+        if connection.vendor == "mysql" and connection.mysql_is_mariadb:
+            sql = "JSON_UNQUOTE(%s)" % sql
+        return sql, params
+
+    def process_lhs(self, compiler, connection):
+        sql, params = super().process_lhs(compiler, connection)
+        if isinstance(self.lhs, KeyTransform):
+            return sql, params
+        if connection.vendor == "mysql":
+            return self._process_as_mysql(sql, params, connection)
+        elif connection.vendor == "oracle":
+            return self._process_as_oracle(sql, params, connection)
+        elif connection.vendor == "sqlite":
+            return self._process_as_sqlite(sql, params, connection)
+        return sql, params
+
+    def as_oracle(self, compiler, connection):
+        if (
+            connection.features.supports_primitives_in_json_field
+            and isinstance(self.rhs, expressions.ExpressionList)
+            and JSONNull() in self.rhs.get_source_expressions()
+        ):
+            # Break the lookup into multiple exact lookups combined with OR, as
+            # Oracle does not support directly extracting JSON scalar null as a
+            # value in the right-hand side of an IN clause.
+            exact_lookup = self.lhs.get_lookup("exact")
+            sql_parts = []
+            all_params = ()
+            for expr in self.rhs.get_source_expressions():
+                lookup = exact_lookup(self.lhs, expr)
+                sql, params = lookup.as_oracle(compiler, connection)
+                sql_parts.append(f"({sql})")
+                all_params = (*all_params, *params)
+            sql = " OR ".join(sql_parts)
+            return sql, all_params
+        return self.as_sql(compiler, connection)
+
+
 JSONField.register_lookup(DataContains)
 JSONField.register_lookup(ContainedBy)
 JSONField.register_lookup(HasKey)
@@ -380,9 +489,10 @@ JSONField.register_lookup(HasKeys)
 JSONField.register_lookup(HasAnyKeys)
 JSONField.register_lookup(JSONExact)
 JSONField.register_lookup(JSONIContains)
+JSONField.register_lookup(JSONIn)
 
 
-class KeyTransform(Transform):
+class KeyTransform(ProcessJSONLHSMixin, Transform):
     postgres_operator = "->"
     postgres_nested_operator = "#>"
 
@@ -404,33 +514,11 @@ class KeyTransform(Transform):
 
     def as_mysql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = connection.ops.compile_json_path(key_transforms)
-        return "JSON_EXTRACT(%s, %%s)" % lhs, (*params, json_path)
+        return self._process_as_mysql(lhs, params, connection, key_transforms)
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = connection.ops.compile_json_path(key_transforms)
-        if connection.features.supports_primitives_in_json_field:
-            sql = (
-                "COALESCE("
-                "JSON_VALUE(%s, q'\uffff%s\uffff'),"
-                "JSON_QUERY(%s, q'\uffff%s\uffff' DISALLOW SCALARS)"
-                ")"
-            )
-        else:
-            sql = (
-                "COALESCE("
-                "JSON_QUERY(%s, q'\uffff%s\uffff'),"
-                "JSON_VALUE(%s, q'\uffff%s\uffff')"
-                ")"
-            )
-        # Add paths directly into SQL because path expressions cannot be passed
-        # as bind variables on Oracle. Use a custom delimiter to prevent the
-        # JSON path from escaping the SQL literal. Each key in the JSON path is
-        # passed through json.dumps() with ensure_ascii=True (the default),
-        # which converts the delimiter into the escaped \uffff format. This
-        # ensures that the delimiter is not present in the JSON path.
-        return sql % ((lhs, json_path) * 2), tuple(params) * 2
+        return self._process_as_oracle(lhs, params, connection, key_transforms)
 
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
@@ -445,14 +533,7 @@ class KeyTransform(Transform):
 
     def as_sqlite(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = connection.ops.compile_json_path(key_transforms)
-        datatype_values = ",".join(
-            [repr(datatype) for datatype in connection.ops.jsonfield_datatype_values]
-        )
-        return (
-            "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
-            "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
-        ) % (lhs, datatype_values, lhs, lhs), (*params, json_path) * 3
+        return self._process_as_sqlite(lhs, params, connection, key_transforms)
 
 
 class KeyTextTransform(KeyTransform):
@@ -533,33 +614,8 @@ class KeyTransformIsNull(lookups.IsNull):
         )
 
 
-class KeyTransformIn(lookups.In):
-    def resolve_expression_parameter(self, compiler, connection, sql, param):
-        sql, params = super().resolve_expression_parameter(
-            compiler,
-            connection,
-            sql,
-            param,
-        )
-        if (
-            not hasattr(param, "as_sql")
-            and not connection.features.has_native_json_field
-        ):
-            if connection.vendor == "oracle":
-                value = json.loads(param)
-                sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
-                if isinstance(value, (list, dict)):
-                    sql %= "JSON_QUERY"
-                else:
-                    sql %= "JSON_VALUE"
-            elif connection.vendor == "mysql" or (
-                connection.vendor == "sqlite"
-                and params[0] not in connection.ops.jsonfield_datatype_values
-            ):
-                sql = "JSON_EXTRACT(%s, '$')"
-        if connection.vendor == "mysql" and connection.mysql_is_mariadb:
-            sql = "JSON_UNQUOTE(%s)" % sql
-        return sql, params
+class KeyTransformIn(JSONIn):
+    pass
 
 
 class KeyTransformExact(JSONExact):
@@ -609,7 +665,19 @@ class KeyTransformExact(JSONExact):
 class KeyTransformIExact(
     CaseInsensitiveMixin, KeyTransformTextLookupMixin, lookups.IExact
 ):
-    pass
+    can_use_none_as_rhs = True
+
+    def as_sql(self, compiler, connection):
+        if self.rhs is None:
+            # Interpret __iexact=None on KeyTextTransform as __exact=None on
+            # KeyTransform.
+            keytransform = KeyTransform(self.lhs.key_name, self.lhs.lhs)
+            exact_lookup = keytransform.get_lookup("exact")(keytransform, self.rhs)
+            # Delegate to the backend vendor method, if it exists.
+            vendor = connection.vendor
+            as_vendor = getattr(exact_lookup, f"as_{vendor}", exact_lookup.as_sql)
+            return as_vendor(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 class KeyTransformIContains(

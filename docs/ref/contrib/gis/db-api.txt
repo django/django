@@ -365,6 +365,7 @@ Lookup Type                        PostGIS    Oracle    MariaDB      MySQL [#]_ 
 :lookup:`intersects`               X          X         X            X            X          B
 :lookup:`isempty`                  X                                              X
 :lookup:`isvalid`                  X          X         X (≥ 12.0.1) X            X
+:lookup:`num_dimensions`           X                                              X
 :lookup:`overlaps`                 X          X         X            X            X          B
 :lookup:`relate`                   X          X         X                         X          C
 :lookup:`same_as`                  X          X         X            X            X          B
@@ -420,6 +421,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)
 :class:`MemSize`                      X
+:class:`NumDimensions`                X                                                X
 :class:`NumGeometries`                X        X              X            X           X
 :class:`NumPoints`                    X        X              X            X           X
 :class:`Perimeter`                    X        X                                       X

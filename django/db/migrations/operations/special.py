@@ -93,6 +93,8 @@ class RunSQL(Operation):
             kwargs["state_operations"] = self.state_operations
         if self.hints:
             kwargs["hints"] = self.hints
+        if self.elidable:
+            kwargs["elidable"] = self.elidable
         return (self.__class__.__qualname__, [], kwargs)
 
     @property
@@ -173,6 +175,8 @@ class RunPython(Operation):
             kwargs["atomic"] = self.atomic
         if self.hints:
             kwargs["hints"] = self.hints
+        if self.elidable:
+            kwargs["elidable"] = self.elidable
         return (self.__class__.__qualname__, [], kwargs)
 
     @property

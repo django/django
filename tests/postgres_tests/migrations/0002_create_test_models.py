@@ -9,6 +9,7 @@ from ..fields import (
     EnumField,
     HStoreField,
     IntegerRangeField,
+    OffByOneField,
     SearchVectorField,
 )
 from ..models import TagField
@@ -107,7 +108,7 @@ class Migration(migrations.Migration):
                 ("tags", ArrayField(TagField(), blank=True, null=True)),
                 (
                     "json",
-                    ArrayField(models.JSONField(default=dict), default=list),
+                    ArrayField(models.JSONField(default=dict), default=list, null=True),
                 ),
                 ("int_ranges", ArrayField(IntegerRangeField(), null=True, blank=True)),
                 (
@@ -178,7 +179,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    ArrayField(models.FloatField(), size=2, null=True, blank=True),
+                    ArrayField(models.FloatField(), size=3),
                 ),
             ],
             options={
@@ -564,5 +565,27 @@ class Migration(migrations.Migration):
             options={
                 "required_db_vendor": "postgresql",
             },
+        ),
+        migrations.CreateModel(
+            name="OffByOneModel",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "one_off",
+                    OffByOneField(),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
         ),
     ]

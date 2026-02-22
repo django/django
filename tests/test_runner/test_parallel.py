@@ -160,7 +160,7 @@ class RemoteTestResultTest(SimpleTestCase):
         self.assertEqual(event[0], "addError")
         self.assertEqual(event[1], -1)
         self.assertEqual(event[2], test_id)
-        (error_type, _, _) = event[3]
+        error_type, _, _ = event[3]
         self.assertEqual(error_type, ValueError)
         self.assertIs(result.wasSuccessful(), False)
 
@@ -309,9 +309,8 @@ class ParallelTestSuiteTest(SimpleTestCase):
                 test_result.shouldStop = True
                 return (0, remote_result.events)
 
-            mock_pool.return_value.imap_unordered.return_value = unittest.mock.Mock(
-                next=fake_next
-            )
+            mock_imap = mock_pool.return_value.__enter__.return_value.imap_unordered
+            mock_imap.return_value = unittest.mock.Mock(next=fake_next)
             pts.run(test_result)
 
         self.assertIn("ValueError: woops", test_result.errors[0][1])

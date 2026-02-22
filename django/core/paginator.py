@@ -3,7 +3,7 @@ import inspect
 import warnings
 from math import ceil
 
-from asgiref.sync import iscoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
@@ -266,7 +266,7 @@ class AsyncPaginator(BasePaginator):
             return self._cache_acount
         c = getattr(self.object_list, "acount", None)
         if (
-            iscoroutinefunction(c)
+            inspect.iscoroutinefunction(c)
             and not inspect.isbuiltin(c)
             and method_has_no_args(c)
         ):

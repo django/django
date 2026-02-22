@@ -18,7 +18,7 @@ changes::
     from django.core.signals import setting_changed
 
 
-    def my_callback(sender, **kwargs):
+    def my_receiver(sender, **kwargs):
         print("Setting changed!")
 
 
@@ -26,7 +26,7 @@ changes::
         ...
 
         def ready(self):
-            setting_changed.connect(my_callback)
+            setting_changed.connect(my_receiver)
 
 Django's :doc:`built-in signals </ref/signals>` let user code get notified of
 certain actions.
@@ -58,7 +58,7 @@ the order they were registered.
     :param sender: Specifies a particular sender to receive signals from. See
         :ref:`connecting-to-specific-signals` for more information.
 
-    :param weak: Django stores signal handlers as weak references by
+    :param weak: Django stores signal receivers as weak references by
         default. Thus, if your receiver is a local function, it may be
         garbage collected. To prevent this, pass ``weak=False`` when you call
         the signal's ``connect()`` method.
@@ -79,11 +79,11 @@ Receiver functions
 First, we need to define a receiver function. A receiver can be any Python
 function or method::
 
-    def my_callback(sender, **kwargs):
+    def my_receiver(sender, **kwargs):
         print("Request finished!")
 
 Notice that the function takes a ``sender`` argument, along with wildcard
-keyword arguments (``**kwargs``); all signal handlers must take these
+keyword arguments (``**kwargs``); all signal receivers must take these
 arguments.
 
 We'll look at senders :ref:`a bit later <connecting-to-specific-signals>`, but
@@ -91,7 +91,7 @@ right now look at the ``**kwargs`` argument. All signals send keyword
 arguments, and may change those keyword arguments at any time. In the case of
 :data:`~django.core.signals.request_finished`, it's documented as sending no
 arguments, which means we might be tempted to write our signal handling as
-``my_callback(sender)``.
+``my_receiver(sender)``.
 
 This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
@@ -100,7 +100,7 @@ must be able to handle those new arguments.
 Receivers may also be asynchronous functions, with the same signature but
 declared using ``async def``::
 
-    async def my_callback(sender, **kwargs):
+    async def my_receiver(sender, **kwargs):
         await asyncio.sleep(5)
         print("Request finished!")
 
@@ -118,7 +118,7 @@ manual connect route::
 
     from django.core.signals import request_finished
 
-    request_finished.connect(my_callback)
+    request_finished.connect(my_receiver)
 
 Alternatively, you can use a :func:`receiver` decorator:
 
@@ -135,10 +135,10 @@ Here's how you connect with the decorator::
 
 
     @receiver(request_finished)
-    def my_callback(sender, **kwargs):
+    def my_receiver(sender, **kwargs):
         print("Request finished!")
 
-Now, our ``my_callback`` function will be called each time a request finishes.
+Now, our ``my_receiver`` function will be called each time a request finishes.
 
 .. admonition:: Where should this code live?
 
@@ -146,13 +146,13 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     you like, although it's recommended to avoid the application's root module
     and its ``models`` module to minimize side-effects of importing code.
 
-    In practice, signal handlers are usually defined in a ``signals``
+    In practice, signal receivers are usually defined in a ``signals``
     submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
     application :ref:`configuration class <configuring-applications-ref>`. If
     you're using the :func:`receiver` decorator, import the ``signals``
     submodule inside :meth:`~django.apps.AppConfig.ready`, this will implicitly
-    connect signal handlers::
+    connect signal receivers::
 
         from django.apps import AppConfig
         from django.core.signals import request_finished
@@ -162,11 +162,11 @@ Now, our ``my_callback`` function will be called each time a request finishes.
             ...
 
             def ready(self):
-                # Implicitly connect signal handlers decorated with @receiver.
+                # Implicitly connect signal receivers decorated with @receiver.
                 from . import signals
 
                 # Explicitly connect a signal handler.
-                request_finished.connect(signals.my_callback)
+                request_finished.connect(signals.my_receiver)
 
 .. note::
 
@@ -228,7 +228,7 @@ bound to the signal once for each unique ``dispatch_uid`` value::
 
     from django.core.signals import request_finished
 
-    request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
+    request_finished.connect(my_receiver, dispatch_uid="my_unique_identifier")
 
 .. _defining-and-sending-signals:
 
@@ -323,10 +323,14 @@ in order to reduce the number of sync/async calling-style switches within a
 they are async before being called. This means that an asynchronous receiver
 registered before a synchronous receiver may be executed after the synchronous
 receiver. In addition, async receivers are executed concurrently using
-``asyncio.gather()``.
+:class:`asyncio.TaskGroup`.
 
 All built-in signals, except those in the async request-response cycle, are
 dispatched using :meth:`Signal.send`.
+
+.. versionchanged:: 6.1
+
+    In older versions, async receivers were executed via ``asyncio.gather()``.
 
 Disconnecting signals
 =====================

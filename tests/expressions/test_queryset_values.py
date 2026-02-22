@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -42,26 +44,36 @@ class ValuesExpressionsTests(TestCase):
         self.assertEqual(len(cm.warnings), 1)
 
     def test_values_expression_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Company.objects.values(**{crafted_alias: F("ceo__salary")})
+        for crafted_alias in [
+            """injected_name" from "expressions_company"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Company.objects.values(**{crafted_alias: F("ceo__salary")})
 
     @skipUnlessDBFeature("supports_json_field")
     def test_values_expression_alias_sql_injection_json_field(self):
-        crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            JSONFieldModel.objects.values(f"data__{crafted_alias}")
+        for crafted_alias in [
+            """injected_name" from "expressions_company"; --""",
+            # Control characters.
+            *(chr(c) for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    JSONFieldModel.objects.values(f"data__{crafted_alias}")
 
-        with self.assertRaisesMessage(ValueError, msg):
-            JSONFieldModel.objects.values_list(f"data__{crafted_alias}")
+                with self.assertRaisesMessage(ValueError, msg):
+                    JSONFieldModel.objects.values_list(f"data__{crafted_alias}")
 
     def test_values_expression_group_by(self):
         # values() applies annotate() first, so values selected are grouped by

@@ -3,14 +3,19 @@ name: New contributor message
 on:
   pull_request_target:
     types: [opened]
+    branches:
+      - main
 
 permissions:
   pull-requests: write
 
 jobs:
   build:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
     name: Hello new contributor
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       # Pin to v1: https://github.com/actions/first-interaction/issues/369
       - uses: actions/first-interaction@v1

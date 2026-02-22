@@ -21,10 +21,13 @@ jobs:
           - '3.14'
           - '3.15-dev'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
+    timeout-minutes: 60
     continue-on-error: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -40,9 +43,12 @@ jobs:
   pyc-only:
     runs-on: ubuntu-latest
     name: Byte-compiled Django with no source files (only .pyc files)
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -66,9 +72,12 @@ jobs:
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
@@ -81,9 +90,12 @@ jobs:
   selenium-sqlite:
     runs-on: ubuntu-latest
     name: Selenium tests, SQLite
+    timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -98,11 +110,12 @@ jobs:
       - name: Run Selenium tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 1
 
   selenium-postgresql:
     runs-on: ubuntu-latest
     name: Selenium tests, PostgreSQL
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:15-alpine
@@ -119,7 +132,9 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -136,7 +151,7 @@ jobs:
       - name: Run Selenium tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 1
 
   postgresql:
     strategy:
@@ -146,6 +161,7 @@ jobs:
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
     name: PostgreSQL Versions
+    timeout-minutes: 60
     env:
       SERVER_SIDE_BINDING: ${{ matrix.server_side_bindings }}
     services:
@@ -164,7 +180,9 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:

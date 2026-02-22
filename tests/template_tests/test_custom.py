@@ -2,7 +2,7 @@ import os
 
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
-from django.template.library import InvalidTemplateLibrary
+from django.template.library import InvalidTemplateLibrary, Library
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
 
@@ -216,10 +216,6 @@ class SimpleTagTests(TagTestCase):
         self.verify_tag(
             custom.simple_unlimited_args_kwargs, "simple_unlimited_args_kwargs"
         )
-        self.verify_tag(
-            custom.simple_tag_without_context_parameter,
-            "simple_tag_without_context_parameter",
-        )
 
     def test_simple_tag_missing_context(self):
         # The 'context' parameter must be present when takes_context is True
@@ -228,9 +224,10 @@ class SimpleTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_tag_without_context_parameter 123 %}"
-            )
+
+            @Library().simple_tag(takes_context=True)
+            def simple_tag_without_context_parameter(arg):
+                return "Expected result"
 
     def test_simple_tag_missing_context_no_params(self):
         msg = (
@@ -238,9 +235,10 @@ class SimpleTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_tag_takes_context_without_params %}"
-            )
+
+            @Library().simple_tag(takes_context=True)
+            def simple_tag_takes_context_without_params():
+                return "Expected result"
 
 
 class SimpleBlockTagTests(TagTestCase):
@@ -423,18 +421,6 @@ class SimpleBlockTagTests(TagTestCase):
                 "of: endsimple_one_default_block.",
                 "{% load custom %}{% simple_one_default_block %}Some content",
             ),
-            (
-                "'simple_tag_without_content_parameter' must have a first argument "
-                "of 'content'",
-                "{% load custom %}{% simple_tag_without_content_parameter %}",
-            ),
-            (
-                "'simple_tag_with_context_without_content_parameter' is decorated with "
-                "takes_context=True so it must have a first argument of 'context' and "
-                "a second argument of 'content'",
-                "{% load custom %}"
-                "{% simple_tag_with_context_without_content_parameter %}",
-            ),
         ]
 
         for entry in errors:
@@ -485,10 +471,10 @@ class SimpleBlockTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_block_tag_without_context_parameter 123 %}"
-                "{% endsimple_block_tag_without_context_parameter %}"
-            )
+
+            @Library().simple_block_tag(takes_context=True)
+            def simple_block_tag_without_context_parameter(arg):
+                return "Expected result"
 
     def test_simple_block_tag_missing_context_no_params(self):
         msg = (
@@ -496,10 +482,10 @@ class SimpleBlockTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_tag_takes_context_without_params_block %}"
-                "{% endsimple_tag_takes_context_without_params_block %}"
-            )
+
+            @Library().simple_block_tag(takes_context=True)
+            def simple_tag_takes_context_without_params_block():
+                return "Expected result"
 
     def test_simple_block_tag_missing_content(self):
         # The 'content' parameter must be present when takes_context is True
@@ -507,10 +493,10 @@ class SimpleBlockTagTests(TagTestCase):
             "'simple_block_tag_without_content' must have a first argument of 'content'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_block_tag_without_content %}"
-                "{% endsimple_block_tag_without_content %}"
-            )
+
+            @Library().simple_block_tag
+            def simple_block_tag_without_content():
+                return "Expected result"
 
     def test_simple_block_tag_with_context_missing_content(self):
         # The 'content' parameter must be present when takes_context is True
@@ -520,10 +506,10 @@ class SimpleBlockTagTests(TagTestCase):
             "second argument of 'content'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load custom %}{% simple_block_tag_with_context_without_content %}"
-                "{% endsimple_block_tag_with_context_without_content %}"
-            )
+
+            @Library().simple_block_tag(takes_context=True)
+            def simple_block_tag_with_context_without_content():
+                return "Expected result"
 
     def test_simple_block_gets_context(self):
         c = Context({"name": "Jack & Jill"})
@@ -720,9 +706,10 @@ class InclusionTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load inclusion %}{% inclusion_tag_without_context_parameter 123 %}"
-            )
+
+            @Library().inclusion_tag("inclusion.html", takes_context=True)
+            def inclusion_tag_without_context_parameter(arg):
+                return {}
 
     def test_include_tag_missing_context_no_params(self):
         msg = (
@@ -730,9 +717,10 @@ class InclusionTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string(
-                "{% load inclusion %}{% inclusion_tag_takes_context_without_params %}"
-            )
+
+            @Library().inclusion_tag("inclusion.html", takes_context=True)
+            def inclusion_tag_takes_context_without_params():
+                return {}
 
     def test_inclusion_tags_from_template(self):
         c = Context({"value": 42})
@@ -821,10 +809,6 @@ class InclusionTagTests(TagTestCase):
         self.verify_tag(inclusion.inclusion_unlimited_args, "inclusion_unlimited_args")
         self.verify_tag(
             inclusion.inclusion_only_unlimited_args, "inclusion_only_unlimited_args"
-        )
-        self.verify_tag(
-            inclusion.inclusion_tag_without_context_parameter,
-            "inclusion_tag_without_context_parameter",
         )
         self.verify_tag(inclusion.inclusion_tag_use_l10n, "inclusion_tag_use_l10n")
         self.verify_tag(

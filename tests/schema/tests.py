@@ -412,7 +412,7 @@ class SchemaTests(TransactionTestCase):
             ]
         )
 
-    @skipUnlessDBFeature("can_create_inline_fk")
+    @skipUnlessDBFeature("can_create_inline_fk", "supports_on_delete_db_cascade")
     def test_inline_fk_db_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -602,7 +602,11 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field2, new_field, strict=True)
         self.assertForeignKeyNotExists(Author, "tag_id", "schema_tag")
 
-    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "supports_foreign_keys",
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+    )
     def test_fk_alter_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -1029,7 +1033,7 @@ class SchemaTests(TransactionTestCase):
         class GeneratedFieldIndexedModel(Model):
             number = IntegerField(default=1)
             generated = GeneratedField(
-                expression=F("number"),
+                expression=F("number") + 1,
                 db_persist=True,
                 output_field=IntegerField(),
             )
@@ -1042,7 +1046,7 @@ class SchemaTests(TransactionTestCase):
 
         old_field = GeneratedFieldIndexedModel._meta.get_field("generated")
         new_field = GeneratedField(
-            expression=F("number"),
+            expression=F("number") + 1,
             db_persist=True,
             db_index=True,
             output_field=IntegerField(),
@@ -2889,6 +2893,40 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_repoint_inherited(self):
         self._test_m2m_repoint(InheritedManyToManyField)
 
+    def test_m2m_rename(self):
+        class LocalBook(Model):
+            authors = ManyToManyField("schema.Author")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalBook]
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(LocalBook)
+        old_field = LocalBook._meta.get_field("authors")
+        new_field = ManyToManyField("schema.Author")
+        new_field.contribute_to_class(LocalBook, "writers")
+        with connection.schema_editor() as editor:
+            editor.alter_field(LocalBook, old_field, new_field, strict=True)
+        # Ensure old M2M is gone.
+        with self.assertRaises(DatabaseError):
+            self.column_classes(
+                LocalBook._meta.get_field("authors").remote_field.through
+            )
+        if connection.features.supports_foreign_keys:
+            self.assertForeignKeyExists(
+                new_field.remote_field.through,
+                "author_id",
+                "schema_author",
+            )
+        new_through_table = new_field.remote_field.through._meta.db_table
+        self.assertIn("writers", new_through_table)
+        self.assertNotIn("authors", new_through_table)
+        # Remove the old field from meta for tearDown().
+        LocalBook._meta.local_many_to_many.remove(old_field)
+
     @isolate_apps("schema")
     def test_m2m_rename_field_in_target_model(self):
         class LocalTagM2MTest(Model):
@@ -3767,8 +3805,14 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
-    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    @skipUnlessDBFeature(
+        "supports_expression_indexes", "supports_nulls_distinct_unique_constraints"
+    )
     def test_unique_constraint_index_nulls_distinct(self):
+        """
+        For a UniqueConstraint with expressions, the backend executes:
+        CREATE UNIQUE INDEX ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         nulls_distinct = UniqueConstraint(
@@ -3793,6 +3837,10 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
     def test_unique_constraint_nulls_distinct(self):
+        """
+        For UniqueConstraint(fields=...), the backend executes:
+        ALTER TABLE "schema_author" ADD CONSTRAINT ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         constraint = UniqueConstraint(

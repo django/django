@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection, models
 from django.db.models import F, Value
 from django.db.models.fields.files import ImageFieldFile
-from django.db.models.functions import Lower
+from django.db.models.functions import Cast, Lower
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
@@ -102,6 +102,7 @@ class Choiceful(models.Model):
 
 class BigD(models.Model):
     d = models.DecimalField(max_digits=32, decimal_places=30)
+    large_int = models.DecimalField(max_digits=16, decimal_places=0, null=True)
 
 
 class FloatModel(models.Model):
@@ -261,8 +262,18 @@ class DataModel(models.Model):
 # FileField
 
 
+def upload_to_with_date(instance, filename):
+    return f"{instance.created_at.year}/{filename}"
+
+
 class Document(models.Model):
     myfile = models.FileField(storage=temp_storage, upload_to="unused", unique=True)
+
+
+# See ticket #36847.
+class DocumentWithTimestamp(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    myfile = models.FileField(storage=temp_storage, upload_to=upload_to_with_date)
 
 
 ###############################################################################
@@ -534,7 +545,7 @@ class UUIDGrandchild(UUIDChild):
 class GeneratedModelFieldWithConverters(models.Model):
     field = models.UUIDField()
     field_copy = models.GeneratedField(
-        expression=F("field"),
+        expression=Cast("field", models.UUIDField()),
         output_field=models.UUIDField(),
         db_persist=True,
     )
@@ -561,7 +572,7 @@ class GeneratedModelNonAutoPk(models.Model):
     id = models.IntegerField(primary_key=True)
     a = models.IntegerField()
     b = models.GeneratedField(
-        expression=F("a"),
+        expression=F("a") + 1,
         output_field=models.IntegerField(),
         db_persist=True,
     )
@@ -636,7 +647,6 @@ class GeneratedModelNull(models.Model):
         expression=Lower("name"),
         output_field=models.CharField(max_length=10),
         db_persist=True,
-        null=True,
     )
 
     class Meta:
@@ -649,7 +659,6 @@ class GeneratedModelNullVirtual(models.Model):
         expression=Lower("name"),
         output_field=models.CharField(max_length=10),
         db_persist=False,
-        null=True,
     )
 
     class Meta:

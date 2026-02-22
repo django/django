@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
 from django.utils.functional import cached_property
+from django.utils.version import PY314
 
 from .base import Database
 
@@ -55,9 +56,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
+    supports_no_precision_decimalfield = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
     can_return_rows_from_update = True
+    supports_uuid4_function = True
+
+    @cached_property
+    def supports_uuid7_function(self):
+        return PY314
 
     @cached_property
     def django_test_skips(self):
@@ -150,6 +157,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         32766) or lowered per connection at run-time with
         setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
         """
+        self.connection.ensure_connection()
         return self.connection.connection.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
 
     @cached_property

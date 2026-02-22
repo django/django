@@ -1,7 +1,6 @@
 import copy
 import datetime
 import functools
-import inspect
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
@@ -17,6 +16,7 @@ from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property, classproperty
 from django.utils.hashable import make_hashable
+from django.utils.inspect import signature
 
 
 class SQLiteNumericMixin:
@@ -426,7 +426,7 @@ class BaseExpression:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                expr.replace_expressions(replacements) if expr else None
+                None if expr is None else expr.replace_expressions(replacements)
                 for expr in source_expressions
             ]
         )
@@ -523,7 +523,7 @@ class Expression(BaseExpression, Combinable):
     @classproperty
     @functools.lru_cache(maxsize=128)
     def _constructor_signature(cls):
-        return inspect.signature(cls.__init__)
+        return signature(cls.__init__)
 
     @classmethod
     def _identity(cls, value):
@@ -1141,7 +1141,7 @@ class Func(SQLiteNumericMixin, Expression):
 
 
 @deconstructible(path="django.db.models.Value")
-class Value(SQLiteNumericMixin, Expression):
+class Value(Expression):
     """Represent a wrapped value as a node within an expression."""
 
     # Provide a default value for `for_save` in order to allow unresolved
@@ -1181,6 +1181,18 @@ class Value(SQLiteNumericMixin, Expression):
             # use a literal SQL NULL
             return "NULL", []
         return "%s", [val]
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(compiler, connection, **extra_context)
+        try:
+            if self.output_field.get_internal_type() == "DecimalField":
+                if isinstance(self.value, Decimal):
+                    sql = "(CAST(%s AS REAL))" % sql
+                else:
+                    sql = "(CAST(%s AS NUMERIC))" % sql
+        except FieldError:
+            pass
+        return sql, params
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False

@@ -59,8 +59,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT
                 user_tables.table_name,
                 't',
@@ -79,8 +78,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT view_name, 'v', NULL FROM user_views
             UNION ALL
             SELECT mview_name, 'v', NULL FROM user_mviews
-        """
-        )
+        """)
         return [
             TableInfo(self.identifier_converter(row[0]), row[1], row[2])
             for row in cursor.fetchall()
@@ -194,14 +192,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 comment,
             ) = field_map[name]
             name %= {}  # oracledb, for some reason, doubles percent signs.
+            if desc[1] == oracledb.NUMBER and desc[5] == -127 and desc[4] == 0:
+                # DecimalField with no precision.
+                precision = None
+                scale = None
+            else:
+                precision = desc[4] or 0
+                scale = desc[5] or 0
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),
                     desc[1],
                     display_size,
                     desc[3],
-                    desc[4] or 0,
-                    desc[5] or 0,
+                    precision,
+                    scale,
                     *desc[6:],
                     default,
                     collation,

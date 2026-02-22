@@ -433,7 +433,7 @@ class SQLCompiler:
                 yield OrderBy(expr, descending=descending), False
                 continue
 
-            if "." in field:
+            if "." in field and field in self.query.extra_order_by:
                 # This came in through an extra(order_by=...) addition. Pass it
                 # on verbatim.
                 table, col = col.split(".", 1)
@@ -553,6 +553,14 @@ class SQLCompiler:
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
         """
+        if (
+            self.connection.features.prohibits_dollar_signs_in_column_aliases
+            and "$" in name
+        ):
+            raise ValueError(
+                "Dollar signs are not permitted in column aliases on "
+                f"{self.connection.display_name}."
+            )
         if name in self.quote_cache:
             return self.quote_cache[name]
         if (
@@ -1621,9 +1629,12 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+            try:
+                cursor.close()
+            except DatabaseError:
+                raise e from None
             raise
 
         if result_type == ROW_COUNT:
@@ -1808,9 +1819,13 @@ class SQLInsertCompiler(SQLCompiler):
             for field in list(fields):
                 field_prepare = partial(self.prepare_value, field)
                 field_pre_save = partial(self.pre_save_val, field)
-                field_values = [
-                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
-                ]
+
+                field_values = []
+                for obj in self.query.objs:
+                    value = field_pre_save(obj)
+                    if not isinstance(value, DatabaseDefault):
+                        value = field_prepare(value)
+                    field_values.append(value)
 
                 if not field.has_db_default():
                     value_cols.append(field_values)

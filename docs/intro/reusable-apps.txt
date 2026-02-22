@@ -143,8 +143,10 @@ this. For a small app like polls, this process isn't too difficult.
    to ``django_polls``.
 
 #. Edit ``django_polls/apps.py`` so that :attr:`~.AppConfig.name` refers to the
-   new module name and add :attr:`~.AppConfig.label` to give a short name for
-   the app:
+   new module name, add :attr:`~.AppConfig.label` to give a short name for
+   the app, and set :attr:`~.AppConfig.default_auto_field` to ensure your
+   migrations are not affected by changes to :setting:`DEFAULT_AUTO_FIELD`
+   made by users of your reusable app:
 
    .. code-block:: python
        :caption: ``django-polls/django_polls/apps.py``
@@ -153,6 +155,7 @@ this. For a small app like polls, this process isn't too difficult.
 
 
        class PollsConfig(AppConfig):
+           default_auto_field = "django.db.models.BigAutoField"
            name = "django_polls"
            label = "polls"
 

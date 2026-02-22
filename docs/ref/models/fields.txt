@@ -10,16 +10,6 @@ Model field reference
 This document contains all the API references of :class:`Field` including the
 `field options`_ and `field types`_ Django offers.
 
-.. seealso::
-
-    If the built-in fields don't do the trick, you can try
-    :pypi:`django-localflavor` (`documentation
-    <https://django-localflavor.readthedocs.io/>`_), which contains assorted
-    pieces of code that are useful for particular countries and cultures.
-
-    Also, you can easily :doc:`write your own custom model fields
-    </howto/custom-model-fields>`.
-
 .. note::
 
     Fields are defined in :mod:`django.db.models.fields`, but for convenience
@@ -831,6 +821,39 @@ exclusive. Any combination of these options will result in an error.
     instance, removing its time component. This is true for both storage and
     comparison.
 
+.. warning::
+
+    On PostgreSQL and MySQL, arithmetic operations on a ``DateField`` with a
+    :class:`~datetime.timedelta` return a ``datetime`` instead of a ``date``.
+    This occurs because Python's ``timedelta`` is converted to SQL
+    ``INTERVAL``, and the SQL operation ``date +/- interval`` returns a
+    ``timestamp`` on these databases.
+
+    To ensure a ``date`` result, use one of the following approaches. Either
+    explicitly cast the result to a date::
+
+        import datetime
+        from django.db.models import DateField, F
+        from django.db.models.functions import Cast
+
+        qs = MyModel.objects.annotate(
+            previous_day=Cast(
+                F("date_field") - datetime.timedelta(days=1),
+                output_field=DateField(),
+            )
+        )
+
+    Or on PostgreSQL only, use integer arithmetic to represent days::
+
+        from django.db.models import DateField, ExpressionWrapper, F
+
+        qs = MyModel.objects.annotate(
+            previous_day=ExpressionWrapper(
+                F("date_field") - 1,  # Subtract 1 day as integer
+                output_field=DateField(),
+            )
+        )
+
 ``DateTimeField``
 -----------------
 
@@ -862,16 +885,22 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has the following **required** arguments:
+Has the following arguments:
 
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than or equal to ``decimal_places``.
+    must be greater than or equal to ``decimal_places``. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.decimal_places` is provided.
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number.
+    The number of decimal places to store with the number. It's always required
+    on MySQL because this database doesn't support numeric fields with no
+    precision. It's also required for all database backends when
+    :attr:`~DecimalField.max_digits` is provided.
 
 For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
@@ -894,6 +923,11 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
     should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
     of decimal fields.
+
+.. versionchanged:: 6.1
+
+    Support for ``DecimalField`` with no precision was added on Oracle,
+    PostgreSQL, and SQLite.
 
 ``DurationField``
 -----------------
@@ -1302,8 +1336,13 @@ materialized view.
     real column. If ``False``, the column acts as a virtual column and does
     not occupy database storage space.
 
-    PostgreSQL < 18 only supports persisted columns. Oracle only supports
-    virtual columns.
+    PostgreSQL < 18 only supports persisted columns. Oracle < 23ai/26ai (23.7)
+    only supports virtual columns.
+
+    .. versionchanged:: 6.1
+
+        Support for stored ``GeneratedField``\s was added on Oracle 23ai/26ai
+        (23.7+).
 
 .. admonition:: Database limitations
 
@@ -1327,6 +1366,9 @@ materialized view.
     ``GeneratedField``\s are now automatically refreshed from the database on
     backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
     deferred otherwise.
+
+:attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
+column is nullable depends on the database and expression used.
 
 ``GenericIPAddressField``
 -------------------------
@@ -1607,8 +1649,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 .. class:: UUIDField(**options)
 
 A field for storing universally unique identifiers. Uses Python's
-:class:`~python:uuid.UUID` class. When used on PostgreSQL and MariaDB 10.7+,
-this stores in a ``uuid`` datatype, otherwise in a ``char(32)``.
+:class:`~python:uuid.UUID` class. When used on PostgreSQL and MariaDB, this
+stores in a ``uuid`` datatype, otherwise in a ``char(32)``.
 
 Universally unique identifiers are a good alternative to :class:`AutoField` for
 :attr:`~Field.primary_key`. The database will not generate the UUID for you, so
@@ -1625,13 +1667,13 @@ it is recommended to use :attr:`~Field.default`::
 Note that a callable (with the parentheses omitted) is passed to ``default``,
 not an instance of ``UUID``.
 
-.. admonition:: Lookups on PostgreSQL and MariaDB 10.7+
+.. admonition:: Lookups on PostgreSQL and MariaDB
 
     Using :lookup:`iexact`, :lookup:`contains`, :lookup:`icontains`,
     :lookup:`startswith`, :lookup:`istartswith`, :lookup:`endswith`, or
     :lookup:`iendswith` lookups on PostgreSQL don't work for values without
-    hyphens, because PostgreSQL and MariaDB 10.7+ store them in a hyphenated
-    uuid datatype type.
+    hyphens, because PostgreSQL and MariaDB store them in a hyphenated uuid
+    datatype type.
 
 .. _relationship-fields:
 
@@ -2523,8 +2565,8 @@ Field API reference
     .. method:: get_db_prep_value(value, connection, prepared=False)
 
         Converts ``value`` to a backend-specific value. By default it returns
-        ``value`` if ``prepared=True`` and :meth:`~Field.get_prep_value` if is
-        ``False``.
+        ``value`` if ``prepared=True``, and :meth:`get_prep_value(value)
+        <Field.get_prep_value>` otherwise.
 
         See :ref:`converting-query-values-to-database-values` for usage.
 

@@ -70,7 +70,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 )
             )
         else:
-            base_checks = self.base_field.check()
+            base_checks = self.base_field.check(**kwargs)
             if base_checks:
                 error_messages = "\n    ".join(
                     "%s (%s)" % (base_check.msg, base_check.id)

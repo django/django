@@ -169,17 +169,12 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 ~~~~~~~~~~~~~~~~
 
 A string containing a dotted path to a function (or any callable) that defines
-how to compose a prefix, version and key into a final cache key. The default
-implementation is equivalent to the function::
-
-    def make_key(key, key_prefix, version):
-        return ":".join([key_prefix, str(version), key])
+how to compose a key, prefix, and version into a final cache key. The default
+function converts the components to strings and joins them with colons, as
+shown in the :ref:`cache documentation <cache_key_transformation>`.
 
 You may use any key function you want, as long as it has the same
 argument signature.
-
-See the :ref:`cache documentation <cache_key_transformation>` for more
-information.
 
 .. setting:: CACHES-KEY_PREFIX
 
@@ -2767,15 +2762,6 @@ backend definition in :setting:`STORAGES`.
     Defining this setting overrides the default value and is *not* merged with
     it.
 
-.. admonition:: There are community maintained solutions too!
-
-    Django has a vibrant ecosystem. There are storage backends
-    highlighted on the `Community Ecosystem`_ page. The Django Packages
-    `Storage Backends grid`_ has even more options for you!
-
-.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#storage-and-static-files
-.. _Storage Backends grid: https://djangopackages.org/grids/g/storage-backends/
-
 .. setting:: TASKS
 
 ``TASKS``
@@ -3677,7 +3663,7 @@ usage.
     :doc:`staticfiles</ref/contrib/staticfiles>`’s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
-    :setting:`STATICFILES_DIRS`).
+    :setting:`STATICFILES_DIRS`.
 
 .. setting:: STATIC_URL
 

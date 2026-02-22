@@ -39,6 +39,7 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 MAX_URL_LENGTH = 2048
+MAX_URL_REDIRECT_LENGTH = 16384
 
 
 def urlencode(query, doseq=False):
@@ -169,11 +170,11 @@ def int_to_base36(i):
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
         return char_set[i]
-    b36 = ""
+    b36_parts = []
     while i != 0:
         i, n = divmod(i, 36)
-        b36 = char_set[n] + b36
-    return b36
+        b36_parts.append(char_set[n])
+    return "".join(reversed(b36_parts))
 
 
 def urlsafe_base64_encode(s):

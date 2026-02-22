@@ -30,6 +30,7 @@ from django.utils.version import PY314, PYPY
 from .models import (
     Article,
     ArticleStatus,
+    AttnameConstraintsModel,
     Author,
     Author1,
     Award,
@@ -976,15 +977,15 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
         )
         self.assertHTMLEqual(
             form["name"].legend_tag(),
-            '<legend for="id_name">Title:</legend>',
+            "<legend>Title:</legend>",
         )
         self.assertHTMLEqual(
             form["url"].legend_tag(),
-            '<legend for="id_url">The URL:</legend>',
+            "<legend>The URL:</legend>",
         )
         self.assertHTMLEqual(
             form["slug"].legend_tag(),
-            '<legend for="id_slug">Slug:</legend>',
+            "<legend>Slug:</legend>",
         )
 
     def test_help_text_overrides(self):
@@ -1649,11 +1650,10 @@ class ModelFormBasicTests(TestCase):
 <input id="id_headline" type="text" name="headline" maxlength="50" required></li>
 <li><label for="id_categories">Categories:</label>
 <select multiple name="categories" id="id_categories">
-<option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&#x27;s a test</option>
-<option value="%d">Third test</option>
-</select></li>"""
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+<option value="%s" selected>Entertainment</option>
+<option value="%s" selected>It&#x27;s a test</option>
+<option value="%s">Third test</option>
+</select></li>""" % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_basic_creation(self):
@@ -3118,8 +3118,7 @@ class OtherModelFormTests(TestCase):
             <select multiple name="colors" id="id_colors" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
-            """
-            % {"blue_pk": color.pk},
+            """ % {"blue_pk": color.pk},
         )
 
     def test_callable_field_default(self):
@@ -3156,9 +3155,7 @@ class OtherModelFormTests(TestCase):
             <option value="3" selected>Novel</option></select>
             <input id="initial-id_category" name="initial-category" type="hidden"
                 value="3">
-            """.format(
-                today_str
-            ),
+            """.format(today_str),
         )
         empty_data = {
             "title": "",
@@ -3766,3 +3763,17 @@ class ConstraintValidationTests(TestCase):
         self.assertEqual(
             full_form.errors, {"__all__": ["Price must be greater than zero."]}
         )
+
+    def test_check_constraint_refs_excluded_field_attname(self):
+        left = AttnameConstraintsModel.objects.create()
+        instance = AttnameConstraintsModel.objects.create(left=left)
+        data = {
+            "left": str(left.id),
+            "right": "",
+        }
+        AttnameConstraintsModelForm = modelform_factory(
+            AttnameConstraintsModel, fields="__all__"
+        )
+        full_form = AttnameConstraintsModelForm(data, instance=instance)
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(full_form.errors, {"right": ["This field is required."]})

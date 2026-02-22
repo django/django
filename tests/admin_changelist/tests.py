@@ -17,14 +17,14 @@ from django.contrib.admin.views.main import (
 )
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.cookie import CookieStorage
-from django.db import DatabaseError, connection, models
+from django.db import DatabaseError, connection
 from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
+from django.test.utils import CaptureQueriesContext, register_lookup
 from django.urls import reverse
 from django.utils import formats
 
@@ -66,6 +66,7 @@ from .models import (
     Group,
     Invitation,
     Membership,
+    MixedFieldsModel,
     Musician,
     OrderedObject,
     Parent,
@@ -240,7 +241,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -285,7 +285,6 @@ class ChangeListTests(TestCase):
         admin.site.empty_value_display = "???"
         m = ChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -310,7 +309,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = EmptyValueChildAdmin(Child, admin.site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -341,7 +339,6 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -370,7 +367,6 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/grandchild/", self.superuser)
         m = GrandChildAdmin(GrandChild, custom_site)
         cl = m.get_changelist_instance(request)
-        cl.formset = None
         template = Template(
             "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
         )
@@ -422,7 +418,7 @@ class ChangeListTests(TestCase):
         # make sure that hidden fields are in the correct place
         hiddenfields_div = (
             '<div class="hiddenfields">'
-            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
+            '<input type="hidden" name="form-0-id" value="%s" id="id_form-0-id">'
             "</div>"
         ) % new_child.id
         self.assertInHTML(
@@ -458,7 +454,7 @@ class ChangeListTests(TestCase):
         with self.assertRaises(IncorrectLookupParameters):
             m.get_changelist_instance(request)
 
-    @skipUnlessDBFeature("supports_transactions")
+    @skipUnlessDBFeature("uses_savepoints")
     def test_list_editable_atomicity(self):
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
         b = Swallow.objects.create(origin="Swallow B", load=2, speed=2)
@@ -861,6 +857,90 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_exact_lookup_with_invalid_value(self):
+        Child.objects.create(name="Test", age=10)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["pk__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "foo"})
+        request.user = self.superuser
+
+        # Invalid values are gracefully ignored.
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_exact_lookup_mixed_terms(self):
+        """
+        Multi-term search validates each term independently.
+
+        For 'foo 123' with search_fields=['name__icontains', 'age__exact']:
+        - 'foo': age lookup skipped (invalid), name lookup used
+        - '123': both lookups used (valid for age)
+        No Cast should be used; invalid lookups are simply skipped.
+        """
+        child = Child.objects.create(name="foo123", age=123)
+        Child.objects.create(name="other", age=456)
+        m = admin.ModelAdmin(Child, custom_site)
+        m.search_fields = ["name__icontains", "age__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "foo 123"})
+        request.user = self.superuser
+
+        # One result matching on foo and 123.
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
+        # "xyz" - invalid for age (skipped), no match for name either.
+        request = self.factory.get("/", data={SEARCH_VAR: "xyz"})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_exact_lookup_with_more_lenient_formfield(self):
+        """
+        Exact lookups on BooleanField use formfield().to_python() for lenient
+        parsing. Using model field's to_python() would reject 'false' whereas
+        the form field accepts it.
+        """
+        obj = UnorderedObject.objects.create(bool=False)
+        UnorderedObject.objects.create(bool=True)
+        m = admin.ModelAdmin(UnorderedObject, custom_site)
+        m.search_fields = ["bool__exact"]
+
+        # 'false' is accepted by form field but rejected by model field.
+        request = self.factory.get("/", data={SEARCH_VAR: "false"})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [obj])
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_exact_lookup_validates_each_field_independently(self):
+        """
+        Each field validates the search term independently without leaking
+        converted values between fields.
+
+        "3." is valid for IntegerField (converts to 3) but invalid for
+        JSONField. The converted value must not leak to the JSONField check.
+        """
+        # obj_int has int_field=3, should match "3." via IntegerField.
+        obj_int = MixedFieldsModel.objects.create(
+            int_field=3, json_field={"key": "value"}
+        )
+        # obj_json has json_field=3, should NOT match "3." because "3." is
+        # invalid JSON.
+        MixedFieldsModel.objects.create(int_field=99, json_field=3)
+        m = admin.ModelAdmin(MixedFieldsModel, custom_site)
+        m.search_fields = ["int_field__exact", "json_field__exact"]
+
+        # "3." is valid for int (becomes 3) but invalid JSON.
+        # Only obj_int should match via int_field.
+        request = self.factory.get("/", data={SEARCH_VAR: "3."})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [obj_int])
+
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
         model_admin = ChildAdmin(Child, custom_site)
@@ -1111,17 +1191,6 @@ class ChangeListTests(TestCase):
             response,
             '<a href="/admin/admin_changelist/genre/%s/change/">'
             "http://blues_history.com</a>" % g.pk,
-        )
-
-    def test_blank_str_display_links(self):
-        self.client.force_login(self.superuser)
-        gc = GrandChild.objects.create(name="          ")
-        response = self.client.get(
-            reverse("admin:admin_changelist_grandchild_changelist")
-        )
-        self.assertContains(
-            response,
-            '<a href="/admin/admin_changelist/grandchild/%s/change/">-</a>' % gc.pk,
         )
 
     def test_clear_all_filters_link(self):
@@ -1501,176 +1570,6 @@ class ChangeListTests(TestCase):
         check_results_order()
         OrderedObjectAdmin.ordering = ["id", "bool"]
         check_results_order(ascending=True)
-
-    @isolate_apps("admin_changelist")
-    def test_total_ordering_optimization(self):
-        class Related(models.Model):
-            unique_field = models.BooleanField(unique=True)
-
-            class Meta:
-                ordering = ("unique_field",)
-
-        class Model(models.Model):
-            unique_field = models.BooleanField(unique=True)
-            unique_nullable_field = models.BooleanField(unique=True, null=True)
-            related = models.ForeignKey(Related, models.CASCADE)
-            other_related = models.ForeignKey(Related, models.CASCADE)
-            related_unique = models.OneToOneField(Related, models.CASCADE)
-            field = models.BooleanField()
-            other_field = models.BooleanField()
-            null_field = models.BooleanField(null=True)
-
-            class Meta:
-                unique_together = {
-                    ("field", "other_field"),
-                    ("field", "null_field"),
-                    ("related", "other_related_id"),
-                }
-
-        class ModelAdmin(admin.ModelAdmin):
-            def get_queryset(self, request):
-                return Model.objects.none()
-
-        request = self._mocked_authenticated_request("/", self.superuser)
-        site = admin.AdminSite(name="admin")
-        model_admin = ModelAdmin(Model, site)
-        change_list = model_admin.get_changelist_instance(request)
-        tests = (
-            ([], ["-pk"]),
-            # Unique non-nullable field.
-            (["unique_field"], ["unique_field"]),
-            (["-unique_field"], ["-unique_field"]),
-            # Unique nullable field.
-            (["unique_nullable_field"], ["unique_nullable_field", "-pk"]),
-            # Field.
-            (["field"], ["field", "-pk"]),
-            # Related field introspection is not implemented.
-            (["related__unique_field"], ["related__unique_field", "-pk"]),
-            # Related attname unique.
-            (["related_unique_id"], ["related_unique_id"]),
-            # Related ordering introspection is not implemented.
-            (["related_unique"], ["related_unique", "-pk"]),
-            # Composite unique.
-            (["field", "-other_field"], ["field", "-other_field"]),
-            # Composite unique nullable.
-            (["-field", "null_field"], ["-field", "null_field", "-pk"]),
-            # Composite unique and nullable.
-            (
-                ["-field", "null_field", "other_field"],
-                ["-field", "null_field", "other_field"],
-            ),
-            # Composite unique attnames.
-            (["related_id", "-other_related_id"], ["related_id", "-other_related_id"]),
-            # Composite unique names.
-            (["related", "-other_related_id"], ["related", "-other_related_id", "-pk"]),
-        )
-        # F() objects composite unique.
-        total_ordering = [F("field"), F("other_field").desc(nulls_last=True)]
-        # F() objects composite unique nullable.
-        non_total_ordering = [F("field"), F("null_field").desc(nulls_last=True)]
-        tests += (
-            (total_ordering, total_ordering),
-            (non_total_ordering, non_total_ordering + ["-pk"]),
-        )
-        for ordering, expected in tests:
-            with self.subTest(ordering=ordering):
-                self.assertEqual(
-                    change_list._get_deterministic_ordering(ordering), expected
-                )
-
-    @isolate_apps("admin_changelist")
-    def test_total_ordering_optimization_meta_constraints(self):
-        class Related(models.Model):
-            unique_field = models.BooleanField(unique=True)
-
-            class Meta:
-                ordering = ("unique_field",)
-
-        class Model(models.Model):
-            field_1 = models.BooleanField()
-            field_2 = models.BooleanField()
-            field_3 = models.BooleanField()
-            field_4 = models.BooleanField()
-            field_5 = models.BooleanField()
-            field_6 = models.BooleanField()
-            nullable_1 = models.BooleanField(null=True)
-            nullable_2 = models.BooleanField(null=True)
-            related_1 = models.ForeignKey(Related, models.CASCADE)
-            related_2 = models.ForeignKey(Related, models.CASCADE)
-            related_3 = models.ForeignKey(Related, models.CASCADE)
-            related_4 = models.ForeignKey(Related, models.CASCADE)
-
-            class Meta:
-                constraints = [
-                    *[
-                        models.UniqueConstraint(fields=fields, name="".join(fields))
-                        for fields in (
-                            ["field_1"],
-                            ["nullable_1"],
-                            ["related_1"],
-                            ["related_2_id"],
-                            ["field_2", "field_3"],
-                            ["field_2", "nullable_2"],
-                            ["field_2", "related_3"],
-                            ["field_3", "related_4_id"],
-                        )
-                    ],
-                    models.CheckConstraint(condition=models.Q(id__gt=0), name="foo"),
-                    models.UniqueConstraint(
-                        fields=["field_5"],
-                        condition=models.Q(id__gt=10),
-                        name="total_ordering_1",
-                    ),
-                    models.UniqueConstraint(
-                        fields=["field_6"],
-                        condition=models.Q(),
-                        name="total_ordering",
-                    ),
-                ]
-
-        class ModelAdmin(admin.ModelAdmin):
-            def get_queryset(self, request):
-                return Model.objects.none()
-
-        request = self._mocked_authenticated_request("/", self.superuser)
-        site = admin.AdminSite(name="admin")
-        model_admin = ModelAdmin(Model, site)
-        change_list = model_admin.get_changelist_instance(request)
-        tests = (
-            # Unique non-nullable field.
-            (["field_1"], ["field_1"]),
-            # Unique nullable field.
-            (["nullable_1"], ["nullable_1", "-pk"]),
-            # Related attname unique.
-            (["related_1_id"], ["related_1_id"]),
-            (["related_2_id"], ["related_2_id"]),
-            # Related ordering introspection is not implemented.
-            (["related_1"], ["related_1", "-pk"]),
-            # Composite unique.
-            (["-field_2", "field_3"], ["-field_2", "field_3"]),
-            # Composite unique nullable.
-            (["field_2", "-nullable_2"], ["field_2", "-nullable_2", "-pk"]),
-            # Composite unique and nullable.
-            (
-                ["field_2", "-nullable_2", "field_3"],
-                ["field_2", "-nullable_2", "field_3"],
-            ),
-            # Composite field and related field name.
-            (["field_2", "-related_3"], ["field_2", "-related_3", "-pk"]),
-            (["field_3", "related_4"], ["field_3", "related_4", "-pk"]),
-            # Composite field and related field attname.
-            (["field_2", "related_3_id"], ["field_2", "related_3_id"]),
-            (["field_3", "-related_4_id"], ["field_3", "-related_4_id"]),
-            # Partial unique constraint is ignored.
-            (["field_5"], ["field_5", "-pk"]),
-            # Unique constraint with an empty condition.
-            (["field_6"], ["field_6"]),
-        )
-        for ordering, expected in tests:
-            with self.subTest(ordering=ordering):
-                self.assertEqual(
-                    change_list._get_deterministic_ordering(ordering), expected
-                )
 
     def test_dynamic_list_filter(self):
         """

@@ -69,26 +69,33 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
-    supports_stored_generated_columns = False
     supports_virtual_generated_columns = True
+    supports_alter_generated_column_data_type = False
     can_rename_index = True
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
-    supports_json_negative_indexing = False
     supports_collation_on_textfield = False
     supports_on_delete_db_default = False
+    supports_no_precision_decimalfield = True
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
+        # A bug in Django with respect to unioning ordered querysets (#36938).
+        "queries.test_qs_combinators.QuerySetSetOperationTests."
+        "test_count_union_with_select_related_in_values",
     }
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
     )
+
+    @cached_property
+    def supports_json_negative_indexing(self):
+        return self.connection.oracle_version >= (21,)
 
     @cached_property
     def django_test_skips(self):
@@ -126,6 +133,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             },
             "Oracle doesn't support casting filters to NUMBER.": {
                 "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
+            },
+            "Oracle doesn't support some data types (e.g. BOOLEAN, BLOB) in "
+            "GeneratedField expressions (ORA-54003).": {
+                "schema.tests.SchemaTests.test_add_generated_field_contains",
+                "schema.tests.SchemaTests.test_add_generated_field_with_kt_model",
             },
         }
         if self.connection.oracle_version < (23,):
@@ -220,3 +232,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_tuple_lookups(self):
         # Support is known to be missing on 23.2 but available on 23.4.
         return self.connection.oracle_version >= (23, 4)
+
+    @cached_property
+    def supports_uuid4_function(self):
+        return self.connection.oracle_version >= (23, 9)
+
+    @cached_property
+    def supports_stored_generated_columns(self):
+        return self.connection.oracle_version >= (23, 7)

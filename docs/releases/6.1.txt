@@ -92,7 +92,12 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The admin site login view now redirects authenticated users to the next URL,
+  if available, instead of always redirecting to the admin index page.
+
+* The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
+  preserve :ref:`named groups <field-choices-named-groups>` (e.g.
+  ``choices=[("Group", [("1", "Item")]), ...]``).
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,6 +122,11 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   database function are now supported on SpatiaLite.
 
+* The new :lookup:`num_dimensions` lookup and :class:`NumDimensions()
+  <django.contrib.gis.db.models.functions.NumDimensions>` database function
+  allow filtering geometries by the number of dimensions on PostGIS and
+  SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -125,7 +135,12 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`inspectdb` now introspects
+  :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
+  installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
+
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
+  supports the Hash index type.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,7 +150,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.sessions.backends.base.SessionBase` now supports
+  boolean evaluation via
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.__bool__`.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,7 +242,13 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Management commands now set :class:`~argparse.ArgumentParser`\'s
+  ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
+  suggestions for incorrectly typed subcommand names and argument choices.
+
+* The :djadmin:`loaddata` command now calls
+  :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
+  loading fixtures.
 
 Migrations
 ~~~~~~~~~~
@@ -244,6 +267,32 @@ Models
   top-level or nested JSON ``null`` values. See
   :ref:`storing-and-querying-for-none` for usage examples and some caveats.
 
+* :attr:`DecimalField.max_digits <django.db.models.DecimalField.max_digits>`
+  and :attr:`DecimalField.decimal_places
+  <django.db.models.DecimalField.decimal_places>` are no longer required to be
+  set on Oracle, PostgreSQL, and SQLite.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on Oracle
+  21c+.
+
+* The new :class:`~django.db.models.functions.UUID4` and
+  :class:`~django.db.models.functions.UUID7` database functions were added.
+
+* :class:`~django.db.models.GeneratedField` now supports stored columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
+  Oracle 23ai/26ai (23.7+).
+
+* The :data:`~django.db.models.signals.m2m_changed` signal now receives a
+  ``raw`` argument.
+
+* :class:`~django.db.models.StringAgg` now supports ``distinct=True`` on SQLite
+  when using the default delimiter ``Value(",")`` only.
+
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
@@ -252,7 +301,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
+  can now be customized to use a different multipart parser class.
 
 Security
 ~~~~~~~~
@@ -262,7 +312,14 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Subclasses of models defining the ``natural_key()`` method can now opt out of
+  natural key serialization by overriding the method to return an empty tuple:
+  ``()``. This ensures primary keys are serialized when using
+  :option:`dumpdata --natural-primary`.
+
+* The XML deserializer now raises
+  :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
+  unexpected nested tags.
 
 Signals
 ~~~~~~~
@@ -292,7 +349,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
+  time periods expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~
@@ -319,10 +377,17 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+* Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
+  if the management command isn't supported.
+
 :mod:`django.contrib.gis`
 -------------------------
 
 * Support for PostGIS 3.1 is removed.
+
+* Support for GEOS 3.8 and 3.9 is removed.
+
+* Support for GDAL 3.1 and 3.2 is removed.
 
 :mod:`django.contrib.postgres`
 ------------------------------
@@ -332,6 +397,12 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+System checks
+-------------
+
+* The :djadmin:`check` management command now supplies all ``databases`` if not
+  specified. Callers should be prepared for databases to be accessed.
 
 Dropped support for PostgreSQL 14
 ---------------------------------
@@ -345,6 +416,12 @@ Dropped support for MySQL < 8.4
 Upstream support for MySQL 8.0 ends in April 2026, and MySQL 8.1-8.3 are
 short-term innovation releases. Django 6.1 supports MySQL 8.4 and higher.
 
+Dropped support for MariaDB < 10.11
+-----------------------------------
+
+Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
+short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
+
 Miscellaneous
 -------------
 
@@ -352,6 +429,15 @@ Miscellaneous
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
 
 .. _deprecated-features-6.1:
 

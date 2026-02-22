@@ -1296,6 +1296,10 @@ def querystring(context, *args, **kwargs):
     Keyword arguments are treated as an extra, final mapping. These mappings
     are processed sequentially, with later arguments taking precedence.
 
+    Passing `None` as a value removes the corresponding key from the result.
+    For iterable values, `None` entries are ignored, but if all values are
+    `None`, the key is removed.
+
     A query string prefixed with `?` is returned.
 
     Raise TemplateSyntaxError if a positional argument is not a mapping or if
@@ -1327,7 +1331,8 @@ def querystring(context, *args, **kwargs):
                 "querystring requires mappings for positional arguments (got "
                 "%r instead)." % d
             )
-        for key, value in d.items():
+        items = d.lists() if isinstance(d, QueryDict) else d.items()
+        for key, value in items:
             if not isinstance(key, str):
                 raise TemplateSyntaxError(
                     "querystring requires strings for mapping keys (got %r "
@@ -1336,7 +1341,8 @@ def querystring(context, *args, **kwargs):
             if value is None:
                 params.pop(key, None)
             elif isinstance(value, Iterable) and not isinstance(value, str):
-                params.setlist(key, value)
+                # Drop None values; if no values remain, the key is removed.
+                params.setlist(key, [v for v in value if v is not None])
             else:
                 params[key] = value
     query_string = params.urlencode() if params else ""

@@ -102,3 +102,15 @@ class ManyPointModel(NamedModel):
     point1 = models.PointField()
     point2 = models.PointField()
     point3 = models.PointField(srid=3857)
+
+
+class Points(models.Model):
+    geom = models.MultiPointField()
+
+
+class Lines(models.Model):
+    geom = models.MultiLineStringField()
+
+
+class GeometryCollectionModel(models.Model):
+    geom = models.GeometryCollectionField()

@@ -5,6 +5,7 @@ from unittest import mock
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, models
+from django.db.models import Max
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -140,3 +141,20 @@ class DecimalFieldTests(TestCase):
         obj = Foo.objects.create(a="bar", d=Decimal("8.320"))
         obj.refresh_from_db()
         self.assertEqual(obj.d.compare_total(Decimal("8.320")), Decimal("0"))
+
+    def test_large_integer_precision(self):
+        large_int_val = Decimal("9999999999999999")
+        obj = BigD.objects.create(large_int=large_int_val, d=Decimal("0"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.large_int, large_int_val)
+
+    def test_large_integer_precision_aggregation(self):
+        large_int_val = Decimal("9999999999999999")
+        BigD.objects.create(large_int=large_int_val, d=Decimal("0"))
+        result = BigD.objects.aggregate(max_val=Max("large_int"))
+        self.assertEqual(result["max_val"], large_int_val)
+
+    def test_roundtrip_integer_with_trailing_zeros(self):
+        obj = Foo.objects.create(a="bar", d=Decimal("8"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.d.compare_total(Decimal("8.000")), Decimal("0"))

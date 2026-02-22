@@ -10,6 +10,7 @@ from unittest import mock
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
+from django.core.exceptions import SuspiciousOperation
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import CommandError
 from django.core.management.commands.dumpdata import ProxyModelWarning
@@ -519,6 +520,15 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             format="xml",
             natural_foreign_keys=True,
         )
+
+    def test_deeply_nested_elements(self):
+        """Text inside deeply-nested tags raises SuspiciousOperation."""
+        for file in [
+            "invalid_deeply_nested_elements.xml",
+            "invalid_deeply_nested_elements_natural_key.xml",
+        ]:
+            with self.subTest(file=file), self.assertRaises(SuspiciousOperation):
+                management.call_command("loaddata", file, verbosity=0)
 
     def test_dumpdata_with_excludes(self):
         # Load fixture1 which has a site, two articles, and a category

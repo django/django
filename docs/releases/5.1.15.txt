@@ -1,0 +1,34 @@
+===========================
+Django 5.1.15 release notes
+===========================
+
+*December 2, 2025*
+
+Django 5.1.15 fixes one security issue with severity "high", one security issue
+with severity "moderate", and one bug in 5.1.14.
+
+CVE-2025-13372: Potential SQL injection in ``FilteredRelation`` column aliases on PostgreSQL
+============================================================================================
+
+:class:`.FilteredRelation` was subject to SQL injection in column aliases,
+using a suitably crafted dictionary, with dictionary expansion, as the
+``**kwargs`` passed to :meth:`.QuerySet.annotate` or :meth:`.QuerySet.alias` on
+PostgreSQL.
+
+CVE-2025-64460: Potential denial-of-service vulnerability in XML ``Deserializer``
+=================================================================================
+
+:ref:`XML Serialization <serialization-formats-xml>` was subject to a potential
+denial-of-service attack due to quadratic time complexity when deserializing
+crafted documents containing many nested invalid elements. The internal helper
+``django.core.serializers.xml_serializer.getInnerText()`` previously
+accumulated inner text inefficiently during recursion. It now collects text per
+element, avoiding excessive resource usage.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1.14 where ``DisallowedRedirect`` was raised
+  by :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` for URLs longer than 2048
+  characters. The limit is now 16384 characters (:ticket:`36743`).

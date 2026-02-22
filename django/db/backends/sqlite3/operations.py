@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import sqlite3
 import uuid
 from functools import lru_cache
 from itertools import chain
@@ -16,6 +17,14 @@ from django.utils.functional import cached_property
 
 from .base import Database
 
+UNSUPPORTED_DATETIME_AGGREGATES = (
+    models.Sum,
+    models.Avg,
+    models.Variance,
+    models.StdDev,
+)
+DATETIME_FIELDS = (models.DateField, models.DateTimeField, models.TimeField)
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = "text"
@@ -28,30 +37,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     # SQLite. Use JSON_TYPE() instead.
     jsonfield_datatype_values = frozenset(["null", "false", "true"])
 
-    def bulk_batch_size(self, fields, objs):
-        """
-        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
-        (reflected in max_query_params).
-        """
-        fields = list(
-            chain.from_iterable(
-                (
-                    field.fields
-                    if isinstance(field, models.CompositePrimaryKey)
-                    else [field]
-                )
-                for field in fields
-            )
-        )
-        if fields:
-            return self.connection.features.max_query_params // len(fields)
-        else:
-            return len(objs)
-
     def check_expression_support(self, expression):
-        bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
-        bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
-        if isinstance(expression, bad_aggregates):
+        if isinstance(expression, UNSUPPORTED_DATETIME_AGGREGATES):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
@@ -60,11 +47,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                     # to ignore.
                     pass
                 else:
-                    if isinstance(output_field, bad_fields):
+                    if isinstance(output_field, DATETIME_FIELDS):
+                        klass = expression.__class__.__name__
                         raise NotSupportedError(
-                            "You cannot use Sum, Avg, StdDev, and Variance "
-                            "aggregations on date/time fields in sqlite3 "
-                            "since date/time is saved as text."
+                            f"SQLite does not support {klass} on date or time "
+                            "fields, because they are stored as text."
                         )
         if (
             isinstance(expression, models.Aggregate)
@@ -143,16 +130,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         Only for last_executed_query! Don't use this to execute SQL queries!
         """
-        # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
-        # number of return values, default = 2000). Since Python's sqlite3
-        # module doesn't expose the get_limit() C API, assume the default
-        # limits are in effect and split the work in batches if needed.
-        BATCH_SIZE = 999
-        if len(params) > BATCH_SIZE:
+        connection = self.connection.connection
+        variable_limit = self.connection.features.max_query_params
+        column_limit = connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN)
+        batch_size = min(variable_limit, column_limit)
+
+        if len(params) > batch_size:
             results = ()
-            for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index : index + BATCH_SIZE]
+            for index in range(0, len(params), batch_size):
+                chunk = params[index : index + batch_size]
                 results += self._quote_params_for_last_executed_query(chunk)
             return results
 
@@ -320,10 +306,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = parse_time(value)
         return value
 
+    @staticmethod
+    def _create_decimal(value):
+        if isinstance(value, (int, str)):
+            return decimal.Decimal(value)
+        return decimal.Context(prec=15).create_decimal_from_float(value)
+
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        create_decimal = decimal.Context(prec=15).create_decimal_from_float
         if isinstance(expression, Col):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
@@ -331,7 +322,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value).quantize(
+                    return self._create_decimal(value).quantize(
                         quantize_value, context=expression.output_field.context
                     )
 
@@ -339,7 +330,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value)
+                    return self._create_decimal(value)
 
         return converter
 

@@ -121,6 +121,15 @@ class CharFieldUnlimited(models.Model):
         required_db_features = {"supports_unlimited_charfield"}
 
 
+class DecimalFieldNoPrec(models.Model):
+    decimal_field_no_precision = models.DecimalField(
+        max_digits=None, decimal_places=None
+    )
+
+    class Meta:
+        required_db_features = {"supports_no_precision_decimalfield"}
+
+
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
@@ -169,3 +178,9 @@ class DbOnDeleteModel(models.Model):
     fk_set_null = models.ForeignKey(
         DigitsInColumnName, on_delete=models.DB_SET_NULL, null=True
     )
+
+    class Meta:
+        required_db_features = {
+            "supports_on_delete_db_cascade",
+            "supports_on_delete_db_null",
+        }

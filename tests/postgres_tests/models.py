@@ -9,6 +9,7 @@ from .fields import (
     EnumField,
     HStoreField,
     IntegerRangeField,
+    OffByOneField,
     SearchVectorField,
 )
 
@@ -207,3 +208,7 @@ class HotelReservation(PostgreSQLModel):
     end = models.DateTimeField()
     cancelled = models.BooleanField(default=False)
     requirements = models.JSONField(blank=True, null=True)
+
+
+class OffByOneModel(PostgreSQLModel):
+    one_off = OffByOneField()

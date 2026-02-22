@@ -2,11 +2,16 @@ import re
 from io import StringIO
 from unittest import mock, skipUnless
 
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.core.management.commands import inspectdb
 from django.db import connection
 from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from .models import PeopleMoreData, test_collation
 
@@ -40,6 +45,7 @@ def cursor_execute(*queries):
     return results
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTestCase(TestCase):
     unique_re = re.compile(r".*unique_together = \((.+),\).*")
 
@@ -202,6 +208,13 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         self.assertIn("char_field = models.CharField()", output)
 
+    @skipUnlessDBFeature("supports_no_precision_decimalfield")
+    def test_decimal_field_no_precision(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_decimalfieldnoprec", stdout=out)
+        output = out.getvalue()
+        self.assertIn("decimal_field_no_precision = models.DecimalField()", output)
+
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()
@@ -228,13 +241,8 @@ class InspectDBTestCase(TestCase):
             assertFieldType(
                 "decimal_field", "models.DecimalField(max_digits=6, decimal_places=1)"
             )
-        else:  # Guessed arguments on SQLite, see #5014
-            assertFieldType(
-                "decimal_field",
-                "models.DecimalField(max_digits=10, decimal_places=5)  "
-                "# max_digits and decimal_places have been guessed, "
-                "as this database handles decimal fields as float",
-            )
+        else:
+            assertFieldType("decimal_field", "models.DecimalField()")
 
         assertFieldType("float_field", "models.FloatField()")
         assertFieldType(
@@ -299,7 +307,11 @@ class InspectDBTestCase(TestCase):
             out.getvalue(),
         )
 
-    @skipUnlessDBFeature("can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+        "supports_on_delete_db_null",
+    )
     def test_foreign_key_db_on_delete(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_dbondeletemodel", stdout=out)
@@ -513,6 +525,7 @@ class InspectDBTestCase(TestCase):
         )
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTransactionalTests(TransactionTestCase):
     available_apps = ["inspectdb"]
 
@@ -665,3 +678,14 @@ class InspectDBTransactionalTests(TransactionTestCase):
         out = StringIO()
         call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
         self.assertNotIn("unique_together", out.getvalue())
+
+
+@skipIfDBFeature("supports_inspectdb")
+class InspectDBNotSupportedTests(TestCase):
+    def test_not_supported(self):
+        msg = (
+            "Database inspection isn't supported for the currently selected "
+            "database backend."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("inspectdb")

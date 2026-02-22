@@ -25,7 +25,6 @@ plain text message::
         "Here is the message.",
         "from@example.com",
         ["to@example.com"],
-        fail_silently=False,
     )
 
 When additional email sending functionality is needed, use
@@ -471,17 +470,26 @@ email backend API :ref:`provides an alternative
           directly to the resulting message. For example, to attach an inline
           image with a :mailheader:`Content-ID`::
 
+              import email.utils
+              from email.message import MIMEPart
+              from django.core.mail import EmailMultiAlternatives
+
+              message = EmailMultiAlternatives(...)
+              image_data_bytes = ...  # Load image as bytes
+
+              # Create a random Content-ID, including angle brackets
               cid = email.utils.make_msgid()
               inline_image = email.message.MIMEPart()
               inline_image.set_content(
                   image_data_bytes,
                   maintype="image",
-                  subtype="png",
+                  subtype="png",  # or "jpeg", etc. depending on the image type
                   disposition="inline",
-                  cid=f"<{cid}>",
+                  cid=cid,
               )
               message.attach(inline_image)
-              message.attach_alternative(f'… <img src="cid:${cid}"> …', "text/html")
+              # Refer to Content-ID in HTML without angle brackets
+              message.attach_alternative(f'… <img src="cid:{cid[1:-1]}"> …', "text/html")
 
           Python's :meth:`email.contentmanager.set_content` documentation
           describes the supported arguments for ``MIMEPart.set_content()``.
@@ -772,6 +780,16 @@ specify this backend, put the following in your settings::
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
+
+.. admonition:: There are community-maintained solutions too!
+
+    Django has a vibrant ecosystem. There are email backends
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Email grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-and-notifications
+.. _Email grid: https://djangopackages.org/grids/g/email/
+
 
 .. _topic-custom-email-backend:
 

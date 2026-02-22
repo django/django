@@ -1,24 +1,23 @@
 import functools
 import inspect
+import threading
+from contextlib import contextmanager
 
 from django.utils.version import PY314
 
 if PY314:
     import annotationlib
 
+    lock = threading.Lock()
+    safe_signature_from_callable = functools.partial(
+        inspect._signature_from_callable,
+        annotation_format=annotationlib.Format.FORWARDREF,
+    )
+
 
 @functools.lru_cache(maxsize=512)
 def _get_func_parameters(func, remove_first):
-    # As the annotations are not used in any case, inspect the signature with
-    # FORWARDREF to leave any deferred annotations unevaluated.
-    if PY314:
-        signature = inspect.signature(
-            func, annotation_format=annotationlib.Format.FORWARDREF
-        )
-    else:
-        signature = inspect.signature(func)
-
-    parameters = tuple(signature.parameters.values())
+    parameters = tuple(signature(func).parameters.values())
     if remove_first:
         parameters = parameters[1:]
     return parameters
@@ -98,3 +97,38 @@ def is_module_level_function(func):
         return False
 
     return True
+
+
+@contextmanager
+def lazy_annotations():
+    """
+    inspect.getfullargspec eagerly evaluates type annotations. To add
+    compatibility with Python 3.14+ deferred evaluation, patch the module-level
+    helper to provide the annotation_format that we are using elsewhere.
+
+    This private helper could be removed when there is an upstream solution for
+    https://github.com/python/cpython/issues/141560.
+
+    This context manager is not reentrant.
+    """
+    if not PY314:
+        yield
+        return
+    with lock:
+        original_helper = inspect._signature_from_callable
+        inspect._signature_from_callable = safe_signature_from_callable
+        try:
+            yield
+        finally:
+            inspect._signature_from_callable = original_helper
+
+
+def signature(obj):
+    """
+    A wrapper around inspect.signature that leaves deferred annotations
+    unevaluated on Python 3.14+, since they are not used in our case.
+    """
+    if PY314:
+        return inspect.signature(obj, annotation_format=annotationlib.Format.FORWARDREF)
+    else:
+        return inspect.signature(obj)

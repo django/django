@@ -26,7 +26,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
@@ -45,6 +45,8 @@ MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
+
+PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
 
 
 class BaseIterable:
@@ -112,16 +114,15 @@ class ModelIterable(BaseIterable):
             (
                 field,
                 related_objs,
-                operator.attrgetter(
-                    *[
-                        (
-                            field.attname
-                            if from_field == "self"
-                            else queryset.model._meta.get_field(from_field).attname
-                        )
-                        for from_field in field.from_fields
-                    ]
-                ),
+                attnames := [
+                    (
+                        field.attname
+                        if from_field == "self"
+                        else queryset.model._meta.get_field(from_field).attname
+                    )
+                    for from_field in field.from_fields
+                ],
+                operator.attrgetter(*attnames),
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
@@ -143,9 +144,13 @@ class ModelIterable(BaseIterable):
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getter in known_related_objects:
+            for field, rel_objs, rel_attnames, rel_getter in known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
+                    continue
+                # Avoid fetching potentially deferred attributes that would
+                # result in unexpected queries.
+                if any(attname not in obj.__dict__ for attname in rel_attnames):
                     continue
                 rel_obj_id = rel_getter(obj)
                 try:
@@ -840,8 +845,7 @@ class QuerySet(AltersData):
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
                     for result, field in zip(results, opts.db_returning_fields):
-                        if field != opts.pk:
-                            setattr(obj_with_pk, field.attname, result)
+                        setattr(obj_with_pk, field.attname, result)
                 for obj_with_pk in objs_with_pk:
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
@@ -1154,7 +1158,7 @@ class QuerySet(AltersData):
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
@@ -1167,7 +1171,7 @@ class QuerySet(AltersData):
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self.reverse()
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
@@ -1645,6 +1649,9 @@ class QuerySet(AltersData):
         return clone
 
     def _filter_or_exclude_inplace(self, negate, args, kwargs):
+        if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(kwargs):
+            invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+            raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         if negate:
             self._query.add_q(~Q(*args, **kwargs))
         else:
@@ -1672,6 +1679,7 @@ class QuerySet(AltersData):
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
+        clone.query.default_ordering = True
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
@@ -1965,6 +1973,80 @@ class QuerySet(AltersData):
             return True
         else:
             return False
+
+    @property
+    def totally_ordered(self):
+        """
+        Returns True if the QuerySet is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a GROUP BY clause, the model's default
+        ordering is ignored. Ordering specified via .extra(order_by=...)
+        is also ignored.
+        """
+        if not self.ordered:
+            return False
+        ordering = self.query.order_by
+        if not ordering and self.query.default_ordering:
+            ordering = self.query.get_meta().ordering
+        if not ordering:
+            return False
+        opts = self.model._meta
+        pk_fields = {f.attname for f in opts.pk_fields}
+        ordering_fields = set()
+        for part in ordering:
+            # Search for single field providing a total ordering.
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip("-")
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+            if field_name:
+                if field_name == "pk":
+                    return True
+                # Normalize attname references by using get_field().
+                try:
+                    field = opts.get_field(field_name)
+                except exceptions.FieldDoesNotExist:
+                    # Could be "?" for random ordering or a related field
+                    # lookup. Skip this part of introspection for now.
+                    continue
+                # Ordering by a related field name orders by the referenced
+                # model's ordering. Skip this part of introspection for now.
+                if field.remote_field and field_name == field.name:
+                    continue
+                if field.attname in pk_fields and len(pk_fields) == 1:
+                    return True
+                if field.unique and not field.null:
+                    return True
+                ordering_fields.add(field.attname)
+
+        # Account for members of a CompositePrimaryKey.
+        if ordering_fields.issuperset(pk_fields):
+            return True
+        # No single total ordering field, try unique_together and total
+        # unique constraints.
+        constraint_field_names = (
+            *opts.unique_together,
+            *(constraint.fields for constraint in opts.total_unique_constraints),
+        )
+        for field_names in constraint_field_names:
+            # Normalize attname references by using get_field().
+            try:
+                fields = [opts.get_field(field_name) for field_name in field_names]
+            except exceptions.FieldDoesNotExist:
+                continue
+            # Composite unique constraints containing a nullable column
+            # cannot ensure total ordering.
+            if any(field.null for field in fields):
+                continue
+            if ordering_fields.issuperset(field.attname for field in fields):
+                return True
+
+        return False
 
     @property
     def db(self):

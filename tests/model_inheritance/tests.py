@@ -449,6 +449,12 @@ class ModelInheritanceDataTests(TestCase):
         with self.assertRaises(Place.MultipleObjectsReturned):
             Restaurant.objects.get()
 
+    def test_inherited_not_updated_exception(self):
+        # NotUpdated is also inherited.
+        obj = Restaurant(id=999)
+        with self.assertRaises(Place.NotUpdated):
+            obj.save(update_fields={"name"})
+
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
         s1 = Supplier.objects.create(name="Joe's Chickens", address="123 Sesame St")

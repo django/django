@@ -308,7 +308,6 @@ database:
     Operations to perform:
       Apply all migrations: admin, auth, contenttypes, polls, sessions
     Running migrations:
-      Rendering model states... DONE
       Applying polls.0001_initial... OK
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
@@ -325,7 +324,7 @@ but for now, remember the three-step guide to making model changes:
 
 * Change your models (in ``models.py``).
 * Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
-  migrations for those changes
+  migrations for those changes.
 * Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
   the database.
 

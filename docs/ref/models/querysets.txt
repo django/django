@@ -170,6 +170,18 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: totally_ordered
+
+        .. versionadded:: 6.1
+
+        Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a ``GROUP BY`` clause, the model's default
+        ordering is ignored. Ordering specified via ``.extra(order_by=...)``
+        is also ignored.
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.
@@ -330,9 +342,9 @@ interested in the exact number of entries, you could do this:
     >>> blogs = Blog.objects.alias(entries=Count("entry")).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
-:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
-with other methods (e.g. :meth:`aggregate`), you must promote it to an
-annotation::
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use an aliased
+expression with other methods (e.g. :meth:`aggregate`), you must promote it to
+an annotation::
 
     Blog.objects.alias(entries=Count("entry")).annotate(
         entries=F("entries"),
@@ -341,9 +353,9 @@ annotation::
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
 example, ``QuerySet`` method creates expressions, for later use in views).
-``alias()`` allows building complex expressions incrementally, possibly
-spanning multiple methods and modules, refer to the expression parts by their
-aliases and only use :meth:`annotate` for the final result.
+``alias()`` allows building complex expressions incrementally (possibly
+spanning multiple methods and modules), referring to the expression parts by
+their aliases, and only using :meth:`annotate` for the final result.
 
 ``order_by()``
 ~~~~~~~~~~~~~~
@@ -549,22 +561,17 @@ Examples (those after the first will only work on PostgreSQL):
 .. code-block:: pycon
 
     >>> Author.objects.distinct()
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("pub_date").distinct("pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog").distinct("blog")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author", "pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog__name", "mod_date").distinct("blog__name", "mod_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author")
-    [...]
+    <QuerySet [...]>
 
 .. note::
     Keep in mind that :meth:`order_by` uses any default related model ordering
@@ -1204,7 +1211,7 @@ and run:
 .. code-block:: pycon
 
     >>> Pizza.objects.all()
-    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
+    <QuerySet [<Pizza: Hawaiian (ham, pineapple)>, <Pizza: Seafood (prawns, smoked salmon)>, ...]>
 
 The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
@@ -1990,13 +1997,12 @@ them:
 .. code-block:: pycon
 
     >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
-    <QuerySet [<Person: ...)>, ...]>
+    <QuerySet [<Person: ...>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB only supports the ``nowait``
-argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
-argument is only supported on PostgreSQL.
+``select_for_update()``. However, MariaDB only supports the ``nowait`` and
+``skip_locked`` arguments, and MySQL supports the ``nowait``, ``skip_locked``,
+and ``of`` arguments. The ``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2432,7 +2438,8 @@ are), and returns created objects as a list, in the same order as provided:
 
 This has a number of caveats though:
 
-* The model's ``save()`` method will not be called, and the ``pre_save`` and
+* The model's ``save()`` method :ref:`will not be called
+  <methods-not-called-on-bulk-operations>`, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
@@ -2513,7 +2520,8 @@ than iterating through the list of models and calling ``save()`` on each of
 them, but it has a few caveats:
 
 * You cannot update the model's primary key.
-* Each model's ``save()`` method isn't called, and the
+* Each model's ``save()`` method :ref:`isn't called
+  <methods-not-called-on-bulk-operations>`, and the
   :attr:`~django.db.models.signals.pre_save` and
   :attr:`~django.db.models.signals.post_save` signals aren't sent.
 * If updating a large number of columns in a large number of rows, the SQL
@@ -2778,8 +2786,9 @@ the direction is changed.
 *Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key. This can affect
+is no matching object. If the ``QuerySet`` has no ordering defined (and has not
+had ordering forcibly cleared by calling :meth:`order_by` with no arguments),
+then the queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
@@ -2793,6 +2802,12 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
+
+.. versionchanged:: 6.1
+
+    ``first()`` and :meth:`last` no longer order by the primary key when
+    ordering has been forcibly cleared by calling :meth:`order_by` with no
+    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -2999,7 +3014,8 @@ and calling ``save()``.
     such filter conditions on MySQL.
 
 Finally, realize that ``update()`` does an update at the SQL level and, thus,
-does not call any ``save()`` methods on your models, nor does it emit the
+method :ref:`does not call<methods-not-called-on-bulk-operations>` any
+``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
 calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
@@ -3072,13 +3088,13 @@ This cascade behavior is customizable via the
 :attr:`~django.db.models.ForeignKey.on_delete` argument to the
 :class:`~django.db.models.ForeignKey`.
 
-The ``delete()`` method does a bulk delete and does not call any ``delete()``
-methods on your models. It does, however, emit the
-:data:`~django.db.models.signals.pre_delete` and
-:data:`~django.db.models.signals.post_delete` signals for all deleted objects
-(including cascaded deletions). Signals won't be sent when ``DB_CASCADE`` is
-used. Also, ``delete()`` doesn't return information about objects deleted from
-database variants (``DB_*``) of the
+The ``delete()`` method does a bulk delete and :ref:`does not call
+<methods-not-called-on-bulk-operations>` any ``delete()`` methods on your
+models. It does, however, emit the :data:`~django.db.models.signals.pre_delete`
+and :data:`~django.db.models.signals.post_delete` signals for all deleted
+objects (including cascaded deletions). Signals won't be sent when
+``DB_CASCADE`` is used. Also, ``delete()`` doesn't return information about
+objects deleted from database variants (``DB_*``) of the
 :attr:`~django.db.models.ForeignKey.on_delete` argument, e.g. ``DB_CASCADE``.
 
 Django won’t need to fetch objects into memory when deleting them in the
@@ -4171,7 +4187,14 @@ by the aggregate.
     .. attribute:: delimiter
 
         A ``Value`` or expression representing the string that should separate
-        each of the values. For example, ``Value(",")``.
+        each of the values. For example, ``Value(",")``. (On SQLite, the
+        literal delimiter ``Value(",")`` is the only delimiter compatible with
+        ``distinct=True``.)
+
+        .. versionchanged:: 6.1
+
+            Support for using ``distinct=True`` with a delimiter of
+            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================
@@ -4237,7 +4260,7 @@ attribute:
 
     >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

@@ -14,13 +14,12 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
-from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
-from django.db.models import IntegerField, Sum, Value
+from django.db.models import F, IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin
+from ..utils import FuncTestMixin, can_save_multipoint
 from .models import (
     City,
     Country,
@@ -28,6 +27,7 @@ from .models import (
     Feature,
     ManyPointModel,
     State,
+    ThreeDimensionalFeature,
     Track,
 )
 
@@ -608,6 +608,28 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertEqual(1, city.num_geom)
 
+    @skipUnlessDBFeature("has_NumDimensions_function")
+    def test_num_dimensions(self):
+        for c in Country.objects.annotate(num_dims=functions.NumDimensions("mpoly")):
+            self.assertEqual(2, c.num_dims)
+
+        ThreeDimensionalFeature.objects.create(
+            name="London", geom=Point(-0.126418, 51.500832, 0)
+        )
+        qs = ThreeDimensionalFeature.objects.annotate(
+            num_dims=functions.NumDimensions("geom")
+        )
+        self.assertEqual(qs[0].num_dims, 3)
+
+        qs = ThreeDimensionalFeature.objects.annotate(
+            num_dims=F("geom__num_dimensions")
+        )
+        self.assertEqual(qs[0].num_dims, 3)
+
+        msg = "'NumDimensions' takes exactly 1 argument (2 given)"
+        with self.assertRaisesMessage(TypeError, msg):
+            Country.objects.annotate(num_dims=functions.NumDimensions("point", "error"))
+
     @skipUnlessDBFeature("has_NumPoints_function")
     def test_num_points(self):
         coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
@@ -942,12 +964,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ("MULTILINESTRING", MultiLineString),
             ("MULTIPOLYGON", MultiPolygon),
         ]
-        # GEOSWKTWriter_write() behavior was changed in GEOS 3.12+ to include
-        # parentheses for sub-members. MariaDB doesn't accept WKT
-        # representations with additional parentheses for MultiPoint. This is
-        # an accepted bug (MDEV-36166) in MariaDB that should be fixed in the
-        # future.
-        if not connection.ops.mariadb or geos_version_tuple() < (3, 12):
+        if can_save_multipoint:
             test_features.append(
                 Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1)))
             )

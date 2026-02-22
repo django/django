@@ -19,42 +19,42 @@ API reference
 
 .. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
-The warnings and errors raised by system checks must be instances of
-``CheckMessage``. An instance encapsulates a single reportable error or
-warning. It also provides context and hints applicable to the message, and a
-unique identifier that is used for filtering purposes.
+    The warnings and errors raised by system checks must be instances of
+    ``CheckMessage``. An instance encapsulates a single reportable error or
+    warning. It also provides context and hints applicable to the message, and
+    a unique identifier that is used for filtering purposes.
 
-Constructor arguments are:
+    Constructor arguments are:
 
-``level``
-    The severity of the message. Use one of the predefined values: ``DEBUG``,
-    ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is greater or
-    equal to ``ERROR``, then Django will prevent management commands from
-    executing. Messages with level lower than ``ERROR`` (i.e. warnings) are
-    reported to the console, but can be silenced.
+    ``level``
+       The severity of the message. Use one of the predefined values: ``DEBUG``
+       , ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is
+       greater or equal to ``ERROR``, then Django will prevent management
+       commands from executing. Messages with level lower than ``ERROR``
+       (i.e. warnings) are reported to the console, but can be silenced.
 
-``msg``
-    A short (less than 80 characters) string describing the problem. The string
-    should *not* contain newlines.
+    ``msg``
+       A short (less than 80 characters) string describing the problem. The
+       string should *not* contain newlines.
 
-``hint``
-    A single-line string providing a hint for fixing the problem. If no hint
-    can be provided, or the hint is self-evident from the error message, the
-    hint can be omitted, or a value of ``None`` can be used.
+    ``hint``
+       A single-line string providing a hint for fixing the problem. If no hint
+       can be provided, or the hint is self-evident from the error message, the
+       hint can be omitted, or a value of ``None`` can be used.
 
-``obj``
-    Optional. An object providing context for the message (for example, the
-    model where the problem was discovered). The object should be a model,
-    field, or manager or any other object that defines a ``__str__()`` method.
-    The method is used while reporting all messages and its result precedes the
-    message.
+    ``obj``
+       Optional. An object providing context for the message (for example, the
+       model where the problem was discovered). The object should be a model,
+       field, or manager or any other object that defines a ``__str__()``
+       method. The method is used while reporting all messages and its result
+       precedes the message.
 
-``id``
-    Optional string. A unique identifier for the issue. Identifiers should
-    follow the pattern ``applabel.X001``, where ``X`` is one of the letters
-    ``CEWID``, indicating the message severity (``C`` for criticals, ``E`` for
-    errors and so). The number can be allocated by the application, but should
-    be unique within that application.
+    ``id``
+       Optional string. A unique identifier for the issue. Identifiers should
+       follow the pattern ``applabel.X001``, where ``X`` is one of the letters
+       ``CEWID``, indicating the message severity (``C`` for criticals, ``E``
+       for errors and so). The number can be allocated by the application, but
+       should be unique within that application.
 
 There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the
@@ -79,10 +79,10 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flags potential problems with version upgrades.
 * ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
-  are not run by default because they do more than static code analysis as
-  regular checks do. They are only run by the :djadmin:`migrate` command or if
-  you specify configured database aliases using the ``--database`` option when
-  calling the :djadmin:`check` command.
+  are not run by default because they do more than only static code analysis as
+  most regular checks do. They are only run by the :djadmin:`migrate` command
+  or if you specify configured database aliases using the ``--database`` option
+  when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -167,7 +167,7 @@ Model fields
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
 * **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
-  iterable (e.g. a list or tuple).
+  ordered iterable (e.g. a list or tuple, but not a set).
 * **fields.E005**: ``choices`` must be a mapping of actual values to human
   readable names or an iterable containing ``(actual value, human readable
   name)`` tuples.
@@ -196,6 +196,8 @@ Model fields
 * **fields.E133**: ``max_digits`` must be a positive integer.
 * **fields.E134**: ``max_digits`` must be greater or equal to
   ``decimal_places``.
+* **fields.E135**: ``DecimalField``’s ``max_digits`` and ``decimal_places``
+  must both be defined or both omitted.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
 * **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if
@@ -219,6 +221,7 @@ Model fields
   ``GeneratedField``\s.
 * **fields.E223**: ``GeneratedField.output_field`` has errors: ...
 * **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
+* **fields.W225**: ``null`` has no effect on ``GeneratedField``.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -307,7 +310,8 @@ Related fields
   ``db_default`` value.
 * **fields.E323**: Field specifies database/Python-level on_delete variant, but
   referenced model uses python/database-level variant.
-* **fields.E324**: ``<database>`` does not support ``DB_SET_DEFAULT``.
+* **fields.E324**: ``<database>`` does not support
+  ``<database delete option>``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
@@ -444,8 +448,8 @@ Models
   expression and won't be validated during the model ``full_clean()``.
 * **models.W046**: ``<database>`` does not support comments on tables
   (``db_table_comment``).
-* **models.W047**: ``<database>`` does not support unique constraints with
-  nulls distinct.
+* **models.W047**: ``<database>`` does not support
+  ``UniqueConstraint.nulls_distinct``.
 * **models.E048**: ``constraints/indexes/unique_together`` refers to a
   ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
   not supported for that option.

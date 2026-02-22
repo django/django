@@ -182,12 +182,26 @@ General-purpose aggregation functions
 
     .. deprecated:: 6.0
 
+        The PostgreSQL ``StringAgg`` class is deprecated in favor of the
+        generally available :class:`~django.db.models.StringAgg` class.
+
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
 
     .. attribute:: delimiter
 
-        Required argument. Needs to be a string.
+        Required argument. A string, :class:`~django.db.models.Value`, or
+        expression representing the string for separating values. For example,
+        ``Value(",")``.
+
+        .. versionadded:: 6.0
+
+            Support for providing a ``Value`` or expression rather than a
+            string was added.
+
+        .. deprecated:: 6.0
+
+            Support for providing a string is deprecated.
 
     .. attribute:: distinct
 

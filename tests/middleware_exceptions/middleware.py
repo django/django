@@ -1,4 +1,4 @@
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+from inspect import iscoroutinefunction, markcoroutinefunction
 
 from django.http import Http404, HttpResponse
 from django.template import engines
