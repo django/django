@@ -120,6 +120,20 @@ therefore never expire after a single request::
                     self._queued_messages.append(message)
             return iter(self._loaded_messages)
 
+We would then set this in settings::
+
+    MESSAGE_STORAGE = "myapp.messages_storage.PermanentStorage"
+
+Finally we could then pass the extra kwargs in a view::
+
+    from django.contrib import messages
+
+
+    def my_view(request):
+        messages.info(request, "A temporary message")
+        messages.info(request, "A permanent message", extra_kwargs={"permanent": True})
+
+
 .. _message-level:
 
 Message levels
