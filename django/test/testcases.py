@@ -278,7 +278,8 @@ class SimpleTestCase(unittest.TestCase):
             connection = connections[alias]
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
-                setattr(connection, name, method.wrapped)
+                if hasattr(method, "wrapped"):
+                    setattr(connection, name, method.wrapped)
 
     @classmethod
     def ensure_connection_patch_method(cls):
