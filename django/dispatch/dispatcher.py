@@ -154,13 +154,10 @@ class Signal:
 
         if weak:
             ref = weakref.ref
-            receiver_object = receiver
             # Check for bound methods
             if hasattr(receiver, "__self__") and hasattr(receiver, "__func__"):
                 ref = weakref.WeakMethod
-                receiver_object = receiver.__self__
-            receiver = ref(receiver)
-            weakref.finalize(receiver_object, self._flag_dead_receivers)
+            receiver = ref(receiver, self._flag_dead_receivers)
 
         # Keep a weakref to sender if possible to ensure associated receivers
         # are cleared if it gets garbage collected. This ensures there is no
