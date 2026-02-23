@@ -338,6 +338,28 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         self.assertEqual(request.script_name, "/root")
         self.assertEqual(request.path_info, "/somepath/")
 
+    def test_root_path_no_trailing_slash(self):
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(
+            **{"path": "/root", "root_path": "/root"}
+        )
+        self.assertEqual(request.path, "/root")
+        self.assertEqual(request.script_name, "/root")
+        self.assertEqual(request.path_info, "")
+
+    def test_root_path_substring_no_strip(self):
+        """
+        A root_path that is a substring prefix of the path but not at a
+        segment boundary must not be stripped.
+        """
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(
+            **{"path": "/myapplication/page", "root_path": "/myapp"}
+        )
+        self.assertEqual(request.path, "/myapplication/page")
+        self.assertEqual(request.script_name, "/myapp")
+        self.assertEqual(request.path_info, "/myapplication/page")
+
     @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX")
     def test_force_script_name(self):
         async_request_factory = AsyncRequestFactory()
@@ -345,6 +367,20 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         self.assertEqual(request.path, "/FORCED_PREFIX/somepath/")
         self.assertEqual(request.script_name, "/FORCED_PREFIX")
         self.assertEqual(request.path_info, "/somepath/")
+
+    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX")
+    def test_force_script_name_substring_no_strip(self):
+        """
+        FORCE_SCRIPT_NAME that is a substring prefix of the path but not
+        at a segment boundary must not be stripped.
+        """
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(
+            **{"path": "/FORCED_PREFIX_extended/somepath/"}
+        )
+        self.assertEqual(request.path, "/FORCED_PREFIX_extended/somepath/")
+        self.assertEqual(request.script_name, "/FORCED_PREFIX")
+        self.assertEqual(request.path_info, "/FORCED_PREFIX_extended/somepath/")
 
     async def test_sync_streaming(self):
         response = await self.async_client.get("/streaming/")
