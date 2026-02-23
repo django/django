@@ -250,6 +250,11 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* Bad remote template archive filenames will raise
+  ``SuspiciousFileOperation`` when
+  running :djadmin:`startproject` or :djadmin:`startapp` with
+  ``--template`` and a remote URL.
+
 Migrations
 ~~~~~~~~~~
 
